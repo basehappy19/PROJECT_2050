@@ -125,14 +125,37 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 /* Bottom HUD */
 .hud-bot{position:absolute;left:16px;right:16px;bottom:10px;z-index:5;display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
 .hud-bot>*{min-width:0}
-.bars{padding:8px 12px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:6px 18px}
+.bars{padding:8px 34px 8px 34px;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px 56px}
 .bar-row{min-width:0}
 .bar-row .lab{display:flex;justify-content:space-between;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);gap:8px}
 .bar-row .lab b{font-family:var(--f-mono);color:var(--fg);letter-spacing:0}
 .pbar{position:relative;height:12px;border-radius:6px;background:var(--panel-2);overflow:hidden;margin-top:3px}
 .pbar i{position:absolute;left:0;top:0;bottom:0;border-radius:6px;transition:width .4s}
 .pbar .mk{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--fg);opacity:.5}
-#stripes{grid-column:1/-1;width:100%;height:10px;display:block;border-radius:3px}
+#stripes{grid-column:1/-1;width:100%;height:8px;display:block;border-radius:3px}
+.meterbox{min-width:0;display:grid;gap:5px}
+.mh2{display:flex;justify-content:space-between;align-items:baseline;gap:8px}
+.mt{font-family:var(--f-display);font-weight:600;font-size:13px;letter-spacing:.06em;text-transform:uppercase}
+.mv{font-family:var(--f-mono);font-weight:600;font-size:22px;line-height:1}
+.mv small{font-size:12px;color:var(--muted);font-weight:400}
+.track{position:relative;height:18px;border-radius:9px;background:var(--panel-2);overflow:visible}
+.track .fill{position:absolute;left:0;top:0;bottom:0;border-radius:9px;background:linear-gradient(90deg,#1f9e78 0%,#d9a62b 30%,#e0612f 60%,#e0302a 100%);background-size:calc(100% * 50 / 50) 100%;transition:width .5s}
+.track.nz{background:linear-gradient(90deg,rgba(255,84,72,.16),rgba(217,166,43,.14),rgba(95,211,154,.16))}
+.track.nz .fill{width:100%;background:linear-gradient(90deg,#e0302a 0%,#e0612f 35%,#d9a62b 65%,#1f9e78 100%);transition:clip-path .5s}
+.track.nz .goal{left:auto;right:-4px;margin-left:0;margin-right:-20px}
+.track .ghost{position:absolute;top:-3px;bottom:-3px;width:2px;background:var(--fg);opacity:.45}
+.track .mark{position:absolute;top:50%;width:18px;height:18px;border-radius:50%;transform:translate(-50%,-50%);border:3px solid var(--bg);box-shadow:0 0 0 2px currentColor,0 0 12px currentColor;background:currentColor;transition:left .5s}
+.track .goal,.track .lose{position:absolute;top:50%;transform:translateY(-50%);display:flex;z-index:2}
+.track .goal{left:-4px;margin-left:-18px;color:var(--good)}
+.track .lose{right:-4px;margin-right:-20px;color:var(--bad)}
+.track .zone{position:absolute;top:0;bottom:0}
+.track .zone:first-of-type{border-radius:9px 0 0 9px} .track .zone:nth-of-type(4){border-radius:0 9px 9px 0}
+.track .tick{position:absolute;top:100%;transform:translateX(-50%);font-family:var(--f-mono);font-size:9.5px;color:var(--muted);margin-top:1px}
+.track.temp{margin-bottom:9px}
+.mf{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;font-size:11.5px;color:var(--muted)}
+.mf b{font-family:var(--f-mono)}
+.good{color:var(--good)} .warn{color:var(--warn)} .hot{color:var(--hot)} .bad{color:var(--bad)}
+.mark.good{color:var(--good)} .mark.warn{color:var(--warn)} .mark.hot{color:var(--hot)} .mark.bad{color:var(--bad)}
 .navrow{display:flex;gap:6px;align-items:stretch}
 .ticker{flex:1;min-width:0;padding:7px 12px;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ticker .d{font-family:var(--f-mono);color:var(--muted);margin-right:8px;font-size:12px}
@@ -142,7 +165,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .nav button .cnt{display:inline-block;min-width:18px;padding:0 5px;margin-left:5px;border-radius:9px;background:var(--good);color:#04130c;font-family:var(--f-mono);font-size:11px}
 
 /* Drawer */
-.drawer{position:absolute;right:16px;top:66px;bottom:150px;width:410px;z-index:6;background:var(--panel);display:flex;flex-direction:column;overflow:hidden}
+.drawer{position:absolute;right:16px;top:66px;bottom:196px;width:410px;z-index:6;background:var(--panel);display:flex;flex-direction:column;overflow:hidden}
 .drawer-h{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid var(--line)}
 .drawer-h h2{font-family:var(--f-display);font-size:14px;letter-spacing:.08em;text-transform:uppercase;margin:0;font-weight:600}
 .x{cursor:pointer;background:transparent;border:1px solid var(--line);border-radius:7px;width:30px;height:30px;color:var(--muted)}
@@ -300,7 +323,8 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .navrow{flex-direction:column}
   .nav{width:100%;min-width:0}
   .nav button{flex:1;min-width:0;padding:8px 4px;font-size:12px}
-  .bars{padding:6px 10px}
+  .bars{padding:6px 30px}
+  .mv{font-size:18px}
   .ghint{display:none}
   .drawer{left:8px;right:8px;bottom:6px}
   .nodes,.rlist{grid-template-columns:repeat(2,minmax(0,1fr))}
@@ -345,9 +369,8 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
   <footer class="hud-bot">
     <div class="bars glass">
-      <canvas id="stripes" height="10"></canvas>
-      <div class="bar-row"><div class="lab"><span id="barNZ"></span><b id="barNZv"></b></div><div class="pbar"><i id="nzFill" style="background:var(--good)"></i></div></div>
-      <div class="bar-row"><div class="lab"><span id="barT"></span><b id="barTv"></b></div><div class="pbar"><i id="tFill"></i><span class="mk" style="left:25%"></span><span class="mk" style="left:50%"></span></div></div>
+      <div class="meterbox" id="nzBox"></div>
+      <div class="meterbox" id="tBox"></div>
     </div>
     <div class="navrow">
       <div class="ticker glass" id="ticker"></div>
@@ -398,6 +421,15 @@ const UI = {
   alsoNeeds:{th:"ต้องมี",en:"needs"},
   nbTech:{th:"เทคโนโลยี",en:"Tech"}, nbRegion:{th:"ภูมิภาค",en:"Regions"}, nbStats:{th:"สถิติ",en:"Stats"}, nbNews:{th:"ข่าว",en:"News"},
   dTech:{th:"เทคโนโลยี & นโยบาย",en:"Tech & Policy Tree"}, dRegion:{th:"ควบคุมภูมิภาค",en:"Regional control"}, dStats:{th:"สถิติโลก",en:"Global metrics"}, dNews:{th:"รายงานข่าวคณะทำงาน",en:"Taskforce dispatch"},
+  rush:{th:"เงินเฟ้อสีเขียว",en:"Greenflation"},
+  rushTip:{th:"เงินเฟ้อสีเขียว (Greenflation): อนุมัติหลายโครงการในรอบ 12 เดือน ความต้องการเทคโนโลยีสะอาดพุ่งพร้อมกัน ราคาจึงขึ้น 20% ต่อโครงการ",en:"Greenflation: approving many projects within 12 months drives clean-tech demand up, adding 20% per project"},
+  nzTitle:{th:"Net Zero",en:"Net Zero"}, tTitle:{th:"อุณหภูมิโลก",en:"Global warming"},
+  nzGoal:{th:"เป้า 0",en:"Goal 0"}, tLose:{th:"แพ้",en:"Lose"},
+  vs2026:{th:"เทียบปี 2026",en:"vs 2026"}, left:{th:"เหลือ",en:"left"}, yrs:{th:"ปี",en:"yrs"},
+  onTrack:{th:"ตามแนวโน้มนี้ถึงเป้าปี",en:"On this trend: Net Zero in"},
+  offTrack:{th:"ตามแนวโน้มนี้ไม่ทันปี 2050",en:"On this trend: miss 2050"},
+  rising:{th:"กำลังเพิ่มขึ้น ยังไม่ลด",en:"Still rising"},
+  toLose:{th:"ห่างจุดแพ้",en:"from losing"},
   barNZ:{th:"ความคืบหน้าสู่ Net Zero",en:"Progress to Net Zero"}, barT:{th:"ภาวะโลกร้อน (ขีดแพ้ +3.0°C)",en:"Warming (lose at +3.0°C)"},
   ghint:{th:"ลากเพื่อหมุนโลก · ล้อเมาส์/สองนิ้วเพื่อซูม · แตะภูมิภาคเพื่อสั่งการ · แตะฟองเพื่อเก็บแต้ม",en:"Drag to spin · scroll/pinch to zoom · tap a region to act · tap bubbles to collect"},
   cat1:{th:"พลังงานและอุตสาหกรรม",en:"Energy & Industrial Transition"},
@@ -798,13 +830,13 @@ function maybeNews(){
 /* ---------------------------- State ---------------------------- */
 const TOTAL_TICKS = 300;
 const TIP_TO_TEMP = 0.004;   // 1 'tipping %' in the GDD ≈ +0.004 °C
-const SPEEDS = [0, 3000, 1500];   // 300 ticks: 15 min at 1×, 7.5 min at 2× (+ time spent on decisions)
+const SPEEDS = [0, 4000, 2000];   // 300 ticks: 15 min at 1×, 7.5 min at 2× (+ time spent on decisions)
 const MAX_PROJECTS = 3;
 let S;
 function newState(lang){
   return {
     lang: lang || "th", speed:1, tick:0,
-    temp:1.20, tip:10, ep:40, pc:25, appr:75,
+    temp:1.20, tip:10, ep:25, pc:20, appr:75, buys:[],
     epInc:0, damp:0, sink:0, discAll:1, disc:{}, p3:false,
     owned:{}, rollouts:[], delays:[], stall:0,
     used:[], lastEv:-3, bubbles:[], bubId:0, newsUsed:[], flags:{},
@@ -843,9 +875,12 @@ function changeComp(id, v, permanent){
 function changeVuln(id, v){ (id === "ALL" ? S.regions : [R(id)]).forEach(r => { r.vuln = clamp(r.vuln + v, 0, 100); }); }
 
 /* ---------------------------- Economy ---------------------------- */
-const epGain = () => Math.floor(3 + avg(r => r.comp) * 0.09 + S.appr / 25) + S.epInc;   // harder than GDD (10 + C×0.2 + A/10)
+const epGain = () => Math.floor(2 + avg(r => r.comp) * 0.07 + S.appr / 30) + S.epInc;   // harder than GDD (10 + C×0.2 + A/10)
 const pcGain = () => Math.floor(1 + avg(r => r.comp) * 0.03);                          // harder than GDD (2 + C×0.05)
-function nodeCost(n){ const m = (S.disc[n.id] ?? 1) * S.discAll; return {ep: Math.round(n.ep * m), pc: Math.round(n.pc * m)}; }
+/* Rush penalty: each project approved in the last 12 months makes the next one 20% dearer (the council resists rushed programmes). */
+const recentBuys = () => (S.buys || []).filter(tk => S.tick - tk < 12).length;
+const rushMult = () => 1 + 0.2 * recentBuys();
+function nodeCost(n){ const m = (S.disc[n.id] ?? 1) * S.discAll * rushMult(); return {ep: Math.round(n.ep * m), pc: Math.round(n.pc * m)}; }
 const busyIds = () => [...new Set(S.rollouts.map(r => r.id))];
 const atCapacity = n => n.months > 0 && busyIds().length >= MAX_PROJECTS;
 function nodeState(n){ if (S.owned[n.id]) return "own"; return n.req.every(q => S.owned[q]) ? "ready" : "locked"; }
@@ -855,7 +890,7 @@ function actionCost(a, r){ const m = Math.pow(1.25, r.uses[a.id] || 0); return {
 function buyNode(id){
   const n = NODE[id]; if (!n || nodeState(n) !== "ready") return;
   const c = nodeCost(n); if (S.ep < c.ep || S.pc < c.pc || atCapacity(n)) return;
-  S.ep -= c.ep; S.pc -= c.pc; S.owned[id] = true;
+  S.ep -= c.ep; S.pc -= c.pc; S.owned[id] = true; (S.buys = S.buys || []).push(S.tick);
   const fx = n.fx;
   const boost = (n.cat === 1 && id !== "E1" && S.owned.E1) ? 1.1 : 1;
   const dacEff = (id === "N4" && !S.owned.E2) ? 0.6 : 1;
@@ -1158,20 +1193,53 @@ function renderKpis(){
   const acls = S.appr < 25 ? "bad" : S.appr < 45 ? "warn" : "good";
   const trend = S.hist.length > 12 ? net - S.hist[S.hist.length - 13].net : 0;
   $("kpis").innerHTML = icx(`
-    <div class="kpi glass"><div class="k">${t("temp")}</div><div class="v ${tcls}">+${S.temp.toFixed(2)}°C</div></div>
-    <div class="kpi glass"><div class="k">${t("co2")}</div><div class="v ${net <= 5 ? "good" : ""}">${net.toFixed(1)} Gt</div><div class="s">${fmt(trend)} ${t("perYr")}</div></div>
     <div class="kpi glass"><div class="k">${t("ep")}</div><div class="v">${Math.floor(S.ep)}</div><div class="s">+${epGain()}${t("perMo")}</div></div>
     <div class="kpi glass"><div class="k">${t("pc")}</div><div class="v">${Math.floor(S.pc)}</div><div class="s">+${pcGain()}${t("perMo")}</div></div>
     <div class="kpi glass"><div class="k">${t("appr")}</div><div class="v ${acls}">${S.appr.toFixed(0)}%</div><div class="meter"><i style="width:${S.appr}%;background:var(--${acls})"></i></div></div>`);
 }
+/* Two outcome meters.
+   Net Zero: scale 0 (win, left) → 50 Gt (right). Marker = current net CO₂, ghost tick = 2026 level. Fill = distance still to cut.
+   Warming: scale +1.0 → +3.0 °C with coloured danger zones; marker = now, right end = lose. */
+const NZ_MAX = 50;
 function renderBars(){
-  const net = netCO2(), prog = clamp((36 - net) / 36, 0, 1);
-  $("barNZ").textContent = t("barNZ"); $("barNZv").textContent = `${net.toFixed(1)} → 0 Gt · ${(prog*100).toFixed(0)}%`;
-  $("nzFill").style.width = (prog * 100) + "%";
-  $("barT").textContent = t("barT"); $("barTv").textContent = `+${S.temp.toFixed(2)}°C`;
-  const tp = clamp((S.temp - 1.0) / 2.0, 0, 1);
-  $("tFill").style.width = (tp * 100) + "%";
-  $("tFill").style.background = `linear-gradient(90deg,#f2b441,${S.temp >= 2 ? "#ff5448" : "#f07a3c"})`;
+  const net = netCO2(), start = 36, prev = S.hist.length > 12 ? S.hist[S.hist.length - 13].net : start;
+  const trend = net - prev;                        // Gt change over the last 12 months
+  const monthsLeft = Math.max(0, TOTAL_TICKS - S.tick), yearsLeft = monthsLeft / 12;
+  let proj, projCls;
+  if (trend < -0.05){
+    const yrs = net / -trend, yr = 2026 + (S.tick / 12) + yrs;
+    proj = yr <= 2051 ? `${t("onTrack")} ${Math.floor(yr)}` : t("offTrack");
+    projCls = yr <= 2051 ? "good" : "bad";
+  } else { proj = t("rising"); projCls = "bad"; }
+  const pos = v => clamp(v / NZ_MAX, 0, 1) * 100;
+  const nzCls = net <= 8 ? "good" : net <= 20 ? "warn" : "bad";
+  $("nzBox").innerHTML = icx(`
+    <div class="mh2"><span class="mt">[[flag]] ${t("nzTitle")}</span>
+      <span class="mv ${nzCls}">${net.toFixed(1)}<small> Gt</small></span></div>
+    <div class="track nz">
+      <span class="goal">[[trophy]]</span>
+      <i class="fill" style="clip-path:inset(0 ${pos(net)}% 0 0 round 9px)"></i>
+      <span class="ghost" style="left:${100 - pos(start)}%" title="2026"></span>
+      <span class="mark ${nzCls}" style="left:${100 - pos(net)}%"></span>
+    </div>
+    <div class="mf"><span>${t("vs2026")} <b class="${net < start ? "good" : "bad"}">${fmt(net - start)}</b> · ${trend <= 0 ? "▼" : "▲"} <b class="${trend <= 0 ? "good" : "bad"}">${fmt(trend)}</b>/12${t("perMo").replace("/", "")}</span>
+      <span class="${projCls}">${proj}</span></div>`);
+  const tp = v => clamp((v - 1.0) / 2.0, 0, 1) * 100;
+  const tCls = S.temp >= 2.5 ? "bad" : S.temp >= 2.0 ? "hot" : S.temp >= 1.5 ? "warn" : "good";
+  $("tBox").innerHTML = icx(`
+    <div class="mh2"><span class="mt">[[thermometer]] ${t("tTitle")}</span>
+      <span class="mv ${tCls}">+${S.temp.toFixed(2)}<small>°C</small></span></div>
+    <div class="track temp">
+      <span class="zone" style="left:0;width:25%;background:rgba(95,211,154,.28)"></span>
+      <span class="zone" style="left:25%;width:25%;background:rgba(242,180,65,.3)"></span>
+      <span class="zone" style="left:50%;width:25%;background:rgba(240,122,60,.35)"></span>
+      <span class="zone" style="left:75%;width:25%;background:rgba(255,84,72,.45)"></span>
+      <span class="tick" style="left:25%">1.5</span><span class="tick" style="left:50%">2.0</span><span class="tick" style="left:75%">2.5</span>
+      <span class="lose">[[triangle-alert]]</span>
+      <span class="mark ${tCls}" style="left:${tp(S.temp)}%"></span>
+    </div>
+    <div class="mf"><span><b class="${tCls}">${Math.max(0, 3 - S.temp).toFixed(2)}°C</b> ${t("toLose")} (3.0°C)</span>
+      <span>${t("left")} <b>${Math.floor(yearsLeft)}</b> ${t("yrs")} ${monthsLeft % 12} ${t("months")}</span></div>`);
 }
 function renderTicker(){
   const l = S.log[0];
@@ -1189,6 +1257,7 @@ function paneTech(){
       <span class="pill ${S.pc >= c.pc ? "acc" : "bad"}">${IC.pc} ${c.pc}</span>
       <span class="pill">${t("needs")}: ${n.req.length ? n.req.join(" + ") : t("none")}</span>
       ${n.months ? `<span class="pill">${t("rollout")} ${n.months} ${t("months")}</span>` : ""}
+      ${recentBuys() ? `<span class="pill bad" title="${t("rushTip")}">[[chart-line]] ${t("rush")} +${recentBuys() * 20}%</span>` : ""}
     </div>
     <button class="btn" data-buy="${n.id}" ${can ? "" : "disabled"}>${st === "own" ? "[[check]] " + t("owned") : t("unlock")}</button>
     ${full ? `<span class="warn-t">${t("capFull")}</span>` : ""}
@@ -1267,7 +1336,8 @@ function tempColor(v){
 }
 function css(v){ return getComputedStyle(document.documentElement).getPropertyValue(v).trim(); }
 function drawStripes(){
-  const cv = $("stripes"), w = cv.clientWidth, dpr = window.devicePixelRatio || 1; if (!w) return;
+  const cv = $("stripes"); if (!cv) return;
+  const w = cv.clientWidth, dpr = window.devicePixelRatio || 1; if (!w) return;
   cv.width = w * dpr; cv.height = 10 * dpr;
   const x = cv.getContext("2d"); x.scale(dpr, dpr);
   x.fillStyle = css("--panel-2"); x.fillRect(0, 0, w, 10);
@@ -1499,7 +1569,7 @@ const Globe = (() => {
     requestAnimationFrame(frame);
     clock += 0.016; G.idle += 0.016;
     if (G.tRotY !== null){ G.rotY += (G.tRotY - G.rotY) * 0.08; G.rotX += (G.tRotX - G.rotX) * 0.08; if (Math.abs(G.tRotY - G.rotY) < 0.002) G.tRotY = G.tRotX = null; }
-    else if (!G.drag && G.idle > 4 && S && (UIM.screen === "menu" || (S.speed > 0 && !S.event))) G.rotY += UIM.screen === "menu" ? 0.0022 : 0.0012;
+    else if (!G.drag && G.idle > 4 && S && (UIM.screen === "menu" || (S.speed > 0 && !S.event))) G.rotY += UIM.screen === "menu" ? 0.0010 : 0.00035;
     const offX = (UIM.screen === "menu" && camera.aspect > 1.15) ? 1.05 : 0;
     group.position.x += (offX - group.position.x) * 0.06; atmo.position.x = group.position.x;
     group.rotation.set(G.rotX, G.rotY, 0);
