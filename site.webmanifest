@@ -1,0 +1,17 @@
+{
+  "name": "Project : 2050 — ภารกิจกู้วิกฤตโลก",
+  "short_name": "Project 2050",
+  "description": "เกมวางแผนกลยุทธ์บนลูกโลก 3 มิติ นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 (SDG 13)",
+  "lang": "th",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#050b10",
+  "theme_color": "#081116",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" }
+  ]
+}
