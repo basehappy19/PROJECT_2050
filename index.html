@@ -57,6 +57,14 @@
 }
 *{box-sizing:border-box}
 [hidden]{display:none!important}
+.i{width:1.05em;height:1.05em;vertical-align:-.17em;flex:none;display:inline-block}
+.i-leaf,.i-sprout{color:var(--good)} .i-landmark{color:#c3a6ff} .i-users{color:var(--accent)} .i-thermometer{color:var(--hot)}
+.i-cloud{color:#b7c7cf} .i-handshake{color:var(--warn)} .i-shield-alert{color:#ff8a7a} .i-siren{color:var(--bad)} .i-newspaper{color:var(--muted)}
+.btn .i,.nav .i,.hbtn .i,.seg .i,.x .i{color:inherit}
+.hbtn{display:inline-flex;align-items:center;justify-content:center}
+.nav button{display:inline-flex;align-items:center;gap:6px}
+.mbig .ic .i{width:22px;height:22px;color:var(--accent)} .mbig.primary .ic .i{color:var(--accent-ink)}
+.bub .b span .i{width:17px;height:17px}
 html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--fg)}
 body{font-family:var(--f-body);font-size:14px;line-height:1.5;margin:0}
 button{font:inherit;color:inherit}
@@ -153,7 +161,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .node.own{background:rgba(95,211,154,.12);border-color:rgba(95,211,154,.5)} .node.own .nid{color:var(--good)}
 .node.sel{box-shadow:0 0 0 2px var(--accent)}
 .tree{position:relative;margin-top:4px}
-.tree svg{position:absolute;left:0;top:0;overflow:visible}
+.tree > svg{position:absolute;left:0;top:0;overflow:visible}
 .edge{fill:none;stroke-width:2}
 .edge.own{stroke:var(--good)} .edge.ready{stroke:var(--accent)} .edge.locked{stroke:var(--line);stroke-dasharray:4 4}
 .ah.own{fill:var(--good)} .ah.ready{fill:var(--accent)} .ah.locked{fill:var(--line)}
@@ -272,6 +280,10 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   .bars{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:640px){
+  .hud-top .seg[aria-label=language]{display:none}
+  .nav .nl{display:none}
+  .nav button{justify-content:center}
+  .nav button .i{width:20px;height:20px}
   .hbtn{padding:3px 7px;font-size:12px}
   .hud-top{left:8px;right:8px;top:6px;flex-wrap:nowrap}
   .brand{padding:5px 8px}
@@ -304,15 +316,16 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   <canvas id="globe"></canvas>
   <div class="layer" id="labels"></div>
   <div class="layer" id="bubbles"></div>
-  <div class="ghint" id="ghint"></div>
+  
 
   <header class="hud-top">
     <div class="brand glass"><h1>PROJECT <b>:</b> 2050</h1><span id="subtitle"></span></div>
     <div class="ctrls glass">
-      <button class="hbtn" data-m="pause" id="menuBtn" aria-label="menu">☰</button>
+      <button class="hbtn" data-m="sfx" id="sfxBtn" aria-label="sound"></button>
+      <button class="hbtn" data-m="pause" id="menuBtn" aria-label="menu"></button>
       <span class="date" id="date"></span>
       <div class="seg" role="group" aria-label="speed">
-        <button id="sp0" data-sp="0" title="Space">❚❚</button>
+        <button id="sp0" data-sp="0" title="Space" aria-label="pause"></button>
         <button id="sp1" data-sp="1">1×</button>
         <button id="sp2" data-sp="2">2×</button>
       </div>
@@ -326,7 +339,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
   <section class="kpis" id="kpis"></section>
 
   <aside class="drawer glass" id="drawer" hidden>
-    <div class="drawer-h"><h2 id="drawerTitle"></h2><button class="x" data-close="1" aria-label="close">✕</button></div>
+    <div class="drawer-h"><h2 id="drawerTitle"></h2><button class="x" data-close="1" aria-label="close"></button></div>
     <div class="pane" id="pane"></div>
   </aside>
 
@@ -364,19 +377,23 @@ const GEO=[["SEA","Fiji",[[[1781,-175,1784,-173,1787,-176,1786,-182,1779,-183,17
    ========================================================================= */
 
 /* ---------------------------- Icons (one per resource/stat, used everywhere) ---------------------------- */
-const IC = {ep:"🌿", pc:"🏛️", appr:"👥", temp:"🌡️", co2:"☁️", tip:"⚠️", comp:"🤝", vuln:"🏚️"};
+/* Lucide icons v1.48.0 — ISC License, https://lucide.dev */
+const LUCIDE={"leaf": "<path d=\"M11 20a10 10 0 0010-10 25.9 25.9 0 00-1.04-7.281 1 1 0 00-1.755-.325C15.833 5.5 13 5.5 9.8 6.1A7 7 0 0011 20\" /> <path d=\"M2 21a5 5 0 012.911-4.544C7.613 15.212 8.351 15.24 11 13\" />", "landmark": "<path d=\"M10 18v-7\" /> <path d=\"M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z\" /> <path d=\"M14 18v-7\" /> <path d=\"M18 18v-7\" /> <path d=\"M3 22h18\" /> <path d=\"M6 18v-7\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "thermometer": "<path d=\"M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z\" />", "cloud": "<path d=\"M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z\" />", "triangle-alert": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\" /> <path d=\"M12 9v4\" /> <path d=\"M12 17h.01\" />", "handshake": "<path d=\"m11 17 2 2a1 1 0 1 0 3-3\" /> <path d=\"m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4\" /> <path d=\"m21 3 1 11h-2\" /> <path d=\"M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3\" /> <path d=\"M3 4h8\" />", "shield-alert": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\" /> <path d=\"M12 8v4\" /> <path d=\"M12 16h.01\" />", "sprout": "<path d=\"M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3\" /> <path d=\"M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4\" /> <path d=\"M5 21h14\" />", "siren": "<path d=\"M7 18v-6a5 5 0 1 1 10 0v6\" /> <path d=\"M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z\" /> <path d=\"M21 12h1\" /> <path d=\"M18.5 4.5 18 5\" /> <path d=\"M2 12h1\" /> <path d=\"M12 2v1\" /> <path d=\"m4.929 4.929.707.707\" /> <path d=\"M12 12v6\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "play": "<path d=\"M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "book-open": "<path d=\"M12 5v16\" /> <path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\" />", "pause": "<rect x=\"14\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\" /> <rect x=\"5\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\" />", "fast-forward": "<path d=\"M12 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 12 18z\" /> <path d=\"M2 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 2 18z\" />", "menu": "<path d=\"M4 5h16\" /> <path d=\"M4 12h16\" /> <path d=\"M4 19h16\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "newspaper": "<path d=\"M15 18h-5\" /> <path d=\"M18 14h-8\" /> <path d=\"M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2\" /> <rect width=\"8\" height=\"4\" x=\"10\" y=\"6\" rx=\"1\" />", "volume-2": "<path d=\"M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z\" /> <path d=\"M16 9a5 5 0 0 1 0 6\" /> <path d=\"M19.364 18.364a9 9 0 0 0 0-12.728\" />", "volume-x": "<path d=\"M11 4.702a.7.7 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.7.7 0 0 0 11 19.298z\" /> <path d=\"m16.5 14.5 5-5\" /> <path d=\"m16.5 9.5 5 5\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "arrow-left": "<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />", "flask-conical": "<path d=\"M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2\" /> <path d=\"M6.453 15h11.094\" /> <path d=\"M8.5 2h7\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "chart-line": "<path d=\"M3 3v16a2 2 0 0 0 2 2h16\" /> <path d=\"m19 9-5 5-4-4-3 3\" />", "zap": "<path d=\"M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z\" />", "copy": "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\" /> <path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\" />", "trophy": "<path d=\"M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2\" /> <path d=\"M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2\" /> <path d=\"M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3\" /> <path d=\"M4 22h16\" /> <path d=\"M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z\" /> <path d=\"M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />"};
+/* Icons are written as [[name]] tokens inside strings (safe to store in saves/logs) and expanded by icx() at render time. */
+const I = (n, cls = "") => LUCIDE[n] ? `<svg class="i i-${n} ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${LUCIDE[n]}</svg>` : "";
+const icx = str => String(str).replace(/\[\[([a-z0-9-]+)\]\]/g, (m, n) => I(n));
+const IC = {ep:"[[leaf]]", pc:"[[landmark]]", appr:"[[users]]", temp:"[[thermometer]]", co2:"[[cloud]]", comp:"[[handshake]]", vuln:"[[shield-alert]]"};
 const costTxt = (ep, pc, tight) => [ep ? `${IC.ep}${tight ? "" : " "}${ep}` : "", pc ? `${IC.pc}${tight ? "" : " "}${pc}` : ""].filter(Boolean).join(tight ? " " : "  ");
 
 /* ---------------------------- i18n ---------------------------- */
 const UI = {
   subtitle:{th:"ภารกิจกู้วิกฤตโลก",en:"Global Climate Taskforce"},
-  temp:{th:"🌡️ อุณหภูมิโลก",en:"🌡️ Global temp"}, co2:{th:"☁️ CO₂ สุทธิ",en:"☁️ Net CO₂"},
-  ep:{th:"🌿 งบเขียว (Eco-Points)",en:"🌿 Eco-Points"}, pc:{th:"🏛️ ทุนการเมือง",en:"🏛️ Political capital"},
+  temp:{th:"[[thermometer]] อุณหภูมิโลก",en:"[[thermometer]] Global temp"}, co2:{th:"[[cloud]] CO₂ สุทธิ",en:"[[cloud]] Net CO₂"},
+  ep:{th:"[[leaf]] งบเขียว",en:"[[leaf]] Eco-Points"}, pc:{th:"[[landmark]] ทุนการเมือง",en:"[[landmark]] Political capital"},
   epHint:{th:"เงินทุน",en:"money"}, pcHint:{th:"อำนาจผ่านนโยบาย",en:"clout"},
-  appr:{th:"👥 ความนิยม",en:"👥 Approval"}, tip:{th:"⚠️ เสี่ยงจุดพลิกผัน",en:"⚠️ Tipping risk"},
+  appr:{th:"[[users]] ความนิยม",en:"[[users]] Approval"},
   perMo:{th:"/ด.",en:"/mo"}, sinks:{th:"ดักจับ",en:"sinks"}, perYr:{th:"ใน 12 ด.",en:"in 12 mo"},
-  compliance:{th:"🤝 ความร่วมมือ",en:"🤝 Compliance"}, vuln:{th:"🏚️ ความเปราะบาง",en:"🏚️ Vulnerability"},
-  legend:{th:"🌿 งบเขียว = เงินทุน · 🏛️ ทุนการเมือง = อำนาจผ่านนโยบาย · 👥 ความนิยม · 🤝 ความร่วมมือ · 🏚️ ความเปราะบาง · ⚠️ จุดพลิกผัน",en:"🌿 Eco-Points = money · 🏛️ Political capital = clout for policies · 👥 Approval · 🤝 Compliance · 🏚️ Vulnerability · ⚠️ Tipping risk"},
+  compliance:{th:"[[handshake]] ความร่วมมือ",en:"[[handshake]] Compliance"}, vuln:{th:"[[shield-alert]] ความเปราะบาง",en:"[[shield-alert]] Vulnerability"},
   treeHint:{th:"เส้นลูกศรแสดงลำดับการปลดล็อก: ต้องมีโหนดต้นทางก่อน · สีเขียว = มีแล้ว · สีฟ้า = ปลดล็อกได้ · เส้นประ = ยังล็อก",en:"Arrows show unlock order: own the source first · green = owned · blue = available · dashed = locked"},
   alsoNeeds:{th:"ต้องมี",en:"needs"},
   nbTech:{th:"เทคโนโลยี",en:"Tech"}, nbRegion:{th:"ภูมิภาค",en:"Regions"}, nbStats:{th:"สถิติ",en:"Stats"}, nbNews:{th:"ข่าว",en:"News"},
@@ -404,8 +421,8 @@ const UI = {
   introTitle:{th:"ท่านคือผู้อำนวยการสูงสุดแห่ง GCT",en:"You are Supreme Director of the GCT"},
   introBody:{th:"นานาชาติมอบอำนาจให้ท่านจัดสรรงบประมาณ ผลักดันสนธิสัญญา และเร่งเทคโนโลยีข้ามพรมแดน เป้าหมายคือทำให้การปล่อยคาร์บอนสุทธิของโลกเหลือศูนย์ก่อนสิ้นปี 2050",
              en:"The world has given you authority over budgets, treaties and cross-border technology. Your goal: bring global net carbon emissions to zero before the end of 2050."},
-  introRules:{th:["1 tick = 1 เดือน · 🌿 งบเขียว (เงินทุน) และ 🏛️ ทุนการเมือง (อำนาจผ่านนโยบาย) ได้เพิ่มทุกเดือนตาม 🤝 ความร่วมมือและ 👥 ความนิยม","แตะ 🌱 ฟองสีเขียวบนลูกโลกเพื่อเก็บ 🌿 งบเขียว · แตะ ⚠ ฟองสีแดงเพื่อส่งความช่วยเหลือก่อนหมดเวลา","ลงทุนในผังเทคโนโลยี 18 โหนด ผลทยอยมา ขึ้นกับความร่วมมือ และทำได้พร้อมกัน 3 โครงการ","แตะภูมิภาคบนลูกโลกเพื่อเพิ่มความร่วมมือ ลดความเปราะบาง หรือเร่งลด CO₂","แพ้เมื่อ ΔT ถึง +3.0°C, ความนิยมเหลือ 0% หรือเข้าปี 2051 โดยยังไม่ Net Zero · Space = หยุด/เล่น"],
-              en:["1 tick = 1 month · 🌿 Eco-Points (money) and 🏛️ Political capital (clout) come in monthly, based on 🤝 compliance and 👥 approval","Tap 🌱 green bubbles on the globe to collect Eco-Points · tap ⚠ red bubbles to send aid before they expire","Invest in an 18-node tree. Effects roll out, scale with compliance, max 3 at once","Tap a region on the globe to raise compliance, cut vulnerability or force cuts","Lose at +3.0°C, 0% approval, or 2051 without Net Zero · Space = pause/play"]},
+  introRules:{th:["1 เดือนในเกม = 1 tick · [[leaf]] งบเขียว และ [[landmark]] ทุนการเมือง เพิ่มทุกเดือน","แตะ [[sprout]] บนลูกโลกเพื่อเก็บงบเขียว · แตะ [[siren]] เพื่อส่งความช่วยเหลือก่อนหมดเวลา","ซื้อเทคโนโลยีตามผัง (พร้อมกันได้ 3 โครงการ) · แตะภูมิภาคบนลูกโลกเพื่อสั่งการ","แพ้เมื่อ [[thermometer]] ถึง +3.0°C, [[users]] เหลือ 0% หรือถึงปี 2051 · Space = หยุด/เล่น"],
+              en:["1 in-game month = 1 tick · [[leaf]] Eco-Points and [[landmark]] Political capital come in monthly","Tap [[sprout]] on the globe to collect Eco-Points · tap [[siren]] to send aid before time runs out","Buy tech along the tree (3 projects at once) · tap a region on the globe to act","Lose at [[thermometer]] +3.0°C, [[users]] 0%, or 2051 · Space = pause/play"]},
   winTitle:{th:"Net Zero สำเร็จ",en:"Net Zero achieved"},
   winBody:{th:"การปล่อยคาร์บอนสุทธิของโลกแตะศูนย์ โลกหลังยุคคาร์บอนเริ่มต้นขึ้นแล้ว",en:"Global net emissions hit zero. The post-carbon era begins."},
   l1Title:{th:"ภูมิอากาศล่มสลาย",en:"Runaway warming"}, l1Body:{th:"อุณหภูมิโลกแตะ +3.0°C ระบบธรรมชาติพลิกผันเกินกว่าจะฟื้นคืน",en:"Global warming reached +3.0°C. Earth systems tipped past recovery."},
@@ -414,8 +431,8 @@ const UI = {
   finalScore:{th:"คะแนนสุดท้าย",en:"Final score"},
   logStart:{th:"GCT เริ่มปฏิบัติการ เป้าหมาย: Net Zero ก่อนสิ้นปี 2050",en:"GCT operations begin. Target: Net Zero before end of 2050."},
   logTech:{th:"อนุมัติโครงการ",en:"Approved"}, logAct:{th:"สั่งการ",en:"Ordered"},
-  logTipping:{th:"อุณหภูมิเกิน +1.5°C ความเสี่ยงจุดพลิกผันเริ่มเร่งตัว",en:"Warming passed +1.5°C. Tipping risk is accelerating."},
-  logTipping2:{th:"อุณหภูมิเกิน +2.0°C ระบบนิเวศเข้าสู่ภาวะวิกฤต",en:"Warming passed +2.0°C. Ecosystems are in crisis."},
+  logTipping:{th:"[[thermometer]] อุณหภูมิเกิน +1.5°C โลกร้อนเร็วขึ้น",en:"[[thermometer]] Warming passed +1.5°C and is speeding up."},
+  logTipping2:{th:"[[thermometer]] อุณหภูมิเกิน +2.0°C ระบบนิเวศวิกฤต",en:"[[thermometer]] Warming passed +2.0°C. Ecosystems in crisis."},
   logRollDone:{th:"โครงการทยอยผลครบแล้ว",en:"finished rolling out"},
   delayed:{th:"ผลล่าช้า",en:"delayed"},
   redHelp:{th:"ส่งความช่วยเหลือภัยพิบัติที่",en:"Disaster aid sent to"},
@@ -423,7 +440,7 @@ const UI = {
   mNew:{th:"เกมใหม่",en:"New game"}, mNewS:{th:"เริ่มภารกิจ มกราคม 2026",en:"Start the mission in January 2026"},
   mCont:{th:"เล่นต่อ",en:"Continue"}, mLoad:{th:"โหลดเกม",en:"Load game"}, mLoadS:{th:"บันทึกอัตโนมัติ + 3 ช่อง + รหัสเซฟ",en:"Autosave, 3 slots and save codes"},
   mHow:{th:"วิธีเล่น",en:"How to play"}, mHowS:{th:"กติกา ทรัพยากร และเงื่อนไขแพ้ชนะ",en:"Rules, resources and win/lose conditions"},
-  mBack:{th:"← กลับ",en:"← Back"}, mNoSave:{th:"ยังไม่มีเกมที่บันทึกไว้",en:"No saved game yet"},
+  mBack:{th:"[[arrow-left]] กลับ",en:"[[arrow-left]] Back"}, mNoSave:{th:"ยังไม่มีเกมที่บันทึกไว้",en:"No saved game yet"},
   mTag:{th:"เป้าหมายการพัฒนาที่ยั่งยืน ข้อ 13 · การรับมือการเปลี่ยนแปลงสภาพภูมิอากาศ",en:"UN Sustainable Development Goal 13 · Climate Action"},
   mDesc:{th:"นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 โดยไม่ให้อุณหภูมิแตะ +3.0°C และไม่ให้ประชาชนหมดความเชื่อมั่น",en:"Lead the world to Net Zero before 2050 without hitting +3.0°C or losing the public's trust."},
   slotAuto:{th:"บันทึกอัตโนมัติ",en:"Autosave"}, slot:{th:"ช่องบันทึก",en:"Slot"}, empty:{th:"ว่าง",en:"Empty"},
@@ -482,10 +499,10 @@ const NODES = [
   {id:"E2",cat:1,ep:80, pc:15,req:["E1"],    months:18,name:{th:"ฟาร์มแสงอาทิตย์และกังหันลมสเกลใหญ่",en:"Utility Solar & Wind Farms"}, fx:{all:-0.4}, desc:{th:"CO₂ ทุกภูมิภาค −0.4 Gt (รวม −2.4 Gt)",en:"Every region −0.4 Gt (−2.4 Gt total)"}},
   {id:"E3",cat:1,ep:110,pc:20,req:["E2"],    months:12,name:{th:"ระบบกักเก็บพลังงานแบตเตอรี่ขั้นสูง",en:"Next-Gen Battery Storage"}, fx:{co2:-1.5,damp:.15}, desc:{th:"เสถียรภาพโครงข่าย +15% (ชะลอการเติบโตของการปล่อย), CO₂ โลก −1.5 Gt",en:"Grid stability +15% (slows emission growth), global CO₂ −1.5 Gt"}},
   {id:"E4",cat:1,ep:140,pc:30,req:["E1"],    months:24,name:{th:"เตาปฏิกรณ์นิวเคลียร์ขนาดเล็ก SMR",en:"SMR Nuclear Reactors"}, fx:{co2:-3.0,appr:-5}, desc:{th:"CO₂ โลก −3.0 Gt, ความนิยม −5% จากความกังวลเรื่องความปลอดภัย",en:"Global CO₂ −3.0 Gt, approval −5% over safety fears"}},
-  {id:"E5",cat:1,ep:250,pc:60,req:["E4","E3"],months:36,name:{th:"โรงไฟฟ้าฟิวชันเชิงพาณิชย์",en:"Commercial Fusion Power"}, fx:{co2:-6.0,epInc:10,damp:.3}, desc:{th:"CO₂ โลก −6.0 Gt, รายได้ 🌿 +10/เดือน",en:"Global CO₂ −6.0 Gt, 🌿 Eco-Points income +10/mo"}},
+  {id:"E5",cat:1,ep:250,pc:60,req:["E4","E3"],months:36,name:{th:"โรงไฟฟ้าฟิวชันเชิงพาณิชย์",en:"Commercial Fusion Power"}, fx:{co2:-6.0,epInc:10,damp:.3}, desc:{th:"CO₂ โลก −6.0 Gt, รายได้ [[leaf]] +10/เดือน",en:"Global CO₂ −6.0 Gt, [[leaf]] income +10/mo"}},
   {id:"E6",cat:1,ep:160,pc:35,req:["E3"],    months:18,name:{th:"ไฮโดรเจนเขียวสำหรับอุตสาหกรรมหนัก",en:"Green Hydrogen Metallurgy"}, fx:{rco2:{EA:-1.5,NA:-1.5}}, desc:{th:"CO₂ ใน EA และ NA แห่งละ −1.5 Gt",en:"EA and NA each −1.5 Gt"}},
   {id:"P1",cat:2,ep:30, pc:5, req:[],        months:0, name:{th:"แคมเปญความรอบรู้ด้านภูมิอากาศ",en:"Climate Literacy Campaign"}, fx:{appr:10,compAll:5}, desc:{th:"ความนิยม +10%, ความร่วมมือทุกภูมิภาค +5% (ถาวร)",en:"Approval +10%, all regions' compliance +5% (permanent)"}},
-  {id:"P2",cat:2,ep:60, pc:25,req:["P1"],    months:6, name:{th:"ภาษีคาร์บอนมาตรฐาน",en:"Standard Carbon Tax"}, fx:{co2:-2.5,appr:-8,epInc:6}, desc:{th:"CO₂ โลก −2.5 Gt, ความนิยม −8%, รายได้ 🌿 +6/เดือน",en:"Global CO₂ −2.5 Gt, approval −8%, 🌿 income +6/mo"}},
+  {id:"P2",cat:2,ep:60, pc:25,req:["P1"],    months:6, name:{th:"ภาษีคาร์บอนมาตรฐาน",en:"Standard Carbon Tax"}, fx:{co2:-2.5,appr:-8,epInc:6}, desc:{th:"CO₂ โลก −2.5 Gt, ความนิยม −8%, รายได้ [[leaf]] +6/เดือน",en:"Global CO₂ −2.5 Gt, approval −8%, [[leaf]] income +6/mo"}},
   {id:"P3",cat:2,ep:90, pc:40,req:["P2"],    months:0, name:{th:"กลไกปรับคาร์บอนข้ามพรมแดน",en:"Carbon Border Adjustment"}, fx:{p3:1}, desc:{th:"ภูมิภาคที่ความร่วมมือต่ำกว่า 70% ถูกบังคับลด CO₂ ปีละ −0.3 Gt ต่อเนื่อง",en:"Regions under 70% compliance are forced to cut −0.3 Gt/yr, ongoing"}},
   {id:"P4",cat:2,ep:120,pc:30,req:["P2"],    months:24,name:{th:"กฎหมายบังคับขนส่งไฟฟ้า 100%",en:"Mandatory EV & Zero-Emission Transit"}, fx:{co2:-3.2,damp:.25}, desc:{th:"CO₂ โลก −3.2 Gt และกดการเติบโตของการปล่อยภาคคมนาคมถาวร",en:"Global CO₂ −3.2 Gt; permanently damps transport emission growth"}},
   {id:"P5",cat:2,ep:100,pc:25,req:["P1"],    months:18,name:{th:"มาตรฐานอาคาร Net-Zero",en:"Net-Zero Building Code"}, fx:{co2:-1.8,damp:.15}, desc:{th:"CO₂ โลก −1.8 Gt, ประหยัดพลังงานในเขตเมือง",en:"Global CO₂ −1.8 Gt, urban energy savings"}},
@@ -495,7 +512,7 @@ const NODES = [
   {id:"N3",cat:3,ep:85, pc:20,req:["N1"],    months:18,name:{th:"เกษตรฟื้นฟูบำรุงดิน",en:"Regenerative Agriculture"}, fx:{sink:1.5,appr:3,vulnAll:-3}, desc:{th:"ดักจับ 1.5 Gt/ปี, ความมั่นคงทางอาหาร: ความนิยม +3%, ความเปราะบางทุกภูมิภาค −3%",en:"Captures 1.5 Gt/yr; food security: approval +3%, all vulnerability −3%"}},
   {id:"N4",cat:3,ep:180,pc:30,req:["N1","E3"],months:24,name:{th:"โรงงานดักจับคาร์บอนจากอากาศ (DAC)",en:"Direct Air Capture Mega-Facilities"}, fx:{sink:3.5}, desc:{th:"ดักจับ 3.5 Gt/ปี ต้องใช้พลังงานหมุนเวียนสูง: ได้ผลเพียง 60% ถ้ายังไม่มี E2",en:"Captures 3.5 Gt/yr; needs renewables: only 60% effective without E2"}},
   {id:"N5",cat:3,ep:95, pc:20,req:["N3"],    months:12,name:{th:"ไบโอชาร์ฝังดินระยะยาว",en:"Industrial Biochar Pyrolysis"}, fx:{sink:1.0,appr:2}, desc:{th:"ดักจับ 1.0 Gt/ปี, ผลผลิตเกษตร +5% (ความนิยม +2%)",en:"Captures 1.0 Gt/yr, crop yield +5% (approval +2%)"}},
-  {id:"N6",cat:3,ep:210,pc:50,req:["N2"],    months:12,name:{th:"การเติมแร่ธาตุฟื้นฟูมหาสมุทร",en:"Ocean Enhanced Mineralization"}, fx:{sink:4.0,tip:8}, desc:{th:"ดักจับ 4.0 Gt/ปี, ความเสี่ยงจุดพลิกผัน +8% (รบกวนระบบนิเวศทะเล)",en:"Captures 4.0 Gt/yr, tipping risk +8% (marine disruption)"}},
+  {id:"N6",cat:3,ep:210,pc:50,req:["N2"],    months:12,name:{th:"การเติมแร่ธาตุฟื้นฟูมหาสมุทร",en:"Ocean Enhanced Mineralization"}, fx:{sink:4.0,tip:8}, desc:{th:"ดักจับ 4.0 Gt/ปี แต่รบกวนระบบนิเวศทะเล: อุณหภูมิ +0.03°C",en:"Captures 4.0 Gt/yr but disrupts marine life: +0.03°C"}},
 ];
 const NODE = Object.fromEntries(NODES.map(n => [n.id, n]));
 
@@ -765,7 +782,7 @@ function maybeNews(){
   // Annual report every January
   if (S.tick > 0 && S.tick % 12 === 0){
     const y = 2025 + S.tick / 12, prev = S.hist[Math.max(0, S.hist.length - 13)].net, net = netCO2();
-    addLog(`${t("annual")} ${y}: ${t("co2")} ${net.toFixed(1)} Gt (${fmt(net - prev)}) · ΔT +${S.temp.toFixed(2)}°C · ${t("appr")} ${S.appr.toFixed(0)}%`, "tc");
+    SFX.play("year"); addLog(`[[chart-line]] ${t("annual")} ${y}: ${t("co2")} ${net.toFixed(1)} Gt (${fmt(net - prev)}) · ΔT +${S.temp.toFixed(2)}°C · ${t("appr")} ${S.appr.toFixed(0)}%`, "tc");
   }
   S.regions.forEach(r => { if (!S.flags["half" + r.id] && r.co2 <= r.co2_0 / 2){ S.flags["half" + r.id] = 1; addLog(`${L(RMETA[r.id].name)} ${t("halved")}`, "gd"); } });
   if (Math.random() > 0.3) return;
@@ -775,18 +792,19 @@ function maybeNews(){
   S.newsUsed.push(i); if (S.newsUsed.length > 24) S.newsUsed.shift();
   const reg = REGIONS[Math.floor(Math.random() * REGIONS.length)], cities = CITIES[reg.id];
   const txt = NEWS[i][S.lang].replace("{C}", cities[Math.floor(Math.random() * cities.length)][3]).replace("{R}", L(reg.name)).replace("{Y}", 2025 + Math.floor(S.tick / 12));
-  addLog("📰 " + txt, "nw");
+  addLog("[[newspaper]] " + txt, "nw"); SFX.play("news");
 }
 
 /* ---------------------------- State ---------------------------- */
 const TOTAL_TICKS = 300;
+const TIP_TO_TEMP = 0.004;   // 1 'tipping %' in the GDD ≈ +0.004 °C
 const SPEEDS = [0, 3000, 1500];   // 300 ticks: 15 min at 1×, 7.5 min at 2× (+ time spent on decisions)
 const MAX_PROJECTS = 3;
 let S;
 function newState(lang){
   return {
     lang: lang || "th", speed:1, tick:0,
-    temp:1.20, tip:10, ep:80, pc:30, appr:75,
+    temp:1.20, tip:10, ep:40, pc:25, appr:75,
     epInc:0, damp:0, sink:0, discAll:1, disc:{}, p3:false,
     owned:{}, rollouts:[], delays:[], stall:0,
     used:[], lastEv:-3, bubbles:[], bubId:0, newsUsed:[], flags:{},
@@ -825,7 +843,7 @@ function changeComp(id, v, permanent){
 function changeVuln(id, v){ (id === "ALL" ? S.regions : [R(id)]).forEach(r => { r.vuln = clamp(r.vuln + v, 0, 100); }); }
 
 /* ---------------------------- Economy ---------------------------- */
-const epGain = () => Math.floor(4 + avg(r => r.comp) * 0.10 + S.appr / 20) + S.epInc;   // harder than GDD (10 + C×0.2 + A/10)
+const epGain = () => Math.floor(3 + avg(r => r.comp) * 0.09 + S.appr / 25) + S.epInc;   // harder than GDD (10 + C×0.2 + A/10)
 const pcGain = () => Math.floor(1 + avg(r => r.comp) * 0.03);                          // harder than GDD (2 + C×0.05)
 function nodeCost(n){ const m = (S.disc[n.id] ?? 1) * S.discAll; return {ep: Math.round(n.ep * m), pc: Math.round(n.pc * m)}; }
 const busyIds = () => [...new Set(S.rollouts.map(r => r.id))];
@@ -848,7 +866,7 @@ function buyNode(id){
   if (fx.vulnAll) changeVuln("ALL", fx.vulnAll);
   if (fx.epInc) S.epInc += fx.epInc;
   if (fx.damp) S.damp += fx.damp;
-  if (fx.tip) S.tip = clamp(S.tip + fx.tip, 0, 100);
+  if (fx.tip) S.temp += fx.tip * TIP_TO_TEMP;
   if (fx.p3) S.p3 = true;
   const per = {};
   if (fx.co2){ const g = grossCO2() || 1; S.regions.forEach(r => per[r.id] = (per[r.id]||0) + fx.co2 * boost * r.co2 / g); }
@@ -858,7 +876,7 @@ function buyNode(id){
   if (Object.keys(per).length) S.rollouts.push({id, kind:"co2", left:months, months, per});
   if (fx.sink) S.rollouts.push({id, kind:"sink", left:months, months, amt: fx.sink * dacEff});
   addLog(`${t("logTech")}: ${n.id} ${L(n.name)}`, "tc");
-  render(); Globe.refresh();
+  SFX.play("buy"); render(); Globe.refresh();
 }
 function doAction(aid){
   const a = ACTIONS.find(x => x.id === aid), r = R(S.sel);
@@ -869,14 +887,14 @@ function doAction(aid){
   if (aid === "diplo")  r.comp = clamp(r.comp + 8, 0, 100);
   if (aid === "adapt"){ r.vuln = clamp(r.vuln - 10, 0, 100); S.appr = clamp(S.appr + 1, 0, 100); }
   if (aid === "tariff"){ r.co2 = Math.max(0, r.co2 - 0.8 * r.comp / 100); r.comp = clamp(r.comp - 6, 0, 100); }
-  addLog(`${t("logAct")}: ${L(a.name)} → ${L(RMETA[r.id].name)}`, "tc");
+  addLog(`${t("logAct")}: ${L(a.name)} → ${L(RMETA[r.id].name)}`, "tc"); SFX.play("action");
   if (!checkEnd()) { render(); Globe.refresh(); }
 }
 function applyFx(fx, target){
   if (fx.co2){ if (target) applyRegionCO2(R(target), fx.co2); else applyGlobalCO2(fx.co2); }
   if (fx.rco2) Object.entries(fx.rco2).forEach(([k,v]) => applyRegionCO2(R(k), v));
   if (fx.temp) S.temp += fx.temp;
-  if (fx.tip)  S.tip = clamp(S.tip + fx.tip, 0, 100);
+  if (fx.tip)  S.temp += fx.tip * TIP_TO_TEMP;             // tipping effects shown and applied as warming
   if (fx.appr) S.appr = clamp(S.appr + fx.appr, 0, 100);
   if (fx.ep)   S.ep = Math.max(0, S.ep + fx.ep);
   if (fx.pc)   S.pc = Math.max(0, S.pc + fx.pc);
@@ -891,19 +909,19 @@ function applyFx(fx, target){
 
 /* ---------------------------- Bubbles (Plague Inc-style pickups) ----------------------------
    green: clean-energy opportunity → tap for EP. red: climate disaster → tap to send aid (EP cost) before it expires. */
-const RED_COST = 15;
+const RED_COST = 20;
 function spawnBubbles(){
   const greens = S.bubbles.filter(b => b.type === "green").length;
-  if (greens < 2 && Math.random() < 0.22){
+  if (greens < 1 && Math.random() < 0.10){
     const reg = pick(S.regions, r => 0.3 + r.comp / 100);
     const city = pick(CITIES[reg.id], c => c[2]);
-    S.bubbles.push({id:++S.bubId, type:"green", reg:reg.id, lat:city[0], lon:city[1], ttl:5});
+    S.bubbles.push({id:++S.bubId, type:"green", reg:reg.id, lat:city[0], lon:city[1], ttl:4}); SFX.play("spawnGreen");
   }
-  const pRed = 0.04 + Math.max(0, S.temp - 1.2) * 0.14;
-  if (S.bubbles.filter(b => b.type === "red").length < 2 && Math.random() < pRed){
+  const pRed = 0.025 + Math.max(0, S.temp - 1.2) * 0.08;
+  if (S.bubbles.filter(b => b.type === "red").length < 1 && Math.random() < pRed){
     const reg = pick(S.regions, r => r.vuln);
     const city = pick(CITIES[reg.id], c => 1);
-    S.bubbles.push({id:++S.bubId, type:"red", reg:reg.id, lat:city[0] + (Math.random()-.5)*4, lon:city[1] + (Math.random()-.5)*4, ttl:6});
+    S.bubbles.push({id:++S.bubId, type:"red", reg:reg.id, lat:city[0] + (Math.random()-.5)*4, lon:city[1] + (Math.random()-.5)*4, ttl:6}); SFX.play("spawnRed");
   }
 }
 function ageBubbles(){
@@ -911,7 +929,7 @@ function ageBubbles(){
     b.ttl--;
     if (b.ttl <= 0 && b.type === "red"){
       const r = R(b.reg); S.appr = clamp(S.appr - 1.5, 0, 100); r.vuln = clamp(r.vuln + 2, 0, 100); r.comp = clamp(r.comp - 2, 0, 100);
-      addLog(`${t("redMiss")} ${L(RMETA[b.reg].name)} · ${t("appr")} −1.5% · ${t("vuln")} +2%`, "al");
+      SFX.play("miss"); addLog(`${t("redMiss")} ${L(RMETA[b.reg].name)} · ${t("appr")} −1.5% · ${t("vuln")} +2%`, "al");
     }
   });
   S.bubbles = S.bubbles.filter(b => b.ttl > 0);
@@ -920,18 +938,18 @@ function popBubble(id, x, y){
   const b = S.bubbles.find(q => q.id === id); if (!b || S.over || S.event) return;
   if (b.type === "green"){
     const gain = 2 + Math.round(avg(r => r.comp) / 40);
-    S.ep += gain; floatText(x, y, `+${gain} ${IC.ep}`, "var(--good)");
+    S.ep += gain; SFX.play("pop"); floatText(x, y, `+${gain} ${IC.ep}`, "var(--good)");
   } else {
-    if (S.ep < RED_COST) { floatText(x, y, t("cantAfford"), "var(--bad)"); return; }
+    if (S.ep < RED_COST) { SFX.play("error"); floatText(x, y, t("cantAfford"), "var(--bad)"); return; }
     const r = R(b.reg); S.ep -= RED_COST; r.comp = clamp(r.comp + 3, 0, 100); r.vuln = clamp(r.vuln - 1, 0, 100); S.appr = clamp(S.appr + 1, 0, 100);
-    floatText(x, y, `+1% ${t("appr")}`, "var(--accent)");
+    SFX.play("aid"); floatText(x, y, `+1% ${IC.appr}`, "var(--accent)");
     addLog(`${t("redHelp")} ${L(RMETA[b.reg].name)} · ${IC.ep} −${RED_COST} · ${t("compliance")} +3%`, "gd");
   }
   S.bubbles = S.bubbles.filter(q => q.id !== id);
   renderBubbles(); render();
 }
 function floatText(x, y, txt, color){
-  const el = document.createElement("div"); el.className = "float"; el.textContent = txt;
+  const el = document.createElement("div"); el.className = "float"; el.innerHTML = icx(txt);
   el.style.left = x + "px"; el.style.top = y + "px"; el.style.color = color;
   $("bubbles").appendChild(el); setTimeout(() => el.remove(), 1200);
 }
@@ -947,7 +965,7 @@ function tick(){
       if (ro.kind === "co2") S.regions.forEach(r => { const d = ro.per[r.id]; if (d) r.co2 = Math.max(0, r.co2 + (d / ro.months) * (r.comp / 100) * lastMile(r)); });
       else S.sink += ro.amt / ro.months;
       ro.left--;
-      if (ro.left === 0) addLog(`${ro.id} ${L(NODE[ro.id].name)} — ${t("logRollDone")}`, "tc");
+      if (ro.left === 0) SFX.play("done"), addLog(`${ro.id} ${L(NODE[ro.id].name)} — ${t("logRollDone")}`, "tc");
     });
     S.rollouts = S.rollouts.filter(ro => ro.left > 0);
   }
@@ -969,8 +987,8 @@ function tick(){
   S.ep += epGain(); S.pc += pcGain();
   if (S.temp >= 2.5) S.tip += 1.2; else if (S.temp >= 2.0) S.tip += 0.6; else if (S.temp >= 1.5) S.tip += 0.2;
   S.tip = clamp(S.tip, 0, 100);
-  if (prevTemp < 1.5 && S.temp >= 1.5) addLog(t("logTipping"), "al");
-  if (prevTemp < 2.0 && S.temp >= 2.0) addLog(t("logTipping2"), "al");
+  if (prevTemp < 1.5 && S.temp >= 1.5) { addLog(t("logTipping"), "al"); SFX.play("warn"); }
+  if (prevTemp < 2.0 && S.temp >= 2.0) { addLog(t("logTipping2"), "al"); SFX.play("warn"); }
   const stress = avg(r => r.vuln) / 100 * Math.max(0, S.temp - 1.3) * 0.6;
   S.appr = clamp(S.appr - stress + (60 - S.appr) * 0.004, 0, 100);
   ageBubbles(); spawnBubbles();
@@ -989,7 +1007,7 @@ function eligible(e){
 function triggerEvent(){
   const pool = EVENTS.filter(eligible); if (!pool.length) return;
   const e = pool[Math.floor(Math.random() * pool.length)];
-  S.used.push(e.id); S.lastEv = S.tick; S.event = e.id;
+  S.used.push(e.id); S.lastEv = S.tick; S.event = e.id; SFX.play("event");
   if (e.target) Globe.focus(e.target);
   renderEvent();
 }
@@ -998,7 +1016,7 @@ function chooseOption(i){
   const e = EVENTS.find(x => x.id === S.event); if (!e) return;
   const opt = i === -1 ? {label:{th:UI.postpone.th,en:UI.postpone.en}, fx:{appr:-6,tip:1}} : e.options[i];
   if (i !== -1 && !affordable(opt.fx)) return;
-  applyFx(opt.fx, e.target);
+  applyFx(opt.fx, e.target); SFX.play("choose");
   addLog(`${L(e.title)} → ${L(opt.label)} [${fxChips(opt.fx, e.target).map(c => c.txt).join(", ") || "—"}]`, "ev");
   S.event = null; closeModal();
   if (!checkEnd()) { render(); Globe.refresh(); loop(); }
@@ -1007,7 +1025,7 @@ function checkEnd(){
   let o = null;
   if (netCO2() <= 0) o = "win"; else if (S.temp >= 3.0) o = "l1"; else if (S.appr <= 0) o = "l2"; else if (S.tick >= TOTAL_TICKS) o = "l3";
   if (!o) return false;
-  S.over = o; S.event = null; render(); Globe.refresh(); renderEnd(); return true;
+  S.over = o; S.event = null; SFX.play(o === "win" ? "win" : "lose"); render(); Globe.refresh(); renderEnd(); return true;
 }
 function score(){
   const left = Math.max(0, TOTAL_TICKS - S.tick);
@@ -1017,24 +1035,85 @@ function score(){
 
 /* ---------------------------- Effect chips ---------------------------- */
 function fxChips(fx, target){
-  const c = [], rn = id => id === "ALL" ? (S.lang === "th" ? "ทุกภูมิภาค" : "all") : (id === "T" ? (target || "ALL") : id);
+  const c = [], rn = id => id === "ALL" ? (S.lang === "th" ? "ทั้งโลก" : "all") : (id === "T" ? (target || "ALL") : id);
   const push = (txt, good) => c.push({txt, good});
-  if (fx.co2) push(`${IC.co2} CO₂ ${fmt(fx.co2)} Gt${target ? " " + target : ""}`, fx.co2 < 0);
-  if (fx.rco2) Object.entries(fx.rco2).forEach(([k,v]) => push(`${k} CO₂ ${fmt(v)} Gt`, v < 0));
+  if (fx.co2) push(`${IC.co2} ${target ? target + " " : ""}${fmt(fx.co2)} Gt`, fx.co2 < 0);
+  if (fx.rco2) Object.entries(fx.rco2).forEach(([k,v]) => push(`${IC.co2} ${k} ${fmt(v)} Gt`, v < 0));
   if (fx.temp) push(`${IC.temp} ${fmt(fx.temp,2)}°C`, fx.temp < 0);
   if (fx.ep) push(`${IC.ep} ${fmt(fx.ep,0)}`, fx.ep > 0);
   if (fx.pc) push(`${IC.pc} ${fmt(fx.pc,0)}`, fx.pc > 0);
-  if (fx.appr) push(`${t("appr")} ${fmt(fx.appr,0)}%`, fx.appr > 0);
-  if (fx.tip) push(`${t("tip")} ${fmt(fx.tip,0)}%`, fx.tip < 0);
-  if (fx.comp) Object.entries(fx.comp).forEach(([k,v]) => push(`${t("compliance")} ${rn(k)} ${fmt(v,0)}%`, v > 0));
-  if (fx.vuln) Object.entries(fx.vuln).forEach(([k,v]) => push(`${t("vuln")} ${rn(k)} ${fmt(v,0)}%`, v < 0));
-  if (fx.disc) Object.entries(fx.disc).forEach(([k,v]) => push(`${k === "ALL" ? (S.lang==="th"?"ทุกโหนด":"all nodes") : k} ${S.lang==="th"?"ลดราคา":"cost"} −${Math.round(v*100)}%`, true));
-  if (fx.damp) push(S.lang === "th" ? "ชะลอการเติบโตการปล่อย" : "Slows emission growth", true);
-  if (fx.stall) push(S.lang === "th" ? `โครงการชะงัก ${fx.stall} เดือน` : `Projects stall ${fx.stall} mo`, false);
+  if (fx.appr) push(`${IC.appr} ${fmt(fx.appr,0)}%`, fx.appr > 0);
+  if (fx.tip) push(`${IC.temp} ${fmt(fx.tip * TIP_TO_TEMP,2)}°C`, fx.tip < 0);
+  if (fx.comp) Object.entries(fx.comp).forEach(([k,v]) => push(`${IC.comp} ${rn(k)} ${fmt(v,0)}%`, v > 0));
+  if (fx.vuln) Object.entries(fx.vuln).forEach(([k,v]) => push(`${IC.vuln} ${rn(k)} ${fmt(v,0)}%`, v < 0));
+  if (fx.disc) Object.entries(fx.disc).forEach(([k,v]) => push(`[[flask-conical]] ${k === "ALL" ? (S.lang==="th"?"ทุกโหนด":"all") : k} −${Math.round(v*100)}%`, true));
+  if (fx.damp) push(`${IC.co2} ${S.lang === "th" ? "โตช้าลง" : "growth ↓"}`, true);
+  if (fx.stall) push(`[[flask-conical]] ${S.lang === "th" ? "ชะงัก" : "stall"} ${fx.stall} ${t("months")}`, false);
   if (fx.delay) fxChips(fx.delay.fx, target).forEach(x => push(`${x.txt} (${t("delayed")} ${fx.delay.m} ${t("months")})`, x.good));
   return c;
 }
 const chipHtml = cs => cs.map(x => `<span class="pill ${x.good ? "good" : "bad"}">${x.txt}</span>`).join("");
+
+/* ---------------------------- Sound effects (Web Audio, synthesized — no files) ---------------------------- */
+const SFX = (() => {
+  let ctx = null, out = null, on = true;
+  try { on = localStorage.getItem("p2050-sfx") !== "0"; } catch(e) {}
+  function ac(){
+    if (!ctx){ const C = window.AudioContext || window.webkitAudioContext; if (!C) return null; ctx = new C(); out = ctx.createGain(); out.gain.value = 0.55; out.connect(ctx.destination); }
+    if (ctx.state === "suspended") ctx.resume();
+    return ctx;
+  }
+  function tone(f, dur, o = {}){
+    const c = ac(); if (!c) return;
+    const t0 = c.currentTime + (o.at || 0), osc = c.createOscillator(), g = c.createGain();
+    osc.type = o.type || "sine"; osc.frequency.setValueAtTime(f, t0);
+    if (o.slide) osc.frequency.exponentialRampToValueAtTime(Math.max(30, f * o.slide), t0 + dur);
+    g.gain.setValueAtTime(0.0001, t0); g.gain.exponentialRampToValueAtTime(o.vol || 0.1, t0 + (o.atk || 0.006)); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(g); g.connect(out); osc.start(t0); osc.stop(t0 + dur + 0.03);
+  }
+  function noise(dur, o = {}){
+    const c = ac(); if (!c) return;
+    const t0 = c.currentTime + (o.at || 0), n = Math.floor(c.sampleRate * dur), buf = c.createBuffer(1, n, c.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    src.buffer = buf; f.type = "lowpass"; f.frequency.value = o.freq || 1200;
+    g.gain.setValueAtTime(o.vol || 0.05, t0); g.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    src.connect(f); f.connect(g); g.connect(out); src.start(t0);
+  }
+  const arp = (fs, step, o) => fs.forEach((f, i) => tone(f, o.dur || 0.2, {...o, at:i * step}));
+  const P = {
+    click:     () => tone(620, .05, {type:"triangle", vol:.07}),
+    open:      () => tone(520, .08, {vol:.07, slide:1.5}),
+    close:     () => tone(700, .07, {vol:.06, slide:.6}),
+    select:    () => { tone(520, .06, {vol:.09}); tone(780, .09, {vol:.07, at:.05}); },
+    speed:     () => tone(740, .06, {type:"triangle", vol:.07, slide:1.3}),
+    pause:     () => tone(420, .09, {type:"triangle", vol:.07, slide:.7}),
+    buy:       () => arp([523, 659, 784, 1047], .06, {type:"triangle", vol:.09, dur:.2}),
+    action:    () => { tone(280, .2, {type:"sawtooth", vol:.04, slide:2.4}); tone(880, .12, {vol:.07, at:.13}); },
+    error:     () => { tone(190, .1, {type:"square", vol:.05}); tone(150, .14, {type:"square", vol:.05, at:.1}); },
+    event:     () => { tone(880, .15, {type:"square", vol:.05}); tone(660, .22, {type:"square", vol:.05, at:.17}); noise(.35, {vol:.025, freq:900}); },
+    choose:    () => { tone(440, .08, {type:"triangle", vol:.09}); tone(660, .14, {type:"triangle", vol:.09, at:.07}); },
+    pop:       () => { tone(820, .09, {vol:.13, slide:1.9}); tone(1500, .06, {vol:.06, at:.05}); },
+    aid:       () => { tone(240, .22, {type:"triangle", vol:.12, slide:.6}); tone(990, .16, {vol:.07, at:.1}); },
+    miss:      () => tone(170, .38, {type:"sawtooth", vol:.045, slide:.65}),
+    spawnGreen:() => tone(1250, .08, {vol:.04, slide:1.25}),
+    spawnRed:  () => { tone(760, .09, {type:"square", vol:.035}); tone(760, .09, {type:"square", vol:.035, at:.15}); },
+    news:      () => tone(1400, .04, {vol:.025}),
+    year:      () => arp([392, 523, 659], .1, {vol:.06, dur:.28}),
+    done:      () => { tone(784, .1, {vol:.07}); tone(1175, .18, {vol:.07, at:.09}); },
+    warn:      () => { tone(330, .3, {type:"sawtooth", vol:.04, slide:.8}); },
+    save:      () => { tone(660, .07, {vol:.08}); tone(990, .12, {vol:.08, at:.07}); },
+    start:     () => arp([392, 523, 784], .09, {type:"triangle", vol:.09, dur:.3}),
+    win:       () => arp([523, 659, 784, 1047, 1319], .12, {type:"triangle", vol:.1, dur:.4}),
+    lose:      () => arp([392, 330, 262, 196], .22, {type:"sawtooth", vol:.045, dur:.45}),
+  };
+  return {
+    play(n){ if (on && P[n]) { try { P[n](); } catch(e) {} } },
+    unlock(){ if (on) ac(); },
+    get on(){ return on; },
+    toggle(){ on = !on; try { localStorage.setItem("p2050-sfx", on ? "1" : "0"); } catch(e) {} if (on) P.click(); },
+  };
+})();
 
 /* ---------------------------- Heat colour ---------------------------- */
 const HEAT = [[31,158,120],[217,166,43],[208,97,47],[224,48,42]];
@@ -1051,14 +1130,16 @@ function render(){
   document.documentElement.lang = S.lang;
   $("subtitle").textContent = t("subtitle");
   $("date").textContent = dateStr();
-  $("ghint").textContent = t("ghint");
   [0,1,2].forEach(i => $("sp"+i).classList.toggle("on", S.speed === i));
   $("lgth").classList.toggle("on", S.lang === "th"); $("lgen").classList.toggle("on", S.lang === "en");
   const nb = {tech:"nbTech", region:"nbRegion", stats:"nbStats", news:"nbNews"};
+  const NAVI = {tech:"flask-conical", region:"map", stats:"chart-line", news:"newspaper"};
+  $("sp0").innerHTML = I("pause"); $("menuBtn").innerHTML = I("menu"); $("sfxBtn").innerHTML = I(SFX.on ? "volume-2" : "volume-x");
+  document.querySelector("#drawer .x").innerHTML = I("x");
   const readyCount = NODES.filter(n => nodeState(n) === "ready" && !atCapacity(n) && S.ep >= nodeCost(n).ep && S.pc >= nodeCost(n).pc).length;
   Object.entries(nb).forEach(([k,v]) => {
     const b = $("nb-"+k); b.classList.toggle("on", S.tab === k);
-    b.innerHTML = t(v) + (k === "tech" && readyCount ? `<span class="cnt">${readyCount}</span>` : "");
+    b.innerHTML = I(NAVI[k]) + `<span class="nl">${t(v)}</span>` + (k === "tech" && readyCount ? `<span class="cnt">${readyCount}</span>` : "");
   });
   renderKpis(); renderBars(); renderTicker(); drawStripes();
   const dr = $("drawer");
@@ -1066,7 +1147,7 @@ function render(){
   if (S.tab){
     $("drawerTitle").textContent = t({tech:"dTech", region:"dRegion", stats:"dStats", news:"dNews"}[S.tab]);
     const p = $("pane"), st = p.scrollTop;
-    p.innerHTML = S.tab === "tech" ? paneTech() : S.tab === "region" ? paneRegion() : S.tab === "stats" ? paneStats() : paneNews();
+    p.innerHTML = icx(S.tab === "tech" ? paneTech() : S.tab === "region" ? paneRegion() : S.tab === "stats" ? paneStats() : paneNews());
     p.scrollTop = st;
     if (S.tab === "stats") drawCharts();
   }
@@ -1076,13 +1157,12 @@ function renderKpis(){
   const net = netCO2(), tcls = S.temp >= 2 ? "bad" : S.temp >= 1.5 ? "warn" : "";
   const acls = S.appr < 25 ? "bad" : S.appr < 45 ? "warn" : "good";
   const trend = S.hist.length > 12 ? net - S.hist[S.hist.length - 13].net : 0;
-  $("kpis").innerHTML = `
-    <div class="kpi glass"><div class="k">${t("temp")}</div><div class="v ${tcls}">+${S.temp.toFixed(2)}°C</div><div class="s">1.5 · 2.0 · <span style="color:var(--bad)">3.0 ${S.lang==="th"?"แพ้":"lose"}</span></div></div>
-    <div class="kpi glass"><div class="k">${t("co2")}</div><div class="v ${net <= 5 ? "good" : ""}">${net.toFixed(1)} Gt</div><div class="s">${fmt(trend)} ${t("perYr")} · ${t("sinks")} ${(S.sink*sinkEff()).toFixed(1)}</div></div>
-    <div class="kpi glass"><div class="k">${t("ep")}</div><div class="v">${Math.floor(S.ep)}</div><div class="s">+${epGain()}${t("perMo")} · ${t("epHint")}</div></div>
-    <div class="kpi glass"><div class="k">${t("pc")}</div><div class="v">${Math.floor(S.pc)}</div><div class="s">+${pcGain()}${t("perMo")} · ${t("pcHint")}</div></div>
-    <div class="kpi glass"><div class="k">${t("appr")}</div><div class="v ${acls}">${S.appr.toFixed(0)}%</div><div class="meter"><i style="width:${S.appr}%;background:var(--${acls})"></i></div></div>
-    <div class="kpi glass ${S.temp >= 1.5 ? "danger" : ""}"><div class="k">${t("tip")}</div><div class="v ${S.tip >= 40 ? "bad" : S.tip >= 20 ? "warn" : ""}">${S.tip.toFixed(1)}%</div><div class="meter"><i style="width:${S.tip}%"></i></div></div>`;
+  $("kpis").innerHTML = icx(`
+    <div class="kpi glass"><div class="k">${t("temp")}</div><div class="v ${tcls}">+${S.temp.toFixed(2)}°C</div></div>
+    <div class="kpi glass"><div class="k">${t("co2")}</div><div class="v ${net <= 5 ? "good" : ""}">${net.toFixed(1)} Gt</div><div class="s">${fmt(trend)} ${t("perYr")}</div></div>
+    <div class="kpi glass"><div class="k">${t("ep")}</div><div class="v">${Math.floor(S.ep)}</div><div class="s">+${epGain()}${t("perMo")}</div></div>
+    <div class="kpi glass"><div class="k">${t("pc")}</div><div class="v">${Math.floor(S.pc)}</div><div class="s">+${pcGain()}${t("perMo")}</div></div>
+    <div class="kpi glass"><div class="k">${t("appr")}</div><div class="v ${acls}">${S.appr.toFixed(0)}%</div><div class="meter"><i style="width:${S.appr}%;background:var(--${acls})"></i></div></div>`);
 }
 function renderBars(){
   const net = netCO2(), prog = clamp((36 - net) / 36, 0, 1);
@@ -1095,7 +1175,7 @@ function renderBars(){
 }
 function renderTicker(){
   const l = S.log[0];
-  $("ticker").innerHTML = l ? `<span class="d">${dateStr(l.tk)}</span><span class="${l.cls}">${l.txt}</span>` : "";
+  $("ticker").innerHTML = l ? icx(`<span class="d">${dateStr(l.tk)}</span><span class="${l.cls}">${l.txt}</span>`) : "";
 }
 function paneTech(){
   const n = NODE[S.node], st = nodeState(n), c = nodeCost(n);
@@ -1110,14 +1190,13 @@ function paneTech(){
       <span class="pill">${t("needs")}: ${n.req.length ? n.req.join(" + ") : t("none")}</span>
       ${n.months ? `<span class="pill">${t("rollout")} ${n.months} ${t("months")}</span>` : ""}
     </div>
-    <button class="btn" data-buy="${n.id}" ${can ? "" : "disabled"}>${st === "own" ? "✓ " + t("owned") : t("unlock")}</button>
+    <button class="btn" data-buy="${n.id}" ${can ? "" : "disabled"}>${st === "own" ? "[[check]] " + t("owned") : t("unlock")}</button>
     ${full ? `<span class="warn-t">${t("capFull")}</span>` : ""}
   </div>`;
-  html += `<p class="legend-t">${t("legend")}</p><p class="note" style="margin:0 0 10px">${t("treeHint")}</p>`;
   [1,2,3].forEach(cat => { html += `<div class="cat"><h3>${t("cat"+cat)}</h3>${treeHtml(cat)}</div>`; });
   html += `<div class="cat"><h3>${t("inProgress")} ${busyIds().length}/${MAX_PROJECTS}${S.stall ? ` · <span style="color:var(--bad)">${t("paused")} ${S.stall} ${t("months")}</span>` : ""}</h3><div class="roll">` +
     S.rollouts.map(ro => `<div><span class="num">${ro.id}</span><div class="meter"><i style="width:${(1 - ro.left / ro.months) * 100}%"></i></div><span class="num" style="color:var(--muted)">${ro.left} ${t("months")}</span></div>`).join("") +
-    `</div><p class="note">${t("rollNote")}</p></div>`;
+    `</div></div>`;
   return html;
 }
 /* Tree layout: [col, row] per node. Edges come from each node's req list (same category);
@@ -1145,7 +1224,7 @@ function treeHtml(cat){
     return `<button class="node tnode ${s} ${afford ? "afford" : ""} ${S.node === n.id ? "sel" : ""}" data-node="${n.id}" style="left:${c * colW}px;top:${r * rowH}px;width:${nodeW}px;height:${nodeH}px">
       <span class="nid">${n.id}${cross.length ? ` <span class="xreq">${t("alsoNeeds")} ${cross.join("+")}</span>` : ""}</span>
       <span class="nn">${L(n.name)}</span>
-      <span class="nc">${s === "own" ? "✓ " + t("owned") : costTxt(cc.ep, cc.pc, true)}</span></button>`;
+      <span class="nc">${s === "own" ? "[[check]] " + t("owned") : costTxt(cc.ep, cc.pc, true)}</span></button>`;
   }).join("");
   return `<div class="tree" style="height:${H}px"><svg width="${W}" height="${H}" aria-hidden="true"><defs>${marks}</defs>${edges}</svg>${boxes}</div>`;
 }
@@ -1158,8 +1237,6 @@ function paneRegion(){
       <div><span>${t("co2Start")}</span><b>${r.co2_0.toFixed(1)} Gt</b></div>
       <div><span>${t("compliance")}</span><b>${r.comp.toFixed(0)}%</b></div>
       <div><span>${t("vuln")}</span><b>${r.vuln.toFixed(0)}%</b></div>
-      <div><span>${t("fossil")}</span><b>${(fossil * 100).toFixed(0)}%</b></div>
-      <div><span>${t("reserve")}</span><b style="font-family:var(--f-body)">${L(RESERVE[meta.reserve])}</b></div>
     </div><div class="acts">`;
   ACTIONS.forEach(a => {
     const c = actionCost(a, r), cd = r.cd[a.id] || 0, ok = !cd && S.ep >= c.ep && S.pc >= c.pc;
@@ -1481,20 +1558,21 @@ function renderBubbles(){
     let el = layer.querySelector(`[data-bub="${b.id}"]`);
     if (!el){
       el = document.createElement("button"); el.className = "bub " + b.type; el.dataset.bub = b.id;
-      el.innerHTML = `<span class="b"><span>${b.type === "green" ? "🌱" : "⚠"}</span></span><span class="ttl"></span>`;
+      el.innerHTML = `<span class="b"><span>${I(b.type === "green" ? "sprout" : "siren")}</span></span><span class="ttl"></span>`;
       layer.appendChild(el);
     }
-    el.querySelector(".ttl").textContent = b.type === "red" ? `${b.reg} · ${IC.ep}−${RED_COST} · ${b.ttl}` : `${b.ttl}`;
+    el.querySelector(".ttl").innerHTML = icx(b.type === "red" ? `${IC.ep}−${RED_COST} · ${b.ttl}` : `${b.ttl}`);
     el.setAttribute("aria-label", b.type === "green" ? "Eco-Points" : t("redHelp") + " " + L(RMETA[b.reg].name));
   });
   if (!Globe.ok) layer.querySelectorAll(".bub").forEach(el => el.hidden = true);
 }
 function selectRegion(id, focus = true){
+  SFX.play("select");
   S.sel = id; S.tab = "region"; if (focus) Globe.focus(id); Globe.refresh(); render();
 }
 
 /* ---------------------------- Modals ---------------------------- */
-function openModal(html, cls=""){ $("modal").className = "modal " + cls; $("modal").innerHTML = html; $("veil").hidden = false; $("modal").scrollTop = 0; }
+function openModal(html, cls=""){ $("modal").className = "modal " + cls; $("modal").innerHTML = icx(html); $("veil").hidden = false; $("modal").scrollTop = 0; }
 function closeModal(){ $("veil").hidden = true; $("modal").innerHTML = ""; }
 function renderEvent(){
   const e = EVENTS.find(x => x.id === S.event); if (!e) return;
@@ -1524,7 +1602,7 @@ function renderEnd(){
       <div><span>${t("temp")}</span><b>+${S.temp.toFixed(2)}°C</b></div>
       <div><span>${t("co2")}</span><b>${netCO2().toFixed(1)} Gt</b></div>
       <div><span>${t("appr")}</span><b>${S.appr.toFixed(0)}%</b></div>
-      <div><span>${t("tip")}</span><b>${S.tip.toFixed(1)}%</b></div>
+      <div><span>Net Zero</span><b>${Math.round(clamp((36 - netCO2()) / 36, 0, 1) * 100)}%</b></div>
       <div><span>Tech</span><b>${Object.keys(S.owned).length}/18</b></div>
       <div><span>Events</span><b>${S.used.length}</b></div>
     </div>
@@ -1541,7 +1619,7 @@ function loop(){
   if (!S.started || S.speed === 0 || S.over || S.event) return;
   timer = setTimeout(() => { tick(); render(); Globe.refresh(); loop(); }, SPEEDS[S.speed]);
 }
-function setSpeed(v){ S.speed = v; render(); loop(); }
+function setSpeed(v){ S.speed = v; SFX.play(v ? "speed" : "pause"); render(); loop(); }
 function setLang(l){
   S.lang = l; try { localStorage.setItem("p2050-lang", l); } catch(e) {}
   render();
@@ -1553,7 +1631,7 @@ function startGame(lang){
   clearTimeout(timer);
   S = newState(lang); S.started = true; S.speed = 1;
   UIM.screen = "game"; UIM.paused = false; renderMenu();
-  addLog(t("logStart"), "tc");
+  addLog(t("logStart"), "tc"); SFX.play("start");
   closeModal(); render(); Globe.refresh(); autosave(); loop();
 }
 
@@ -1618,25 +1696,25 @@ function renderMenu(){
       <div><button class="btn ghost" data-m="back">${t("mBack")}</button></div>`;
   } else {
     body = `<div class="mlist">
-      <button class="mbig ${auto ? "" : "primary"}" data-m="new"><span class="ic">🌍</span><span class="t1">${t("mNew")}</span><span class="t2">${t("mNewS")}</span></button>
-      <button class="mbig ${auto ? "primary" : ""}" data-m="continue" ${auto ? "" : "disabled"}><span class="ic">▶</span><span class="t1">${t("mCont")}</span><span class="t2">${auto ? `${dateStr(auto.meta.tick)} · ΔT +${auto.meta.temp.toFixed(2)}°C · ${auto.meta.net.toFixed(1)} Gt` : t("mNoSave")}</span></button>
-      <button class="mbig" data-m="loadmenu"><span class="ic">💾</span><span class="t1">${t("mLoad")}</span><span class="t2">${t("mLoadS")}</span></button>
-      <button class="mbig" data-m="howto"><span class="ic">📘</span><span class="t1">${t("mHow")}</span><span class="t2">${t("mHowS")}</span></button>
+      <button class="mbig ${auto ? "" : "primary"}" data-m="new"><span class="ic">${I("globe")}</span><span class="t1">${t("mNew")}</span><span class="t2">${t("mNewS")}</span></button>
+      <button class="mbig ${auto ? "primary" : ""}" data-m="continue" ${auto ? "" : "disabled"}><span class="ic">${I("play")}</span><span class="t1">${t("mCont")}</span><span class="t2">${auto ? `${dateStr(auto.meta.tick)} · ΔT +${auto.meta.temp.toFixed(2)}°C · ${auto.meta.net.toFixed(1)} Gt` : t("mNoSave")}</span></button>
+      <button class="mbig" data-m="loadmenu"><span class="ic">${I("save")}</span><span class="t1">${t("mLoad")}</span><span class="t2">${t("mLoadS")}</span></button>
+      <button class="mbig" data-m="howto"><span class="ic">${I("book-open")}</span><span class="t1">${t("mHow")}</span><span class="t2">${t("mHowS")}</span></button>
     </div>`;
   }
-  el.innerHTML = `<div class="menu-card">
+  el.innerHTML = icx(`<div class="menu-card">
     <div><div class="eyebrow">Global Climate Taskforce · 2026 – 2050</div>
     <h1>PROJECT <b>:</b><br>2050</h1></div>
     <p class="tag2">${UIM.sub ? (UIM.sub === "load" ? t("mLoad") : t("mHow")) : t("mDesc")}</p>
     ${body}
     <div class="credit"><span class="k">${t("teamK")}</span><span class="team">${t("team")}</span><p class="note">${t("disclaimer")}</p></div>
-    <div class="mfoot"><span>${t("mTag")}</span>${lang}</div></div>`;
+    <div class="mfoot"><span>${t("mTag")}</span><span style="display:flex;gap:6px"><button class="hbtn" data-m="sfx" aria-label="sound">${I(SFX.on ? "volume-2" : "volume-x")}</button>${lang}</span></div></div>`);
 }
 function renderPause(){
   const saves = readSaves();
   openModal(`<div class="mh"><div class="tag">${dateStr()}</div><h3>${t("pTitle")}</h3></div>
     <div class="mb"><div class="opts" style="margin-bottom:14px">
-      <button class="btn" data-m="resume">${t("pResume")}</button></div>
+      <div style="display:flex;gap:8px;align-items:center;justify-content:space-between"><button class="btn" data-m="resume">${t("pResume")}</button><div class="seg"><button data-lg="th" class="${S.lang==="th"?"on":""}">TH</button><button data-lg="en" class="${S.lang==="en"?"on":""}">EN</button></div></div></div>
     <div class="mlist" style="margin-bottom:14px">` + (saves === null ? `<p class="msg err">${t("noStore")}</p>` :
       ["s1","s2","s3"].map(k => `<div class="slot"><div><b>${slotName(k)}</b>${slotMeta(saves[k] && saves[k].meta)}</div>
       <button class="btn ghost" data-m="save" data-slot="${k}">${t("save")}</button></div>`).join("")) + `</div>
@@ -1658,15 +1736,20 @@ function menuAction(b){
     if (!loadState(o)){ UIM.msg = t("codeBad"); UIM.err = true; renderMenu(); }
     return;
   }
-  if (m === "pause"){ if (!S.started || S.over || S.event) return; UIM.paused = true; UIM.prevSpeed = S.speed; S.speed = 0; render(); loop(); return renderPause(); }
+  if (m === "pause"){ if (!S.started || S.over || S.event) return; SFX.play("pause"); UIM.paused = true; UIM.prevSpeed = S.speed; S.speed = 0; render(); loop(); return renderPause(); }
   if (m === "resume"){ UIM.paused = false; closeModal(); S.speed = UIM.prevSpeed || 1; render(); return loop(); }
-  if (m === "save"){ UIM.msg = writeSlot(b.dataset.slot) ? `${t("saved")} · ${slotName(b.dataset.slot)}` : t("noStore"); return renderPause(); }
+  if (m === "sfx"){ SFX.toggle(); return render(), renderMenu(); }
+  if (m === "save"){ SFX.play("save"); UIM.msg = writeSlot(b.dataset.slot) ? `${t("saved")} · ${slotName(b.dataset.slot)}` : t("noStore"); return renderPause(); }
   if (m === "copy") return copyCode(b);
   if (m === "main" || m === "tomenu"){ autosave(); clearTimeout(timer); UIM.paused = false; closeModal(); S.speed = 0; S.tab = null; UIM.screen = "menu"; UIM.sub = null; render(); return renderMenu(); }
 }
 document.addEventListener("click", ev => {
   const b = ev.target.closest("button"); if (!b) return;
-  if (b.dataset.m) return menuAction(b);
+  SFX.unlock();
+  if (b.dataset.m){ if (!["save","sfx","pause"].includes(b.dataset.m)) SFX.play("click"); return menuAction(b); }
+  if (b.dataset.lg || b.dataset.node || b.id === "introLang") SFX.play("click");
+  if (b.dataset.close) SFX.play("close");
+  if (b.dataset.tab) SFX.play(S.tab === b.dataset.tab ? "close" : "open");
   if (b.dataset.bub) return popBubble(+b.dataset.bub, ev.clientX, ev.clientY);
   if (b.dataset.sp !== undefined) return setSpeed(+b.dataset.sp);
   if (b.dataset.lg) return setLang(b.dataset.lg);
