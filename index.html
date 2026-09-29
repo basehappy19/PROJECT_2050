@@ -152,6 +152,20 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .node.ready{border-color:rgba(143,208,255,.55)} .node.ready .nid{color:var(--accent)}
 .node.own{background:rgba(95,211,154,.12);border-color:rgba(95,211,154,.5)} .node.own .nid{color:var(--good)}
 .node.sel{box-shadow:0 0 0 2px var(--accent)}
+.tree{position:relative;margin-top:4px}
+.tree svg{position:absolute;left:0;top:0;overflow:visible}
+.edge{fill:none;stroke-width:2}
+.edge.own{stroke:var(--good)} .edge.ready{stroke:var(--accent)} .edge.locked{stroke:var(--line);stroke-dasharray:4 4}
+.ah.own{fill:var(--good)} .ah.ready{fill:var(--accent)} .ah.locked{fill:var(--line)}
+.tnode{position:absolute;display:flex;flex-direction:column;justify-content:space-between;padding:5px 7px;overflow:hidden}
+.tnode .nn{font-size:11px;line-height:1.3}
+.node.locked.tnode{opacity:.6}
+.drawer.wide{width:580px}
+.tnode .nc{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tnode.afford{box-shadow:0 0 0 1px var(--accent),0 0 12px rgba(143,208,255,.35)}
+.tnode.sel{box-shadow:0 0 0 2px #fff}
+.xreq{font-weight:400;font-size:9.5px;color:var(--warn);border:1px solid rgba(242,180,65,.5);border-radius:4px;padding:0 3px}
+.legend-t{font-size:11.5px;line-height:1.6;color:var(--fg);background:var(--panel-2);border-radius:8px;padding:7px 10px;margin:0 0 6px}
 .detail{border:1px solid var(--line);border-radius:9px;padding:11px;margin-bottom:14px;background:var(--bg)}
 .detail h4{font-family:var(--f-display);font-size:16px;margin:0 0 4px;font-weight:600;text-wrap:balance}
 .detail p{margin:4px 0 8px}
@@ -254,6 +268,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
 @media (max-width:900px){
   .drawer{left:16px;right:16px;width:auto;top:auto;bottom:10px;height:72%;z-index:8}
+  .drawer.wide{width:auto}
   .bars{grid-template-columns:minmax(0,1fr)}
 }
 @media (max-width:640px){
@@ -299,7 +314,7 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
       <div class="seg" role="group" aria-label="speed">
         <button id="sp0" data-sp="0" title="Space">❚❚</button>
         <button id="sp1" data-sp="1">1×</button>
-        <button id="sp2" data-sp="2">3×</button>
+        <button id="sp2" data-sp="2">2×</button>
       </div>
       <div class="seg" role="group" aria-label="language">
         <button id="lgth" data-lg="th">TH</button>
@@ -348,14 +363,22 @@ const GEO=[["SEA","Fiji",[[[1781,-175,1784,-173,1787,-176,1786,-182,1779,-183,17
            → HUD renderer (DOM) + Globe renderer (Three.js, canvas texture) → Modals
    ========================================================================= */
 
+/* ---------------------------- Icons (one per resource/stat, used everywhere) ---------------------------- */
+const IC = {ep:"🌿", pc:"🏛️", appr:"👥", temp:"🌡️", co2:"☁️", tip:"⚠️", comp:"🤝", vuln:"🏚️"};
+const costTxt = (ep, pc, tight) => [ep ? `${IC.ep}${tight ? "" : " "}${ep}` : "", pc ? `${IC.pc}${tight ? "" : " "}${pc}` : ""].filter(Boolean).join(tight ? " " : "  ");
+
 /* ---------------------------- i18n ---------------------------- */
 const UI = {
   subtitle:{th:"ภารกิจกู้วิกฤตโลก",en:"Global Climate Taskforce"},
-  temp:{th:"อุณหภูมิ ΔT",en:"Temp ΔT"}, co2:{th:"CO₂ สุทธิ",en:"Net CO₂"},
-  ep:{th:"Eco-Points",en:"Eco-Points"}, pc:{th:"ทุนการเมือง",en:"Political Cap."},
-  appr:{th:"ความนิยม",en:"Approval"}, tip:{th:"เสี่ยงจุดพลิกผัน",en:"Tipping risk"},
+  temp:{th:"🌡️ อุณหภูมิโลก",en:"🌡️ Global temp"}, co2:{th:"☁️ CO₂ สุทธิ",en:"☁️ Net CO₂"},
+  ep:{th:"🌿 งบเขียว (Eco-Points)",en:"🌿 Eco-Points"}, pc:{th:"🏛️ ทุนการเมือง",en:"🏛️ Political capital"},
+  epHint:{th:"เงินทุน",en:"money"}, pcHint:{th:"อำนาจผ่านนโยบาย",en:"clout"},
+  appr:{th:"👥 ความนิยม",en:"👥 Approval"}, tip:{th:"⚠️ เสี่ยงจุดพลิกผัน",en:"⚠️ Tipping risk"},
   perMo:{th:"/ด.",en:"/mo"}, sinks:{th:"ดักจับ",en:"sinks"}, perYr:{th:"ใน 12 ด.",en:"in 12 mo"},
-  compliance:{th:"ความร่วมมือ",en:"Compliance"}, vuln:{th:"ความเปราะบาง",en:"Vulnerability"},
+  compliance:{th:"🤝 ความร่วมมือ",en:"🤝 Compliance"}, vuln:{th:"🏚️ ความเปราะบาง",en:"🏚️ Vulnerability"},
+  legend:{th:"🌿 งบเขียว = เงินทุน · 🏛️ ทุนการเมือง = อำนาจผ่านนโยบาย · 👥 ความนิยม · 🤝 ความร่วมมือ · 🏚️ ความเปราะบาง · ⚠️ จุดพลิกผัน",en:"🌿 Eco-Points = money · 🏛️ Political capital = clout for policies · 👥 Approval · 🤝 Compliance · 🏚️ Vulnerability · ⚠️ Tipping risk"},
+  treeHint:{th:"เส้นลูกศรแสดงลำดับการปลดล็อก: ต้องมีโหนดต้นทางก่อน · สีเขียว = มีแล้ว · สีฟ้า = ปลดล็อกได้ · เส้นประ = ยังล็อก",en:"Arrows show unlock order: own the source first · green = owned · blue = available · dashed = locked"},
+  alsoNeeds:{th:"ต้องมี",en:"needs"},
   nbTech:{th:"เทคโนโลยี",en:"Tech"}, nbRegion:{th:"ภูมิภาค",en:"Regions"}, nbStats:{th:"สถิติ",en:"Stats"}, nbNews:{th:"ข่าว",en:"News"},
   dTech:{th:"เทคโนโลยี & นโยบาย",en:"Tech & Policy Tree"}, dRegion:{th:"ควบคุมภูมิภาค",en:"Regional control"}, dStats:{th:"สถิติโลก",en:"Global metrics"}, dNews:{th:"รายงานข่าวคณะทำงาน",en:"Taskforce dispatch"},
   barNZ:{th:"ความคืบหน้าสู่ Net Zero",en:"Progress to Net Zero"}, barT:{th:"ภาวะโลกร้อน (ขีดแพ้ +3.0°C)",en:"Warming (lose at +3.0°C)"},
@@ -381,8 +404,8 @@ const UI = {
   introTitle:{th:"ท่านคือผู้อำนวยการสูงสุดแห่ง GCT",en:"You are Supreme Director of the GCT"},
   introBody:{th:"นานาชาติมอบอำนาจให้ท่านจัดสรรงบประมาณ ผลักดันสนธิสัญญา และเร่งเทคโนโลยีข้ามพรมแดน เป้าหมายคือทำให้การปล่อยคาร์บอนสุทธิของโลกเหลือศูนย์ก่อนสิ้นปี 2050",
              en:"The world has given you authority over budgets, treaties and cross-border technology. Your goal: bring global net carbon emissions to zero before the end of 2050."},
-  introRules:{th:["1 tick = 1 เดือน · รายได้ EP และ PC มาจากความร่วมมือและความนิยม","แตะ 🌱 ฟองสีเขียวบนลูกโลกเพื่อเก็บ Eco-Points · แตะ ⚠ ฟองสีแดงเพื่อส่งความช่วยเหลือก่อนหมดเวลา","ลงทุนในผังเทคโนโลยี 18 โหนด ผลทยอยมา ขึ้นกับความร่วมมือ และทำได้พร้อมกัน 3 โครงการ","แตะภูมิภาคบนลูกโลกเพื่อเพิ่มความร่วมมือ ลดความเปราะบาง หรือเร่งลด CO₂","แพ้เมื่อ ΔT ถึง +3.0°C, ความนิยมเหลือ 0% หรือเข้าปี 2051 โดยยังไม่ Net Zero · Space = หยุด/เล่น"],
-              en:["1 tick = 1 month · EP and PC income depends on compliance and approval","Tap 🌱 green bubbles on the globe to collect Eco-Points · tap ⚠ red bubbles to send aid before they expire","Invest in an 18-node tree. Effects roll out, scale with compliance, max 3 at once","Tap a region on the globe to raise compliance, cut vulnerability or force cuts","Lose at +3.0°C, 0% approval, or 2051 without Net Zero · Space = pause/play"]},
+  introRules:{th:["1 tick = 1 เดือน · 🌿 งบเขียว (เงินทุน) และ 🏛️ ทุนการเมือง (อำนาจผ่านนโยบาย) ได้เพิ่มทุกเดือนตาม 🤝 ความร่วมมือและ 👥 ความนิยม","แตะ 🌱 ฟองสีเขียวบนลูกโลกเพื่อเก็บ 🌿 งบเขียว · แตะ ⚠ ฟองสีแดงเพื่อส่งความช่วยเหลือก่อนหมดเวลา","ลงทุนในผังเทคโนโลยี 18 โหนด ผลทยอยมา ขึ้นกับความร่วมมือ และทำได้พร้อมกัน 3 โครงการ","แตะภูมิภาคบนลูกโลกเพื่อเพิ่มความร่วมมือ ลดความเปราะบาง หรือเร่งลด CO₂","แพ้เมื่อ ΔT ถึง +3.0°C, ความนิยมเหลือ 0% หรือเข้าปี 2051 โดยยังไม่ Net Zero · Space = หยุด/เล่น"],
+              en:["1 tick = 1 month · 🌿 Eco-Points (money) and 🏛️ Political capital (clout) come in monthly, based on 🤝 compliance and 👥 approval","Tap 🌱 green bubbles on the globe to collect Eco-Points · tap ⚠ red bubbles to send aid before they expire","Invest in an 18-node tree. Effects roll out, scale with compliance, max 3 at once","Tap a region on the globe to raise compliance, cut vulnerability or force cuts","Lose at +3.0°C, 0% approval, or 2051 without Net Zero · Space = pause/play"]},
   winTitle:{th:"Net Zero สำเร็จ",en:"Net Zero achieved"},
   winBody:{th:"การปล่อยคาร์บอนสุทธิของโลกแตะศูนย์ โลกหลังยุคคาร์บอนเริ่มต้นขึ้นแล้ว",en:"Global net emissions hit zero. The post-carbon era begins."},
   l1Title:{th:"ภูมิอากาศล่มสลาย",en:"Runaway warming"}, l1Body:{th:"อุณหภูมิโลกแตะ +3.0°C ระบบธรรมชาติพลิกผันเกินกว่าจะฟื้นคืน",en:"Global warming reached +3.0°C. Earth systems tipped past recovery."},
@@ -459,10 +482,10 @@ const NODES = [
   {id:"E2",cat:1,ep:80, pc:15,req:["E1"],    months:18,name:{th:"ฟาร์มแสงอาทิตย์และกังหันลมสเกลใหญ่",en:"Utility Solar & Wind Farms"}, fx:{all:-0.4}, desc:{th:"CO₂ ทุกภูมิภาค −0.4 Gt (รวม −2.4 Gt)",en:"Every region −0.4 Gt (−2.4 Gt total)"}},
   {id:"E3",cat:1,ep:110,pc:20,req:["E2"],    months:12,name:{th:"ระบบกักเก็บพลังงานแบตเตอรี่ขั้นสูง",en:"Next-Gen Battery Storage"}, fx:{co2:-1.5,damp:.15}, desc:{th:"เสถียรภาพโครงข่าย +15% (ชะลอการเติบโตของการปล่อย), CO₂ โลก −1.5 Gt",en:"Grid stability +15% (slows emission growth), global CO₂ −1.5 Gt"}},
   {id:"E4",cat:1,ep:140,pc:30,req:["E1"],    months:24,name:{th:"เตาปฏิกรณ์นิวเคลียร์ขนาดเล็ก SMR",en:"SMR Nuclear Reactors"}, fx:{co2:-3.0,appr:-5}, desc:{th:"CO₂ โลก −3.0 Gt, ความนิยม −5% จากความกังวลเรื่องความปลอดภัย",en:"Global CO₂ −3.0 Gt, approval −5% over safety fears"}},
-  {id:"E5",cat:1,ep:250,pc:60,req:["E4","E3"],months:36,name:{th:"โรงไฟฟ้าฟิวชันเชิงพาณิชย์",en:"Commercial Fusion Power"}, fx:{co2:-6.0,epInc:20,damp:.3}, desc:{th:"CO₂ โลก −6.0 Gt, รายได้ EP +20/เดือน",en:"Global CO₂ −6.0 Gt, Eco-Points income +20/mo"}},
+  {id:"E5",cat:1,ep:250,pc:60,req:["E4","E3"],months:36,name:{th:"โรงไฟฟ้าฟิวชันเชิงพาณิชย์",en:"Commercial Fusion Power"}, fx:{co2:-6.0,epInc:10,damp:.3}, desc:{th:"CO₂ โลก −6.0 Gt, รายได้ 🌿 +10/เดือน",en:"Global CO₂ −6.0 Gt, 🌿 Eco-Points income +10/mo"}},
   {id:"E6",cat:1,ep:160,pc:35,req:["E3"],    months:18,name:{th:"ไฮโดรเจนเขียวสำหรับอุตสาหกรรมหนัก",en:"Green Hydrogen Metallurgy"}, fx:{rco2:{EA:-1.5,NA:-1.5}}, desc:{th:"CO₂ ใน EA และ NA แห่งละ −1.5 Gt",en:"EA and NA each −1.5 Gt"}},
   {id:"P1",cat:2,ep:30, pc:5, req:[],        months:0, name:{th:"แคมเปญความรอบรู้ด้านภูมิอากาศ",en:"Climate Literacy Campaign"}, fx:{appr:10,compAll:5}, desc:{th:"ความนิยม +10%, ความร่วมมือทุกภูมิภาค +5% (ถาวร)",en:"Approval +10%, all regions' compliance +5% (permanent)"}},
-  {id:"P2",cat:2,ep:60, pc:25,req:["P1"],    months:6, name:{th:"ภาษีคาร์บอนมาตรฐาน",en:"Standard Carbon Tax"}, fx:{co2:-2.5,appr:-8,epInc:15}, desc:{th:"CO₂ โลก −2.5 Gt, ความนิยม −8%, รายได้ EP +15/เดือน",en:"Global CO₂ −2.5 Gt, approval −8%, EP income +15/mo"}},
+  {id:"P2",cat:2,ep:60, pc:25,req:["P1"],    months:6, name:{th:"ภาษีคาร์บอนมาตรฐาน",en:"Standard Carbon Tax"}, fx:{co2:-2.5,appr:-8,epInc:6}, desc:{th:"CO₂ โลก −2.5 Gt, ความนิยม −8%, รายได้ 🌿 +6/เดือน",en:"Global CO₂ −2.5 Gt, approval −8%, 🌿 income +6/mo"}},
   {id:"P3",cat:2,ep:90, pc:40,req:["P2"],    months:0, name:{th:"กลไกปรับคาร์บอนข้ามพรมแดน",en:"Carbon Border Adjustment"}, fx:{p3:1}, desc:{th:"ภูมิภาคที่ความร่วมมือต่ำกว่า 70% ถูกบังคับลด CO₂ ปีละ −0.3 Gt ต่อเนื่อง",en:"Regions under 70% compliance are forced to cut −0.3 Gt/yr, ongoing"}},
   {id:"P4",cat:2,ep:120,pc:30,req:["P2"],    months:24,name:{th:"กฎหมายบังคับขนส่งไฟฟ้า 100%",en:"Mandatory EV & Zero-Emission Transit"}, fx:{co2:-3.2,damp:.25}, desc:{th:"CO₂ โลก −3.2 Gt และกดการเติบโตของการปล่อยภาคคมนาคมถาวร",en:"Global CO₂ −3.2 Gt; permanently damps transport emission growth"}},
   {id:"P5",cat:2,ep:100,pc:25,req:["P1"],    months:18,name:{th:"มาตรฐานอาคาร Net-Zero",en:"Net-Zero Building Code"}, fx:{co2:-1.8,damp:.15}, desc:{th:"CO₂ โลก −1.8 Gt, ประหยัดพลังงานในเขตเมือง",en:"Global CO₂ −1.8 Gt, urban energy savings"}},
@@ -757,13 +780,13 @@ function maybeNews(){
 
 /* ---------------------------- State ---------------------------- */
 const TOTAL_TICKS = 300;
-const SPEEDS = [0, 1500, 500];
+const SPEEDS = [0, 3000, 1500];   // 300 ticks: 15 min at 1×, 7.5 min at 2× (+ time spent on decisions)
 const MAX_PROJECTS = 3;
 let S;
 function newState(lang){
   return {
     lang: lang || "th", speed:1, tick:0,
-    temp:1.20, tip:10, ep:120, pc:50, appr:75,
+    temp:1.20, tip:10, ep:80, pc:30, appr:75,
     epInc:0, damp:0, sink:0, discAll:1, disc:{}, p3:false,
     owned:{}, rollouts:[], delays:[], stall:0,
     used:[], lastEv:-3, bubbles:[], bubId:0, newsUsed:[], flags:{},
@@ -802,8 +825,8 @@ function changeComp(id, v, permanent){
 function changeVuln(id, v){ (id === "ALL" ? S.regions : [R(id)]).forEach(r => { r.vuln = clamp(r.vuln + v, 0, 100); }); }
 
 /* ---------------------------- Economy ---------------------------- */
-const epGain = () => Math.floor(10 + avg(r => r.comp) * 0.20 + S.appr / 10) + S.epInc;
-const pcGain = () => Math.floor(2 + avg(r => r.comp) * 0.05);
+const epGain = () => Math.floor(4 + avg(r => r.comp) * 0.10 + S.appr / 20) + S.epInc;   // harder than GDD (10 + C×0.2 + A/10)
+const pcGain = () => Math.floor(1 + avg(r => r.comp) * 0.03);                          // harder than GDD (2 + C×0.05)
 function nodeCost(n){ const m = (S.disc[n.id] ?? 1) * S.discAll; return {ep: Math.round(n.ep * m), pc: Math.round(n.pc * m)}; }
 const busyIds = () => [...new Set(S.rollouts.map(r => r.id))];
 const atCapacity = n => n.months > 0 && busyIds().length >= MAX_PROJECTS;
@@ -871,7 +894,7 @@ function applyFx(fx, target){
 const RED_COST = 15;
 function spawnBubbles(){
   const greens = S.bubbles.filter(b => b.type === "green").length;
-  if (greens < 3 && Math.random() < 0.32){
+  if (greens < 2 && Math.random() < 0.22){
     const reg = pick(S.regions, r => 0.3 + r.comp / 100);
     const city = pick(CITIES[reg.id], c => c[2]);
     S.bubbles.push({id:++S.bubId, type:"green", reg:reg.id, lat:city[0], lon:city[1], ttl:5});
@@ -896,13 +919,13 @@ function ageBubbles(){
 function popBubble(id, x, y){
   const b = S.bubbles.find(q => q.id === id); if (!b || S.over || S.event) return;
   if (b.type === "green"){
-    const gain = 6 + Math.round(avg(r => r.comp) / 20);
-    S.ep += gain; floatText(x, y, `+${gain} EP`, "var(--good)");
+    const gain = 2 + Math.round(avg(r => r.comp) / 40);
+    S.ep += gain; floatText(x, y, `+${gain} ${IC.ep}`, "var(--good)");
   } else {
     if (S.ep < RED_COST) { floatText(x, y, t("cantAfford"), "var(--bad)"); return; }
     const r = R(b.reg); S.ep -= RED_COST; r.comp = clamp(r.comp + 3, 0, 100); r.vuln = clamp(r.vuln - 1, 0, 100); S.appr = clamp(S.appr + 1, 0, 100);
     floatText(x, y, `+1% ${t("appr")}`, "var(--accent)");
-    addLog(`${t("redHelp")} ${L(RMETA[b.reg].name)} · EP −${RED_COST} · ${t("compliance")} +3%`, "gd");
+    addLog(`${t("redHelp")} ${L(RMETA[b.reg].name)} · ${IC.ep} −${RED_COST} · ${t("compliance")} +3%`, "gd");
   }
   S.bubbles = S.bubbles.filter(q => q.id !== id);
   renderBubbles(); render();
@@ -996,11 +1019,11 @@ function score(){
 function fxChips(fx, target){
   const c = [], rn = id => id === "ALL" ? (S.lang === "th" ? "ทุกภูมิภาค" : "all") : (id === "T" ? (target || "ALL") : id);
   const push = (txt, good) => c.push({txt, good});
-  if (fx.co2) push(`CO₂ ${fmt(fx.co2)} Gt${target ? " " + target : ""}`, fx.co2 < 0);
+  if (fx.co2) push(`${IC.co2} CO₂ ${fmt(fx.co2)} Gt${target ? " " + target : ""}`, fx.co2 < 0);
   if (fx.rco2) Object.entries(fx.rco2).forEach(([k,v]) => push(`${k} CO₂ ${fmt(v)} Gt`, v < 0));
-  if (fx.temp) push(`ΔT ${fmt(fx.temp,2)}°C`, fx.temp < 0);
-  if (fx.ep) push(`EP ${fmt(fx.ep,0)}`, fx.ep > 0);
-  if (fx.pc) push(`PC ${fmt(fx.pc,0)}`, fx.pc > 0);
+  if (fx.temp) push(`${IC.temp} ${fmt(fx.temp,2)}°C`, fx.temp < 0);
+  if (fx.ep) push(`${IC.ep} ${fmt(fx.ep,0)}`, fx.ep > 0);
+  if (fx.pc) push(`${IC.pc} ${fmt(fx.pc,0)}`, fx.pc > 0);
   if (fx.appr) push(`${t("appr")} ${fmt(fx.appr,0)}%`, fx.appr > 0);
   if (fx.tip) push(`${t("tip")} ${fmt(fx.tip,0)}%`, fx.tip < 0);
   if (fx.comp) Object.entries(fx.comp).forEach(([k,v]) => push(`${t("compliance")} ${rn(k)} ${fmt(v,0)}%`, v > 0));
@@ -1039,7 +1062,7 @@ function render(){
   });
   renderKpis(); renderBars(); renderTicker(); drawStripes();
   const dr = $("drawer");
-  dr.hidden = !S.tab;
+  dr.hidden = !S.tab; dr.classList.toggle("wide", S.tab === "tech");
   if (S.tab){
     $("drawerTitle").textContent = t({tech:"dTech", region:"dRegion", stats:"dStats", news:"dNews"}[S.tab]);
     const p = $("pane"), st = p.scrollTop;
@@ -1054,10 +1077,10 @@ function renderKpis(){
   const acls = S.appr < 25 ? "bad" : S.appr < 45 ? "warn" : "good";
   const trend = S.hist.length > 12 ? net - S.hist[S.hist.length - 13].net : 0;
   $("kpis").innerHTML = `
-    <div class="kpi glass"><div class="k">${t("temp")}</div><div class="v ${tcls}">+${S.temp.toFixed(2)}°C</div><div class="s">${t("tip")} ${S.tip.toFixed(1)}%</div></div>
+    <div class="kpi glass"><div class="k">${t("temp")}</div><div class="v ${tcls}">+${S.temp.toFixed(2)}°C</div><div class="s">1.5 · 2.0 · <span style="color:var(--bad)">3.0 ${S.lang==="th"?"แพ้":"lose"}</span></div></div>
     <div class="kpi glass"><div class="k">${t("co2")}</div><div class="v ${net <= 5 ? "good" : ""}">${net.toFixed(1)} Gt</div><div class="s">${fmt(trend)} ${t("perYr")} · ${t("sinks")} ${(S.sink*sinkEff()).toFixed(1)}</div></div>
-    <div class="kpi glass"><div class="k">${t("ep")}</div><div class="v">${Math.floor(S.ep)}</div><div class="s">+${epGain()}${t("perMo")}</div></div>
-    <div class="kpi glass"><div class="k">${t("pc")}</div><div class="v">${Math.floor(S.pc)}</div><div class="s">+${pcGain()}${t("perMo")}</div></div>
+    <div class="kpi glass"><div class="k">${t("ep")}</div><div class="v">${Math.floor(S.ep)}</div><div class="s">+${epGain()}${t("perMo")} · ${t("epHint")}</div></div>
+    <div class="kpi glass"><div class="k">${t("pc")}</div><div class="v">${Math.floor(S.pc)}</div><div class="s">+${pcGain()}${t("perMo")} · ${t("pcHint")}</div></div>
     <div class="kpi glass"><div class="k">${t("appr")}</div><div class="v ${acls}">${S.appr.toFixed(0)}%</div><div class="meter"><i style="width:${S.appr}%;background:var(--${acls})"></i></div></div>
     <div class="kpi glass ${S.temp >= 1.5 ? "danger" : ""}"><div class="k">${t("tip")}</div><div class="v ${S.tip >= 40 ? "bad" : S.tip >= 20 ? "warn" : ""}">${S.tip.toFixed(1)}%</div><div class="meter"><i style="width:${S.tip}%"></i></div></div>`;
 }
@@ -1082,28 +1105,49 @@ function paneTech(){
     <div class="num" style="color:var(--accent);font-size:12px">${n.id}</div>
     <h4>${L(n.name)}</h4><p>${L(n.desc)}</p>
     <div class="meta">
-      <span class="pill ${S.ep >= c.ep ? "acc" : "bad"}">${c.ep} EP</span>
-      <span class="pill ${S.pc >= c.pc ? "acc" : "bad"}">${c.pc} PC</span>
+      <span class="pill ${S.ep >= c.ep ? "acc" : "bad"}">${IC.ep} ${c.ep}</span>
+      <span class="pill ${S.pc >= c.pc ? "acc" : "bad"}">${IC.pc} ${c.pc}</span>
       <span class="pill">${t("needs")}: ${n.req.length ? n.req.join(" + ") : t("none")}</span>
       ${n.months ? `<span class="pill">${t("rollout")} ${n.months} ${t("months")}</span>` : ""}
     </div>
     <button class="btn" data-buy="${n.id}" ${can ? "" : "disabled"}>${st === "own" ? "✓ " + t("owned") : t("unlock")}</button>
     ${full ? `<span class="warn-t">${t("capFull")}</span>` : ""}
   </div>`;
-  [1,2,3].forEach(cat => {
-    html += `<div class="cat"><h3>${t("cat"+cat)}</h3><div class="nodes">` +
-      NODES.filter(x => x.cat === cat).map(x => {
-        const s = nodeState(x), cc = nodeCost(x);
-        return `<button class="node ${s} ${S.node === x.id ? "sel" : ""}" data-node="${x.id}">
-          <span class="nid">${x.id}${x.req.length ? ` <span style="color:var(--muted);font-weight:400">← ${x.req.join("+")}</span>` : ""}</span>
-          <span class="nn">${L(x.name)}</span>
-          <span class="nc">${s === "own" ? "✓" : `${cc.ep} EP · ${cc.pc} PC`}</span></button>`;
-      }).join("") + `</div></div>`;
-  });
+  html += `<p class="legend-t">${t("legend")}</p><p class="note" style="margin:0 0 10px">${t("treeHint")}</p>`;
+  [1,2,3].forEach(cat => { html += `<div class="cat"><h3>${t("cat"+cat)}</h3>${treeHtml(cat)}</div>`; });
   html += `<div class="cat"><h3>${t("inProgress")} ${busyIds().length}/${MAX_PROJECTS}${S.stall ? ` · <span style="color:var(--bad)">${t("paused")} ${S.stall} ${t("months")}</span>` : ""}</h3><div class="roll">` +
     S.rollouts.map(ro => `<div><span class="num">${ro.id}</span><div class="meter"><i style="width:${(1 - ro.left / ro.months) * 100}%"></i></div><span class="num" style="color:var(--muted)">${ro.left} ${t("months")}</span></div>`).join("") +
     `</div><p class="note">${t("rollNote")}</p></div>`;
   return html;
+}
+/* Tree layout: [col, row] per node. Edges come from each node's req list (same category);
+   cross-category requirements (N4 ← E3) show as a badge on the node. */
+const TREE_POS = {
+  E1:[0,1], E2:[1,0], E4:[1,2], E3:[2,0], E6:[3,0], E5:[3,2],
+  P1:[0,1], P2:[1,0], P5:[1,2], P3:[2,0], P4:[2,1], P6:[3,0],
+  N1:[0,1], N2:[1,0], N3:[1,2], N4:[2,1], N6:[2,0], N5:[2,2],
+};
+function treeHtml(cat){
+  const W = Math.max(300, ($("pane").clientWidth || 380) - 28), colW = W / 4, nodeW = colW - 16, rowH = 86, nodeH = 74, H = rowH * 3 - (rowH - nodeH);
+  const nodes = NODES.filter(n => n.cat === cat);
+  let edges = "";
+  nodes.forEach(n => n.req.filter(q => NODE[q].cat === cat).forEach(q => {
+    const [pc, pr] = TREE_POS[q], [cc, cr] = TREE_POS[n.id];
+    const x1 = pc * colW + nodeW, y1 = pr * rowH + nodeH / 2, x2 = cc * colW - 2, y2 = cr * rowH + nodeH / 2, mx = (x1 + x2) / 2;
+    const st = S.owned[n.id] ? "own" : S.owned[q] ? "ready" : "locked";
+    edges += `<path class="edge ${st}" d="M${x1},${y1} C${mx},${y1} ${mx},${y2} ${x2},${y2}" marker-end="url(#ar-${st})"/>`;
+  }));
+  const marks = ["own","ready","locked"].map(k => `<marker id="ar-${k}" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L8,4 L0,8 z" class="ah ${k}"/></marker>`).join("");
+  const boxes = nodes.map(n => {
+    const [c, r] = TREE_POS[n.id], s = nodeState(n), cc = nodeCost(n);
+    const cross = n.req.filter(q => NODE[q].cat !== cat);
+    const afford = s === "ready" && S.ep >= cc.ep && S.pc >= cc.pc && !atCapacity(n);
+    return `<button class="node tnode ${s} ${afford ? "afford" : ""} ${S.node === n.id ? "sel" : ""}" data-node="${n.id}" style="left:${c * colW}px;top:${r * rowH}px;width:${nodeW}px;height:${nodeH}px">
+      <span class="nid">${n.id}${cross.length ? ` <span class="xreq">${t("alsoNeeds")} ${cross.join("+")}</span>` : ""}</span>
+      <span class="nn">${L(n.name)}</span>
+      <span class="nc">${s === "own" ? "✓ " + t("owned") : costTxt(cc.ep, cc.pc, true)}</span></button>`;
+  }).join("");
+  return `<div class="tree" style="height:${H}px"><svg width="${W}" height="${H}" aria-hidden="true"><defs>${marks}</defs>${edges}</svg>${boxes}</div>`;
 }
 function paneRegion(){
   const meta = RMETA[S.sel], r = R(S.sel), fossil = r.fossil0 * (r.co2 / r.co2_0);
@@ -1119,7 +1163,7 @@ function paneRegion(){
     </div><div class="acts">`;
   ACTIONS.forEach(a => {
     const c = actionCost(a, r), cd = r.cd[a.id] || 0, ok = !cd && S.ep >= c.ep && S.pc >= c.pc;
-    const cost = [c.ep ? `${c.ep} EP` : "", c.pc ? `${c.pc} PC` : ""].filter(Boolean).join(" · ");
+    const cost = costTxt(c.ep, c.pc);
     html += `<div class="act"><div style="min-width:0"><h5>${L(a.name)}</h5><p>${L(a.desc)}</p></div>
       <button class="btn ${ok ? "" : "ghost"}" data-act="${a.id}" ${ok ? "" : "disabled"}>${cd ? `${t("cooldown")} ${cd}` : cost}</button></div>`;
   });
@@ -1367,7 +1411,6 @@ const Globe = (() => {
     ty = G.rotY + Math.atan2(Math.sin(ty - G.rotY), Math.cos(ty - G.rotY));   // shortest path
     G.tRotY = ty; G.tRotX = clamp(lat * DEG, -1.1, 1.1); G.idle = 0;
   }
-  const tmp = new THREE.Vector3 ? null : null;
   function project(lat, lon, r = 1.02){
     const v = ll2v(lat, lon, r).applyMatrix4(group.matrixWorld);
     const facing = v.clone().normalize().dot(camera.position.clone().sub(v).normalize());
@@ -1441,7 +1484,7 @@ function renderBubbles(){
       el.innerHTML = `<span class="b"><span>${b.type === "green" ? "🌱" : "⚠"}</span></span><span class="ttl"></span>`;
       layer.appendChild(el);
     }
-    el.querySelector(".ttl").textContent = b.type === "red" ? `${b.reg} · −${RED_COST} EP · ${b.ttl}` : `${b.ttl}`;
+    el.querySelector(".ttl").textContent = b.type === "red" ? `${b.reg} · ${IC.ep}−${RED_COST} · ${b.ttl}` : `${b.ttl}`;
     el.setAttribute("aria-label", b.type === "green" ? "Eco-Points" : t("redHelp") + " " + L(RMETA[b.reg].name));
   });
   if (!Globe.ok) layer.querySelectorAll(".bub").forEach(el => el.hidden = true);
@@ -1642,7 +1685,7 @@ document.addEventListener("keydown", ev => {
   if (ev.code === "Space" && ev.target.tagName !== "TEXTAREA" && UIM.screen === "game" && $("veil").hidden && S.started && !S.over && !S.event){ ev.preventDefault(); setSpeed(S.speed === 0 ? 1 : 0); }
   if (ev.code === "Escape" && S.tab){ S.tab = null; render(); }
 });
-window.addEventListener("resize", () => { drawStripes(); if (S.tab === "stats") drawCharts(); });
+window.addEventListener("resize", () => { drawStripes(); if (S.tab === "stats") drawCharts(); if (S.tab === "tech") render(); });
 
 /* ---------------------------- Boot ---------------------------- */
 function boot(){
