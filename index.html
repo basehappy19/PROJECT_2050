@@ -1,3 +1,8 @@
+﻿<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Project : 2050</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -202,6 +207,10 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .mbig .t2{font-size:12px;color:var(--muted);font-family:var(--f-mono)}
 .mbig.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
 .mbig.primary .t2{color:var(--accent-ink);opacity:.75}
+.credit{border-top:1px solid var(--line);padding-top:12px;display:grid;gap:4px}
+.credit .k{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+.credit .team{font-family:var(--f-display);font-weight:600;font-size:15px;line-height:1.35;color:var(--fg);text-wrap:balance}
+.credit .note{font-size:12px;color:var(--muted);margin:2px 0 0}
 .mfoot{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:12px;color:var(--muted)}
 .slot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)}
 .slot b{font-family:var(--f-display);font-size:15px}
@@ -246,6 +255,9 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 }
 @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
+</head>
+<body>
+
 
 <div id="app">
   <canvas id="globe"></canvas>
@@ -376,6 +388,9 @@ const UI = {
   mainMenu:{th:"เมนูหลัก",en:"Main menu"}, autosaveNote:{th:"เกมบันทึกอัตโนมัติทุก 6 เดือนในเกม",en:"The game autosaves every 6 in-game months"},
   annual:{th:"สรุปปี",en:"Year in review"},
   halved:{th:"ลดการปล่อยลงได้ครึ่งหนึ่งจากปี 2026 แล้ว",en:"has halved its emissions since 2026"},
+  teamK:{th:"พัฒนาโดยทีม",en:"Developed by team"},
+  team:{th:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์",en:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์"},
+  disclaimer:{th:"เกมนี้จัดทำขึ้นเพื่อใช้ในกิจกรรม Garena Academy Game Maker เท่านั้น",en:"This game was made for the Garena Academy Game Maker activity only."},
   noGL:{th:"เบราว์เซอร์นี้แสดงลูกโลก 3 มิติไม่ได้ ยังเล่นได้ผ่านแผง “ภูมิภาค” ด้านล่าง",en:"This browser can't show the 3D globe. You can still play through the Regions panel below."},
 };
 const MONTHS = {th:["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."],en:["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"]};
@@ -1545,6 +1560,7 @@ function renderMenu(){
     <h1>PROJECT <b>:</b><br>2050</h1></div>
     <p class="tag2">${UIM.sub ? (UIM.sub === "load" ? t("mLoad") : t("mHow")) : t("mDesc")}</p>
     ${body}
+    <div class="credit"><span class="k">${t("teamK")}</span><span class="team">${t("team")}</span><p class="note">${t("disclaimer")}</p></div>
     <div class="mfoot"><span>${t("mTag")}</span>${lang}</div></div>`;
 }
 function renderPause(){
@@ -1611,3 +1627,6 @@ function boot(){
 }
 boot();
 </script>
+
+</body>
+</html>
