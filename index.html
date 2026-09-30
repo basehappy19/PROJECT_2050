@@ -2041,6 +2041,32 @@ const rgb = (c, a=1) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
 
 /* ---------------------------- HUD rendering ---------------------------- */
 const $ = id => document.getElementById(id);
+/* Performance: update the DOM in place instead of replacing it.
+   setHTML skips identical markup, otherwise morphs only the nodes/attributes/text that changed,
+   so unchanged buttons, SVG icons and scroll positions are left alone (no re-layout of the whole panel). */
+const _tpl = document.createElement("template");
+function setHTML(el, html){
+  if (!el || el._html === html) return;
+  el._html = html;
+  _tpl.innerHTML = html;
+  morphChildren(el, _tpl.content);
+}
+function morphChildren(from, to){
+  const a = from.childNodes, b = to.childNodes;
+  let i = 0;
+  for (; i < b.length; i++){
+    const x = a[i], y = b[i];
+    if (!x){ from.appendChild(document.importNode(y, true)); continue; }
+    if (x.nodeType !== y.nodeType || x.nodeName !== y.nodeName){ from.replaceChild(document.importNode(y, true), x); continue; }
+    if (x.nodeType === 3 || x.nodeType === 8){ if (x.nodeValue !== y.nodeValue) x.nodeValue = y.nodeValue; continue; }
+    const xa = x.attributes, ya = y.attributes;
+    for (let k = 0; k < ya.length; k++){ const at = ya[k]; if (x.getAttribute(at.name) !== at.value) x.setAttribute(at.name, at.value); }
+    for (let k = xa.length - 1; k >= 0; k--){ const n = xa[k].name; if (!y.hasAttribute(n)) x.removeAttribute(n); }
+    if (x.tagName === "INPUT" && document.activeElement !== x && x.value !== y.getAttribute("value")) x.value = y.getAttribute("value") || "";
+    morphChildren(x, y);
+  }
+  while (a.length > b.length) from.removeChild(a[a.length - 1]);
+}
 function render(){
   document.documentElement.lang = S.lang;
   $("subtitle").textContent = t("subtitle");
@@ -2049,22 +2075,20 @@ function render(){
   $("lgth").classList.toggle("on", S.lang === "th"); $("lgen").classList.toggle("on", S.lang === "en");
   const nb = {tech:"nbTech", region:"nbRegion", stats:"nbStats", news:"nbNews"};
   const NAVI = {tech:"flask-conical", region:"map", stats:"chart-line", news:"newspaper"};
-  $("sp0").innerHTML = I("pause"); $("menuBtn").innerHTML = I("menu"); $("sfxBtn").innerHTML = I(SFX.on ? "volume-2" : "volume-x"); $("musBtn").innerHTML = I(SFX.musicOn ? "music" : "music-off");
-  $("fsBtn").hidden = !document.fullscreenEnabled; $("fsBtn").innerHTML = I(document.fullscreenElement ? "minimize" : "maximize");
-  document.querySelector("#drawer .x").innerHTML = I("x");
+  setHTML($("sp0"), I("pause")); setHTML($("menuBtn"), I("menu")); setHTML($("sfxBtn"), I(SFX.on ? "volume-2" : "volume-x")); setHTML($("musBtn"), I(SFX.musicOn ? "music" : "music-off"));
+  $("fsBtn").hidden = !document.fullscreenEnabled; setHTML($("fsBtn"), I(document.fullscreenElement ? "minimize" : "maximize"));
+  setHTML(document.querySelector("#drawer .x"), I("x"));
   const readyCount = NODES.filter(n => nodeState(n) === "ready" && !atCapacity(n) && S.ep >= nodeCost(n).ep && S.pc >= nodeCost(n).pc).length;
   Object.entries(nb).forEach(([k,v]) => {
     const b = $("nb-"+k); b.classList.toggle("on", S.tab === k);
-    b.innerHTML = I(NAVI[k]) + `<span class="nl">${t(v)}</span>` + (k === "tech" && readyCount ? `<span class="cnt">${readyCount}</span>` : "");
+    setHTML(b, I(NAVI[k]) + `<span class="nl">${t(v)}</span>` + (k === "tech" && readyCount ? `<span class="cnt">${readyCount}</span>` : ""));
   });
   renderKpis(); renderBars(); renderTicker(); drawStripes();
   const dr = $("drawer");
   dr.hidden = !S.tab; dr.classList.toggle("wide", S.tab === "tech");
   if (S.tab){
     $("drawerTitle").textContent = t({tech:"dTech", region:"dRegion", stats:"dStats", news:"dNews"}[S.tab]);
-    const p = $("pane"), st = p.scrollTop;
-    p.innerHTML = icx(S.tab === "tech" ? paneTech() : S.tab === "region" ? paneRegion() : S.tab === "stats" ? paneStats() : paneNews());
-    p.scrollTop = st;
+    setHTML($("pane"), icx(S.tab === "tech" ? paneTech() : S.tab === "region" ? paneRegion() : S.tab === "stats" ? paneStats() : paneNews()));
     if (S.tab === "stats") drawCharts();
   }
   Globe.labels();
@@ -2073,10 +2097,10 @@ function renderKpis(){
   const net = netCO2(), tcls = S.temp >= 2 ? "bad" : S.temp >= 1.5 ? "warn" : "";
   const acls = S.appr < 25 ? "bad" : S.appr < 45 ? "warn" : "good";
   const trend = S.hist.length > 12 ? net - S.hist[S.hist.length - 13].net : 0;
-  $("kpis").innerHTML = icx(`
+  setHTML($("kpis"), icx(`
     <div class="kpi glass"><div class="k">${t("ep")}</div><div class="v">${Math.floor(S.ep)}</div><div class="s">+${epGain()}${t("perMo")}</div></div>
     <div class="kpi glass"><div class="k">${t("pc")}</div><div class="v">${Math.floor(S.pc)}</div><div class="s">+${pcGain()}${t("perMo")}</div></div>
-    <div class="kpi glass"><div class="k">${t("appr")}</div><div class="v ${acls}">${S.appr.toFixed(0)}%</div><div class="meter"><i style="width:${S.appr}%;background:var(--${acls})"></i></div></div>`);
+    <div class="kpi glass"><div class="k">${t("appr")}</div><div class="v ${acls}">${S.appr.toFixed(0)}%</div><div class="meter"><i style="width:${S.appr}%;background:var(--${acls})"></i></div></div>`));
 }
 /* Two outcome meters.
    Net Zero: scale 0 (win, left) → 50 Gt (right). Marker = current net CO₂, ghost tick = 2026 level. Fill = distance still to cut.
@@ -2094,7 +2118,7 @@ function renderBars(){
   } else { proj = t("rising"); projCls = "bad"; }
   const pos = v => clamp(v / NZ_MAX, 0, 1) * 100;
   const nzCls = net <= 8 ? "good" : net <= 20 ? "warn" : "bad";
-  $("nzBox").innerHTML = icx(`
+  setHTML($("nzBox"), icx(`
     <div class="mh2"><span class="mt">[[flag]] ${t("nzTitle")}</span>
       <span class="mv ${nzCls}">${net.toFixed(1)}<small> Gt</small></span></div>
     <div class="track nz">
@@ -2104,10 +2128,10 @@ function renderBars(){
       <span class="mark ${nzCls}" style="left:${100 - pos(net)}%"></span>
     </div>
     <div class="mf"><span>${t("vs2026")} <b class="${net < start ? "good" : "bad"}">${fmt(net - start)}</b> · ${trend <= 0 ? "▼" : "▲"} <b class="${trend <= 0 ? "good" : "bad"}">${fmt(trend)}</b>/12${t("perMo").replace("/", "")}</span>
-      <span class="${projCls}">${proj}</span></div>`);
+      <span class="${projCls}">${proj}</span></div>`));
   const tp = v => clamp((v - 1.0) / 2.0, 0, 1) * 100;
   const tCls = S.temp >= 2.5 ? "bad" : S.temp >= 2.0 ? "hot" : S.temp >= 1.5 ? "warn" : "good";
-  $("tBox").innerHTML = icx(`
+  setHTML($("tBox"), icx(`
     <div class="mh2"><span class="mt">[[thermometer]] ${t("tTitle")}</span>
       <span class="mv ${tCls}">+${S.temp.toFixed(2)}<small>°C</small></span></div>
     <div class="track temp">
@@ -2120,11 +2144,11 @@ function renderBars(){
       <span class="mark ${tCls}" style="left:${tp(S.temp)}%"></span>
     </div>
     <div class="mf"><span><b class="${tCls}">${Math.max(0, 3 - S.temp).toFixed(2)}°C</b> ${t("toLose")} (3.0°C)</span>
-      <span>${t("left")} <b>${Math.floor(yearsLeft)}</b> ${t("yrs")} ${monthsLeft % 12} ${t("months")}</span></div>`);
+      <span>${t("left")} <b>${Math.floor(yearsLeft)}</b> ${t("yrs")} ${monthsLeft % 12} ${t("months")}</span></div>`));
 }
 function renderTicker(){
   const l = S.log[0];
-  $("ticker").innerHTML = l ? icx(`<span class="d">${dateStr(l.tk)}</span><span class="${l.cls}">${l.txt}</span>`) : "";
+  setHTML($("ticker"), l ? icx(`<span class="d">${dateStr(l.tk)}</span><span class="${l.cls}">${l.txt}</span>`) : "");
 }
 function paneTech(){
   const n = NODE[S.node], st = nodeState(n), c = nodeCost(n);
@@ -2238,8 +2262,8 @@ function drawStripes(){
 function lineChart(id, data, opts){
   const cv = $(id); if (!cv) return;
   const w = cv.clientWidth, hgt = 150, dpr = window.devicePixelRatio || 1; if (!w) return;
-  cv.width = w * dpr; cv.height = hgt * dpr;
-  const x = cv.getContext("2d"); x.scale(dpr, dpr);
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(hgt * dpr)){ cv.width = Math.round(w * dpr); cv.height = Math.round(hgt * dpr); }
+  const x = cv.getContext("2d"); x.setTransform(dpr, 0, 0, dpr, 0, 0); x.clearRect(0, 0, w, hgt);
   const pad = {l:34, r:10, t:10, b:20}, W = w - pad.l - pad.r, H = hgt - pad.t - pad.b, lo = opts.min, hi = opts.max;
   const sx = i => pad.l + i / TOTAL_TICKS * W, sy = v => pad.t + (1 - (clamp(v, lo, hi) - lo) / (hi - lo)) * H;
   x.font = "10px 'IBM Plex Mono', monospace"; x.fillStyle = css("--muted"); x.strokeStyle = css("--line"); x.lineWidth = 1;
@@ -2256,6 +2280,10 @@ function lineChart(id, data, opts){
   const li = data.length - 1; x.beginPath(); x.arc(sx(li), sy(data[li]), 4, 0, Math.PI * 2); x.fillStyle = opts.color; x.fill();
 }
 function drawCharts(){
+  const cv = $("cCo2"); if (!cv) return;
+  const key = `${S.hist.length}|${S.lang}|${cv.clientWidth}`;
+  if (cv._key === key) return;                       // same canvas, same data: nothing new to draw
+  cv._key = key;
   lineChart("cCo2", S.hist.map(h => h.net), {min:-5, max:45, ticks:[0,10,20,30,40], color:css("--hot"), refs:[{v:0, c:css("--good")}]});
   lineChart("cTemp", S.hist.map(h => h.temp), {min:1.0, max:3.0, ticks:[1.0,1.5,2.0,2.5,3.0], color:css("--accent"), refs:[{v:1.5, c:css("--warn")},{v:2.0, c:css("--bad")}]});
 }
@@ -2305,8 +2333,13 @@ const Globe = (() => {
     const k = Math.round(val / 40);
     return Object.keys(RIDX).find(id => RIDX[id] === k) || null;
   }
+  let texKey = "";
   function drawTexture(){
     const cx = texCx, T = S ? S.temp : 1.2;
+    /* Skip the redraw + GPU upload when nothing visible changed (colours are quantised). */
+    const key = S ? `${S.sel}|${T.toFixed(2)}|` + S.regions.map(r => Math.round(regionHeatValue(r) * 60)).join(",") : "init";
+    if (key === texKey) return;
+    texKey = key;
     // ocean
     const warm = clamp((T - 1.2) / 1.6, 0, 1);
     const g = cx.createLinearGradient(0, 0, 0, TH);
@@ -2456,11 +2489,20 @@ const Globe = (() => {
     const w = $("app").clientWidth, h = $("app").clientHeight;
     return {x:(p.x + 1) / 2 * w, y:(1 - p.y) / 2 * h, front: facing > 0.12};
   }
+  const CITY_TOT = Object.fromEntries(Object.entries(CITIES).map(([k, l]) => [k, l.reduce((s, c) => s + c[2], 0)]));
+  let _wp, _dir, _n, _skip = false;
+  const LOW_POWER = window.matchMedia && matchMedia("(pointer: coarse)").matches;   // phones/tablets
   function frame(){
     requestAnimationFrame(frame);
-    clock += 0.016; G.idle += 0.016;
+    if (!_wp){ _wp = new THREE.Vector3(); _dir = new THREE.Vector3(); _n = new THREE.Vector3(); }
+    /* On touch devices, draw every other frame while nothing is being dragged or animated;
+       motion is doubled on the frames that are drawn, so speed looks the same. */
+    const busy = G.drag || G.pointers.size || G.tRotY !== null;
+    if (LOW_POWER && !busy){ _skip = !_skip; if (_skip) return; }
+    const k = (LOW_POWER && !busy) ? 2 : 1;
+    clock += 0.016 * k; G.idle += 0.016 * k;
     if (G.tRotY !== null){ G.rotY += (G.tRotY - G.rotY) * 0.08; G.rotX += (G.tRotX - G.rotX) * 0.08; if (Math.abs(G.tRotY - G.rotY) < 0.002) G.tRotY = G.tRotX = null; }
-    else if (!G.drag && G.idle > 4 && S && (UIM.screen === "menu" || (S.speed > 0 && !S.event))) G.rotY += UIM.screen === "menu" ? 0.0010 : 0.00035;
+    else if (!G.drag && G.idle > 4 && S && (UIM.screen === "menu" || (S.speed > 0 && !S.event))) G.rotY += (UIM.screen === "menu" ? 0.0010 : 0.00035) * k;
     const offX = (UIM.screen === "menu" && camera.aspect > 1.15) ? 1.05 : 0;
     group.position.x += (offX - group.position.x) * 0.06; atmo.position.x = group.position.x;
     group.rotation.set(G.rotX, G.rotY, 0);
@@ -2468,11 +2510,11 @@ const Globe = (() => {
     group.updateMatrixWorld(); camera.updateMatrixWorld();
     // plumes: size ∝ regional CO₂ share; pulse
     if (S){
-      const tot = {}; Object.entries(CITIES).forEach(([k, l]) => tot[k] = l.reduce((s,c) => s + c[2], 0));
       plumes.forEach(p => {
-        const r = R(p.userData.reg), amt = r.co2 * p.userData.w / tot[p.userData.reg];
-        const wp = p.position.clone().applyMatrix4(group.matrixWorld);
-        p.visible = wp.clone().normalize().dot(camera.position.clone().sub(wp).normalize()) > 0.05;
+        const r = R(p.userData.reg), amt = r.co2 * p.userData.w / CITY_TOT[p.userData.reg];
+        _wp.copy(p.position).applyMatrix4(group.matrixWorld);
+        _dir.copy(camera.position).sub(_wp).normalize();
+        p.visible = _n.copy(_wp).normalize().dot(_dir) > 0.05;
         const s = amt <= 0.02 ? 0 : (0.035 + Math.sqrt(amt) * 0.075) * (1 + 0.18 * Math.sin(clock * 2.4 + p.userData.phase));
         p.scale.set(s, s, 1);
         p.material.color.setRGB(1, clamp(0.55 - r.co2 / r.co2_0 * 0.35, 0.15, 0.7), 0.15);
@@ -2483,27 +2525,32 @@ const Globe = (() => {
     renderer.render(scene, camera);
     overlays();
   }
+  const labelEls = {};
+  function place(el, p){
+    const x = Math.round(p.x), y = Math.round(p.y);
+    if (el._x !== x){ el._x = x; el.style.left = x + "px"; }
+    if (el._y !== y){ el._y = y; el.style.top = y + "px"; }
+    if (el._f !== p.front){ el._f = p.front; el.classList.toggle("back", !p.front); }
+  }
   function overlays(){
     if (!S) return;
     const lab = $("labels");
     S.regions.forEach(r => {
-      let el = lab.querySelector(`[data-reg="${r.id}"]`);
-      if (!el){ el = document.createElement("button"); el.className = "rlabel"; el.dataset.reg = r.id; lab.appendChild(el); }
-      const p = project(RMETA[r.id].lab[0], RMETA[r.id].lab[1], 1.03);
-      el.style.left = p.x + "px"; el.style.top = p.y + "px";
-      el.classList.toggle("back", !p.front); el.classList.toggle("sel", S.sel === r.id);
+      let el = labelEls[r.id];
+      if (!el){ el = document.createElement("button"); el.className = "rlabel"; el.dataset.reg = r.id; lab.appendChild(el); labelEls[r.id] = el; }
+      place(el, project(RMETA[r.id].lab[0], RMETA[r.id].lab[1], 1.03));
+      const sel = S.sel === r.id; if (el._s !== sel){ el._s = sel; el.classList.toggle("sel", sel); }
     });
-    document.querySelectorAll("#bubbles .bub").forEach(el => {
+    if (S.bubbles.length) document.querySelectorAll("#bubbles .bub").forEach(el => {
       const b = S.bubbles.find(q => q.id === +el.dataset.bub); if (!b) return;
-      const p = project(b.lat, b.lon, 1.02);
-      el.style.left = p.x + "px"; el.style.top = p.y + "px"; el.classList.toggle("back", !p.front);
+      place(el, project(b.lat, b.lon, 1.02));
     });
   }
   function labels(){
     document.querySelectorAll("#labels .rlabel").forEach(el => {
       const r = R(el.dataset.reg); if (!r) return;
-      el.innerHTML = `<b>${r.id}</b><span class="c">${r.co2.toFixed(1)}</span>`;
-      el.title = L(RMETA[r.id].name);
+      setHTML(el, `<b>${r.id}</b><span class="c">${r.co2.toFixed(1)}</span>`);
+      if (el.title !== L(RMETA[r.id].name)) el.title = L(RMETA[r.id].name);
     });
     renderBubbles();
     const ng = $("nogl"); if (ng) ng.textContent = t("noGL");
@@ -2522,7 +2569,7 @@ function renderBubbles(){
       el.innerHTML = `<span class="b"><span>${I(b.type === "green" ? "sprout" : "siren")}</span></span><span class="ttl"></span>`;
       layer.appendChild(el);
     }
-    el.querySelector(".ttl").innerHTML = icx(b.type === "red" ? `${IC.ep}−${RED_COST} · ${b.ttl}` : `${b.ttl}`);
+    setHTML(el.querySelector(".ttl"), icx(b.type === "red" ? `${IC.ep}−${RED_COST} · ${b.ttl}` : `${b.ttl}`));
     el.setAttribute("aria-label", b.type === "green" ? "Eco-Points" : t("redHelp") + " " + L(RMETA[b.reg].name));
   });
   if (!Globe.ok) layer.querySelectorAll(".bub").forEach(el => el.hidden = true);
