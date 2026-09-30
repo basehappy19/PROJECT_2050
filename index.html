@@ -312,6 +312,24 @@ button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .vrow b{font-size:12px;text-align:right;color:var(--fg)}
 .vslider{width:100%;accent-color:var(--accent);height:22px;cursor:pointer}
 @media (max-width:420px){.vrow{grid-template-columns:auto minmax(0,1fr) 40px}.vlab{display:none}}
+.menu-card.wide{width:min(620px,100%)}
+.ach-sum{display:grid;gap:6px;font-size:13px;color:var(--muted)} .ach-sum b{font-family:var(--f-display);font-size:22px;color:var(--fg)}
+.ach-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.ach{display:grid;grid-template-columns:44px minmax(0,1fr);gap:10px;align-items:center;padding:9px 10px;border-radius:10px;border:1px solid var(--line);background:rgba(13,26,32,.92)}
+.ach.locked{opacity:.62}
+.ach-ic{width:44px;height:44px;border-radius:9px;display:flex;align-items:center;justify-content:center;background:var(--panel-2);color:var(--muted);border:1px solid var(--line)}
+.ach-ic .i{width:22px;height:22px;color:inherit}
+.ach-ic.got{background:linear-gradient(135deg,#f2b441,#e0612f);color:#2b1300;border-color:#f2b441;box-shadow:0 0 12px rgba(242,180,65,.35)}
+.ach-tx{min-width:0;display:grid;gap:1px}
+.ach-tx b{font-size:13.5px} .ach-tx em{font-style:normal;font-size:12px;color:var(--muted);line-height:1.35} .ach-tx small{font-size:11px;color:var(--warn);font-family:var(--f-mono)}
+.ach-prog{display:block;height:5px;border-radius:3px;background:var(--panel-2);overflow:hidden;margin-top:3px} .ach-prog i{display:block;height:100%;background:var(--accent)}
+.ach-toast{position:fixed;right:16px;bottom:130px;z-index:200;display:grid;grid-template-columns:52px minmax(0,1fr);gap:12px;align-items:center;width:min(340px,calc(100% - 32px));
+  padding:12px 14px;border-radius:12px;background:linear-gradient(135deg,#16303a,#0b1a20);border:1px solid #f2b441;box-shadow:0 12px 40px rgba(0,0,0,.55);
+  transform:translateY(20px);opacity:0;transition:transform .35s ease,opacity .35s ease}
+.ach-toast.in{transform:none;opacity:1}
+.ach-toast .ach-ic{width:52px;height:52px} .ach-toast small{display:block;font-size:11px;color:var(--warn);letter-spacing:.06em;text-transform:uppercase}
+.ach-toast b{display:block;font-family:var(--f-display);font-size:16px} .ach-toast em{display:block;font-style:normal;font-size:12px;color:var(--muted)}
+@media (max-width:560px){.ach-list{grid-template-columns:minmax(0,1fr)} .ach-toast{bottom:200px}}
 .mfoot{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;font-size:12px;color:var(--muted)}
 .slot{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:10px;align-items:center;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel-2)}
 .slot b{font-family:var(--f-display);font-size:15px}
@@ -452,7 +470,7 @@ const GEO=[["SEA","Fiji",[[[1781,-175,1784,-173,1787,-176,1786,-182,1779,-183,17
 
 /* ---------------------------- Icons (one per resource/stat, used everywhere) ---------------------------- */
 /* Lucide icons v1.48.0 — ISC License, https://lucide.dev */
-const LUCIDE={"leaf": "<path d=\"M11 20a10 10 0 0010-10 25.9 25.9 0 00-1.04-7.281 1 1 0 00-1.755-.325C15.833 5.5 13 5.5 9.8 6.1A7 7 0 0011 20\" /> <path d=\"M2 21a5 5 0 012.911-4.544C7.613 15.212 8.351 15.24 11 13\" />", "landmark": "<path d=\"M10 18v-7\" /> <path d=\"M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z\" /> <path d=\"M14 18v-7\" /> <path d=\"M18 18v-7\" /> <path d=\"M3 22h18\" /> <path d=\"M6 18v-7\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "thermometer": "<path d=\"M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z\" />", "cloud": "<path d=\"M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z\" />", "triangle-alert": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\" /> <path d=\"M12 9v4\" /> <path d=\"M12 17h.01\" />", "handshake": "<path d=\"m11 17 2 2a1 1 0 1 0 3-3\" /> <path d=\"m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4\" /> <path d=\"m21 3 1 11h-2\" /> <path d=\"M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3\" /> <path d=\"M3 4h8\" />", "shield-alert": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\" /> <path d=\"M12 8v4\" /> <path d=\"M12 16h.01\" />", "sprout": "<path d=\"M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3\" /> <path d=\"M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4\" /> <path d=\"M5 21h14\" />", "siren": "<path d=\"M7 18v-6a5 5 0 1 1 10 0v6\" /> <path d=\"M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z\" /> <path d=\"M21 12h1\" /> <path d=\"M18.5 4.5 18 5\" /> <path d=\"M2 12h1\" /> <path d=\"M12 2v1\" /> <path d=\"m4.929 4.929.707.707\" /> <path d=\"M12 12v6\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "play": "<path d=\"M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "book-open": "<path d=\"M12 5v16\" /> <path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\" />", "pause": "<rect x=\"14\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\" /> <rect x=\"5\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\" />", "fast-forward": "<path d=\"M12 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 12 18z\" /> <path d=\"M2 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 2 18z\" />", "menu": "<path d=\"M4 5h16\" /> <path d=\"M4 12h16\" /> <path d=\"M4 19h16\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "newspaper": "<path d=\"M15 18h-5\" /> <path d=\"M18 14h-8\" /> <path d=\"M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2\" /> <rect width=\"8\" height=\"4\" x=\"10\" y=\"6\" rx=\"1\" />", "volume-2": "<path d=\"M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z\" /> <path d=\"M16 9a5 5 0 0 1 0 6\" /> <path d=\"M19.364 18.364a9 9 0 0 0 0-12.728\" />", "volume-x": "<path d=\"M11 4.702a.7.7 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.7.7 0 0 0 11 19.298z\" /> <path d=\"m16.5 14.5 5-5\" /> <path d=\"m16.5 9.5 5 5\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "arrow-left": "<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />", "flask-conical": "<path d=\"M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2\" /> <path d=\"M6.453 15h11.094\" /> <path d=\"M8.5 2h7\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "chart-line": "<path d=\"M3 3v16a2 2 0 0 0 2 2h16\" /> <path d=\"m19 9-5 5-4-4-3 3\" />", "zap": "<path d=\"M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z\" />", "copy": "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\" /> <path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\" />", "trophy": "<path d=\"M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2\" /> <path d=\"M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2\" /> <path d=\"M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3\" /> <path d=\"M4 22h16\" /> <path d=\"M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z\" /> <path d=\"M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />", "lightbulb": "<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\" /> <path d=\"M9 18h6\" /> <path d=\"M10 22h4\" />", "music": "<path d=\"M9 18V5l12-2v13\" /> <circle cx=\"6\" cy=\"18\" r=\"3\" /> <circle cx=\"18\" cy=\"16\" r=\"3\" />", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />", "battery-charging": "<path d=\"m11 7-3 5h4l-3 5\" /> <path d=\"M14.856 6H16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.935\" /> <path d=\"M22 14v-4\" /> <path d=\"M5.14 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2.936\" />", "atom": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <path d=\"M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z\" /> <path d=\"M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z\" />", "sparkles": "<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />", "factory": "<path d=\"M12 16h.01\" /> <path d=\"M16 16h.01\" /> <path d=\"M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z\" /> <path d=\"M8 16h.01\" />", "megaphone": "<path d=\"M11 6a13 13 0 0 0 8.4-2.8A1 1 0 0 1 21 4v12a1 1 0 0 1-1.6.8A13 13 0 0 0 11 14H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z\" /> <path d=\"M6 14a12 12 0 0 0 2.4 7.2 2 2 0 0 0 3.2-2.4A8 8 0 0 1 10 14\" /> <path d=\"M8 6v8\" />", "receipt": "<path d=\"M12 17V7\" /> <path d=\"M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8\" /> <path d=\"M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z\" />", "scale": "<path d=\"M12 3v18\" /> <path d=\"m19 8 3 8a5 5 0 0 1-6 0zV7\" /> <path d=\"M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1\" /> <path d=\"m5 8 3 8a5 5 0 0 1-6 0zV7\" /> <path d=\"M7 21h10\" />", "car": "<path d=\"M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2\" /> <circle cx=\"7\" cy=\"17\" r=\"2\" /> <path d=\"M9 17h6\" /> <circle cx=\"17\" cy=\"17\" r=\"2\" />", "building-2": "<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />", "ban": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M4.929 4.929 19.07 19.071\" />", "trees": "<path d=\"M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z\" /> <path d=\"M7 16v6\" /> <path d=\"M13 19v3\" /> <path d=\"M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5\" />", "waves": "<path d=\"M2 12q2.5 2 5 0t5 0 5 0 5 0\" /> <path d=\"M2 19q2.5 2 5 0t5 0 5 0 5 0\" /> <path d=\"M2 5q2.5 2 5 0t5 0 5 0 5 0\" />", "wheat": "<path d=\"M2 22 16 8\" /> <path d=\"M3.47 12.53 5 11l1.53 1.53a3.5 3.5 0 0 1 0 4.94L5 19l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z\" /> <path d=\"M7.47 8.53 9 7l1.53 1.53a3.5 3.5 0 0 1 0 4.94L9 15l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z\" /> <path d=\"M11.47 4.53 13 3l1.53 1.53a3.5 3.5 0 0 1 0 4.94L13 11l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z\" /> <path d=\"M20 2h2v2a4 4 0 0 1-4 4h-2V6a4 4 0 0 1 4-4Z\" /> <path d=\"M11.47 17.47 13 19l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L5 19l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z\" /> <path d=\"M15.47 13.47 17 15l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L9 15l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z\" /> <path d=\"M19.47 9.47 21 11l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L13 11l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z\" />", "fan": "<path d=\"M10.827 16.379a6.082 6.082 0 0 1-8.618-7.002l5.412 1.45a6.082 6.082 0 0 1 7.002-8.618l-1.45 5.412a6.082 6.082 0 0 1 8.618 7.002l-5.412-1.45a6.082 6.082 0 0 1-7.002 8.618l1.45-5.412Z\" /> <path d=\"M12 12v.01\" />", "shovel": "<path d=\"M21.56 4.56a1.5 1.5 0 0 1 0 2.122l-.47.47a3 3 0 0 1-4.212-.03 3 3 0 0 1 0-4.243l.44-.44a1.5 1.5 0 0 1 2.121 0z\" /> <path d=\"M3 22a1 1 0 0 1-1-1v-3.586a1 1 0 0 1 .293-.707l3.355-3.355a1.205 1.205 0 0 1 1.704 0l3.296 3.296a1.205 1.205 0 0 1 0 1.704l-3.355 3.355a1 1 0 0 1-.707.293z\" /> <path d=\"m9 15 7.879-7.878\" />", "fish": "<path d=\"M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z\" /> <path d=\"M18 12v.5\" /> <path d=\"M16 17.93a9.77 9.77 0 0 1 0-11.86\" /> <path d=\"M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33\" /> <path d=\"M10.46 7.26C10.2 5.88 9.17 4.24 8 3h5.8a2 2 0 0 1 1.98 1.67l.23 1.4\" /> <path d=\"m16.01 17.93-.23 1.4A2 2 0 0 1 13.8 21H9.5a5.96 5.96 0 0 0 1.49-3.98\" />", "droplets": "<path d=\"M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z\" /> <path d=\"M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97\" />", "graduation-cap": "<path d=\"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z\" /> <path d=\"M22 10v6\" /> <path d=\"M6 12.5V16a6 3 0 0 0 12 0v-3.5\" />", "chevron-left": "<path d=\"m15 18-6-6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "skip-forward": "<path d=\"M21 4v16\" /> <path d=\"M6.029 4.285A2 2 0 0 0 3 6v12a2 2 0 0 0 3.029 1.715l9.997-5.998a2 2 0 0 0 .003-3.432z\" />", "loader": "<path d=\"M12 2v4\" /> <path d=\"m16.2 7.8 2.9-2.9\" /> <path d=\"M18 12h4\" /> <path d=\"m16.2 16.2 2.9 2.9\" /> <path d=\"M12 18v4\" /> <path d=\"m4.9 19.1 2.9-2.9\" /> <path d=\"M2 12h4\" /> <path d=\"m4.9 4.9 2.9 2.9\" />", "music-off": "<path d=\"M9 18V5l12-2v13\" /> <circle cx=\"6\" cy=\"18\" r=\"3\" /> <circle cx=\"18\" cy=\"16\" r=\"3\" /> <path d=\"M2 2l20 20\" />"};
+const LUCIDE={"leaf": "<path d=\"M11 20a10 10 0 0010-10 25.9 25.9 0 00-1.04-7.281 1 1 0 00-1.755-.325C15.833 5.5 13 5.5 9.8 6.1A7 7 0 0011 20\" /> <path d=\"M2 21a5 5 0 012.911-4.544C7.613 15.212 8.351 15.24 11 13\" />", "landmark": "<path d=\"M10 18v-7\" /> <path d=\"M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z\" /> <path d=\"M14 18v-7\" /> <path d=\"M18 18v-7\" /> <path d=\"M3 22h18\" /> <path d=\"M6 18v-7\" />", "users": "<path d=\"M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2\" /> <path d=\"M16 3.128a4 4 0 0 1 0 7.744\" /> <path d=\"M22 21v-2a4 4 0 0 0-3-3.87\" /> <circle cx=\"9\" cy=\"7\" r=\"4\" />", "thermometer": "<path d=\"M14 4v10.54a4 4 0 1 1-4 0V4a2 2 0 0 1 4 0Z\" />", "cloud": "<path d=\"M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z\" />", "triangle-alert": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\" /> <path d=\"M12 9v4\" /> <path d=\"M12 17h.01\" />", "handshake": "<path d=\"m11 17 2 2a1 1 0 1 0 3-3\" /> <path d=\"m14 14 2.5 2.5a1 1 0 1 0 3-3l-3.88-3.88a3 3 0 0 0-4.24 0l-.88.88a1 1 0 1 1-3-3l2.81-2.81a5.79 5.79 0 0 1 7.06-.87l.47.28a2 2 0 0 0 1.42.25L21 4\" /> <path d=\"m21 3 1 11h-2\" /> <path d=\"M3 3 2 14l6.5 6.5a1 1 0 1 0 3-3\" /> <path d=\"M3 4h8\" />", "shield-alert": "<path d=\"M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z\" /> <path d=\"M12 8v4\" /> <path d=\"M12 16h.01\" />", "sprout": "<path d=\"M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3\" /> <path d=\"M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4\" /> <path d=\"M5 21h14\" />", "siren": "<path d=\"M7 18v-6a5 5 0 1 1 10 0v6\" /> <path d=\"M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a2 2 0 0 0-2-2H7a2 2 0 0 0-2 2z\" /> <path d=\"M21 12h1\" /> <path d=\"M18.5 4.5 18 5\" /> <path d=\"M2 12h1\" /> <path d=\"M12 2v1\" /> <path d=\"m4.929 4.929.707.707\" /> <path d=\"M12 12v6\" />", "globe": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20\" /> <path d=\"M2 12h20\" />", "play": "<path d=\"M5 5a2 2 0 0 1 3.008-1.728l11.997 6.998a2 2 0 0 1 .003 3.458l-12 7A2 2 0 0 1 5 19z\" />", "save": "<path d=\"M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z\" /> <path d=\"M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7\" /> <path d=\"M7 3v4a1 1 0 0 0 1 1h7\" />", "book-open": "<path d=\"M12 5v16\" /> <path d=\"M20.001 19A2 2 0 0022 17V5a2 2 0 00-1.999-2L16 3.002A5 5 0 0012 5a5 5 0 00-4-2H4a2 2 0 00-2 2v12a2 2 0 001.999 2H8a5 5 0 014 2 5 5 0 014-2z\" />", "pause": "<rect x=\"14\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\" /> <rect x=\"5\" y=\"3\" width=\"5\" height=\"18\" rx=\"1\" />", "fast-forward": "<path d=\"M12 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 12 18z\" /> <path d=\"M2 6a2 2 0 0 1 3.414-1.414l6 6a2 2 0 0 1 0 2.828l-6 6A2 2 0 0 1 2 18z\" />", "menu": "<path d=\"M4 5h16\" /> <path d=\"M4 12h16\" /> <path d=\"M4 19h16\" />", "x": "<path d=\"M18 6 6 18\" /> <path d=\"m6 6 12 12\" />", "newspaper": "<path d=\"M15 18h-5\" /> <path d=\"M18 14h-8\" /> <path d=\"M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-4 0v-9a2 2 0 0 1 2-2h2\" /> <rect width=\"8\" height=\"4\" x=\"10\" y=\"6\" rx=\"1\" />", "volume-2": "<path d=\"M11 4.702a.705.705 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.705.705 0 0 0 11 19.298z\" /> <path d=\"M16 9a5 5 0 0 1 0 6\" /> <path d=\"M19.364 18.364a9 9 0 0 0 0-12.728\" />", "volume-x": "<path d=\"M11 4.702a.7.7 0 0 0-1.203-.498L6.413 7.587A1.4 1.4 0 0 1 5.416 8H3a1 1 0 0 0-1 1v6a1 1 0 0 0 1 1h2.416a1.4 1.4 0 0 1 .997.413l3.383 3.384A.7.7 0 0 0 11 19.298z\" /> <path d=\"m16.5 14.5 5-5\" /> <path d=\"m16.5 9.5 5 5\" />", "check": "<path d=\"M20 6 9 17l-5-5\" />", "arrow-left": "<path d=\"m12 19-7-7 7-7\" /> <path d=\"M19 12H5\" />", "flask-conical": "<path d=\"M14 2v6a2 2 0 0 0 .245.96l5.51 10.08A2 2 0 0 1 18 22H6a2 2 0 0 1-1.755-2.96l5.51-10.08A2 2 0 0 0 10 8V2\" /> <path d=\"M6.453 15h11.094\" /> <path d=\"M8.5 2h7\" />", "map": "<path d=\"M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z\" /> <path d=\"M15 5.764v15\" /> <path d=\"M9 3.236v15\" />", "chart-line": "<path d=\"M3 3v16a2 2 0 0 0 2 2h16\" /> <path d=\"m19 9-5 5-4-4-3 3\" />", "zap": "<path d=\"M15.914 4a1.5 1.5 0 00-2.474-1.561l-9 9A1.5 1.5 0 005.5 14h4.002a.5.5 0 01.471.666L8.086 20a1.5 1.5 0 002.475 1.56l9-9A1.5 1.5 0 0018.5 10h-3.997a.5.5 0 01-.472-.667z\" />", "copy": "<rect width=\"14\" height=\"14\" x=\"8\" y=\"8\" rx=\"2\" ry=\"2\" /> <path d=\"M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2\" />", "trophy": "<path d=\"M10 14.66V17a1 1 0 0 1-1 1 2 2 0 0 0-2 2v2\" /> <path d=\"M14 14.66V17a1 1 0 0 0 1 1 2 2 0 0 1 2 2v2\" /> <path d=\"M17.916 10H19.5A2.5 2.5 0 0 0 22 7.5V5a1 1 0 0 0-1-1h-3\" /> <path d=\"M4 22h16\" /> <path d=\"M6 9a6 6 0 0 0 12 0V3a1 1 0 0 0-1-1H7a1 1 0 0 0-1 1z\" /> <path d=\"M6.084 10H4.5A2.5 2.5 0 0 1 2 7.5V5a1 1 0 0 1 1-1h3\" />", "flag": "<path d=\"M4 22V4a1 1 0 0 1 .4-.8A6 6 0 0 1 8 2c3 0 5 2 7.333 2q2 0 3.067-.8A1 1 0 0 1 20 4v10a1 1 0 0 1-.4.8A6 6 0 0 1 16 16c-3 0-5-2-8-2a6 6 0 0 0-4 1.528\" />", "lightbulb": "<path d=\"M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5\" /> <path d=\"M9 18h6\" /> <path d=\"M10 22h4\" />", "music": "<path d=\"M9 18V5l12-2v13\" /> <circle cx=\"6\" cy=\"18\" r=\"3\" /> <circle cx=\"18\" cy=\"16\" r=\"3\" />", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\" /> <path d=\"M12 2v2\" /> <path d=\"M12 20v2\" /> <path d=\"m4.93 4.93 1.41 1.41\" /> <path d=\"m17.66 17.66 1.41 1.41\" /> <path d=\"M2 12h2\" /> <path d=\"M20 12h2\" /> <path d=\"m6.34 17.66-1.41 1.41\" /> <path d=\"m19.07 4.93-1.41 1.41\" />", "battery-charging": "<path d=\"m11 7-3 5h4l-3 5\" /> <path d=\"M14.856 6H16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2h-2.935\" /> <path d=\"M22 14v-4\" /> <path d=\"M5.14 18H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h2.936\" />", "atom": "<circle cx=\"12\" cy=\"12\" r=\"1\" /> <path d=\"M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z\" /> <path d=\"M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z\" />", "sparkles": "<path d=\"M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z\" /> <path d=\"M20 2v4\" /> <path d=\"M22 4h-4\" /> <circle cx=\"4\" cy=\"20\" r=\"2\" />", "factory": "<path d=\"M12 16h.01\" /> <path d=\"M16 16h.01\" /> <path d=\"M3 19a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8.5a.5.5 0 0 0-.769-.422l-4.462 2.844A.5.5 0 0 1 15 10.5v-2a.5.5 0 0 0-.769-.422L9.77 10.922A.5.5 0 0 1 9 10.5V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2z\" /> <path d=\"M8 16h.01\" />", "megaphone": "<path d=\"M11 6a13 13 0 0 0 8.4-2.8A1 1 0 0 1 21 4v12a1 1 0 0 1-1.6.8A13 13 0 0 0 11 14H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z\" /> <path d=\"M6 14a12 12 0 0 0 2.4 7.2 2 2 0 0 0 3.2-2.4A8 8 0 0 1 10 14\" /> <path d=\"M8 6v8\" />", "receipt": "<path d=\"M12 17V7\" /> <path d=\"M16 8h-6a2 2 0 0 0 0 4h4a2 2 0 0 1 0 4H8\" /> <path d=\"M4 3a1 1 0 0 1 1-1 1.3 1.3 0 0 1 .7.2l.933.6a1.3 1.3 0 0 0 1.4 0l.934-.6a1.3 1.3 0 0 1 1.4 0l.933.6a1.3 1.3 0 0 0 1.4 0l.933-.6a1.3 1.3 0 0 1 1.4 0l.934.6a1.3 1.3 0 0 0 1.4 0l.933-.6A1.3 1.3 0 0 1 19 2a1 1 0 0 1 1 1v18a1 1 0 0 1-1 1 1.3 1.3 0 0 1-.7-.2l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.934.6a1.3 1.3 0 0 1-1.4 0l-.933-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-1.4 0l-.934-.6a1.3 1.3 0 0 0-1.4 0l-.933.6a1.3 1.3 0 0 1-.7.2 1 1 0 0 1-1-1z\" />", "scale": "<path d=\"M12 3v18\" /> <path d=\"m19 8 3 8a5 5 0 0 1-6 0zV7\" /> <path d=\"M3 7h1a17 17 0 0 0 8-2 17 17 0 0 0 8 2h1\" /> <path d=\"m5 8 3 8a5 5 0 0 1-6 0zV7\" /> <path d=\"M7 21h10\" />", "car": "<path d=\"M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2\" /> <circle cx=\"7\" cy=\"17\" r=\"2\" /> <path d=\"M9 17h6\" /> <circle cx=\"17\" cy=\"17\" r=\"2\" />", "building-2": "<path d=\"M10 12h4\" /> <path d=\"M10 8h4\" /> <path d=\"M14 21v-3a2 2 0 0 0-4 0v3\" /> <path d=\"M6 10H4a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-2\" /> <path d=\"M6 21V5a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v16\" />", "ban": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <path d=\"M4.929 4.929 19.07 19.071\" />", "trees": "<path d=\"M10 10v.2A3 3 0 0 1 8.9 16H5a3 3 0 0 1-1-5.8V10a3 3 0 0 1 6 0Z\" /> <path d=\"M7 16v6\" /> <path d=\"M13 19v3\" /> <path d=\"M12 19h8.3a1 1 0 0 0 .7-1.7L18 14h.3a1 1 0 0 0 .7-1.7L16 9h.2a1 1 0 0 0 .8-1.7L13 3l-1.4 1.5\" />", "waves": "<path d=\"M2 12q2.5 2 5 0t5 0 5 0 5 0\" /> <path d=\"M2 19q2.5 2 5 0t5 0 5 0 5 0\" /> <path d=\"M2 5q2.5 2 5 0t5 0 5 0 5 0\" />", "wheat": "<path d=\"M2 22 16 8\" /> <path d=\"M3.47 12.53 5 11l1.53 1.53a3.5 3.5 0 0 1 0 4.94L5 19l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z\" /> <path d=\"M7.47 8.53 9 7l1.53 1.53a3.5 3.5 0 0 1 0 4.94L9 15l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z\" /> <path d=\"M11.47 4.53 13 3l1.53 1.53a3.5 3.5 0 0 1 0 4.94L13 11l-1.53-1.53a3.5 3.5 0 0 1 0-4.94Z\" /> <path d=\"M20 2h2v2a4 4 0 0 1-4 4h-2V6a4 4 0 0 1 4-4Z\" /> <path d=\"M11.47 17.47 13 19l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L5 19l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z\" /> <path d=\"M15.47 13.47 17 15l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L9 15l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z\" /> <path d=\"M19.47 9.47 21 11l-1.53 1.53a3.5 3.5 0 0 1-4.94 0L13 11l1.53-1.53a3.5 3.5 0 0 1 4.94 0Z\" />", "fan": "<path d=\"M10.827 16.379a6.082 6.082 0 0 1-8.618-7.002l5.412 1.45a6.082 6.082 0 0 1 7.002-8.618l-1.45 5.412a6.082 6.082 0 0 1 8.618 7.002l-5.412-1.45a6.082 6.082 0 0 1-7.002 8.618l1.45-5.412Z\" /> <path d=\"M12 12v.01\" />", "shovel": "<path d=\"M21.56 4.56a1.5 1.5 0 0 1 0 2.122l-.47.47a3 3 0 0 1-4.212-.03 3 3 0 0 1 0-4.243l.44-.44a1.5 1.5 0 0 1 2.121 0z\" /> <path d=\"M3 22a1 1 0 0 1-1-1v-3.586a1 1 0 0 1 .293-.707l3.355-3.355a1.205 1.205 0 0 1 1.704 0l3.296 3.296a1.205 1.205 0 0 1 0 1.704l-3.355 3.355a1 1 0 0 1-.707.293z\" /> <path d=\"m9 15 7.879-7.878\" />", "fish": "<path d=\"M6.5 12c.94-3.46 4.94-6 8.5-6 3.56 0 6.06 2.54 7 6-.94 3.47-3.44 6-7 6s-7.56-2.53-8.5-6Z\" /> <path d=\"M18 12v.5\" /> <path d=\"M16 17.93a9.77 9.77 0 0 1 0-11.86\" /> <path d=\"M7 10.67C7 8 5.58 5.97 2.73 5.5c-1 1.5-1 5 .23 6.5-1.24 1.5-1.24 5-.23 6.5C5.58 18.03 7 16 7 13.33\" /> <path d=\"M10.46 7.26C10.2 5.88 9.17 4.24 8 3h5.8a2 2 0 0 1 1.98 1.67l.23 1.4\" /> <path d=\"m16.01 17.93-.23 1.4A2 2 0 0 1 13.8 21H9.5a5.96 5.96 0 0 0 1.49-3.98\" />", "droplets": "<path d=\"M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z\" /> <path d=\"M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97\" />", "graduation-cap": "<path d=\"M21.42 10.922a1 1 0 0 0-.019-1.838L12.83 5.18a2 2 0 0 0-1.66 0L2.6 9.08a1 1 0 0 0 0 1.832l8.57 3.908a2 2 0 0 0 1.66 0z\" /> <path d=\"M22 10v6\" /> <path d=\"M6 12.5V16a6 3 0 0 0 12 0v-3.5\" />", "chevron-left": "<path d=\"m15 18-6-6 6-6\" />", "chevron-right": "<path d=\"m9 18 6-6-6-6\" />", "skip-forward": "<path d=\"M21 4v16\" /> <path d=\"M6.029 4.285A2 2 0 0 0 3 6v12a2 2 0 0 0 3.029 1.715l9.997-5.998a2 2 0 0 0 .003-3.432z\" />", "loader": "<path d=\"M12 2v4\" /> <path d=\"m16.2 7.8 2.9-2.9\" /> <path d=\"M18 12h4\" /> <path d=\"m16.2 16.2 2.9 2.9\" /> <path d=\"M12 18v4\" /> <path d=\"m4.9 19.1 2.9-2.9\" /> <path d=\"M2 12h4\" /> <path d=\"m4.9 4.9 2.9 2.9\" />", "music-off": "<path d=\"M9 18V5l12-2v13\" /> <circle cx=\"6\" cy=\"18\" r=\"3\" /> <circle cx=\"18\" cy=\"16\" r=\"3\" /> <path d=\"M2 2l20 20\" />", "award": "<path d=\"m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526\" /> <circle cx=\"12\" cy=\"8\" r=\"6\" />", "medal": "<path d=\"M7.21 15 2.66 7.14a2 2 0 0 1 .13-2.2L4.4 2.8A2 2 0 0 1 6 2h12a2 2 0 0 1 1.6.8l1.6 2.14a2 2 0 0 1 .14 2.2L16.79 15\" /> <path d=\"M11 12 5.12 2.2\" /> <path d=\"m13 12 5.88-9.8\" /> <path d=\"M8 7h8\" /> <circle cx=\"12\" cy=\"17\" r=\"5\" /> <path d=\"M12 18v-2h-.5\" />", "star": "<path d=\"M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16z\" />", "crown": "<path d=\"M11.562 3.266a.5.5 0 0 1 .876 0L15.39 8.87a1 1 0 0 0 1.516.294L21.183 5.5a.5.5 0 0 1 .798.519l-2.834 10.246a1 1 0 0 1-.956.734H5.81a1 1 0 0 1-.957-.734L2.02 6.02a.5.5 0 0 1 .798-.519l4.276 3.664a1 1 0 0 0 1.516-.294z\" /> <path d=\"M5 21h14\" />", "timer": "<line x1=\"10\" x2=\"14\" y1=\"2\" y2=\"2\" /> <line x1=\"12\" x2=\"15\" y1=\"14\" y2=\"11\" /> <circle cx=\"12\" cy=\"14\" r=\"8\" />", "hourglass": "<path d=\"M5 22h14\" /> <path d=\"M5 2h14\" /> <path d=\"M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22\" /> <path d=\"M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2\" />", "flame": "<path d=\"M12 3q1 4 4 6.5t3 5.5a1 1 0 0 1-14 0 5 5 0 0 1 1-3 1 1 0 0 0 5 0c0-2-1.5-3-1.5-5q0-2 2.5-4\" />", "lock": "<rect width=\"18\" height=\"11\" x=\"3\" y=\"11\" rx=\"2\" ry=\"2\" /> <path d=\"M7 11V7a5 5 0 0 1 10 0v4\" />", "calendar-check": "<path d=\"M8 2v3\" /> <path d=\"M16 2v3\" /> <rect x=\"3\" y=\"3\" width=\"18\" height=\"18\" rx=\"2\" /> <path d=\"M3 9h18\" /> <path d=\"m9 15 2 2 4-4\" />", "target": "<circle cx=\"12\" cy=\"12\" r=\"10\" /> <circle cx=\"12\" cy=\"12\" r=\"6\" /> <circle cx=\"12\" cy=\"12\" r=\"2\" />", "heart-handshake": "<path d=\"M19.414 14.414C21 12.828 22 11.5 22 9.5a5.5 5.5 0 0 0-9.591-3.676.6.6 0 0 1-.818.001A5.5 5.5 0 0 0 2 9.5c0 2.3 1.5 4 3 5.5l5.535 5.362a2 2 0 0 0 2.879.052 2.12 2.12 0 0 0-.004-3 2.124 2.124 0 1 0 3-3 2.124 2.124 0 0 0 3.004 0 2 2 0 0 0 0-2.828l-1.881-1.882a2.41 2.41 0 0 0-3.409 0l-1.71 1.71a2 2 0 0 1-2.828 0 2 2 0 0 1 0-2.828l2.823-2.762\" />", "piggy-bank": "<path d=\"M11 17h3v2a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1v-3a3.16 3.16 0 0 0 2-2h1a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1h-1a5 5 0 0 0-2-4V3a4 4 0 0 0-3.2 1.6l-.3.4H11a6 6 0 0 0-6 6v1a5 5 0 0 0 2 4v3a1 1 0 0 0 1 1h2a1 1 0 0 0 1-1z\" /> <path d=\"M16 10h.01\" /> <path d=\"M2 8v1a2 2 0 0 0 2 2h1\" />", "rocket": "<path d=\"M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5\" /> <path d=\"M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09\" /> <path d=\"M9 12a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.4 22.4 0 0 1-4 2z\" /> <path d=\"M9 12H4s.55-3.03 2-4c1.62-1.08 5 .05 5 .05\" />", "party-popper": "<path d=\"M5.8 11.3 2 22l10.7-3.79\" /> <path d=\"M4 3h.01\" /> <path d=\"M22 8h.01\" /> <path d=\"M15 2h.01\" /> <path d=\"M22 20h.01\" /> <path d=\"m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10\" /> <path d=\"m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11c-.11.7-.72 1.22-1.43 1.22H17\" /> <path d=\"m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7\" /> <path d=\"M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z\" />", "library": "<path d=\"m16 6 4 14\" /> <path d=\"M12 6v14\" /> <path d=\"M8 8v12\" /> <path d=\"M4 4v16\" />"};
 /* Icons are written as [[name]] tokens inside strings (safe to store in saves/logs) and expanded by icx() at render time. */
 const I = (n, cls = "") => LUCIDE[n] ? `<svg class="i i-${n} ${cls}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${LUCIDE[n]}</svg>` : "";
 const icx = str => String(str).replace(/\[\[([a-z0-9-]+)\]\]/g, (m, n) => I(n));
@@ -526,6 +544,8 @@ const UI = {
   enter:{th:"แตะเพื่อเข้าสู่เกม",en:"Tap to enter"},
   tutNext:{th:"ถัดไป",en:"Next"}, tutBack:{th:"ย้อนกลับ",en:"Back"}, tutSkip:{th:"ข้าม",en:"Skip"}, tutDone:{th:"เริ่มเล่น",en:"Start playing"},
   tutMenu:{th:"วิธีเล่น",en:"How to play"}, musicLbl:{th:"ดนตรี",en:"Music"}, sfxLbl:{th:"เสียงเอฟเฟกต์",en:"Sound effects"},
+  mAch:{th:"ความสำเร็จ",en:"Achievements"}, achUnlocked:{th:"ปลดล็อกความสำเร็จ!",en:"Achievement unlocked!"},
+  achSecret:{th:"ความสำเร็จลับ",en:"Secret achievement"}, achOn:{th:"ได้เมื่อ",en:"Unlocked"},
   mNew:{th:"เกมใหม่",en:"New game"}, mNewS:{th:"เริ่มภารกิจ มกราคม 2026",en:"Start the mission in January 2026"},
   mCont:{th:"เล่นต่อ",en:"Continue"}, mLoad:{th:"โหลดเกม",en:"Load game"}, mLoadS:{th:"บันทึกอัตโนมัติ + 3 ช่อง + รหัสเซฟ",en:"Autosave, 3 slots and save codes"},
   mHow:{th:"วิธีเล่น",en:"How to play"}, mHowS:{th:"กติกา ทรัพยากร และเงื่อนไขแพ้ชนะ",en:"Rules, resources and win/lose conditions"},
@@ -1691,7 +1711,7 @@ function buyNode(id){
   const months = Math.max(1, n.months);
   if (Object.keys(per).length) S.rollouts.push({id, kind:"co2", left:months, months, per});
   if (fx.sink) S.rollouts.push({id, kind:"sink", left:months, months, amt: fx.sink * dacEff});
-  addLog(`${t("logTech")}: ${n.id} ${L(n.name)}`, "tc");
+  addLog(`${t("logTech")}: ${n.id} ${L(n.name)}`, "tc"); Ach.check();
   SFX.play("buy"); render(); Globe.refresh();
 }
 function doAction(aid){
@@ -1703,7 +1723,7 @@ function doAction(aid){
   if (aid === "diplo")  r.comp = clamp(r.comp + 8, 0, 100);
   if (aid === "adapt"){ r.vuln = clamp(r.vuln - 10, 0, 100); S.appr = clamp(S.appr + 1, 0, 100); }
   if (aid === "tariff"){ r.co2 = Math.max(0, r.co2 - 0.8 * r.comp / 100); r.comp = clamp(r.comp - 6, 0, 100); }
-  addLog(`${t("logAct")}: ${L(a.name)} → ${L(RMETA[r.id].name)}`, "tc"); SFX.play("action");
+  addLog(`${t("logAct")}: ${L(a.name)} → ${L(RMETA[r.id].name)}`, "tc"); Ach.unlock("action1"); SFX.play("action");
   if (!checkEnd()) { render(); Globe.refresh(); }
 }
 function applyFx(fx, target){
@@ -1754,11 +1774,11 @@ function popBubble(id, x, y){
   const b = S.bubbles.find(q => q.id === id); if (!b || S.over || S.event) return;
   if (b.type === "green"){
     const gain = 2 + Math.round(avg(r => r.comp) / 40);
-    S.ep += gain; SFX.play("pop"); floatText(x, y, `+${gain} ${IC.ep}`, "var(--good)");
+    S.ep += gain; SFX.play("pop"); Ach.green(); floatText(x, y, `+${gain} ${IC.ep}`, "var(--good)");
   } else {
     if (S.ep < RED_COST) { SFX.play("error"); floatText(x, y, t("cantAfford"), "var(--bad)"); return; }
     const r = R(b.reg); S.ep -= RED_COST; r.comp = clamp(r.comp + 3, 0, 100); r.vuln = clamp(r.vuln - 1, 0, 100); S.appr = clamp(S.appr + 1, 0, 100);
-    SFX.play("aid"); floatText(x, y, `+1% ${IC.appr}`, "var(--accent)");
+    SFX.play("aid"); Ach.aid(); floatText(x, y, `+1% ${IC.appr}`, "var(--accent)");
     addLog(`${t("redHelp")} ${L(RMETA[b.reg].name)} · ${IC.ep} −${RED_COST} · ${t("compliance")} +3%`, "gd");
   }
   S.bubbles = S.bubbles.filter(q => q.id !== id);
@@ -1808,7 +1828,7 @@ function tick(){
   const stress = avg(r => r.vuln) / 100 * Math.max(0, S.temp - 1.3) * 0.6;
   S.appr = clamp(S.appr - stress + (60 - S.appr) * 0.004, 0, 100);
   ageBubbles(); spawnBubbles();
-  S.hist.push({net, temp:S.temp});
+  S.hist.push({net, temp:S.temp}); Ach.check();
   if (checkEnd()) return;
   maybeNews();
   if (S.tick % 6 === 0) autosave();
@@ -1832,7 +1852,7 @@ function chooseOption(i){
   const e = EVENTS.find(x => x.id === S.event); if (!e) return;
   const opt = i === -1 ? {label:{th:UI.postpone.th,en:UI.postpone.en}, fx:{appr:-6,tip:1}} : e.options[i];
   if (i !== -1 && !affordable(opt.fx)) return;
-  applyFx(opt.fx, e.target); SFX.play("choose");
+  applyFx(opt.fx, e.target); SFX.play("choose"); Ach.unlock("event1"); Ach.sawEvent(e.id); if (e.id === "EVT_119" || e.id === "EVT_47") Ach.unlock("chaoPhraya");
   addLog(`${L(e.title)} → ${L(opt.label)} [${fxChips(opt.fx, e.target).map(c => c.txt).join(", ") || "—"}]`, "ev");
   S.event = null; closeModal(); SFX.stopAmb();
   if (!checkEnd()) { render(); Globe.refresh(); loop(); }
@@ -1841,7 +1861,7 @@ function checkEnd(){
   let o = null;
   if (netCO2() <= 0) o = "win"; else if (S.temp >= 3.0) o = "l1"; else if (S.appr <= 0) o = "l2"; else if (S.tick >= TOTAL_TICKS) o = "l3";
   if (!o) return false;
-  S.over = o; S.event = null; SFX.play(o === "win" ? "win" : "lose"); render(); Globe.refresh(); renderEnd(); return true;
+  S.over = o; S.event = null; SFX.play(o === "win" ? "win" : "lose"); Ach.check(); render(); Globe.refresh(); renderEnd(); return true;
 }
 function score(){
   const left = Math.max(0, TOTAL_TICKS - S.tick);
@@ -2528,7 +2548,7 @@ function startGame(lang){
   clearTimeout(timer);
   S = newState(lang); S.started = true; S.speed = 1;
   UIM.screen = "game"; UIM.paused = false; renderMenu();
-  addLog(t("logStart"), "tc"); SFX.play("start");
+  addLog(t("logStart"), "tc"); SFX.play("start"); Ach.unlock("start");
   closeModal(); render(); Globe.refresh(); autosave(); loop();
 }
 
@@ -2615,6 +2635,7 @@ const Tutorial = (() => {
         <button class="btn" data-tut="${last ? "done" : "next"}">${last ? t("tutDone") : t("tutNext") + " [[chevron-right]]"}</button></span></div></div></div>`, "tutm");
   }
   function close(){
+    if (i === TUT.length - 1) Ach.unlock("tutorial");
     markSeen(); closeModal();
     if (thenIntro) renderIntro();
     else if (UIM.paused) renderPause();
@@ -2623,6 +2644,116 @@ const Tutorial = (() => {
     seen,
     open(start = 0, intro = false){ i = start; thenIntro = intro; show(); },
     act(a){ if (a === "next"){ i++; show(); } else if (a === "back"){ i--; show(); } else close(); },
+  };
+})();
+
+/* ---------------------------- Achievements (Steam-style) ----------------------------
+   Saved per browser in localStorage "p2050-ach": {got:{id:timestamp}, greens, aids, seen:[event ids]}.
+   Each entry: icon, title, desc, test() run after game actions; optional prog() → [now, goal]; hidden until unlocked. */
+const ACH = [
+  {id:"start",     icon:"globe",           t:{th:"ก้าวแรกของ GCT",en:"First Day at GCT"},            d:{th:"เริ่มภารกิจครั้งแรก",en:"Start your first mission"}},
+  {id:"tutorial",  icon:"graduation-cap",  t:{th:"นักเรียนดีเด่น",en:"Top Student"},                  d:{th:"อ่านคู่มือจนจบทุกขั้น",en:"Finish every step of the tutorial"}},
+  {id:"tech1",     icon:"flask-conical",   t:{th:"โครงการแรก",en:"First Project"},                    d:{th:"อนุมัติโครงการเทคโนโลยีครั้งแรก",en:"Approve your first tech project"}},
+  {id:"action1",   icon:"map",             t:{th:"ลงพื้นที่",en:"Boots on the Ground"},               d:{th:"สั่งการรายภูมิภาคครั้งแรก",en:"Give your first regional order"}},
+  {id:"event1",    icon:"lightbulb",       t:{th:"ผู้ตัดสินใจ",en:"Decision Maker"},                  d:{th:"ตัดสินใจอีเวนต์แรก",en:"Resolve your first event"}},
+  {id:"saver",     icon:"save",            t:{th:"กันไว้ดีกว่าแก้",en:"Better Safe"},                 d:{th:"บันทึกเกมลงช่องบันทึก",en:"Save a game to a slot"}},
+  {id:"greens",    icon:"sprout",          t:{th:"นักเก็บงบเขียว",en:"Green Collector"},              d:{th:"เก็บฟองเขียวรวม 25 ฟอง (นับทุกเกม)",en:"Collect 25 green bubbles (all games)"}, prog:()=>[AchStore.data.greens, 25]},
+  {id:"aids",      icon:"siren",           t:{th:"หน่วยกู้ภัย",en:"First Responder"},                 d:{th:"ส่งความช่วยเหลือภัยพิบัติรวม 10 ครั้ง (นับทุกเกม)",en:"Send disaster aid 10 times (all games)"}, prog:()=>[AchStore.data.aids, 10]},
+  {id:"rush",      icon:"receipt",         t:{th:"เงินเฟ้อสีเขียว",en:"Greenflation"},                 d:{th:"อนุมัติ 3 โครงการภายใน 12 เดือน",en:"Approve 3 projects within 12 months"}},
+  {id:"rich",      icon:"piggy-bank",      t:{th:"คลังเขียวเต็ม",en:"Full Treasury"},                 d:{th:"มีงบเขียว 300 ในคราวเดียว",en:"Hold 300 Eco-Points at once"}},
+  {id:"branchE",   icon:"zap",             t:{th:"ปฏิวัติพลังงาน",en:"Energy Revolution"},             d:{th:"ปลดล็อกสายพลังงานครบ 6 โหนดในเกมเดียว",en:"Unlock all 6 energy nodes in one game"}},
+  {id:"branchP",   icon:"landmark",        t:{th:"นักนิติบัญญัติ",en:"Lawmaker"},                     d:{th:"ปลดล็อกสายนโยบายครบ 6 โหนดในเกมเดียว",en:"Unlock all 6 policy nodes in one game"}},
+  {id:"branchN",   icon:"trees",           t:{th:"ผู้พิทักษ์ธรรมชาติ",en:"Nature Guardian"},           d:{th:"ปลดล็อกสายธรรมชาติครบ 6 โหนดในเกมเดียว",en:"Unlock all 6 nature nodes in one game"}},
+  {id:"allTech",   icon:"award",           t:{th:"ต้นไม้ครบทุกกิ่ง",en:"Full Tree"},                  d:{th:"ปลดล็อกครบ 18 โหนดในเกมเดียว",en:"Unlock all 18 nodes in one game"}},
+  {id:"fusion",    icon:"sparkles",        t:{th:"ดวงอาทิตย์บนโลก",en:"A Sun on Earth"},              d:{th:"สร้างโรงไฟฟ้าฟิวชันจนเสร็จ",en:"Finish building fusion power"}},
+  {id:"unity",     icon:"handshake",       t:{th:"โลกสามัคคี",en:"United World"},                     d:{th:"ความร่วมมือทุกภูมิภาคถึง 85% พร้อมกัน",en:"Every region at 85% compliance at once"}},
+  {id:"safe",      icon:"shield-alert",    t:{th:"โลกปลอดภัย",en:"Safe Planet"},                      d:{th:"ความเสี่ยงภัยพิบัติทุกภูมิภาคต่ำกว่า 35%",en:"Every region below 35% disaster risk"}},
+  {id:"peak",      icon:"chart-line",      t:{th:"ผ่านจุดสูงสุด",en:"Past the Peak"},                 d:{th:"CO₂ สุทธิลดลงอย่างน้อย 2 Gt ใน 12 เดือน",en:"Cut net CO₂ by at least 2 Gt in 12 months"}},
+  {id:"half",      icon:"flag",            t:{th:"ครึ่งทาง",en:"Halfway There"},                      d:{th:"CO₂ สุทธิต่ำกว่า 18 Gt",en:"Get net CO₂ below 18 Gt"}},
+  {id:"decade",    icon:"hourglass",       t:{th:"ทศวรรษแรก",en:"First Decade"},                      d:{th:"บริหารโลกจนถึงปี 2036",en:"Lead the world until 2036"}},
+  {id:"win",       icon:"trophy",          t:{th:"Net Zero!",en:"Net Zero!"},                         d:{th:"ชนะเกม",en:"Win the game"}},
+  {id:"winEarly",  icon:"rocket",          t:{th:"ก่อนกำหนด",en:"Ahead of Schedule"},                d:{th:"ชนะก่อนปี 2046",en:"Win before 2046"}},
+  {id:"win15",     icon:"thermometer",     t:{th:"รักษา 1.5 องศา",en:"Keep It at 1.5"},               d:{th:"ชนะโดยอุณหภูมิไม่ถึง +1.5°C",en:"Win with warming under +1.5°C"}},
+  {id:"winLoved",  icon:"users",           t:{th:"ขวัญใจมวลชน",en:"People's Champion"},               d:{th:"ชนะโดยความนิยมอย่างน้อย 70%",en:"Win with at least 70% approval"}},
+  {id:"loseTime",  icon:"timer",           t:{th:"เกือบไปแล้ว",en:"So Close"},                        d:{th:"เล่นจนถึงปี 2051 แต่ยังไม่ Net Zero",en:"Reach 2051 without Net Zero"}},
+  {id:"loseHeat",  icon:"flame",           t:{th:"โลกเดือด",en:"Boiling Point"},                      d:{th:"ปล่อยให้โลกร้อนถึง +3.0°C",en:"Let warming reach +3.0°C"}, hidden:true},
+  {id:"loseVote",  icon:"megaphone",       t:{th:"ถูกถอดถอน",en:"Voted Out"},                         d:{th:"ความนิยมเหลือ 0%",en:"Drop to 0% approval"}, hidden:true},
+  {id:"chaoPhraya",icon:"waves",           t:{th:"ลุ่มเจ้าพระยา",en:"Chao Phraya"},                   d:{th:"รับมืออีเวนต์น้ำท่วมหรือน้ำเค็มรุกลุ่มเจ้าพระยา",en:"Handle a Chao Phraya flood or saltwater event"}, hidden:true},
+  {id:"read25",    icon:"newspaper",       t:{th:"นักอ่านข่าว",en:"News Reader"},                     d:{th:"พบอีเวนต์ต่างกัน 25 เรื่อง (นับทุกเกม)",en:"See 25 different events (all games)"}, prog:()=>[AchStore.data.seen.length, 25]},
+  {id:"read100",   icon:"library",         t:{th:"ผู้รอบรู้",en:"Well Informed"},                     d:{th:"พบอีเวนต์ต่างกัน 100 เรื่อง (นับทุกเกม)",en:"See 100 different events (all games)"}, prog:()=>[AchStore.data.seen.length, 100]},
+  {id:"readAll",   icon:"crown",           t:{th:"สารานุกรมภูมิอากาศ",en:"Climate Encyclopedia"},     d:{th:"พบอีเวนต์ครบทุกเรื่อง",en:"See every event"}, prog:()=>[AchStore.data.seen.length, EVENTS.length]},
+];
+const AchStore = (() => {
+  const KEY = "p2050-ach";
+  let data = {got:{}, greens:0, aids:0, seen:[]};
+  try { data = Object.assign(data, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch(e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {} };
+  return { get data(){ return data; }, save };
+})();
+const Ach = (() => {
+  const queue = []; let showing = false;
+  function unlock(id){
+    const d = AchStore.data; if (d.got[id]) return;
+    const a = ACH.find(x => x.id === id); if (!a) return;
+    d.got[id] = Date.now(); AchStore.save(); queue.push(a); next();
+  }
+  function next(){
+    if (showing || !queue.length) return;
+    showing = true; const a = queue.shift();
+    const el = document.createElement("div"); el.className = "ach-toast";
+    el.innerHTML = `<span class="ach-ic got">${I(a.icon)}</span><span><small>${t("achUnlocked")}</small><b>${L(a.t)}</b><em>${L(a.d)}</em></span>`;
+    document.body.appendChild(el); SFX.play("done");
+    requestAnimationFrame(() => el.classList.add("in"));
+    setTimeout(() => { el.classList.remove("in"); setTimeout(() => { el.remove(); showing = false; next(); }, 400); }, 4200);
+  }
+  const byCat = cat => NODES.filter(n => n.cat === cat).every(n => S.owned[n.id]);
+  /* check game-state achievements; call after anything that changes S */
+  function check(){
+    if (!S || !S.started) return;
+    if (Object.keys(S.owned).length) unlock("tech1");
+    if (recentBuys() >= 3) unlock("rush");
+    if (S.ep >= 300) unlock("rich");
+    if (byCat(1)) unlock("branchE"); if (byCat(2)) unlock("branchP"); if (byCat(3)) unlock("branchN");
+    if (NODES.every(n => S.owned[n.id])) unlock("allTech");
+    if (S.owned.E5 && rollProgress("E5") === null) unlock("fusion");
+    if (S.regions.every(r => r.comp >= 85)) unlock("unity");
+    if (S.regions.every(r => r.vuln < 35)) unlock("safe");
+    if (S.hist.length > 12 && S.hist[S.hist.length - 13].net - netCO2() >= 2) unlock("peak");
+    if (netCO2() < 18) unlock("half");
+    if (S.tick >= 120) unlock("decade");
+    const d = AchStore.data;
+    if (d.greens >= 25) unlock("greens"); if (d.aids >= 10) unlock("aids");
+    if (d.seen.length >= 25) unlock("read25"); if (d.seen.length >= 100) unlock("read100"); if (d.seen.length >= EVENTS.length) unlock("readAll");
+    if (S.over === "win"){
+      unlock("win");
+      if (S.tick < 240) unlock("winEarly");
+      if (S.temp < 1.5) unlock("win15");
+      if (S.appr >= 70) unlock("winLoved");
+    }
+    if (S.over === "l3") unlock("loseTime");
+    if (S.over === "l1") unlock("loseHeat");
+    if (S.over === "l2") unlock("loseVote");
+  }
+  function count(){ return ACH.filter(a => AchStore.data.got[a.id]).length; }
+  function listHtml(){
+    const d = AchStore.data, n = count(), pct = Math.round(n / ACH.length * 100);
+    const loc = S.lang === "th" ? "th-TH" : "en-GB";
+    return `<div class="ach-sum"><div><b>${n}</b> / ${ACH.length} · ${pct}%</div><div class="meter"><i style="width:${pct}%;background:var(--accent)"></i></div></div>
+      <div class="ach-list">` + ACH.map(a => {
+        const got = d.got[a.id], secret = a.hidden && !got;
+        const p = a.prog && !got ? a.prog() : null;
+        return `<div class="ach ${got ? "got" : "locked"}">
+          <span class="ach-ic ${got ? "got" : ""}">${I(secret ? "lock" : a.icon)}</span>
+          <span class="ach-tx"><b>${secret ? t("achSecret") : L(a.t)}</b><em>${secret ? "???" : L(a.d)}</em>
+          ${got ? `<small>${t("achOn")} ${new Date(got).toLocaleDateString(loc, {dateStyle:"medium"})}</small>` : ""}
+          ${p ? `<span class="ach-prog"><i style="width:${Math.min(100, p[0] / p[1] * 100)}%"></i></span><small>${Math.min(p[0], p[1])} / ${p[1]}</small>` : ""}</span></div>`;
+      }).join("") + `</div>`;
+  }
+  return {
+    unlock, check, count, listHtml,
+    green(){ AchStore.data.greens++; AchStore.save(); check(); },
+    aid(){ AchStore.data.aids++; AchStore.save(); check(); },
+    sawEvent(id){ const s = AchStore.data.seen; if (!s.includes(id)){ s.push(id); AchStore.save(); } check(); },
   };
 })();
 
@@ -2660,6 +2791,8 @@ function renderMenu(){
       <textarea class="code" id="codeIn" spellcheck="false" placeholder="P2050:..."></textarea>
       <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><button class="btn ghost" data-m="import">${t("codeLoad")}</button><p class="msg ${UIM.err ? "err" : ""}" id="msg">${UIM.msg}</p></div></div>
       <div><button class="btn ghost" data-m="back">${t("mBack")}</button></div>`;
+  } else if (UIM.sub === "ach"){
+    body = `${Ach.listHtml()}<div><button class="btn ghost" data-m="back">${t("mBack")}</button></div>`;
   } else if (UIM.sub === "howto"){
     body = `<ul style="margin:0;padding-left:18px;display:grid;gap:6px">${UI.introRules[S.lang].map(x => `<li>${x}</li>`).join("")}<li>${t("autosaveNote")}</li></ul>
       <div><button class="btn ghost" data-m="back">${t("mBack")}</button></div>`;
@@ -2668,13 +2801,14 @@ function renderMenu(){
       <button class="mbig ${auto ? "" : "primary"}" data-m="new"><span class="ic">${I("globe")}</span><span class="t1">${t("mNew")}</span><span class="t2">${t("mNewS")}</span></button>
       <button class="mbig ${auto ? "primary" : ""}" data-m="continue" ${auto ? "" : "disabled"}><span class="ic">${I("play")}</span><span class="t1">${t("mCont")}</span><span class="t2">${auto ? `${dateStr(auto.meta.tick)} · ΔT +${auto.meta.temp.toFixed(2)}°C · ${auto.meta.net.toFixed(1)} Gt` : t("mNoSave")}</span></button>
       <button class="mbig" data-m="loadmenu"><span class="ic">${I("save")}</span><span class="t1">${t("mLoad")}</span><span class="t2">${t("mLoadS")}</span></button>
+      <button class="mbig" data-m="ach"><span class="ic">${I("trophy")}</span><span class="t1">${t("mAch")}</span><span class="t2">${Ach.count()} / ${ACH.length} · ${Math.round(Ach.count() / ACH.length * 100)}%</span></button>
       <button class="mbig" data-m="tutorial"><span class="ic">${I("book-open")}</span><span class="t1">${t("mHow")}</span><span class="t2">${t("mHowS")}</span></button>
     </div>`;
   }
-  el.innerHTML = icx(`<div class="menu-card">
+  el.innerHTML = icx(`<div class="menu-card ${UIM.sub === "ach" ? "wide" : ""}">
     <div><div class="eyebrow">Global Climate Taskforce · 2026 – 2050</div>
     <h1>PROJECT <b>:</b><br>2050</h1></div>
-    <p class="tag2">${UIM.sub ? (UIM.sub === "load" ? t("mLoad") : t("mHow")) : t("mDesc")}</p>
+    <p class="tag2">${UIM.sub ? (UIM.sub === "load" ? t("mLoad") : UIM.sub === "ach" ? t("mAch") : t("mHow")) : t("mDesc")}</p>
     ${body}
     <div class="credit"><span class="k">${t("teamK")}</span><span class="team">${t("team")}</span><p class="note">${t("disclaimer")}</p></div>
     ${volHtml()}
@@ -2699,6 +2833,7 @@ function menuAction(b){
   if (m === "new"){ clearTimeout(timer); S = newState(S.lang); UIM.screen = "game"; UIM.sub = null; renderMenu(); render(); Globe.refresh(); if (!Tutorial.seen()) Tutorial.open(0, true); else renderIntro(); return; }
   if (m === "continue"){ const s = readSaves(); if (s && s.auto) loadState(s.auto.S); return; }
   if (m === "loadmenu"){ UIM.sub = "load"; return renderMenu(); }
+  if (m === "ach"){ UIM.sub = "ach"; return renderMenu(); }
   if (m === "howto"){ UIM.sub = "howto"; return renderMenu(); }
   if (m === "back"){ UIM.sub = null; return renderMenu(); }
   if (m === "load"){ const s = readSaves(); if (s && s[b.dataset.slot]) loadState(s[b.dataset.slot].S); return; }
@@ -2712,7 +2847,7 @@ function menuAction(b){
   if (m === "sfx"){ SFX.toggle(); render(); renderMenu(); if (UIM.paused) renderPause(); return; }
   if (m === "music"){ SFX.toggleMusic(); render(); renderMenu(); if (UIM.paused) renderPause(); return; }
   if (m === "tutorial"){ return Tutorial.open(0, false); }
-  if (m === "save"){ SFX.play("save"); UIM.msg = writeSlot(b.dataset.slot) ? `${t("saved")} · ${slotName(b.dataset.slot)}` : t("noStore"); return renderPause(); }
+  if (m === "save"){ SFX.play("save"); Ach.unlock("saver"); UIM.msg = writeSlot(b.dataset.slot) ? `${t("saved")} · ${slotName(b.dataset.slot)}` : t("noStore"); return renderPause(); }
   if (m === "copy") return copyCode(b);
   if (m === "main" || m === "tomenu"){ autosave(); clearTimeout(timer); UIM.paused = false; closeModal(); S.speed = 0; S.tab = null; UIM.screen = "menu"; UIM.sub = null; render(); return renderMenu(); }
 }
@@ -2758,13 +2893,17 @@ async function preloadAll(){
   Globe.init();
   await Promise.all([SFX.preload(() => step(t("ldAudio"))), ...TUT.map(x => loadImg(`assets/tutorial/${x.img}`).then(() => step(t("ldImg"))))]);
   $("ldLabel").textContent = t("ldReady");
+  let returning = false; try { returning = localStorage.getItem("p2050-entered") === "1"; } catch(e) {}
+  if (returning){ $("loader").hidden = true; return; }        // audio starts on the first tap anywhere
   const btn = $("enterBtn"); btn.textContent = t("enter"); btn.hidden = false;
 }
 function boot(){
   let lang = "th"; try { lang = localStorage.getItem("p2050-lang") || "th"; } catch(e) {}
   S = newState(lang);
   render(); renderMenu();
-  $("enterBtn").addEventListener("click", () => { SFX.unlock(); SFX.play("start"); $("loader").hidden = true; }, {once:true});
+  $("enterBtn").addEventListener("click", () => { SFX.unlock(); SFX.play("start"); $("loader").hidden = true; try { localStorage.setItem("p2050-entered", "1"); } catch(e) {} }, {once:true});
+  const firstTap = () => SFX.unlock();                       // browsers only allow sound after a user gesture
+  document.addEventListener("pointerdown", firstTap, {once:true}); document.addEventListener("keydown", firstTap, {once:true});
   preloadAll();
 }
 boot();
