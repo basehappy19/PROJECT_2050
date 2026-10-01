@@ -15,6 +15,10 @@
 <link rel="icon" href="icon-16.png" type="image/png" sizes="16x16">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="site.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Project 2050">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Project : 2050">
 <meta property="og:locale" content="th_TH">
@@ -2985,7 +2989,7 @@ async function preloadAll(){
   const step = label => { done++; const p = Math.round(done / total * 100); $("ldFill").style.width = p + "%"; $("ldPct").textContent = p + "%"; if (label) $("ldLabel").textContent = `${t("loading")} · ${label}`; };
   $("ldLabel").textContent = `${t("loading")} · ${t("ldFonts")}`;
   await Promise.race([document.fonts ? document.fonts.ready : Promise.resolve(), new Promise(r => setTimeout(r, 4000))]); step(t("ldGlobe"));
-  await loadScript(THREE_URL); step(t("ldAudio"));
+  if (!(await loadScript("assets/lib/three.min.js"))) await loadScript(THREE_URL); step(t("ldAudio"));   // local copy first (works offline), CDN as fallback
   Globe.init();
   await Promise.all([SFX.preload(() => step(t("ldAudio"))), ...TUT.map(x => loadImg(`assets/tutorial/${x.img}`).then(() => step(t("ldImg"))))]);
   $("ldLabel").textContent = t("ldReady");
@@ -3005,5 +3009,9 @@ function boot(){
 boot();
 </script>
 
+<script>/* PWA: register the service worker so the game works offline after the first visit */
+if ("serviceWorker" in navigator && (location.protocol === "https:" || location.hostname === "localhost" || location.hostname === "127.0.0.1"))
+  addEventListener("load", () => navigator.serviceWorker.register("sw.js").catch(() => {}));
+</script>
 </body>
 </html>
