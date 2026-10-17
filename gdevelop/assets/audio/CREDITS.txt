@@ -1,0 +1,21 @@
+Project : 2050 — audio credits
+All files in this folder were trimmed, mixed and re-encoded for the game.
+
+Music (CC0 1.0)
+- music-menu.mp3, music-game1.mp3, music-game2.mp3
+  "Theme_1", "Ambient_1", "Ambient_2" by Maximiliano Stradex
+  via https://github.com/lavenderdotpet/CC0-Public-Domain-Sounds
+
+Interface sounds and jingles (CC0 1.0)
+- sfx-*.mp3 from Kenney "Interface Sounds", "Music Jingles", "RPG Audio" (https://kenney.nl)
+  via https://github.com/lavenderdotpet/CC0-Public-Domain-Sounds
+- sfx-spawnRed.mp3 from "30 CC0 SFX loops" (alarm_01), same collection
+
+Event ambiences (amb-*.mp3)
+- Nature, animal, rain, place, transport and urban recordings from the Moodist project
+  (https://github.com/remvze/moodist, commit 11c0be2). Moodist states these sounds are under
+  the Pixabay Content License or CC0 (https://pixabay.com/service/license-summary/).
+- amb-factory.mp3 mixes "machine_01" (30 CC0 SFX loops) and "sfx100v2_loop_machine_02" (100 CC0 SFX 2), CC0
+- amb-explosion.mp3 mixes "explosion" (100 CC0 SFX, CC0) with a Moodist siren recording
+
+These sounds are used inside the game only. Do not redistribute them as a standalone sound pack.

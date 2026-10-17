@@ -1,0 +1,158 @@
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.dataA) return;
+(P.mods = P.mods || {}).dataA = 1;
+/* ===== Data · Text strings, regions, actions, tech tree =====
+   Copied from the web version (index.html). [[icon]] tokens are drawn as icons by the UI toolkit. */
+const UI = {
+  subtitle:{th:"ภารกิจกู้วิกฤตโลก",en:"Global Climate Taskforce"},
+  temp:{th:"[[thermometer]] อุณหภูมิโลก",en:"[[thermometer]] Global temp"}, co2:{th:"[[cloud]] CO₂ สุทธิ",en:"[[cloud]] Net CO₂"},
+  ep:{th:"[[leaf]] งบเขียว",en:"[[leaf]] Eco-Points"}, pc:{th:"[[landmark]] ทุนการเมือง",en:"[[landmark]] Political capital"},
+  epHint:{th:"เงินทุน",en:"money"}, pcHint:{th:"อำนาจผ่านนโยบาย",en:"clout"},
+  appr:{th:"[[users]] ความนิยม",en:"[[users]] Approval"},
+  perMo:{th:"/ด.",en:"/mo"}, sinks:{th:"ดักจับ",en:"sinks"}, perYr:{th:"ใน 12 ด.",en:"in 12 mo"},
+  compliance:{th:"[[handshake]] ความร่วมมือ",en:"[[handshake]] Compliance"}, vuln:{th:"[[shield-alert]] ความเสี่ยงภัยพิบัติ",en:"[[shield-alert]] Disaster risk"},
+  treeHint:{th:"เส้นลูกศรแสดงลำดับการปลดล็อก: ต้องมีโหนดต้นทางก่อน · สีเขียว = มีแล้ว · สีฟ้า = ปลดล็อกได้ · เส้นประ = ยังล็อก",en:"Arrows show unlock order: own the source first · green = owned · blue = available · dashed = locked"},
+  alsoNeeds:{th:"ต้องมี",en:"needs"},
+  nbTech:{th:"เทคโนโลยี",en:"Tech"}, nbRegion:{th:"ภูมิภาค",en:"Regions"}, nbStats:{th:"สถิติ",en:"Stats"}, nbNews:{th:"ข่าว",en:"News"},
+  dTech:{th:"เทคโนโลยี & นโยบาย",en:"Tech & Policy Tree"}, dRegion:{th:"ควบคุมภูมิภาค",en:"Regional control"}, dStats:{th:"สถิติโลก",en:"Global metrics"}, dNews:{th:"รายงานข่าวคณะทำงาน",en:"Taskforce dispatch"},
+  rush:{th:"เงินเฟ้อสีเขียว",en:"Greenflation"},
+  rushTip:{th:"เงินเฟ้อสีเขียว (Greenflation): อนุมัติหลายโครงการในรอบ 12 เดือน ความต้องการเทคโนโลยีสะอาดพุ่งพร้อมกัน ราคาจึงขึ้น 20% ต่อโครงการ",en:"Greenflation: approving many projects within 12 months drives clean-tech demand up, adding 20% per project"},
+  nzTitle:{th:"Net Zero",en:"Net Zero"}, tTitle:{th:"อุณหภูมิโลก",en:"Global warming"},
+  nzGoal:{th:"เป้า 0",en:"Goal 0"}, tLose:{th:"แพ้",en:"Lose"},
+  vs2026:{th:"เทียบปี 2026",en:"vs 2026"}, left:{th:"เหลือ",en:"left"}, yrs:{th:"ปี",en:"yrs"},
+  onTrack:{th:"ตามแนวโน้มนี้ถึงเป้าปี",en:"On this trend: Net Zero in"},
+  offTrack:{th:"ตามแนวโน้มนี้ไม่ทันปี 2050",en:"On this trend: miss 2050"},
+  rising:{th:"กำลังเพิ่มขึ้น ยังไม่ลด",en:"Still rising"},
+  toLose:{th:"ห่างจุดแพ้",en:"from losing"},
+  barNZ:{th:"ความคืบหน้าสู่ Net Zero",en:"Progress to Net Zero"}, barT:{th:"ภาวะโลกร้อน (ขีดแพ้ +3.0°C)",en:"Warming (lose at +3.0°C)"},
+  ghint:{th:"ลากเพื่อเลื่อนแผนที่ · ล้อเมาส์เพื่อซูม · แตะภูมิภาคเพื่อสั่งการ · แตะฟองเพื่อเก็บแต้ม",en:"Drag to pan · scroll to zoom · tap a region to act · tap bubbles to collect"},
+  cat1:{th:"พลังงานและอุตสาหกรรม",en:"Energy & Industrial Transition"},
+  cat2:{th:"นโยบายภูมิอากาศและเศรษฐกิจสังคม",en:"Climate Policy & Socio-Economy"},
+  cat3:{th:"แหล่งดูดซับคาร์บอนและวิศวกรรมธรรมชาติ",en:"Carbon Sink & Nature Engineering"},
+  unlock:{th:"อนุมัติโครงการ",en:"Approve project"}, owned:{th:"ดำเนินการแล้ว",en:"Enacted"},
+  needs:{th:"ต้องมีก่อน",en:"Requires"}, none:{th:"ไม่มี",en:"None"}, rollout:{th:"ทยอยผล",en:"Roll-out"},
+  months:{th:"เดือน",en:"mo"}, inProgress:{th:"โครงการที่กำลังทยอยผล",en:"Projects rolling out"},
+  paused:{th:"หยุดชะงัก",en:"stalled"},
+  rollNote:{th:"การลด CO₂ ทยอยเกิดขึ้นทุกเดือน คูณด้วยอัตราความร่วมมือของภูมิภาค ณ เดือนนั้น และยิ่งลดได้มากแล้ว ตันสุดท้ายยิ่งลดยาก",en:"CO₂ cuts arrive monthly, scale with each region's compliance at that time, and the last tonnes are the hardest to cut."},
+  capFull:{th:"ทีมงาน GCT ดูแลโครงการได้พร้อมกันสูงสุด 3 โครงการ รอให้โครงการเดิมทยอยผลครบก่อน",en:"GCT can run at most 3 roll-outs at once. Wait for one to finish."},
+  co2Now:{th:"CO₂ ปัจจุบัน",en:"CO₂ now"}, co2Start:{th:"ปี 2026",en:"In 2026"}, fossil:{th:"สัดส่วนฟอสซิล",en:"Fossil share"}, reserve:{th:"ทุนสำรอง",en:"Reserves"},
+  cooldown:{th:"พักอีก",en:"Ready in"},
+  chartCo2:{th:"CO₂ สุทธิของโลก (Gt/ปี)",en:"Global net CO₂ (Gt/yr)"}, chartTemp:{th:"อุณหภูมิเพิ่มจากยุคก่อนอุตสาหกรรม (°C)",en:"Warming vs pre-industrial (°C)"},
+  shares:{th:"การปล่อยรายภูมิภาค (Gt/ปี)",en:"Emissions by region (Gt/yr)"},
+  eventTag:{th:"เหตุการณ์ฉุกเฉิน · ต้องตัดสินใจ",en:"Dilemma event · decision required"},
+  cantAfford:{th:"ทรัพยากรไม่พอ",en:"Not enough resources"},
+  postpone:{th:"เลื่อนการตัดสินใจ (ถูกวิจารณ์หนัก)",en:"Postpone the decision (heavy criticism)"},
+  start:{th:"เริ่มภารกิจ",en:"Begin mission"}, restart:{th:"เริ่มใหม่",en:"Play again"},
+  introTag:{th:"คำสั่งแต่งตั้ง · มกราคม 2026",en:"Appointment order · January 2026"},
+  introTitle:{th:"ท่านคือผู้อำนวยการสูงสุดแห่ง GCT",en:"You are Supreme Director of the GCT"},
+  introBody:{th:"นานาชาติมอบอำนาจให้ท่านจัดสรรงบประมาณ ผลักดันสนธิสัญญา และเร่งเทคโนโลยีข้ามพรมแดน เป้าหมายคือทำให้การปล่อยคาร์บอนสุทธิของโลกเหลือศูนย์ก่อนสิ้นปี 2050",
+             en:"The world has given you authority over budgets, treaties and cross-border technology. Your goal: bring global net carbon emissions to zero before the end of 2050."},
+  introRules:{th:["1 เดือนในเกม = 1 tick · [[leaf]] งบเขียว และ [[landmark]] ทุนการเมือง เพิ่มทุกเดือน","แตะ [[sprout]] บนแผนที่เพื่อเก็บงบเขียว · แตะ [[siren]] เพื่อส่งความช่วยเหลือก่อนหมดเวลา","ซื้อเทคโนโลยีตามผัง (พร้อมกันได้ 3 โครงการ) · แตะภูมิภาคบนแผนที่เพื่อสั่งการ","แพ้เมื่อ [[thermometer]] ถึง +3.0°C, [[users]] เหลือ 0% หรือถึงปี 2051 · Space = หยุด/เล่น"],
+              en:["1 in-game month = 1 tick · [[leaf]] Eco-Points and [[landmark]] Political capital come in monthly","Tap [[sprout]] on the map to collect Eco-Points · tap [[siren]] to send aid before time runs out","Buy tech along the tree (3 projects at once) · tap a region on the map to act","Lose at [[thermometer]] +3.0°C, [[users]] 0%, or 2051 · Space = pause/play"]},
+  winTitle:{th:"Net Zero สำเร็จ",en:"Net Zero achieved"},
+  winBody:{th:"การปล่อยคาร์บอนสุทธิของโลกแตะศูนย์ โลกหลังยุคคาร์บอนเริ่มต้นขึ้นแล้ว",en:"Global net emissions hit zero. The post-carbon era begins."},
+  l1Title:{th:"ภูมิอากาศล่มสลาย",en:"Runaway warming"}, l1Body:{th:"อุณหภูมิโลกแตะ +3.0°C ระบบธรรมชาติพลิกผันเกินกว่าจะฟื้นคืน",en:"Global warming reached +3.0°C. Earth systems tipped past recovery."},
+  l2Title:{th:"ถูกถอดถอนจากตำแหน่ง",en:"Impeached"}, l2Body:{th:"ความไว้วางใจของประชาชนเหลือ 0% นานาชาติถอนฉันทามติที่มอบให้ท่าน",en:"Public approval fell to 0%. The nations withdrew your mandate."},
+  l3Title:{th:"หมดเวลา",en:"Time over"}, l3Body:{th:"ปี 2051 มาถึงแล้ว แต่โลกยังปล่อยคาร์บอนสุทธิมากกว่าศูนย์",en:"2051 arrived and the world still emits net carbon."},
+  finalScore:{th:"คะแนนสุดท้าย",en:"Final score"},
+  logStart:{th:"GCT เริ่มปฏิบัติการ เป้าหมาย: Net Zero ก่อนสิ้นปี 2050",en:"GCT operations begin. Target: Net Zero before end of 2050."},
+  logTech:{th:"อนุมัติโครงการ",en:"Approved"}, logAct:{th:"สั่งการ",en:"Ordered"},
+  logTipping:{th:"[[thermometer]] อุณหภูมิเกิน +1.5°C โลกร้อนเร็วขึ้น",en:"[[thermometer]] Warming passed +1.5°C and is speeding up."},
+  logTipping2:{th:"[[thermometer]] อุณหภูมิเกิน +2.0°C ระบบนิเวศวิกฤต",en:"[[thermometer]] Warming passed +2.0°C. Ecosystems in crisis."},
+  logRollDone:{th:"โครงการทยอยผลครบแล้ว",en:"finished rolling out"},
+  delayed:{th:"ผลล่าช้า",en:"delayed"},
+  redHelp:{th:"ส่งความช่วยเหลือภัยพิบัติที่",en:"Disaster aid sent to"},
+  redMiss:{th:"ไม่ได้ตอบสนองภัยพิบัติที่",en:"Missed the disaster in"},
+  didYouKnow:{th:"รู้ไหม?",en:"Did you know?"},
+  loading:{th:"กำลังเตรียมทรัพยากร",en:"Preparing resources"}, ldFonts:{th:"ฟอนต์",en:"Fonts"}, ldGlobe:{th:"แผนที่โลก",en:"World map"},
+  ldAudio:{th:"เสียงและดนตรี",en:"Sound and music"}, ldImg:{th:"ภาพประกอบ",en:"Illustrations"}, ldReady:{th:"พร้อมแล้ว",en:"Ready"},
+  enter:{th:"แตะเพื่อเข้าสู่เกม",en:"Tap to enter"},
+  tutNext:{th:"ถัดไป",en:"Next"}, tutBack:{th:"ย้อนกลับ",en:"Back"}, tutSkip:{th:"ข้าม",en:"Skip"}, tutDone:{th:"เริ่มเล่น",en:"Start playing"},
+  tutMenu:{th:"วิธีเล่น",en:"How to play"}, musicLbl:{th:"ดนตรี",en:"Music"}, sfxLbl:{th:"เสียงเอฟเฟกต์",en:"Sound effects"},
+  mAch:{th:"ความสำเร็จ",en:"Achievements"}, achUnlocked:{th:"ปลดล็อกความสำเร็จ!",en:"Achievement unlocked!"},
+  achSecret:{th:"ความสำเร็จลับ",en:"Secret achievement"}, achOn:{th:"ได้เมื่อ",en:"Unlocked"},
+  mNew:{th:"เกมใหม่",en:"New game"}, mNewS:{th:"เริ่มภารกิจ มกราคม 2026",en:"Start the mission in January 2026"},
+  mCont:{th:"เล่นต่อ",en:"Continue"}, mLoad:{th:"โหลดเกม",en:"Load game"}, mLoadS:{th:"บันทึกอัตโนมัติ + 3 ช่อง + รหัสเซฟ",en:"Autosave, 3 slots and save codes"},
+  mHow:{th:"วิธีเล่น",en:"How to play"}, mHowS:{th:"กติกา ทรัพยากร และเงื่อนไขแพ้ชนะ",en:"Rules, resources and win/lose conditions"},
+  mBack:{th:"[[arrow-left]] กลับ",en:"[[arrow-left]] Back"}, mNoSave:{th:"ยังไม่มีเกมที่บันทึกไว้",en:"No saved game yet"},
+  mTag:{th:"เป้าหมายการพัฒนาที่ยั่งยืน ข้อ 13 · การรับมือการเปลี่ยนแปลงสภาพภูมิอากาศ",en:"UN Sustainable Development Goal 13 · Climate Action"},
+  mDesc:{th:"นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 โดยไม่ให้อุณหภูมิแตะ +3.0°C และไม่ให้ประชาชนหมดความเชื่อมั่น",en:"Lead the world to Net Zero before 2050 without hitting +3.0°C or losing the public's trust."},
+  slotAuto:{th:"บันทึกอัตโนมัติ",en:"Autosave"}, slot:{th:"ช่องบันทึก",en:"Slot"}, empty:{th:"ว่าง",en:"Empty"},
+  load:{th:"โหลด",en:"Load"}, save:{th:"บันทึก",en:"Save"}, saved:{th:"บันทึกแล้ว",en:"Saved"},
+  codeTitle:{th:"รหัสเซฟ (ย้ายไปเล่นเครื่องอื่น)",en:"Save code (move to another device)"},
+  codeCopy:{th:"คัดลอกรหัส",en:"Copy code"}, codeCopied:{th:"คัดลอกแล้ว",en:"Copied"}, codeSel:{th:"เลือกข้อความไว้แล้ว กด Ctrl+C เพื่อคัดลอก",en:"Text selected. Press Ctrl+C to copy."},
+  codePaste:{th:"วางรหัสเซฟที่นี่แล้วกดโหลด",en:"Paste a save code here, then load"}, codeLoad:{th:"โหลดจากรหัส",en:"Load from code"},
+  codeFail:{th:"คัดลอกไม่สำเร็จ ลองอีกครั้ง หรือใช้ช่องบันทึกแทน",en:"Couldn't copy. Try again, or use a save slot."},
+  codeBad:{th:"รหัสเซฟไม่ถูกต้อง ตรวจว่าคัดลอกมาครบทั้งข้อความ",en:"That save code is invalid. Check that you copied all of it."},
+  noStore:{th:"เบราว์เซอร์นี้ไม่อนุญาตให้บันทึก ใช้รหัสเซฟแทน",en:"This browser blocks saving. Use a save code instead."},
+  pTitle:{th:"หยุดเกมชั่วคราว",en:"Paused"}, pResume:{th:"เล่นต่อ",en:"Resume"}, pMain:{th:"กลับเมนูหลัก (บันทึกอัตโนมัติ)",en:"Main menu (autosaves)"},
+  mainMenu:{th:"เมนูหลัก",en:"Main menu"}, autosaveNote:{th:"เกมบันทึกอัตโนมัติทุก 6 เดือนในเกม",en:"The game autosaves every 6 in-game months"},
+  annual:{th:"สรุปปี",en:"Year in review"},
+  halved:{th:"ลดการปล่อยลงได้ครึ่งหนึ่งจากปี 2026 แล้ว",en:"has halved its emissions since 2026"},
+  teamK:{th:"พัฒนาโดยทีม",en:"Developed by team"},
+  team:{th:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์",en:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์"},
+  disclaimer:{th:"เกมนี้จัดทำขึ้นเพื่อใช้ในกิจกรรม Garena Academy Game Maker เท่านั้น",en:"This game was made for the Garena Academy Game Maker activity only."},
+  noGL:{th:"เบราว์เซอร์นี้แสดงลูกโลก 3 มิติไม่ได้ ยังเล่นได้ผ่านแผง “ภูมิภาค” ด้านล่าง",en:"This browser can't show the 3D globe. You can still play through the Regions panel below."},
+};
+const MONTHS = {th:["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."],en:["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"]};
+const RESERVE = { vh:{m:.8,th:"สูงมาก",en:"Very high"}, h:{m:.9,th:"สูง",en:"High"}, m:{m:1,th:"ปานกลาง",en:"Medium"}, l:{m:1.2,th:"ต่ำ",en:"Low"} };
+const REGIONS = [
+  {id:"NA",  name:{th:"อเมริกาเหนือ",en:"North America"},                  co2:10.5, fossil:.78, reserve:"vh", comp:80, vuln:30, lab:[45,-100]},
+  {id:"EU",  name:{th:"สหภาพยุโรป",en:"European Union"},                    co2:5.5,  fossil:.55, reserve:"h",  comp:90, vuln:25, lab:[52,15]},
+  {id:"EA",  name:{th:"เอเชียตะวันออก",en:"East Asia"},                     co2:12.0, fossil:.82, reserve:"h",  comp:75, vuln:45, lab:[38,110]},
+  {id:"SA",  name:{th:"อเมริกาใต้",en:"South America"},                     co2:2.5,  fossil:.45, reserve:"l",  comp:65, vuln:65, lab:[-15,-60]},
+  {id:"MEAF",name:{th:"ตะวันออกกลางและแอฟริกา",en:"Middle East & Africa"},  co2:2.0,  fossil:.90, reserve:"m",  comp:60, vuln:85, lab:[8,22]},
+  {id:"SEA", name:{th:"เอเชียตะวันออกเฉียงใต้",en:"Southeast Asia"},         co2:3.5,  fossil:.80, reserve:"m",  comp:70, vuln:75, lab:[8,105]},
+];
+const RIDS = REGIONS.map(r => r.id);
+const RMETA = Object.fromEntries(REGIONS.map(r => [r.id, r]));
+/* Emission hotspots [lat, lon, weight within region, name] — drawn as glowing plumes and used for bubbles */
+const CITIES = {
+  NA:[[40.7,-74,3,"New York"],[29.8,-95.4,3,"Houston"],[34,-118.2,2,"Los Angeles"],[41.9,-87.6,2,"Chicago"],[43.7,-79.4,1,"Toronto"],[19.4,-99.1,2,"Mexico City"],[53.5,-113.5,1,"Edmonton"]],
+  EU:[[51.5,-0.1,2,"London"],[48.9,2.35,1,"Paris"],[52.5,13.4,2,"Berlin"],[55.8,37.6,3,"Moscow"],[52.2,21,2,"Warsaw"],[40.4,-3.7,1,"Madrid"],[41,29,2,"Istanbul"],[59.9,30.3,1,"St Petersburg"]],
+  EA:[[39.9,116.4,3,"Beijing"],[31.2,121.5,3,"Shanghai"],[35.7,139.7,2,"Tokyo"],[37.6,127,2,"Seoul"],[23.1,113.3,2,"Guangzhou"],[29.6,106.5,2,"Chongqing"],[43.2,76.9,1,"Almaty"],[41.8,123.4,2,"Shenyang"]],
+  SEA:[[13.75,100.5,2,"Bangkok"],[-6.2,106.8,2,"Jakarta"],[14.6,121,1,"Manila"],[28.6,77.2,3,"Delhi"],[19.1,72.9,2,"Mumbai"],[23.8,90.4,1,"Dhaka"],[-33.9,151.2,1,"Sydney"],[10.8,106.7,1,"Ho Chi Minh"],[24.9,67,1,"Karachi"]],
+  SA:[[-23.5,-46.6,3,"São Paulo"],[-34.6,-58.4,2,"Buenos Aires"],[-12,-77,1,"Lima"],[4.7,-74.1,1,"Bogotá"],[-33.4,-70.6,1,"Santiago"],[-3.1,-60,1,"Manaus"]],
+  MEAF:[[24.7,46.7,3,"Riyadh"],[35.7,51.4,2,"Tehran"],[30,31.2,2,"Cairo"],[6.5,3.4,1,"Lagos"],[-26.2,28,2,"Johannesburg"],[25.2,55.3,2,"Dubai"],[-1.3,36.8,1,"Nairobi"]],
+};
+
+/* Regional actions: cost ×1.25 per use in that region, 4-month cooldown. */
+const ACTIONS = [
+  {id:"fund",  ep:40, pc:0,  cd:4, name:{th:"กองทุนพลังงานสะอาด",en:"Clean energy fund"}, desc:{th:"CO₂ ภูมิภาค −0.35 Gt × ความร่วมมือ",en:"Regional CO₂ −0.35 Gt × compliance"}},
+  {id:"diplo", ep:0,  pc:12, cd:4, name:{th:"การทูตภูมิอากาศ",en:"Climate diplomacy"}, desc:{th:"ความร่วมมือ +8% (ค่อยๆ ลดลงสู่ค่าฐาน)",en:"Compliance +8% (drifts back to baseline)"}},
+  {id:"adapt", ep:35, pc:0,  cd:4, name:{th:"กองทุนปรับตัว",en:"Adaptation fund"}, desc:{th:"ความเปราะบาง −10%, ความนิยม +1%",en:"Vulnerability −10%, approval +1%"}},
+  {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ภูมิภาค −0.8 Gt × ความร่วมมือ, ความร่วมมือ −6%",en:"Regional CO₂ −0.8 Gt × compliance, compliance −6%"}},
+];
+
+/* ---------------------------- Tech & Policy Tree (18) ---------------------------- */
+const NODES = [
+  {id:"E1",cat:1,ep:50, pc:10,req:[],        months:6, name:{th:"ปรับปรุงโครงข่ายไฟฟ้าอัจฉริยะ",en:"Smart Grid Modernization"}, fx:{co2:-0.8}, desc:{th:"CO₂ โลก −0.8 Gt และเพิ่มผลลด CO₂ ของโหนดพลังงานสะอาด (E2–E6) อีก 10%",en:"Global CO₂ −0.8 Gt; boosts clean-energy nodes (E2–E6) by 10%"}},
+  {id:"E2",cat:1,ep:80, pc:15,req:["E1"],    months:18,name:{th:"ฟาร์มแสงอาทิตย์และกังหันลมสเกลใหญ่",en:"Utility Solar & Wind Farms"}, fx:{all:-0.4}, desc:{th:"CO₂ ทุกภูมิภาค −0.4 Gt (รวม −2.4 Gt)",en:"Every region −0.4 Gt (−2.4 Gt total)"}},
+  {id:"E3",cat:1,ep:110,pc:20,req:["E2"],    months:12,name:{th:"ระบบกักเก็บพลังงานแบตเตอรี่ขั้นสูง",en:"Next-Gen Battery Storage"}, fx:{co2:-1.5,damp:.15}, desc:{th:"เสถียรภาพโครงข่าย +15% (ชะลอการเติบโตของการปล่อย), CO₂ โลก −1.5 Gt",en:"Grid stability +15% (slows emission growth), global CO₂ −1.5 Gt"}},
+  {id:"E4",cat:1,ep:140,pc:30,req:["E1"],    months:24,name:{th:"เตาปฏิกรณ์นิวเคลียร์ขนาดเล็ก SMR",en:"SMR Nuclear Reactors"}, fx:{co2:-3.0,appr:-5}, desc:{th:"CO₂ โลก −3.0 Gt, ความนิยม −5% จากความกังวลเรื่องความปลอดภัย",en:"Global CO₂ −3.0 Gt, approval −5% over safety fears"}},
+  {id:"E5",cat:1,ep:250,pc:60,req:["E4","E3"],months:36,name:{th:"โรงไฟฟ้าฟิวชันเชิงพาณิชย์",en:"Commercial Fusion Power"}, fx:{co2:-6.0,epInc:10,damp:.3}, desc:{th:"CO₂ โลก −6.0 Gt, รายได้ [[leaf]] +10/เดือน",en:"Global CO₂ −6.0 Gt, [[leaf]] income +10/mo"}},
+  {id:"E6",cat:1,ep:160,pc:35,req:["E3"],    months:18,name:{th:"ไฮโดรเจนเขียวสำหรับอุตสาหกรรมหนัก",en:"Green Hydrogen Metallurgy"}, fx:{rco2:{EA:-1.5,NA:-1.5}}, desc:{th:"CO₂ ใน EA และ NA แห่งละ −1.5 Gt",en:"EA and NA each −1.5 Gt"}},
+  {id:"P1",cat:2,ep:30, pc:5, req:[],        months:0, name:{th:"แคมเปญความรอบรู้ด้านภูมิอากาศ",en:"Climate Literacy Campaign"}, fx:{appr:10,compAll:5}, desc:{th:"ความนิยม +10%, ความร่วมมือทุกภูมิภาค +5% (ถาวร)",en:"Approval +10%, all regions' compliance +5% (permanent)"}},
+  {id:"P2",cat:2,ep:60, pc:25,req:["P1"],    months:6, name:{th:"ภาษีคาร์บอนมาตรฐาน",en:"Standard Carbon Tax"}, fx:{co2:-2.5,appr:-8,epInc:6}, desc:{th:"CO₂ โลก −2.5 Gt, ความนิยม −8%, รายได้ [[leaf]] +6/เดือน",en:"Global CO₂ −2.5 Gt, approval −8%, [[leaf]] income +6/mo"}},
+  {id:"P3",cat:2,ep:90, pc:40,req:["P2"],    months:0, name:{th:"กลไกปรับคาร์บอนข้ามพรมแดน",en:"Carbon Border Adjustment"}, fx:{p3:1}, desc:{th:"ภูมิภาคที่ความร่วมมือต่ำกว่า 70% ถูกบังคับลด CO₂ ปีละ −0.3 Gt ต่อเนื่อง",en:"Regions under 70% compliance are forced to cut −0.3 Gt/yr, ongoing"}},
+  {id:"P4",cat:2,ep:120,pc:30,req:["P2"],    months:24,name:{th:"กฎหมายบังคับขนส่งไฟฟ้า 100%",en:"Mandatory EV & Zero-Emission Transit"}, fx:{co2:-3.2,damp:.25}, desc:{th:"CO₂ โลก −3.2 Gt และกดการเติบโตของการปล่อยภาคคมนาคมถาวร",en:"Global CO₂ −3.2 Gt; permanently damps transport emission growth"}},
+  {id:"P5",cat:2,ep:100,pc:25,req:["P1"],    months:18,name:{th:"มาตรฐานอาคาร Net-Zero",en:"Net-Zero Building Code"}, fx:{co2:-1.8,damp:.15}, desc:{th:"CO₂ โลก −1.8 Gt, ประหยัดพลังงานในเขตเมือง",en:"Global CO₂ −1.8 Gt, urban energy savings"}},
+  {id:"P6",cat:2,ep:150,pc:60,req:["P3"],    months:12,name:{th:"ยกเลิกเงินอุดหนุนฟอสซิลทั่วโลก",en:"Abolish Global Fossil Subsidies"}, fx:{co2:-4.5,comp:{MEAF:-15,NA:-15},damp:.25}, desc:{th:"CO₂ โลก −4.5 Gt, ความร่วมมือใน MEAF และ NA −15% ทันที",en:"Global CO₂ −4.5 Gt, MEAF and NA compliance −15% immediately"}},
+  {id:"N1",cat:3,ep:50, pc:10,req:[],        months:24,name:{th:"โครงการมหาปลูกป่าระดับทวีป",en:"Mega-Reforestation Initiative"}, fx:{sink:1.0,appr:5}, desc:{th:"ดักจับ CO₂ 1.0 Gt/ปี, ความนิยม +5%",en:"Captures 1.0 Gt/yr, approval +5%"}},
+  {id:"N2",cat:3,ep:70, pc:15,req:["N1"],    months:18,name:{th:"ป่าชายเลนและบลูคาร์บอน",en:"Mangrove & Blue Carbon"}, fx:{sink:1.2,vuln:{SEA:-15}}, desc:{th:"ดักจับ 1.2 Gt/ปี, ความเปราะบาง SEA −15%",en:"Captures 1.2 Gt/yr, SEA vulnerability −15%"}},
+  {id:"N3",cat:3,ep:85, pc:20,req:["N1"],    months:18,name:{th:"เกษตรฟื้นฟูบำรุงดิน",en:"Regenerative Agriculture"}, fx:{sink:1.5,appr:3,vulnAll:-3}, desc:{th:"ดักจับ 1.5 Gt/ปี, ความมั่นคงทางอาหาร: ความนิยม +3%, ความเปราะบางทุกภูมิภาค −3%",en:"Captures 1.5 Gt/yr; food security: approval +3%, all vulnerability −3%"}},
+  {id:"N4",cat:3,ep:180,pc:30,req:["N1","E3"],months:24,name:{th:"โรงงานดักจับคาร์บอนจากอากาศ (DAC)",en:"Direct Air Capture Mega-Facilities"}, fx:{sink:3.5}, desc:{th:"ดักจับ 3.5 Gt/ปี ต้องใช้พลังงานหมุนเวียนสูง: ได้ผลเพียง 60% ถ้ายังไม่มี E2",en:"Captures 3.5 Gt/yr; needs renewables: only 60% effective without E2"}},
+  {id:"N5",cat:3,ep:95, pc:20,req:["N3"],    months:12,name:{th:"ไบโอชาร์ฝังดินระยะยาว",en:"Industrial Biochar Pyrolysis"}, fx:{sink:1.0,appr:2}, desc:{th:"ดักจับ 1.0 Gt/ปี, ผลผลิตเกษตร +5% (ความนิยม +2%)",en:"Captures 1.0 Gt/yr, crop yield +5% (approval +2%)"}},
+  {id:"N6",cat:3,ep:210,pc:50,req:["N2"],    months:12,name:{th:"การเติมแร่ธาตุฟื้นฟูมหาสมุทร",en:"Ocean Enhanced Mineralization"}, fx:{sink:4.0,tip:8}, desc:{th:"ดักจับ 4.0 Gt/ปี แต่รบกวนระบบนิเวศทะเล: อุณหภูมิ +0.03°C",en:"Captures 4.0 Gt/yr but disrupts marine life: +0.03°C"}},
+];
+const NODE = Object.fromEntries(NODES.map(n => [n.id, n]));
+const NODE_ICON = {E1:"zap",E2:"sun",E3:"battery-charging",E4:"atom",E5:"sparkles",E6:"factory",
+  P1:"megaphone",P2:"receipt",P3:"scale",P4:"car",P5:"building-2",P6:"ban",
+  N1:"trees",N2:"waves",N3:"wheat",N4:"fan",N5:"shovel",N6:"fish"};
+const TREE_POS = {
+  E1:[0,1], E2:[1,0], E4:[1,2], E3:[2,0], E6:[3,0], E5:[3,2],
+  P1:[0,1], P2:[1,0], P5:[1,2], P3:[2,0], P4:[2,1], P6:[3,0],
+  N1:[0,1], N2:[1,0], N3:[1,2], N4:[2,1], N6:[2,0], N5:[2,2],
+};
+const IC = {ep:"[[leaf]]", pc:"[[landmark]]", appr:"[[users]]", temp:"[[thermometer]]", co2:"[[cloud]]", comp:"[[handshake]]", vuln:"[[shield-alert]]"};
+Object.assign(P, {UI, MONTHS, RESERVE, REGIONS, RIDS, RMETA, CITIES, ACTIONS, NODES, NODE, NODE_ICON, TREE_POS, IC});

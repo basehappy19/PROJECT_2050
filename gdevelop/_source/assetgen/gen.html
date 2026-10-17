@@ -1,0 +1,165 @@
+<!doctype html><html><head><meta charset="utf-8"></head><body>
+<script src="geo.js"></script>
+<script src="robinson.js"></script>
+<script>
+// ---------- Map geometry (all in SOURCE pixels; game shows map at 1/SS scale) ----------
+const LON0 = 11, LAT_TOP = 84, LAT_BOT = -56;
+const MW = 1920, SS = 1.5, SW = MW * SS;                 // base width on screen, source scale
+const XR = 0.8487 * Math.PI;                              // half width in projection units
+const U = SW / (2 * XR);                                  // source px per projection unit
+const YT = robinson(LAT_TOP, LON0, LON0)[1], YB = robinson(LAT_BOT, LON0, LON0)[1];
+const SH = Math.ceil((YT - YB) * U);
+const PAD = 40;                                           // padding for glow (ocean)
+function P(lat, l){                                       // l = longitude relative to LON0 (may exceed ±180)
+  const a = Math.min(90, Math.abs(lat)) / 5, i = Math.min(17, Math.floor(a)), f = a - i;
+  const X = ROB[i][0] + (ROB[i+1][0] - ROB[i][0]) * f, Y = ROB[i][1] + (ROB[i+1][1] - ROB[i][1]) * f;
+  return [(0.8487 * X * l * Math.PI / 180 + XR) * U, (YT - 1.3523 * Y * Math.sign(lat)) * U];
+}
+function outline(cx, ox = 0, oy = 0){
+  cx.beginPath();
+  for (let la = LAT_TOP; la >= LAT_BOT; la -= 1){ const [x, y] = P(la, 180); la === LAT_TOP ? cx.moveTo(x + ox, y + oy) : cx.lineTo(x + ox, y + oy); }
+  for (let la = LAT_BOT; la <= LAT_TOP; la += 1){ const [x, y] = P(la, -180); cx.lineTo(x + ox, y + oy); }
+  cx.closePath();
+}
+function relRings(polys){
+  // returns list of rings in rel-lon unwrapped form, duplicated across the seam when needed
+  const out = [];
+  polys.forEach(poly => poly.forEach(ring => {
+    const pts = []; let prev = null;
+    for (let i = 0; i < ring.length; i += 2){
+      let l = ring[i] / 10 - LON0; const lat = ring[i + 1] / 10;
+      while (l <= -180) l += 360; while (l > 180) l -= 360;
+      if (prev !== null){ while (l - prev > 180) l -= 360; while (l - prev < -180) l += 360; }
+      pts.push([lat, l]); prev = l;
+    }
+    const mn = Math.min(...pts.map(p => p[1])), mx = Math.max(...pts.map(p => p[1]));
+    out.push(pts);
+    if (mn < -180) out.push(pts.map(p => [p[0], p[1] + 360]));
+    if (mx > 180) out.push(pts.map(p => [p[0], p[1] - 360]));
+  }));
+  return out;
+}
+function traceRings(cx, rings, ox = 0, oy = 0, sc = 1){
+  cx.beginPath();
+  rings.forEach(r => r.forEach(([lat, l], i) => { const [x, y] = P(lat, l); i ? cx.lineTo(x * sc + ox, y * sc + oy) : cx.moveTo(x * sc + ox, y * sc + oy); }) || cx.closePath());
+  rings.forEach(() => {});
+}
+function trace(cx, rings, ox = 0, oy = 0, sc = 1){
+  cx.beginPath();
+  for (const r of rings){
+    r.forEach(([lat, l], i) => { const [x, y] = P(lat, l); const X = x * sc + ox, Y = y * sc + oy; i ? cx.lineTo(X, Y) : cx.moveTo(X, Y); });
+    cx.closePath();
+  }
+}
+const REGS = ["NA","EU","EA","SA","MEAF","SEA"];
+function canvas(w, h){ const c = document.createElement("canvas"); c.width = w; c.height = h; return c; }
+function bbox(c){
+  const d = c.getContext("2d").getImageData(0, 0, c.width, c.height).data; let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
+  for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3] > 2){ if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+  return [x0, y0, x1 + 1, y1 + 1];
+}
+function crop(c, b){ const o = canvas(b[2] - b[0], b[3] - b[1]); o.getContext("2d").drawImage(c, -b[0], -b[1]); return o; }
+
+window.genMap = function(){
+  const res = {meta:{LON0, LAT_TOP, LAT_BOT, MW, SS, SW, SH, U, XR, YT}, regions:{}, lines:{}};
+  const rings = {}; REGS.forEach(r => rings[r] = []);
+  const countries = {}; REGS.forEach(r => countries[r] = []);
+  GEO.forEach(([reg, name, polys]) => { if (!rings[reg]) return; const rr = relRings(polys); countries[reg].push(rr); });
+  // clip path = map outline
+  for (const reg of REGS){
+    const c = canvas(SW, SH), cx = c.getContext("2d");
+    outline(cx); cx.save(); cx.clip();
+    countries[reg].forEach(rr => { trace(cx, rr); cx.fillStyle = "#fff"; cx.fill("evenodd"); });
+    countries[reg].forEach(rr => { trace(cx, rr); cx.strokeStyle = "rgba(4,10,14,.55)"; cx.lineWidth = 1.2 * SS; cx.stroke(); });
+    cx.restore();
+    const b = bbox(c); res.regions[reg] = {bbox:b, png:crop(c, b).toDataURL()};
+    // selection outline
+    const c2 = canvas(SW, SH), cx2 = c2.getContext("2d");
+    outline(cx2); cx2.save(); cx2.clip();
+    cx2.lineJoin = "round";
+    countries[reg].forEach(rr => { trace(cx2, rr); cx2.strokeStyle = "rgba(143,208,255,.95)"; cx2.lineWidth = 3 * SS; cx2.stroke(); });
+    cx2.restore();
+    const b2 = bbox(c2); res.lines[reg] = {bbox:b2, png:crop(c2, b2).toDataURL()};
+  }
+  // hit grid at 1/4 of base width
+  const G = 4 / SS, gw = Math.ceil(SW / (SS * 4)), gh = Math.ceil(SH / (SS * 4));
+  const g = canvas(gw, gh), gx = g.getContext("2d");
+  REGS.forEach((reg, k) => { countries[reg].forEach(rr => { trace(gx, rr, 0, 0, 1 / (SS * 4)); gx.fillStyle = `rgb(${(k + 1) * 40},0,0)`; gx.fill("evenodd"); }); });
+  const d = gx.getImageData(0, 0, gw, gh).data; let s = "";
+  for (let i = 0; i < gw * gh; i++){ const v = Math.round(d[i * 4] / 40); s += (d[i * 4 + 3] > 128 ? v : 0); }
+  // RLE
+  let rle = "", cur = s[0], n = 0;
+  for (const ch of s){ if (ch === cur) n++; else { rle += cur + n.toString(36) + "."; cur = ch; n = 1; } }
+  rle += cur + n.toString(36);
+  res.grid = {w:gw, h:gh, cell:4, rle};
+  // ocean (grayscale, tinted at runtime), with rim glow, padded
+  const oc = canvas(SW + PAD * 2, SH + PAD * 2), ox = oc.getContext("2d");
+  // rim glow: separate image (tinted with the atmosphere colour at runtime)
+  { const rc = canvas(SW + PAD * 2, SH + PAD * 2), rx = rc.getContext("2d");
+    outline(rx, PAD, PAD); rx.shadowColor = "rgba(255,255,255,1)"; rx.shadowBlur = 36; rx.lineWidth = 5; rx.strokeStyle = "rgba(255,255,255,.95)"; for (let k = 0; k < 4; k++) rx.stroke(); rx.shadowBlur = 0;
+    rx.globalCompositeOperation = "destination-out"; outline(rx, PAD, PAD); rx.lineWidth = 0; rx.fillStyle = "rgba(0,0,0,.8)"; rx.fill();
+    res.rim = {png:rc.toDataURL()}; }
+  const grad = ox.createLinearGradient(0, PAD, 0, PAD + SH);
+  grad.addColorStop(0, "#a8b6c4"); grad.addColorStop(.5, "#ffffff"); grad.addColorStop(1, "#a8b6c4");
+  ox.save(); outline(ox, PAD, PAD); ox.clip(); ox.fillStyle = grad; ox.fillRect(0, 0, oc.width, oc.height);
+  // graticule
+  ox.strokeStyle = "rgba(255,255,255,.55)"; ox.lineWidth = 1.2 * SS;
+  for (let lo = -180; lo <= 180; lo += 30){ ox.beginPath(); for (let la = LAT_TOP; la >= LAT_BOT; la--){ const [x, y] = P(la, lo); la === LAT_TOP ? ox.moveTo(x + PAD, y + PAD) : ox.lineTo(x + PAD, y + PAD); } ox.stroke(); }
+  for (let la = -30; la <= 60; la += 30){ ox.beginPath(); const [x0, y] = P(la, -180), [x1] = P(la, 180); ox.moveTo(x0 + PAD, y + PAD); ox.lineTo(x1 + PAD, y + PAD); ox.stroke(); }
+  ox.restore();
+  // darken the graticule relative to base ocean: we draw lines lighter; ocean body slightly darker
+  res.ocean = {pad:PAD, png:oc.toDataURL()};
+  // arctic ice band: from LAT_TOP down to 58N, alpha gradient
+  const yIce = P(58, 0)[1];
+  const ic = canvas(SW, Math.ceil(yIce)), ix = ic.getContext("2d");
+  outline(ix); ix.save(); ix.clip();
+  const ig = ix.createLinearGradient(0, 0, 0, yIce);
+  ig.addColorStop(0, "rgba(225,240,248,.95)"); ig.addColorStop(.8, "rgba(210,232,245,.75)"); ig.addColorStop(1, "rgba(210,232,245,0)");
+  ix.fillStyle = ig; ix.fillRect(0, 0, SW, yIce); ix.restore();
+  res.ice = {png:ic.toDataURL(), h:Math.ceil(yIce)};
+  return res;
+};
+
+// ---------- Icons ----------
+window.genIcons = function(LUCIDE, size){
+  const out = {};
+  return Promise.all(Object.entries(LUCIDE).map(([n, paths]) => new Promise(res => {
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${paths}</svg>`;
+    const im = new Image(); im.onload = () => { const c = canvas(size, size); c.getContext("2d").drawImage(im, 0, 0, size, size); out[n] = c.toDataURL(); res(); };
+    im.onerror = () => { out[n] = null; res(); };
+    im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  }))).then(() => out);
+};
+
+// ---------- Small sprites ----------
+window.genSprites = function(LUCIDE){
+  const out = {};
+  // plume glow (white; tinted + additive at runtime)
+  { const c = canvas(96, 96), x = c.getContext("2d"), g = x.createRadialGradient(48, 48, 0, 48, 48, 48);
+    g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(.25, "rgba(255,255,255,.8)"); g.addColorStop(1, "rgba(255,255,255,0)");
+    x.fillStyle = g; x.fillRect(0, 0, 96, 96); out.glow = c.toDataURL(); }
+  // backdrop 1920x1080 radial gradient
+  { const c = canvas(1920, 1080), x = c.getContext("2d"), g = x.createRadialGradient(960, 486, 0, 960, 486, 1250);
+    g.addColorStop(0, "#0d2230"); g.addColorStop(.65, "#050b10"); g.addColorStop(1, "#050b10");
+    x.fillStyle = g; x.fillRect(0, 0, 1920, 1080);
+    // faint stars
+    for (let i = 0; i < 420; i++){ x.fillStyle = `rgba(159,184,200,${.15 + Math.random() * .45})`; const r = Math.random() * 1.6 + .4; x.beginPath(); x.arc(Math.random() * 1920, Math.random() * 1080, r, 0, 7); x.fill(); }
+    out.backdrop = c.toDataURL("image/jpeg", .9); }
+  // bubbles (teardrop rotated, like the CSS): 34px design * 1.5 = 51; draw at 2x for zoom => 102 + glow pad
+  const bub = (fill, stroke, icon) => new Promise(res => {
+    const S = 160, c = canvas(S, S), x = c.getContext("2d"), r = 50;
+    x.save(); x.translate(S / 2, 72);
+    x.rotate(-Math.PI / 4);
+    const path = () => { x.beginPath(); const h = r; x.moveTo(-h, -h + h); // teardrop: rounded except bottom-left
+      x.arc(0, 0, h, Math.PI, Math.PI * 1.5); x.arc(0, 0, h, Math.PI * 1.5, 0); x.arc(0, 0, h, 0, Math.PI * .5);
+      x.lineTo(-h + 6, h); x.quadraticCurveTo(-h, h, -h, h - 6); x.closePath(); };
+    x.shadowColor = stroke; x.shadowBlur = 24; path(); x.fillStyle = fill; x.fill(); x.shadowBlur = 0;
+    path(); x.lineWidth = 6; x.strokeStyle = stroke; x.stroke();
+    x.restore();
+    const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="${stroke}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">${LUCIDE[icon]}</svg>`;
+    const im = new Image(); im.onload = () => { x.drawImage(im, S / 2 - 24, 72 - 24, 48, 48); res(c.toDataURL()); };
+    im.src = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(svg);
+  });
+  return Promise.all([bub("#0f3a2a", "#5fd39a", "sprout"), bub("#3d1210", "#ff5448", "siren")]).then(([g, r]) => { out.bubGreen = g; out.bubRed = r; return out; });
+};
+</script></body></html>

@@ -1,0 +1,11 @@
+# Claude: leftover zip waiting to be deleted
+_to_delete/
+
+# OS files
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# GDevelop temporary / backup files
+gdevelop/*.autosave
+gdevelop/.game.json
