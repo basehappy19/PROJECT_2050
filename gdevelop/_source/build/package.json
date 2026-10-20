@@ -1,0 +1,17 @@
+{
+  "name": "p2050-gdevelop-build",
+  "private": true,
+  "type": "module",
+  "description": "Builds gdevelop/game.json and the web version (index.html + game/) from gdevelop/_source/src",
+  "scripts": {
+    "build": "node make-project.mjs --export",
+    "assets": "node gen-assets.mjs",
+    "tutorial-shots": "node tutshots.mjs"
+  },
+  "dependencies": {
+    "@expo-google-fonts/kanit": "^0.4.1",
+    "gdcore-tools": "2.0.0-gd-v5.6.269-autobuild",
+    "lucide-static": "0.460.0",
+    "playwright": "^1.48.0"
+  }
+}

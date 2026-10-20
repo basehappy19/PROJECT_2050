@@ -9,3 +9,12 @@ desktop.ini
 # GDevelop temporary / backup files
 gdevelop/*.autosave
 gdevelop/.game.json
+
+# build tools (gdevelop/_source/build)
+gdevelop/_source/build/node_modules/
+gdevelop/_source/build/export/
+
+# server secrets, backups and packages
+server/.env
+server/backups/
+server/api/node_modules/

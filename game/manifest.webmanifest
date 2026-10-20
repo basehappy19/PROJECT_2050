@@ -1,0 +1,12 @@
+{
+  "name": "Project : 2050",
+  "short_name": "Project : 2050",
+  "id": "com.project2050.climategame",
+  "description": "เกมวางแผนกลยุทธ์ นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 (SDG 13) — Garena Academy Game Maker",
+  "orientation": "landscape",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "black",
+  "categories": ["games", "entertainment"],
+  "icons": []
+}

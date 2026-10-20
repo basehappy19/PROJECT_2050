@@ -1,0 +1,68 @@
+# PROJECT : 2050 · game server
+#   db  = PostgreSQL 16 (data kept in the "pgdata" volume)
+#   api = Node.js API (accounts, Terra, shop, leaderboard, cloud saves, certificates)
+#   web = Nginx: serves the game (../index.html + ../game/) and forwards /api and /verify to the API
+# Start:  cp .env.example .env   (then edit it)   ·   docker compose up -d --build
+# Open:   http://localhost:8080   (or the WEB_PORT you chose)
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-p2050}
+      POSTGRES_USER: ${POSTGRES_USER:-p2050}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+      TZ: Asia/Bangkok
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  api:
+    build: ./api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      DATABASE_URL: postgres://${POSTGRES_USER:-p2050}:${POSTGRES_PASSWORD}@db:5432/${POSTGRES_DB:-p2050}
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET in .env}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      CORS_ORIGIN: ${CORS_ORIGIN:-*}
+      PUBLIC_URL: ${PUBLIC_URL:-}
+      CERT_MIN_CARDS: ${CERT_MIN_CARDS:-20}
+      MIN_GAME_SECONDS: ${MIN_GAME_SECONDS:-300}
+      CERT_CONFIG: /app/certificate/certificate.json
+      TZ: Asia/Bangkok
+    volumes:
+      - ./certificate:/app/certificate:ro
+
+  web:
+    image: nginx:1.27-alpine
+    restart: unless-stopped
+    depends_on:
+      - api
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+      # the game (built from GDevelop) and the PWA files from the project folder
+      - ../index.html:/usr/share/nginx/html/index.html:ro
+      - ../game:/usr/share/nginx/html/game:ro
+      - ../site.webmanifest:/usr/share/nginx/html/site.webmanifest:ro
+      - ../sw.js:/usr/share/nginx/html/sw.js:ro
+      - ../favicon.svg:/usr/share/nginx/html/favicon.svg:ro
+      - ../apple-touch-icon.png:/usr/share/nginx/html/apple-touch-icon.png:ro
+      - ../icon-16.png:/usr/share/nginx/html/icon-16.png:ro
+      - ../icon-32.png:/usr/share/nginx/html/icon-32.png:ro
+      - ../icon-192.png:/usr/share/nginx/html/icon-192.png:ro
+      - ../icon-512.png:/usr/share/nginx/html/icon-512.png:ro
+      - ../og-image.png:/usr/share/nginx/html/og-image.png:ro
+
+volumes:
+  pgdata:

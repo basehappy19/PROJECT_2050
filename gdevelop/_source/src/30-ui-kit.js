@@ -11,14 +11,15 @@ if (P.mods && P.mods.kit) return;
    Each UI layer redraws only when marked dirty.
    ========================================================================= */
 const K = 1.5, W = 1280, Hh = 720;
+/* clean flat palette: one main colour (sea teal), one warning colour (orange-red), the rest greys */
 const COL = {
-  bg:"#050b10", glass:"#0a161c", panel:"#0d1a20", panel2:"#13252c", line:"#23404a", fg:"#e0ebe8", muted:"#8ba6a2",
-  accent:"#8fd0ff", ink:"#06202e", good:"#5fd39a", warn:"#f2b441", hot:"#f07a3c", bad:"#ff5448",
-  purple:"#c3a6ff", cloud:"#b7c7cf", vuln:"#ff8a7a", white:"#ffffff", black:"#000000", gold:"#f2b441",
+  bg:"#061015", glass:"#0b181e", panel:"#0e1d24", panel2:"#15272f", line:"#24414b", fg:"#e6f0ee", muted:"#8fa9a6",
+  accent:"#4fd1c5", ink:"#04201d", good:"#5fd39a", warn:"#f2b441", hot:"#f07a3c", bad:"#ff5a4a",
+  purple:"#c3a6ff", cloud:"#b7c7cf", vuln:"#ff8a7a", white:"#ffffff", black:"#000000", gold:"#f2c14e", sky:"#8fd0ff", terra:"#5fd39a",
 };
 const ICON_COL = {leaf:"good", sprout:"good", landmark:"purple", users:"accent", thermometer:"hot", cloud:"cloud", handshake:"warn", "shield-alert":"vuln", siren:"bad", newspaper:"muted"};
 const FONT = {
-  body:"PlexThai-Regular", bodyB:"PlexThai-SemiBold", disp:"Chakra-Bold", dispS:"Chakra-SemiBold", mono:"PlexMono-Medium", monoB:"PlexMono-SemiBold",
+  body:"PlexThai-Regular", bodyB:"PlexThai-SemiBold", disp:"Kanit-Bold", dispS:"Kanit-SemiBold", dispM:"Kanit-Medium", logo:"Chakra-Bold", logoS:"Chakra-SemiBold", mono:"PlexMono-Medium", monoB:"PlexMono-SemiBold",
 };
 const hexCache = {};
 function hexNum(c){ c = COL[c] || c; if (typeof c === "number") return c; return hexCache[c] ?? (hexCache[c] = parseInt(c.slice(1), 16)); }
@@ -174,7 +175,10 @@ const Kit = {
   /* a GDevelop Text input (save codes) placed like any other element */
   input(l, x, y, w, h, o = {}){
     const ob = l.obj("CodeInput"), go = ob.go, c = ob.c;
-    if (!c.init){ c.init = 1; go.setInputType && go.setInputType("text area"); go.setFontSize && go.setFontSize(Math.round(11 * K)); }
+    const type = o.type || "text area", fs = o.fontSize || 11;
+    if (c.type !== type){ c.type = type; go.setInputType && go.setInputType(type); c.val = undefined; c.ph = undefined; if (go.setString) go.setString(""); }
+    if (c.fs !== fs){ c.fs = fs; go.setFontSize && go.setFontSize(Math.round(fs * K)); }
+    if (o.key !== undefined && c.key !== o.key){ c.key = o.key; if (go.setString) go.setString(o.value || ""); c.val = o.value; }
     if (c.w !== w || c.h !== h){ go.setWidth(w * K); go.setHeight(h * K); c.w = w; c.h = h; }
     if (c.ro !== !!o.readOnly){ go.setReadOnly(!!o.readOnly); c.ro = !!o.readOnly; }
     if (o.placeholder !== undefined && c.ph !== o.placeholder){ go.setPlaceholder(o.placeholder); c.ph = o.placeholder; }
@@ -291,7 +295,7 @@ const Kit = {
       let cx = x + (boxW - ln.w / K) * ax; const cy = y + li * lh;
       for (const it of ln.items){
         if (it.t === "i"){
-          const isz = lay.iconW, ic = o.iconColor || ICON_COL[it.v] || color;
+          const isz = lay.iconW, ic = it.v === "terra" ? "#ffffff" : (o.iconColor || ICON_COL[it.v] || color);
           this.icon(l, it.v, cx, cy + (lh - isz) / 2, isz, ic, alpha);
         } else {
           const t = l.obj("UIText");
@@ -311,7 +315,9 @@ const Kit = {
     const s = size * K; if (c.s !== s){ go.setWidth(s); go.setHeight(s); c.s = s; }
     const col = hexNum(ICON_COL[color] ? COL[ICON_COL[color]] : color); if (c.col !== col){ go.setColor(`${(col >> 16) & 255};${(col >> 8) & 255};${col & 255}`); c.col = col; }
     const a = Math.round(alpha * 255); if (c.a !== a){ go.setOpacity(a); c.a = a; }
-    this._pos(o, x * K, y * K);
+    const ang = arguments[7] || 0;
+    if (ang){ if (c.ang !== ang){ go.setAngle(ang); c.ang = ang; } this._pos(o, x * K + s / 2 - go.getCenterX(), y * K + s / 2 - go.getCenterY()); }
+    else { if (c.ang){ go.setAngle(0); c.ang = 0; } this._pos(o, x * K, y * K); }
   },
   sprite(l, type, anim, x, y, w, h, alpha = 1){
     const o = l.obj(type), go = o.go, c = o.c;
@@ -345,7 +351,7 @@ const Kit = {
     const im = scene.getGame().getInputManager();
     const mx = im.getCursorX() / K, my = im.getCursorY() / K, down = im.isMouseButtonPressed(0);
     const m = this.mouse;
-    if (down && !m.down){ m.sx = mx; m.sy = my; m.moved = 0; const f = this._find(mx, my); m.onUI = !!f; this.pressHit = f && f.hit; m.scrollL = this._scrollAt(mx, my); m.scroll0 = m.scrollL ? m.scrollL.scroll : 0; }
+    if (down && !m.down){ m.sx = mx; m.sy = my; m.moved = 0; const f = this._find(mx, my); m.onUI = !!f && !(f.layer.name === "MapUI" && !f.hit); this.pressHit = f && f.hit; m.scrollL = this._scrollAt(mx, my); m.scroll0 = m.scrollL ? m.scrollL.scroll : 0; }
     if (down) m.moved = Math.max(m.moved, Math.abs(mx - m.sx) + Math.abs(my - m.sy));
     if (down && this.pressHit && this.pressHit.drag){ const h = this.pressHit, l = h.layer; h.drag(Math.max(0, Math.min(1, (mx - l.ox - h.x) / h.w))); this.dirty(l.master || l.name); }
     else if (down && m.scrollL && m.moved > 6){ this.setScroll(m.scrollL, m.scroll0 - (my - m.sy)); }
@@ -357,10 +363,11 @@ const Kit = {
       this.hover = hv; this.hoverLayer = hl;
       if (this.canvas) this.canvas.style.cursor = hv && f.hit.cursor ? "pointer" : "";
     }
-    this.overUI = !!f;
+    // labels and markers on the map layer do not block map zoom / pan
+    this.overUI = !!f && f.layer.name !== "MapUI";
     const wheel = im.getMouseWheelDelta ? im.getMouseWheelDelta() : 0;
     this.wheelUsed = false;
-    if (wheel){ const sl = this._scrollAt(mx, my); if (sl){ this.setScroll(sl, sl.scroll - wheel * 0.6); this.wheelUsed = true; } else if (f) this.wheelUsed = true; }
+    if (wheel){ const sl = this._scrollAt(mx, my); if (sl){ this.setScroll(sl, sl.scroll - wheel * 0.6); this.wheelUsed = true; } else if (this.overUI) this.wheelUsed = true; }
     for (const n of this.order){ const l = this.layers[n]; if (l && l.dirty && l.master){ l.dirty = false; this.layers[l.master].dirty = true; } }
     for (const n of this.order){ const l = this.layers[n]; if (l && l.dirty && l.render){ l.dirty = false; l.begin(); try { l.render(l); } catch(e){ console.error("UI render", n, e); } l.end(); this._applyClip(l); } }
   },

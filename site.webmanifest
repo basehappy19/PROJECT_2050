@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Project : 2050 — ภารกิจกู้วิกฤตโลก",
   "short_name": "Project 2050",
-  "description": "เกมวางแผนกลยุทธ์บนลูกโลก 3 มิติ นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 (SDG 13) เล่นออฟไลน์ได้",
+  "description": "เกมวางแผนกลยุทธ์บนแผนที่โลก นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 (SDG 13) · 67 ประเทศ · 40 สกิล · เล่นออฟไลน์ได้",
   "lang": "th",
   "start_url": "./",
   "scope": "./",
@@ -12,8 +12,8 @@
     "standalone"
   ],
   "orientation": "landscape",
-  "background_color": "#050b10",
-  "theme_color": "#081116",
+  "background_color": "#061015",
+  "theme_color": "#061015",
   "categories": [
     "games",
     "education"

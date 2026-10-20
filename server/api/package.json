@@ -1,0 +1,27 @@
+{
+  "name": "p2050-api",
+  "version": "1.0.0",
+  "description": "Project : 2050 game server: accounts, Terra, shop, leaderboard, cloud saves, certificates",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test test/*.test.js",
+    "reset-password": "node scripts/reset-password.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@fastify/cors": "^11.3.1",
+    "@fastify/rate-limit": "^10.3.0",
+    "@node-rs/argon2": "^2.2.2",
+    "fastify": "^5.12.7",
+    "google-auth-library": "^9.15.1",
+    "jose": "^5.10.0",
+    "pdfkit": "^0.15.2",
+    "pg": "^8.23.1"
+  },
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -124,35 +124,5 @@ const ACTIONS = [
   {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ภูมิภาค −0.8 Gt × ความร่วมมือ, ความร่วมมือ −6%",en:"Regional CO₂ −0.8 Gt × compliance, compliance −6%"}},
 ];
 
-/* ---------------------------- Tech & Policy Tree (18) ---------------------------- */
-const NODES = [
-  {id:"E1",cat:1,ep:50, pc:10,req:[],        months:6, name:{th:"ปรับปรุงโครงข่ายไฟฟ้าอัจฉริยะ",en:"Smart Grid Modernization"}, fx:{co2:-0.8}, desc:{th:"CO₂ โลก −0.8 Gt และเพิ่มผลลด CO₂ ของโหนดพลังงานสะอาด (E2–E6) อีก 10%",en:"Global CO₂ −0.8 Gt; boosts clean-energy nodes (E2–E6) by 10%"}},
-  {id:"E2",cat:1,ep:80, pc:15,req:["E1"],    months:18,name:{th:"ฟาร์มแสงอาทิตย์และกังหันลมสเกลใหญ่",en:"Utility Solar & Wind Farms"}, fx:{all:-0.4}, desc:{th:"CO₂ ทุกภูมิภาค −0.4 Gt (รวม −2.4 Gt)",en:"Every region −0.4 Gt (−2.4 Gt total)"}},
-  {id:"E3",cat:1,ep:110,pc:20,req:["E2"],    months:12,name:{th:"ระบบกักเก็บพลังงานแบตเตอรี่ขั้นสูง",en:"Next-Gen Battery Storage"}, fx:{co2:-1.5,damp:.15}, desc:{th:"เสถียรภาพโครงข่าย +15% (ชะลอการเติบโตของการปล่อย), CO₂ โลก −1.5 Gt",en:"Grid stability +15% (slows emission growth), global CO₂ −1.5 Gt"}},
-  {id:"E4",cat:1,ep:140,pc:30,req:["E1"],    months:24,name:{th:"เตาปฏิกรณ์นิวเคลียร์ขนาดเล็ก SMR",en:"SMR Nuclear Reactors"}, fx:{co2:-3.0,appr:-5}, desc:{th:"CO₂ โลก −3.0 Gt, ความนิยม −5% จากความกังวลเรื่องความปลอดภัย",en:"Global CO₂ −3.0 Gt, approval −5% over safety fears"}},
-  {id:"E5",cat:1,ep:250,pc:60,req:["E4","E3"],months:36,name:{th:"โรงไฟฟ้าฟิวชันเชิงพาณิชย์",en:"Commercial Fusion Power"}, fx:{co2:-6.0,epInc:10,damp:.3}, desc:{th:"CO₂ โลก −6.0 Gt, รายได้ [[leaf]] +10/เดือน",en:"Global CO₂ −6.0 Gt, [[leaf]] income +10/mo"}},
-  {id:"E6",cat:1,ep:160,pc:35,req:["E3"],    months:18,name:{th:"ไฮโดรเจนเขียวสำหรับอุตสาหกรรมหนัก",en:"Green Hydrogen Metallurgy"}, fx:{rco2:{EA:-1.5,NA:-1.5}}, desc:{th:"CO₂ ใน EA และ NA แห่งละ −1.5 Gt",en:"EA and NA each −1.5 Gt"}},
-  {id:"P1",cat:2,ep:30, pc:5, req:[],        months:0, name:{th:"แคมเปญความรอบรู้ด้านภูมิอากาศ",en:"Climate Literacy Campaign"}, fx:{appr:10,compAll:5}, desc:{th:"ความนิยม +10%, ความร่วมมือทุกภูมิภาค +5% (ถาวร)",en:"Approval +10%, all regions' compliance +5% (permanent)"}},
-  {id:"P2",cat:2,ep:60, pc:25,req:["P1"],    months:6, name:{th:"ภาษีคาร์บอนมาตรฐาน",en:"Standard Carbon Tax"}, fx:{co2:-2.5,appr:-8,epInc:6}, desc:{th:"CO₂ โลก −2.5 Gt, ความนิยม −8%, รายได้ [[leaf]] +6/เดือน",en:"Global CO₂ −2.5 Gt, approval −8%, [[leaf]] income +6/mo"}},
-  {id:"P3",cat:2,ep:90, pc:40,req:["P2"],    months:0, name:{th:"กลไกปรับคาร์บอนข้ามพรมแดน",en:"Carbon Border Adjustment"}, fx:{p3:1}, desc:{th:"ภูมิภาคที่ความร่วมมือต่ำกว่า 70% ถูกบังคับลด CO₂ ปีละ −0.3 Gt ต่อเนื่อง",en:"Regions under 70% compliance are forced to cut −0.3 Gt/yr, ongoing"}},
-  {id:"P4",cat:2,ep:120,pc:30,req:["P2"],    months:24,name:{th:"กฎหมายบังคับขนส่งไฟฟ้า 100%",en:"Mandatory EV & Zero-Emission Transit"}, fx:{co2:-3.2,damp:.25}, desc:{th:"CO₂ โลก −3.2 Gt และกดการเติบโตของการปล่อยภาคคมนาคมถาวร",en:"Global CO₂ −3.2 Gt; permanently damps transport emission growth"}},
-  {id:"P5",cat:2,ep:100,pc:25,req:["P1"],    months:18,name:{th:"มาตรฐานอาคาร Net-Zero",en:"Net-Zero Building Code"}, fx:{co2:-1.8,damp:.15}, desc:{th:"CO₂ โลก −1.8 Gt, ประหยัดพลังงานในเขตเมือง",en:"Global CO₂ −1.8 Gt, urban energy savings"}},
-  {id:"P6",cat:2,ep:150,pc:60,req:["P3"],    months:12,name:{th:"ยกเลิกเงินอุดหนุนฟอสซิลทั่วโลก",en:"Abolish Global Fossil Subsidies"}, fx:{co2:-4.5,comp:{MEAF:-15,NA:-15},damp:.25}, desc:{th:"CO₂ โลก −4.5 Gt, ความร่วมมือใน MEAF และ NA −15% ทันที",en:"Global CO₂ −4.5 Gt, MEAF and NA compliance −15% immediately"}},
-  {id:"N1",cat:3,ep:50, pc:10,req:[],        months:24,name:{th:"โครงการมหาปลูกป่าระดับทวีป",en:"Mega-Reforestation Initiative"}, fx:{sink:1.0,appr:5}, desc:{th:"ดักจับ CO₂ 1.0 Gt/ปี, ความนิยม +5%",en:"Captures 1.0 Gt/yr, approval +5%"}},
-  {id:"N2",cat:3,ep:70, pc:15,req:["N1"],    months:18,name:{th:"ป่าชายเลนและบลูคาร์บอน",en:"Mangrove & Blue Carbon"}, fx:{sink:1.2,vuln:{SEA:-15}}, desc:{th:"ดักจับ 1.2 Gt/ปี, ความเปราะบาง SEA −15%",en:"Captures 1.2 Gt/yr, SEA vulnerability −15%"}},
-  {id:"N3",cat:3,ep:85, pc:20,req:["N1"],    months:18,name:{th:"เกษตรฟื้นฟูบำรุงดิน",en:"Regenerative Agriculture"}, fx:{sink:1.5,appr:3,vulnAll:-3}, desc:{th:"ดักจับ 1.5 Gt/ปี, ความมั่นคงทางอาหาร: ความนิยม +3%, ความเปราะบางทุกภูมิภาค −3%",en:"Captures 1.5 Gt/yr; food security: approval +3%, all vulnerability −3%"}},
-  {id:"N4",cat:3,ep:180,pc:30,req:["N1","E3"],months:24,name:{th:"โรงงานดักจับคาร์บอนจากอากาศ (DAC)",en:"Direct Air Capture Mega-Facilities"}, fx:{sink:3.5}, desc:{th:"ดักจับ 3.5 Gt/ปี ต้องใช้พลังงานหมุนเวียนสูง: ได้ผลเพียง 60% ถ้ายังไม่มี E2",en:"Captures 3.5 Gt/yr; needs renewables: only 60% effective without E2"}},
-  {id:"N5",cat:3,ep:95, pc:20,req:["N3"],    months:12,name:{th:"ไบโอชาร์ฝังดินระยะยาว",en:"Industrial Biochar Pyrolysis"}, fx:{sink:1.0,appr:2}, desc:{th:"ดักจับ 1.0 Gt/ปี, ผลผลิตเกษตร +5% (ความนิยม +2%)",en:"Captures 1.0 Gt/yr, crop yield +5% (approval +2%)"}},
-  {id:"N6",cat:3,ep:210,pc:50,req:["N2"],    months:12,name:{th:"การเติมแร่ธาตุฟื้นฟูมหาสมุทร",en:"Ocean Enhanced Mineralization"}, fx:{sink:4.0,tip:8}, desc:{th:"ดักจับ 4.0 Gt/ปี แต่รบกวนระบบนิเวศทะเล: อุณหภูมิ +0.03°C",en:"Captures 4.0 Gt/yr but disrupts marine life: +0.03°C"}},
-];
-const NODE = Object.fromEntries(NODES.map(n => [n.id, n]));
-const NODE_ICON = {E1:"zap",E2:"sun",E3:"battery-charging",E4:"atom",E5:"sparkles",E6:"factory",
-  P1:"megaphone",P2:"receipt",P3:"scale",P4:"car",P5:"building-2",P6:"ban",
-  N1:"trees",N2:"waves",N3:"wheat",N4:"fan",N5:"shovel",N6:"fish"};
-const TREE_POS = {
-  E1:[0,1], E2:[1,0], E4:[1,2], E3:[2,0], E6:[3,0], E5:[3,2],
-  P1:[0,1], P2:[1,0], P5:[1,2], P3:[2,0], P4:[2,1], P6:[3,0],
-  N1:[0,1], N2:[1,0], N3:[1,2], N4:[2,1], N6:[2,0], N5:[2,2],
-};
 const IC = {ep:"[[leaf]]", pc:"[[landmark]]", appr:"[[users]]", temp:"[[thermometer]]", co2:"[[cloud]]", comp:"[[handshake]]", vuln:"[[shield-alert]]"};
-Object.assign(P, {UI, MONTHS, RESERVE, REGIONS, RIDS, RMETA, CITIES, ACTIONS, NODES, NODE, NODE_ICON, TREE_POS, IC});
+Object.assign(P, {UI, MONTHS, RESERVE, REGIONS, RIDS, RMETA, CITIES, ACTIONS, IC});

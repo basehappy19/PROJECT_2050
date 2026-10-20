@@ -1,15 +1,18 @@
-// Builds the GDevelop 5 project (game.json) for Project : 2050 and optionally exports it to HTML5.
-//   node make-project.mjs [--export]
+// Builds the GDevelop 5 project (gdevelop/game.json) for Project : 2050 from the JavaScript in ../src,
+// and with --export also builds the web version: <project>/game/ (HTML5 export), <project>/index.html and <project>/sw.js.
+//   cd gdevelop/_source/build && npm install && node make-project.mjs [--export]
 import { gd, loadProject, saveProject, exportProject } from "gdcore-tools";
 import fs from "node:fs";
 import path from "node:path";
 import crypto from "node:crypto";
+import { fileURLToPath } from "node:url";
 
-const ROOT = "/home/claude/p2050";
-const OUT = `${ROOT}/out`;                 // project folder (game.json + assets/)
-const SRC = `${ROOT}/src`;
-const META = JSON.parse(fs.readFileSync(`${ROOT}/assetgen/mapmeta.json`, "utf8"));
-const LUCIDE = JSON.parse(fs.readFileSync("/home/claude/src/lucide.json", "utf8"));
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const SOURCE = path.resolve(HERE, "..");                 // gdevelop/_source
+const OUT = path.resolve(HERE, "../..");                  // gdevelop/  (game.json + assets/)
+const REPO = path.resolve(HERE, "../../..");              // the project folder (index.html, game/, sw.js)
+const SRC = `${SOURCE}/src`;
+const META = JSON.parse(fs.readFileSync(`${SOURCE}/assetgen/mapmeta.json`, "utf8"));
 const uuid = () => crypto.randomUUID();
 
 /* ------------------------------------------------------------------ resources */
@@ -21,6 +24,10 @@ for (const f of fs.readdirSync(`${OUT}/assets/map`).sort()) img(`map/${f}`, `ass
 for (const f of fs.readdirSync(`${OUT}/assets/ui`).sort()) img(`ui/${f}`, `assets/ui/${f}`);
 const ICONS = fs.readdirSync(`${OUT}/assets/icons`).filter(f => f.endsWith(".png")).map(f => f.slice(0, -4)).sort();
 for (const n of ICONS) img(`icons/${n}.png`, `assets/icons/${n}.png`);
+const PORTRAITS = fs.readdirSync(`${OUT}/assets/portraits`).filter(f => f.endsWith(".png")).sort();
+for (const f of PORTRAITS) img(`portraits/${f}`, `assets/portraits/${f}`);
+const ENDS = fs.readdirSync(`${OUT}/assets/endings`).filter(f => f.endsWith(".jpg")).sort();
+for (const f of ENDS) img(`endings/${f}`, `assets/endings/${f}`);
 const TUTS = fs.readdirSync(`${OUT}/assets/tutorial`).filter(f => /\.(jpg|png)$/.test(f)).sort();
 for (const f of TUTS) img(`tutorial/${f}`, `assets/tutorial/${f}`);
 for (const f of fs.readdirSync(`${OUT}/assets/fonts`).filter(f => f.endsWith(".ttf")).sort()) font(f.slice(0, -4), `assets/fonts/${f}`);
@@ -48,6 +55,9 @@ const globalObjects = [
   sprite("TutImage", TUTS.map(f => anim(f.replace(/\.(jpg|png)$/, ""), `tutorial/${f}`))),
   textInput("CodeInput"),
   sprite("Backdrop", [anim("Backdrop", "ui/backdrop.jpg")]),
+  sprite("Portrait", PORTRAITS.map(f => anim(f.slice(0, -4), `portraits/${f}`))),
+  sprite("EndArt", ENDS.map(f => anim(f.slice(0, -4), `endings/${f}`))),
+  sprite("Logo", [anim("Logo", "ui/logo.png")]),
 ];
 const mapObjects = () => [
   sprite("Ocean", [anim("Ocean", "map/ocean.png")]),
@@ -105,10 +115,14 @@ const guard = "const P = window.P2050; if (!P || !P.ready) return;\n";
 
 /* ------------------------------------------------------------------ core JS (external events "Core") */
 const MODULES = [
-  ["10-data-a.js", "Data · ข้อความ TH/EN, ภูมิภาค, เมือง, การสั่งการรายภูมิภาค, ผังเทคโนโลยี"],
+  ["10-data-a.js", "Data · ข้อความ TH/EN, ภูมิภาค, เมือง, การสั่งการรายภูมิภาค"],
   ["11-data-events.js", "Data · เหตุการณ์ตัดสินใจ 152 เรื่อง"],
   ["12-data-c.js", "Data · ข่าวทั่วไป, หน้าคู่มือ, ความสำเร็จ"],
-  ["20-engine.js", "Engine · การจำลองรายเดือน, เศรษฐกิจ, เหตุการณ์, การบันทึก, ความสำเร็จ"],
+  ["13-data-skills.js", "Data · สกิล 40 สกิล 5 หมวด"],
+  ["14-data-world.js", "Data · ประเทศ, ภัยเฉพาะถิ่น, อีเวนต์ระหว่างประเทศ, ตัวละคร, เนื้อเรื่อง, ร้านค้า"],
+  ["15-data-ui2.js", "Data · ข้อความของระบบใหม่"],
+  ["20-engine.js", "Engine · การจำลองรายเดือน, ประเทศ, ความสัมพันธ์, ภัยเฉพาะถิ่น, เหตุการณ์, การบันทึก, ความสำเร็จ"],
+  ["21-net.js", "Net · เชื่อมต่อเซิร์ฟเวอร์: บัญชี, Terra, ร้านค้า, อันดับ, เกียรติบัตร"],
   ["30-ui-kit.js", "UI toolkit · วาดแผง/ข้อความ/ไอคอนด้วย UIPainter, UIText, UIIcon"],
   ["40-audio.js", "Audio · เสียงเอฟเฟกต์และเสียงบรรยากาศของเหตุการณ์"],
   ["50-map.js", "Map · แผนที่โลก 2D, สีภูมิภาค, ควันมลพิษ, ฟอง, กล้อง"],
@@ -116,8 +130,11 @@ const MODULES = [
   ["61-hud.js", "Screens · HUD และป้ายภูมิภาค"],
   ["62-drawer.js", "Screens · แผงเทคโนโลยี / ภูมิภาค / สถิติ / ข่าว"],
   ["63-modals.js", "Screens · หน้าต่างเริ่มภารกิจ, เหตุการณ์, จบเกม, หยุดเกม, คู่มือ"],
-  ["64-menu.js", "Screens · หน้าโหลด, เมนูหลัก, แจ้งเตือนความสำเร็จ"],
+  ["64-menu.js", "Screens · หน้าโหลด, เมนูหลัก, บัญชี, ร้านค้า, อันดับ, เกียรติบัตร, แจ้งเตือน"],
+  ["65-skills.js", "Screens · หน้าสกิล (เต็มจอ)"],
+  ["66-learn.js", "Screens · หน้าเรียนรู้"],
 ];
+const COUNTRYGEO = fs.readFileSync(`${SOURCE}/assetgen/countrygeo.json`, "utf8");
 const tutSizes = {};
 { // read jpeg/png sizes
   for (const f of TUTS){
@@ -132,7 +149,7 @@ const coreEvents = [
   comment("PROJECT : 2050 — โค้ดหลักของเกม (JavaScript)\nบล็อกด้านล่างทำงานครั้งเดียวตอนเริ่มฉาก Loading แล้วสร้าง window.P2050 ไว้ใช้ทั้งเกม\n• Data = ข้อความ TH/EN, ภูมิภาค, ผังเทคโนโลยี, เหตุการณ์ 152 เรื่อง, ข่าว, คู่มือ, ความสำเร็จ (แก้ตัวเลข/ข้อความได้ที่นี่)\n• Engine = กติกาการจำลองรายเดือน (เหมือนเวอร์ชันเว็บทุกอย่าง)\n• UI/Screens = วาดหน้าจอด้วยออบเจกต์ UIPainter, UIText, UIIcon, TutImage\nส่วนจังหวะเวลา การคลิก คีย์บอร์ด ดนตรี และการเปลี่ยนฉาก อยู่ใน Events ของแต่ละฉาก"),
   std([atStart], [], MODULES.map(([f, title]) => {
     let code = fs.readFileSync(`${SRC}/${f}`, "utf8");
-    code = code.replace("/*MAPMETA*/null", JSON.stringify(mapMetaSmall)).replace("/*TUTSIZES*/{}", JSON.stringify(tutSizes));
+    code = code.replace("/*MAPMETA*/null", JSON.stringify(mapMetaSmall)).replace("/*TUTSIZES*/{}", JSON.stringify(tutSizes)).replace("/*COUNTRYGEO*/null", COUNTRYGEO);
     return js(`/* ${title} */\n` + code);
   })),
 ];
@@ -168,7 +185,6 @@ const menuScene = scene("Menu", ["Backdrop", "", "MapUI", "Menu", "MenuScroll", 
   frameJs,
   group("การควบคุม (คลิก แตะ คีย์บอร์ด)", [
     std([released], [], [releaseJs]),
-    std([keyPressed("Escape")], [], [js(guard + "P.Screens.key(\"esc\");")]),
   ]),
   group("แอนิเมชันบนแผนที่", [plumePulse]),
   group("ดนตรีประกอบ", [
@@ -178,7 +194,7 @@ const menuScene = scene("Menu", ["Backdrop", "", "MapUI", "Menu", "MenuScroll", 
 ], commonVars);
 
 const gameScene = scene("Game", ["Backdrop", "", "MapUI", "HUD", "Drawer", "DrawerScroll", "Modal", "ModalScroll", "Toast"], mapObjects(), [backdrop(), ...mapInstances()], [
-  comment("ฉากเล่นเกม: 1 tick = 1 เดือนในเกม (ความเร็ว 1× = 4 วินาที, 2× = 2 วินาที) รวม 300 เดือน ม.ค. 2026 → ธ.ค. 2050\nตัวแปรฉาก Running = 1 เมื่อเวลาควรเดิน (ไม่ได้หยุด และไม่มีหน้าต่างตัดสินใจเปิดอยู่)"),
+  comment("ฉากเล่นเกม: 1 tick = 1 เดือนในเกม (ความเร็ว 1× = 4 วินาที, 2× = 2 วินาที, 3× = 1.33 วินาที) รวม 300 เดือน ม.ค. 2026 → ธ.ค. 2050\nตัวแปรฉาก Running = 1 เมื่อเวลาควรเดิน (ไม่ได้หยุด และไม่มีหน้าต่างตัดสินใจเปิดอยู่)"),
   std([atStart], [A("ResetTimer", ["", "\"tick\""])], [js("if (!window.P2050 || !window.P2050.ready) { runtimeScene.getVariables().get(\"GoTo\").setString(\"Loading\"); return; }\nwindow.P2050.Screens.setup(runtimeScene, \"game\");")]),
   frameJs,
   group("นาฬิกาเกม (เดินทีละเดือน)", [
@@ -190,8 +206,7 @@ const gameScene = scene("Game", ["Backdrop", "", "MapUI", "HUD", "Drawer", "Draw
     std([released], [], [releaseJs]),
     std([released, numVar("UIConsumed", "=", 0), C("SourisSurObjet", ["Bubble", "", "yes", ""])], [setNum("UIConsumed", "=", 1)], [js(guard + "if (objects.length) P.Map.popBubbleObject(objects[0]);", "Bubble")]),
     std([released, numVar("UIConsumed", "=", 0)], [], [js(guard + "P.Map.click();")]),
-    std([keyPressed("Space")], [], [js(guard + "P.Screens.key(\"space\");")]),
-    std([keyPressed("Escape")], [], [js(guard + "P.Screens.key(\"esc\");")]),
+    comment("คีย์บอร์ด: T สกิล · R ภูมิภาค · S สถิติ · N ข่าว · Space หยุด · 1 2 3 ความเร็ว · H ทั้งโลก · + − ซูม · Esc ปิด (อยู่ในโค้ด Screens)"),
   ]),
   group("แอนิเมชันบนแผนที่", [
     plumePulse,
@@ -212,7 +227,7 @@ const project = {
   gdVersion:{build:269, major:5, minor:6, revision:0},
   properties:{
     adaptGameResolutionAtRuntime:false, antialiasingMode:"MSAA", antialisingEnabledOnMobile:true, folderProject:false, orientation:"landscape",
-    packageName:"com.project2050.climategame", pixelsRounding:false, projectUuid:uuid(), scaleMode:"linear", sizeOnStartupMode:"", templateSlug:"", version:"1.0.0",
+    packageName:"com.project2050.climategame", pixelsRounding:false, projectUuid:uuid(), scaleMode:"linear", sizeOnStartupMode:"", templateSlug:"", version:"2.0.0",
     name:"Project : 2050", description:"เกมวางแผนกลยุทธ์ นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 (SDG 13) — Garena Academy Game Maker",
     author:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์",
     windowWidth:1920, windowHeight:1080, latestCompilationDirectory:"", maxFPS:60, minFPS:20, verticalSync:false, platformSpecificAssets:{},
@@ -248,7 +263,9 @@ fs.unlinkSync(raw);
 console.log("saved game.json", fs.statSync(`${OUT}/game.json`).size);
 if (process.argv.includes("--export")){
   const loaded = await loadProject(`${OUT}/game.json`);
-  const dir = `${ROOT}/export`; fs.rmSync(dir, {recursive:true, force:true}); fs.mkdirSync(dir, {recursive:true});
+  const dir = `${HERE}/export`; fs.rmSync(dir, {recursive:true, force:true}); fs.mkdirSync(dir, {recursive:true});
   exportProject(loaded, dir);
   console.log("exported to", dir, fs.readdirSync(dir).length, "files");
+  const {buildWeb} = await import("./build-web.mjs");
+  buildWeb(dir, REPO);
 }

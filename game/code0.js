@@ -1,0 +1,5793 @@
+gdjs.LoadingCode = {};
+gdjs.LoadingCode.localVariables = [];
+gdjs.LoadingCode.idToCallbackMap = new Map();
+gdjs.LoadingCode.GDUIPainterObjects1= [];
+gdjs.LoadingCode.GDUIPainterObjects2= [];
+gdjs.LoadingCode.GDUITextObjects1= [];
+gdjs.LoadingCode.GDUITextObjects2= [];
+gdjs.LoadingCode.GDUIIconObjects1= [];
+gdjs.LoadingCode.GDUIIconObjects2= [];
+gdjs.LoadingCode.GDTutImageObjects1= [];
+gdjs.LoadingCode.GDTutImageObjects2= [];
+gdjs.LoadingCode.GDCodeInputObjects1= [];
+gdjs.LoadingCode.GDCodeInputObjects2= [];
+gdjs.LoadingCode.GDBackdropObjects1= [];
+gdjs.LoadingCode.GDBackdropObjects2= [];
+gdjs.LoadingCode.GDPortraitObjects1= [];
+gdjs.LoadingCode.GDPortraitObjects2= [];
+gdjs.LoadingCode.GDEndArtObjects1= [];
+gdjs.LoadingCode.GDEndArtObjects2= [];
+gdjs.LoadingCode.GDLogoObjects1= [];
+gdjs.LoadingCode.GDLogoObjects2= [];
+
+
+gdjs.LoadingCode.userFunc0xfe7130 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Data · ข้อความ TH/EN, ภูมิภาค, เมือง, การสั่งการรายภูมิภาค */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.dataA) return;
+(P.mods = P.mods || {}).dataA = 1;
+/* ===== Data · Text strings, regions, actions, tech tree =====
+   Copied from the web version (index.html). [[icon]] tokens are drawn as icons by the UI toolkit. */
+const UI = {
+  subtitle:{th:"ภารกิจกู้วิกฤตโลก",en:"Global Climate Taskforce"},
+  temp:{th:"[[thermometer]] อุณหภูมิโลก",en:"[[thermometer]] Global temp"}, co2:{th:"[[cloud]] CO₂ สุทธิ",en:"[[cloud]] Net CO₂"},
+  ep:{th:"[[leaf]] งบเขียว",en:"[[leaf]] Eco-Points"}, pc:{th:"[[landmark]] ทุนการเมือง",en:"[[landmark]] Political capital"},
+  epHint:{th:"เงินทุน",en:"money"}, pcHint:{th:"อำนาจผ่านนโยบาย",en:"clout"},
+  appr:{th:"[[users]] ความนิยม",en:"[[users]] Approval"},
+  perMo:{th:"/ด.",en:"/mo"}, sinks:{th:"ดักจับ",en:"sinks"}, perYr:{th:"ใน 12 ด.",en:"in 12 mo"},
+  compliance:{th:"[[handshake]] ความร่วมมือ",en:"[[handshake]] Compliance"}, vuln:{th:"[[shield-alert]] ความเสี่ยงภัยพิบัติ",en:"[[shield-alert]] Disaster risk"},
+  treeHint:{th:"เส้นลูกศรแสดงลำดับการปลดล็อก: ต้องมีโหนดต้นทางก่อน · สีเขียว = มีแล้ว · สีฟ้า = ปลดล็อกได้ · เส้นประ = ยังล็อก",en:"Arrows show unlock order: own the source first · green = owned · blue = available · dashed = locked"},
+  alsoNeeds:{th:"ต้องมี",en:"needs"},
+  nbTech:{th:"เทคโนโลยี",en:"Tech"}, nbRegion:{th:"ภูมิภาค",en:"Regions"}, nbStats:{th:"สถิติ",en:"Stats"}, nbNews:{th:"ข่าว",en:"News"},
+  dTech:{th:"เทคโนโลยี & นโยบาย",en:"Tech & Policy Tree"}, dRegion:{th:"ควบคุมภูมิภาค",en:"Regional control"}, dStats:{th:"สถิติโลก",en:"Global metrics"}, dNews:{th:"รายงานข่าวคณะทำงาน",en:"Taskforce dispatch"},
+  rush:{th:"เงินเฟ้อสีเขียว",en:"Greenflation"},
+  rushTip:{th:"เงินเฟ้อสีเขียว (Greenflation): อนุมัติหลายโครงการในรอบ 12 เดือน ความต้องการเทคโนโลยีสะอาดพุ่งพร้อมกัน ราคาจึงขึ้น 20% ต่อโครงการ",en:"Greenflation: approving many projects within 12 months drives clean-tech demand up, adding 20% per project"},
+  nzTitle:{th:"Net Zero",en:"Net Zero"}, tTitle:{th:"อุณหภูมิโลก",en:"Global warming"},
+  nzGoal:{th:"เป้า 0",en:"Goal 0"}, tLose:{th:"แพ้",en:"Lose"},
+  vs2026:{th:"เทียบปี 2026",en:"vs 2026"}, left:{th:"เหลือ",en:"left"}, yrs:{th:"ปี",en:"yrs"},
+  onTrack:{th:"ตามแนวโน้มนี้ถึงเป้าปี",en:"On this trend: Net Zero in"},
+  offTrack:{th:"ตามแนวโน้มนี้ไม่ทันปี 2050",en:"On this trend: miss 2050"},
+  rising:{th:"กำลังเพิ่มขึ้น ยังไม่ลด",en:"Still rising"},
+  toLose:{th:"ห่างจุดแพ้",en:"from losing"},
+  barNZ:{th:"ความคืบหน้าสู่ Net Zero",en:"Progress to Net Zero"}, barT:{th:"ภาวะโลกร้อน (ขีดแพ้ +3.0°C)",en:"Warming (lose at +3.0°C)"},
+  ghint:{th:"ลากเพื่อเลื่อนแผนที่ · ล้อเมาส์เพื่อซูม · แตะภูมิภาคเพื่อสั่งการ · แตะฟองเพื่อเก็บแต้ม",en:"Drag to pan · scroll to zoom · tap a region to act · tap bubbles to collect"},
+  cat1:{th:"พลังงานและอุตสาหกรรม",en:"Energy & Industrial Transition"},
+  cat2:{th:"นโยบายภูมิอากาศและเศรษฐกิจสังคม",en:"Climate Policy & Socio-Economy"},
+  cat3:{th:"แหล่งดูดซับคาร์บอนและวิศวกรรมธรรมชาติ",en:"Carbon Sink & Nature Engineering"},
+  unlock:{th:"อนุมัติโครงการ",en:"Approve project"}, owned:{th:"ดำเนินการแล้ว",en:"Enacted"},
+  needs:{th:"ต้องมีก่อน",en:"Requires"}, none:{th:"ไม่มี",en:"None"}, rollout:{th:"ทยอยผล",en:"Roll-out"},
+  months:{th:"เดือน",en:"mo"}, inProgress:{th:"โครงการที่กำลังทยอยผล",en:"Projects rolling out"},
+  paused:{th:"หยุดชะงัก",en:"stalled"},
+  rollNote:{th:"การลด CO₂ ทยอยเกิดขึ้นทุกเดือน คูณด้วยอัตราความร่วมมือของภูมิภาค ณ เดือนนั้น และยิ่งลดได้มากแล้ว ตันสุดท้ายยิ่งลดยาก",en:"CO₂ cuts arrive monthly, scale with each region's compliance at that time, and the last tonnes are the hardest to cut."},
+  capFull:{th:"ทีมงาน GCT ดูแลโครงการได้พร้อมกันสูงสุด 3 โครงการ รอให้โครงการเดิมทยอยผลครบก่อน",en:"GCT can run at most 3 roll-outs at once. Wait for one to finish."},
+  co2Now:{th:"CO₂ ปัจจุบัน",en:"CO₂ now"}, co2Start:{th:"ปี 2026",en:"In 2026"}, fossil:{th:"สัดส่วนฟอสซิล",en:"Fossil share"}, reserve:{th:"ทุนสำรอง",en:"Reserves"},
+  cooldown:{th:"พักอีก",en:"Ready in"},
+  chartCo2:{th:"CO₂ สุทธิของโลก (Gt/ปี)",en:"Global net CO₂ (Gt/yr)"}, chartTemp:{th:"อุณหภูมิเพิ่มจากยุคก่อนอุตสาหกรรม (°C)",en:"Warming vs pre-industrial (°C)"},
+  shares:{th:"การปล่อยรายภูมิภาค (Gt/ปี)",en:"Emissions by region (Gt/yr)"},
+  eventTag:{th:"เหตุการณ์ฉุกเฉิน · ต้องตัดสินใจ",en:"Dilemma event · decision required"},
+  cantAfford:{th:"ทรัพยากรไม่พอ",en:"Not enough resources"},
+  postpone:{th:"เลื่อนการตัดสินใจ (ถูกวิจารณ์หนัก)",en:"Postpone the decision (heavy criticism)"},
+  start:{th:"เริ่มภารกิจ",en:"Begin mission"}, restart:{th:"เริ่มใหม่",en:"Play again"},
+  introTag:{th:"คำสั่งแต่งตั้ง · มกราคม 2026",en:"Appointment order · January 2026"},
+  introTitle:{th:"ท่านคือผู้อำนวยการสูงสุดแห่ง GCT",en:"You are Supreme Director of the GCT"},
+  introBody:{th:"นานาชาติมอบอำนาจให้ท่านจัดสรรงบประมาณ ผลักดันสนธิสัญญา และเร่งเทคโนโลยีข้ามพรมแดน เป้าหมายคือทำให้การปล่อยคาร์บอนสุทธิของโลกเหลือศูนย์ก่อนสิ้นปี 2050",
+             en:"The world has given you authority over budgets, treaties and cross-border technology. Your goal: bring global net carbon emissions to zero before the end of 2050."},
+  introRules:{th:["1 เดือนในเกม = 1 tick · [[leaf]] งบเขียว และ [[landmark]] ทุนการเมือง เพิ่มทุกเดือน","แตะ [[sprout]] บนแผนที่เพื่อเก็บงบเขียว · แตะ [[siren]] เพื่อส่งความช่วยเหลือก่อนหมดเวลา","ซื้อเทคโนโลยีตามผัง (พร้อมกันได้ 3 โครงการ) · แตะภูมิภาคบนแผนที่เพื่อสั่งการ","แพ้เมื่อ [[thermometer]] ถึง +3.0°C, [[users]] เหลือ 0% หรือถึงปี 2051 · Space = หยุด/เล่น"],
+              en:["1 in-game month = 1 tick · [[leaf]] Eco-Points and [[landmark]] Political capital come in monthly","Tap [[sprout]] on the map to collect Eco-Points · tap [[siren]] to send aid before time runs out","Buy tech along the tree (3 projects at once) · tap a region on the map to act","Lose at [[thermometer]] +3.0°C, [[users]] 0%, or 2051 · Space = pause/play"]},
+  winTitle:{th:"Net Zero สำเร็จ",en:"Net Zero achieved"},
+  winBody:{th:"การปล่อยคาร์บอนสุทธิของโลกแตะศูนย์ โลกหลังยุคคาร์บอนเริ่มต้นขึ้นแล้ว",en:"Global net emissions hit zero. The post-carbon era begins."},
+  l1Title:{th:"ภูมิอากาศล่มสลาย",en:"Runaway warming"}, l1Body:{th:"อุณหภูมิโลกแตะ +3.0°C ระบบธรรมชาติพลิกผันเกินกว่าจะฟื้นคืน",en:"Global warming reached +3.0°C. Earth systems tipped past recovery."},
+  l2Title:{th:"ถูกถอดถอนจากตำแหน่ง",en:"Impeached"}, l2Body:{th:"ความไว้วางใจของประชาชนเหลือ 0% นานาชาติถอนฉันทามติที่มอบให้ท่าน",en:"Public approval fell to 0%. The nations withdrew your mandate."},
+  l3Title:{th:"หมดเวลา",en:"Time over"}, l3Body:{th:"ปี 2051 มาถึงแล้ว แต่โลกยังปล่อยคาร์บอนสุทธิมากกว่าศูนย์",en:"2051 arrived and the world still emits net carbon."},
+  finalScore:{th:"คะแนนสุดท้าย",en:"Final score"},
+  logStart:{th:"GCT เริ่มปฏิบัติการ เป้าหมาย: Net Zero ก่อนสิ้นปี 2050",en:"GCT operations begin. Target: Net Zero before end of 2050."},
+  logTech:{th:"อนุมัติโครงการ",en:"Approved"}, logAct:{th:"สั่งการ",en:"Ordered"},
+  logTipping:{th:"[[thermometer]] อุณหภูมิเกิน +1.5°C โลกร้อนเร็วขึ้น",en:"[[thermometer]] Warming passed +1.5°C and is speeding up."},
+  logTipping2:{th:"[[thermometer]] อุณหภูมิเกิน +2.0°C ระบบนิเวศวิกฤต",en:"[[thermometer]] Warming passed +2.0°C. Ecosystems in crisis."},
+  logRollDone:{th:"โครงการทยอยผลครบแล้ว",en:"finished rolling out"},
+  delayed:{th:"ผลล่าช้า",en:"delayed"},
+  redHelp:{th:"ส่งความช่วยเหลือภัยพิบัติที่",en:"Disaster aid sent to"},
+  redMiss:{th:"ไม่ได้ตอบสนองภัยพิบัติที่",en:"Missed the disaster in"},
+  didYouKnow:{th:"รู้ไหม?",en:"Did you know?"},
+  loading:{th:"กำลังเตรียมทรัพยากร",en:"Preparing resources"}, ldFonts:{th:"ฟอนต์",en:"Fonts"}, ldGlobe:{th:"แผนที่โลก",en:"World map"},
+  ldAudio:{th:"เสียงและดนตรี",en:"Sound and music"}, ldImg:{th:"ภาพประกอบ",en:"Illustrations"}, ldReady:{th:"พร้อมแล้ว",en:"Ready"},
+  enter:{th:"แตะเพื่อเข้าสู่เกม",en:"Tap to enter"},
+  tutNext:{th:"ถัดไป",en:"Next"}, tutBack:{th:"ย้อนกลับ",en:"Back"}, tutSkip:{th:"ข้าม",en:"Skip"}, tutDone:{th:"เริ่มเล่น",en:"Start playing"},
+  tutMenu:{th:"วิธีเล่น",en:"How to play"}, musicLbl:{th:"ดนตรี",en:"Music"}, sfxLbl:{th:"เสียงเอฟเฟกต์",en:"Sound effects"},
+  mAch:{th:"ความสำเร็จ",en:"Achievements"}, achUnlocked:{th:"ปลดล็อกความสำเร็จ!",en:"Achievement unlocked!"},
+  achSecret:{th:"ความสำเร็จลับ",en:"Secret achievement"}, achOn:{th:"ได้เมื่อ",en:"Unlocked"},
+  mNew:{th:"เกมใหม่",en:"New game"}, mNewS:{th:"เริ่มภารกิจ มกราคม 2026",en:"Start the mission in January 2026"},
+  mCont:{th:"เล่นต่อ",en:"Continue"}, mLoad:{th:"โหลดเกม",en:"Load game"}, mLoadS:{th:"บันทึกอัตโนมัติ + 3 ช่อง + รหัสเซฟ",en:"Autosave, 3 slots and save codes"},
+  mHow:{th:"วิธีเล่น",en:"How to play"}, mHowS:{th:"กติกา ทรัพยากร และเงื่อนไขแพ้ชนะ",en:"Rules, resources and win/lose conditions"},
+  mBack:{th:"[[arrow-left]] กลับ",en:"[[arrow-left]] Back"}, mNoSave:{th:"ยังไม่มีเกมที่บันทึกไว้",en:"No saved game yet"},
+  mTag:{th:"เป้าหมายการพัฒนาที่ยั่งยืน ข้อ 13 · การรับมือการเปลี่ยนแปลงสภาพภูมิอากาศ",en:"UN Sustainable Development Goal 13 · Climate Action"},
+  mDesc:{th:"นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 โดยไม่ให้อุณหภูมิแตะ +3.0°C และไม่ให้ประชาชนหมดความเชื่อมั่น",en:"Lead the world to Net Zero before 2050 without hitting +3.0°C or losing the public's trust."},
+  slotAuto:{th:"บันทึกอัตโนมัติ",en:"Autosave"}, slot:{th:"ช่องบันทึก",en:"Slot"}, empty:{th:"ว่าง",en:"Empty"},
+  load:{th:"โหลด",en:"Load"}, save:{th:"บันทึก",en:"Save"}, saved:{th:"บันทึกแล้ว",en:"Saved"},
+  codeTitle:{th:"รหัสเซฟ (ย้ายไปเล่นเครื่องอื่น)",en:"Save code (move to another device)"},
+  codeCopy:{th:"คัดลอกรหัส",en:"Copy code"}, codeCopied:{th:"คัดลอกแล้ว",en:"Copied"}, codeSel:{th:"เลือกข้อความไว้แล้ว กด Ctrl+C เพื่อคัดลอก",en:"Text selected. Press Ctrl+C to copy."},
+  codePaste:{th:"วางรหัสเซฟที่นี่แล้วกดโหลด",en:"Paste a save code here, then load"}, codeLoad:{th:"โหลดจากรหัส",en:"Load from code"},
+  codeFail:{th:"คัดลอกไม่สำเร็จ ลองอีกครั้ง หรือใช้ช่องบันทึกแทน",en:"Couldn't copy. Try again, or use a save slot."},
+  codeBad:{th:"รหัสเซฟไม่ถูกต้อง ตรวจว่าคัดลอกมาครบทั้งข้อความ",en:"That save code is invalid. Check that you copied all of it."},
+  noStore:{th:"เบราว์เซอร์นี้ไม่อนุญาตให้บันทึก ใช้รหัสเซฟแทน",en:"This browser blocks saving. Use a save code instead."},
+  pTitle:{th:"หยุดเกมชั่วคราว",en:"Paused"}, pResume:{th:"เล่นต่อ",en:"Resume"}, pMain:{th:"กลับเมนูหลัก (บันทึกอัตโนมัติ)",en:"Main menu (autosaves)"},
+  mainMenu:{th:"เมนูหลัก",en:"Main menu"}, autosaveNote:{th:"เกมบันทึกอัตโนมัติทุก 6 เดือนในเกม",en:"The game autosaves every 6 in-game months"},
+  annual:{th:"สรุปปี",en:"Year in review"},
+  halved:{th:"ลดการปล่อยลงได้ครึ่งหนึ่งจากปี 2026 แล้ว",en:"has halved its emissions since 2026"},
+  teamK:{th:"พัฒนาโดยทีม",en:"Developed by team"},
+  team:{th:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์",en:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์"},
+  disclaimer:{th:"เกมนี้จัดทำขึ้นเพื่อใช้ในกิจกรรม Garena Academy Game Maker เท่านั้น",en:"This game was made for the Garena Academy Game Maker activity only."},
+  noGL:{th:"เบราว์เซอร์นี้แสดงลูกโลก 3 มิติไม่ได้ ยังเล่นได้ผ่านแผง “ภูมิภาค” ด้านล่าง",en:"This browser can't show the 3D globe. You can still play through the Regions panel below."},
+};
+const MONTHS = {th:["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."],en:["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"]};
+const RESERVE = { vh:{m:.8,th:"สูงมาก",en:"Very high"}, h:{m:.9,th:"สูง",en:"High"}, m:{m:1,th:"ปานกลาง",en:"Medium"}, l:{m:1.2,th:"ต่ำ",en:"Low"} };
+const REGIONS = [
+  {id:"NA",  name:{th:"อเมริกาเหนือ",en:"North America"},                  co2:10.5, fossil:.78, reserve:"vh", comp:80, vuln:30, lab:[45,-100]},
+  {id:"EU",  name:{th:"สหภาพยุโรป",en:"European Union"},                    co2:5.5,  fossil:.55, reserve:"h",  comp:90, vuln:25, lab:[52,15]},
+  {id:"EA",  name:{th:"เอเชียตะวันออก",en:"East Asia"},                     co2:12.0, fossil:.82, reserve:"h",  comp:75, vuln:45, lab:[38,110]},
+  {id:"SA",  name:{th:"อเมริกาใต้",en:"South America"},                     co2:2.5,  fossil:.45, reserve:"l",  comp:65, vuln:65, lab:[-15,-60]},
+  {id:"MEAF",name:{th:"ตะวันออกกลางและแอฟริกา",en:"Middle East & Africa"},  co2:2.0,  fossil:.90, reserve:"m",  comp:60, vuln:85, lab:[8,22]},
+  {id:"SEA", name:{th:"เอเชียตะวันออกเฉียงใต้",en:"Southeast Asia"},         co2:3.5,  fossil:.80, reserve:"m",  comp:70, vuln:75, lab:[8,105]},
+];
+const RIDS = REGIONS.map(r => r.id);
+const RMETA = Object.fromEntries(REGIONS.map(r => [r.id, r]));
+/* Emission hotspots [lat, lon, weight within region, name] — drawn as glowing plumes and used for bubbles */
+const CITIES = {
+  NA:[[40.7,-74,3,"New York"],[29.8,-95.4,3,"Houston"],[34,-118.2,2,"Los Angeles"],[41.9,-87.6,2,"Chicago"],[43.7,-79.4,1,"Toronto"],[19.4,-99.1,2,"Mexico City"],[53.5,-113.5,1,"Edmonton"]],
+  EU:[[51.5,-0.1,2,"London"],[48.9,2.35,1,"Paris"],[52.5,13.4,2,"Berlin"],[55.8,37.6,3,"Moscow"],[52.2,21,2,"Warsaw"],[40.4,-3.7,1,"Madrid"],[41,29,2,"Istanbul"],[59.9,30.3,1,"St Petersburg"]],
+  EA:[[39.9,116.4,3,"Beijing"],[31.2,121.5,3,"Shanghai"],[35.7,139.7,2,"Tokyo"],[37.6,127,2,"Seoul"],[23.1,113.3,2,"Guangzhou"],[29.6,106.5,2,"Chongqing"],[43.2,76.9,1,"Almaty"],[41.8,123.4,2,"Shenyang"]],
+  SEA:[[13.75,100.5,2,"Bangkok"],[-6.2,106.8,2,"Jakarta"],[14.6,121,1,"Manila"],[28.6,77.2,3,"Delhi"],[19.1,72.9,2,"Mumbai"],[23.8,90.4,1,"Dhaka"],[-33.9,151.2,1,"Sydney"],[10.8,106.7,1,"Ho Chi Minh"],[24.9,67,1,"Karachi"]],
+  SA:[[-23.5,-46.6,3,"São Paulo"],[-34.6,-58.4,2,"Buenos Aires"],[-12,-77,1,"Lima"],[4.7,-74.1,1,"Bogotá"],[-33.4,-70.6,1,"Santiago"],[-3.1,-60,1,"Manaus"]],
+  MEAF:[[24.7,46.7,3,"Riyadh"],[35.7,51.4,2,"Tehran"],[30,31.2,2,"Cairo"],[6.5,3.4,1,"Lagos"],[-26.2,28,2,"Johannesburg"],[25.2,55.3,2,"Dubai"],[-1.3,36.8,1,"Nairobi"]],
+};
+
+/* Regional actions: cost ×1.25 per use in that region, 4-month cooldown. */
+const ACTIONS = [
+  {id:"fund",  ep:40, pc:0,  cd:4, name:{th:"กองทุนพลังงานสะอาด",en:"Clean energy fund"}, desc:{th:"CO₂ ภูมิภาค −0.35 Gt × ความร่วมมือ",en:"Regional CO₂ −0.35 Gt × compliance"}},
+  {id:"diplo", ep:0,  pc:12, cd:4, name:{th:"การทูตภูมิอากาศ",en:"Climate diplomacy"}, desc:{th:"ความร่วมมือ +8% (ค่อยๆ ลดลงสู่ค่าฐาน)",en:"Compliance +8% (drifts back to baseline)"}},
+  {id:"adapt", ep:35, pc:0,  cd:4, name:{th:"กองทุนปรับตัว",en:"Adaptation fund"}, desc:{th:"ความเปราะบาง −10%, ความนิยม +1%",en:"Vulnerability −10%, approval +1%"}},
+  {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ภูมิภาค −0.8 Gt × ความร่วมมือ, ความร่วมมือ −6%",en:"Regional CO₂ −0.8 Gt × compliance, compliance −6%"}},
+];
+
+const IC = {ep:"[[leaf]]", pc:"[[landmark]]", appr:"[[users]]", temp:"[[thermometer]]", co2:"[[cloud]]", comp:"[[handshake]]", vuln:"[[shield-alert]]"};
+Object.assign(P, {UI, MONTHS, RESERVE, REGIONS, RIDS, RMETA, CITIES, ACTIONS, IC});
+
+};
+gdjs.LoadingCode.userFunc0xfec880 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Data · เหตุการณ์ตัดสินใจ 152 เรื่อง */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.dataB) return;
+(P.mods = P.mods || {}).dataB = 1;
+/* ===== Data · 152 dilemma events =====
+   EV(id, target, cond, title, desc, ...options)  ·  EV3(id, target, cond, sound, title, desc, fact, ...options)
+   O(th, en, effects)  — effects: co2, rco2, temp, tip, appr, ep, pc, comp, vuln, disc, damp, stall, delay */
+const EV = (id,target,cond,title,desc,...options) => ({id,target,cond,title,desc,options});
+const EV3 = (id,target,cond,snd,title,desc,fact,...options) => ({id,target,cond,snd,title,desc,fact,options});
+const O = (th,en,fx) => ({label:{th,en},fx});
+const EVENTS = [
+EV("EVT_01","EU",{},{th:"วิกฤตคลื่นความร้อนในยุโรป",en:"Pan-European Heat Dome"},
+ {th:"คลื่นความร้อนระดับประวัติการณ์ทำแม่น้ำสายหลักแห้งขอด โรงไฟฟ้านิวเคลียร์ขาดน้ำหล่อเย็น และความต้องการไฟฟ้าเพื่อทำความเย็นพุ่งสูง",en:"An unprecedented heat dome dries major rivers, cripples nuclear cooling and drives peak air-conditioning demand."},
+ O("เดินเครื่องโรงไฟฟ้าถ่านหินสำรองชั่วคราว","Fire up reserve coal plants",{co2:1.2,appr:5,ep:-20,comp:{T:5}}),
+ O("บังคับปันส่วนไฟฟ้าและพักอุตสาหกรรมหนัก","Mandate power rationing, pause heavy industry",{co2:-0.2,appr:-10,ep:-40,comp:{T:-10}})),
+EV("EVT_02","SA",{minTemp:1.3},{th:"สัญญาณเตือนป่าแอมะซอนเปลี่ยนสภาพ",en:"Amazon Dieback Alert"},
+ {th:"ภาพถ่ายดาวเทียมพบป่าฝนแอมะซอนหลายพื้นที่กำลังกลายสภาพเป็นทุ่งหญ้าสะวันนา ผืนป่าที่เคยดูดซับคาร์บอนเริ่มปล่อยคาร์บอนออกมาแทน",en:"Satellites show large tracts of the Amazon turning to savanna. A carbon sink is becoming a carbon source."},
+ O("ระดมทุนนานาชาติฟื้นฟูเร่งด่วน","Fund an international emergency restoration",{ep:-80,tip:-5,comp:{T:10}}),
+ O("ปล่อยให้รัฐบาลท้องถิ่นจัดการ","Leave it to local governments",{co2:2.0,tip:8,appr:-8})),
+EV("EVT_03",null,{minYear:2028},{th:"น้ำแข็งอาร์กติกละลายแตะจุดวิกฤต",en:"Arctic Sea Ice Collapse"},
+ {th:"ฤดูร้อนนี้มหาสมุทรอาร์กติกไร้น้ำแข็งเป็นครั้งแรก พื้นผิวทะเลสีเข้มดูดซับความร้อนเพิ่มขึ้นอย่างรวดเร็ว",en:"The Arctic Ocean is ice-free in summer for the first time. Dark open water absorbs heat faster."},
+ O("ลงทุนเทคโนโลยีสะท้อนแสงอาทิตย์ขั้วโลก","Invest in polar solar-reflection geoengineering",{ep:-100,pc:-20,temp:-0.05,tip:5}),
+ O("ยอมรับสภาพ เปลี่ยนงบไปสร้างแนวกั้นน้ำทะเล","Accept it and build coastal sea walls",{ep:-70,vuln:{NA:-10,EU:-10}})),
+EV("EVT_04","MEAF",{},{th:"ค้นพบแหล่งน้ำมันดิบยักษ์นอกชายฝั่ง",en:"Massive Offshore Oil Basin Discovered"},
+ {th:"บริษัทพลังงานค้นพบแหล่งน้ำมันขนาดใหญ่ที่สุดในรอบ 40 ปี รัฐบาลในภูมิภาคกดดันขอสัมปทานขุดเจาะ",en:"The largest oil find in 40 years. Regional governments press for drilling rights."},
+ O("อนุญาตขุดเจาะโดยเก็บภาษีสัมปทานสูง","Allow drilling with a steep royalty",{ep:120,co2:2.5,appr:-10}),
+ O("สั่งระงับและประกาศเป็นเขตอนุรักษ์สากล","Ban it and declare a global reserve",{pc:-35,co2:-0.5,comp:{T:-15}})),
+EV("EVT_05",null,{},{th:"พบไมโครพลาสติกในน้ำฝนทั่วโลก",en:"Microplastics in Rainwater Scandal"},
+ {th:"งานวิจัยพบไมโครพลาสติกในน้ำฝนทุกทวีป ประชาชนเรียกร้องให้ GCT ดำเนินการทันที",en:"Researchers find microplastics in rain on every continent. The public demands action."},
+ O("แบนพลาสติกใช้ครั้งเดียวทั่วโลกทันที","Ban single-use plastics worldwide now",{pc:-25,appr:8,ep:-15}),
+ O("อุดหนุนอุตสาหกรรมพลาสติกชีวภาพ","Subsidise bioplastics",{ep:-60,co2:-0.4})),
+EV("EVT_06","SEA",{},{th:"ซูเปอร์ไต้ฝุ่นถล่มสามเหลี่ยมปากแม่น้ำโขง",en:"Super Typhoon in the Mekong Delta"},
+ {th:"พายุระดับ 5 ถล่มพื้นที่ปลูกข้าวสำคัญ ประชาชนหลายล้านคนต้องอพยพ",en:"A Category 5 storm floods a key rice basket. Millions are displaced."},
+ O("ส่งกองทุนฟื้นฟูภัยพิบัติฉุกเฉิน","Send an emergency recovery fund",{ep:-50,comp:{T:15},appr:5}),
+ O("ให้กู้แบบมีเงื่อนไขปรับโครงสร้างเขียว","Offer loans tied to green restructuring",{pc:-10,comp:{T:-15},rco2:{SEA:-0.5}})),
+EV("EVT_07",null,{req:"E4"},{th:"ความสำเร็จก้าวสำคัญของเตาฟิวชัน",en:"Fusion Reactor Milestone"},
+ {th:"ห้องปฏิบัติการผลิตพลังงานจากฟิวชันได้มากกว่าที่ใช้ต่อเนื่อง 10 นาที นักลงทุนจับตามอง",en:"A lab sustains net-positive fusion for ten minutes. Investors take notice."},
+ O("ทุ่มงบ R&D เร่งการผลิตเชิงพาณิชย์","Pour R&D money into commercialisation",{ep:-100,disc:{E5:.3}}),
+ O("นำงบไปสร้างโซลาร์เซลล์ทันที","Spend it on solar right now",{co2:-1.0,ep:-40})),
+EV("EVT_08",null,{req:"P2"},{th:"ม็อบเกษตรกรประท้วงภาษีสิ่งแวดล้อม",en:"Farmers' Anti-Climate Tax Strike"},
+ {th:"รถแทรกเตอร์นับหมื่นคันปิดถนนเข้าเมืองหลวงหลายประเทศ ประท้วงภาษีคาร์บอนภาคเกษตร",en:"Tens of thousands of tractors block capitals in protest of farm carbon taxes."},
+ O("ชะลอการเก็บภาษีภาคเกษตร","Pause the farm tax",{appr:10,co2:0.8,ep:-25}),
+ O("ยืนกรานบังคับใช้กฎหมายเดิม","Hold firm on the law",{appr:-15,comp:{ALL:-10},co2:-0.5})),
+EV("EVT_09",null,{},{th:"คิดค้นคอนกรีตดูดซับคาร์บอนได้",en:"Bio-Concrete Breakthrough"},
+ {th:"คอนกรีตชนิดใหม่ดูดซับ CO₂ ระหว่างการบ่มตัว ต้นทุนใกล้เคียงคอนกรีตทั่วไป",en:"A new concrete absorbs CO₂ while curing, at near-standard cost."},
+ O("บังคับใช้ในโครงการก่อสร้างรัฐทั่วโลก","Mandate it for public construction",{pc:-20,co2:-1.5,ep:-30}),
+ O("ลดหย่อนภาษีให้เอกชนที่สมัครใจ","Tax breaks for voluntary adopters",{ep:-50,co2:-0.6})),
+EV("EVT_10",null,{minTemp:1.3},{th:"ก๊าซมีเทนปะทุจากทุนดราไซบีเรีย",en:"Siberian Methane Burst"},
+ {th:"หลุมยุบขนาดใหญ่ปรากฏในไซบีเรีย ปล่อยมีเทนที่กักเก็บไว้ใต้ดินเยือกแข็งออกมา",en:"Giant craters open in Siberia, venting methane trapped in permafrost."},
+ O("สร้างสถานีดักจับและเผาทำลายมีเทน","Build methane capture-and-flare stations",{ep:-90,tip:-3}),
+ O("ประกาศภาวะฉุกเฉินและเฝ้าระวัง","Declare an emergency and monitor",{temp:0.08,tip:6})),
+EV("EVT_11",null,{req:"E6"},{th:"ท่อส่งไฮโดรเจนเขียวระเบิด",en:"Green Hydrogen Pipeline Explosion"},
+ {th:"ท่อส่งไฮโดรเจนสายหลักระเบิด สื่อตั้งคำถามถึงความปลอดภัยของเทคโนโลยีใหม่",en:"A major hydrogen line explodes. Media question the new technology's safety."},
+ O("ตรวจสอบความปลอดภัยทั่วโลก (โครงการหยุด 3 เดือน)","Global safety audit (projects stall 3 months)",{appr:-5,co2:0.5,stall:3}),
+ O("จ่ายเยียวยาและเดินหน้าต่อ","Compensate victims and continue",{ep:-45,appr:2})),
+EV("EVT_12",null,{minTemp:1.25},{th:"แนวปะการังฟอกขาวขั้นวิกฤต",en:"Great Barrier Reef Bleaching Emergency"},
+ {th:"ปะการังกว่า 80% ของแนวปะการังเกรตแบร์ริเออร์ฟอกขาวในฤดูเดียว",en:"Over 80% of the Great Barrier Reef bleaches in a single season."},
+ O("เพาะพันธุ์ปะการังทนร้อนและปลูกถ่าย","Breed and transplant heat-tolerant coral",{ep:-55,tip:-2,appr:2}),
+ O("ประกาศเขตห้ามเดินเรือและจำกัดการท่องเที่ยว","Close shipping lanes and limit tourism",{pc:-15,comp:{ALL:-5},tip:-1})),
+EV("EVT_13",null,{minYear:2027},{th:"แบตเตอรี่โซลิดสเตตพร้อมผลิตเชิงพาณิชย์",en:"Solid-State Batteries Go Commercial"},
+ {th:"แบตเตอรี่รุ่นใหม่เก็บพลังงานได้มากกว่าเดิม 2 เท่า ผู้ผลิตรายใหญ่ถือสิทธิบัตรไว้",en:"New batteries hold twice the energy. One manufacturer owns the patents."},
+ O("ซื้อสิทธิบัตรให้ทุกประเทศใช้ฟรี","Buy the patents and open them to all",{ep:-110,pc:-20,disc:{E3:.5}}),
+ O("ปล่อยให้ตลาดเสรีแข่งขันกันเอง","Let the market compete",{co2:-0.8})),
+EV("EVT_14","NA",{},{th:"ภัยแล้งรุนแรงในเขตเกษตรกรรมสหรัฐฯ",en:"Mega-Drought Strikes the US Midwest"},
+ {th:"ผลผลิตข้าวโพดลดลง 40% แหล่งน้ำใต้ดินลดระดับต่ำสุดในประวัติศาสตร์",en:"Corn yields fall 40% as aquifers hit record lows."},
+ O("สร้างระบบผันน้ำข้ามรัฐขนาดใหญ่","Build large cross-state water transfers",{ep:-80,comp:{T:10}}),
+ O("หนุนเปลี่ยนไปปลูกพืชทนแล้ง","Switch farmers to drought-tolerant crops",{ep:-40,co2:-0.3,appr:-5})),
+EV("EVT_15","EA",{},{th:"หมอกควันไฟป่าคลุมมหานครเอเชีย",en:"Wildfire Smoke Envelops an East Asian Megacity"},
+ {th:"ค่าฝุ่น PM2.5 สูงเกิน 400 โรงเรียนและสำนักงานต้องปิด",en:"PM2.5 tops 400. Schools and offices close."},
+ O("สั่งหยุดโรงงานรอบเมือง 1 สัปดาห์","Shut nearby factories for a week",{rco2:{EA:-0.8},appr:5,ep:-15}),
+ O("แจกหน้ากากและเปิดเครื่องกรองอากาศเมือง","Hand out masks and run city air filters",{ep:-30,appr:-5})),
+EV("EVT_16",null,{minYear:2028},{th:"น้ำมันเครื่องบินจากสาหร่ายสำเร็จ",en:"Algae-Based Aviation Fuel"},
+ {th:"เที่ยวบินข้ามมหาสมุทรแรกที่ใช้เชื้อเพลิงสาหร่าย 100% ลงจอดสำเร็จ",en:"The first ocean crossing on 100% algae fuel lands safely."},
+ O("บังคับผสมเชื้อเพลิงชีวภาพ 20% ทันที","Mandate a 20% bio-blend now",{pc:-30,co2:-1.1,appr:-4}),
+ O("อุดหนุนราคาตั๋วเครื่องบินเขียว","Subsidise green tickets",{ep:-70,co2:-0.5})),
+EV("EVT_17",null,{minTemp:1.35},{th:"วิกฤตผู้ลี้ภัยสภาพภูมิอากาศ",en:"Climate Refugee Crisis at the Border"},
+ {th:"ผู้คนนับล้านอพยพจากพื้นที่แห้งแล้งและน้ำท่วม เกิดความตึงเครียดตามแนวชายแดน",en:"Millions flee drought and flooding. Borders grow tense."},
+ O("ตั้งศูนย์พักพิงและจัดสรรโควตารับผู้ลี้ภัย","Open shelters and share refugee quotas",{pc:-25,ep:-50,appr:-8,comp:{ALL:5}}),
+ O("ให้เงินช่วยเหลือในพื้นที่ต้นทาง","Fund aid at the source",{ep:-65,appr:-12})),
+EV("EVT_18",null,{},{th:"บริษัทเทคยักษ์ใหญ่เปลี่ยนสู่พลังงานสะอาด 24/7",en:"Tech Giant Goes 24/7 Clean"},
+ {th:"ผู้ให้บริการคลาวด์รายใหญ่ประกาศใช้พลังงานสะอาดทุกชั่วโมงในศูนย์ข้อมูลทุกแห่ง",en:"A cloud giant pledges hour-by-hour clean power in every data centre."},
+ O("มอบรางวัลและลดหย่อนภาษีองค์กรต้นแบบ","Reward it with tax relief",{ep:-20,co2:-0.4,appr:4}),
+ O("บังคับเป็นมาตรฐานสำหรับทุกบริษัทไอที","Make it mandatory for all IT firms",{pc:-20,co2:-1.0,comp:{ALL:-4}})),
+EV("EVT_19",null,{minYear:2027},{th:"อื้อฉาวคาร์บอนเครดิตปลอม",en:"Carbon Offset Scandal"},
+ {th:"นักข่าวพบว่าเครดิตคาร์บอนจากป่าหลายล้านตันไม่มีอยู่จริง",en:"Journalists find millions of forest credits never existed."},
+ O("สอบสวนและยกเลิกเครดิตที่ไม่ผ่านเกณฑ์","Investigate and void bad credits",{pc:-15,appr:8,co2:-0.3}),
+ O("ประนีประนอมเพื่อรักษาเสถียรภาพตลาด","Compromise to keep markets stable",{appr:-10,co2:0.6})),
+EV("EVT_20","MEAF",{},{th:"ประท้วงเหมืองโคบอลต์สำหรับ EV",en:"Cobalt Mining Human Rights Outcry"},
+ {th:"รายงานเผยการใช้แรงงานเด็กในเหมืองโคบอลต์ที่ป้อนอุตสาหกรรมแบตเตอรี่",en:"Reports expose child labour in cobalt mines supplying battery makers."},
+ O("แบนแร่จากเหมืองผิดมาตรฐานทันที","Ban non-compliant ore now",{pc:-20,stall:2,appr:10}),
+ O("ใช้งบ GCT ปรับปรุงมาตรฐานความปลอดภัย","Fund safety reforms with GCT money",{ep:-60,appr:3,comp:{T:5}})),
+EV("EVT_21","NA",{minTemp:1.35},{th:"ถนนสายหลักพังจากดินเยือกแข็งละลาย",en:"Permafrost Highway Collapse"},
+ {th:"ทางหลวงในอะแลสกาและแคนาดาทรุดตัวเป็นระยะทางหลายร้อยกิโลเมตร",en:"Hundreds of kilometres of Arctic highway sink as permafrost thaws."},
+ O("สร้างรถไฟความเร็วสูงทดแทน","Build high-speed rail instead",{ep:-75,co2:-0.4}),
+ O("ซ่อมแซมฉุกเฉินชั่วคราว","Patch it temporarily",{ep:-20,vuln:{T:5}})),
+EV("EVT_22",null,{},{th:"เยาวชนทั่วโลกชุมนุมเพื่อภูมิอากาศ",en:"Youth Global Climate Strike"},
+ {th:"นักเรียนกว่า 20 ล้านคนใน 150 ประเทศหยุดเรียนเพื่อเรียกร้องให้เร่งเป้าหมาย",en:"Twenty million students in 150 countries walk out, demanding faster action."},
+ O("ร่วมแถลงการณ์และให้คำมั่นเร่ง Net Zero","Join them and pledge a faster Net Zero",{pc:15,appr:12,comp:{ALL:-5}}),
+ O("ชี้แจงข้อจำกัดทางเศรษฐกิจ","Explain the economic limits",{appr:-15,comp:{ALL:3}})),
+EV("EVT_23","MEAF",{req:"E2"},{th:"พายุทรายถล่มแผงโซลาร์ในทะเลทราย",en:"Sandstorm Damages Desert Solar"},
+ {th:"พายุทรายปกคลุมฟาร์มโซลาร์ขนาดใหญ่ กำลังผลิตลดลงกว่าครึ่ง",en:"A sandstorm buries a mega solar farm, halving output."},
+ O("ติดตั้งหุ่นยนต์ทำความสะอาดแผงอัตโนมัติ","Install robotic panel cleaners",{ep:-45,co2:-0.3}),
+ O("ใช้แรงงานคนทยอยทำความสะอาด","Clean gradually by hand",{ep:-15,co2:0.4})),
+EV("EVT_24",null,{},{th:"โรงไฟฟ้าความร้อนใต้พิภพก่อแผ่นดินไหวเบา",en:"Geothermal Plant Triggers Tremors"},
+ {th:"ชาวบ้านรอบโรงไฟฟ้ารู้สึกถึงแรงสั่นสะเทือนหลายครั้งในหนึ่งสัปดาห์",en:"Residents feel repeated tremors near a geothermal plant."},
+ O("ระงับโครงการและศึกษาธรณีวิทยาใหม่","Halt it and restudy the geology",{co2:0.5,appr:4}),
+ O("เดินเครื่องต่อพร้อมติดเซนเซอร์เตือนภัย","Keep running with early-warning sensors",{ep:-30,appr:-4})),
+EV("EVT_25",null,{minYear:2028},{th:"ประชากรผึ้งและแมลงผสมเกสรลดฮวบ",en:"Pollinator Die-Off"},
+ {th:"ประชากรผึ้งลดลง 60% ใน 3 ปี ผลผลิตผลไม้และพืชผักเสี่ยงขาดแคลน",en:"Bee populations drop 60% in three years. Fruit and vegetable supply is at risk."},
+ O("แบนยาฆ่าแมลงนีโอนิโคตินอยด์ทั่วโลก","Ban neonicotinoids worldwide",{pc:-30,appr:-3,tip:-3}),
+ O("สนับสนุนโดรนผสมเกสรและฟาร์มปิด","Fund pollination drones and indoor farms",{ep:-60,co2:0.2})),
+EV("EVT_26",null,{minTemp:1.3},{th:"ทะเลเป็นกรดทำลายอุตสาหกรรมหอย",en:"Ocean Acidification Hits Shellfish"},
+ {th:"เปลือกหอยนางรมและหอยแมลงภู่บางลงจนเพาะเลี้ยงไม่ได้ในหลายพื้นที่",en:"Oyster and mussel shells thin until farms fail."},
+ O("โปรยหินปูนปรับสภาพกรดชายฝั่ง","Spread lime along coasts",{ep:-50,tip:-2}),
+ O("ชดเชยรายได้และฝึกอาชีพใหม่ให้ชาวประมง","Compensate and retrain fishers",{ep:-40,comp:{ALL:-5}})),
+EV("EVT_27","SEA",{minTemp:1.3},{th:"เกาะความร้อนในมหานครเขตร้อน",en:"Urban Heat Island in a Tropical Megacity"},
+ {th:"อุณหภูมิกลางเมืองสูงกว่าชานเมือง 7°C ผู้สูงอายุเข้าโรงพยาบาลเพิ่มขึ้นมาก",en:"The city core runs 7°C hotter than suburbs. Hospital admissions surge."},
+ O("บังคับหลังคาสะท้อนความร้อนและสวนดาดฟ้า","Mandate cool roofs and rooftop gardens",{ep:-35,pc:-10,vuln:{T:-8}}),
+ O("อุดหนุนค่าแอร์ครัวเรือนรายได้น้อย","Subsidise AC for low-income homes",{ep:-50,co2:0.4,appr:5})),
+EV("EVT_28","NA",{},{th:"คลื่นความเย็นทำโครงข่ายไฟฟ้าเท็กซัสล่ม",en:"Cold Snap Cripples Texas Grid"},
+ {th:"พายุหิมะทำโรงไฟฟ้าแข็งตัว ประชาชนหลายล้านคนไร้ไฟฟ้ากลางอากาศติดลบ",en:"A blizzard freezes plants, leaving millions without power in sub-zero cold."},
+ O("บังคับปรับปรุงฉนวนโรงไฟฟ้าทั้งหมด","Mandate winterised power plants",{ep:-55,vuln:{T:-5}}),
+ O("อนุญาตเผาน้ำมันเตาผลิตไฟฉุกเฉิน","Allow emergency oil-fired generation",{co2:0.9,appr:2})),
+EV("EVT_29",null,{},{th:"เรือขนส่งติดขัด ปล่อยคาร์บอนพุ่ง",en:"Shipping Congestion Carbon Spike"},
+ {th:"เรือสินค้านับร้อยลำจอดรอหน้าท่าเรือหลัก เครื่องยนต์เดินตลอดเวลา",en:"Hundreds of ships idle outside major ports, engines running."},
+ O("บังคับเรือลดความเร็ว (Slow Steaming)","Mandate slow steaming",{pc:-15,co2:-0.7,ep:-10}),
+ O("ขยายท่าเรือและระบบขนถ่ายไฟฟ้า","Expand ports with electric cranes",{ep:-65,co2:-0.2,comp:{ALL:3}})),
+EV("EVT_30",null,{req:"P2"},{th:"ขบวนการลักลอบเลี่ยงภาษีคาร์บอน",en:"Carbon Tax Smuggling Ring"},
+ {th:"ตำรวจสากลพบเครือข่ายปลอมเอกสารแหล่งกำเนิดสินค้าเพื่อหลบภาษีคาร์บอน",en:"Interpol uncovers a ring forging origin papers to dodge carbon tax."},
+ O("ตั้งกองกำลังตรวจจับคาร์บอนสากล","Create a global carbon enforcement unit",{ep:-40,pc:-15,comp:{ALL:10}}),
+ O("ลดอัตราภาษีเพื่อลดแรงจูงใจ","Lower the tax rate",{co2:0.8,appr:-5})),
+EV("EVT_31","SEA",{},{th:"ชนเผ่าปกป้องป่าบนเกาะบอร์เนียว",en:"Indigenous Land Defense in Borneo"},
+ {th:"ชุมชนพื้นเมืองปิดถนนขวางรถแทรกเตอร์ของบริษัทสวนปาล์ม",en:"Indigenous communities blockade palm-oil bulldozers."},
+ O("มอบกรรมสิทธิ์ที่ดินและเพิกถอนสัมปทาน","Grant land title, revoke concessions",{pc:-20,co2:-0.6,appr:10}),
+ O("เจรจาแบ่งผลประโยชน์กับกลุ่มทุน","Broker a benefit-sharing deal",{comp:{T:-5},co2:0.3})),
+EV("EVT_32",null,{minYear:2029},{th:"ค้นพบแหล่งไฮโดรเจนธรรมชาติ",en:"Natural Hydrogen Well Discovered"},
+ {th:"นักธรณีวิทยาพบแหล่งไฮโดรเจนบริสุทธิ์ใต้ดินที่เติมตัวเองได้",en:"Geologists find a self-replenishing underground hydrogen reservoir."},
+ O("รัฐบาลสากลพัฒนาเป็นพลังงานสาธารณะ","Develop it as public energy",{ep:-70,co2:-1.5}),
+ O("ประมูลสัมปทานให้เอกชน","Auction it to private firms",{ep:80,co2:-0.8,appr:-5})),
+EV("EVT_33",null,{minYear:2034},{th:"ทดสอบส่งพลังงานแสงอาทิตย์จากอวกาศ",en:"Space Solar Power Test"},
+ {th:"ดาวเทียมส่งพลังงานไมโครเวฟลงสถานีรับบนโลกได้สำเร็จเป็นครั้งแรก",en:"A satellite beams microwave power to a ground station for the first time."},
+ O("ร่วมลงทุนโครงข่ายดาวเทียมรับพลังงาน","Co-invest in the satellite network",{ep:-120,disc:{E5:.2},damp:.1,co2:-0.5}),
+ O("เลื่อนการทดสอบเพราะกังวลความปลอดภัย","Delay over safety concerns",{appr:2})),
+EV("EVT_34","EA",{},{th:"น้ำท่วมฉับพลันทำลายโรงงานผลิตชิป",en:"Flash Floods Hit Microchip Fabs"},
+ {th:"นิคมอุตสาหกรรมเซมิคอนดักเตอร์จมน้ำ ห่วงโซ่อุปทานเทคโนโลยีสะอาดชะงัก",en:"Semiconductor parks flood, disrupting clean-tech supply chains."},
+ O("สร้างเขื่อนกั้นน้ำรอบนิคม","Build flood walls around the parks",{ep:-60,vuln:{T:-5}}),
+ O("ย้ายฐานการผลิตไปที่สูง (โครงการชะงัก 3 เดือน)","Relocate to higher ground (projects stall 3 months)",{ep:-30,stall:3,vuln:{T:-10}})),
+EV("EVT_35",null,{minYear:2031},{th:"รับรองน้ำมันเครื่องบินคาร์บอนลบ",en:"Carbon-Negative Jet Fuel Certified"},
+ {th:"เชื้อเพลิงสังเคราะห์จาก CO₂ ในอากาศผ่านการรับรองความปลอดภัยการบิน",en:"Synthetic fuel made from air-captured CO₂ passes aviation certification."},
+ O("ยกเว้นภาษีสนามบินให้เที่ยวบินที่ใช้","Waive airport taxes for users",{ep:-30,co2:-0.5}),
+ O("กำหนดโควตาบังคับตามสัดส่วน","Set a mandatory quota",{pc:-15,co2:-0.9,appr:-4})),
+EV("EVT_36",null,{req:"E4"},{th:"ประชามติปิดโรงไฟฟ้านิวเคลียร์",en:"Anti-Nuclear Referendum"},
+ {th:"ประเทศผู้นำด้าน SMR จัดประชามติ ผลสำรวจชี้ว่าฝ่ายต้านนิวเคลียร์นำอยู่",en:"A leading SMR nation holds a referendum. Polls favour a shutdown."},
+ O("เคารพผลประชามติ สร้างกังหันลมทดแทน","Respect it and build wind instead",{ep:-80,co2:0.5}),
+ O("ทำแคมเปญความรู้วิทยาศาสตร์เพื่อยับยั้ง","Run a science campaign against it",{pc:-35,appr:-10})),
+EV("EVT_37","MEAF",{},{th:"สาหร่ายสะพรั่งปิดโรงกลั่นน้ำทะเล",en:"Algal Bloom Shuts Desalination Plants"},
+ {th:"สาหร่ายพิษอุดตันท่อรับน้ำ โรงกลั่นน้ำจืดหลายแห่งต้องหยุดเดินเครื่อง",en:"Toxic algae clog intakes and shut several desalination plants."},
+ O("ส่งเรือบำบัดและติดตัวกรองอัลตราโซนิก","Deploy treatment ships and ultrasonic filters",{ep:-45,comp:{T:5}}),
+ O("แจกน้ำดื่มบรรจุขวดฉุกเฉิน","Hand out bottled water",{ep:-25,appr:-3})),
+EV("EVT_38",null,{minYear:2030},{th:"ค้นพบสารดูดซับคาร์บอนราคาประหยัด",en:"Cheap DAC Sorbent Breakthrough"},
+ {th:"สารดูดซับชนิดใหม่ลดต้นทุนการดักจับคาร์บอนจากอากาศลง 70%",en:"A new sorbent cuts direct air capture costs by 70%."},
+ O("สั่งผลิตและติดตั้งทั่วโลก","Manufacture and deploy worldwide",{ep:-70,co2:-2.0}),
+ O("ตีพิมพ์เป็น Open Source","Publish it open source",{pc:10,delay:{m:6,fx:{co2:-1.0}}})),
+EV("EVT_39",null,{req:"P2"},{th:"อุตสาหกรรมขู่ย้ายฐานหนีกฎหมายเขียว",en:"Heavy Industry Threatens to Relocate"},
+ {th:"กลุ่มโรงงานเหล็กและซีเมนต์ขู่ย้ายไปประเทศที่ไม่มีภาษีคาร์บอน",en:"Steel and cement makers threaten to move to carbon-tax havens."},
+ O("บังคับใช้มาตรการปิดกั้นทางการค้า","Impose trade sanctions",{pc:-25,comp:{ALL:15},ep:-20}),
+ O("ให้สิทธิลดหย่อนภาษีชั่วคราว","Grant temporary tax relief",{co2:1.0,appr:-8})),
+EV("EVT_40",null,{minTemp:1.35},{th:"เตือนภัยทะเลสาบธารน้ำแข็งแตกตัว",en:"Glacier Lake Outburst Warning"},
+ {th:"ทะเลสาบบนเทือกเขาหิมาลัยขยายตัวเร็ว เขื่อนธรรมชาติอาจพังภายในไม่กี่สัปดาห์",en:"A Himalayan glacial lake swells fast. Its natural dam may fail within weeks."},
+ O("ขุดระบายน้ำเชิงวิศวกรรมล่วงหน้า","Engineer a controlled drainage",{ep:-50,appr:3}),
+ O("อพยพประชาชนท้ายน้ำถาวร","Permanently evacuate downstream",{ep:-30,comp:{ALL:-10},appr:-5})),
+EV("EVT_41",null,{minYear:2031},{th:"เนื้อสัตว์เพาะเลี้ยงราคาเท่าเนื้อจริง",en:"Cultured Meat Hits Cost Parity"},
+ {th:"เนื้อจากห้องแล็บวางขายในซูเปอร์มาร์เก็ตในราคาเดียวกับเนื้อวัว",en:"Lab-grown meat reaches supermarkets at the price of beef."},
+ O("ยกเลิกเงินอุดหนุนฟาร์มปศุสัตว์","End livestock subsidies",{pc:-30,co2:-2.2,appr:-6}),
+ O("สนับสนุนเฉพาะอาหารกลางวันโรงเรียน","Fund school lunches only",{ep:-35,co2:-0.4})),
+EV("EVT_42","MEAF",{},{th:"พายุฝุ่นปิดท่าส่งออกน้ำมัน",en:"Dust Storm Paralyzes an Oil Hub"},
+ {th:"พายุฝุ่นหนาทึบปิดท่าเรือส่งออกน้ำมันใหญ่ที่สุดในภูมิภาคนาน 10 วัน",en:"A dust storm closes the region's largest oil port for ten days."},
+ O("ฉวยโอกาสผลักดันสัญญาลดฟอสซิล","Use the moment to push a fossil phase-down deal",{pc:-20,co2:-0.8}),
+ O("ส่งทีมกู้ภัยและอุปกรณ์ช่วยเหลือ","Send rescue teams and equipment",{ep:-40,comp:{T:10}})),
+EV("EVT_43",null,{minYear:2028},{th:"กลุ่มหัวรุนแรงระเบิดท่อก๊าซ",en:"Eco-Terrorists Bomb a Gas Pipeline"},
+ {th:"กลุ่มหัวรุนแรงอ้างความรับผิดชอบการระเบิดท่อก๊าซธรรมชาติสายหลัก",en:"Militants claim responsibility for bombing a major gas pipeline."},
+ O("ประณามและเพิ่มการคุ้มกันโครงสร้างพื้นฐาน","Condemn it and protect infrastructure",{ep:-35,appr:5}),
+ O("ชี้ความเสี่ยงของการพึ่งพาก๊าซและเร่งโซลาร์","Highlight gas dependence and accelerate solar",{pc:-15,appr:-4,damp:.05})),
+EV("EVT_44","SEA",{},{th:"มรสุมถล่มพื้นที่เกษตรกรรมเอเชียใต้",en:"Record Monsoon Floods South Asian Farmland"},
+ {th:"ฝนมรสุมหนักที่สุดในรอบศตวรรษท่วมนาข้าวหลายล้านไร่",en:"The heaviest monsoon in a century floods millions of hectares of rice."},
+ O("ช่วยจัดซื้อเมล็ดพันธุ์ข้าวทนน้ำท่วม","Buy flood-tolerant rice seed",{ep:-50,appr:3}),
+ O("ปรับผังลุ่มน้ำเป็นพื้นที่แก้มลิง","Redesign the basin with retention zones",{ep:-75,vuln:{T:-20}})),
+EV("EVT_45",null,{req:"E3"},{th:"รีไซเคิลลิเทียมบริสุทธิ์ได้ 98%",en:"EV Battery Recycling Breakthrough"},
+ {th:"กระบวนการใหม่กู้คืนลิเทียมจากแบตเตอรี่เก่าได้เกือบทั้งหมด",en:"A new process recovers nearly all lithium from spent batteries."},
+ O("บังคับรีไซเคิลแบตเตอรี่ทุกลูก","Mandate recycling of every battery",{pc:-20,disc:{ALL:.1}}),
+ O("อุดหนุนราคาแบตเตอรี่รีไซเคิล","Subsidise recycled batteries",{ep:-40,co2:-0.6})),
+EV("EVT_46",null,{},{th:"นายกเทศมนตรีแบนรถยนต์ส่วนตัวในเขตเมือง",en:"Mayor Bans Private Cars Downtown"},
+ {th:"มหานครใหญ่ประกาศห้ามรถยนต์ส่วนบุคคลเข้าเขตเมืองชั้นใน",en:"A megacity bans private cars from its core."},
+ O("อุดหนุนระบบรางเบาไฟฟ้าเชื่อมต่อ","Fund a connecting light-rail line",{ep:-50,co2:-0.5,appr:6}),
+ O("เตือนเรื่องผลกระทบต่อธุรกิจค้าปลีก","Warn about retail impact",{appr:-5,ep:15})),
+EV("EVT_47","SEA",{minTemp:1.3},{th:"น้ำเค็มรุกพื้นที่ปลูกข้าวลุ่มน้ำเจ้าพระยา",en:"Saltwater Intrusion in the Chao Phraya"},
+ {th:"น้ำทะเลหนุนสูงดันความเค็มเข้าคลองชลประทาน นาข้าวภาคกลางเสียหาย",en:"Rising seas push salt into irrigation canals, ruining central Thai rice."},
+ O("สร้างประตูกั้นน้ำเค็มและโรงบำบัดน้ำกร่อย","Build salt barriers and brackish treatment",{ep:-45,vuln:{T:-10}}),
+ O("ส่งเสริมเลี้ยงสัตว์น้ำกร่อยแทน","Shift farmers to brackish aquaculture",{ep:-25,comp:{T:3}})),
+EV("EVT_48",null,{minYear:2027},{th:"กองทุนความมั่งคั่งแห่งชาติถอนทุนถ่านหิน",en:"Sovereign Fund Divests from Coal"},
+ {th:"กองทุนมูลค่าล้านล้านดอลลาร์ประกาศขายหุ้นถ่านหินทั้งหมด",en:"A trillion-dollar fund sells every coal holding."},
+ O("ดึงเงินเข้า Green Infrastructure Fund","Channel it into a green infrastructure fund",{ep:80,damp:.05}),
+ O("กดดันกองทุนอื่นให้ทำตาม","Pressure other funds to follow",{pc:-15,co2:-0.8})),
+EV("EVT_49",null,{},{th:"ทดลองว่าวพลังงานลมชั้นบรรยากาศสูง",en:"High-Altitude Wind Kite Demo"},
+ {th:"ว่าวผลิตไฟฟ้าลอยสูง 800 เมตรผลิตไฟได้คงที่กว่ากังหันลมทั่วไป",en:"Power kites at 800 m deliver steadier output than turbines."},
+ O("ตั้งเขตทดสอบการบินเพื่อวิจัย","Open a research flight zone",{ep:-30,co2:-0.3}),
+ O("รอให้ผ่านการรับรองจากเอกชนก่อน","Wait for private certification",{})),
+EV("EVT_50","NA",{minTemp:1.3},{th:"ไฟป่าคุกคามลุ่มน้ำประปาเมืองใหญ่",en:"Wildfires Threaten a City Watershed"},
+ {th:"ไฟป่าลุกลามเข้าใกล้อ่างเก็บน้ำหลักที่ผลิตน้ำประปาให้คน 4 ล้านคน",en:"Fire nears the reservoir that supplies four million people."},
+ O("ทิ้งสารหน่วงไฟและสารดูดซับเถ้าทางอากาศ","Air-drop retardant and ash absorbents",{ep:-50,appr:2}),
+ O("ปันส่วนน้ำและตั้งสถานีฟอกน้ำเคลื่อนที่","Ration water with mobile purifiers",{ep:-30,appr:-8})),
+EV("EVT_51",null,{minYear:2029},{th:"ข้อพิพาทแหล่งแร่หายาก",en:"Geopolitical Conflict Over Rare Earths"},
+ {th:"สองมหาอำนาจพิพาทเหนือแหล่งแร่หายากที่จำเป็นต่อมอเตอร์และกังหันลม",en:"Two powers clash over rare earths needed for motors and turbines."},
+ O("ตั้งเขตพัฒนาเศรษฐกิจร่วมสากล","Broker a joint development zone",{pc:-35,disc:{ALL:.05},comp:{ALL:3}}),
+ O("วิจัยมอเตอร์ไร้แร่หายาก","Research rare-earth-free motors",{ep:-80,delay:{m:6,fx:{co2:-0.8,disc:{ALL:.05}}}})),
+EV("EVT_52",null,{minYear:2030},{th:"ตรวจสอบบัญชีคาร์บอนสุทธิรอบ 5 ปี",en:"Five-Year Carbon Audit"},
+ {th:"ผู้ตรวจสอบอิสระพบว่าตัวเลขการปล่อยจริงสูงกว่าที่รายงานไว้",en:"Independent auditors find real emissions exceed reported figures."},
+ O("ยอมรับผลตรวจอย่างโปร่งใส","Accept the findings openly",{appr:10,co2:0.5}),
+ O("ใช้วิธีคำนวณแบบยืดหยุ่น","Use flexible accounting",{appr:-12,ep:10})),
+];
+/* Extra data for the original 52 events: ambience sound, a "did you know" fact,
+   and (for many) a third option. Third options are written in the current economy scale. */
+const F = (th, en) => ({th, en});
+const OLD_META = {
+EVT_01:{snd:"heat",fact:F("คลื่นความร้อนในยุโรปปี 2003 ทำให้มีผู้เสียชีวิตหลายหมื่นคน","The 2003 European heatwave killed tens of thousands of people."),
+  c:O("ขอประเทศเพื่อนบ้านส่งไฟมาช่วย","Import power from neighbours",{pc:-8,ep:-10,appr:2})},
+EVT_02:{fx:{1:{co2:0.6,tip:3,pc:10}},snd:"forest",fact:F("ป่าแอมะซอนสร้างฝนให้ตัวเองได้ราวครึ่งหนึ่ง ถ้าป่าหายไปมาก ป่าที่เหลือจะแห้งตาม","The Amazon makes about half of its own rain. Lose too much forest and the rest dries out."),
+  c:O("ส่งทีมลาดตระเวนจับคนลักลอบเผา","Send patrols to stop illegal burning",{ep:-20,pc:-6,tip:-2})},
+EVT_03:{snd:"arctic",fact:F("น้ำแข็งขาวสะท้อนแสงแดดกลับได้มาก แต่ทะเลสีเข้มดูดความร้อนไว้","White ice reflects most sunlight, but dark ocean absorbs the heat."),
+  c:O("ให้ทุนงานวิจัยขั้วโลกแทน","Fund polar research instead",{ep:-15,tip:-1})},
+EVT_04:{snd:"harbor",fact:F("สำนักงานพลังงานสากลประเมินว่าเส้นทางสู่ Net Zero ไม่ต้องเปิดแหล่งน้ำมันใหม่","The IEA found that a Net Zero path needs no new oil fields."),
+  c:O("อนุญาตแต่ต้องปลูกป่าชดเชย","Allow it, but require forest offsets",{ep:20,co2:1.5,appr:-6,pc:-5})},
+EVT_05:{snd:"storm",fact:F("พลาสติกเกือบทั้งหมดผลิตจากน้ำมันและก๊าซ","Almost all plastic is made from oil and gas.")},
+EVT_06:{snd:"storm",fact:F("ปากแม่น้ำโขงอยู่สูงกว่าระดับน้ำทะเลเพียงราว 1 เมตร จึงเสี่ยงน้ำท่วมมาก","The Mekong Delta sits only about 1 metre above sea level."),
+  c:O("ส่งอาสาสมัครและทหารช่วยก่อน","Send volunteers and troops first",{pc:-6,appr:3,vuln:{T:-3}})},
+EVT_07:{snd:"lab",fact:F("ฟิวชันคือการรวมอะตอมแบบเดียวกับที่เกิดในดวงอาทิตย์","Fusion joins atoms together, the same way the Sun makes energy.")},
+EVT_08:{fx:{1:{appr:-8,comp:{ALL:-3},co2:-0.8}},snd:"crowd",fact:F("นโยบายที่คืนเงินภาษีคาร์บอนให้ประชาชน มักได้รับการยอมรับมากกว่า","Carbon taxes that return money to citizens tend to be more popular."),
+  c:O("ใช้เงินภาษีช่วยเกษตรกรเปลี่ยนวิธีทำเกษตร","Use tax money to help farmers change methods",{ep:-25,appr:4,co2:-0.2})},
+EVT_09:{snd:"construction",fact:F("การผลิตปูนซีเมนต์ปล่อย CO₂ ราว 8% ของโลก","Cement production causes about 8% of global CO₂.")},
+EVT_10:{fx:{1:{temp:0.03,tip:3,pc:5}},snd:"arctic",fact:F("ดินเยือกแข็งทั่วโลกเก็บคาร์บอนไว้มากกว่าในอากาศตอนนี้ราว 2 เท่า","Permafrost holds about twice as much carbon as the atmosphere does now."),
+  c:O("ให้ทุนวิจัยติดตามดินเยือกแข็ง","Fund permafrost monitoring",{ep:-15,pc:-4,tip:1})},
+EVT_11:{fx:{0:{appr:-3,co2:0.3,stall:1},1:{ep:-30,appr:1}},snd:"explosion",fact:F("ไฮโดรเจนเป็นก๊าซที่เบาที่สุดและรั่วได้ง่าย ท่อต้องออกแบบพิเศษ","Hydrogen is the lightest gas and leaks easily, so it needs special pipes.")},
+EVT_12:{snd:"underwater",fact:F("แนวปะการังครอบคลุมพื้นทะเลไม่ถึง 1% แต่เป็นบ้านของสัตว์ทะเลราว 1 ใน 4","Reefs cover under 1% of the seabed but host about a quarter of marine species."),
+  c:O("ลดน้ำเสียจากชายฝั่งที่ไหลลงทะเล","Cut coastal pollution into the sea",{ep:-15,pc:-4,tip:-1})},
+EVT_13:{snd:"lab",fact:F("แบตเตอรี่ลิเทียมราคาลดลงราว 90% ในรอบ 10 กว่าปีที่ผ่านมา","Lithium battery prices fell about 90% over little more than a decade."),
+  c:O("ร่วมลงทุนกับผู้ผลิต","Co-invest with the maker",{ep:-30,disc:{E3:0.25},co2:-0.2})},
+EVT_14:{snd:"heat",fact:F("น้ำใต้ดินหลายแห่งถูกสูบใช้เร็วกว่าที่ฝนเติมกลับได้","Many aquifers are pumped faster than rain can refill them."),
+  c:O("จ่ายเงินให้เกษตรกรพักดินบางส่วน","Pay farmers to rest some land",{ep:-20,co2:-0.1,vuln:{T:-4}})},
+EVT_15:{fx:{0:{rco2:{EA:-0.8},appr:-3,ep:-8,comp:{T:-3}},1:{ep:-15,appr:6,vuln:{T:-4}}},snd:"fire",fact:F("ฝุ่น PM2.5 เล็กกว่าเส้นผมราว 30 เท่า จึงเข้าลึกถึงปอด","PM2.5 is about 30 times thinner than a hair and reaches deep into the lungs.")},
+EVT_16:{snd:"air",fact:F("การบินปล่อย CO₂ ราว 2–3% ของโลก","Aviation produces about 2–3% of global CO₂."),
+  c:O("ลงทุนวิจัยเครื่องยนต์ไฮโดรเจน","Invest in hydrogen engine research",{ep:-25,delay:{m:12,fx:{co2:-0.5}}})},
+EVT_17:{snd:"crowd",fact:F("ภัยแล้งและน้ำท่วมทำให้คนหลายล้านคนต้องย้ายถิ่นทุกปี","Droughts and floods force millions of people to move every year."),
+  c:O("ให้ทุนสร้างงานในประเทศต้นทาง","Fund jobs in their home countries",{ep:-30,pc:-6,vuln:{MEAF:-5}})},
+EVT_18:{snd:"office",fact:F("ศูนย์ข้อมูลใช้ไฟหลายเปอร์เซ็นต์ของไฟฟ้าโลก","Data centres use a few percent of the world's electricity.")},
+EVT_19:{fx:{1:{appr:-4,co2:0.3,ep:10}},snd:"forest",fact:F("คาร์บอนเครดิตที่ดีต้องวัดได้จริง และต้องไม่ใช่ป่าที่จะไม่ถูกตัดอยู่แล้ว","A good carbon credit must be measurable and protect forest that was truly at risk."),
+  c:O("ตั้งหน่วยตรวจสอบเครดิตอิสระ","Create an independent credit auditor",{ep:-20,pc:-5,appr:5})},
+EVT_20:{snd:"crowd",fact:F("แบตเตอรี่รุ่นใหม่หลายแบบลดหรือเลิกใช้โคบอลต์แล้ว","Many new battery types use less cobalt or none at all.")},
+EVT_21:{snd:"arctic",fact:F("ดินเยือกแข็งที่ละลายทำให้ถนน บ้าน และท่อส่งน้ำมันทรุดพัง","Thawing permafrost makes roads, homes and pipelines sink and crack."),
+  c:O("ย้ายถนนไปบนแนวหินแข็ง","Reroute the road onto bedrock",{ep:-30,vuln:{T:-4}})},
+EVT_22:{snd:"crowd",fact:F("เยาวชนทั่วโลกเคยหยุดเรียนประท้วงเรื่องโลกร้อนพร้อมกันหลายล้านคน","Millions of students worldwide have joined climate school strikes at once."),
+  c:O("ตั้งสภาเยาวชนที่ปรึกษา GCT","Create a youth advisory council",{pc:-5,appr:6})},
+EVT_23:{snd:"wind",fact:F("ฝุ่นบนแผงโซลาร์ลดการผลิตไฟได้มาก ทะเลทรายจึงต้องล้างแผงบ่อย","Dust on solar panels cuts output a lot, so desert panels need regular cleaning.")},
+EVT_24:{snd:"lab",fact:F("ไอซ์แลนด์ใช้ความร้อนใต้พิภพทำความร้อนให้บ้านเกือบทั้งประเทศ","Iceland heats almost all its homes with geothermal energy."),
+  c:O("ให้ชาวบ้านร่วมตรวจสอบและแบ่งรายได้","Let residents monitor it and share profits",{ep:-15,pc:-4,appr:2})},
+EVT_25:{fx:{1:{ep:-30,co2:0.1,appr:4,vuln:{ALL:-1}}},snd:"bees",fact:F("พืชอาหารหลักของโลกราว 3 ใน 4 ได้ประโยชน์จากแมลงผสมเกสร","About three quarters of leading food crops benefit from pollinators."),
+  c:O("ปลูกดอกไม้ป่าริมถนนทั่วประเทศ","Plant wildflowers along roads nationwide",{ep:-20,tip:-1,appr:2})},
+EVT_26:{fx:{1:{ep:-20,appr:4,comp:{ALL:-2}}},snd:"ocean",fact:F("มหาสมุทรดูดซับ CO₂ ราว 1 ใน 4 ที่มนุษย์ปล่อย ทำให้น้ำทะเลเป็นกรดขึ้น","The ocean absorbs about a quarter of our CO₂, which makes seawater more acidic."),
+  c:O("ส่งเสริมเลี้ยงสาหร่ายคู่กับหอย","Promote seaweed farming beside shellfish",{ep:-20,tip:-1,comp:{ALL:1}})},
+EVT_27:{snd:"heat",fact:F("หลังคาสีขาวสะท้อนแดดได้ดี ทำให้ในบ้านเย็นลง","White roofs reflect sunlight and keep homes cooler.")},
+EVT_28:{snd:"arctic",fact:F("พายุหิมะเท็กซัสปี 2021 ทำให้ไฟดับหลายล้านหลังเพราะโรงไฟฟ้าไม่ได้เตรียมรับความหนาว","The 2021 Texas freeze cut power to millions because plants weren't winter-proofed."),
+  c:O("ต่อสายส่งไฟกับรัฐข้างเคียง","Connect the grid to neighbouring states",{ep:-30,pc:-4,vuln:{T:-6}})},
+EVT_29:{snd:"harbor",fact:F("การแล่นเรือช้าลงเล็กน้อยช่วยประหยัดน้ำมันได้มาก","Sailing a little slower saves a lot of fuel.")},
+EVT_30:{fx:{0:{ep:-20,pc:-8,comp:{ALL:5}},1:{co2:0.5,appr:-2,ep:10}},snd:"office",fact:F("ภาษีคาร์บอนที่ชายแดนช่วยไม่ให้บริษัทย้ายโรงงานไปประเทศที่ไม่มีกฎ","Border carbon taxes stop firms moving factories to places with no rules."),
+  c:O("ให้รางวัลผู้แจ้งเบาะแส","Reward whistle-blowers",{ep:-15,comp:{ALL:4}})},
+EVT_31:{snd:"forest",fact:F("ป่าที่ชนพื้นเมืองดูแล มักถูกทำลายน้อยกว่าป่ารอบข้าง","Forests managed by Indigenous peoples are often cleared less.")},
+EVT_32:{snd:"lab",fact:F("ไฮโดรเจนธรรมชาติใต้ดินเพิ่งถูกค้นพบว่าอาจมีมากกว่าที่เคยคิด","Natural underground hydrogen may be far more common than once thought."),
+  c:O("ให้บริษัทรัฐร่วมทุนกับเอกชน","A public–private partnership",{ep:-10,pc:-6,co2:-0.5})},
+EVT_33:{fx:{0:{ep:-60,disc:{E5:0.2},damp:0.05,co2:-0.5},1:{appr:2,pc:4}},snd:"lab",fact:F("ในอวกาศมีแสงแดดตลอดเวลา ไม่มีกลางคืนหรือเมฆบัง","In space the Sun shines all the time, with no night or clouds.")},
+EVT_34:{snd:"flood",fact:F("โรงงานผลิตชิปต้องใช้น้ำสะอาดจำนวนมาก จึงมักอยู่ใกล้แหล่งน้ำ","Chip factories need huge amounts of pure water, so many sit near rivers.")},
+EVT_35:{snd:"air",fact:F("น้ำมันเครื่องบินสังเคราะห์ผลิตได้จาก CO₂ ในอากาศ น้ำ และไฟฟ้าสะอาด","Synthetic jet fuel can be made from air-captured CO₂, water and clean power."),
+  c:O("ให้รัฐซื้อเชื้อเพลิงล่วงหน้าเพื่อให้ราคาถูกลง","Pre-buy fuel to bring its price down",{ep:-25,co2:-0.7,pc:-3})},
+EVT_36:{fx:{1:{pc:-18,appr:-6,co2:-0.4}},snd:"crowd",fact:F("โรงไฟฟ้านิวเคลียร์แทบไม่ปล่อย CO₂ ขณะผลิตไฟ","Nuclear plants emit almost no CO₂ while making power."),
+  c:O("ยืดอายุโรงเก่าไว้จนกว่าลมจะพร้อม","Keep old plants open until wind is ready",{pc:-10,appr:-4,co2:-0.2})},
+EVT_37:{snd:"ocean",fact:F("น้ำทะเลที่อุ่นขึ้นและน้ำเสียทำให้สาหร่ายพิษเกิดบ่อยขึ้น","Warmer water and pollution make toxic algae blooms more common.")},
+EVT_38:{snd:"lab",fact:F("เครื่องดักจับคาร์บอนจากอากาศ (DAC) ต้องใช้พลังงานมาก จึงควรใช้ไฟสะอาด","Direct air capture needs lots of energy, so it should run on clean power."),
+  c:O("ขายสิทธิ์ให้บริษัทแล้วเก็บค่าใช้","License it to firms for a fee",{ep:20,co2:-0.6})},
+EVT_39:{fx:{0:{pc:-13,comp:{ALL:6},ep:-10},1:{co2:0.6,appr:-4,ep:15}},snd:"factory",fact:F("การย้ายโรงงานไปประเทศที่กฎหลวมเรียกว่า 'การรั่วไหลของคาร์บอน'","Moving factories to places with weaker rules is called 'carbon leakage'."),
+  c:O("ช่วยจ่ายค่าเปลี่ยนเครื่องจักรสะอาด","Help pay for clean machinery",{ep:-35,comp:{ALL:6},co2:-0.3})},
+EVT_40:{fx:{1:{comp:{ALL:-2},appr:-2,vuln:{SEA:-10}}},snd:"flood",fact:F("ธารน้ำแข็งเทือกเขาหิมาลัยเป็นต้นน้ำให้คนเกือบ 2 พันล้านคน","Himalayan glaciers feed rivers used by nearly two billion people."),
+  c:O("ติดระบบเตือนภัยล่วงหน้า","Install an early warning system",{ep:-15,appr:2,vuln:{SEA:-3}})},
+EVT_41:{snd:"farm",fact:F("การเลี้ยงสัตว์ปล่อยก๊าซเรือนกระจกราว 1 ใน 7 ของโลก","Livestock produce about one seventh of global greenhouse gases."),
+  c:O("ช่วยฟาร์มเก่าเปลี่ยนไปปลูกพืช","Help farms switch to crops",{ep:-30,co2:-0.8,comp:{ALL:2}})},
+EVT_42:{snd:"wind",fact:F("พายุฝุ่นพัดทรายไปได้ไกลข้ามทวีป","Dust storms can carry sand across whole continents.")},
+EVT_43:{snd:"explosion",fact:F("การประท้วงอย่างสันติได้รับการสนับสนุนจากประชาชนมากกว่าความรุนแรง","Peaceful protest wins far more public support than violence."),
+  c:O("เปิดเวทีรับฟังกลุ่มสิ่งแวดล้อม","Hold talks with environmental groups",{pc:-5,appr:3})},
+EVT_44:{fx:{0:{ep:-15,appr:3}},snd:"storm",fact:F("อากาศที่อุ่นขึ้นอุ้มไอน้ำได้มากขึ้น ฝนจึงตกหนักขึ้น","Warmer air holds more water vapour, so rain falls harder."),
+  c:O("ซื้อประกันภัยพืชผลให้ชาวนา","Buy crop insurance for farmers",{ep:-25,appr:3,vuln:{T:-5}})},
+EVT_45:{snd:"factory",fact:F("แบตเตอรี่รถไฟฟ้าเก่านำไปใช้เก็บไฟในบ้านต่อได้อีกหลายปี","Old EV batteries can store home power for years more.")},
+EVT_46:{snd:"city",fact:F("เมืองที่ลดรถยนต์ส่วนตัว มักมีร้านค้าริมถนนคึกคักขึ้น","Cities that cut car traffic often see busier local shops."),
+  c:O("ทดลองแบนเฉพาะวันหยุด","Trial the ban on weekends only",{ep:-10,appr:2,co2:-0.1})},
+EVT_47:{snd:"flood",fact:F("น้ำทะเลหนุนสูงขึ้นทำให้น้ำเค็มรุกเข้าแม่น้ำลึกขึ้นทุกปี","Rising seas push salt water further up rivers every year."),
+  c:O("ปลูกข้าวพันธุ์ทนเค็ม","Plant salt-tolerant rice",{ep:-15,vuln:{T:-5}})},
+EVT_48:{fx:{0:{ep:25}},snd:"office",fact:F("กองทุนใหญ่หลายแห่งถอนการลงทุนจากถ่านหินเพราะมองว่าเสี่ยงขาดทุน","Many big funds have sold coal holdings, seeing them as a financial risk.")},
+EVT_49:{snd:"wind",fact:F("ลมบนที่สูงแรงและสม่ำเสมอกว่าลมใกล้พื้นดิน","Winds high above the ground are stronger and steadier.")},
+EVT_50:{snd:"fire",fact:F("ป่าต้นน้ำช่วยกรองน้ำฝนให้สะอาดก่อนไหลลงแม่น้ำ","Watershed forests filter rain before it reaches rivers."),
+  c:O("จ้างทีมดับไฟป่าประจำ","Hire a permanent wildfire crew",{ep:-30,vuln:{T:-5}})},
+EVT_51:{snd:"office",fact:F("แร่หายากใช้ทำแม่เหล็กในมอเตอร์รถไฟฟ้าและกังหันลม","Rare earths make the magnets in EV motors and wind turbines.")},
+EVT_52:{snd:"office",fact:F("ทุก 5 ปี ประเทศต่าง ๆ ต้องส่งเป้าลดคาร์บอนใหม่ที่เข้มขึ้นตามความตกลงปารีส","Every five years, countries must submit stronger targets under the Paris Agreement."),
+  c:O("ยอมรับผลและประกาศแผนแก้","Accept it and announce a fix",{appr:4,pc:-6,co2:0.2})},
+};
+
+/* ---------------- New events EVT_53 – EVT_152 ----------------
+   EV3(id, target, cond, sound, title, desc, fact, ...options)
+   Costs here are already in the game's current economy scale (no halving). */
+const EVENTS2 = [
+/* ===== Energy ===== */
+EV3("EVT_53","SEA",{},"heat",{th:"ไฟดับทั้งเมืองกลางหน้าร้อน",en:"Summer Blackout"},
+ {th:"คนเปิดแอร์พร้อมกันจนโรงไฟฟ้าผลิตไม่ทัน ไฟดับหลายชั่วโมงในหลายเมือง",en:"Everyone turns on the AC at once. Power plants can't keep up and cities go dark for hours."},
+ {th:"ตั้งแอร์สูงขึ้นทุก 1°C ช่วยประหยัดไฟของแอร์ได้ราว 6–10%",en:"Every 1°C higher on the AC saves roughly 6–10% of its power."},
+ O("เปิดโรงไฟฟ้าก๊าซสำรอง","Start backup gas plants",{co2:0.5,appr:4}),
+ O("รณรงค์ตั้งแอร์ 26°C","Campaign: set AC to 26°C",{pc:-6,appr:-3,co2:-0.2}),
+ O("ติดแบตเตอรี่เก็บไฟเร่งด่วน","Rush-install grid batteries",{ep:-35,comp:{T:4}})),
+EV3("EVT_54",null,{},"lab",{th:"แผงโซลาร์ราคาถูกลงครึ่งหนึ่ง",en:"Solar Panels Now Half Price"},
+ {th:"โรงงานผลิตแผงโซลาร์ได้เยอะขึ้นจนราคาตกลงเหลือครึ่งเดียว",en:"Factories now make so many solar panels that the price has halved."},
+ {th:"ราคาไฟฟ้าจากแผงโซลาร์ลดลงราว 90% ในช่วงปี 2010–2020",en:"The cost of solar power fell by about 90% between 2010 and 2020."},
+ O("อุดหนุนโซลาร์บนหลังคาบ้าน","Subsidise rooftop solar",{ep:-30,co2:-0.6,appr:3}),
+ O("ปล่อยตลาดโตเอง เก็บเงินไว้","Let the market grow, save money",{co2:-0.2}),
+ O("สร้างฟาร์มโซลาร์ของรัฐ","Build state solar farms",{ep:-45,pc:-5,co2:-0.9})),
+EV3("EVT_55","EA",{},"factory",{th:"เหมืองถ่านหินจะปิด คนงานกังวล",en:"Coal Mines Closing, Workers Worried"},
+ {th:"เหมืองถ่านหินหลายแห่งจะปิด คนงานนับแสนกลัวตกงาน",en:"Many coal mines will close. Hundreds of thousands of workers fear losing their jobs."},
+ {th:"การเปลี่ยนผ่านที่เป็นธรรม (Just Transition) คือการดูแลคนงานให้มีงานใหม่เมื่ออุตสาหกรรมเก่าปิดตัว",en:"A 'just transition' means helping workers find new jobs when old industries close."},
+ O("ฝึกอาชีพใหม่ด้านพลังงานสะอาด","Retrain them for clean energy jobs",{ep:-30,comp:{T:8}}),
+ O("ปิดเหมืองตามกำหนดทันที","Close the mines on schedule",{rco2:{EA:-0.8},appr:-6,comp:{T:-8}}),
+ O("เลื่อนการปิดออกไป 5 ปี","Delay the closures five years",{rco2:{EA:0.4},appr:4})),
+EV3("EVT_56",null,{},"wind",{th:"กังหันลมถูกร้องเรียนเรื่องเสียงดัง",en:"Wind Turbine Noise Complaints"},
+ {th:"ชาวบ้านบอกว่ากังหันลมใกล้หมู่บ้านเสียงดังและบังวิว",en:"Villagers say nearby wind turbines are noisy and spoil the view."},
+ {th:"กังหันลมใหม่ ๆ ตั้งอยู่กลางทะเลได้ ลมแรงกว่าและไกลจากบ้านคน",en:"Modern wind turbines can stand far out at sea, where winds are stronger and nobody lives."},
+ O("ย้ายไปสร้างกลางทะเล (แพงกว่า)","Move them offshore (costs more)",{ep:-40,co2:-0.3}),
+ O("แบ่งค่าไฟให้หมู่บ้าน","Share power profits with the village",{ep:-15,comp:{ALL:3}}),
+ O("ยืนยันสร้างต่อที่เดิม","Build as planned",{appr:-5,co2:-0.4})),
+EV3("EVT_57","MEAF",{},"heat",{th:"ทะเลทรายอยากส่งออกไฟโซลาร์",en:"Desert Solar Export Plan"},
+ {th:"ประเทศในทะเลทรายเสนอสร้างสายไฟใต้ทะเลส่งไฟโซลาร์ไปขายยุโรป",en:"Desert nations propose an undersea cable to sell solar power to Europe."},
+ {th:"ทะเลทรายได้รับแสงแดดมากที่สุดในโลก แต่ต้องมีสายส่งไฟยาวมากจึงจะส่งไปที่อื่นได้",en:"Deserts get the most sunshine on Earth, but need very long power lines to send it elsewhere."},
+ O("ร่วมลงทุนสายส่ง","Co-fund the cable",{ep:-40,pc:-5,rco2:{EU:-0.5,MEAF:-0.3}}),
+ O("ให้ยุโรปจ่ายเอง","Let Europe pay for it",{pc:-8,rco2:{EU:-0.2},comp:{T:-4}}),
+ O("ใช้ไฟในภูมิภาคก่อน","Use the power locally first",{ep:-20,rco2:{MEAF:-0.4},comp:{T:6}})),
+EV3("EVT_58",null,{},"office",{th:"บ้านเรือนเปิดไฟทิ้งไว้ทั้งคืน",en:"Lights Left On All Night"},
+ {th:"ผลสำรวจพบว่าอาคารสำนักงานส่วนใหญ่เปิดไฟและจอคอมทิ้งไว้ทั้งคืน",en:"A survey finds most office buildings leave lights and screens on all night."},
+ {th:"หลอด LED ใช้ไฟน้อยกว่าหลอดไส้ราว 75%",en:"LED bulbs use about 75% less power than old incandescent bulbs."},
+ O("แจกหลอด LED ฟรี","Hand out free LED bulbs",{ep:-20,co2:-0.3}),
+ O("ออกกฎปิดไฟอัตโนมัติ","Require automatic light switches",{pc:-6,co2:-0.4,appr:-2}),
+ O("ทำแคมเปญในโรงเรียน","Run a school campaign",{ep:-5,appr:3,co2:-0.1})),
+EV3("EVT_59","EU",{minYear:2028},"arctic",{th:"หน้าหนาวก๊าซขาดแคลน",en:"Winter Gas Shortage"},
+ {th:"ก๊าซสำหรับทำความร้อนในบ้านไม่พอ ราคาพุ่ง คนกลัวหนาว",en:"There isn't enough gas to heat homes. Prices soar and people fear the cold."},
+ {th:"ปั๊มความร้อน (heat pump) ให้ความร้อนได้ 3–4 เท่าของไฟฟ้าที่ใช้",en:"A heat pump gives out 3–4 times more heat than the electricity it uses."},
+ O("นำเข้าก๊าซราคาแพง","Import expensive gas",{ep:-25,co2:0.3,appr:3}),
+ O("อุดหนุนปั๊มความร้อน","Subsidise heat pumps",{ep:-40,rco2:{EU:-0.5}}),
+ O("ขอให้ลดอุณหภูมิในบ้าน 1°C","Ask homes to turn heating down 1°C",{pc:-5,appr:-5,rco2:{EU:-0.2}})),
+EV3("EVT_60","SA",{},"flood",{th:"เขื่อนพลังน้ำแห้งเพราะภัยแล้ง",en:"Hydro Dams Run Dry"},
+ {th:"ฝนไม่ตก น้ำในเขื่อนเหลือน้อย ผลิตไฟได้ครึ่งเดียว",en:"No rain. Reservoirs are low and dams make half their usual power."},
+ {th:"อเมริกาใต้หลายประเทศได้ไฟส่วนใหญ่จากพลังน้ำ จึงเสี่ยงเมื่อฝนแล้ง",en:"Several South American countries get most of their power from dams, so droughts hit hard."},
+ O("เปิดโรงไฟฟ้าดีเซลชั่วคราว","Run diesel generators",{rco2:{SA:0.4},appr:3}),
+ O("สร้างโซลาร์ลอยน้ำบนเขื่อน","Put floating solar on the reservoirs",{ep:-35,rco2:{SA:-0.2},vuln:{T:-4}}),
+ O("ประกาศตัดไฟเป็นช่วง","Announce rolling blackouts",{appr:-7,comp:{T:-4}})),
+EV3("EVT_61",null,{minYear:2029},"lab",{th:"นักเรียนประดิษฐ์เครื่องผลิตไฟจากคลื่น",en:"Students Invent a Wave-Power Buoy"},
+ {th:"ทีมนักเรียนมัธยมสร้างทุ่นผลิตไฟจากคลื่นทะเลได้สำเร็จ",en:"A high-school team builds a buoy that makes electricity from ocean waves."},
+ {th:"คลื่นทะเลมีพลังงานมาก แต่เครื่องต้องทนน้ำเค็มและพายุได้",en:"Waves carry a lot of energy, but machines must survive salt water and storms."},
+ O("ให้ทุนต่อยอด","Fund further research",{ep:-20,delay:{m:12,fx:{co2:-0.4}}}),
+ O("มอบรางวัลและประชาสัมพันธ์","Give an award and publicity",{ep:-5,appr:4}),
+ O("ขายสิทธิบัตรให้บริษัท","Sell the patent to a company",{ep:20})),
+EV3("EVT_62","NA",{},"factory",{th:"บริษัทน้ำมันขอสัมปทานใหม่",en:"Oil Company Wants New Drilling Rights"},
+ {th:"บริษัทน้ำมันยักษ์ใหญ่ขอเปิดหลุมใหม่ พร้อมสัญญาจ้างงานหลายหมื่นตำแหน่ง",en:"An oil giant asks to open new wells and promises tens of thousands of jobs."},
+ {th:"สำนักงานพลังงานสากล (IEA) ประเมินว่าเส้นทางสู่ Net Zero ปี 2050 ไม่ต้องเปิดแหล่งน้ำมันและก๊าซแห่งใหม่",en:"The International Energy Agency found that a path to Net Zero by 2050 needs no new oil and gas fields."},
+ O("อนุญาต เก็บค่าสัมปทานสูง","Approve with high fees",{ep:35,rco2:{NA:0.6},appr:-4}),
+ O("ปฏิเสธ","Refuse",{pc:-10,comp:{T:-6}}),
+ O("อนุญาตถ้าลงทุนพลังงานสะอาดคู่กัน","Approve only with matching clean-energy investment",{ep:10,rco2:{NA:0.2},pc:-4})),
+EV3("EVT_63",null,{req:"E2"},"wind",{th:"ใบพัดกังหันลมเก่ารีไซเคิลไม่ได้",en:"Old Turbine Blades Pile Up"},
+ {th:"ใบพัดกังหันลมรุ่นแรกหมดอายุ แต่ทำจากวัสดุที่รีไซเคิลยาก",en:"The first wind turbine blades are wearing out, and they're made of hard-to-recycle material."},
+ {th:"ปัจจุบันมีใบพัดกังหันลมรุ่นใหม่ที่ออกแบบให้รีไซเคิลได้",en:"New turbine blades are now being designed to be fully recyclable."},
+ O("ตั้งโรงงานรีไซเคิลใบพัด","Build a blade recycling plant",{ep:-30,appr:3}),
+ O("ฝังกลบไปก่อน","Bury them in landfill",{appr:-5}),
+ O("บังคับผู้ผลิตรับคืน","Make manufacturers take them back",{pc:-8,disc:{E2:-0.1}})),
+EV3("EVT_64","EA",{minYear:2030},"lab",{th:"ไฮโดรเจนเขียวราคาลด",en:"Green Hydrogen Gets Cheaper"},
+ {th:"เครื่องแยกน้ำด้วยไฟโซลาร์ราคาถูกลงมาก ผลิตไฮโดรเจนได้คุ้มขึ้น",en:"Solar-powered machines that split water have become much cheaper, making hydrogen affordable."},
+ {th:"ไฮโดรเจนเขียวผลิตจากน้ำด้วยไฟพลังงานหมุนเวียน เผาแล้วได้แค่น้ำ",en:"Green hydrogen is made from water using renewable power. Burning it only makes water."},
+ O("ใช้กับโรงงานเหล็ก","Use it in steel plants",{ep:-35,disc:{E6:0.25}}),
+ O("ใช้กับรถบรรทุก","Use it in trucks",{ep:-30,co2:-0.4}),
+ O("รอให้ราคาลดอีก","Wait for prices to fall further",{})),
+EV3("EVT_65",null,{},"crowd",{th:"ค่าไฟแพง ประชาชนโวย",en:"Electricity Bills Soar"},
+ {th:"ค่าไฟขึ้นเป็นประวัติการณ์ คนโทษนโยบายพลังงานสะอาด",en:"Power bills hit a record high and people blame clean-energy policies."},
+ {th:"ค่าไฟจากโซลาร์และลมในหลายประเทศถูกกว่าไฟจากถ่านหินแล้ว",en:"In many countries, power from new solar and wind is now cheaper than from coal."},
+ O("ลดค่าไฟชั่วคราว","Cut bills temporarily",{ep:-30,appr:6}),
+ O("อธิบายต้นทุนจริงให้ประชาชน","Explain the real costs publicly",{pc:-6,appr:1}),
+ O("ขึ้นภาษีถ่านหินมาช่วย","Raise coal taxes to pay for relief",{pc:-10,appr:3,co2:-0.3})),
+EV3("EVT_66","SEA",{},"ocean",{th:"เสนอสร้างเขื่อนบนแม่น้ำโขง",en:"New Mekong Dam Proposed"},
+ {th:"บริษัทเสนอสร้างเขื่อนผลิตไฟ แต่ชาวประมงกลัวปลาหายไป",en:"A company proposes a hydropower dam, but fishers fear the fish will disappear."},
+ {th:"แม่น้ำโขงเลี้ยงปลาน้ำจืดมากที่สุดแห่งหนึ่งของโลก เขื่อนขวางทางปลาว่ายไปวางไข่",en:"The Mekong has one of the world's biggest freshwater fisheries. Dams block fish from reaching spawning grounds."},
+ O("อนุมัติ","Approve it",{rco2:{SEA:-0.4},comp:{T:-6},vuln:{T:5}}),
+ O("ใช้โซลาร์ลอยน้ำแทน","Use floating solar instead",{ep:-35,rco2:{SEA:-0.2}}),
+ O("ปฏิเสธ","Reject it",{pc:-5,appr:3})),
+EV3("EVT_67",null,{req:"E4"},"lab",{th:"ขยะนิวเคลียร์ไม่มีที่เก็บ",en:"Nowhere to Store Nuclear Waste"},
+ {th:"เตานิวเคลียร์ SMR ทำงานดี แต่ไม่มีเมืองไหนยอมให้เก็บขยะนิวเคลียร์",en:"SMR reactors work well, but no town will accept the nuclear waste."},
+ {th:"ฟินแลนด์สร้างที่เก็บขยะนิวเคลียร์ใต้ดินลึกหลายร้อยเมตรในชั้นหิน",en:"Finland built a nuclear waste store hundreds of metres deep in solid rock."},
+ O("สร้างคลังใต้ดินลึก","Build a deep rock store",{ep:-45,appr:2}),
+ O("จ่ายค่าตอบแทนเมืองที่รับ","Pay a town to host it",{ep:-20,pc:-6}),
+ O("เก็บไว้ที่โรงไฟฟ้าไปก่อน","Keep it at the plants for now",{appr:-6,temp:0.01})),
+EV3("EVT_68","MEAF",{},"heat",{th:"หมู่บ้านห่างไกลยังไม่มีไฟฟ้า",en:"Villages Still Without Power"},
+ {th:"หลายล้านครอบครัวยังใช้ตะเกียงน้ำมันก๊าดและฟืนหุงข้าว",en:"Millions of families still use kerosene lamps and firewood for cooking."},
+ {th:"ทั่วโลกยังมีคนหลายร้อยล้านคนที่ไม่มีไฟฟ้าใช้ ส่วนใหญ่อยู่ในแอฟริกา",en:"Hundreds of millions of people still have no electricity, most of them in Africa."},
+ O("ติดโซลาร์ขนาดเล็กให้ทุกบ้าน","Give every home a small solar kit",{ep:-35,comp:{T:10},vuln:{T:-4}}),
+ O("ขยายสายไฟจากโรงไฟฟ้าดีเซล","Extend lines from diesel plants",{ep:-15,rco2:{MEAF:0.3},comp:{T:5}}),
+ O("รอให้เอกชนลงทุน","Wait for private investors",{comp:{T:-4}})),
+/* ===== Industry ===== */
+EV3("EVT_69","EA",{},"factory",{th:"โรงงานปูนซีเมนต์ปล่อยควันหนัก",en:"Cement Plants Pour Out CO₂"},
+ {th:"โรงงานปูนซีเมนต์คือหนึ่งในผู้ปล่อยคาร์บอนรายใหญ่ที่สุด",en:"Cement plants are among the biggest carbon polluters."},
+ {th:"การผลิตปูนซีเมนต์ปล่อย CO₂ ราว 8% ของโลก",en:"Making cement produces about 8% of the world's CO₂."},
+ O("บังคับใช้ปูนสูตรคาร์บอนต่ำ","Require low-carbon cement",{pc:-10,rco2:{EA:-0.5},comp:{T:-4}}),
+ O("ให้ทุนวิจัยปูนดักจับคาร์บอน","Fund carbon-capturing cement research",{ep:-30,delay:{m:12,fx:{co2:-0.5}}}),
+ O("ปล่อยไว้ก่อน เศรษฐกิจสำคัญกว่า","Leave it, the economy comes first",{ep:10,appr:-3})),
+EV3("EVT_70",null,{},"market",{th:"เสื้อผ้าแฟชั่นเร็วล้นโลก",en:"Fast Fashion Mountain"},
+ {th:"เสื้อผ้าราคาถูกถูกผลิตมากเกินไปและถูกทิ้งหลังใส่ไม่กี่ครั้ง",en:"Cheap clothes are overproduced and thrown out after a few wears."},
+ {th:"ทุก ๆ วินาที มีเสื้อผ้าเท่ากับรถขยะหนึ่งคันถูกฝังกลบหรือเผาทิ้ง",en:"Every second, a garbage truck's worth of textiles is landfilled or burned."},
+ O("เก็บภาษีเสื้อผ้าแฟชั่นเร็ว","Tax fast fashion",{pc:-8,co2:-0.3,appr:-3}),
+ O("ตั้งตลาดเสื้อผ้ามือสอง","Open second-hand clothing markets",{ep:-15,appr:4,co2:-0.1}),
+ O("ไม่แทรกแซง","Don't intervene",{})),
+EV3("EVT_71","NA",{minYear:2028},"factory",{th:"โรงงานเหล็กขอเงินช่วยเปลี่ยนเครื่องจักร",en:"Steelmaker Asks for Upgrade Money"},
+ {th:"โรงงานเหล็กเก่าจะเปลี่ยนเตาถ่านหินเป็นเตาไฟฟ้า ถ้ารัฐช่วยออกเงิน",en:"An old steel mill will switch its coal furnace to electric, if the state helps pay."},
+ {th:"เตาหลอมเหล็กด้วยไฟฟ้า (EAF) หลอมเศษเหล็กรีไซเคิลได้โดยไม่ใช้ถ่านหิน",en:"Electric arc furnaces melt recycled scrap steel without using coal."},
+ O("ช่วยจ่ายครึ่งหนึ่ง","Pay half",{ep:-30,rco2:{NA:-0.5}}),
+ O("ให้กู้ดอกเบี้ยต่ำ","Offer a cheap loan",{ep:-10,pc:-5,rco2:{NA:-0.3}}),
+ O("ปฏิเสธ","Say no",{comp:{T:-5}})),
+EV3("EVT_72",null,{},"market",{th:"พบบริษัทฟอกเขียว",en:"Greenwashing Exposed"},
+ {th:"บริษัทดังโฆษณาว่ารักษ์โลก แต่ความจริงปล่อยคาร์บอนเพิ่มขึ้น",en:"A famous company advertises itself as eco-friendly while its emissions keep rising."},
+ {th:"'ฟอกเขียว' คือการโฆษณาว่ารักษ์โลกเกินกว่าที่ทำจริง",en:"'Greenwashing' means claiming to be greener than you really are."},
+ O("ปรับหนักและประกาศชื่อ","Fine them and name them",{pc:-6,ep:15,comp:{ALL:3}}),
+ O("ออกกฎฉลากคาร์บอนทุกสินค้า","Require carbon labels on all products",{pc:-10,co2:-0.3}),
+ O("ตักเตือนเบา ๆ","Give a quiet warning",{appr:-4})),
+EV3("EVT_73","EA",{},"factory",{th:"สารทำความเย็นรั่วจากตู้เย็นเก่า",en:"Old Fridges Leak Coolant"},
+ {th:"ตู้เย็นและแอร์เก่านับล้านเครื่องปล่อยสารทำความเย็นที่ทำให้โลกร้อนรุนแรง",en:"Millions of old fridges and ACs leak coolants that heat the planet strongly."},
+ {th:"สาร HFC ในแอร์บางชนิดกักความร้อนได้แรงกว่า CO₂ หลายพันเท่า",en:"Some HFC coolants trap thousands of times more heat than CO₂."},
+ O("รับซื้อแอร์เก่าไปกำจัดถูกวิธี","Buy back old units and dispose safely",{ep:-30,temp:-0.02}),
+ O("ห้ามขายสาร HFC","Ban HFC sales",{pc:-10,temp:-0.02,comp:{T:-4}}),
+ O("ปล่อยไว้","Leave it",{temp:0.01})),
+EV3("EVT_74",null,{minYear:2029},"lab",{th:"พลาสติกจากสาหร่ายผลิตได้แล้ว",en:"Seaweed Plastic Ready"},
+ {th:"บริษัทสตาร์ทอัปทำถุงจากสาหร่ายที่ย่อยสลายได้ในไม่กี่สัปดาห์",en:"A startup makes bags from seaweed that break down in a few weeks."},
+ {th:"พลาสติกเกือบทั้งหมดผลิตจากน้ำมันและก๊าซ",en:"Almost all plastic is made from oil and gas."},
+ O("ให้ทุนขยายโรงงาน","Fund a bigger factory",{ep:-25,co2:-0.3,appr:3}),
+ O("บังคับร้านค้าใช้","Make shops use it",{pc:-8,co2:-0.4,appr:-3}),
+ O("รอดูผลตลาด","Wait and see",{})),
+EV3("EVT_75","SEA",{},"factory",{th:"โรงงานปล่อยน้ำเสียลงแม่น้ำ",en:"Factory Dumps Waste in River"},
+ {th:"ชาวบ้านพบปลาตายเต็มแม่น้ำใกล้นิคมอุตสาหกรรม",en:"Villagers find dead fish all along the river next to an industrial park."},
+ {th:"แม่น้ำที่สะอาดช่วยให้ระบบนิเวศแข็งแรงและรับมือโลกร้อนได้ดีขึ้น",en:"Clean rivers keep ecosystems healthy and better able to cope with warming."},
+ O("สั่งปิดโรงงานจนกว่าจะแก้ไข","Close the factory until it's fixed",{pc:-8,appr:6,comp:{T:-3}}),
+ O("ปรับเงินแล้วให้เปิดต่อ","Fine it and let it run",{ep:15,appr:-3}),
+ O("ช่วยจ่ายค่าระบบบำบัด","Help pay for water treatment",{ep:-25,appr:3,vuln:{T:-3}})),
+EV3("EVT_76","EU",{minYear:2030},"office",{th:"กฎหมายซ่อมได้ (Right to Repair)",en:"Right to Repair Law"},
+ {th:"ประชาชนเรียกร้องให้สินค้าต้องซ่อมได้ ไม่ใช่เสียแล้วต้องทิ้ง",en:"People demand that products can be repaired instead of thrown away."},
+ {th:"คาร์บอนส่วนใหญ่ของโทรศัพท์มือถือเกิดตอนผลิต ไม่ใช่ตอนใช้งาน จึงควรใช้ให้นานที่สุด",en:"Most of a phone's carbon comes from making it, not using it, so keeping it longer helps."},
+ O("ออกกฎหมายทั่วโลก","Make it a global law",{pc:-12,co2:-0.4,appr:4}),
+ O("ทำเฉพาะในยุโรปก่อน","Start with Europe only",{pc:-5,rco2:{EU:-0.2}}),
+ O("ปล่อยให้บริษัทสมัครใจ","Let companies volunteer",{})),
+EV3("EVT_77","MEAF",{},"factory",{th:"เปลวไฟเผาก๊าซทิ้งจากบ่อน้ำมัน",en:"Oil Wells Burn Off Gas"},
+ {th:"บ่อน้ำมันเผาก๊าซส่วนเกินทิ้งทั้งวันทั้งคืน มองเห็นจากอวกาศ",en:"Oil wells burn off extra gas day and night. The flames can be seen from space."},
+ {th:"ก๊าซที่เผาทิ้งทั่วโลกในแต่ละปี มีพลังงานมากพอผลิตไฟให้หลายประเทศรวมกัน",en:"The gas flared worldwide each year holds enough energy to power several countries."},
+ O("บังคับเก็บก๊าซมาใช้ผลิตไฟ","Require capturing it for power",{pc:-8,rco2:{MEAF:-0.5},comp:{T:-3}}),
+ O("ให้ทุนติดอุปกรณ์เก็บก๊าซ","Fund gas-capture equipment",{ep:-30,rco2:{MEAF:-0.4}}),
+ O("ไม่ยุ่ง","Stay out of it",{rco2:{MEAF:0.1}})),
+/* ===== Transport ===== */
+EV3("EVT_78","SEA",{},"city",{th:"รถติดหนัก ควันพิษคลุมเมือง",en:"Traffic Jams Choke the City"},
+ {th:"รถติดยาวทุกเช้าเย็น ฝุ่นและควันรถทำให้คนป่วย",en:"Endless morning and evening jams fill the air with fumes and make people sick."},
+ {th:"การเดินทางด้วยรถไฟฟ้าปล่อยคาร์บอนต่อคนน้อยกว่ารถยนต์ส่วนตัวหลายเท่า",en:"Travelling by metro emits many times less carbon per person than driving alone."},
+ O("สร้างรถไฟฟ้าเพิ่ม","Build more metro lines",{ep:-45,rco2:{SEA:-0.4},appr:4}),
+ O("เก็บค่าเข้าเมืองชั้นใน","Charge cars to enter downtown",{pc:-8,rco2:{SEA:-0.3},appr:-5,ep:10}),
+ O("ขยายถนนเพิ่มเลน","Widen the roads",{ep:-25,rco2:{SEA:0.2},appr:3})),
+EV3("EVT_79",null,{},"air",{th:"ตั๋วเครื่องบินราคาถูกมาก",en:"Ultra-Cheap Flights Boom"},
+ {th:"สายการบินราคาประหยัดขายตั๋วถูกกว่าค่ารถแท็กซี่ คนบินเที่ยวบ่อยขึ้นมาก",en:"Budget airlines sell tickets cheaper than a taxi ride, so people fly far more often."},
+ {th:"การบินปล่อย CO₂ ราว 2–3% ของโลก และเพิ่มขึ้นทุกปี",en:"Aviation produces about 2–3% of the world's CO₂, and the share is growing."},
+ O("เก็บภาษีคนบินบ่อย","Tax frequent flyers",{pc:-8,co2:-0.3,appr:-3}),
+ O("ห้ามบินเส้นทางสั้นที่มีรถไฟ","Ban short flights where trains exist",{pc:-12,co2:-0.4,appr:-4}),
+ O("ปล่อยไว้ การท่องเที่ยวสร้างรายได้","Leave it, tourism brings money",{ep:15,co2:0.3})),
+EV3("EVT_80","EU",{},"train",{th:"รถไฟนอนข้ามประเทศกลับมาฮิต",en:"Night Trains Are Back"},
+ {th:"คนรุ่นใหม่หันมานั่งรถไฟนอนแทนเครื่องบิน แต่ตั๋วยังแพง",en:"Young people choose sleeper trains over planes, but tickets are still pricey."},
+ {th:"นั่งรถไฟจากปารีสไปเบอร์ลินปล่อยคาร์บอนน้อยกว่าบินหลายเท่า",en:"Taking the train from Paris to Berlin emits many times less carbon than flying."},
+ O("อุดหนุนตั๋วรถไฟ","Subsidise train tickets",{ep:-25,rco2:{EU:-0.3},appr:3}),
+ O("เพิ่มเส้นทางใหม่","Open new routes",{ep:-40,rco2:{EU:-0.4},comp:{T:3}}),
+ O("ปล่อยให้ตลาดตัดสิน","Let the market decide",{})),
+EV3("EVT_81",null,{minYear:2028},"harbor",{th:"เรือสินค้าติดใบเรือยักษ์",en:"Cargo Ships Try Giant Sails"},
+ {th:"บริษัทเดินเรือทดลองติดใบเรือแข็งบนเรือสินค้า ช่วยประหยัดน้ำมัน",en:"Shipping firms test rigid sails on cargo ships to save fuel."},
+ {th:"การขนส่งทางเรือปล่อย CO₂ ราว 3% ของโลก",en:"Shipping produces about 3% of the world's CO₂."},
+ O("ให้ทุนติดใบเรือทั้งฝูงเรือ","Fund sails for whole fleets",{ep:-35,co2:-0.4}),
+ O("บังคับมาตรฐานเรือประหยัดน้ำมัน","Require fuel-saving ship standards",{pc:-10,co2:-0.5,ep:-5}),
+ O("รอผลทดลองก่อน","Wait for test results",{delay:{m:12,fx:{co2:-0.1}}})),
+EV3("EVT_82","EA",{},"city",{th:"รถยนต์ไฟฟ้าราคาเท่ารถน้ำมัน",en:"EVs Reach Price Parity"},
+ {th:"รถยนต์ไฟฟ้ารุ่นใหม่ราคาเท่ารถน้ำมันแล้ว แต่สถานีชาร์จยังไม่พอ",en:"New EVs now cost the same as petrol cars, but there aren't enough chargers."},
+ {th:"ตลอดอายุการใช้งาน รถยนต์ไฟฟ้าส่วนใหญ่ปล่อยคาร์บอนน้อยกว่ารถน้ำมัน",en:"Over their lifetime, most EVs emit less carbon than petrol cars."},
+ O("สร้างสถานีชาร์จทั่วประเทศ","Build chargers nationwide",{ep:-40,rco2:{EA:-0.5}}),
+ O("บังคับตึกใหม่ต้องมีที่ชาร์จ","Require chargers in new buildings",{pc:-8,rco2:{EA:-0.3}}),
+ O("ให้บริษัทรถลงทุนเอง","Let carmakers pay for it",{rco2:{EA:-0.1},comp:{T:-2}})),
+EV3("EVT_83","SEA",{},"city",{th:"มอเตอร์ไซค์ไฟฟ้าสลับแบต",en:"Swap-Battery Scooters"},
+ {th:"สตาร์ทอัปเปิดตู้สลับแบตมอเตอร์ไซค์ไฟฟ้า ใช้เวลาแค่ 1 นาที",en:"A startup opens battery-swap stations for e-scooters. A swap takes one minute."},
+ {th:"ในอาเซียนมีมอเตอร์ไซค์หลายสิบล้านคัน เปลี่ยนเป็นไฟฟ้าได้จะลดควันพิษในเมืองมาก",en:"Southeast Asia has tens of millions of motorbikes. Electrifying them would clear city air."},
+ O("ให้ทุนขยายตู้สลับแบต","Fund more swap stations",{ep:-25,rco2:{SEA:-0.3},appr:3}),
+ O("ลดภาษีมอเตอร์ไซค์ไฟฟ้า","Cut taxes on e-scooters",{ep:-15,pc:-4,rco2:{SEA:-0.3}}),
+ O("ห้ามมอเตอร์ไซค์น้ำมันคันใหม่ภายใน 5 ปี","Ban new petrol scooters in 5 years",{pc:-12,rco2:{SEA:-0.5},appr:-6})),
+EV3("EVT_84","NA",{},"city",{th:"รถบรรทุกไฟฟ้าวิ่งทางไกล",en:"Electric Trucks Go Long-Haul"},
+ {th:"รถบรรทุกไฟฟ้าวิ่งข้ามรัฐได้แล้ว แต่ต้องมีที่ชาร์จพลังสูงตามทาง",en:"Electric trucks can now cross states, but need fast chargers along the way."},
+ {th:"รถบรรทุกมีจำนวนน้อยกว่ารถเก๋งมาก แต่ปล่อย CO₂ จากถนนเป็นสัดส่วนใหญ่",en:"Trucks are far fewer than cars but produce a large share of road CO₂."},
+ O("สร้างทางด่วนชาร์จไฟ","Build charging highways",{ep:-40,rco2:{NA:-0.5}}),
+ O("บังคับบริษัทขนส่งเปลี่ยนรถ","Require fleets to switch",{pc:-10,rco2:{NA:-0.4},comp:{T:-4}}),
+ O("ให้ใช้ไบโอดีเซลแทนก่อน","Use biodiesel for now",{ep:-10,rco2:{NA:-0.1}})),
+EV3("EVT_85",null,{},"city",{th:"เมืองจักรยาน",en:"Cycling City Challenge"},
+ {th:"เมืองใหญ่หลายเมืองแข่งกันสร้างเลนจักรยาน แต่คนขับรถไม่พอใจ",en:"Big cities race to build bike lanes, but drivers are angry."},
+ {th:"อัมสเตอร์ดัมมีจักรยานมากกว่าจำนวนประชากร",en:"Amsterdam has more bicycles than people."},
+ O("สร้างเลนจักรยานแยกถาวร","Build protected bike lanes",{ep:-25,co2:-0.2,appr:2}),
+ O("แบ่งเลนรถยนต์มาเป็นเลนจักรยาน","Turn car lanes into bike lanes",{pc:-6,co2:-0.3,appr:-4}),
+ O("จัดวันปลอดรถเดือนละครั้ง","Hold a car-free day each month",{ep:-5,appr:3})),
+EV3("EVT_86",null,{minYear:2031},"air",{th:"เครื่องบินไฟฟ้าเที่ยวแรก",en:"First Electric Passenger Flight"},
+ {th:"เครื่องบินไฟฟ้าขนาดเล็กบินรับผู้โดยสารเส้นทางสั้นสำเร็จ",en:"A small electric plane carries its first passengers on a short route."},
+ {th:"แบตเตอรี่ยังหนักเกินกว่าจะใช้บินไกล เครื่องบินไฟฟ้าจึงเริ่มจากเส้นทางสั้น",en:"Batteries are still too heavy for long flights, so electric planes start with short hops."},
+ O("ลงทุนสนามบินชาร์จไฟ","Invest in charging airports",{ep:-35,co2:-0.3}),
+ O("ลดค่าธรรมเนียมให้สายการบินไฟฟ้า","Cut fees for electric airlines",{ep:-15,co2:-0.1,appr:2}),
+ O("ยังไม่ถึงเวลา","Not yet",{})),
+EV3("EVT_87","SA",{},"harbor",{th:"ท่าเรือต้องการไฟฟ้าจากฝั่ง",en:"Ports Want Shore Power"},
+ {th:"เรือที่จอดเทียบท่าเปิดเครื่องยนต์ดีเซลทิ้งไว้ ทำให้อากาศในเมืองท่าแย่",en:"Docked ships run diesel engines, polluting port cities."},
+ {th:"การต่อไฟจากฝั่งให้เรือที่จอดอยู่ ช่วยตัดควันดีเซลได้เกือบหมด",en:"Plugging docked ships into shore power cuts almost all their diesel fumes."},
+ O("ติดระบบไฟฝั่งทุกท่าเรือ","Install shore power at all ports",{ep:-35,rco2:{SA:-0.2},vuln:{T:-3},appr:3}),
+ O("เก็บค่าจอดเรือที่เปิดเครื่อง","Charge ships that idle",{pc:-5,ep:10,rco2:{SA:-0.1}}),
+ O("ไม่ทำอะไร","Do nothing",{appr:-3})),
+/* ===== Food & agriculture ===== */
+EV3("EVT_88","SEA",{},"farm",{th:"นาข้าวปล่อยก๊าซมีเทน",en:"Rice Paddies Release Methane"},
+ {th:"นาข้าวที่ขังน้ำตลอดเวลาปล่อยก๊าซมีเทนออกมามาก",en:"Rice fields kept flooded all season release a lot of methane."},
+ {th:"การทำนาแบบเปียกสลับแห้ง ลดมีเทนได้มาก และประหยัดน้ำด้วย",en:"Alternate wetting and drying cuts methane a lot and saves water too."},
+ O("สอนเกษตรกรทำนาเปียกสลับแห้ง","Teach alternate wetting and drying",{ep:-20,rco2:{SEA:-0.4},comp:{T:3}}),
+ O("ให้เงินชาวนาที่ลดมีเทนได้","Pay farmers who cut methane",{ep:-35,rco2:{SEA:-0.5},appr:3}),
+ O("ไม่แตะเรื่องข้าว กลัวราคาขึ้น","Leave rice alone, avoid price rises",{appr:2})),
+EV3("EVT_89",null,{},"farm",{th:"วัวเรอก๊าซมีเทน",en:"Cow Burps Warm the Planet"},
+ {th:"นักวิจัยพบว่าการเลี้ยงวัวทั่วโลกปล่อยก๊าซเรือนกระจกสูงมาก",en:"Researchers find the world's cattle release huge amounts of greenhouse gas."},
+ {th:"ก๊าซมีเทนกักความร้อนได้แรงกว่า CO₂ ราว 80 เท่าในช่วง 20 ปีแรก",en:"Methane traps about 80 times more heat than CO₂ over its first 20 years."},
+ O("อุดหนุนอาหารเสริมสาหร่ายลดเรอ","Subsidise seaweed feed that cuts burps",{ep:-30,co2:-0.4}),
+ O("เก็บภาษีเนื้อวัว","Tax beef",{pc:-10,co2:-0.5,appr:-6}),
+ O("ส่งเสริมโปรตีนจากพืช","Promote plant protein",{ep:-15,co2:-0.2,appr:2})),
+EV3("EVT_90",null,{},"market",{th:"อาหารเหลือทิ้งล้นถังขยะ",en:"Mountains of Food Waste"},
+ {th:"ร้านค้าและบ้านเรือนทิ้งอาหารที่ยังกินได้วันละหลายตัน",en:"Shops and homes throw away tonnes of edible food every day."},
+ {th:"อาหารที่ถูกทิ้งทั้งหมดรวมกันปล่อยก๊าซเรือนกระจกราว 8–10% ของโลก",en:"Wasted food accounts for about 8–10% of global greenhouse gases."},
+ O("บังคับซูเปอร์มาร์เก็ตบริจาคอาหาร","Make supermarkets donate food",{pc:-8,co2:-0.3,appr:4}),
+ O("แยกเศษอาหารไปทำปุ๋ยหมัก","Collect scraps for compost",{ep:-25,co2:-0.4}),
+ O("ทำแคมเปญกินให้หมด","Run a clean-plate campaign",{ep:-5,co2:-0.1,appr:2})),
+EV3("EVT_91","SEA",{minTemp:1.3},"fire",{th:"เผาตอซังข้าว ฝุ่นพิษคลุมภาคเหนือ",en:"Crop Burning Smog"},
+ {th:"เกษตรกรเผาตอซังและไร่ข้าวโพด ฝุ่น PM2.5 พุ่งสูงหลายสัปดาห์",en:"Farmers burn stubble and corn fields. PM2.5 soars for weeks."},
+ {th:"การไถกลบตอซังแทนการเผา ช่วยลดฝุ่นและเพิ่มคาร์บอนในดิน",en:"Ploughing stubble back in instead of burning cuts smog and adds carbon to the soil."},
+ O("ห้ามเผาเด็ดขาด ปรับหนัก","Strict burning ban with fines",{pc:-8,appr:-4,rco2:{SEA:-0.2},comp:{T:-4}}),
+ O("รับซื้อตอซังไปทำเชื้อเพลิง","Buy the stubble for biomass fuel",{ep:-30,rco2:{SEA:-0.3},appr:4}),
+ O("แจกหน้ากากกันฝุ่น","Hand out masks",{ep:-10,appr:-2})),
+EV3("EVT_92","MEAF",{minTemp:1.35},"heat",{th:"ตั๊กแตนบุกกินพืชไร่",en:"Locust Swarm"},
+ {th:"ฝูงตั๊กแตนนับพันล้านตัวบุกกินพืชไร่ หลังฝนตกผิดฤดู",en:"Billions of locusts sweep across farms after unusual rains."},
+ {th:"อากาศที่แปรปรวนจากโลกร้อนทำให้ตั๊กแตนขยายพันธุ์ได้เร็วขึ้น",en:"Unusual weather linked to warming helps locusts breed faster."},
+ O("ฉีดยาฆ่าแมลงทางอากาศ","Spray pesticides from the air",{ep:-20,appr:2,vuln:{T:-3}}),
+ O("ส่งอาหารช่วยเหลือ","Send food aid",{ep:-30,comp:{T:8}}),
+ O("ปล่อยให้รัฐบาลท้องถิ่นจัดการ","Leave it to local governments",{appr:-5,vuln:{T:6}})),
+EV3("EVT_93",null,{minYear:2028},"birds",{th:"ฟาร์มแนวตั้งกลางเมือง",en:"Vertical Farms Downtown"},
+ {th:"ตึกร้างถูกเปลี่ยนเป็นฟาร์มผักหลายชั้น ใช้น้ำน้อยมาก",en:"Empty buildings become multi-storey vegetable farms that use very little water."},
+ {th:"ฟาร์มแนวตั้งใช้น้ำน้อยกว่าฟาร์มทั่วไปมาก แต่ต้องใช้ไฟเปิดหลอดไฟปลูกพืช",en:"Vertical farms use far less water than normal farms, but need electricity for grow lights."},
+ O("ให้ทุนสร้างฟาร์มแนวตั้ง","Fund vertical farms",{ep:-30,vuln:{ALL:-2},co2:0.1}),
+ O("ให้ใช้โซลาร์บนหลังคาฟาร์ม","Require rooftop solar on them",{ep:-40,vuln:{ALL:-2}}),
+ O("ไม่สนับสนุน","Don't support it",{})),
+EV3("EVT_94","SA",{},"forest",{th:"ถางป่าเพื่อปลูกถั่วเหลือง",en:"Forest Cleared for Soybeans"},
+ {th:"ป่าหลายล้านไร่ถูกถางเพื่อปลูกถั่วเหลืองส่งออกไปเลี้ยงสัตว์",en:"Millions of acres of forest are cleared to grow soybeans for animal feed."},
+ {th:"การตัดไม้ทำลายป่าปล่อยก๊าซเรือนกระจกราว 1 ใน 10 ของโลก",en:"Deforestation causes about one tenth of the world's greenhouse gases."},
+ O("ห้ามนำเข้าสินค้าจากป่าที่ถูกถาง","Ban imports from cleared land",{pc:-12,rco2:{SA:-0.5},comp:{T:-6}}),
+ O("จ่ายเงินให้รักษาป่า","Pay landowners to keep forest",{ep:-40,rco2:{SA:-0.5},comp:{T:4}}),
+ O("ยอมให้ถางบางส่วน","Allow some clearing",{ep:10,rco2:{SA:0.4}})),
+EV3("EVT_95",null,{minYear:2029},"bees",{th:"อาหารจากแมลงขึ้นห้าง",en:"Insect Protein Hits Shelves"},
+ {th:"แป้งจิ้งหรีดและโปรตีนแมลงเริ่มวางขาย คนครึ่งหนึ่งยังไม่กล้าลอง",en:"Cricket flour and insect protein go on sale. Half of people won't try them."},
+ {th:"การเลี้ยงจิ้งหรีดใช้น้ำ อาหาร และพื้นที่น้อยกว่าเลี้ยงวัวมาก",en:"Farming crickets needs far less water, feed and land than raising cattle."},
+ O("ใส่ในอาหารกลางวันโรงเรียน","Put it in school lunches",{pc:-6,co2:-0.2,appr:-3}),
+ O("ให้ทุนฟาร์มจิ้งหรีด","Fund cricket farms",{ep:-20,co2:-0.2,comp:{ALL:1}}),
+ O("ปล่อยตลาดโตเอง","Let the market grow",{})),
+EV3("EVT_96","EA",{minTemp:1.3},"flood",{th:"น้ำท่วมนาข้าว ราคาข้าวพุ่ง",en:"Floods Push Rice Prices Up"},
+ {th:"น้ำท่วมใหญ่ทำลายนาข้าว ราคาข้าวในตลาดขึ้น 40%",en:"Major floods wreck rice fields and market prices jump 40%."},
+ {th:"ข้าวพันธุ์ทนน้ำท่วมอยู่ใต้น้ำได้นานราว 2 สัปดาห์",en:"Flood-tolerant rice can survive underwater for about two weeks."},
+ O("ปล่อยข้าวในคลังออกมาขาย","Release rice reserves",{ep:-20,appr:5}),
+ O("แจกเมล็ดพันธุ์ทนน้ำท่วม","Hand out flood-tolerant seeds",{ep:-25,vuln:{T:-8}}),
+ O("ปล่อยให้ราคาปรับเอง","Let prices adjust",{appr:-6,ep:10})),
+EV3("EVT_97",null,{},"farm",{th:"ปุ๋ยเคมีราคาแพง",en:"Fertiliser Prices Soar"},
+ {th:"ปุ๋ยเคมีผลิตจากก๊าซธรรมชาติ ราคาจึงขึ้นตามก๊าซ เกษตรกรเดือดร้อน",en:"Fertiliser is made from natural gas, so its price follows gas. Farmers are struggling."},
+ {th:"ปุ๋ยไนโตรเจนที่ใช้เกินปล่อยไนตรัสออกไซด์ ก๊าซที่กักความร้อนแรงกว่า CO₂ ราว 270 เท่า",en:"Extra nitrogen fertiliser releases nitrous oxide, about 270 times stronger than CO₂."},
+ O("อุดหนุนปุ๋ยเคมี","Subsidise fertiliser",{ep:-25,appr:4,co2:0.2}),
+ O("ส่งเสริมปุ๋ยอินทรีย์","Promote organic fertiliser",{ep:-20,co2:-0.2,appr:-2}),
+ O("สอนใส่ปุ๋ยแม่นยำด้วยดาวเทียม","Teach precision fertilising by satellite",{ep:-30,co2:-0.3})),
+EV3("EVT_98","MEAF",{minTemp:1.4},"heat",{th:"ภัยแล้งทำพืชผลเสียหาย",en:"Drought Destroys Harvests"},
+ {th:"ฝนไม่ตกสามฤดูติดกัน ผู้คนหลายล้านขาดอาหาร",en:"Three failed rainy seasons in a row leave millions short of food."},
+ {th:"พืชทนแล้งอย่างข้าวฟ่างใช้น้ำน้อยกว่าข้าวโพด",en:"Drought-hardy crops like sorghum need less water than maize."},
+ O("ส่งอาหารฉุกเฉิน","Send emergency food",{ep:-30,appr:3,comp:{T:6}}),
+ O("ขุดบ่อและระบบน้ำหยด","Dig wells and drip irrigation",{ep:-40,vuln:{T:-10}}),
+ O("แจกพันธุ์พืชทนแล้ง","Hand out drought-hardy seeds",{ep:-15,vuln:{T:-5},comp:{T:2}})),
+EV3("EVT_99","NA",{},"market",{th:"เนื้อจากพืชขายไม่ออก",en:"Plant-Based Meat Sales Slump"},
+ {th:"กระแสเนื้อจากพืชซาลง บริษัทขอเงินช่วยเหลือ",en:"The plant-based meat trend fades and companies ask for help."},
+ {th:"การผลิตเนื้อวัว 1 กิโลกรัมปล่อยก๊าซเรือนกระจกมากกว่าถั่ว 1 กิโลกรัมหลายสิบเท่า",en:"Producing 1 kg of beef emits dozens of times more greenhouse gas than 1 kg of beans."},
+ O("ช่วยเงินทุนวิจัยรสชาติ","Fund taste research",{ep:-20,delay:{m:12,fx:{co2:-0.3}}}),
+ O("ลดภาษีอาหารจากพืช","Cut taxes on plant foods",{ep:-15,rco2:{NA:-0.2},appr:2}),
+ O("ไม่ช่วย","Don't help",{})),
+/* ===== Forests & land ===== */
+EV3("EVT_100","SEA",{minTemp:1.3},"fire",{th:"ไฟไหม้ป่าพรุ",en:"Peatland Fires"},
+ {th:"ป่าพรุที่ถูกระบายน้ำจนแห้งติดไฟ ควันลอยข้ามประเทศ",en:"Drained peat swamps catch fire and smoke drifts across borders."},
+ {th:"ป่าพรุครอบคลุมพื้นที่ราว 3% ของโลก แต่เก็บคาร์บอนได้มากกว่าป่าทั้งหมดในโลกรวมกัน",en:"Peatlands cover about 3% of land but store more carbon than all the world's forests."},
+ O("ปิดคลองระบาย คืนน้ำให้ป่าพรุ","Block drains, re-wet the peat",{ep:-30,rco2:{SEA:-0.5}}),
+ O("ส่งเครื่องบินดับไฟ","Send firefighting planes",{ep:-25,appr:4}),
+ O("ขอความร่วมมือบริษัทสวนปาล์ม","Ask palm oil firms to help",{pc:-8,rco2:{SEA:-0.2},comp:{T:-3}})),
+EV3("EVT_101","NA",{minTemp:1.35},"fire",{th:"ไฟป่าเผาเมืองเล็ก",en:"Wildfire Reaches a Town"},
+ {th:"ไฟป่าลามเข้าเมืองเล็ก บ้านเรือนหลายพันหลังถูกไฟไหม้",en:"A wildfire sweeps into a small town and burns thousands of homes."},
+ {th:"ฤดูไฟป่ายาวนานขึ้นเพราะอากาศร้อนและแห้งกว่าเดิม",en:"Fire seasons are growing longer as weather gets hotter and drier."},
+ O("สร้างแนวกันไฟรอบเมือง","Build firebreaks around towns",{ep:-30,vuln:{T:-8}}),
+ O("ห้ามสร้างบ้านในเขตเสี่ยง","Ban new homes in fire zones",{pc:-10,vuln:{T:-10},appr:-4}),
+ O("ช่วยสร้างบ้านใหม่ที่เดิม","Rebuild in the same place",{ep:-20,appr:5})),
+EV3("EVT_102","MEAF",{},"forest",{th:"กำแพงสีเขียวกันทะเลทราย",en:"Great Green Wall"},
+ {th:"ประเทศในแอฟริกาชวนกันปลูกแนวต้นไม้ยาวหลายพันกิโลเมตรกันทะเลทรายขยาย",en:"African nations plan a line of trees thousands of kilometres long to stop the desert."},
+ {th:"โครงการกำแพงสีเขียวยิ่งใหญ่ (Great Green Wall) มีเป้ายาวราว 8,000 กิโลเมตรข้ามทวีปแอฟริกา",en:"The Great Green Wall aims to stretch about 8,000 km across Africa."},
+ O("ให้ทุนปลูกต้นไม้","Fund the tree planting",{ep:-35,vuln:{T:-6},rco2:{MEAF:-0.2}}),
+ O("จ้างชาวบ้านดูแลต้นไม้","Pay locals to care for the trees",{ep:-25,comp:{T:8}}),
+ O("ส่งแค่ผู้เชี่ยวชาญไปช่วย","Send experts only",{pc:-4,comp:{T:2}})),
+EV3("EVT_103",null,{req:"N1"},"forest",{th:"ปลูกป่าแต่ต้นไม้ตายครึ่งหนึ่ง",en:"Half the New Trees Died"},
+ {th:"ต้นไม้ที่ปลูกไว้ตายเกือบครึ่ง เพราะปลูกผิดพันธุ์และไม่มีคนดูแล",en:"Nearly half the planted trees died: wrong species and nobody to care for them."},
+ {th:"ปลูกต้นไม้พันธุ์ท้องถิ่นและดูแลต่อเนื่อง รอดมากกว่าปลูกทีเดียวแล้วทิ้ง",en:"Native trees with ongoing care survive far better than one-off plantings."},
+ O("ปลูกซ่อมด้วยพันธุ์ท้องถิ่น","Replant with native species",{ep:-30,co2:-0.3}),
+ O("ปล่อยให้ป่าฟื้นตัวเองตามธรรมชาติ","Let the forest regrow naturally",{pc:-4,delay:{m:24,fx:{co2:-0.3}}}),
+ O("ยอมรับความเสียหาย","Accept the loss",{appr:-4,co2:0.2})),
+EV3("EVT_104","SA",{},"forest",{th:"ชนเผ่าในป่าแอมะซอนขอสิทธิ์ดูแลป่า",en:"Amazon Tribes Ask to Guard Their Forest"},
+ {th:"ชนพื้นเมืองขอสิทธิ์ดูแลป่าเอง หลังพบคนลักลอบตัดไม้",en:"Indigenous peoples ask for the right to protect their forest after illegal logging."},
+ {th:"ป่าที่ชนพื้นเมืองดูแล มักถูกทำลายน้อยกว่าป่ารอบข้าง",en:"Forests managed by Indigenous peoples are often cleared less than nearby land."},
+ O("มอบสิทธิ์ที่ดินอย่างเป็นทางการ","Grant official land rights",{pc:-10,rco2:{SA:-0.4},appr:3}),
+ O("ส่งเจ้าหน้าที่ลาดตระเวน","Send ranger patrols",{ep:-25,rco2:{SA:-0.3}}),
+ O("ให้เงินชุมชนดูแลป่า","Pay communities to guard it",{ep:-20,comp:{T:6},rco2:{SA:-0.2}})),
+EV3("EVT_105","EU",{},"forest",{th:"ป่าไม้ถูกตัดทำเชื้อเพลิงชีวมวล",en:"Forests Cut for Biomass Fuel"},
+ {th:"โรงไฟฟ้าเผาไม้แทนถ่านหิน แต่ต้องตัดป่ามาเผาจำนวนมาก",en:"Power plants burn wood instead of coal, but whole forests are cut to feed them."},
+ {th:"การเผาไม้ปล่อย CO₂ ทันที ต้นไม้ใหม่ต้องใช้เวลาหลายสิบปีดูดกลับ",en:"Burning wood releases CO₂ at once. New trees take decades to absorb it back."},
+ O("ให้เผาได้เฉพาะเศษไม้","Allow only sawmill waste",{pc:-6,rco2:{EU:-0.2}}),
+ O("ปิดโรงไฟฟ้าชีวมวล","Shut the biomass plants",{pc:-10,rco2:{EU:0.2},appr:3}),
+ O("ปล่อยไว้ ยังดีกว่าถ่านหิน","Allow it, better than coal",{rco2:{EU:0.1},appr:-3})),
+EV3("EVT_106","EA",{},"wind",{th:"พายุทรายจากทะเลทรายโกบี",en:"Gobi Dust Storms"},
+ {th:"พายุทรายพัดเข้าเมืองใหญ่ ท้องฟ้าเป็นสีส้ม",en:"Dust storms blow into big cities and turn the sky orange."},
+ {th:"การปลูกหญ้าและต้นไม้คลุมดินช่วยหยุดทรายไม่ให้ปลิว",en:"Planting grass and trees to cover the soil stops sand from blowing."},
+ O("ปลูกแนวต้นไม้กันลม","Plant windbreak forests",{ep:-30,vuln:{T:-6},rco2:{EA:-0.1}}),
+ O("จำกัดการเลี้ยงสัตว์บนทุ่งหญ้า","Limit grazing on grasslands",{pc:-8,vuln:{T:-5},comp:{T:-3}}),
+ O("ติดเครื่องฟอกอากาศในเมือง","Install city air purifiers",{ep:-15,appr:2})),
+EV3("EVT_107",null,{},"birds",{th:"เกษตรกรขายคาร์บอนเครดิตจากดิน",en:"Farmers Sell Soil Carbon Credits"},
+ {th:"เกษตรกรที่เก็บคาร์บอนในดินได้ อยากขายเครดิตให้บริษัท แต่วัดยาก",en:"Farmers who store carbon in soil want to sell credits, but it's hard to measure."},
+ {th:"ดินเก็บคาร์บอนได้มากกว่าอากาศและพืชทั้งหมดรวมกัน",en:"Soil holds more carbon than the air and all plants combined."},
+ O("ตั้งระบบวัดด้วยดาวเทียม","Set up satellite measurement",{ep:-30,co2:-0.3}),
+ O("อนุญาตขายโดยไม่ตรวจเข้ม","Allow sales without strict checks",{ep:15,appr:-3}),
+ O("ห้ามขายจนกว่าจะวัดได้แม่น","Ban sales until measurement is accurate",{pc:-4})),
+EV3("EVT_108","SEA",{},"forest",{th:"เสือโคร่งกลับมาในป่าตะวันตก",en:"Tigers Return to the Western Forest"},
+ {th:"กล้องดักถ่ายพบเสือโคร่งเพิ่มขึ้น แต่ชาวบ้านกลัวเสือเข้าหมู่บ้าน",en:"Camera traps show more tigers, but villagers fear they will come close."},
+ {th:"ป่าที่มีสัตว์ผู้ล่าครบ เป็นป่าที่แข็งแรงและเก็บคาร์บอนได้ดี",en:"Forests with healthy predator numbers are healthy forests that store carbon well."},
+ O("ขยายเขตอุทยาน","Expand the national park",{pc:-6,rco2:{SEA:-0.2},appr:2}),
+ O("จ้างชาวบ้านเป็นผู้พิทักษ์ป่า","Hire villagers as rangers",{ep:-20,comp:{T:5}}),
+ O("ทำรั้วรอบหมู่บ้าน","Fence the villages",{ep:-15,appr:1})),
+EV3("EVT_109","NA",{minTemp:1.4},"forest",{th:"ด้วงเจาะต้นสนระบาด",en:"Bark Beetles Kill Pine Forests"},
+ {th:"หน้าหนาวไม่หนาวพอจะฆ่าด้วง ด้วงจึงกัดกินต้นสนตายเป็นล้านไร่",en:"Winters aren't cold enough to kill beetles, and they destroy millions of acres of pine."},
+ {th:"ต้นไม้ที่ตายแล้วไม่ดูดคาร์บอน และกลายเป็นเชื้อไฟชั้นดี",en:"Dead trees stop absorbing carbon and become perfect fuel for fires."},
+ O("ตัดต้นที่ตายไปใช้ประโยชน์","Harvest the dead trees",{ep:10,rco2:{NA:0.1},vuln:{T:-4}}),
+ O("ปลูกป่าผสมหลายพันธุ์","Replant with mixed species",{ep:-30,vuln:{T:-6}}),
+ O("ปล่อยตามธรรมชาติ","Let nature take its course",{appr:2,vuln:{T:4},rco2:{NA:0.1}})),
+/* ===== Oceans & water ===== */
+EV3("EVT_110","SEA",{},"ocean",{th:"ขยะพลาสติกลอยเต็มชายหาด",en:"Beaches Covered in Plastic"},
+ {th:"คลื่นพัดขยะพลาสติกขึ้นชายหาดท่องเที่ยว นักท่องเที่ยวหาย",en:"Waves wash plastic onto tourist beaches and visitors stay away."},
+ {th:"ขยะพลาสติกในทะเลส่วนใหญ่มาจากแม่น้ำบนบก",en:"Most ocean plastic comes from rivers on land."},
+ O("ติดทุ่นดักขยะที่ปากแม่น้ำ","Put trash barriers at river mouths",{ep:-25,appr:4}),
+ O("ห้ามถุงพลาสติก","Ban plastic bags",{pc:-8,appr:2,co2:-0.1}),
+ O("จ้างคนเก็บขยะชายหาด","Hire beach cleaners",{ep:-15,appr:3,comp:{T:2}})),
+EV3("EVT_111","EA",{minYear:2028},"ocean",{th:"ฟาร์มสาหร่ายทะเลยักษ์",en:"Giant Seaweed Farms"},
+ {th:"ชาวประมงเปลี่ยนมาเลี้ยงสาหร่ายทะเล สาหร่ายดูดคาร์บอนและขายได้",en:"Fishers switch to seaweed farming. It absorbs carbon and sells well."},
+ {th:"สาหร่ายทะเลโตเร็วมาก และช่วยลดความเป็นกรดของน้ำทะเลรอบฟาร์ม",en:"Seaweed grows very fast and reduces ocean acidity around the farms."},
+ O("ให้ทุนฟาร์มสาหร่าย","Fund seaweed farms",{ep:-25,co2:-0.3,comp:{T:3}}),
+ O("ส่งเสริมการส่งออก","Promote exports",{ep:10,pc:-4}),
+ O("รอผลวิจัย","Wait for research",{})),
+EV3("EVT_112","SEA",{minTemp:1.3},"ocean",{th:"น้ำทะเลกัดเซาะชายฝั่ง",en:"Sea Eats the Coastline"},
+ {th:"ชายฝั่งหายไปหลายเมตรต่อปี บ้านชาวประมงเริ่มพังลงทะเล",en:"The coast retreats metres each year and fishers' homes fall into the sea."},
+ {th:"ป่าชายเลนช่วยลดแรงคลื่นและกักตะกอนดินไว้",en:"Mangroves slow waves and trap sediment to hold the coast."},
+ O("สร้างกำแพงคอนกรีต","Build a concrete sea wall",{ep:-35,vuln:{T:-8},co2:0.1}),
+ O("ปลูกป่าชายเลน","Plant mangroves",{ep:-20,vuln:{T:-6},co2:-0.1}),
+ O("ย้ายหมู่บ้านขึ้นที่สูง","Move the village inland",{ep:-25,appr:-4,vuln:{T:-10}})),
+EV3("EVT_113","EA",{},"harbor",{th:"ปลาหนีน้ำร้อนไปทางเหนือ",en:"Fish Flee North"},
+ {th:"ปลาเคยจับได้หายไป เพราะว่ายไปหาน้ำที่เย็นกว่า",en:"Familiar fish vanish as they swim north to cooler water."},
+ {th:"น้ำทะเลอุ่นขึ้นทำให้ปลาหลายชนิดย้ายถิ่นเข้าหาขั้วโลก",en:"Warming seas push many fish species toward the poles."},
+ O("ช่วยชาวประมงเปลี่ยนอาชีพ","Help fishers change jobs",{ep:-25,comp:{T:5}}),
+ O("อนุญาตให้จับปลาไกลขึ้น","Allow fishing further out",{pc:-6,co2:0.1,appr:3}),
+ O("ตั้งเขตห้ามจับให้ปลาฟื้นตัว","Create no-fishing zones",{pc:-8,appr:-4,vuln:{T:-3}})),
+EV3("EVT_114",null,{minTemp:1.35},"underwater",{th:"คลื่นความร้อนใต้ทะเล",en:"Marine Heatwave"},
+ {th:"อุณหภูมิน้ำทะเลสูงผิดปกติหลายเดือน สัตว์ทะเลตายเป็นจำนวนมาก",en:"Ocean temperatures stay abnormally high for months and sea life dies in huge numbers."},
+ {th:"มหาสมุทรดูดซับความร้อนส่วนเกินจากโลกร้อนไว้มากกว่า 90%",en:"The ocean has absorbed more than 90% of the extra heat from global warming."},
+ O("ปิดชายหาดและแหล่งดำน้ำชั่วคราว","Close beaches and dive sites for now",{pc:-6,appr:-3,vuln:{ALL:-1}}),
+ O("ให้ทุนติดตามอุณหภูมิทะเล","Fund ocean monitoring",{ep:-20,tip:-2}),
+ O("ไม่ทำอะไร","Do nothing",{tip:3})),
+EV3("EVT_115","MEAF",{},"ocean",{th:"โรงกลั่นน้ำทะเลใช้ไฟมหาศาล",en:"Desalination Eats Energy"},
+ {th:"เมืองในทะเลทรายต้องกลั่นน้ำทะเลเป็นน้ำจืด แต่ใช้ไฟจากน้ำมัน",en:"Desert cities turn seawater into drinking water, using oil-fired power."},
+ {th:"การกลั่นน้ำทะเลใช้พลังงานมาก ถ้าใช้ไฟโซลาร์จะลดคาร์บอนได้",en:"Desalination uses a lot of energy. Solar power can make it low-carbon."},
+ O("เปลี่ยนเป็นไฟโซลาร์","Switch to solar power",{ep:-35,rco2:{MEAF:-0.3}}),
+ O("ซ่อมท่อน้ำรั่วก่อน","Fix leaking pipes first",{ep:-15,vuln:{T:-3}}),
+ O("เก็บค่าน้ำเพิ่ม","Raise water prices",{ep:10,appr:-4})),
+EV3("EVT_116",null,{},"ocean",{th:"สนธิสัญญาทะเลหลวง",en:"High Seas Treaty"},
+ {th:"นานาชาติเจรจาคุ้มครองทะเลนอกเขตประเทศ ซึ่งยังไม่มีใครเป็นเจ้าของ",en:"Nations negotiate to protect the high seas, the ocean that belongs to no country."},
+ {th:"ทะเลหลวงครอบคลุมเกือบสองในสามของมหาสมุทรทั้งหมด",en:"The high seas cover nearly two-thirds of the world's ocean."},
+ O("ผลักดันให้ลงนามทันที","Push for signing now",{pc:-12,tip:-2,appr:3}),
+ O("ขอให้ยกเว้นการประมง","Exempt fishing",{pc:-5,comp:{ALL:2}}),
+ O("รอประเทศใหญ่ลงนามก่อน","Wait for big nations to sign first",{})),
+EV3("EVT_117","SA",{minTemp:1.35},"arctic",{th:"ธารน้ำแข็งแอนดีสละลาย",en:"Andes Glaciers Melting"},
+ {th:"เมืองบนภูเขาใช้น้ำจากธารน้ำแข็ง แต่ธารน้ำแข็งเล็กลงทุกปี",en:"Mountain cities drink glacier water, but the glaciers shrink every year."},
+ {th:"ธารน้ำแข็งเหมือนแท็งก์น้ำธรรมชาติ ปล่อยน้ำช่วงหน้าแล้ง",en:"Glaciers are natural water tanks that release water in the dry season."},
+ O("สร้างอ่างเก็บน้ำ","Build reservoirs",{ep:-30,vuln:{T:-6}}),
+ O("ฟื้นฟูพื้นที่ชุ่มน้ำบนภูเขา","Restore mountain wetlands",{ep:-20,vuln:{T:-4},co2:-0.1}),
+ O("ปันส่วนน้ำ","Ration water",{appr:-5,vuln:{T:-2}})),
+EV3("EVT_118",null,{minYear:2029},"underwater",{th:"สัตว์ทะเลน้ำลึกถูกคุกคามจากเหมือง",en:"Deep-Sea Mining Threat"},
+ {th:"บริษัทอยากขุดแร่จากก้นทะเลลึกไปทำแบตเตอรี่ แต่นักวิทยาศาสตร์คัดค้าน",en:"Companies want to mine the deep seabed for battery metals. Scientists object."},
+ {th:"ก้นทะเลลึกมีสิ่งมีชีวิตที่เรายังไม่รู้จักอีกมาก",en:"The deep seabed holds many living things we still know nothing about."},
+ O("อนุญาต ช่วยให้แบตถูกลง","Allow it, batteries get cheaper",{ep:15,disc:{E3:0.1},tip:3,appr:-3}),
+ O("ห้ามจนกว่าจะศึกษาเสร็จ","Ban it until studies finish",{pc:-6,appr:3}),
+ O("ลงทุนรีไซเคิลแร่แทน","Invest in metal recycling instead",{ep:-25,disc:{E3:0.1}})),
+EV3("EVT_119","SEA",{},"flood",{th:"แม่น้ำเจ้าพระยาน้ำเอ่อล้น",en:"Chao Phraya Overflows"},
+ {th:"ฝนตกหนักร่วมกับน้ำทะเลหนุน น้ำท่วมกรุงเทพฯ หลายเขต",en:"Heavy rain and high tides flood many districts of Bangkok."},
+ {th:"กรุงเทพฯ ทรุดตัวราว 1–2 เซนติเมตรต่อปี ในบางพื้นที่",en:"Parts of Bangkok are sinking by about 1–2 cm a year."},
+ O("สร้างแก้มลิงเก็บน้ำ","Build water retention ponds",{ep:-35,vuln:{T:-8}}),
+ O("สูบน้ำออกเร่งด่วน","Pump the water out fast",{ep:-15,appr:3}),
+ O("ห้ามสูบน้ำบาดาล ลดการทรุด","Ban groundwater pumping to stop sinking",{pc:-8,vuln:{T:-5},appr:-3})),
+/* ===== Cities & buildings ===== */
+EV3("EVT_120","SEA",{minTemp:1.3},"heat",{th:"เมืองร้อนจนคนป่วย",en:"City Heat Makes People Sick"},
+ {th:"คลื่นความร้อนทำให้คนสูงอายุและคนทำงานกลางแจ้งเป็นลมแดดจำนวนมาก",en:"A heatwave leaves many elderly people and outdoor workers with heatstroke."},
+ {th:"ใต้ร่มไม้ใหญ่เย็นกว่าลานคอนกรีตกลางแดดได้หลายองศา",en:"The shade of a big tree can be several degrees cooler than open concrete."},
+ O("ปลูกต้นไม้ริมถนนทั้งเมือง","Plant street trees citywide",{ep:-30,vuln:{T:-6},co2:-0.1}),
+ O("เปิดศูนย์หลบร้อนติดแอร์","Open air-conditioned cooling centres",{ep:-20,appr:4,co2:0.1}),
+ O("ปรับเวลาทำงานกลางแจ้ง","Change outdoor working hours",{pc:-6,vuln:{T:-3},comp:{T:-2}})),
+EV3("EVT_121","EU",{},"construction",{th:"บ้านเก่ารั่วความร้อน",en:"Old Homes Leak Heat"},
+ {th:"บ้านเก่าหลายล้านหลังไม่มีฉนวน ต้องเปิดฮีตเตอร์แรงตลอดหน้าหนาว",en:"Millions of old homes have no insulation and burn heating all winter."},
+ {th:"การติดฉนวนหลังคาและผนังลดพลังงานทำความร้อนได้มาก",en:"Insulating roofs and walls greatly cuts the energy needed for heating."},
+ O("อุดหนุนติดฉนวนทุกบ้าน","Subsidise insulation for every home",{ep:-40,rco2:{EU:-0.5}}),
+ O("บังคับเจ้าของบ้านเช่า","Require landlords to insulate",{pc:-10,rco2:{EU:-0.4},appr:-3}),
+ O("ให้ส่วนลดภาษีคนที่ทำเอง","Tax breaks for people who do it",{ep:-15,rco2:{EU:-0.2}})),
+EV3("EVT_122",null,{},"construction",{th:"ตึกไม้สูง 20 ชั้น",en:"20-Storey Timber Tower"},
+ {th:"สถาปนิกสร้างตึกสูงด้วยไม้แทนคอนกรีต ไม้เก็บคาร์บอนไว้ในตัว",en:"Architects build a tall tower from timber instead of concrete. The wood locks carbon inside."},
+ {th:"ไม้เก็บคาร์บอนที่ต้นไม้ดูดไว้ตลอดอายุการใช้งานของอาคาร",en:"Timber keeps the carbon the tree absorbed for the whole life of the building."},
+ O("แก้กฎหมายให้สร้างตึกไม้ได้","Change building rules to allow it",{pc:-8,co2:-0.3}),
+ O("สร้างอาคารรัฐด้วยไม้","Build public buildings from timber",{ep:-30,co2:-0.4}),
+ O("กังวลเรื่องไฟ ไม่อนุญาต","Worried about fire, refuse",{appr:1})),
+EV3("EVT_123","SEA",{},"city",{th:"หลังคาเขียวทั่วเมือง",en:"Green Roofs Everywhere"},
+ {th:"เมืองเสนอให้ตึกใหม่ต้องมีสวนหรือแผงโซลาร์บนหลังคา",en:"The city proposes that new buildings must have a garden or solar panels on the roof."},
+ {th:"หลังคาเขียวช่วยลดความร้อนในตึกและชะลอน้ำฝนตอนฝนตกหนัก",en:"Green roofs cool buildings and slow rainwater during storms."},
+ O("บังคับตึกใหม่ทั้งหมด","Require it for all new buildings",{pc:-8,vuln:{T:-4},rco2:{SEA:-0.2}}),
+ O("ให้เงินอุดหนุนแทน","Offer grants instead",{ep:-25,vuln:{T:-3},rco2:{SEA:-0.1}}),
+ O("ไม่บังคับ","Keep it voluntary",{})),
+EV3("EVT_124","NA",{},"city",{th:"เมืองขยายออกไปไกล ต้องขับรถทุกที่",en:"Endless Suburbs"},
+ {th:"บ้านจัดสรรขยายออกไปไกล คนต้องขับรถไปทำงานวันละหลายชั่วโมง",en:"Suburbs sprawl outward and people drive hours to work each day."},
+ {th:"เมืองกะทัดรัดที่เดินถึงร้านค้าและงานได้ ปล่อยคาร์บอนต่อคนน้อยกว่า",en:"Compact cities where shops and jobs are walkable emit less carbon per person."},
+ O("สร้างคอนโดใกล้สถานีรถไฟ","Build housing near train stations",{ep:-30,rco2:{NA:-0.3}}),
+ O("ส่งเสริมทำงานจากบ้าน","Promote working from home",{pc:-5,rco2:{NA:-0.2},appr:3}),
+ O("สร้างทางด่วนเพิ่ม","Build more highways",{ep:-20,rco2:{NA:0.3},appr:3})),
+EV3("EVT_125","EA",{},"construction",{th:"คอนโดสร้างเสร็จแต่ไม่มีคนอยู่",en:"Ghost Towers"},
+ {th:"คอนโดหลายพันตึกสร้างเสร็จแล้วว่างเปล่า ปูนซีเมนต์ที่ใช้สร้างเท่ากับปล่อย CO₂ ไปฟรี ๆ",en:"Thousands of finished towers stand empty. All that cement was CO₂ for nothing."},
+ {th:"การปรับปรุงตึกเก่าปล่อยคาร์บอนน้อยกว่ารื้อแล้วสร้างใหม่",en:"Renovating old buildings emits less carbon than demolishing and rebuilding."},
+ O("เปลี่ยนเป็นบ้านราคาถูก","Turn them into affordable housing",{ep:-25,appr:5}),
+ O("จำกัดการสร้างตึกใหม่","Limit new construction",{pc:-10,rco2:{EA:-0.4},comp:{T:-4}}),
+ O("ปล่อยตลาดจัดการ","Let the market sort it out",{appr:-3})),
+EV3("EVT_126",null,{minYear:2028},"office",{th:"ศูนย์ข้อมูล AI ใช้ไฟมหาศาล",en:"AI Data Centres Guzzle Power"},
+ {th:"ศูนย์ข้อมูลสำหรับ AI ผุดขึ้นทั่วโลก ใช้ไฟและน้ำหล่อเย็นจำนวนมาก",en:"AI data centres spring up everywhere, using huge amounts of power and cooling water."},
+ {th:"ศูนย์ข้อมูลใช้ไฟหลายเปอร์เซ็นต์ของไฟฟ้าโลก และเพิ่มขึ้นเร็วมาก",en:"Data centres use a few percent of the world's electricity, and the share is rising fast."},
+ O("บังคับใช้ไฟสะอาด 100%","Require 100% clean power",{pc:-10,co2:-0.3,comp:{ALL:-1}}),
+ O("เก็บภาษีไฟฟ้าศูนย์ข้อมูล","Tax data centre electricity",{pc:-6,ep:20,co2:-0.1}),
+ O("ต้อนรับการลงทุน","Welcome the investment",{ep:25,co2:0.4})),
+EV3("EVT_127","SEA",{},"city",{th:"ขยะล้นหลุมฝังกลบ",en:"Landfills Overflowing"},
+ {th:"หลุมฝังกลบเต็ม ขยะอินทรีย์เน่าปล่อยก๊าซมีเทนและกลิ่นเหม็น",en:"Landfills are full. Rotting food waste releases methane and a terrible smell."},
+ {th:"หลุมฝังกลบขยะเป็นแหล่งปล่อยก๊าซมีเทนใหญ่อันดับต้น ๆ",en:"Landfills are one of the largest sources of methane."},
+ O("บังคับแยกขยะเปียก","Require food waste separation",{pc:-8,rco2:{SEA:-0.3},appr:-2}),
+ O("สร้างโรงไฟฟ้าจากก๊าซหลุมขยะ","Build a landfill gas power plant",{ep:-30,rco2:{SEA:-0.3}}),
+ O("เปิดหลุมฝังกลบใหม่","Open a new landfill",{ep:-10,rco2:{SEA:0.2}})),
+EV3("EVT_128","MEAF",{},"construction",{th:"เมืองใหม่กลางทะเลทราย",en:"New Desert Megacity"},
+ {th:"ประเทศร่ำรวยสร้างเมืองใหม่กลางทะเลทราย ต้องการแอร์ทั้งเมือง",en:"A rich nation builds a new city in the desert that will need AC everywhere."},
+ {th:"บ้านแบบดั้งเดิมในทะเลทรายใช้ผนังหนาและปล่องลมช่วยให้เย็นโดยไม่ใช้ไฟ",en:"Traditional desert homes stay cool with thick walls and wind towers, no power needed."},
+ O("บังคับออกแบบประหยัดพลังงาน","Require energy-saving design",{pc:-8,rco2:{MEAF:-0.2},comp:{T:-3}}),
+ O("ให้ใช้โซลาร์ทั้งเมือง","Require solar for the whole city",{pc:-5,ep:-15,rco2:{MEAF:-0.2}}),
+ O("ไม่แทรกแซง รับเงินลงทุน","Don't interfere, take the investment",{ep:25,rco2:{MEAF:0.3}})),
+EV3("EVT_129",null,{},"crowd",{th:"คนจนเข้าไม่ถึงแอร์",en:"The Poor Can't Afford Cooling"},
+ {th:"ครอบครัวรายได้น้อยไม่มีเงินซื้อแอร์ในวันที่ร้อนจัด",en:"Low-income families can't afford AC on the hottest days."},
+ {th:"แอร์และพัดลมใช้ไฟราว 10% ของไฟฟ้าทั้งโลก",en:"Air conditioners and fans use about 10% of the world's electricity."},
+ O("แจกพัดลมประหยัดไฟ","Hand out efficient fans",{ep:-15,appr:4}),
+ O("อุดหนุนแอร์ประหยัดไฟเบอร์ 5","Subsidise top-efficiency ACs",{ep:-30,appr:5,co2:0.1}),
+ O("ทาสีหลังคาขาวให้ชุมชน","Paint community roofs white",{ep:-20,vuln:{ALL:-2}})),
+/* ===== Society, politics & economy ===== */
+EV3("EVT_130",null,{},"crowd",{th:"เลือกตั้งใหญ่ ผู้สมัครต่อต้านนโยบายโลกร้อน",en:"Anti-Climate Candidate Surges"},
+ {th:"ผู้สมัครที่สัญญาจะยกเลิกภาษีคาร์บอนได้คะแนนนิยมพุ่ง",en:"A candidate promising to scrap carbon taxes surges in the polls."},
+ {th:"นโยบายโลกร้อนจะได้รับการสนับสนุนมากขึ้น เมื่อคนเห็นประโยชน์ในชีวิตประจำวัน",en:"Climate policies gain support when people see everyday benefits."},
+ O("คืนเงินภาษีคาร์บอนให้ประชาชน","Return carbon tax money to citizens",{ep:-30,appr:6}),
+ O("เดินสายอธิบายประโยชน์","Tour the country explaining benefits",{pc:-8,appr:3}),
+ O("ลดความเข้มนโยบายชั่วคราว","Soften policies for now",{appr:5,co2:0.4})),
+EV3("EVT_131",null,{},"market",{th:"เศรษฐกิจถดถอยทั่วโลก",en:"Global Recession"},
+ {th:"เศรษฐกิจโลกชะลอตัว หลายประเทศขอลดงบสิ่งแวดล้อม",en:"The world economy slows and many countries want to cut climate budgets."},
+ {th:"การลงทุนพลังงานสะอาดสร้างงานได้มากกว่าพลังงานฟอสซิลต่อเงินที่ลงทุน",en:"Clean energy investment creates more jobs per dollar than fossil fuels."},
+ O("อัดงบกระตุ้นเศรษฐกิจสีเขียว","Launch a green stimulus",{ep:-40,co2:-0.4,appr:4}),
+ O("ลดงบตามที่ขอ","Cut budgets as asked",{ep:30,comp:{ALL:-4}}),
+ O("คงงบเดิม","Keep budgets the same",{appr:-3})),
+EV3("EVT_132","EU",{},"office",{th:"ธนาคารถอนเงินจากถ่านหิน",en:"Banks Pull Out of Coal"},
+ {th:"ธนาคารใหญ่หลายแห่งประกาศเลิกปล่อยกู้ให้เหมืองถ่านหิน",en:"Major banks announce they will stop lending to coal mines."},
+ {th:"เมื่อธนาคารไม่ปล่อยกู้ โครงการถ่านหินใหม่จะสร้างได้ยากมาก",en:"When banks stop lending, new coal projects become very hard to build."},
+ O("ชวนธนาคารทั่วโลกทำตาม","Urge banks worldwide to follow",{pc:-10,co2:-0.4}),
+ O("ตั้งกองทุนเขียวร่วมกับธนาคาร","Set up a green fund with the banks",{ep:20,pc:-5}),
+ O("แค่แสดงความยินดี","Just congratulate them",{appr:2})),
+EV3("EVT_133",null,{},"crowd",{th:"ข่าวปลอมโลกร้อนระบาด",en:"Climate Fake News Spreads"},
+ {th:"คลิปอ้างว่าโลกร้อนเป็นเรื่องโกหก มีคนแชร์หลายล้านครั้ง",en:"A video claiming climate change is a hoax is shared millions of times."},
+ {th:"นักวิทยาศาสตร์ด้านภูมิอากาศเกือบทั้งหมดเห็นตรงกันว่ามนุษย์ทำให้โลกร้อน",en:"Nearly all climate scientists agree that humans are warming the planet."},
+ O("ทำคลิปอธิบายแบบเข้าใจง่าย","Make simple explainer videos",{ep:-15,appr:3}),
+ O("ขอให้แพลตฟอร์มลบคลิป","Ask platforms to remove it",{pc:-8,appr:-2}),
+ O("ปล่อยไว้ ไม่ตอบโต้","Ignore it",{appr:-5})),
+EV3("EVT_134","SEA",{},"crowd",{th:"เยาวชนฟ้องรัฐบาลเรื่องโลกร้อน",en:"Youths Sue Over Climate"},
+ {th:"กลุ่มเยาวชนยื่นฟ้องรัฐบาลว่าทำไม่พอเพื่อปกป้องอนาคตของพวกเขา",en:"Young people sue the government for not doing enough to protect their future."},
+ {th:"ศาลในหลายประเทศเคยตัดสินให้รัฐต้องลดการปล่อยก๊าซเพิ่มขึ้น",en:"Courts in several countries have ordered governments to cut emissions faster."},
+ O("ยอมรับข้อเรียกร้อง เพิ่มเป้า","Accept and raise targets",{pc:-10,rco2:{SEA:-0.3},appr:4}),
+ O("เชิญเยาวชนร่วมวางแผน","Invite youth into planning",{pc:-4,appr:5}),
+ O("ต่อสู้ในศาล","Fight it in court",{ep:-15,appr:-5})),
+EV3("EVT_135",null,{minYear:2028},"office",{th:"ประชุมโลกร้อนระดับโลก",en:"Global Climate Summit"},
+ {th:"ผู้นำโลกประชุมกัน ทุกประเทศถูกขอให้เพิ่มเป้าลดคาร์บอน",en:"World leaders meet and every country is asked to raise its targets."},
+ {th:"ความตกลงปารีสปี 2015 ตั้งเป้าคุมโลกร้อนให้ต่ำกว่า 2°C และพยายามไม่เกิน 1.5°C",en:"The 2015 Paris Agreement aims to keep warming well below 2°C and ideally 1.5°C."},
+ O("ใช้ทุนการเมืองกดดันเต็มที่","Spend political capital pushing hard",{pc:-15,comp:{ALL:6}}),
+ O("เสนอกองทุนช่วยประเทศยากจน","Offer a fund for poorer nations",{ep:-35,comp:{MEAF:8,SEA:6,SA:6}}),
+ O("รักษาสัมพันธ์ ไม่กดดัน","Keep relations smooth",{pc:5,appr:-2})),
+EV3("EVT_136","MEAF",{},"market",{th:"ประเทศยากจนขอเงินช่วยปรับตัว",en:"Poor Nations Ask for Adaptation Money"},
+ {th:"ประเทศที่ปล่อยคาร์บอนน้อยแต่ได้รับผลกระทบมาก ขอเงินช่วยสร้างเขื่อนและระบบเตือนภัย",en:"Nations that emit little but suffer most ask for money for flood defences and warning systems."},
+ {th:"ประเทศยากจนที่สุดปล่อยก๊าซน้อยมาก แต่เสี่ยงภัยจากโลกร้อนสูงที่สุด",en:"The poorest countries emit very little but face the greatest climate risks."},
+ O("ให้เงินเต็มจำนวน","Give the full amount",{ep:-45,vuln:{T:-10},comp:{T:8}}),
+ O("ให้ครึ่งหนึ่ง","Give half",{ep:-20,vuln:{T:-5},comp:{T:3}}),
+ O("ปฏิเสธ","Refuse",{comp:{T:-8},appr:-3})),
+EV3("EVT_137",null,{},"market",{th:"บริษัทประกันไม่รับประกันบ้านริมทะเล",en:"Insurers Drop Coastal Homes"},
+ {th:"บริษัทประกันเลิกรับประกันบ้านในพื้นที่เสี่ยงน้ำท่วม ราคาบ้านตก",en:"Insurers stop covering homes in flood zones and house prices crash."},
+ {th:"ภัยธรรมชาติที่รุนแรงขึ้นทำให้ค่าเสียหายและเบี้ยประกันสูงขึ้นทั่วโลก",en:"Worsening disasters are pushing damages and insurance costs up worldwide."},
+ O("รัฐรับประกันแทน","The state provides insurance",{ep:-35,appr:4}),
+ O("ช่วยย้ายบ้านออกจากเขตเสี่ยง","Help people move out of danger zones",{ep:-30,vuln:{ALL:-3},appr:-2}),
+ O("ปล่อยให้ตลาดตัดสิน","Let the market decide",{appr:-5})),
+EV3("EVT_138","NA",{},"crowd",{th:"สหภาพแรงงานรถยนต์ประท้วง",en:"Autoworkers Strike"},
+ {th:"คนงานโรงงานรถยนต์กลัวตกงานเพราะรถไฟฟ้าใช้ชิ้นส่วนน้อยกว่า",en:"Car factory workers fear job losses because EVs need fewer parts."},
+ {th:"รถยนต์ไฟฟ้ามีชิ้นส่วนเคลื่อนไหวน้อยกว่ารถน้ำมันมาก",en:"EVs have far fewer moving parts than petrol cars."},
+ O("ตั้งโรงงานแบตเตอรี่ในเมืองเดิม","Open battery plants in the same towns",{ep:-35,comp:{T:8},rco2:{NA:-0.2}}),
+ O("เลื่อนเป้ารถไฟฟ้า","Delay EV targets",{appr:4,rco2:{NA:0.3}}),
+ O("จ่ายเงินชดเชย","Pay compensation",{ep:-25,comp:{T:4}})),
+EV3("EVT_139",null,{minYear:2029},"office",{th:"ตลาดคาร์บอนราคาดิ่ง",en:"Carbon Price Crash"},
+ {th:"ราคาคาร์บอนเครดิตตกหนัก บริษัทแทบไม่มีแรงจูงใจลดการปล่อย",en:"Carbon credit prices collapse and companies lose the reason to cut emissions."},
+ {th:"ราคาคาร์บอนทำให้การปล่อยก๊าซมีต้นทุน บริษัทจึงอยากลด",en:"A carbon price makes pollution cost money, so companies want to cut it."},
+ O("ตั้งราคาขั้นต่ำ","Set a minimum price",{pc:-10,co2:-0.3}),
+ O("ลดจำนวนเครดิตในตลาด","Cut the number of credits",{pc:-6,co2:-0.2,comp:{ALL:-2}}),
+ O("ปล่อยตามกลไกตลาด","Let the market run",{co2:0.3})),
+EV3("EVT_140","SA",{},"crowd",{th:"คนงานเหมืองลิเทียมขอส่วนแบ่ง",en:"Lithium Towns Want a Share"},
+ {th:"ชุมชนรอบเหมืองลิเทียมขาดน้ำ และขอส่วนแบ่งรายได้",en:"Communities near lithium mines lack water and ask for a share of profits."},
+ {th:"การผลิตลิเทียมจากบ่อน้ำเกลือใช้น้ำจำนวนมากในพื้นที่แห้งแล้ง",en:"Producing lithium from salt flats uses lots of water in very dry places."},
+ O("แบ่งรายได้ให้ชุมชน","Share revenue with communities",{ep:-20,comp:{T:8}}),
+ O("บังคับใช้เทคโนโลยีประหยัดน้ำ","Require water-saving technology",{pc:-8,vuln:{T:-4},disc:{E3:-0.1}}),
+ O("เดินหน้าขุดต่อ","Keep mining as is",{ep:15,comp:{T:-6},disc:{E3:0.05}})),
+EV3("EVT_141","EA",{},"office",{th:"ประเทศใหญ่แข่งกันผลิตแผงโซลาร์",en:"Solar Trade War"},
+ {th:"สองประเทศใหญ่ตั้งกำแพงภาษีสินค้าพลังงานสะอาดของกันและกัน",en:"Two big powers put tariffs on each other's clean-energy products."},
+ {th:"การค้าเสรีทำให้แผงโซลาร์และแบตเตอรี่ราคาถูกลงทั่วโลก",en:"Open trade has made solar panels and batteries cheaper worldwide."},
+ O("เป็นคนกลางไกล่เกลี่ย","Mediate between them",{pc:-12,disc:{ALL:0.05}}),
+ O("ตั้งโรงงานในประเทศอื่นแทน","Build factories in other countries",{ep:-30,comp:{SEA:5}}),
+ O("ไม่ยุ่ง","Stay out",{disc:{ALL:-0.05}})),
+/* ===== Health & disasters ===== */
+EV3("EVT_142","SEA",{minTemp:1.3},"siren",{th:"ไข้เลือดออกระบาดหนัก",en:"Dengue Outbreak"},
+ {th:"อากาศร้อนชื้นทำให้ยุงลายเพิ่มขึ้น ผู้ป่วยไข้เลือดออกเต็มโรงพยาบาล",en:"Hot, wet weather boosts mosquitoes and dengue patients fill hospitals."},
+ {th:"ยุงลายขยายถิ่นไปพื้นที่ใหม่เมื่ออากาศอุ่นขึ้น",en:"Dengue mosquitoes spread to new areas as the climate warms."},
+ O("รณรงค์กำจัดแหล่งน้ำขัง","Campaign to remove standing water",{ep:-10,appr:3,vuln:{T:-3}}),
+ O("ส่งทีมแพทย์และยา","Send doctors and medicine",{ep:-30,appr:5,vuln:{T:-4}}),
+ O("ฉีดพ่นยาฆ่ายุงทั้งเมือง","Fog the whole city with insecticide",{ep:-20,appr:6})),
+EV3("EVT_143","EA",{},"siren",{th:"ฝุ่น PM2.5 ปิดโรงเรียน",en:"PM2.5 Closes Schools"},
+ {th:"ค่าฝุ่นสูงจนต้องปิดโรงเรียนทั่วเมือง ต้นเหตุหลักคือโรงไฟฟ้าถ่านหินและรถ",en:"Air pollution closes schools citywide. The main causes are coal plants and cars."},
+ {th:"ลดการเผาเชื้อเพลิงฟอสซิลช่วยทั้งลดโลกร้อนและทำให้อากาศสะอาดขึ้นพร้อมกัน",en:"Burning less fossil fuel both slows warming and cleans the air."},
+ O("สั่งลดกำลังโรงไฟฟ้าถ่านหิน","Order coal plants to cut output",{pc:-8,rco2:{EA:-0.4},appr:3}),
+ O("ติดเครื่องฟอกอากาศในโรงเรียน","Put air purifiers in schools",{ep:-25,appr:4}),
+ O("ปิดโรงเรียนจนกว่าฝุ่นจาง","Keep schools closed until it clears",{appr:-5})),
+EV3("EVT_144","NA",{minTemp:1.35},"storm",{th:"เฮอริเคนระดับ 5 ถล่มชายฝั่ง",en:"Category 5 Hurricane"},
+ {th:"พายุเฮอริเคนรุนแรงที่สุดถล่มเมืองชายฝั่ง ไฟดับหลายล้านหลัง",en:"The strongest kind of hurricane hits a coastal city and millions lose power."},
+ {th:"น้ำทะเลที่อุ่นขึ้นเป็นเหมือนเชื้อเพลิงให้พายุแรงขึ้น",en:"Warmer ocean water acts like fuel that makes storms stronger."},
+ O("สร้างใหม่แบบทนพายุ","Rebuild storm-proof",{ep:-40,vuln:{T:-8}}),
+ O("ซ่อมเร็วแบบเดิม","Quick repairs as before",{ep:-20,appr:4}),
+ O("ติดโซลาร์และแบตให้โรงพยาบาล","Give hospitals solar and batteries",{ep:-25,vuln:{T:-4},appr:3})),
+EV3("EVT_145","SEA",{minTemp:1.3},"storm",{th:"ดินถล่มหลังฝนตกหนัก",en:"Landslides After Heavy Rain"},
+ {th:"ฝนตกหนักติดต่อกันทำให้ภูเขาถล่มทับหมู่บ้าน",en:"Days of heavy rain bring a hillside down onto villages."},
+ {th:"ภูเขาที่มีต้นไม้ปกคลุม รากไม้ช่วยยึดดินไม่ให้ถล่ม",en:"On forested hills, tree roots help hold the soil in place."},
+ O("ปลูกป่าบนภูเขาหัวโล้น","Replant bare hills",{ep:-25,vuln:{T:-6},co2:-0.1}),
+ O("ติดระบบเตือนภัย","Install early warning systems",{ep:-20,vuln:{T:-4},appr:3}),
+ O("ย้ายหมู่บ้านออก","Relocate villages",{ep:-30,vuln:{T:-8},appr:-4})),
+EV3("EVT_146","EU",{minTemp:1.4},"siren",{th:"คลื่นความร้อนในยุโรปคร่าชีวิต",en:"Deadly European Heatwave"},
+ {th:"อุณหภูมิเกิน 40°C หลายวัน ผู้สูงอายุเสียชีวิตจำนวนมาก",en:"Temperatures top 40°C for days and many elderly people die."},
+ {th:"คลื่นความร้อนเป็นหนึ่งในภัยธรรมชาติที่คร่าชีวิตคนมากที่สุด",en:"Heatwaves are among the deadliest natural hazards."},
+ O("ตั้งระบบเตือนภัยความร้อน","Set up heat warnings",{ep:-15,vuln:{T:-4},appr:3}),
+ O("ติดแอร์ในบ้านพักคนชรา","Install AC in care homes",{ep:-30,appr:5,co2:0.1}),
+ O("ปลูกต้นไม้ในเมือง","Plant city trees",{ep:-25,vuln:{T:-6}})),
+EV3("EVT_147",null,{minTemp:1.4},"siren",{th:"น้ำท่วมใหญ่พร้อมกันหลายทวีป",en:"Floods on Several Continents"},
+ {th:"น้ำท่วมใหญ่เกิดพร้อมกันหลายประเทศ เงินช่วยเหลือไม่พอ",en:"Major floods strike several countries at once and aid money runs short."},
+ {th:"อากาศที่อุ่นขึ้นอุ้มไอน้ำได้มากขึ้น ฝนจึงตกหนักขึ้น",en:"Warmer air holds more water vapour, so rain falls harder."},
+ O("แบ่งเงินช่วยทุกประเทศเท่ากัน","Split aid equally",{ep:-30,comp:{ALL:3}}),
+ O("ช่วยประเทศที่เสี่ยงที่สุดก่อน","Help the most vulnerable first",{ep:-25,vuln:{MEAF:-5,SEA:-5}}),
+ O("ขอให้ประเทศร่ำรวยจ่ายเพิ่ม","Ask rich nations to pay more",{pc:-10,comp:{NA:-3,EU:-2,MEAF:4,SEA:4}})),
+EV3("EVT_148","MEAF",{minTemp:1.4},"heat",{th:"ภัยแล้งทำให้คนย้ายถิ่น",en:"Drought Drives People to Cities"},
+ {th:"เกษตรกรจำนวนมากทิ้งไร่มาหางานในเมือง สลัมขยายตัว",en:"Many farmers abandon their land for the city and slums grow."},
+ {th:"การย้ายถิ่นเพราะสภาพอากาศเพิ่มขึ้นทั่วโลก",en:"Climate-driven migration is rising around the world."},
+ O("สร้างงานในชนบท","Create rural jobs",{ep:-30,comp:{T:6},vuln:{T:-4}}),
+ O("ขยายบริการในเมือง","Expand city services",{ep:-25,appr:3}),
+ O("ไม่ทำอะไร","Do nothing",{comp:{T:-6},vuln:{T:4}})),
+EV3("EVT_149","NA",{minTemp:1.3},"flood",{th:"ภัยแล้งแม่น้ำโคโลราโด",en:"Colorado River Drying Up"},
+ {th:"แม่น้ำสายสำคัญแห้งจนหลายรัฐต้องแบ่งน้ำกัน",en:"A vital river is so low that states must share out its water."},
+ {th:"น้ำประปาในหลายเมืองมาจากแม่น้ำที่มีต้นน้ำจากหิมะบนภูเขา",en:"Many cities' water comes from rivers fed by mountain snow."},
+ O("ตัดโควตาน้ำเกษตรกรรม","Cut farm water quotas",{pc:-8,vuln:{T:-5},appr:-3}),
+ O("รีไซเคิลน้ำเสียเป็นน้ำประปา","Recycle wastewater into tap water",{ep:-35,vuln:{T:-6}}),
+ O("ขอให้ประชาชนประหยัดน้ำ","Ask people to save water",{ep:-5,vuln:{T:-2}})),
+/* ===== Science & technology ===== */
+EV3("EVT_150",null,{minYear:2030},"lab",{th:"ดาวเทียมจับการรั่วของมีเทนได้",en:"Satellites Spot Methane Leaks"},
+ {th:"ดาวเทียมใหม่มองเห็นท่อก๊าซที่รั่วจากอวกาศ และเปิดเผยชื่อบริษัท",en:"New satellites see leaking gas pipes from space and name the companies."},
+ {th:"การอุดรอยรั่วมีเทนเป็นวิธีชะลอโลกร้อนที่เร็วและถูกที่สุดวิธีหนึ่ง",en:"Fixing methane leaks is one of the fastest, cheapest ways to slow warming."},
+ O("บังคับซ่อมภายใน 30 วัน","Require repairs within 30 days",{pc:-8,temp:-0.02}),
+ O("ปรับบริษัทที่รั่ว","Fine the leaking companies",{pc:-4,ep:15,temp:-0.01}),
+ O("แค่ประกาศรายชื่อ","Just publish the list",{appr:2})),
+EV3("EVT_151",null,{minYear:2031},"lab",{th:"ข้อเสนอพ่นละอองบังแดดบนฟ้า",en:"Proposal to Dim the Sun"},
+ {th:"นักวิทยาศาสตร์บางกลุ่มเสนอพ่นละอองในชั้นบรรยากาศเพื่อสะท้อนแสงแดด",en:"Some scientists propose spraying particles high in the sky to reflect sunlight."},
+ {th:"วิธีนี้อาจทำให้โลกเย็นลงเร็ว แต่ไม่ได้ลด CO₂ และอาจเปลี่ยนรูปแบบฝน",en:"It might cool Earth quickly, but doesn't remove CO₂ and could change rainfall."},
+ O("ทดลองขนาดเล็ก","Allow a small test",{ep:-30,temp:-0.04,appr:-5,comp:{ALL:-2}}),
+ O("ศึกษาในคอมพิวเตอร์ก่อน","Study with computer models first",{ep:-10}),
+ O("ห้ามเด็ดขาด","Ban it outright",{pc:-4,appr:3})),
+EV3("EVT_152","EU",{minYear:2030},"lab",{th:"แบตเตอรี่โซเดียมจากเกลือ",en:"Salt Batteries"},
+ {th:"นักวิจัยผลิตแบตเตอรี่จากโซเดียม ซึ่งหาได้จากเกลือ ถูกกว่าลิเทียม",en:"Researchers make batteries from sodium, found in salt, cheaper than lithium."},
+ {th:"โซเดียมมีมากกว่าลิเทียมในธรรมชาติหลายพันเท่า",en:"Sodium is thousands of times more abundant in nature than lithium."},
+ O("สร้างโรงงานแบตโซเดียม","Build sodium battery plants",{ep:-35,disc:{E3:0.2}}),
+ O("เปิดสิทธิบัตรให้ทุกคนใช้","Open the patent to everyone",{pc:-8,disc:{E3:0.15},comp:{ALL:2}}),
+ O("ปล่อยบริษัทพัฒนาเอง","Let companies develop it",{delay:{m:18,fx:{disc:{E3:0.1}}}})),
+];
+
+/* The first 52 events were written for a richer economy: halve their Eco-Point and political costs/gains,
+   then attach sound, fact and the optional third choice. */
+(function mergeEvents(){
+  const scale = fx => {
+    const f = {...fx};
+    ["ep","pc"].forEach(k => { if (f[k]) f[k] = Math.round(f[k] * 0.5); });
+    if (f.delay) f.delay = {...f.delay, fx:scale(f.delay.fx)};
+    return f;
+  };
+  EVENTS.forEach(e => {
+    e.options = e.options.map(o => ({...o, fx:scale(o.fx)}));
+    const m = OLD_META[e.id];
+    if (m){ e.snd = m.snd; e.fact = m.fact; if (m.fx) Object.entries(m.fx).forEach(([i, fx]) => { e.options[i] = {...e.options[i], fx}; }); if (m.c) e.options.push(m.c); }
+  });
+  EVENTS.push(...EVENTS2);
+})();
+P.EVENTS = EVENTS;
+
+};
+gdjs.LoadingCode.userFunc0xfec970 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Data · ข่าวทั่วไป, หน้าคู่มือ, ความสำเร็จ */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.dataC) return;
+(P.mods = P.mods || {}).dataC = 1;
+/* ===== Data · Ambient news, tutorial pages, achievements ===== */
+const has = id => S => S.owned[id];
+const NEWS = [
+  {th:"นักวิทยาศาสตร์ยืนยันปี {Y} ร้อนติดอันดับ 5 ปีที่ร้อนที่สุดในประวัติศาสตร์",en:"Scientists confirm {Y} ranks among the five hottest years on record",c:S=>S.tick>=12},
+  {th:"ราคาแผงโซลาร์ลดลงอีก 8% ในไตรมาสนี้",en:"Solar panel prices fall another 8% this quarter"},
+  {th:"{C}: ผู้ใช้จักรยานไฟฟ้าเพิ่มขึ้นเป็นสองเท่าในปีเดียว",en:"E-bike riders in {C} double in a single year"},
+  {th:"ผลสำรวจ: คนรุ่นใหม่ 7 ใน 10 เลือกที่ทำงานจากนโยบายสิ่งแวดล้อมของบริษัท",en:"Poll: 7 in 10 young people choose employers by climate policy"},
+  {th:"โรงเรียนหลายพันแห่งเพิ่มวิชาความรู้ด้านภูมิอากาศเข้าหลักสูตร",en:"Thousands of schools add climate literacy to the curriculum"},
+  {th:"ธนาคารกลางหลายแห่งเริ่มทดสอบความเสี่ยงด้านภูมิอากาศของระบบการเงิน",en:"Central banks begin climate stress tests of the financial system"},
+  {th:"{R}: รัฐบาลเปิดประมูลโครงการกังหันลมนอกชายฝั่ง",en:"{R} opens bids for offshore wind projects"},
+  {th:"ยอดขายรถยนต์ไฟฟ้าทั่วโลกทำสถิติใหม่",en:"Global electric car sales set a new record"},
+  {th:"นักวิจัยพัฒนาวิธีรีไซเคิลแผงโซลาร์เก่าได้ 95%",en:"Researchers recycle 95% of old solar panels"},
+  {th:"สายการบินราคาประหยัดทดลองเครื่องบินไฟฟ้าในเส้นทางระยะสั้น",en:"A budget airline trials electric planes on short routes"},
+  {th:"เทศกาลดนตรีใหญ่ประกาศใช้พลังงานหมุนเวียน 100%",en:"A major music festival runs on 100% renewable power"},
+  {th:"{C} ปลูกต้นไม้ริมถนนครบหนึ่งล้านต้น",en:"{C} plants its millionth street tree"},
+  {th:"อุตสาหกรรมแฟชั่นให้คำมั่นลดขยะสิ่งทอลงครึ่งหนึ่งภายใน 10 ปี",en:"The fashion industry pledges to halve textile waste within a decade"},
+  {th:"แอปติดตามคาร์บอนส่วนบุคคลมีผู้ใช้ทะลุ 500 ล้านคน",en:"A personal carbon-tracking app passes 500 million users"},
+  {th:"{R}: เกษตรกรรวมกลุ่มผลิตไบโอแก๊สจากมูลสัตว์",en:"Farmers in {R} pool manure to make biogas"},
+  {th:"ดาวเทียมตรวจจับการรั่วไหลของมีเทนรุ่นใหม่ขึ้นสู่วงโคจรแล้ว",en:"A new methane-leak tracking satellite reaches orbit"},
+  {th:"เครือร้านกาแฟรายใหญ่ยกเลิกแก้วใช้ครั้งเดียวทุกสาขา",en:"A global coffee chain drops single-use cups"},
+  {th:"สภาเยาวชนโลกยื่นข้อเสนอ 10 ข้อถึง GCT",en:"The World Youth Council sends the GCT ten proposals"},
+  {th:"{C}: รถเมล์ไฟฟ้าล็อตใหม่ 2,000 คันเริ่มวิ่งให้บริการ",en:"{C} puts 2,000 new electric buses into service"},
+  {th:"โรงงานปูนซีเมนต์ใน {R} ทดลองดักจับคาร์บอนจากปล่องควัน",en:"A cement plant in {R} tests capturing carbon from its stack"},
+  {th:"คลื่นความร้อนทำให้โรงเรียนใน {C} ต้องปรับเวลาเรียน",en:"A heatwave forces schools in {C} to change hours",c:S=>S.temp>=1.35},
+  {th:"เบี้ยประกันบ้านในพื้นที่ชายฝั่งแพงขึ้น 30%",en:"Coastal home insurance premiums rise 30%",c:S=>S.temp>=1.35},
+  {th:"ฤดูไฟป่ายาวนานขึ้นเฉลี่ย 3 สัปดาห์เมื่อเทียบกับทศวรรษก่อน",en:"Wildfire seasons now last three weeks longer than a decade ago",c:S=>S.temp>=1.4},
+  {th:"ผลผลิตกาแฟโลกลดลงเพราะอากาศร้อน ราคาพุ่งสูง",en:"Heat cuts the world coffee harvest; prices spike",c:S=>S.temp>=1.5},
+  {th:"ยุงลายขยายถิ่นไปถึงเขตอบอุ่น พบไข้เลือดออกในพื้นที่ใหม่",en:"Dengue mosquitoes spread into temperate zones",c:S=>S.temp>=1.5},
+  {th:"ธารน้ำแข็งบนเทือกเขาแอลป์เหลือไม่ถึงครึ่งของปี 2000",en:"Alpine glaciers shrink below half their 2000 volume",c:S=>S.temp>=1.55},
+  {th:"เมืองชายฝั่งหลายแห่งเริ่มร่างแผนย้ายชุมชนหนีน้ำทะเล",en:"Coastal cities draft plans to relocate from rising seas",c:S=>S.temp>=1.9},
+  {th:"องค์การอนามัยโลกเตือนความร้อนจัดเป็นภัยสุขภาพอันดับหนึ่ง",en:"WHO names extreme heat the top health threat",c:S=>S.temp>=2.0},
+  {th:"นักวิทยาศาสตร์เตือนกระแสน้ำมหาสมุทรแอตแลนติกกำลังชะลอตัว",en:"Scientists warn the Atlantic Ocean current is slowing",c:S=>S.tip>=25},
+  {th:"ไฟฟ้าจากแสงอาทิตย์และลมล้นระบบในวันอาทิตย์ ราคาไฟติดลบชั่วคราว",en:"Solar and wind oversupply briefly sends Sunday power prices negative",c:has("E2")},
+  {th:"เตาปฏิกรณ์ SMR เครื่องแรกเชื่อมเข้าระบบไฟฟ้าแล้ว",en:"The first SMR reactor connects to the grid",c:has("E4")},
+  {th:"โรงไฟฟ้าฟิวชันเชิงพาณิชย์เดินเครื่องครบ 1 ปีไม่มีหยุด",en:"The first commercial fusion plant completes a year of nonstop operation",c:has("E5")},
+  {th:"เหล็กไร้คาร์บอนล็อตแรกส่งมอบให้ผู้ผลิตรถยนต์",en:"The first zero-carbon steel is delivered to carmakers",c:has("E6")},
+  {th:"รายได้ภาษีคาร์บอนถูกนำไปลดค่าไฟให้ครัวเรือนรายได้น้อย",en:"Carbon tax revenue cuts power bills for low-income homes",c:has("P2")},
+  {th:"ปั๊มน้ำมันใน {C} ถูกเปลี่ยนเป็นสถานีชาร์จรถไฟฟ้า",en:"Petrol stations in {C} become charging hubs",c:has("P4")},
+  {th:"อาคารสำนักงานเก่าในเมืองใหญ่เริ่มติดฉนวนและปั๊มความร้อน",en:"Old office towers are retrofitted with insulation and heat pumps",c:has("P5")},
+  {th:"ราคาน้ำมันขายปลีกขยับขึ้นหลังยกเลิกเงินอุดหนุน ผู้ใช้ขนส่งสาธารณะเพิ่มขึ้น",en:"Pump prices rise after subsidies end; transit ridership climbs",c:has("P6")},
+  {th:"ภาพดาวเทียมเผยแนวป่าใหม่ทอดยาวในแถบซาเฮล",en:"Satellites show new forest belts across the Sahel",c:has("N1")},
+  {th:"ป่าชายเลนที่ปลูกใหม่ช่วยลดแรงคลื่นพายุให้หมู่บ้านชายฝั่ง",en:"Replanted mangroves blunt a storm surge for coastal villages",c:has("N2")},
+  {th:"โรงงาน DAC ในไอซ์แลนด์ฝังคาร์บอนลงหินครบหนึ่งล้านตัน",en:"An Icelandic DAC plant stores its millionth tonne in rock",c:has("N4")},
+  {th:"นักชีววิทยาทางทะเลเฝ้าติดตามผลข้างเคียงของการเติมแร่ธาตุในมหาสมุทร",en:"Marine biologists monitor side effects of ocean mineralization",c:has("N6")},
+  {th:"ผลโพล: ความเชื่อมั่นต่อ GCT ต่ำสุดในรอบหลายปี",en:"Poll: trust in the GCT hits a multi-year low",c:S=>S.appr<40},
+  {th:"ผลโพล: ประชาชนส่วนใหญ่สนับสนุนแผนของ GCT",en:"Poll: most people back the GCT plan",c:S=>S.appr>80},
+];
+const TUT = [
+  {img:"t1-goal.jpg", title:{th:"เป้าหมายของเกม",en:"Your goal"},
+   body:{th:["ท่านเป็นผู้นำองค์กรภูมิอากาศโลก เริ่มปี 2026","ต้องทำให้ CO₂ สุทธิของโลกเหลือ 0 ก่อนสิ้นปี 2050","CO₂ สุทธิ = การปล่อยทั้งหมด − สิ่งที่ป่าและเทคโนโลยีดักจับได้"],
+         en:["You lead the world's climate taskforce, starting in 2026","Bring global net CO₂ down to 0 before the end of 2050","Net CO₂ = everything emitted − what forests and machines capture"]}},
+  {img:"t2-meters.jpg", title:{th:"หลอดชนะและหลอดแพ้",en:"The win and lose meters"},
+   body:{th:["[[flag]] หลอด Net Zero: จุดยิ่งเลื่อนไปทางถ้วย [[trophy]] ยิ่งใกล้ชนะ","[[thermometer]] หลอดอุณหภูมิ: จุดยิ่งไปทางขวายิ่งอันตราย ถึง 3.0°C = แพ้","ใต้หลอดบอกแนวโน้ม และเวลาที่เหลือ"],
+         en:["[[flag]] Net Zero meter: the closer the dot gets to the [[trophy]], the closer you are to winning","[[thermometer]] Warming meter: further right is more dangerous. 3.0°C = game over","Below each meter: the trend and the time left"]}},
+  {img:"t3-resources.jpg", title:{th:"ทรัพยากรและตัวละคร",en:"Resources and your character"},
+   body:{th:["[[leaf]] งบเขียว = เงิน · [[landmark]] ทุนการเมือง = อำนาจ · [[users]] ความนิยม ถ้าเหลือ 0% จะถูกถอดถอน","ซ้ายบนคือตัวละครของคุณ แตะปุ่มใต้รูปเพื่อใช้สกิลพิเศษ (มีเวลาพัก)","เล่นจบได้ XP เลื่อนเลเวล · เลเวล 5 ได้สกิลพิเศษที่สอง"],
+         en:["[[leaf]] Eco-Points = money · [[landmark]] Political capital = clout · [[users]] Approval: hit 0% and you're removed","Top left is your character: tap the buttons below it for special skills (with cooldowns)","Finishing games earns XP; level 5 unlocks a second special skill"]}},
+  {img:"t4-regions.jpg", title:{th:"แผนที่ ภูมิภาค และประเทศ",en:"Map, regions and countries"},
+   body:{th:["แตะภูมิภาคเพื่อซูมเข้าไป แล้วแตะประเทศเพื่อเปิดแผงสั่งการ","[[handshake]] ความสัมพันธ์สูง = ร่วมมือดี ทำข้อตกลงและตั้งพันธมิตรได้","ซูม: ปุ่ม + − ล้อเมาส์ หรือถ่างสองนิ้ว · แตะสองครั้งเพื่อดูทั้งโลก"],
+         en:["Tap a region to zoom in, then tap a country to open its orders","[[handshake]] High relations = cooperation, deals and alliances","Zoom: + − buttons, mouse wheel or pinch · double-tap for the whole world"]}},
+  {img:"t5-bubbles.jpg", title:{th:"ภัยเฉพาะถิ่นและฟอง",en:"Local hazards and bubbles"},
+   body:{th:["[[cloud-lightning]] ไอคอนกะพริบ = พยากรณ์ภัย แตะเพื่อสั่งอพยพก่อนภัยมาถึง","[[siren]] หลังภัยถล่มจะมีฟองแดง แตะเพื่อส่งความช่วยเหลือ (ความสัมพันธ์ขึ้น)","[[sprout]] ฟองเขียว: แตะเพื่อเก็บงบเขียวฟรี"],
+         en:["[[cloud-lightning]] A pulsing icon = hazard forecast. Tap it to evacuate in time","[[siren]] After a hazard a red bubble appears. Tap to send aid (relations improve)","[[sprout]] Green bubbles: tap to collect free Eco-Points"]}},
+  {img:"t6-tree.jpg", title:{th:"หน้าสกิล",en:"The skill screen"},
+   body:{th:["40 สกิล 5 หมวด เปิดด้วยปุ่ม \"สกิล\" หรือกด T เกมจะหยุดระหว่างเลือก","เห็นเฉพาะสกิลถัดไปที่ซื้อได้ ที่ไกลกว่านั้นเป็น ???","ทยอยผลพร้อมกันได้ 3 โครงการ ซื้อถี่เกินไปจะเจอเงินเฟ้อสีเขียว"],
+         en:["40 skills in 5 categories. Open with \"Skills\" or press T; the game pauses","You only see the next skills you can buy; further ones are ???","3 roll-outs at once. Buying too fast causes Greenflation"]}},
+  {img:"t7-event.jpg", title:{th:"อีเวนต์และการตัดสินใจ",en:"Events and decisions"},
+   body:{th:["เกมหยุดรอให้เลือก ปุ่มจะกดได้หลังแถบเติมเต็ม (กันกดพลาด)","▲▼ = ค่านั้นขึ้นหรือลง · สีเขียว = ดี สีแดง = เสีย · ยิ่งหลายลูกศรยิ่งแรง","ข้อพิพาทระหว่างประเทศ: ฝ่ายเสนอกับฝ่ายคัดค้านจะพอใจไม่เท่ากัน"],
+         en:["The game waits for your choice; buttons unlock when the bar fills (no misclicks)","▲▼ = that value goes up or down · green = good, red = bad · more arrows = bigger","International disputes: the two sides react differently"]}},
+  {img:"t8-win.jpg", title:{th:"วิธีชนะและแพ้",en:"How to win or lose"},
+   body:{th:["ชนะ: CO₂ สุทธิถึง 0 ก่อนปี 2051 (เกรด S/A/B ตามอุณหภูมิ)","แพ้: อุณหภูมิถึง 3.0°C, ความนิยมเหลือ 0% หรือหมดเวลา","เข้าสู่ระบบเพื่อรับ Terra ซื้อตัวละครและติดอันดับ"],
+         en:["Win: net CO₂ reaches 0 before 2051 (grade S/A/B by temperature)","Lose: 3.0°C warming, 0% approval, or running out of time","Sign in to earn Terra, buy characters and get ranked"]}},
+];
+const ACH = [
+  {id:"start",     icon:"globe",           t:{th:"ก้าวแรกของ GCT",en:"First Day at GCT"},            d:{th:"เริ่มภารกิจครั้งแรก",en:"Start your first mission"}},
+  {id:"tutorial",  icon:"graduation-cap",  t:{th:"นักเรียนดีเด่น",en:"Top Student"},                  d:{th:"อ่านคู่มือจนจบทุกขั้น",en:"Finish every step of the tutorial"}},
+  {id:"tech1",     icon:"flask-conical",   t:{th:"โครงการแรก",en:"First Project"},                    d:{th:"ซื้อสกิลแรก",en:"Buy your first skill"}},
+  {id:"action1",   icon:"map",             t:{th:"ลงพื้นที่",en:"Boots on the Ground"},               d:{th:"สั่งการรายภูมิภาคครั้งแรก",en:"Give your first regional order"}},
+  {id:"event1",    icon:"lightbulb",       t:{th:"ผู้ตัดสินใจ",en:"Decision Maker"},                  d:{th:"ตัดสินใจอีเวนต์แรก",en:"Resolve your first event"}},
+  {id:"saver",     icon:"save",            t:{th:"กันไว้ดีกว่าแก้",en:"Better Safe"},                 d:{th:"บันทึกเกมลงช่องบันทึก",en:"Save a game to a slot"}},
+  {id:"greens",    icon:"sprout",          t:{th:"นักเก็บงบเขียว",en:"Green Collector"},              d:{th:"เก็บฟองเขียวรวม 25 ฟอง (นับทุกเกม)",en:"Collect 25 green bubbles (all games)"}, prog:d=>[d.greens, 25]},
+  {id:"aids",      icon:"siren",           t:{th:"หน่วยกู้ภัย",en:"First Responder"},                 d:{th:"ส่งความช่วยเหลือภัยพิบัติรวม 10 ครั้ง (นับทุกเกม)",en:"Send disaster aid 10 times (all games)"}, prog:d=>[d.aids, 10]},
+  {id:"rush",      icon:"receipt",         t:{th:"เงินเฟ้อสีเขียว",en:"Greenflation"},                 d:{th:"อนุมัติ 3 โครงการภายใน 12 เดือน",en:"Approve 3 projects within 12 months"}},
+  {id:"rich",      icon:"piggy-bank",      t:{th:"คลังเขียวเต็ม",en:"Full Treasury"},                 d:{th:"มีงบเขียว 300 ในคราวเดียว",en:"Hold 300 Eco-Points at once"}},
+  {id:"branchE",   icon:"zap",             t:{th:"ปฏิวัติพลังงาน",en:"Energy Revolution"},             d:{th:"ปลดล็อกสกิลหมวดพลังงานครบ 8 สกิลในเกมเดียว",en:"Unlock all 8 energy skills in one game"}},
+  {id:"branchP",   icon:"landmark",        t:{th:"นักนิติบัญญัติ",en:"Lawmaker"},                     d:{th:"ปลดล็อกสกิลหมวดการทูตและนโยบายครบ 8 สกิลในเกมเดียว",en:"Unlock all 8 diplomacy & policy skills in one game"}},
+  {id:"branchN",   icon:"trees",           t:{th:"ผู้พิทักษ์ธรรมชาติ",en:"Nature Guardian"},           d:{th:"ปลดล็อกสกิลหมวดเกษตรและป่าไม้ครบ 8 สกิลในเกมเดียว",en:"Unlock all 8 farming & forest skills in one game"}},
+  {id:"allTech",   icon:"award",           t:{th:"ต้นไม้ครบทุกกิ่ง",en:"Full Tree"},                  d:{th:"ปลดล็อกครบ 40 สกิลในเกมเดียว",en:"Unlock all 40 skills in one game"}},
+  {id:"fusion",    icon:"sparkles",        t:{th:"ดวงอาทิตย์บนโลก",en:"A Sun on Earth"},              d:{th:"สร้างโรงไฟฟ้าฟิวชันจนเสร็จ",en:"Finish building fusion power"}},
+  {id:"unity",     icon:"handshake",       t:{th:"โลกสามัคคี",en:"United World"},                     d:{th:"ความร่วมมือทุกภูมิภาคถึง 85% พร้อมกัน",en:"Every region at 85% compliance at once"}},
+  {id:"safe",      icon:"shield-alert",    t:{th:"โลกปลอดภัย",en:"Safe Planet"},                      d:{th:"ความเสี่ยงภัยพิบัติทุกภูมิภาคต่ำกว่า 35%",en:"Every region below 35% disaster risk"}},
+  {id:"peak",      icon:"chart-line",      t:{th:"ผ่านจุดสูงสุด",en:"Past the Peak"},                 d:{th:"CO₂ สุทธิลดลงอย่างน้อย 2 Gt ใน 12 เดือน",en:"Cut net CO₂ by at least 2 Gt in 12 months"}},
+  {id:"half",      icon:"flag",            t:{th:"ครึ่งทาง",en:"Halfway There"},                      d:{th:"CO₂ สุทธิต่ำกว่า 18 Gt",en:"Get net CO₂ below 18 Gt"}},
+  {id:"decade",    icon:"hourglass",       t:{th:"ทศวรรษแรก",en:"First Decade"},                      d:{th:"บริหารโลกจนถึงปี 2036",en:"Lead the world until 2036"}},
+  {id:"win",       icon:"trophy",          t:{th:"Net Zero!",en:"Net Zero!"},                         d:{th:"ชนะเกม",en:"Win the game"}},
+  {id:"winEarly",  icon:"rocket",          t:{th:"ก่อนกำหนด",en:"Ahead of Schedule"},                d:{th:"ชนะก่อนปี 2046",en:"Win before 2046"}},
+  {id:"win15",     icon:"thermometer",     t:{th:"รักษา 1.5 องศา",en:"Keep It at 1.5"},               d:{th:"ชนะโดยอุณหภูมิไม่ถึง +1.5°C",en:"Win with warming under +1.5°C"}},
+  {id:"winLoved",  icon:"users",           t:{th:"ขวัญใจมวลชน",en:"People's Champion"},               d:{th:"ชนะโดยความนิยมอย่างน้อย 70%",en:"Win with at least 70% approval"}},
+  {id:"loseTime",  icon:"timer",           t:{th:"เกือบไปแล้ว",en:"So Close"},                        d:{th:"เล่นจนถึงปี 2051 แต่ยังไม่ Net Zero",en:"Reach 2051 without Net Zero"}},
+  {id:"loseHeat",  icon:"flame",           t:{th:"โลกเดือด",en:"Boiling Point"},                      d:{th:"ปล่อยให้โลกร้อนถึง +3.0°C",en:"Let warming reach +3.0°C"}, hidden:true},
+  {id:"loseVote",  icon:"megaphone",       t:{th:"ถูกถอดถอน",en:"Voted Out"},                         d:{th:"ความนิยมเหลือ 0%",en:"Drop to 0% approval"}, hidden:true},
+  {id:"chaoPhraya",icon:"waves",           t:{th:"ลุ่มเจ้าพระยา",en:"Chao Phraya"},                   d:{th:"รับมืออีเวนต์น้ำท่วมหรือน้ำเค็มรุกลุ่มเจ้าพระยา",en:"Handle a Chao Phraya flood or saltwater event"}, hidden:true},
+  {id:"read25",    icon:"newspaper",       t:{th:"นักอ่านข่าว",en:"News Reader"},                     d:{th:"พบอีเวนต์ต่างกัน 25 เรื่อง (นับทุกเกม)",en:"See 25 different events (all games)"}, prog:d=>[d.seen.length, 25]},
+  {id:"read100",   icon:"library",         t:{th:"ผู้รอบรู้",en:"Well Informed"},                     d:{th:"พบอีเวนต์ต่างกัน 100 เรื่อง (นับทุกเกม)",en:"See 100 different events (all games)"}, prog:d=>[d.seen.length, 100]},
+  {id:"readAll",   icon:"crown",           t:{th:"สารานุกรมภูมิอากาศ",en:"Climate Encyclopedia"},     d:{th:"พบอีเวนต์ครบทุกเรื่อง",en:"See every event"}, prog:d=>[d.seen.length, P.EVENTS.length]},
+  {id:"ability1",  icon:"zap",             t:{th:"ใช้พลังพิเศษ",en:"Special Move"},                   d:{th:"ใช้สกิลกดใช้หรือความสามารถของตัวละครครั้งแรก",en:"Use an active skill or character ability"}},
+  {id:"skill20",   icon:"network",         t:{th:"ผู้เชี่ยวชาญ",en:"Specialist"},                     d:{th:"ปลดล็อก 20 สกิลในเกมเดียว",en:"Unlock 20 skills in one game"}},
+  {id:"branchI",   icon:"factory",         t:{th:"อุตสาหกรรมสีเขียว",en:"Green Industry"},             d:{th:"ปลดล็อกสกิลหมวดอุตสาหกรรมและคมนาคมครบ 8 สกิลในเกมเดียว",en:"Unlock all 8 industry & transport skills in one game"}},
+  {id:"branchC",   icon:"building-2",      t:{th:"เมืองแห่งอนาคต",en:"City of Tomorrow"},             d:{th:"ปลดล็อกสกิลหมวดเมืองและการปรับตัวครบ 8 สกิลในเกมเดียว",en:"Unlock all 8 city & adaptation skills in one game"}},
+  {id:"rel100",    icon:"heart-handshake", t:{th:"มิตรแท้",en:"True Friend"},                         d:{th:"ความสัมพันธ์กับประเทศใดประเทศหนึ่งถึง 100",en:"Reach relation 100 with any country"}},
+  {id:"friends20", icon:"users",           t:{th:"เพื่อนทั่วโลก",en:"Friends Everywhere"},             d:{th:"ความสัมพันธ์ 50 ขึ้นไปกับ 20 ประเทศพร้อมกัน",en:"Relation 50+ with 20 countries at once"}},
+  {id:"bilateral", icon:"arrow-left-right",t:{th:"จับมือสองฝ่าย",en:"Two-Way Deal"},                   d:{th:"ทำข้อตกลงทวิภาคีครั้งแรก",en:"Sign your first bilateral agreement"}},
+  {id:"alliance",  icon:"handshake",       t:{th:"พันธมิตรภูมิอากาศ",en:"Climate Alliance"},           d:{th:"ตั้งกลุ่มพันธมิตรระดับภูมิภาค",en:"Form a regional alliance"}},
+  {id:"cev10",     icon:"globe",           t:{th:"คนกลางระดับโลก",en:"World Mediator"},                d:{th:"ตัดสินอีเวนต์ระหว่างประเทศ 10 ครั้ง (นับทุกเกม)",en:"Settle 10 international disputes (all games)"}, prog:d=>[d.cev || 0, 10]},
+  {id:"stormSafe", icon:"shield-check",    t:{th:"รับมือได้ไม่สะเทือน",en:"Weathered the Storm"},      d:{th:"ภัยธรรมชาติเกิดขึ้นแต่แทบไม่เสียหาย",en:"A hazard strikes but does almost no damage"}},
+  {id:"evac5",     icon:"siren",           t:{th:"อพยพทันเวลา",en:"Just in Time"},                     d:{th:"สั่งอพยพก่อนภัยมาถึง 5 ครั้ง (นับทุกเกม)",en:"Evacuate before a hazard 5 times (all games)"}, prog:d=>[d.evac || 0, 5]},
+  {id:"hardWin",   icon:"skull",           t:{th:"ผู้รอดชีวิต Hard Core",en:"Hard Core Survivor"},     d:{th:"ชนะในโหมด Hard Core",en:"Win in Hard Core mode"}},
+  {id:"daily",     icon:"calendar-check",  t:{th:"ภารกิจประจำวัน",en:"Daily Duty"},                   d:{th:"เล่น Daily Challenge จนจบ",en:"Finish a Daily Challenge"}},
+  {id:"charAll",   icon:"contact",         t:{th:"ครบทุกบทบาท",en:"Every Role"},                      d:{th:"เล่นจนจบเกมด้วยตัวละครครบทั้ง 4 ตัว",en:"Finish a game with all 4 characters"}, prog:d=>[(d.charsDone || []).length, 4]},
+  {id:"lvl10",     icon:"star",            t:{th:"ระดับตำนาน",en:"Legendary"},                        d:{th:"ตัวละครตัวใดตัวหนึ่งถึงเลเวล 10",en:"Get any character to level 10"}},
+  {id:"cards30",   icon:"library",         t:{th:"นักสะสมความรู้",en:"Knowledge Collector"},          d:{th:"ปลดล็อกการ์ดความรู้ 30 ใบ",en:"Unlock 30 knowledge cards"}},
+];
+Object.assign(P, {NEWS, TUT, ACH});
+
+};
+gdjs.LoadingCode.userFunc0xff3d30 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Data · สกิล 40 สกิล 5 หมวด */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.dataSkills) return;
+(P.mods = P.mods || {}).dataSkills = 1;
+/* ===== Data · Skill tree: 40 skills in 5 categories (Plague Inc style screen) =====
+   type: passive (bought once, works all game) · active (bought once, then used with a cooldown)
+         target = "country" → the active needs a selected country
+   resp: hazard types this skill softens (local weather, see 14-data-world.js)
+   pos:  [col, row] on the hex grid of its category (cols 0–4, rows 0–3)
+   fx:   same effect keys as before — co2, all, rco2, sink, appr, compAll, comp, vuln, vulnAll, epInc, damp, tip, p3
+   Old ids (E1…N6) are kept so the old balance stays the same. */
+const SKILL_CATS = [
+  {id:"energy",   icon:"zap",        name:{th:"พลังงาน",en:"Energy"}},
+  {id:"industry", icon:"factory",    name:{th:"อุตสาหกรรมและคมนาคม",en:"Industry & Transport"}},
+  {id:"nature",   icon:"trees",      name:{th:"เกษตรและป่าไม้",en:"Farming & Forests"}},
+  {id:"city",     icon:"building-2", name:{th:"เมืองและการปรับตัว",en:"Cities & Adaptation"}},
+  {id:"policy",   icon:"landmark",   name:{th:"การทูตและนโยบาย",en:"Diplomacy & Policy"}},
+];
+const S_ = (id, cat, icon, pos, ep, pc, req, months, name, desc, fx, extra = {}) => ({id, cat, icon, pos, ep, pc, req, months, name, desc, fx, type:"passive", ...extra});
+const SKILLS = [
+  /* ---------------- Energy ---------------- */
+  S_("E1","energy","zap",[0,1],50,10,[],6,{th:"โครงข่ายไฟฟ้าอัจฉริยะ",en:"Smart Grid"},
+    {th:"CO₂ โลก −0.8 Gt และสกิลพลังงานสะอาดอื่นได้ผลเพิ่ม 10%",en:"Global CO₂ −0.8 Gt; other clean-energy skills work 10% better"},{co2:-0.8}),
+  S_("E2","energy","sun",[1,0],80,15,["E1"],18,{th:"ฟาร์มแสงอาทิตย์และกังหันลม",en:"Solar & Wind Farms"},
+    {th:"CO₂ ทุกภูมิภาค −0.4 Gt (รวม −2.4 Gt)",en:"Every region −0.4 Gt (−2.4 Gt total)"},{all:-0.4}),
+  S_("E8","energy","flame-kindling",[1,2],70,15,["E1"],12,{th:"พลังงานความร้อนใต้พิภพ",en:"Geothermal Power"},
+    {th:"CO₂ ใน NA, SEA และ EA แห่งละ −0.3 Gt",en:"NA, SEA and EA each −0.3 Gt"},{rco2:{NA:-0.3,SEA:-0.3,EA:-0.3}}),
+  S_("E3","energy","battery-charging",[2,0],110,20,["E2"],12,{th:"แบตเตอรี่กักเก็บพลังงาน",en:"Battery Storage"},
+    {th:"CO₂ โลก −1.5 Gt และการปล่อยโตช้าลง 15%",en:"Global CO₂ −1.5 Gt; emission growth −15%"},{co2:-1.5,damp:.15}),
+  S_("E7","energy","sun-medium",[2,1],90,15,["E2"],12,{th:"โซลาร์ลอยน้ำ",en:"Floating Solar"},
+    {th:"CO₂ ใน SEA −0.6 Gt และ EA −0.4 Gt ใช้ผิวน้ำเขื่อนแทนพื้นที่เกษตร",en:"SEA −0.6 Gt and EA −0.4 Gt, on reservoirs instead of farmland"},{rco2:{SEA:-0.6,EA:-0.4}}),
+  S_("E4","energy","atom",[2,2],140,30,["E8"],24,{th:"โรงไฟฟ้านิวเคลียร์ขนาดเล็ก (SMR)",en:"Small Modular Reactors"},
+    {th:"CO₂ โลก −3.0 Gt แต่ความนิยม −5% จากความกังวลเรื่องความปลอดภัย",en:"Global CO₂ −3.0 Gt, but approval −5% over safety fears"},{co2:-3.0,appr:-5},{trade:1}),
+  S_("E9","energy","plug-zap",[3,0],60,10,["E3"],0,{th:"ระบบลดการใช้ไฟช่วงพีก",en:"Demand Response"},
+    {th:"คลื่นความร้อนเสียหายน้อยลง 50% และการปล่อยโตช้าลง 5%",en:"Heatwaves do 50% less damage; emission growth −5%"},{damp:.05},{resp:{heat:.5}}),
+  S_("E5","energy","sparkles",[3,2],250,60,["E4","E3"],36,{th:"โรงไฟฟ้าฟิวชัน",en:"Fusion Power"},
+    {th:"CO₂ โลก −6.0 Gt และรายได้ [[leaf]] +10/เดือน",en:"Global CO₂ −6.0 Gt and [[leaf]] income +10/mo"},{co2:-6.0,epInc:10,damp:.3}),
+
+  /* ---------------- Industry & transport ---------------- */
+  S_("I1","industry","anvil",[0,0],60,10,[],12,{th:"เหล็กกล้าคาร์บอนต่ำ",en:"Low-Carbon Steel"},
+    {th:"CO₂ ใน EA −0.5, NA −0.2 และ EU −0.2 Gt",en:"EA −0.5, NA −0.2 and EU −0.2 Gt"},{rco2:{EA:-0.5,NA:-0.2,EU:-0.2}}),
+  S_("I2","industry","train-front",[0,2],70,15,[],18,{th:"รถไฟความเร็วสูง",en:"High-Speed Rail"},
+    {th:"CO₂ โลก −0.9 Gt และความนิยม +2%",en:"Global CO₂ −0.9 Gt, approval +2%"},{co2:-0.9,appr:2}),
+  S_("I5","industry","recycle",[1,0],100,20,["I1"],12,{th:"เศรษฐกิจหมุนเวียน",en:"Circular Economy"},
+    {th:"CO₂ โลก −1.2 Gt และรายได้ [[leaf]] +3/เดือน",en:"Global CO₂ −1.2 Gt and [[leaf]] income +3/mo"},{co2:-1.2,epInc:3}),
+  S_("I4","industry","wrench",[1,1],50,10,["I1"],0,{th:"ปรับปรุงโรงงานเร่งด่วน",en:"Factory Retrofit Drive"},
+    {th:"สกิลกดใช้: CO₂ ของประเทศที่เลือก −15% ทันที แต่ความสัมพันธ์ −5 · พัก 12 เดือน",en:"Active: the selected country's CO₂ −15% now, relation −5 · 12-month cooldown"},{},{type:"active",target:"country",cd:12}),
+  S_("P4","industry","car",[1,2],120,30,["I2"],24,{th:"บังคับขนส่งไฟฟ้า 100%",en:"Zero-Emission Transport Law"},
+    {th:"CO₂ โลก −3.2 Gt และการปล่อยภาคขนส่งโตช้าลงถาวร",en:"Global CO₂ −3.2 Gt; permanently damps transport growth"},{co2:-3.2,damp:.25}),
+  S_("E6","industry","factory",[2,0],160,35,["I5","E3"],18,{th:"ไฮโดรเจนเขียวในอุตสาหกรรมหนัก",en:"Green Hydrogen Industry"},
+    {th:"CO₂ ใน EA และ NA แห่งละ −1.5 Gt",en:"EA and NA each −1.5 Gt"},{rco2:{EA:-1.5,NA:-1.5}}),
+  S_("I3","industry","plane",[2,2],90,20,["I2"],18,{th:"เชื้อเพลิงอากาศยานยั่งยืน",en:"Sustainable Aviation Fuel"},
+    {th:"CO₂ โลก −0.8 Gt",en:"Global CO₂ −0.8 Gt"},{co2:-0.8}),
+  S_("N4","industry","fan",[3,1],180,30,["I5","E3"],24,{th:"โรงงานดักจับคาร์บอนจากอากาศ",en:"Direct Air Capture"},
+    {th:"ดักจับ 3.5 Gt/ปี ได้ผลแค่ 60% ถ้ายังไม่มีฟาร์มแสงอาทิตย์และกังหันลม (E2)",en:"Captures 3.5 Gt/yr; only 60% effective without Solar & Wind (E2)"},{sink:3.5}),
+
+  /* ---------------- Farming & forests ---------------- */
+  S_("N1","nature","trees",[0,1],50,10,[],24,{th:"มหาโครงการปลูกป่า",en:"Mega-Reforestation"},
+    {th:"ดักจับ CO₂ 1.0 Gt/ปี และความนิยม +5%",en:"Captures 1.0 Gt/yr, approval +5%"},{sink:1.0,appr:5}),
+  S_("N2","nature","waves",[1,0],70,15,["N1"],18,{th:"ป่าชายเลนและบลูคาร์บอน",en:"Mangroves & Blue Carbon"},
+    {th:"ดักจับ 1.2 Gt/ปี, ความเสี่ยงภัย SEA −15% และไต้ฝุ่นกับน้ำเค็มรุกเสียหายน้อยลง 30%",en:"Captures 1.2 Gt/yr, SEA risk −15%; typhoons and saltwater do 30% less damage"},{sink:1.2,vuln:{SEA:-15}},{resp:{typhoon:.3,saltwater:.3}}),
+  S_("N3","nature","wheat",[1,2],85,20,["N1"],18,{th:"เกษตรฟื้นฟูบำรุงดิน",en:"Regenerative Farming"},
+    {th:"ดักจับ 1.5 Gt/ปี, ความนิยม +3% และความเสี่ยงภัยทุกภูมิภาค −3%",en:"Captures 1.5 Gt/yr, approval +3%, every region's risk −3%"},{sink:1.5,appr:3,vulnAll:-3}),
+  S_("N6","nature","fish",[2,0],210,50,["N2"],12,{th:"เติมแร่ธาตุในมหาสมุทร",en:"Ocean Mineralisation"},
+    {th:"ดักจับ 4.0 Gt/ปี แต่รบกวนระบบนิเวศทะเล: อุณหภูมิ +0.03°C",en:"Captures 4.0 Gt/yr but disrupts sea life: +0.03°C"},{sink:4.0,tip:8},{trade:1}),
+  S_("A1","nature","sprout",[2,1],60,10,["N3"],12,{th:"ข้าวปล่อยมีเทนต่ำ",en:"Low-Methane Rice"},
+    {th:"CO₂ ใน SEA −0.5 และ EA −0.3 Gt",en:"SEA −0.5 and EA −0.3 Gt"},{rco2:{SEA:-0.5,EA:-0.3}}),
+  S_("N5","nature","shovel",[2,2],95,20,["N3"],12,{th:"ไบโอชาร์ฝังดิน",en:"Biochar"},
+    {th:"ดักจับ 1.0 Gt/ปี และผลผลิตเกษตรดีขึ้น (ความนิยม +2%)",en:"Captures 1.0 Gt/yr, better harvests (approval +2%)"},{sink:1.0,appr:2}),
+  S_("A2","nature","beef",[3,1],110,25,["A1"],18,{th:"เนื้อสัตว์ทางเลือก",en:"Alternative Protein"},
+    {th:"CO₂ โลก −1.0 Gt, รายได้ [[leaf]] +2/เดือน แต่ความนิยม −3%",en:"Global CO₂ −1.0 Gt, [[leaf]] +2/mo, but approval −3%"},{co2:-1.0,epInc:2,appr:-3},{trade:1}),
+  S_("A3","nature","droplets",[3,2],70,15,["N5"],0,{th:"พืชทนแล้ง",en:"Drought-Proof Crops"},
+    {th:"ภัยแล้งและไฟป่าเสียหายน้อยลง 50%, ความเสี่ยงภัยทุกภูมิภาค −4%",en:"Droughts and wildfires do 50% less damage; every region's risk −4%"},{vulnAll:-4},{resp:{drought:.5,wildfire:.5}}),
+
+  /* ---------------- Cities & adaptation ---------------- */
+  S_("C1","city","radio-tower",[0,0],60,10,[],0,{th:"ระบบเตือนภัยล่วงหน้า",en:"Early Warning System"},
+    {th:"เฮอริเคน ไต้ฝุ่น และน้ำท่วมเสียหายน้อยลง 40%, ความเสี่ยงภัยทุกภูมิภาค −5%",en:"Hurricanes, typhoons and floods do 40% less damage; every region's risk −5%"},{vulnAll:-5},{resp:{hurricane:.4,typhoon:.4,flood:.4}}),
+  S_("P5","city","building-2",[0,2],100,25,[],18,{th:"มาตรฐานอาคาร Net-Zero",en:"Net-Zero Building Code"},
+    {th:"CO₂ โลก −1.8 Gt และประหยัดพลังงานในเมือง",en:"Global CO₂ −1.8 Gt, urban energy savings"},{co2:-1.8,damp:.15}),
+  S_("C2","city","droplet",[1,0],90,20,["C1"],12,{th:"เมืองฟองน้ำ",en:"Sponge Cities"},
+    {th:"น้ำท่วมเสียหายน้อยลงอีก 50%, ความเสี่ยงภัย SEA −10% และ EA −5%",en:"Floods do a further 50% less damage; SEA risk −10%, EA −5%"},{vuln:{SEA:-10,EA:-5}},{resp:{flood:.5}}),
+  S_("C6","city","siren",[1,1],40,10,["C1"],0,{th:"กองบัญชาการอพยพ",en:"Evacuation Command"},
+    {th:"สกิลกดใช้: ภัยครั้งถัดไปในประเทศที่เลือกจะอพยพให้ฟรี · พัก 12 เดือน",en:"Active: the next hazard in the selected country is evacuated for free · 12-month cooldown"},{},{type:"active",target:"country",cd:12}),
+  S_("C5","city","tree-palm",[1,2],85,15,["P5"],12,{th:"เมืองร่มรื่นลดความร้อน",en:"Cool Green Cities"},
+    {th:"คลื่นความร้อนเสียหายน้อยลง 40% และ CO₂ โลก −0.4 Gt",en:"Heatwaves do 40% less damage; global CO₂ −0.4 Gt"},{co2:-0.4},{resp:{heat:.4}}),
+  S_("C3","city","umbrella",[2,0],80,20,["C1"],0,{th:"ประกันภัยพิบัติ",en:"Disaster Insurance"},
+    {th:"เมื่อเกิดภัยได้ [[leaf]] คืน 15 และความนิยมลดเพียงครึ่งเดียว",en:"Each hazard refunds [[leaf]] 15 and costs only half the approval"},{},{insure:1}),
+  S_("C4","city","brick-wall",[2,1],75,15,["C2"],12,{th:"ประตูกั้นน้ำเค็ม",en:"Saltwater Barriers"},
+    {th:"น้ำเค็มรุกเสียหายน้อยลง 60% และความเสี่ยงภัย SEA −8%",en:"Saltwater intrusion does 60% less damage; SEA risk −8%"},{vuln:{SEA:-8}},{resp:{saltwater:.6}}),
+  S_("C7","city","shield-check",[3,1],160,40,["C2","C3"],24,{th:"เมกะโปรเจกต์เมืองทนภัย",en:"Resilient Megacities"},
+    {th:"ความเสี่ยงภัยทุกภูมิภาค −10% และความร่วมมือทุกภูมิภาค +3%",en:"Every region's risk −10% and compliance +3%"},{vulnAll:-10,compAll:3}),
+
+  /* ---------------- Diplomacy & policy ---------------- */
+  S_("P1","policy","megaphone",[0,1],30,5,[],0,{th:"แคมเปญความรู้ด้านภูมิอากาศ",en:"Climate Literacy Campaign"},
+    {th:"ความนิยม +10% และความร่วมมือทุกภูมิภาค +5% (ถาวร)",en:"Approval +10%, every region's compliance +5% (permanent)"},{appr:10,compAll:5}),
+  S_("P2","policy","receipt",[1,0],60,25,["P1"],6,{th:"ภาษีคาร์บอน",en:"Carbon Tax"},
+    {th:"CO₂ โลก −2.5 Gt, รายได้ [[leaf]] +6/เดือน แต่ความนิยม −8%",en:"Global CO₂ −2.5 Gt, [[leaf]] +6/mo, but approval −8%"},{co2:-2.5,appr:-8,epInc:6},{trade:1}),
+  S_("D1","policy","hand-coins",[1,1],80,20,["P1"],0,{th:"กองทุนภูมิอากาศโลก",en:"Global Climate Fund"},
+    {th:"ความสัมพันธ์กับทุกประเทศขึ้นเร็วขึ้น 20% และการส่งความช่วยเหลือถูกลง 25%",en:"Relations rise 20% faster; disaster aid costs 25% less"},{},{relBoost:.2,aidDisc:.25}),
+  S_("D4","policy","piggy-bank",[1,2],40,10,["P1"],0,{th:"ระดมทุนฉุกเฉิน",en:"Emergency Fundraising"},
+    {th:"สกิลกดใช้: ได้ [[leaf]] +80 ทันที แต่ความนิยม −4% · พัก 18 เดือน",en:"Active: [[leaf]] +80 now, approval −4% · 18-month cooldown"},{},{type:"active",cd:18}),
+  S_("P3","policy","scale",[2,0],90,40,["P2"],0,{th:"ภาษีคาร์บอนข้ามพรมแดน",en:"Carbon Border Tax"},
+    {th:"ภูมิภาคที่ความร่วมมือต่ำกว่า 70% ถูกบังคับลด CO₂ ปีละ −0.3 Gt ต่อเนื่อง",en:"Regions under 70% compliance must cut −0.3 Gt/yr, ongoing"},{p3:1}),
+  S_("D2","policy","arrow-left-right",[2,1],70,20,["D1"],0,{th:"แลกเปลี่ยนเทคโนโลยี",en:"Technology Exchange"},
+    {th:"ปลดล็อกคำสั่ง \"แลกเปลี่ยนเทคโนโลยี\" กับแต่ละประเทศ",en:"Unlocks the \"Share technology\" order for each country"},{}),
+  S_("P6","policy","ban",[3,0],150,60,["P3"],12,{th:"เลิกอุดหนุนฟอสซิลทั่วโลก",en:"End Fossil Subsidies"},
+    {th:"CO₂ โลก −4.5 Gt แต่ความร่วมมือใน MEAF และ NA −15% ทันที",en:"Global CO₂ −4.5 Gt, but MEAF and NA compliance −15% at once"},{co2:-4.5,comp:{MEAF:-15,NA:-15},damp:.25},{trade:1}),
+  S_("D3","policy","handshake",[3,1],120,40,["D2"],0,{th:"สนธิสัญญาระดับภูมิภาค",en:"Regional Treaties"},
+    {th:"ปลดล็อกการตั้งกลุ่มพันธมิตร (ประเทศที่ความสัมพันธ์ 50+ ตั้งแต่ 3 ประเทศในภูมิภาคเดียวกัน)",en:"Unlocks alliances (3+ countries in one region with relation 50+)"},{}),
+];
+const SKILL = Object.fromEntries(SKILLS.map(n => [n.id, n]));
+const SKILL_TYPE = {passive:{th:"ติดตัวถาวร",en:"Passive"}, active:{th:"กดใช้",en:"Active"}, trade:{th:"ได้อย่างเสียอย่าง",en:"Trade-off"}, resp:{th:"รับมือภัย",en:"Disaster response"}, country:{th:"เลือกประเทศ",en:"Targets a country"}};
+/* compatibility names used by the older code */
+Object.assign(P, {SKILL_CATS, SKILLS, SKILL, SKILL_TYPE, NODES:SKILLS, NODE:SKILL, NODE_ICON:Object.fromEntries(SKILLS.map(n => [n.id, n.icon]))});
+
+};
+gdjs.LoadingCode.userFunc0xff8148 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Data · ประเทศ, ภัยเฉพาะถิ่น, อีเวนต์ระหว่างประเทศ, ตัวละคร, เนื้อเรื่อง, ร้านค้า */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.dataWorld) return;
+(P.mods = P.mods || {}).dataWorld = 1;
+/* ===== Data · Countries, local weather, country events, characters, story, shop =====
+   Country emission weights are approximate real CO₂ figures (Mt, early 2020s) and are only used
+   as SHARES inside each game region; the region totals stay the game's own numbers.
+   risk = base disaster risk 0–100 · stance = −1 (fossil-friendly) … +1 (green-friendly)
+   tags: ind = big industry · vul = climate-vulnerable · rich · fos = fossil exporter · for = forests
+         coast = long coastline · arc = Arctic · farm = farming power · tech = technology maker */
+const C_ = (id, geo, th, en, reg, w, risk, stance, hz, tags) => ({id, geo, name:{th, en}, reg, w, risk, stance, hz, tags});
+const COUNTRIES = [
+  // North America
+  C_("USA","United States of America","สหรัฐอเมริกา","United States","NA",4900,45,.2,["hurricane","heat","wildfire","drought"],["ind","rich","fos","tech","coast","arc"]),
+  C_("CAN","Canada","แคนาดา","Canada","NA",550,30,.5,["wildfire","heat","flood"],["rich","fos","for","arc"]),
+  C_("MEX","Mexico","เม็กซิโก","Mexico","NA",480,55,.1,["hurricane","drought","heat"],["ind","fos","coast","farm"]),
+  C_("CUB","Cuba","คิวบา","Cuba","NA",25,65,.2,["hurricane","flood"],["vul","coast"]),
+  C_("GTM","Guatemala","กัวเตมาลา","Guatemala","NA",20,60,.3,["hurricane","drought"],["vul","farm"]),
+  C_("DOM","Dominican Rep.","สาธารณรัฐโดมินิกัน","Dominican Republic","NA",30,60,.3,["hurricane","flood"],["vul","coast"]),
+  C_("HTI","Haiti","เฮติ","Haiti","NA",3,80,.3,["hurricane","flood"],["vul","coast"]),
+  C_("PAN","Panama","ปานามา","Panama","NA",10,40,.5,["flood","drought"],["coast","for"]),
+  // Europe (and Russia, Turkey)
+  C_("RUS","Russia","รัสเซีย","Russia","EU",1800,35,-.6,["wildfire","heat","flood"],["ind","fos","arc","for"]),
+  C_("DEU","Germany","เยอรมนี","Germany","EU",600,25,.8,["flood","heat"],["ind","rich","tech"]),
+  C_("GBR","United Kingdom","สหราชอาณาจักร","United Kingdom","EU",310,25,.8,["flood","heat"],["rich","coast","tech"]),
+  C_("FRA","France","ฝรั่งเศส","France","EU",280,30,.8,["heat","drought","flood"],["rich","tech","farm"]),
+  C_("ITA","Italy","อิตาลี","Italy","EU",300,40,.6,["heat","flood","drought"],["ind","rich","coast"]),
+  C_("POL","Poland","โปแลนด์","Poland","EU",280,25,0,["flood","drought"],["ind","fos","farm"]),
+  C_("ESP","Spain","สเปน","Spain","EU",220,45,.7,["heat","drought","wildfire"],["rich","coast","farm"]),
+  C_("TUR","Turkey","ตุรกี","Türkiye","EU",450,45,0,["heat","drought","wildfire","flood"],["ind","coast","farm"]),
+  C_("UKR","Ukraine","ยูเครน","Ukraine","EU",130,35,.2,["drought","heat"],["farm","ind"]),
+  C_("NLD","Netherlands","เนเธอร์แลนด์","Netherlands","EU",130,40,.9,["flood"],["rich","coast","tech","vul"]),
+  C_("SWE","Sweden","สวีเดน","Sweden","EU",35,15,.9,["wildfire"],["rich","for","arc","tech"]),
+  C_("NOR","Norway","นอร์เวย์","Norway","EU",40,15,.7,["flood"],["rich","fos","arc","coast"]),
+  C_("GRC","Greece","กรีซ","Greece","EU",55,45,.5,["wildfire","heat","drought"],["coast"]),
+  C_("PRT","Portugal","โปรตุเกส","Portugal","EU",40,40,.7,["wildfire","drought","heat"],["coast"]),
+  C_("BEL","Belgium","เบลเยียม","Belgium","EU",90,30,.7,["flood"],["rich","ind"]),
+  C_("CZE","Czechia","เช็กเกีย","Czechia","EU",90,20,.3,["flood","drought"],["ind"]),
+  C_("ROU","Romania","โรมาเนีย","Romania","EU",70,35,.3,["flood","drought","heat"],["farm"]),
+  // East Asia
+  C_("CHN","China","จีน","China","EA",11900,50,.2,["typhoon","flood","heat","drought"],["ind","tech","coast","farm"]),
+  C_("JPN","Japan","ญี่ปุ่น","Japan","EA",1000,55,.5,["typhoon","flood","heat"],["ind","rich","tech","coast"]),
+  C_("KOR","South Korea","เกาหลีใต้","South Korea","EA",600,40,.4,["typhoon","heat","flood"],["ind","rich","tech","coast"]),
+  C_("TWN","Taiwan","ไต้หวัน","Taiwan","EA",270,55,.5,["typhoon","flood"],["ind","tech","coast"]),
+  C_("KAZ","Kazakhstan","คาซัคสถาน","Kazakhstan","EA",250,35,-.2,["drought","heat"],["fos","farm"]),
+  C_("UZB","Uzbekistan","อุซเบกิสถาน","Uzbekistan","EA",130,40,0,["drought","heat"],["fos","farm","vul"]),
+  C_("MNG","Mongolia","มองโกเลีย","Mongolia","EA",30,45,-.1,["drought"],["fos","vul"]),
+  C_("PRK","North Korea","เกาหลีเหนือ","North Korea","EA",30,55,-.5,["flood","typhoon"],["vul"]),
+  // South America
+  C_("BRA","Brazil","บราซิล","Brazil","SA",480,50,.4,["drought","flood","wildfire"],["for","farm","fos","coast"]),
+  C_("ARG","Argentina","อาร์เจนตินา","Argentina","SA",180,40,.1,["drought","flood","heat"],["farm","fos"]),
+  C_("COL","Colombia","โคลอมเบีย","Colombia","SA",90,50,.4,["flood","drought"],["for","fos","vul"]),
+  C_("CHL","Chile","ชิลี","Chile","SA",80,45,.6,["wildfire","drought"],["coast","tech"]),
+  C_("PER","Peru","เปรู","Peru","SA",60,55,.3,["flood","drought"],["for","vul","coast"]),
+  C_("VEN","Venezuela","เวเนซุเอลา","Venezuela","SA",90,45,-.3,["flood","drought"],["fos","for"]),
+  C_("ECU","Ecuador","เอกวาดอร์","Ecuador","SA",40,50,.3,["flood"],["for","vul","fos"]),
+  // Middle East & Africa
+  C_("SAU","Saudi Arabia","ซาอุดีอาระเบีย","Saudi Arabia","MEAF",700,55,-.7,["heat","drought"],["fos","rich"]),
+  C_("IRN","Iran","อิหร่าน","Iran","MEAF",800,55,-.5,["heat","drought"],["fos","ind"]),
+  C_("ZAF","South Africa","แอฟริกาใต้","South Africa","MEAF",400,50,-.1,["drought","heat","flood"],["ind","fos","coast"]),
+  C_("EGY","Egypt","อียิปต์","Egypt","MEAF",250,65,0,["heat","drought","saltwater"],["vul","farm","coast"]),
+  C_("ARE","United Arab Emirates","สหรัฐอาหรับเอมิเรตส์","United Arab Emirates","MEAF",220,50,-.3,["heat"],["fos","rich","tech"]),
+  C_("IRQ","Iraq","อิรัก","Iraq","MEAF",200,65,-.4,["heat","drought"],["fos","vul"]),
+  C_("DZA","Algeria","แอลจีเรีย","Algeria","MEAF",180,55,-.3,["drought","heat","wildfire"],["fos"]),
+  C_("NGA","Nigeria","ไนจีเรีย","Nigeria","MEAF",130,75,.1,["flood","heat","drought"],["fos","vul","coast"]),
+  C_("ISR","Israel","อิสราเอล","Israel","MEAF",60,40,.4,["heat","drought","wildfire"],["tech","rich"]),
+  C_("MAR","Morocco","โมร็อกโก","Morocco","MEAF",70,55,.4,["drought","heat"],["farm","coast"]),
+  C_("KEN","Kenya","เคนยา","Kenya","MEAF",20,70,.6,["drought","flood"],["vul","farm"]),
+  C_("ETH","Ethiopia","เอธิโอเปีย","Ethiopia","MEAF",20,75,.4,["drought","flood"],["vul","farm"]),
+  C_("QAT","Qatar","กาตาร์","Qatar","MEAF",100,50,-.4,["heat"],["fos","rich"]),
+  C_("KWT","Kuwait","คูเวต","Kuwait","MEAF",100,50,-.5,["heat"],["fos","rich"]),
+  C_("COD","Dem. Rep. Congo","ดีอาร์คองโก","DR Congo","MEAF",5,70,.3,["flood","heat"],["for","vul"]),
+  // South & Southeast Asia, Oceania
+  C_("IND","India","อินเดีย","India","SEA",3100,70,.1,["heat","flood","typhoon","drought"],["ind","farm","tech","coast"]),
+  C_("IDN","Indonesia","อินโดนีเซีย","Indonesia","SEA",730,65,0,["flood","wildfire","saltwater"],["fos","for","coast","vul"]),
+  C_("THA","Thailand","ไทย","Thailand","SEA",270,60,.3,["flood","saltwater","drought","heat"],["ind","farm","coast"]),
+  C_("VNM","Vietnam","เวียดนาม","Vietnam","SEA",370,70,.2,["typhoon","flood","saltwater"],["ind","farm","coast","vul"]),
+  C_("MYS","Malaysia","มาเลเซีย","Malaysia","SEA",270,45,.2,["flood"],["fos","for","ind"]),
+  C_("PHL","Philippines","ฟิลิปปินส์","Philippines","SEA",150,80,.4,["typhoon","flood"],["vul","coast"]),
+  C_("PAK","Pakistan","ปากีสถาน","Pakistan","SEA",200,80,0,["flood","heat","drought"],["vul","farm"]),
+  C_("BGD","Bangladesh","บังกลาเทศ","Bangladesh","SEA",100,85,.3,["flood","typhoon","saltwater"],["vul","coast","farm"]),
+  C_("AUS","Australia","ออสเตรเลีย","Australia","SEA",380,45,.2,["wildfire","drought","heat","flood"],["rich","fos","coast"]),
+  C_("NZL","New Zealand","นิวซีแลนด์","New Zealand","SEA",30,30,.7,["flood"],["rich","farm","coast"]),
+  C_("MMR","Myanmar","เมียนมา","Myanmar","SEA",40,70,0,["typhoon","flood"],["vul","for"]),
+  C_("LKA","Sri Lanka","ศรีลังกา","Sri Lanka","SEA",20,60,.3,["flood","drought"],["vul","coast"]),
+  C_("KHM","Cambodia","กัมพูชา","Cambodia","SEA",20,65,.2,["flood","drought"],["vul","farm"]),
+];
+/* the rest of each region (small countries) is one pooled entry, shown as "other countries in the region" */
+const REST_W = {NA:40, EU:350, EA:100, SA:60, MEAF:650, SEA:120};
+const COUNTRY = Object.fromEntries(COUNTRIES.map(c => [c.id, c]));
+const COUNTRY_BY_GEO = Object.fromEntries(COUNTRIES.map(c => [c.geo, c.id]));
+/* short names for map labels */
+const SHORT = {USA:{th:"สหรัฐฯ",en:"USA"}, GBR:{th:"อังกฤษ",en:"UK"}, ARE:{th:"UAE",en:"UAE"}, COD:{th:"คองโก",en:"DR Congo"}, DOM:{th:"โดมินิกัน",en:"Dominican Rep."}, SAU:{th:"ซาอุฯ",en:"Saudi"}, KOR:{th:"เกาหลีใต้",en:"S. Korea"}, PRK:{th:"เกาหลีเหนือ",en:"N. Korea"}, ZAF:{th:"แอฟริกาใต้",en:"S. Africa"}, NZL:{th:"นิวซีแลนด์",en:"NZ"}};
+
+/* ---------------- Local weather (hazards) ---------------- */
+const HAZARDS = {
+  hurricane:{icon:"tornado",         snd:"storm",  name:{th:"พายุเฮอริเคน",en:"Hurricane"},       ep:18, appr:2.2, vuln:3, co2:0,
+    fact:{th:"พายุเฮอริเคนในมหาสมุทรแอตแลนติกมีแนวโน้มแรงขึ้น เพราะผิวน้ำทะเลที่อุ่นขึ้นเป็นพลังงานให้พายุ",en:"Atlantic hurricanes are getting stronger because warmer sea water feeds them energy."}},
+  typhoon:  {icon:"cloud-lightning", snd:"storm",  name:{th:"พายุไต้ฝุ่น",en:"Typhoon"},          ep:16, appr:2, vuln:3, co2:0,
+    fact:{th:"ไต้ฝุ่นคือพายุหมุนเขตร้อนชนิดเดียวกับเฮอริเคน แต่เกิดในมหาสมุทรแปซิฟิกตะวันตก",en:"A typhoon is the same kind of tropical storm as a hurricane, but in the western Pacific."}},
+  flood:    {icon:"cloud-rain-wind", snd:"flood",  name:{th:"น้ำท่วมใหญ่",en:"Major flood"},      ep:14, appr:1.8, vuln:2, co2:0,
+    fact:{th:"อากาศที่อุ่นขึ้น 1°C เก็บไอน้ำได้มากขึ้นราว 7% ฝนแต่ละครั้งจึงหนักขึ้น",en:"Air 1°C warmer holds about 7% more water vapour, so downpours get heavier."}},
+  heat:     {icon:"thermometer-sun", snd:"heat",   name:{th:"คลื่นความร้อน",en:"Heatwave"},       ep:8,  appr:1.6, vuln:1, co2:.05,
+    fact:{th:"คลื่นความร้อนทำให้คนเปิดแอร์พร้อมกัน ความต้องการไฟฟ้าพุ่ง และโรงไฟฟ้าฟอสซิลต้องเดินเครื่องเพิ่ม",en:"Heatwaves make everyone switch on air-con at once, so fossil plants run harder."}},
+  drought:  {icon:"sun",             snd:"wind",   name:{th:"ภัยแล้ง",en:"Drought"},              ep:12, appr:1.4, vuln:2, co2:0,
+    fact:{th:"ภัยแล้งยาวนานทำให้ผลผลิตเกษตรลดลงและราคาอาหารสูงขึ้นทั่วโลก",en:"Long droughts cut harvests and push up food prices worldwide."}},
+  wildfire: {icon:"flame",           snd:"fire",   name:{th:"ไฟป่า",en:"Wildfire"},               ep:10, appr:1.6, vuln:2, co2:.12,
+    fact:{th:"ไฟป่าใหญ่ปล่อยคาร์บอนที่ต้นไม้เก็บไว้หลายสิบปีกลับสู่อากาศภายในไม่กี่วัน",en:"Big wildfires release carbon that trees stored for decades in just days."}},
+  saltwater:{icon:"waves",           snd:"ocean",  name:{th:"น้ำเค็มรุก",en:"Saltwater intrusion"}, ep:10, appr:1.2, vuln:2, co2:0,
+    fact:{th:"เมื่อน้ำทะเลสูงขึ้นและน้ำจืดในแม่น้ำน้อยลง น้ำเค็มจะดันเข้ามาไกลขึ้น ทำลายนาข้าวและน้ำประปา",en:"Rising seas and low rivers let salt water push further inland, ruining rice fields and tap water."}},
+};
+
+/* ---------------- Country events (templates) ----------------
+   A = the countries that PROPOSE, B = the countries that OBJECT. Each run picks the countries from the
+   tagged pools, preferring countries that have had that role less often, so every country gets both roles.
+   fx keys as usual, plus relA / relB (relation change) and cA / cB (fraction of those countries' CO₂, e.g. −0.05). */
+const CE = (id, poolA, poolB, title, desc, ...options) => ({id, poolA, poolB, title, desc, options});
+const CO = (th, en, fx) => ({label:{th, en}, fx});
+const CEVENTS = [
+  CE("CE_BATTERY",["ind","tech"],["vul","farm","coast"],{th:"นิคมโรงงานแบตเตอรี่ข้ามชาติ",en:"A Cross-Border Battery Factory Complex"},
+    {th:"{A} ร่วมกันเสนอสร้างนิคมโรงงานแบตเตอรี่ แต่ {B} คัดค้าน เพราะกังวลเรื่องมลพิษและการแข่งขันทางการค้า",en:"{A} jointly propose a giant battery factory complex, but {B} object over pollution and trade competition."},
+    CO("อนุมัติ","Approve it",{ep:30,co2:.3,relA:15,relB:-15}),
+    CO("ปฏิเสธ","Reject it",{relA:-20,pc:-10}),
+    CO("อนุมัติแบบมีเงื่อนไข: ต้องใช้พลังงานสะอาด","Approve only if it runs on clean power",{ep:-40,co2:.05,relA:5,relB:5})),
+  CE("CE_COAL",["ind","fos"],["vul"],{th:"แผนสร้างโรงไฟฟ้าถ่านหินใหม่",en:"New Coal Power Plants"},
+    {th:"{A} ต้องการโรงไฟฟ้าถ่านหินเพิ่มเพื่อเร่งเศรษฐกิจ ขณะที่ {B} ซึ่งเสี่ยงภัยพิบัติสูงประท้วงอย่างหนัก",en:"{A} want more coal power to grow their economies, while highly exposed {B} protest loudly."},
+    CO("ยอมให้สร้าง","Let them build",{co2:.6,relA:15,relB:-20,appr:-4}),
+    CO("ไม่อนุญาต แต่ช่วยทุนโซลาร์แทน","Say no, but fund solar instead",{ep:-60,relA:-5,relB:10,co2:-.1}),
+    CO("ตกลงเลิกใช้แบบมีกำหนดเวลา","Agree a phase-out timetable",{pc:-15,co2:.2,relA:5,relB:5,delay:{m:24,fx:{co2:-.5}}})),
+  CE("CE_DAM",["ind","farm"],["vul","farm"],{th:"เขื่อนยักษ์บนแม่น้ำนานาชาติ",en:"A Mega-Dam on a Shared River"},
+    {th:"{A} อยู่ต้นน้ำและต้องการสร้างเขื่อนพลังน้ำ แต่ {B} ซึ่งอยู่ปลายน้ำกลัวน้ำแล้งและปลาหายไป",en:"Upstream {A} want a hydropower dam; downstream {B} fear drought and vanishing fish."},
+    CO("สนับสนุนเขื่อน","Back the dam",{co2:-.2,relA:15,relB:-20,cB:.02}),
+    CO("เป็นคนกลางทำสนธิสัญญาแบ่งน้ำ","Broker a water-sharing treaty",{pc:-20,relA:5,relB:10}),
+    CO("คัดค้านเขื่อน","Oppose the dam",{relA:-20,relB:10})),
+  CE("CE_FOREST",["for","farm"],["rich","tech"],{th:"สัมปทานตัดป่าเพื่อการส่งออก",en:"Logging for Export Farmland"},
+    {th:"{A} ต้องการเปิดป่าทำไร่ส่งออกเพื่อหารายได้ แต่ {B} ขู่จะคว่ำบาตรสินค้าที่มาจากการทำลายป่า",en:"{A} want to clear forest for export crops; {B} threaten to boycott goods from deforested land."},
+    CO("ปล่อยให้ตัดป่า","Allow the clearing",{co2:.5,tip:3,relA:15,relB:-15}),
+    CO("จ่ายค่าตอบแทนให้รักษาป่า","Pay them to keep the forest",{ep:-70,relA:10,relB:5,cA:-.04}),
+    CO("สนับสนุนการคว่ำบาตร","Back the boycott",{relA:-20,relB:10,pc:-5,cA:-.06})),
+  CE("CE_CBAM",["rich"],["ind","fos"],{th:"สงครามภาษีคาร์บอนชายแดน",en:"A Carbon Border Tax Fight"},
+    {th:"{A} จะเก็บภาษีคาร์บอนจากสินค้านำเข้า {B} ขู่ตอบโต้ทางการค้า",en:"{A} plan a carbon tax on imports. {B} threaten trade retaliation."},
+    CO("หนุนภาษีคาร์บอน","Support the tax",{relA:10,relB:-15,cB:-.04,pc:-5}),
+    CO("ขอให้ชะลอ 5 ปี","Ask for a 5-year delay",{relA:-10,relB:10}),
+    CO("ให้รายได้ภาษีกลับไปช่วยผู้ส่งออก","Return the revenue to help exporters go green",{ep:-30,relA:5,relB:5,cB:-.03})),
+  CE("CE_REFUGEE",["vul"],["rich"],{th:"ผู้อพยพจากภัยภูมิอากาศ",en:"Climate Refugees"},
+    {th:"{A} ขอให้นานาชาติรับผู้อพยพที่บ้านจมน้ำและไร่แห้ง แต่ {B} ไม่ต้องการรับเพิ่ม",en:"{A} ask the world to take in people whose homes flooded or fields dried up; {B} refuse more arrivals."},
+    CO("กดดันให้รับผู้อพยพ","Push them to accept refugees",{relA:15,relB:-15,appr:3}),
+    CO("ตั้งกองทุนช่วยในพื้นที่แทน","Fund help where people live instead",{ep:-50,relA:10,relB:5}),
+    CO("ไม่แทรกแซง","Stay out of it",{relA:-20,appr:-3})),
+  CE("CE_SEABED",["tech","ind"],["coast","vul"],{th:"ขุดแร่ใต้ทะเลลึกเพื่อทำแบตเตอรี่",en:"Deep-Sea Mining for Battery Metals"},
+    {th:"{A} ต้องการขุดแร่ใต้ทะเลลึกเพื่อผลิตแบตเตอรี่ราคาถูก แต่ {B} กลัวระบบนิเวศทะเลพัง",en:"{A} want to mine the deep seabed for cheap battery metals; {B} fear wrecking the ocean."},
+    CO("อนุญาต","Allow it",{disc:{E3:.2},relA:12,relB:-15,tip:2}),
+    CO("พักไว้จนกว่าจะมีงานวิจัย","Pause it until the science is in",{relA:-10,relB:12}),
+    CO("ให้ทุนรีไซเคิลแบตเตอรี่แทน","Fund battery recycling instead",{ep:-45,relA:5,relB:8})),
+  CE("CE_NUKE",["tech","ind"],["vul","farm"],{th:"โรงไฟฟ้านิวเคลียร์ใกล้ชายแดน",en:"A Nuclear Plant Near the Border"},
+    {th:"{A} จะสร้างโรงไฟฟ้านิวเคลียร์ใกล้ชายแดน {B} กังวลเรื่องอุบัติเหตุและกากกัมมันตรังสี",en:"{A} will build a nuclear plant near the border. {B} worry about accidents and waste."},
+    CO("สนับสนุน","Support it",{cA:-.06,relA:12,relB:-15,appr:-2}),
+    CO("ให้ตรวจความปลอดภัยร่วมกัน","Require joint safety inspections",{pc:-12,cA:-.04,relA:5,relB:8}),
+    CO("คัดค้าน","Oppose it",{relA:-15,relB:10})),
+  CE("CE_ARCTIC",["fos","arc"],["vul","rich"],{th:"ขุดเจาะน้ำมันในอาร์กติก",en:"Arctic Oil Drilling"},
+    {th:"น้ำแข็งที่ละลายเปิดทางให้ {A} ขุดเจาะน้ำมันในอาร์กติก {B} เรียกร้องให้ห้าม",en:"Melting ice lets {A} drill for Arctic oil. {B} demand a ban."},
+    CO("ปล่อยให้ขุดเจาะ","Let them drill",{co2:.5,ep:20,relA:15,relB:-20,tip:3}),
+    CO("ผลักดันข้อห้ามสากล","Push for a global ban",{pc:-25,relA:-20,relB:15}),
+    CO("แลกกับการลงทุนพลังงานสะอาด","Trade it for clean-energy investment",{relA:5,relB:-5,cA:-.03,co2:.2})),
+  CE("CE_LOSS",["vul"],["rich","fos"],{th:"กองทุนความสูญเสียและความเสียหาย",en:"The Loss and Damage Fund"},
+    {th:"{A} เรียกร้องให้ประเทศที่ปล่อยมากจ่ายค่าเสียหายจากภัยภูมิอากาศ แต่ {B} ปฏิเสธ",en:"{A} demand that big emitters pay for climate damage; {B} refuse."},
+    CO("บีบให้จ่าย","Make them pay",{relA:15,relB:-15,ep:40,vuln:{T:-5}}),
+    CO("ใช้งบ GCT จ่ายส่วนหนึ่ง","Pay part of it from the GCT budget",{ep:-60,relA:15,relB:5}),
+    CO("เลื่อนการเจรจา","Postpone the talks",{relA:-15,appr:-3})),
+  CE("CE_SOLARWAR",["tech","ind"],["ind","rich"],{th:"สงครามราคาแผงโซลาร์",en:"The Solar Panel Price War"},
+    {th:"{A} ขายแผงโซลาร์ราคาถูกมาก {B} ต้องการตั้งกำแพงภาษีเพื่อปกป้องโรงงานของตัวเอง",en:"{A} sell solar panels very cheaply; {B} want tariffs to protect their own factories."},
+    CO("ปล่อยให้แผงราคาถูกไหลเข้า","Let cheap panels flow",{co2:-.4,relA:12,relB:-15}),
+    CO("หนุนกำแพงภาษี","Back the tariffs",{relA:-15,relB:12,co2:.1}),
+    CO("ตั้งโรงงานร่วมทุน","Set up joint-venture factories",{ep:-40,relA:6,relB:6,co2:-.2})),
+  CE("CE_GEOENG",["tech","rich"],["vul","farm"],{th:"ทดลองพ่นละอองบังแดดในชั้นบรรยากาศ",en:"A Sun-Dimming Experiment"},
+    {th:"{A} จะทดลองพ่นละอองในชั้นบรรยากาศเพื่อลดความร้อน {B} กลัวว่าฝนมรสุมจะเปลี่ยน",en:"{A} plan to spray particles high in the sky to cool Earth. {B} fear their monsoon rains will shift."},
+    CO("อนุมัติการทดลอง","Approve the trial",{temp:-.04,relA:10,relB:-20,vuln:{T:5}}),
+    CO("ทดลองเล็ก ๆ ภายใต้การกำกับดูแล","A small, supervised trial",{pc:-15,temp:-.01,relA:5,relB:-5}),
+    CO("ห้ามทดลอง","Ban it",{relA:-15,relB:12})),
+  CE("CE_MARINE",["coast","rich"],["coast","farm"],{th:"เขตคุ้มครองทะเลขนาดใหญ่",en:"A Huge Marine Reserve"},
+    {th:"{A} เสนอเขตคุ้มครองทะเลขนาดใหญ่เพื่อฟื้นฟูปลาและปะการัง {B} ซึ่งพึ่งพาการประมงคัดค้าน",en:"{A} propose a vast marine reserve to restore fish and coral. Fishing nations {B} object."},
+    CO("ประกาศเขตคุ้มครอง","Declare the reserve",{tip:-3,relA:12,relB:-15,appr:2}),
+    CO("ประกาศพร้อมเงินชดเชยชาวประมง","Declare it and compensate fishers",{ep:-50,tip:-3,relA:10,relB:5}),
+    CO("ไม่ประกาศ","Drop the idea",{relA:-15,relB:10})),
+  CE("CE_PALM",["for","farm"],["rich"],{th:"ขยายไร่ปาล์มทำไบโอดีเซล",en:"Palm Oil for Biodiesel"},
+    {th:"{A} จะขยายไร่ปาล์มเพื่อผลิตไบโอดีเซล {B} บอกว่าเป็นการทำลายป่าฝนแบบใหม่",en:"{A} will expand palm plantations for biodiesel. {B} call it deforestation in disguise."},
+    CO("หนุนไบโอดีเซล","Back the biodiesel plan",{co2:-.2,tip:2,relA:12,relB:-12}),
+    CO("ให้ปลูกเฉพาะบนพื้นที่เสื่อมโทรม","Only on already-degraded land",{pc:-10,co2:-.1,relA:5,relB:5}),
+    CO("ห้ามขยายไร่","Block the expansion",{relA:-18,relB:10})),
+  CE("CE_DATA",["tech","rich"],["vul","coast"],{th:"ศูนย์ข้อมูล AI ใช้ก๊าซธรรมชาติ",en:"Gas-Powered AI Data Centres"},
+    {th:"{A} กำลังสร้างศูนย์ข้อมูล AI ขนาดยักษ์ที่ใช้ไฟจากก๊าซ {B} เรียกร้องให้ใช้พลังงานสะอาด",en:"{A} are building giant AI data centres on gas power. {B} demand clean electricity."},
+    CO("ปล่อยไปก่อน เศรษฐกิจโต","Let it run, the economy grows",{co2:.4,ep:25,relA:10,relB:-12}),
+    CO("บังคับให้ซื้อไฟสะอาด","Make them buy clean power",{relA:-10,relB:10,cA:-.02}),
+    CO("ให้ใช้ความร้อนทิ้งทำระบบทำความร้อนในเมือง","Reuse the waste heat to warm cities",{ep:-30,relA:6,relB:6,co2:.1})),
+  CE("CE_RAIL",["rich","tech"],["vul","farm"],{th:"รถไฟความเร็วสูงข้ามประเทศ",en:"A Cross-Border High-Speed Railway"},
+    {th:"{A} เสนอรถไฟความเร็วสูงเชื่อมหลายประเทศ {B} กังวลเรื่องหนี้และการเวนคืนที่ดิน",en:"{A} propose a high-speed line across borders. {B} worry about debt and land seizures."},
+    CO("ผลักดันโครงการ","Push the project",{co2:-.3,relA:12,relB:-12,pc:-8}),
+    CO("ให้ GCT ร่วมจ่ายเพื่อลดหนี้","Co-fund it to cut the debt",{ep:-55,co2:-.3,relA:8,relB:8}),
+    CO("พักโครงการ","Shelve it",{relA:-12,relB:6})),
+];
+/* the example from the planning board: always used the first time this event appears */
+const CE_FIXED = {CE_BATTERY:{A:["CHN","KOR","JPN"], B:["THA","USA","IND"]}};
+
+/* ---------------- Characters ---------------- */
+const CHARS = [
+  {id:"sci", price:0,   icon:"flask-conical", color:"#5fd39a",
+   name:{th:"นักวิทยาศาสตร์",en:"The Scientist"}, person:{th:"ดร.ภูผา",en:"Dr. Phupha"},
+   pas:{th:"สกิลหมวดพลังงานถูกลง 10% (เลเวล 3: 15%)",en:"Energy skills cost 10% less (level 3: 15%)"},
+   acts:[{id:"sci1", cd:36, icon:"lightbulb", name:{th:"ค้นพบใหม่",en:"Breakthrough"}, desc:{th:"สกิลถัดไปที่ซื้อจะทยอยผลเสร็จทันที และไม่นับโควตา 3 โครงการ",en:"The next skill you buy rolls out instantly and ignores the 3-project limit"}},
+         {id:"sci2", cd:30, lv:5, icon:"flask-round", name:{th:"ทุนวิจัยเร่งด่วน",en:"Research Sprint"}, desc:{th:"สกิลถัดไปที่ซื้อถูกลง 40%",en:"The next skill you buy costs 40% less"}}]},
+  {id:"dip", price:249, icon:"handshake", color:"#8fd0ff",
+   name:{th:"นักการทูต",en:"The Diplomat"}, person:{th:"ทูตวารี",en:"Ambassador Waree"},
+   pas:{th:"ความสัมพันธ์กับทุกประเทศขึ้นเร็วขึ้น 15% (เลเวล 3: 25%)",en:"Relations rise 15% faster (level 3: 25%)"},
+   acts:[{id:"dip1", cd:24, icon:"users", name:{th:"ประชุมสุดยอด",en:"Summit"}, desc:{th:"ทุกประเทศในภูมิภาคที่เลือกได้ความสัมพันธ์ +15",en:"Every country in the selected region gets relation +15"}},
+         {id:"dip2", cd:30, lv:5, icon:"heart-handshake", name:{th:"ทูตสันถวไมตรี",en:"Goodwill Tour"}, desc:{th:"ความร่วมมือทุกภูมิภาค +8%",en:"Every region's compliance +8%"}}]},
+  {id:"eco", price:249, icon:"chart-candlestick", color:"#f2b441",
+   name:{th:"นักเศรษฐศาสตร์",en:"The Economist"}, person:{th:"คุณธารา",en:"Tara"},
+   pas:{th:"รายได้ [[leaf]] ต่อเดือน +10% (เลเวล 3: 15%)",en:"[[leaf]] monthly income +10% (level 3: 15%)"},
+   acts:[{id:"eco1", cd:30, icon:"banknote", name:{th:"พันธบัตรสีเขียว",en:"Green Bonds"}, desc:{th:"ได้ [[leaf]] +120 ทันที แล้วผ่อนคืนเดือนละ 12 เป็นเวลา 12 เดือน",en:"[[leaf]] +120 now, repaid at 12 a month for 12 months"}},
+         {id:"eco2", cd:18, lv:5, icon:"arrow-left-right", name:{th:"ตลาดคาร์บอน",en:"Carbon Market"}, desc:{th:"แลก [[landmark]] 20 เป็น [[leaf]] 70",en:"Trade [[landmark]] 20 for [[leaf]] 70"}}]},
+  {id:"act", price:249, icon:"megaphone", color:"#ff8a7a",
+   name:{th:"นักเคลื่อนไหว",en:"The Activist"}, person:{th:"น้องเมฆ",en:"Mek"},
+   pas:{th:"ความนิยมลดช้าลง 25% (เลเวล 3: 35%)",en:"Approval falls 25% slower (level 3: 35%)"},
+   acts:[{id:"act1", cd:24, icon:"megaphone", name:{th:"รณรงค์ใหญ่",en:"Mass Campaign"}, desc:{th:"ความนิยม +12% ทันที",en:"Approval +12% now"}},
+         {id:"act2", cd:36, lv:5, icon:"sprout", name:{th:"พลังเยาวชน",en:"Youth Power"}, desc:{th:"ความร่วมมือทุกภูมิภาค +6% และความสัมพันธ์ทุกประเทศ +5",en:"Every region's compliance +6% and every relation +5"}}]},
+];
+const CHAR = Object.fromEntries(CHARS.map(c => [c.id, c]));
+/* XP needed for each level (level 1 at 0 XP … level 10) */
+const LEVELS = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
+const levelOf = xp => { let l = 1; LEVELS.forEach((v, i) => { if (xp >= v) l = i + 1; }); return l; };
+
+/* ---------------- Shop (prices in Terra) ---------------- */
+const SHOP = [
+  {id:"speed3", price:199, icon:"fast-forward", kind:"unlock", name:{th:"ความเร็ว x3",en:"Speed x3"}, desc:{th:"เพิ่มปุ่มความเร็ว x3 ในเกม (ถาวร)",en:"Adds a x3 speed button (permanent)"}},
+  {id:"char_dip", price:249, icon:"handshake", kind:"char", name:{th:"ตัวละคร: นักการทูต",en:"Character: The Diplomat"}},
+  {id:"char_eco", price:249, icon:"chart-candlestick", kind:"char", name:{th:"ตัวละคร: นักเศรษฐศาสตร์",en:"Character: The Economist"}},
+  {id:"char_act", price:249, icon:"megaphone", kind:"char", name:{th:"ตัวละคร: นักเคลื่อนไหว",en:"Character: The Activist"}},
+  {id:"theme_night", price:99, icon:"moon", kind:"theme", name:{th:"ธีมแผนที่กลางคืน",en:"Night map theme"}, desc:{th:"ทะเลสีเข้มและแสงไฟเมือง",en:"Dark seas and city lights"}},
+  {id:"theme_paint", price:99, icon:"palette", kind:"theme", name:{th:"ธีมแผนที่ภาพวาด",en:"Painted map theme"}, desc:{th:"สีพาสเทลแบบภาพสีน้ำ",en:"Soft watercolour colours"}},
+  {id:"outfit", price:149, icon:"shirt", kind:"outfit", name:{th:"ชุดตัวละครแบบใหม่",en:"New character outfits"}, desc:{th:"ชุดสีใหม่สำหรับตัวละครทุกตัว",en:"A new outfit for every character"}},
+  {id:"frame", price:79, icon:"square-dashed", kind:"frame", name:{th:"กรอบโปรไฟล์ทองบน Leaderboard",en:"Gold Leaderboard frame"}, desc:{th:"ชื่อของคุณมีกรอบสีทองในตารางอันดับ",en:"Your name gets a gold frame on the leaderboard"}},
+];
+const PRICE = {rename:49};
+
+/* ---------------- Story: 3 acts, shown as comic panels ---------------- */
+const STORY = [
+  {act:1, at:0, title:{th:"องก์ 1 · ตั้งหลัก",en:"Act 1 · Taking Charge"}, panels:[
+    {icon:"landmark", bg:"#12324a", who:"adv", say:{th:"ยินดีต้อนรับสู่ GCT ค่ะ ทุกประเทศลงมติให้คุณเป็นผู้นำภารกิจนี้",en:"Welcome to the GCT. Every nation voted for you to lead this mission."}},
+    {icon:"thermometer", bg:"#3b2412", who:"adv", say:{th:"โลกร้อนขึ้นแล้ว 1.2°C ถ้าถึง 3°C ระบบธรรมชาติจะพังจนกู้คืนไม่ได้",en:"Earth is already 1.2°C warmer. At 3°C, nature's systems collapse for good."}},
+    {icon:"handshake", bg:"#13362b", who:"me", say:{th:"ตอนนี้ทุกประเทศยังเชื่อใจเรา ต้องใช้โอกาสนี้ให้คุ้มที่สุด",en:"The world still trusts us. We have to make the most of it."}},
+    {icon:"flag", bg:"#1d2a44", who:"adv", say:{th:"เป้าหมายคือ Net Zero ก่อนสิ้นปี 2050 เริ่มจากสกิลแรกได้เลยค่ะ",en:"The goal: Net Zero before the end of 2050. Start with your first skill."}},
+  ]},
+  {act:2, at:108, title:{th:"องก์ 2 · แรงต้าน",en:"Act 2 · Pushback"}, panels:[
+    {icon:"cloud-lightning", bg:"#2a2140", who:"adv", say:{th:"ปี 2035 แล้ว ภัยพิบัติมาถี่ขึ้นทุกปี หลายประเทศเริ่มโทษกันเอง",en:"It's 2035. Disasters hit more often and countries are blaming each other."}},
+    {icon:"megaphone", bg:"#3a1a1a", who:"adv", say:{th:"มีกลุ่มการเมืองพยายามล้มคุณ ถ้าความนิยมเหลือ 0% คุณจะถูกถอดถอน",en:"A political group is trying to bring you down. Hit 0% approval and you're out."}},
+    {icon:"shield-check", bg:"#143029", who:"me", say:{th:"เราต้องช่วยประเทศที่เดือดร้อนให้ทัน และทำให้ทุกคนเห็นว่าทางนี้ได้ผล",en:"We must help the countries in trouble fast, and show everyone this works."}},
+  ]},
+  {act:3, at:228, title:{th:"องก์ 3 · เส้นชัย",en:"Act 3 · The Finish Line"}, panels:[
+    {icon:"hourglass", bg:"#2b2a16", who:"adv", say:{th:"ปี 2045 เหลือเวลาอีกแค่ 6 ปี การตัดสินใจจากนี้จะกำหนดว่าโลกจะจบแบบไหน",en:"It's 2045. Six years left. Every choice now decides how this ends."}},
+    {icon:"sunrise", bg:"#15344a", who:"me", say:{th:"ไม่ว่าผลจะออกมาอย่างไร เราจะไม่ยอมแพ้จนวันสุดท้าย",en:"Whatever happens, we keep going until the very last day."}},
+  ]},
+];
+const ADVISOR = {name:{th:"ดร.ฟ้าใส · ที่ปรึกษา GCT",en:"Dr. Fasai · GCT Advisor"}};
+
+/* ---------------- Endings ---------------- */
+const ENDINGS = {
+  win:{img:"end-win", grades:{S:{th:"เกรด S · โลกฟื้นคืน",en:"Grade S · A World Restored"}, A:{th:"เกรด A · ทันเวลา",en:"Grade A · Just in Time"}, B:{th:"เกรด B · ชนะแบบเฉียดฉิว",en:"Grade B · A Narrow Win"}},
+    amb:"birds", music:"music-menu.mp3"},
+  l1:{img:"end-heat", amb:"fire"},
+  l2:{img:"end-vote", amb:"crowd"},
+  l3:{img:"end-time", amb:"wind"},
+};
+const gradeOf = temp => temp < 1.6 ? "S" : temp < 2.0 ? "A" : "B";
+
+/* ---------------- Terra rewards (shown in the UI; the server decides the real amount) ---------------- */
+const TERRA = {win:30, l3:12, l2:6, l1:4, bonusMax:15, capGame:45, capHard:67, hardMult:1.5};
+
+Object.assign(P, {COUNTRIES, COUNTRY, COUNTRY_BY_GEO, REST_W, SHORT, HAZARDS, CEVENTS, CE_FIXED, CHARS, CHAR, LEVELS, levelOf, SHOP, PRICE, STORY, ADVISOR, ENDINGS, gradeOf, TERRA});
+
+};
+gdjs.LoadingCode.userFunc0x1001878 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Data · ข้อความของระบบใหม่ */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.dataUI2) return;
+(P.mods = P.mods || {}).dataUI2 = 1;
+/* ===== Data · Text strings for the new systems (countries, hazards, skills screen, characters, story,
+   accounts, Terra, shop, leaderboard, certificates, learning page). Merged into P.UI. ===== */
+const T = (th, en) => ({th, en});
+Object.assign(P.UI, {
+  and:T("และ","and"), otherIn:T("ประเทศอื่น ๆ ใน","Other countries in"), global:T("ทั่วโลก","worldwide"),
+  /* tabs and drawer */
+  nbTech:T("สกิล","Skills"), dCountry:T("ประเทศ","Country"), dRegion:T("ภูมิภาคและประเทศ","Region & countries"),
+  tapCountry:T("แตะประเทศเพื่อเลือก · แตะสองครั้ง = ดูทั้งโลก","Tap a country to select · double-tap = whole world"),
+  countriesIn:T("ประเทศในภูมิภาคนี้ (แตะเพื่อเลือก)","Countries in this region (tap to select)"),
+  ordersRegion:T("คำสั่งรายภูมิภาค","Regional orders"), ordersCountry:T("ความร่วมมือกับประเทศนี้","Work with this country"),
+  thisCountryOnly:T("เฉพาะประเทศนี้ (ถูกกว่า ผลแคบกว่า)","this country only (cheaper, narrower)"),
+  cact_fund:T("CO₂ ประเทศนี้ −12% × ความร่วมมือ และความสัมพันธ์ +3","This country's CO₂ −12% × compliance, relation +3"),
+  cact_diplo:T("ความสัมพันธ์กับประเทศนี้ +12","Relation with this country +12"),
+  cact_adapt:T("การปรับตัวของประเทศนี้ +20 (ภัยเสียหายน้อยลง) และความสัมพันธ์ +4","This country's adaptation +20 (less hazard damage), relation +4"),
+  cact_tariff:T("CO₂ ประเทศนี้ −25% × ความร่วมมือ แต่ความสัมพันธ์ −12","This country's CO₂ −25% × compliance, but relation −12"),
+  relation:T("ความสัมพันธ์","Relation"), relHigh:T("ไว้ใจเรามาก: คำสั่งได้ผลดีและตั้งพันธมิตรได้","Trusts us: orders work well, alliance-ready"),
+  relMid:T("ทั่วไป: ยังพอคุยกันได้","Neutral: open to talks"), relLow:T("ไม่ไว้ใจเรา: ความร่วมมือในภูมิภาคลดลง","Distrusts us: regional compliance suffers"),
+  shareOfRegion:T("สัดส่วนในภูมิภาค","Share of region"), risk:T("ความเสี่ยงภัย","Disaster risk"), adapt:T("การปรับตัว","Adaptation"),
+  hazardsHere:T("ภัยที่พบบ่อย","Common hazards"),
+  allyOn:T("กลุ่มพันธมิตรในภูมิภาคนี้","Alliance in this region"), allyMember:T("สมาชิกพันธมิตร","alliance member"),
+  allyForm:T("ตั้งกลุ่มพันธมิตร","Form an alliance"), allyNeed:T("ต้องมีประเทศที่ความสัมพันธ์ 50+ อย่างน้อย 3 ประเทศ · ถ้าสมาชิกถอนตัว ทุกประเทศจะได้รับผลกระทบ","Needs 3+ countries at relation 50+ · if one leaves, all members suffer"),
+  bilatTitle:T("ข้อตกลงทวิภาคี","Bilateral agreement"), bilatDesc:T("ลด CO₂ ทั้งสองประเทศ −10% ภายใน 24 เดือน","Both countries cut CO₂ −10% over 24 months"),
+  bilatNeedRel:T("ต้องมีความสัมพันธ์อย่างน้อย 40 กับประเทศนี้","Needs relation 40+ with this country"), bilatNone:T("ยังไม่มีประเทศคู่ที่ความสัมพันธ์ 40+","No partner at relation 40+ yet"),
+  topEmitters:T("ประเทศที่ปล่อยมากที่สุด (Gt/ปี)","Top emitting countries (Gt/yr)"),
+  timePlayed:T("เวลาที่เล่น","Time played"),
+  logAbility:T("ใช้สกิล","Used"), logBilat:T("ข้อตกลงทวิภาคี","Bilateral agreement"), logAlly:T("ตั้งกลุ่มพันธมิตร","Alliance formed"), logAllyBreak:T("พันธมิตรแตก เพราะประเทศถอนตัว","Alliance broke up after a country left"),
+  /* hazards */
+  forecast:T("พยากรณ์อากาศ","Forecast"), hits:T("ถล่ม","hits"), evacuate:T("สั่งอพยพ","Evacuate"), evacShort:T("อพยพ","Evacuate"),
+  evacuated:T("อพยพแล้ว","Evacuated"), evacDone:T("สั่งอพยพประชาชนใน","Evacuation ordered in"), moShort:T("ด.","mo"),
+  redHelp:T("ส่งความช่วยเหลือภัยพิบัติที่","Disaster aid sent to"), redMiss:T("ไม่ได้ตอบสนองภัยพิบัติที่","Missed the disaster in"),
+  /* events */
+  eventTag:T("เหตุการณ์","Event"), evCountryTag:T("ข้อพิพาทระหว่างประเทศ","International dispute"),
+  sideA:T("ฝ่ายเสนอ","Proposing"), sideB:T("ฝ่ายคัดค้าน","Objecting"),
+  evAsk:T("คุณจะรับมืออย่างไร?","How will you respond?"), evAskCountry:T("คุณจะตัดสินอย่างไร?","How will you rule?"),
+  later:T("(ผลทีหลัง)","(later)"), evKeys:T("กด 1 2 3 เพื่อเลือก","Press 1 2 3 to choose"), hardHidden:T("โหมด Hard Core: ไม่บอกผลกระทบล่วงหน้า","Hard Core: impacts are hidden"),
+  /* abilities / characters */
+  unlockAtLv:T("ปลดล็อกที่เลเวล","Unlocks at level"), needCountry:T("เลือกประเทศบนแผนที่ก่อน (ซูมแล้วแตะประเทศ)","Select a country on the map first (zoom in and tap one)"),
+  cooldownLen:T("พักหลังใช้","Cooldown"), cooldown:T("พักอีก","Ready in"), level:T("เลเวล","Level"), passive:T("ติดตัว","Passive"),
+  charTitle:T("เลือกบทบาทของคุณ","Choose your role"), charSub:T("แต่ละบทบาทมีจุดเด่นและสกิลพิเศษของตัวเอง เล่นจบแต่ละเกมจะได้ XP เพื่อเลื่อนเลเวล","Each role has its own strengths and special skills. Finish games to earn XP and level up."),
+  buyInShop:T("ซื้อได้ในร้านค้า","buy it in the shop"), loginToBuy:T("เข้าสู่ระบบเพื่อซื้อ","sign in to buy"), charLocked:T("ตัวละครนี้ต้องซื้อด้วย Terra ในร้านค้าก่อน (เมนูหลัก → ร้านค้า)","Buy this character with Terra in the shop first (Main menu → Shop)"),
+  modeTitle:T("โหมดการเล่น","Game mode"), mode_normal:T("ปกติ","Normal"), mode_hard:T("Hard Core","Hard Core"), mode_daily:T("Daily Challenge","Daily Challenge"),
+  modeD_normal:T("เริ่ม 2026 · ภัยปกติ · บันทึกได้ทุกช่อง","Start 2026 · normal hazards · all save slots"),
+  modeD_hard:T("งบน้อย ภัยถี่ ไม่บอกผลกระทบ บันทึกอัตโนมัติอย่างเดียว · Terra ×1.5","Less money, more hazards, hidden impacts, autosave only · Terra ×1.5"),
+  modeD_daily:T("ทุกคนเจอเหตุการณ์ชุดเดียวกันในวันนี้ แข่งอันดับรายวัน","Everyone plays the same world today; daily ranking"),
+  introTag:T("คำสั่งแต่งตั้ง · มกราคม 2026","Appointment order · January 2026"),
+  start:T("เริ่มภารกิจ","Begin mission"),
+  /* story */
+  storyTag:T("เนื้อเรื่อง","Story"), storyGo:T("ไปต่อ","Continue"), storyKeys:T("Space = ต่อไป · Esc = ข้าม","Space = next · Esc = skip"),
+  /* skills screen */
+  skillsTitle:T("สกิล","Skills"), pausedHere:T("เกมหยุดชั่วคราวขณะเปิดหน้านี้","The game is paused while this screen is open"),
+  buffInstant:T("ค้นพบใหม่: สกิลถัดไปเสร็จทันที","Breakthrough: next skill is instant"), buffDisc:T("ทุนวิจัย: สกิลถัดไปถูกลง 40%","Research sprint: next skill −40%"),
+  ready:T("พร้อม","Ready"), hiddenSkill:T("สกิลปริศนา","Unknown skill"), hiddenHint:T("ปลดล็อกสกิลก่อนหน้าเพื่อดูรายละเอียด:","Unlock the earlier skill to reveal it:"),
+  noRollouts:T("ยังไม่มีโครงการที่กำลังทยอยผล","No projects rolling out"), needReq:T("ต้องมีสกิลก่อนหน้าก่อน","Needs the earlier skill first"),
+  useNow:T("ใช้ตอนนี้","Use now"), target:T("เป้าหมาย","Target"), rollingOut:T("กำลังทยอยผล","Rolling out"),
+  unlock:T("ปลดล็อกสกิล","Unlock skill"), owned:T("มีแล้ว","Owned"), inProgress:T("โครงการที่ทยอยผล","Rolling out"),
+  logTech:T("ปลดล็อกสกิล","Skill unlocked"),
+  skillTip:T("[[shield]] = รับมือภัย · [[scale]] = ได้อย่างเสียอย่าง · [[zap]] = สกิลกดใช้ · ซื้อถี่เกินไปจะเจอเงินเฟ้อสีเขียว","[[shield]] = disaster response · [[scale]] = trade-off · [[zap]] = active skill · buying too fast causes Greenflation"),
+  capFull:T("ทยอยผลพร้อมกันได้สูงสุด 3 โครงการ รอให้โครงการเดิมเสร็จก่อน","At most 3 roll-outs at once. Wait for one to finish."),
+  /* end */
+  winBodyS:T("การปล่อยคาร์บอนสุทธิแตะศูนย์ ขณะที่โลกยังร้อนไม่ถึง 1.6°C ป่าฟื้นตัว ทะเลกลับมาใส และเมืองทุกเมืองหายใจได้สะดวก","Net emissions hit zero with warming under 1.6°C. Forests recover, seas clear and every city breathes again."),
+  winBodyA:T("การปล่อยคาร์บอนสุทธิแตะศูนย์ทันเวลา โลกยังมีบาดแผล แต่ยุคหลังคาร์บอนเริ่มต้นขึ้นแล้ว","Net emissions hit zero in time. The planet is scarred, but the post-carbon era has begun."),
+  winBodyB:T("เป็นชัยชนะที่เฉียดฉิว โลกร้อนขึ้นกว่า 2°C แล้ว ภารกิจต่อไปคือช่วยทุกประเทศปรับตัว","A narrow win. Warming passed 2°C; the next mission is helping every country adapt."),
+  yourStory:T("เรื่องราวของคุณ","Your story"), storyBest:T("ประเทศที่คุณช่วยมากที่สุด","Country you helped most"), storyWorst:T("ภัยที่หนักที่สุด","Worst disaster"),
+  storyNone:T("เกมนี้ยังไม่มีเหตุการณ์สำคัญ","No major moments this game"),
+  rewardWait:T("กำลังส่งผลไปที่เซิร์ฟเวอร์...","Sending your result..."), rewardGuest:T("เล่นแบบ Guest: เข้าสู่ระบบเพื่อรับ Terra และติดอันดับ","Playing as guest: sign in to earn Terra and rank"),
+  rewardFail:T("ส่งผลไม่สำเร็จ (ออฟไลน์?)","Couldn't send the result (offline?)"), rewardNoRun:T("เริ่มเกมตอนออฟไลน์ เกมนี้จึงไม่ได้ Terra","This game started offline, so it earns no Terra"),
+  levelUp:T("เลื่อนเป็นเลเวล","Level up! Now level"),
+  note_daily_cap:T("ถึงเพดานรางวัลรายวันแล้ว เกมถัดไปจะได้ Terra น้อยลง","Daily reward cap reached; later games pay less"),
+  note_too_short:T("เกมสั้นกว่า 5 นาที จึงไม่ได้ Terra","Games under 5 minutes earn no Terra"),
+  note_reduced:T("เกมที่ 4 ขึ้นไปของวันได้ Terra ลดลง","From the 4th game of the day, Terra is reduced"),
+  /* pause */
+  hardSaves:T("โหมด Hard Core บันทึกอัตโนมัติได้ช่องเดียว ใช้ช่องบันทึกและรหัสเซฟไม่ได้","Hard Core keeps only the autosave: no slots or save codes"),
+  cloudOk:T("ขึ้นคลาวด์แล้ว","synced to cloud"), cloudSaves:T("เซฟบนคลาวด์ (บัญชีของคุณ)","Cloud saves (your account)"),
+  keysHelp:T("คีย์ลัด: T สกิล · R ภูมิภาค · S สถิติ · N ข่าว · Space หยุด · 1 2 3 ความเร็ว · H ทั้งโลก · + − ซูม · Esc ปิด","Keys: T skills · R regions · S stats · N news · Space pause · 1 2 3 speed · H world · + − zoom · Esc close"),
+  oldSave:T("เซฟจากเวอร์ชันเก่าใช้กับเวอร์ชันนี้ไม่ได้","Saves from the old version don't work in this one"),
+  /* menu */
+  mLearn:T("หน้าเรียนรู้","Learning"), mShop:T("ร้านค้า","Shop"), mBoard:T("อันดับผู้เล่น","Leaderboard"), mCert:T("เกียรติบัตร","Certificate"), mAccount:T("บัญชีผู้เล่น","Account"),
+  netChecking:T("กำลังเชื่อมต่อ...","Connecting..."), netOffline:T("ออฟไลน์","Offline"),
+  netOfflineLong:T("ยังเชื่อมต่อเซิร์ฟเวอร์เกมไม่ได้ ตอนนี้เล่นแบบ Guest ได้ตามปกติ แต่ยังไม่มีบัญชี Terra ร้านค้า และอันดับ","Can't reach the game server. You can still play as a guest, but accounts, Terra, the shop and rankings are unavailable."),
+  signIn:T("เข้าสู่ระบบ","Sign in"), signUp:T("สมัครสมาชิก","Sign up"), signOut:T("ออกจากระบบ","Sign out"), signedOut:T("ออกจากระบบแล้ว","Signed out"),
+  fUserOrEmail:T("ชื่อผู้ใช้ หรือ อีเมล","Username or email"), fPassword:T("รหัสผ่าน","Password"), fUsername:T("ชื่อผู้ใช้ (เปลี่ยนไม่ได้)","Username (permanent)"),
+  fEmail:T("อีเมล","Email"), fDisplay:T("ชื่อที่แสดง (เปลี่ยนได้)","Display name (can change)"), fDisplayPh:T("ชื่อที่โชว์ในเกม","Shown in game"),
+  fPassPh:T("อย่างน้อย 8 ตัวอักษร","At least 8 characters"),
+  noReset:T("หมายเหตุ: ระบบนี้ไม่มีการรีเซ็ตรหัสผ่าน ถ้าลืมรหัส ให้แจ้งผู้ดูแลระบบ","Note: there is no password reset. If you forget it, ask the game admin."),
+  pdpaConsent:T("ฉันยินยอมให้เก็บชื่อผู้ใช้ อีเมล และผลการเล่น เพื่อใช้ในเกมนี้เท่านั้น (ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล)","I agree that my username, email and game results are stored for this game only (Thailand PDPA)"),
+  needConsent:T("กรุณาติ๊กยินยอมก่อน","Please tick the consent box first"),
+  or:T("หรือ","or"), googleLoading:T("กำลังโหลดปุ่ม Google...","Loading Google button..."), googlePickName:T("เกือบเสร็จแล้ว: ตั้งชื่อผู้ใช้สำหรับบัญชี Google นี้","Almost done: pick a username for this Google account"),
+  welcome:T("ยินดีต้อนรับ","Welcome,"), balance:T("ยอด Terra","Terra balance"),
+  terraHow:T("ได้ Terra จากการเล่นจบเกมและความสำเร็จ ยิ่งเล่นดียิ่งได้มาก","Earn Terra by finishing games and achievements; better play earns more"),
+  terraGot:T("ได้รับ Terra","Terra earned"),
+  charLevels:T("เลเวลตัวละคร","Character levels"), renameTitle:T("เปลี่ยนชื่อที่แสดง","Change display name"),
+  free:T("ฟรี","free"), rename:T("เปลี่ยน","Change"), renamed:T("เปลี่ยนชื่อแล้ว","Name changed"),
+  appearance:T("รูปลักษณ์","Appearance"), themeDefault:T("แผนที่ปกติ","Default map"), themeNight:T("กลางคืน","Night"), themePaint:T("ภาพวาด","Painted"),
+  outfitBase:T("ชุดปกติ","Standard outfit"), outfitAlt:T("ชุดใหม่","New outfit"), outfitGold:T("ชุดทอง (Lv10)","Gold outfit (Lv10)"),
+  shopLogin:T("ร้านค้าใช้ Terra ที่ได้จากการเล่น ต้องเข้าสู่ระบบก่อน","The shop uses Terra earned in play. Sign in first."),
+  shopNote:T("ของทุกชิ้นซื้อด้วย Terra ที่ได้จากการเล่นเท่านั้น ไม่มีการขายด้วยเงินจริง","Everything is bought with Terra earned in play. Nothing is sold for real money."),
+  owned2:T("มีแล้ว","Owned"), bought:T("ซื้อสำเร็จ","Purchased"),
+  week:T("สัปดาห์นี้","This week"), allTime:T("ตลอดกาล","All time"), dailyToday:T("โจทย์ประจำวันที่","Today's challenge:"),
+  boardFail:T("โหลดอันดับไม่สำเร็จ","Couldn't load the leaderboard"), boardEmpty:T("ยังไม่มีใครติดอันดับ เล่นเลยเพื่อเป็นคนแรก!","No scores yet. Be the first!"),
+  yourRank:T("อันดับของคุณ","Your rank"), noRankYet:T("คุณยังไม่ติดอันดับในตารางนี้","You're not on this board yet"),
+  certLogin:T("ต้องเข้าสู่ระบบเพื่อขอเกียรติบัตร","Sign in to request a certificate"),
+  certIntro:T("เกียรติบัตรออนไลน์สำหรับผู้เล่นที่ทำภารกิจสำเร็จ มีรหัสตรวจสอบได้","An online certificate for players who complete the mission, with a verification code."),
+  certCondWin:T("ชนะแบบ Net Zero อย่างน้อย 1 ครั้ง","Win with Net Zero at least once"), certCondCards:T("ปลดล็อกการ์ดความรู้อย่างน้อย","Unlock at least this many knowledge cards:"),
+  certNameHelp:T("กรอกชื่อจริงสำหรับพิมพ์ลงเกียรติบัตร (แก้ภายหลังไม่ได้ ตรวจให้ถูกต้องก่อนกด)","Enter your real name for the certificate (it can't be changed later)"),
+  fFullName:T("ชื่อ-นามสกุลจริง","Full real name"), fFullNamePh:T("เช่น เด็กชายภูเขียว ใจดี","e.g. Somchai Jaidee"),
+  certConsent:T("ฉันยินยอมให้แสดงชื่อนี้บนเกียรติบัตรและหน้าตรวจสอบเกียรติบัตร","I agree this name appears on the certificate and its verification page"),
+  certRequest:T("ขอเกียรติบัตร","Request certificate"), certNameShort:T("กรุณากรอกชื่อ-นามสกุล","Please enter your full name"),
+  certMine:T("เกียรติบัตรของฉัน","My certificates"), certCode:T("รหัส","Code"), certDone:T("ออกเกียรติบัตรแล้ว","Certificate issued"),
+  /* learning page */
+  lCards:T("การ์ดความรู้","Knowledge cards"), lHazards:T("ภัยธรรมชาติ","Hazards"), lEndings:T("ฉากจบ","Endings"),
+  lCardsHelp:T("การ์ดปลดล็อกเมื่อพบอีเวนต์นั้นในเกม","Cards unlock when you meet the event in a game"),
+  lLocked:T("การ์ดที่ยังไม่ปลดล็อก","Locked card"), lLockedHelp:T("เล่นต่อไปเพื่อพบอีเวนต์ที่ปลดล็อกการ์ดนี้","Keep playing to meet the event behind this card"),
+  lHazHelp:T("ปลดล็อกเมื่อภัยชนิดนั้นเกิดขึ้นในเกม","Unlocks when that hazard strikes in a game"), lHazLocked:T("ยังไม่เคยเจอภัยชนิดนี้","Not encountered yet"),
+  lEndHelp:T("ภาพฉากจบที่คุณเคยไปถึง","The endings you have reached"),
+  /* server errors */
+  err_generic:T("เกิดข้อผิดพลาด ลองใหม่อีกครั้ง","Something went wrong. Try again."), err_offline:T("เชื่อมต่อเซิร์ฟเวอร์ไม่ได้","Can't reach the server"),
+  err_missing:T("กรอกข้อมูลให้ครบ","Fill in every field"), err_bad_username:T("ชื่อผู้ใช้ใช้ได้เฉพาะ a–z 0–9 และ _ ยาว 3–16 ตัว","Username: a–z 0–9 and _, 3–16 characters"),
+  err_bad_email:T("รูปแบบอีเมลไม่ถูกต้อง","That email doesn't look right"), err_weak_password:T("รหัสผ่านต้องยาวอย่างน้อย 8 ตัวอักษร","Password must be at least 8 characters"),
+  err_bad_display:T("ชื่อที่แสดงต้องยาว 2–20 ตัวอักษร","Display name must be 2–20 characters"), err_bad_word:T("มีคำที่ไม่เหมาะสม ลองชื่ออื่น","That contains a blocked word. Try another."),
+  err_username_taken:T("ชื่อผู้ใช้นี้มีคนใช้แล้ว","That username is taken"), err_email_taken:T("อีเมลนี้สมัครไว้แล้ว","That email is already registered"),
+  err_bad_login:T("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง","Wrong username or password"), err_not_enough_terra:T("Terra ไม่พอ","Not enough Terra"),
+  err_already_owned:T("มีของชิ้นนี้แล้ว","You already own this"), err_not_eligible:T("ยังไม่ผ่านเงื่อนไขการขอเกียรติบัตร","Not eligible yet"),
+  err_rate_limited:T("ส่งคำขอถี่เกินไป รอสักครู่","Too many requests. Wait a moment."), err_google_disabled:T("ยังไม่ได้ตั้งค่า Google Sign-In ในเซิร์ฟเวอร์","Google Sign-In isn't configured on the server"),
+  err_google_bad:T("ยืนยันบัญชี Google ไม่สำเร็จ","Couldn't verify the Google account"), err_unknown_item:T("ไม่พบสินค้านี้","Unknown item"),
+});
+
+};
+gdjs.LoadingCode.userFunc0x1007c38 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Engine · การจำลองรายเดือน, ประเทศ, ความสัมพันธ์, ภัยเฉพาะถิ่น, เหตุการณ์, การบันทึก, ความสำเร็จ */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.engine) return;
+(P.mods = P.mods || {}).engine = 1;
+/* =========================================================================
+   Engine · Simulation
+   One tick = one in-game month. The scene's "tick" timer calls P.tick().
+   Regions hold the totals; each region is split into countries (+ one pooled
+   "other countries" entry) so CO₂ can be cut country by country.
+   Everything visual goes through the hooks in P.H (set by the UI/Map/Audio modules).
+   ========================================================================= */
+const {UI, MONTHS, RESERVE, REGIONS, RIDS, RMETA, CITIES, ACTIONS, SKILLS, SKILL, SKILL_CATS, EVENTS, NEWS, ACH, IC,
+  COUNTRIES, COUNTRY, REST_W, HAZARDS, CEVENTS, CE_FIXED, CHARS, CHAR, STORY, levelOf} = P;
+const H = P.H = P.H || {};
+const hook = (name, ...a) => (H[name] ? H[name](...a) : undefined);
+const S = P.S = P.S || {};
+const t = k => (UI[k] ? UI[k][S.lang || "th"] : k);
+const L = o => (o && typeof o === "object" ? o[S.lang || "th"] : o);
+
+const SAVE_VERSION = 2;
+const TOTAL_TICKS = 300;
+const TIP_TO_TEMP = 0.004;          // 1 'tipping %' ≈ +0.004 °C
+const SPEEDS = [0, 4, 2, 4 / 3];    // seconds per month: 1× = 15 min game, 2× = 7.5 min, 3× = 5 min
+const MAX_PROJECTS = 3;
+const MODES = {normal:{ep:25, pc:20, haz:1, dmg:1}, hard:{ep:10, pc:12, haz:1.6, dmg:1.25}, daily:{ep:25, pc:20, haz:1.15, dmg:1}};
+
+/* ---------------------------- Random numbers (seeded, so a Daily Challenge is the same for everyone) ---------------------------- */
+function rand(){ let x = (S.rng = (S.rng + 0x6D2B79F5) | 0); x = Math.imul(x ^ (x >>> 15), x | 1); x ^= x + Math.imul(x ^ (x >>> 7), x | 61); return ((x ^ (x >>> 14)) >>> 0) / 4294967296; }
+const randSeed = () => (Math.random() * 2 ** 31) | 0;
+
+function newState(lang, o = {}){
+  const mode = MODES[o.mode] ? o.mode : "normal", M = MODES[mode];
+  const st = {
+    v:SAVE_VERSION, lang: lang || "th", mode, char:CHAR[o.char] ? o.char : "sci", charLv:o.charLv || 1, seed:o.seed ?? randSeed(), rng:0,
+    speed:1, tick:0, realSec:0,
+    temp:1.20, tip:10, ep:M.ep, pc:M.pc, appr:75, buys:[],
+    epInc:0, damp:0, sink:0, discAll:1, disc:{}, p3:false,
+    owned:{}, rollouts:[], crolls:[], delays:[], stall:0,
+    used:[], ceUsed:[], lastEv:-3, bubbles:[], bubId:0, newsUsed:[], flags:{},
+    regions: REGIONS.map(r => ({id:r.id, co2:r.co2, co2_0:r.co2, fossil0:r.fossil, comp:r.comp, compBase:r.comp, vuln:r.vuln, cd:{}, uses:{}})),
+    countries:[], selC:null, haz:[], hazId:0, actCd:{}, buff:{}, bond:0, alli:{}, bilats:[], roles:{}, evacFree:{},
+    stats:{help:{}, dmg:[], dec:[], evac:0, aid:0},
+    story:{}, cev:null,
+    hist:[{net:36, temp:1.2}], log:[],
+    sel:"SEA", tab:null, node:"E1", skillCat:"energy", over:null, event:null, started:false, runId:null,
+  };
+  st.rng = st.seed | 0;
+  return st;
+}
+function buildCountries(){
+  S.countries = [];
+  for (const r of S.regions){
+    const list = COUNTRIES.filter(c => c.reg === r.id), tot = list.reduce((s, c) => s + c.w, 0) + REST_W[r.id];
+    for (const c of list){
+      const rel = Math.round(Math.max(-60, Math.min(70, c.stance * 30 + 10 + (rand() - .5) * 16)));
+      S.countries.push({id:c.id, reg:r.id, co2:r.co2 * c.w / tot, co2_0:r.co2 * c.w / tot, rel, adapt:0, cd:{}});
+    }
+    S.countries.push({id:"R_" + r.id, reg:r.id, rest:true, co2:r.co2 * REST_W[r.id] / tot, co2_0:r.co2 * REST_W[r.id] / tot, rel:10, adapt:0, cd:{}});
+  }
+}
+function resetState(o){ Object.keys(S).forEach(k => delete S[k]); Object.assign(S, o); }
+
+/* ---------------------------- Helpers ---------------------------- */
+const clamp = (v,a,b) => Math.max(a, Math.min(b, v));
+const R = id => S.regions.find(r => r.id === id);
+const C = id => S.countries.find(c => c.id === id);
+const regCountries = (reg, withRest = true) => S.countries.filter(c => c.reg === reg && (withRest || !c.rest));
+const avg = f => S.regions.reduce((s,r) => s + f(r), 0) / S.regions.length;
+const grossCO2 = () => S.regions.reduce((s,r) => s + r.co2, 0);
+const sinkEff = () => clamp(1 - Math.max(0, S.temp - 1.2) * 0.3, 0.5, 1);
+const netCO2 = () => grossCO2() - S.sink * sinkEff();
+const lastMile = r => 0.2 + 0.8 * clamp(r.co2 / r.co2_0, 0, 1);
+const dateStr = (tk = S.tick) => `${MONTHS[S.lang][tk % 12]} ${2026 + Math.floor(tk / 12)}`;
+const fmt = (v,d=1) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d);
+const pick = (arr, w) => { let s = arr.reduce((a,x) => a + w(x), 0), r = rand() * s; for (const x of arr){ r -= w(x); if (r <= 0) return x; } return arr[arr.length-1]; };
+const cname = id => { if (!id) return ""; if (id.startsWith("R_")) return `${t("otherIn")} ${L(RMETA[id.slice(2)].name)}`; return L(COUNTRY[id].name); };
+const joinNames = ids => { const n = ids.map(cname); if (n.length < 2) return n.join(""); return n.slice(0, -1).join(", ") + ` ${t("and")} ` + n[n.length - 1]; };
+function addLog(txt, cls=""){ S.log.unshift({tk:S.tick, txt, cls}); if (S.log.length > 150) S.log.pop(); }
+/* region totals = sum of their countries; a change to a whole region is shared out in proportion */
+function syncRegion(r){ r.co2 = regCountries(r.id).reduce((s, c) => s + c.co2, 0); }
+function setRegionCO2(r, v){
+  v = Math.max(0, v); const old = r.co2, list = regCountries(r.id);
+  if (old > 1e-9) list.forEach(c => c.co2 *= v / old); else { const tot = list.reduce((s, c) => s + c.co2_0, 0) || 1; list.forEach(c => c.co2 = v * c.co2_0 / tot); }
+  r.co2 = v;
+}
+function addCountryCO2(c, d){ c.co2 = Math.max(0, c.co2 + d); syncRegion(R(c.reg)); }
+function applyGlobalCO2(delta){ const g = grossCO2() || 1; S.regions.forEach(r => applyRegionCO2(r, delta * (r.co2 / g))); }
+function applyRegionCO2(r, delta){ const d = delta < 0 ? delta * (r.comp / 100) * lastMile(r) : delta; setRegionCO2(r, r.co2 + d); }
+function changeComp(id, v, permanent){ (id === "ALL" ? S.regions : [R(id)]).forEach(r => { r.comp = clamp(r.comp + v, 0, 100); if (permanent) r.compBase = clamp(r.compBase + v, 0, 100); }); }
+function changeVuln(id, v){ (id === "ALL" ? S.regions : [R(id)]).forEach(r => { r.vuln = clamp(r.vuln + v, 0, 100); }); }
+const charLvBonus = () => S.charLv >= 3;
+function relMult(){ let m = 1; if (S.owned.D1) m += .2; if (S.char === "dip") m += charLvBonus() ? .25 : .15; return m; }
+function changeRel(id, v){
+  const c = C(id); if (!c) return 0;
+  const d = v > 0 ? v * relMult() : v, before = c.rel;
+  c.rel = clamp(c.rel + d, -100, 100);
+  if (c.rel >= 100) Ach.unlock("rel100");
+  return c.rel - before;
+}
+const avgRel = reg => { const l = regCountries(reg, false); return l.length ? l.reduce((s, c) => s + c.rel, 0) / l.length : 0; };
+const relAll = () => { const l = S.countries.filter(c => !c.rest); return l.reduce((s, c) => s + c.rel, 0) / l.length; };
+
+/* ---------------------------- Economy ---------------------------- */
+function epGain(){
+  let base = 2 + avg(r => r.comp) * 0.07 + S.appr / 30;
+  if (S.char === "eco") base *= charLvBonus() ? 1.15 : 1.1;
+  return Math.floor(base) + S.epInc;
+}
+const pcGain = () => Math.floor(1 + avg(r => r.comp) * 0.03);
+const recentBuys = () => (S.buys || []).filter(tk => S.tick - tk < 12).length;
+const rushMult = () => 1 + 0.2 * recentBuys();
+function nodeCost(n){
+  let m = (S.disc[n.id] ?? 1) * S.discAll * rushMult();
+  if (S.char === "sci" && n.cat === "energy") m *= charLvBonus() ? .85 : .9;
+  if (S.buff.disc) m *= .6;
+  return {ep: Math.round(n.ep * m), pc: Math.round(n.pc * m)};
+}
+const busyIds = () => [...new Set(S.rollouts.map(r => r.id))];
+const atCapacity = n => n.months > 0 && !S.buff.instant && busyIds().length >= MAX_PROJECTS;
+function nodeState(n){ if (S.owned[n.id]) return "own"; return n.req.every(q => S.owned[q]) ? "ready" : "locked"; }
+function actionCost(a, r, country){
+  const m = Math.pow(1.25, r.uses[a.id] || 0) * (country ? .4 : 1);
+  return {ep: Math.round(a.ep * RESERVE[RMETA[r.id].reserve].m * m), pc: Math.round(a.pc * m)};
+}
+function rollProgress(id){ const rs = S.rollouts.filter(r => r.id === id); if (!rs.length) return null; return Math.min(...rs.map(r => 1 - r.left / r.months)); }
+/* how much a hazard type is softened by owned skills (0 = none … close to 1) */
+function respOf(type){ let m = 1; for (const n of SKILLS) if (S.owned[n.id] && n.resp && n.resp[type]) m *= 1 - n.resp[type]; return 1 - m; }
+
+/* ---------------------------- Player actions: skills ---------------------------- */
+function buyNode(id){
+  const n = SKILL[id]; if (!n || nodeState(n) !== "ready") return false;
+  const c = nodeCost(n); if (S.ep < c.ep || S.pc < c.pc || atCapacity(n)) return false;
+  S.ep -= c.ep; S.pc -= c.pc; S.owned[id] = true; (S.buys = S.buys || []).push(S.tick);
+  const instant = !!S.buff.instant; S.buff.instant = 0; S.buff.disc = 0;
+  const fx = n.fx;
+  const boost = (n.cat === "energy" && id !== "E1" && S.owned.E1) ? 1.1 : 1;
+  const dacEff = (id === "N4" && !S.owned.E2) ? 0.6 : 1;
+  if (fx.appr) S.appr = clamp(S.appr + fx.appr, 0, 100);
+  if (fx.compAll) changeComp("ALL", fx.compAll, true);
+  if (fx.comp) Object.entries(fx.comp).forEach(([k,v]) => changeComp(k, v, true));
+  if (fx.vuln) Object.entries(fx.vuln).forEach(([k,v]) => changeVuln(k, v));
+  if (fx.vulnAll) changeVuln("ALL", fx.vulnAll);
+  if (fx.epInc) S.epInc += fx.epInc;
+  if (fx.damp) S.damp += fx.damp;
+  if (fx.tip) S.temp += fx.tip * TIP_TO_TEMP;
+  if (fx.p3) S.p3 = true;
+  const per = {};
+  if (fx.co2){ const g = grossCO2() || 1; S.regions.forEach(r => per[r.id] = (per[r.id]||0) + fx.co2 * boost * r.co2 / g); }
+  if (fx.all) RIDS.forEach(k => per[k] = (per[k]||0) + fx.all * boost);
+  if (fx.rco2) Object.entries(fx.rco2).forEach(([k,v]) => per[k] = (per[k]||0) + v * boost);
+  const months = instant ? 1 : Math.max(1, n.months);
+  if (Object.keys(per).length){
+    if (instant) S.regions.forEach(r => { if (per[r.id]) setRegionCO2(r, r.co2 + per[r.id] * (r.comp / 100) * lastMile(r)); });
+    else S.rollouts.push({id, kind:"co2", left:months, months, per});
+  }
+  if (fx.sink){ if (instant) S.sink += fx.sink * dacEff; else S.rollouts.push({id, kind:"sink", left:months, months, amt: fx.sink * dacEff}); }
+  addLog(`${t("logTech")}: ${L(n.name)}`, "tc"); Ach.check();
+  hook("sfx", "buy"); changed(); return true;
+}
+/* active skills and character abilities share one cooldown table (months) */
+function abilityList(){
+  const out = [];
+  const ch = CHAR[S.char];
+  if (ch) ch.acts.forEach(a => out.push({id:a.id, kind:"char", icon:a.icon, name:a.name, desc:a.desc, cd:a.cd, lock:a.lv && S.charLv < a.lv ? a.lv : 0}));
+  SKILLS.filter(n => n.type === "active" && S.owned[n.id]).forEach(n => out.push({id:n.id, kind:"skill", icon:n.icon, name:n.name, desc:n.desc, cd:n.cd, target:n.target}));
+  return out;
+}
+function abilityReady(a){ return !a.lock && !(S.actCd[a.id] > 0) && (a.target !== "country" || (S.selC && !S.selC.startsWith("R_"))); }
+function useAbility(id){
+  const a = abilityList().find(x => x.id === id); if (!a || !abilityReady(a) || S.over || S.event) return false;
+  const c = S.selC ? C(S.selC) : null;
+  switch (id){
+    case "I4": addCountryCO2(c, -0.15 * c.co2); changeRel(c.id, -5); S.stats.help[c.id] = (S.stats.help[c.id] || 0) + 1; break;
+    case "C6": S.evacFree[c.id] = 1; break;
+    case "D4": S.ep += 80; S.appr = clamp(S.appr - 4, 0, 100); break;
+    case "sci1": S.buff.instant = 1; break;
+    case "sci2": S.buff.disc = 1; break;
+    case "dip1": regCountries(S.sel, false).forEach(x => changeRel(x.id, 15)); break;
+    case "dip2": changeComp("ALL", 8, false); break;
+    case "eco1": S.ep += 120; S.bond = 12; break;
+    case "eco2": if (S.pc < 20) return false; S.pc -= 20; S.ep += 70; break;
+    case "act1": S.appr = clamp(S.appr + 12, 0, 100); break;
+    case "act2": changeComp("ALL", 6, false); S.countries.forEach(x => { if (!x.rest) changeRel(x.id, 5); }); break;
+    default: return false;
+  }
+  S.actCd[id] = a.cd;
+  addLog(`${t("logAbility")}: ${L(a.name)}${a.target === "country" && c ? " → " + cname(c.id) : ""}`, "tc");
+  hook("sfx", "action"); Ach.unlock("ability1");
+  if (!checkEnd()) changed(); return true;
+}
+
+/* ---------------------------- Player actions: regions and countries ---------------------------- */
+/* regional orders; when a country is selected the order can target just that country (cheaper, narrower) */
+function doAction(aid, scope){
+  const a = ACTIONS.find(x => x.id === aid), r = R(S.sel);
+  const cc = scope === "country" && S.selC && !S.selC.startsWith("R_") ? C(S.selC) : null;
+  if (!a || !r || (r.cd[aid] || 0) > 0) return;
+  const c = actionCost(a, r, !!cc); if (S.ep < c.ep || S.pc < c.pc) return;
+  S.ep -= c.ep; S.pc -= c.pc; r.uses[aid] = (r.uses[aid] || 0) + 1; r.cd[aid] = a.cd;
+  if (!cc){
+    if (aid === "fund")   setRegionCO2(r, r.co2 - 0.35 * r.comp / 100);
+    if (aid === "diplo")  r.comp = clamp(r.comp + 8, 0, 100);
+    if (aid === "adapt"){ r.vuln = clamp(r.vuln - 10, 0, 100); S.appr = clamp(S.appr + 1, 0, 100); }
+    if (aid === "tariff"){ setRegionCO2(r, r.co2 - 0.8 * r.comp / 100); r.comp = clamp(r.comp - 6, 0, 100); regCountries(r.id, false).forEach(x => changeRel(x.id, -4)); }
+  } else {
+    if (aid === "fund"){ addCountryCO2(cc, -cc.co2 * 0.12 * r.comp / 100); changeRel(cc.id, 3); }
+    if (aid === "diplo") changeRel(cc.id, 12);
+    if (aid === "adapt"){ cc.adapt = clamp(cc.adapt + 20, 0, 100); changeRel(cc.id, 4); }
+    if (aid === "tariff"){ addCountryCO2(cc, -cc.co2 * 0.25 * r.comp / 100); changeRel(cc.id, -12); }
+    S.stats.help[cc.id] = (S.stats.help[cc.id] || 0) + 1;
+  }
+  addLog(`${t("logAct")}: ${L(a.name)} → ${cc ? cname(cc.id) : L(RMETA[r.id].name)}`, "tc"); Ach.unlock("action1"); hook("sfx", "action");
+  if (!checkEnd()) changed();
+}
+/* orders for one country (relations) */
+const CACTS = [
+  {id:"talk",  icon:"message-circle", ep:0,  pc:6,  cd:6,  name:{th:"เจรจา",en:"Negotiate"}, desc:{th:"ความสัมพันธ์ +10",en:"Relation +10"}},
+  {id:"fund",  icon:"hand-coins",     ep:50, pc:0,  cd:12, name:{th:"ส่งทุนสนับสนุน",en:"Send funding"}, desc:{th:"ความสัมพันธ์ +20 และ CO₂ ประเทศนี้ −8% ภายใน 12 เดือน",en:"Relation +20; this country's CO₂ −8% over 12 months"}},
+  {id:"tech",  icon:"arrow-left-right", ep:0, pc:10, cd:12, req:"D2", name:{th:"แลกเปลี่ยนเทคโนโลยี",en:"Share technology"}, desc:{th:"ความสัมพันธ์ +8 และ CO₂ ประเทศนี้ −5% ทันที (ต้องมีสกิลอย่างน้อย 3 สกิล)",en:"Relation +8; this country's CO₂ −5% now (needs 3+ skills)"}},
+  {id:"shield",icon:"shield-plus",    ep:25, pc:0,  cd:8,  name:{th:"ช่วยเตรียมรับมือภัย",en:"Help prepare for disasters"}, desc:{th:"ภัยในประเทศนี้เสียหายน้อยลง (การปรับตัว +20) และความสัมพันธ์ +4",en:"Hazards here do less damage (adaptation +20); relation +4"}},
+];
+function cactCost(a){ const m = 1; return {ep:Math.round(a.ep * m), pc:Math.round(a.pc * m)}; }
+function cactOk(a, c){
+  if (!c || c.rest) return false;
+  if (a.req && !S.owned[a.req]) return false;
+  if (a.id === "tech" && Object.keys(S.owned).length < 3) return false;
+  const k = cactCost(a); return !(c.cd[a.id] > 0) && S.ep >= k.ep && S.pc >= k.pc;
+}
+function countryAction(aid){
+  const a = CACTS.find(x => x.id === aid), c = S.selC && C(S.selC); if (!a || !cactOk(a, c)) return;
+  const k = cactCost(a); S.ep -= k.ep; S.pc -= k.pc; c.cd[aid] = a.cd;
+  if (aid === "talk") changeRel(c.id, 10);
+  if (aid === "fund"){ changeRel(c.id, 20); S.crolls.push({c:c.id, left:12, months:12, frac:-0.08}); }
+  if (aid === "tech"){ changeRel(c.id, 8); addCountryCO2(c, -0.05 * c.co2); }
+  if (aid === "shield"){ c.adapt = clamp(c.adapt + 20, 0, 100); changeRel(c.id, 4); }
+  S.stats.help[c.id] = (S.stats.help[c.id] || 0) + 1;
+  addLog(`${t("logAct")}: ${L(a.name)} → ${cname(c.id)}`, "tc"); hook("sfx", "action"); Ach.unlock("action1");
+  changed();
+}
+/* bilateral agreement between the selected country and a partner (both relation ≥ 40) */
+const BILAT_COST = {ep:30, pc:15};
+const bilatKey = (a, b) => [a, b].sort().join("|");
+function bilatPartners(){
+  const c = S.selC && C(S.selC); if (!c || c.rest || c.rel < 40) return [];
+  return S.countries.filter(x => !x.rest && x.id !== c.id && x.rel >= 40 && !S.bilats.includes(bilatKey(c.id, x.id)));
+}
+function bilateral(pid){
+  const c = S.selC && C(S.selC), p = C(pid);
+  if (!c || !p || c.rel < 40 || p.rel < 40 || S.bilats.includes(bilatKey(c.id, p.id)) || S.ep < BILAT_COST.ep || S.pc < BILAT_COST.pc) return;
+  S.ep -= BILAT_COST.ep; S.pc -= BILAT_COST.pc; S.bilats.push(bilatKey(c.id, p.id));
+  [c, p].forEach(x => { S.crolls.push({c:x.id, left:24, months:24, frac:-0.10}); changeRel(x.id, 5); });
+  addLog(`${t("logBilat")}: ${cname(c.id)} + ${cname(p.id)}`, "gd"); hook("sfx", "buy"); Ach.unlock("bilateral");
+  changed();
+}
+/* alliance: 3+ countries in one region with relation ≥ 50 (needs skill D3) */
+const ALLY_COST = {pc:25};
+const allyCandidates = reg => regCountries(reg, false).filter(c => c.rel >= 50);
+function canAlly(reg){ return !!S.owned.D3 && !S.alli[reg] && allyCandidates(reg).length >= 3 && S.pc >= ALLY_COST.pc; }
+function formAlliance(reg){
+  if (!canAlly(reg)) return;
+  S.pc -= ALLY_COST.pc; const members = allyCandidates(reg).map(c => c.id);
+  S.alli[reg] = {members, at:S.tick}; changeComp(reg, 8, true);
+  addLog(`${t("logAlly")}: ${L(RMETA[reg].name)} (${joinNames(members)})`, "gd"); hook("sfx", "buy"); Ach.unlock("alliance");
+  changed();
+}
+function allianceTick(){
+  for (const reg of Object.keys(S.alli)){
+    const al = S.alli[reg]; let broken = null;
+    for (const id of al.members){ const c = C(id); if (!c) continue; addCountryCO2(c, -c.co2 * 0.0025); if (c.rel < 30) broken = id; }
+    if (broken){
+      al.members.forEach(id => { const c = C(id); if (c) c.rel = clamp(c.rel - 15, -100, 100); });
+      changeComp(reg, -8, true); delete S.alli[reg];
+      addLog(`${t("logAllyBreak")}: ${cname(broken)} · ${L(RMETA[reg].name)}`, "al"); hook("sfx", "warn");
+    }
+  }
+}
+
+/* ---------------------------- Effects of event options ---------------------------- */
+function applyFx(fx, target, cev){
+  if (fx.co2){ if (target) applyRegionCO2(R(target), fx.co2); else applyGlobalCO2(fx.co2); }
+  if (fx.rco2) Object.entries(fx.rco2).forEach(([k,v]) => applyRegionCO2(R(k), v));
+  if (fx.temp) S.temp += fx.temp;
+  if (fx.tip)  S.temp += fx.tip * TIP_TO_TEMP;
+  if (fx.appr) S.appr = clamp(S.appr + fx.appr, 0, 100);
+  if (fx.ep)   S.ep = Math.max(0, S.ep + fx.ep);
+  if (fx.pc)   S.pc = Math.max(0, S.pc + fx.pc);
+  if (fx.comp) Object.entries(fx.comp).forEach(([k,v]) => changeComp(k === "T" ? (target || "ALL") : k, v, false));
+  if (fx.vuln) Object.entries(fx.vuln).forEach(([k,v]) => {
+    if (k === "T" && cev){ [...new Set([...cev.A, ...cev.B].map(id => C(id).reg))].forEach(rg => changeVuln(rg, v)); }
+    else changeVuln(k === "T" ? (target || "ALL") : k, v);
+  });
+  if (fx.disc) Object.entries(fx.disc).forEach(([k,v]) => { if (k === "ALL") S.discAll *= (1 - v); else S.disc[k] = (S.disc[k] ?? 1) * (1 - v); });
+  S.discAll = Math.max(.5, S.discAll);
+  if (fx.damp) S.damp += fx.damp;
+  if (fx.stall) S.stall += fx.stall;
+  if (fx.delay) S.delays.push({at:S.tick + fx.delay.m, fx:fx.delay.fx, target});
+  if (cev){
+    if (fx.relA) cev.A.forEach(id => changeRel(id, fx.relA));
+    if (fx.relB) cev.B.forEach(id => changeRel(id, fx.relB));
+    if (fx.cA) cev.A.forEach(id => { const c = C(id); addCountryCO2(c, c.co2 * fx.cA); });
+    if (fx.cB) cev.B.forEach(id => { const c = C(id); addCountryCO2(c, c.co2 * fx.cB); });
+  }
+}
+
+/* ---------------------------- Bubbles (green = free Eco-Points; red = disaster aid after a hazard) ---------------------------- */
+const RED_COST = 20;
+const aidCost = () => Math.round(RED_COST * (S.owned.D1 ? .75 : 1));
+function spawnGreens(){
+  const greens = S.bubbles.filter(b => b.type === "green").length;
+  if (greens < 1 && rand() < 0.10){
+    const reg = pick(S.regions, r => 0.3 + r.comp / 100);
+    const city = pick(CITIES[reg.id], c => c[2]);
+    S.bubbles.push({id:++S.bubId, type:"green", reg:reg.id, lat:city[0], lon:city[1], ttl:4}); hook("sfx", "spawnGreen");
+  }
+}
+function ageBubbles(){
+  S.bubbles.forEach(b => {
+    b.ttl--;
+    if (b.ttl <= 0 && b.type === "red"){
+      const r = R(b.reg); S.appr = clamp(S.appr - 1.5, 0, 100); r.vuln = clamp(r.vuln + 2, 0, 100); r.comp = clamp(r.comp - 2, 0, 100);
+      if (b.cid) changeRel(b.cid, -6);
+      hook("sfx", "miss"); addLog(`${t("redMiss")} ${b.cid ? cname(b.cid) : L(RMETA[b.reg].name)} · ${t("appr")} −1.5% · ${t("vuln")} +2%`, "al");
+    }
+  });
+  S.bubbles = S.bubbles.filter(b => b.ttl > 0);
+}
+/* x, y = screen position (design units) for the floating text */
+function popBubble(id, x, y){
+  const b = S.bubbles.find(q => q.id === id); if (!b || S.over || S.event) return false;
+  if (b.type === "green"){
+    const gain = 2 + Math.round(avg(r => r.comp) / 40);
+    S.ep += gain; hook("sfx", "pop"); Ach.green(); hook("floatText", x, y, `+${gain} ${IC.ep}`, "good");
+  } else {
+    const cost = aidCost();
+    if (S.ep < cost) { hook("sfx", "error"); hook("floatText", x, y, t("cantAfford"), "bad"); return true; }
+    const r = R(b.reg); S.ep -= cost; r.comp = clamp(r.comp + 3, 0, 100); r.vuln = clamp(r.vuln - 1, 0, 100); S.appr = clamp(S.appr + 1, 0, 100);
+    if (b.cid){ changeRel(b.cid, 10); S.stats.help[b.cid] = (S.stats.help[b.cid] || 0) + 1; }
+    S.stats.aid++;
+    hook("sfx", "aid"); Ach.aid(); hook("floatText", x, y, `+1% ${IC.appr}`, "accent");
+    addLog(`${t("redHelp")} ${b.cid ? cname(b.cid) : L(RMETA[b.reg].name)} · ${IC.ep} −${cost} · ${t("relation")} +10`, "gd");
+  }
+  S.bubbles = S.bubbles.filter(q => q.id !== id);
+  changed(); return true;
+}
+
+/* ---------------------------- Local weather ---------------------------- */
+const FORECAST = 3;   // months of warning before a hazard strikes
+function hazardTick(){
+  const M = MODES[S.mode] || MODES.normal;
+  for (const h of S.haz.filter(h => S.tick >= h.at)) strike(h);
+  S.haz = S.haz.filter(h => S.tick < h.at);
+  const maxN = S.mode === "hard" ? 3 : 2;
+  const p = (0.03 + Math.max(0, S.temp - 1.2) * 0.06) * M.haz;
+  if (S.haz.length < maxN && rand() < p){
+    const busy = new Set(S.haz.map(h => h.c));
+    const list = S.countries.filter(c => !c.rest && !busy.has(c.id));
+    const c = pick(list, x => COUNTRY[x.id].risk * (R(x.reg).vuln / 50) / (1 + x.adapt / 40));
+    const type = COUNTRY[c.id].hz[Math.floor(rand() * COUNTRY[c.id].hz.length)];
+    const h = {id:++S.hazId, type, c:c.id, at:S.tick + FORECAST, sev:0.7 + rand() * 0.6, evac:!!S.evacFree[c.id]};
+    if (h.evac){ delete S.evacFree[c.id]; S.stats.evac++; }
+    S.haz.push(h);
+    addLog(`[[${HAZARDS[type].icon}]] ${t("forecast")}: ${L(HAZARDS[type].name)} · ${cname(c.id)} · ${FORECAST} ${t("months")}`, "al");
+    hook("sfx", "warn"); hook("hazardWarn", h);
+  }
+}
+const evacCost = () => 12;
+function evacuate(hid){
+  const h = S.haz.find(x => x.id === hid); if (!h || h.evac || S.over) return false;
+  if (S.ep < evacCost()){ hook("sfx", "error"); return false; }
+  S.ep -= evacCost(); h.evac = true; S.stats.evac++; AchStore.data.evac = (AchStore.data.evac || 0) + 1; AchStore.save();
+  addLog(`${t("evacDone")} ${cname(h.c)} · ${IC.ep} −${evacCost()}`, "gd"); hook("sfx", "aid"); Ach.check(); changed(); return true;
+}
+function strike(h){
+  const M = MODES[S.mode] || MODES.normal, Z = HAZARDS[h.type], c = C(h.c), r = R(c.reg);
+  const d = h.sev * (1 + Math.max(0, S.temp - 1.2) * 0.6) * (1 - respOf(h.type)) * (h.evac ? 0.35 : 1) * M.dmg * (1 - c.adapt / 200);
+  const epLoss = Math.round(Z.ep * d), apLoss = Z.appr * d * (S.owned.C3 ? 0.5 : 1);
+  S.ep = Math.max(0, S.ep - epLoss + (S.owned.C3 ? 15 : 0));
+  S.appr = clamp(S.appr - apLoss, 0, 100);
+  r.vuln = clamp(r.vuln + Z.vuln * d, 0, 100);
+  changeRel(c.id, -2 * d);
+  if (Z.co2) applyRegionCO2(r, Z.co2 * d);
+  if (h.type === "wildfire") S.temp += 0.003 * d;
+  S.stats.dmg.push({type:h.type, c:c.id, tick:S.tick, d:+d.toFixed(2)});
+  const ac = AchStore.data; ac.haz = ac.haz || []; if (!ac.haz.includes(h.type)){ ac.haz.push(h.type); AchStore.save(); }
+  if (d < 0.25) Ach.unlock("stormSafe");
+  addLog(`[[${Z.icon}]] ${L(Z.name)} ${t("hits")} ${cname(c.id)} · ${IC.ep} −${epLoss} · ${t("appr")} −${apLoss.toFixed(1)}%${h.evac ? " · " + t("evacuated") : ""}`, d > 0.6 ? "al" : "ev");
+  // aid bubble at the country
+  S.bubbles.push({id:++S.bubId, type:"red", reg:c.reg, cid:c.id, hz:h.type, ttl:5});
+  hook("sfx", "spawnRed"); hook("hazardStrike", h, d);
+}
+
+/* ---------------------------- Tick engine ---------------------------- */
+function tick(){
+  if (!S.started || S.over || S.event) return;
+  S.tick++;
+  const prevTemp = S.temp;
+  if (S.stall > 0) S.stall--;
+  else {
+    S.rollouts.forEach(ro => {
+      if (ro.kind === "co2") S.regions.forEach(r => { const d = ro.per[r.id]; if (d) setRegionCO2(r, r.co2 + (d / ro.months) * (r.comp / 100) * lastMile(r)); });
+      else S.sink += ro.amt / ro.months;
+      ro.left--;
+      if (ro.left === 0){ hook("sfx", "done"); addLog(`${L(SKILL[ro.id].name)} — ${t("logRollDone")}`, "tc"); }
+    });
+    S.rollouts = S.rollouts.filter(ro => ro.left > 0);
+  }
+  S.crolls.forEach(cr => { const c = C(cr.c); if (c) addCountryCO2(c, c.co2_0 * cr.frac / cr.months * (R(c.reg).comp / 100)); cr.left--; });
+  S.crolls = S.crolls.filter(cr => cr.left > 0);
+  S.delays.filter(d => d.at <= S.tick).forEach(d => applyFx(d.fx, d.target));
+  S.delays = S.delays.filter(d => d.at > S.tick);
+  const damp = Math.min(1.3, S.damp);
+  S.regions.forEach(r => {
+    const fossil = r.fossil0 * (r.co2 / r.co2_0);
+    let v = r.co2 * (1 + 0.0022 * fossil * (1 - damp));
+    if (S.p3 && r.comp < 70) v -= 0.3 / 12;
+    setRegionCO2(r, v);
+    const target = clamp(r.compBase + (S.appr - 75) * 0.25 + avgRel(r.id) * 0.08, 0, 100);
+    r.comp = clamp(r.comp + (target - r.comp) * 0.02, 0, 100);
+    Object.keys(r.cd).forEach(k => { if (r.cd[k] > 0) r.cd[k]--; });
+  });
+  S.countries.forEach(c => { Object.keys(c.cd).forEach(k => { if (c.cd[k] > 0) c.cd[k]--; }); c.rel += (Math.min(c.rel, 20) - c.rel) * 0.004; });
+  Object.keys(S.actCd).forEach(k => { if (S.actCd[k] > 0) S.actCd[k]--; });
+  if (S.bond > 0){ S.ep = Math.max(0, S.ep - 12); S.bond--; }
+  allianceTick();
+  const net = netCO2();
+  S.temp += (net / 36.0) * 0.0035 + (S.tip / 100) * 0.0015;
+  S.ep += epGain(); S.pc += pcGain();
+  if (S.temp >= 2.5) S.tip += 1.2; else if (S.temp >= 2.0) S.tip += 0.6; else if (S.temp >= 1.5) S.tip += 0.2;
+  S.tip = clamp(S.tip, 0, 100);
+  if (prevTemp < 1.5 && S.temp >= 1.5) { addLog(t("logTipping"), "al"); hook("sfx", "warn"); }
+  if (prevTemp < 2.0 && S.temp >= 2.0) { addLog(t("logTipping2"), "al"); hook("sfx", "warn"); }
+  const calm = S.char === "act" ? (charLvBonus() ? .65 : .75) : 1;
+  const stress = avg(r => r.vuln) / 100 * Math.max(0, S.temp - 1.3) * 0.6 * calm;
+  S.appr = clamp(S.appr - stress + (60 - S.appr) * 0.004, 0, 100);
+  ageBubbles(); spawnGreens(); hazardTick();
+  S.hist.push({net, temp:S.temp}); Ach.check();
+  if (checkEnd()) return;
+  maybeNews();
+  if (S.tick % 6 === 0) autosave();
+  const act = STORY.find(a => a.at > 0 && S.tick >= a.at && !S.story[a.act]);
+  if (act){ S.story[act.act] = 1; hook("story", act.act); changed(); return; }
+  const p = Math.min(0.25, 0.08 + S.temp * 0.03);
+  if (S.tick - S.lastEv >= 4 && rand() < p) triggerEvent();
+  changed();
+}
+function maybeNews(){
+  if (S.tick > 0 && S.tick % 12 === 0){
+    const y = 2025 + S.tick / 12, prev = S.hist[Math.max(0, S.hist.length - 13)].net, net = netCO2();
+    hook("sfx", "year"); addLog(`[[chart-line]] ${t("annual")} ${y}: ${t("co2")} ${net.toFixed(1)} Gt (${fmt(net - prev)}) · ΔT +${S.temp.toFixed(2)}°C · ${t("appr")} ${S.appr.toFixed(0)}%`, "tc");
+  }
+  S.regions.forEach(r => { if (!S.flags["half" + r.id] && r.co2 <= r.co2_0 / 2){ S.flags["half" + r.id] = 1; addLog(`${L(RMETA[r.id].name)} ${t("halved")}`, "gd"); } });
+  if (rand() > 0.3) return;
+  const idx = NEWS.map((n,i) => i).filter(i => !S.newsUsed.includes(i) && (!NEWS[i].c || NEWS[i].c(S)));
+  if (!idx.length) return;
+  const i = idx[Math.floor(rand() * idx.length)];
+  S.newsUsed.push(i); if (S.newsUsed.length > 24) S.newsUsed.shift();
+  const reg = REGIONS[Math.floor(rand() * REGIONS.length)], cities = CITIES[reg.id];
+  const txt = NEWS[i][S.lang].replace("{C}", cities[Math.floor(rand() * cities.length)][3]).replace("{R}", L(reg.name)).replace("{Y}", 2025 + Math.floor(S.tick / 12));
+  addLog("[[newspaper]] " + txt, "nw"); hook("sfx", "news");
+}
+
+/* ---------------------------- Events ---------------------------- */
+function eligible(e){
+  const c = e.cond || {}, y = 2026 + Math.floor(S.tick / 12);
+  return !S.used.includes(e.id) && (!c.minTemp || S.temp >= c.minTemp) && (!c.minYear || y >= c.minYear) && (!c.req || S.owned[c.req]);
+}
+/* choose the countries for a country event: prefer those that have had that role less often */
+function pickGroup(pool, role, avoid, n){
+  let list = S.countries.filter(c => !c.rest && !avoid.has(c.id) && COUNTRY[c.id].tags.some(tg => pool.includes(tg)));
+  const out = [];
+  while (out.length < n && list.length){
+    const c = pick(list, x => { const r = (S.roles[x.id] || {})[role] || 0; return (1 / (1 + 2 * r)) * (1 + Math.log10(COUNTRY[x.id].w) / 3); });
+    out.push(c.id); list = list.filter(x => x.id !== c.id);
+  }
+  return out;
+}
+function triggerCountryEvent(){
+  const pool = CEVENTS.filter(e => !S.ceUsed.includes(e.id)); if (!pool.length){ S.ceUsed = []; return false; }
+  const e = pool[Math.floor(rand() * pool.length)];
+  let A, B;
+  const fixed = CE_FIXED[e.id];
+  if (fixed && !(AchStore.data.ceFixed || {})[e.id]){ A = fixed.A.slice(); B = fixed.B.slice(); (AchStore.data.ceFixed = AchStore.data.ceFixed || {})[e.id] = 1; AchStore.save(); }
+  else {
+    A = pickGroup(e.poolA, "A", new Set(), 2 + (rand() < .4 ? 1 : 0));
+    B = pickGroup(e.poolB, "B", new Set(A), 2 + (rand() < .4 ? 1 : 0));
+  }
+  if (A.length < 2 || B.length < 2) return false;
+  A.forEach(id => { (S.roles[id] = S.roles[id] || {}).A = (S.roles[id].A || 0) + 1; });
+  B.forEach(id => { (S.roles[id] = S.roles[id] || {}).B = (S.roles[id].B || 0) + 1; });
+  S.ceUsed.push(e.id); S.lastEv = S.tick; S.event = e.id; S.cev = {id:e.id, A, B};
+  hook("sfx", "event"); hook("amb", "crowd"); hook("mapFocus", C(A[0]).reg); hook("showEvent");
+  return true;
+}
+function triggerEvent(){
+  const y = 2026 + Math.floor(S.tick / 12);
+  if (y >= 2027 && rand() < 0.35 && triggerCountryEvent()) return;
+  const pool = EVENTS.filter(eligible); if (!pool.length) return;
+  const e = pool[Math.floor(rand() * pool.length)];
+  S.used.push(e.id); S.lastEv = S.tick; S.event = e.id; S.cev = null; hook("sfx", "event"); hook("amb", e.snd);
+  if (e.target) hook("mapFocus", e.target);
+  hook("showEvent");
+}
+/* the open event in one shape for the UI: {id, title, desc, options, target, A, B, country} */
+function currentEvent(){
+  if (!S.event) return null;
+  if (S.cev && S.cev.id === S.event){
+    const e = CEVENTS.find(x => x.id === S.event); if (!e) return null;
+    const A = joinNames(S.cev.A), B = joinNames(S.cev.B);
+    const sub = o => ({th:o.th.replace("{A}", A).replace("{B}", B), en:o.en.replace("{A}", A).replace("{B}", B)});
+    return {id:e.id, country:true, title:e.title, desc:sub(e.desc), options:e.options, target:null, A:S.cev.A, B:S.cev.B};
+  }
+  const e = EVENTS.find(x => x.id === S.event); return e ? {...e, country:false} : null;
+}
+const POSTPONE = {appr:-6, tip:1};
+function affordable(fx){ return (!(fx.ep < 0) || S.ep >= -fx.ep) && (!(fx.pc < 0) || S.pc >= -fx.pc); }
+function fxMagnitude(fx){ return Math.abs(fx.co2 || 0) * 2 + Math.abs(fx.temp || 0) * 40 + Math.abs(fx.tip || 0) * .15 + Math.abs(fx.appr || 0) * .12 + Math.abs(fx.ep || 0) / 40 + Math.abs(fx.relA || 0) / 15 + Math.abs(fx.relB || 0) / 15; }
+function chooseOption(i){
+  const e = currentEvent(); if (!e) return;
+  const opt = i === -1 ? {label:{th:UI.postpone.th,en:UI.postpone.en}, fx:POSTPONE} : e.options[i];
+  if (i !== -1 && !affordable(opt.fx)) return;
+  applyFx(opt.fx, e.target, e.country ? S.cev : null); hook("sfx", "choose"); Ach.unlock("event1");
+  if (e.country){ AchStore.data.cev = (AchStore.data.cev || 0) + 1; AchStore.save(); }
+  else Ach.sawEvent(e.id);
+  if (e.id === "EVT_119" || e.id === "EVT_47") Ach.unlock("chaoPhraya");
+  S.stats.dec.push({title:e.title, label:opt.label, mag:fxMagnitude(opt.fx), tk:S.tick});
+  S.stats.dec.sort((a, b) => b.mag - a.mag); S.stats.dec = S.stats.dec.slice(0, 3);
+  addLog(`${L(e.title)} → ${L(opt.label)} [${fxChips(opt.fx, e.target).map(c => c.txt).join(", ") || "—"}]`, "ev");
+  S.event = null; S.cev = null; hook("closeModal"); hook("stopAmb");
+  if (!checkEnd()) changed();
+}
+
+/* ---------------------------- End of game ---------------------------- */
+function checkEnd(){
+  let o = null;
+  if (netCO2() <= 0) o = "win"; else if (S.temp >= 3.0) o = "l1"; else if (S.appr <= 0) o = "l2"; else if (S.tick >= TOTAL_TICKS) o = "l3";
+  if (!o) return false;
+  S.over = o; S.event = null; S.cev = null; S.grade = o === "win" ? P.gradeOf(S.temp) : null;
+  hook("sfx", o === "win" ? "win" : "lose");
+  const ends = AchStore.data.ends = AchStore.data.ends || {}; ends[o === "win" ? "win" + S.grade : o] = Date.now();
+  const played = AchStore.data.charsDone = AchStore.data.charsDone || []; if (!played.includes(S.char)) played.push(S.char);
+  if (S.mode === "daily") AchStore.data.daily = (AchStore.data.daily || 0) + 1;
+  AchStore.save();
+  Ach.check(); changed(); hook("showEnd"); hook("gameOver");
+  const sv = readSaves(); if (sv && sv.auto){ delete sv.auto; try { localStorage.setItem(SAVE_KEY, JSON.stringify(sv)); } catch(e) {} }
+  return true;
+}
+function score(){
+  const left = Math.max(0, TOTAL_TICKS - S.tick);
+  const base = S.over === "win" ? 5000 + left * 20 : Math.round((36 - netCO2()) * 80);
+  return Math.max(0, Math.round(base + Math.max(0, 2.5 - S.temp) * 1500 + S.appr * 15 + Math.max(0, relAll()) * 10));
+}
+/* what the server needs to check the result and pay Terra (the server recomputes everything) */
+function summary(){
+  return {runId:S.runId, mode:S.mode, char:S.char, ending:S.over, tick:S.tick, temp:+S.temp.toFixed(3), net:+netCO2().toFixed(3), appr:+S.appr.toFixed(2),
+    rel:+relAll().toFixed(2), skills:Object.keys(S.owned).length, realSec:Math.round(S.realSec), seed:S.seed, score:score()};
+}
+/* XP for the character (guests keep it on this device; accounts get it from the server) */
+function xpFor(){ return Math.round(Math.min(160, 40 + score() / 120) + (S.over === "win" ? 60 : 0)); }
+function endStory(){
+  const best = Object.entries(S.stats.help).sort((a, b) => b[1] - a[1])[0];
+  const worst = S.stats.dmg.slice().sort((a, b) => b.d - a.d)[0];
+  return {best:best ? best[0] : null, worst, dec:S.stats.dec.slice(0, 3)};
+}
+function fxChips(fx, target){
+  const c = [], rn = id => id === "ALL" ? (S.lang === "th" ? "ทั้งโลก" : "all") : (id === "T" ? (target || "ALL") : id);
+  /* good = helps the player (green) · up = the number goes up (▲) · mag = rough size (1 ≈ normal) */
+  const push = (txt, good, icon, mag, up) => c.push({txt, good, icon, mag, up});
+  if (fx.co2) push(`${IC.co2} ${target ? target + " " : ""}${fmt(fx.co2)} Gt`, fx.co2 < 0, "cloud", Math.abs(fx.co2) / .5, fx.co2 > 0);
+  if (fx.rco2) Object.entries(fx.rco2).forEach(([k,v]) => push(`${IC.co2} ${k} ${fmt(v)} Gt`, v < 0, "cloud", Math.abs(v) / .5, v > 0));
+  if (fx.temp) push(`${IC.temp} ${fmt(fx.temp,2)}°C`, fx.temp < 0, "thermometer", Math.abs(fx.temp) / .02, fx.temp > 0);
+  if (fx.ep) push(`${IC.ep} ${fmt(fx.ep,0)}`, fx.ep > 0, "leaf", Math.abs(fx.ep) / 35, fx.ep > 0);
+  if (fx.pc) push(`${IC.pc} ${fmt(fx.pc,0)}`, fx.pc > 0, "landmark", Math.abs(fx.pc) / 12, fx.pc > 0);
+  if (fx.appr) push(`${IC.appr} ${fmt(fx.appr,0)}%`, fx.appr > 0, "users", Math.abs(fx.appr) / 4, fx.appr > 0);
+  if (fx.tip) push(`${IC.temp} ${fmt(fx.tip * TIP_TO_TEMP,2)}°C`, fx.tip < 0, "thermometer", Math.abs(fx.tip) / 4, fx.tip > 0);
+  if (fx.comp) Object.entries(fx.comp).forEach(([k,v]) => push(`${IC.comp} ${rn(k)} ${fmt(v,0)}%`, v > 0, "handshake", Math.abs(v) / 5, v > 0));
+  if (fx.vuln) Object.entries(fx.vuln).forEach(([k,v]) => push(`${IC.vuln} ${rn(k)} ${fmt(v,0)}%`, v < 0, "shield-alert", Math.abs(v) / 5, v > 0));
+  if (fx.disc) Object.entries(fx.disc).forEach(([k,v]) => push(`[[flask-conical]] ${k === "ALL" ? (S.lang==="th"?"ทุกสกิล":"all") : k} ${v >= 0 ? "−" : "+"}${Math.round(Math.abs(v)*100)}%`, v >= 0, "flask-conical", Math.abs(v) / .15, v < 0));
+  if (fx.damp) push(`${IC.co2} ${S.lang === "th" ? "โตช้าลง" : "growth ↓"}`, true, "cloud", 1, false);
+  if (fx.stall) push(`[[flask-conical]] ${S.lang === "th" ? "ชะงัก" : "stall"} ${fx.stall} ${t("months")}`, false, "flask-conical", fx.stall / 3, false);
+  if (fx.relA) push(`[[handshake]] ${t("sideA")} ${fmt(fx.relA,0)}`, fx.relA > 0, "handshake", Math.abs(fx.relA) / 8, fx.relA > 0);
+  if (fx.relB) push(`[[handshake]] ${t("sideB")} ${fmt(fx.relB,0)}`, fx.relB > 0, "handshake", Math.abs(fx.relB) / 8, fx.relB > 0);
+  if (fx.cA) push(`${IC.co2} ${t("sideA")} ${fmt(fx.cA * 100,0)}%`, fx.cA < 0, "cloud", Math.abs(fx.cA) / .02, fx.cA > 0);
+  if (fx.cB) push(`${IC.co2} ${t("sideB")} ${fmt(fx.cB * 100,0)}%`, fx.cB < 0, "cloud", Math.abs(fx.cB) / .02, fx.cB > 0);
+  if (fx.delay) fxChips(fx.delay.fx, target).forEach(x => push(`${x.txt} (${t("delayed")} ${fx.delay.m} ${t("months")})`, x.good, x.icon, x.mag, x.up));
+  return c;
+}
+/* Something in the game state changed: redraw the HUD and the map colours. */
+function changed(){ hook("dirty"); hook("mapRefresh"); }
+
+/* ---------------------------- Session control ---------------------------- */
+function setSpeed(v){
+  if (v === 3 && !(P.Net && P.Net.owns("speed3"))){ hook("sfx", "error"); return; }
+  S.speed = v; hook("sfx", v ? "speed" : "pause"); changed();
+}
+function setLang(l){ S.lang = l; try { localStorage.setItem("p2050-lang", l); } catch(e) {} changed(); }
+/* "Ready to tick" = what the scene's tick timer checks every frame (scene variable Running). */
+function running(){ return !!(S.started && S.speed > 0 && !S.over && !S.event && !(P.UIM && P.UIM.paused) && !(P.UIM && P.UIM.blocking)); }
+function newGame(lang, o){ resetState(newState(lang, o)); buildCountries(); }
+function startGame(lang, o = {}){
+  const prev = {mode:S.mode, char:S.char, charLv:S.charLv};
+  const opts = Object.assign({}, prev, o);
+  if (opts.mode === "daily" && opts.seed === undefined) opts.seed = P.dailySeed();
+  resetState(newState(lang, opts)); buildCountries(); S.started = true; S.speed = 1;
+  addLog(t("logStart"), "tc"); hook("sfx", "start"); Ach.unlock("start");
+  S.story[1] = 1;
+  hook("closeModal"); changed(); autosave(); hook("gameStart");
+}
+/* Daily Challenge seed: the same for everyone on the same (UTC) date */
+P.dailySeed = (d = new Date()) => { const s = d.toISOString().slice(0, 10); let h = 2166136261; for (const ch of s){ h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h | 0; };
+
+/* ---------------------------- Save / Load ----------------------------
+   localStorage key p2050-saves = {auto, s1, s2, s3}; each {meta, S}. Save codes = base64 JSON for moving between devices.
+   Hard Core games only keep the autosave. */
+const SAVE_KEY = "p2050-saves", SLOTS = ["auto","s1","s2","s3"];
+function readSaves(){ try { return JSON.parse(localStorage.getItem(SAVE_KEY) || "{}") || {}; } catch(e) { return null; } }
+function snapshot(){ const c = JSON.parse(JSON.stringify(S)); c.tab = null; return c; }
+function slotMeta(){ return {tick:S.tick, temp:S.temp, net:netCO2(), appr:S.appr, at:Date.now(), mode:S.mode, char:S.char}; }
+function writeSlot(slot){
+  if (S.mode === "hard" && slot !== "auto") return false;
+  const all = readSaves(); if (all === null) return false;
+  all[slot] = {meta:slotMeta(), S:snapshot()};
+  try { localStorage.setItem(SAVE_KEY, JSON.stringify(all)); return true; } catch(e) { return false; }
+}
+function autosave(){ if (S.started && !S.over){ writeSlot("auto"); hook("autosaved"); } }
+function validSave(o){ return o && o.v === SAVE_VERSION && Array.isArray(o.regions) && o.regions.length === 6 && Array.isArray(o.countries) && typeof o.tick === "number" && Array.isArray(o.hist); }
+function loadState(obj){
+  if (!validSave(obj)) return false;
+  const lang = S.lang;
+  resetState(Object.assign(newState(lang, {mode:obj.mode, char:obj.char, charLv:obj.charLv, seed:obj.seed}), obj, {lang, started:true, speed:0, tab:null}));
+  if (S.speed === 3 && !(P.Net && P.Net.owns("speed3"))) S.speed = 1;
+  return true;
+}
+function exportCode(){ return "P2050:" + btoa(unescape(encodeURIComponent(JSON.stringify(snapshot())))); }
+function importCode(txt){ try { const raw = String(txt).trim().replace(/^P2050:/, ""); return JSON.parse(decodeURIComponent(escape(atob(raw)))); } catch(e) { return null; } }
+function slotName(k){ return k === "auto" ? t("slotAuto") : `${t("slot")} ${k.slice(1)}`; }
+function slotMetaLines(m){
+  if (!m) return [t("empty")];
+  const when = new Date(m.at).toLocaleString(S.lang === "th" ? "th-TH" : "en-GB", {dateStyle:"short", timeStyle:"short"});
+  const tag = m.mode === "hard" ? " · HARD CORE" : m.mode === "daily" ? " · DAILY" : "";
+  return [`${dateStr(m.tick)} · ΔT +${m.temp.toFixed(2)}°C · CO₂ ${m.net.toFixed(1)} Gt · ${t("appr")} ${m.appr.toFixed(0)}%`, when + tag];
+}
+const fmtTime = sec => { sec = Math.max(0, Math.round(sec)); const h = Math.floor(sec / 3600), m = Math.floor(sec / 60) % 60, s = sec % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(s).padStart(2, "0"); };
+
+/* ---------------------------- Achievements ---------------------------- */
+const AchStore = (() => {
+  const KEY = "p2050-ach";
+  let data = {got:{}, greens:0, aids:0, seen:[], haz:[], ends:{}, evac:0, cev:0, charsDone:[], daily:0};
+  try { data = Object.assign(data, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch(e) {}
+  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {} };
+  return { get data(){ return data; }, save };
+})();
+const Ach = (() => {
+  function unlock(id){
+    const d = AchStore.data; if (d.got[id]) return;
+    const a = ACH.find(x => x.id === id); if (!a) return;
+    d.got[id] = Date.now(); AchStore.save(); hook("toast", a); hook("achUnlocked", id);
+  }
+  const byCat = cat => SKILLS.filter(n => n.cat === cat).every(n => S.owned[n.id]);
+  function check(){
+    const d = AchStore.data;
+    if (d.greens >= 25) unlock("greens"); if (d.aids >= 10) unlock("aids");
+    if (d.seen.length >= 25) unlock("read25"); if (d.seen.length >= 100) unlock("read100"); if (d.seen.length >= EVENTS.length) unlock("readAll");
+    if ((d.evac || 0) >= 5) unlock("evac5");
+    if ((d.cev || 0) >= 10) unlock("cev10");
+    if ((d.charsDone || []).length >= 4) unlock("charAll");
+    if ((d.daily || 0) >= 1) unlock("daily");
+    if (P.cardCount && P.cardCount() >= 30) unlock("cards30");
+    if (P.Net && P.Net.maxLevel && P.Net.maxLevel() >= 10) unlock("lvl10");
+    if (!S || !S.started || !S.regions) return;
+    const own = Object.keys(S.owned).length;
+    if (own) unlock("tech1");
+    if (own >= 20) unlock("skill20");
+    if (recentBuys() >= 3) unlock("rush");
+    if (S.ep >= 300) unlock("rich");
+    if (byCat("energy")) unlock("branchE"); if (byCat("policy")) unlock("branchP"); if (byCat("nature")) unlock("branchN");
+    if (byCat("industry")) unlock("branchI"); if (byCat("city")) unlock("branchC");
+    if (SKILLS.every(n => S.owned[n.id])) unlock("allTech");
+    if (S.owned.E5 && rollProgress("E5") === null) unlock("fusion");
+    if (S.regions.every(r => r.comp >= 85)) unlock("unity");
+    if (S.regions.every(r => r.vuln < 35)) unlock("safe");
+    if (S.hist.length > 12 && S.hist[S.hist.length - 13].net - netCO2() >= 2) unlock("peak");
+    if (netCO2() < 18) unlock("half");
+    if (S.tick >= 120) unlock("decade");
+    if (S.countries && S.countries.filter(c => !c.rest && c.rel >= 50).length >= 20) unlock("friends20");
+    if (S.over === "win"){
+      unlock("win");
+      if (S.tick < 240) unlock("winEarly");
+      if (S.temp < 1.5) unlock("win15");
+      if (S.appr >= 70) unlock("winLoved");
+      if (S.mode === "hard") unlock("hardWin");
+    }
+    if (S.over === "l3") unlock("loseTime");
+    if (S.over === "l1") unlock("loseHeat");
+    if (S.over === "l2") unlock("loseVote");
+  }
+  function count(){ return ACH.filter(a => AchStore.data.got[a.id]).length; }
+  return {
+    unlock, check, count,
+    green(){ AchStore.data.greens++; AchStore.save(); check(); },
+    aid(){ AchStore.data.aids++; AchStore.save(); check(); },
+    sawEvent(id){ const s = AchStore.data.seen; if (!s.includes(id)){ s.push(id); AchStore.save(); } check(); },
+  };
+})();
+
+Object.assign(P, {
+  t, L, rand, SAVE_VERSION, TOTAL_TICKS, TIP_TO_TEMP, SPEEDS, MAX_PROJECTS, MODES, RED_COST, POSTPONE, FORECAST, CACTS, BILAT_COST, ALLY_COST,
+  newState, resetState, buildCountries, clamp, R, C, regCountries, avg, grossCO2, netCO2, sinkEff, dateStr, fmt, fmtTime, addLog, cname, joinNames,
+  epGain, pcGain, recentBuys, nodeCost, busyIds, atCapacity, nodeState, actionCost, rollProgress, respOf, aidCost, evacCost,
+  buyNode, abilityList, abilityReady, useAbility, doAction, countryAction, cactCost, cactOk, bilatPartners, bilateral, canAlly, allyCandidates, formAlliance, avgRel, relAll, changeRel,
+  applyFx, popBubble, evacuate, tick, eligible, triggerEvent, currentEvent, affordable, chooseOption, checkEnd, score, summary, xpFor, endStory, fxChips, changed,
+  setSpeed, setLang, running, newGame, startGame,
+  SAVE_KEY, SLOTS, readSaves, writeSlot, autosave, validSave, loadState, exportCode, importCode, slotName, slotMetaLines,
+  AchStore, Ach,
+});
+if (!S.regions){ let lang = "th"; try { lang = localStorage.getItem("p2050-lang") || "th"; } catch(e) {} resetState(newState(lang)); buildCountries(); }
+
+};
+gdjs.LoadingCode.userFunc0x1013248 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Net · เชื่อมต่อเซิร์ฟเวอร์: บัญชี, Terra, ร้านค้า, อันดับ, เกียรติบัตร */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.net) return;
+(P.mods = P.mods || {}).net = 1;
+/* =========================================================================
+   Net · talks to the game server (server/ folder: Node.js API + PostgreSQL in Docker)
+   Accounts (username/email + password, or Google), Terra, shop, leaderboard, cloud saves, certificates.
+   The game still works fully offline / as a guest: then only the starter character, no Terra or ranking.
+   Server address: window.P2050_API, or localStorage "p2050-api", else "/api" on the same site
+   (and http://localhost:8080/api when the game runs from GDevelop's preview).
+   ========================================================================= */
+const {S, t, L} = P;
+const H = P.H = P.H || {};
+const ls = {get:k => { try { return localStorage.getItem(k); } catch(e) { return null; } }, set:(k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch(e) {} }};
+const dirty = () => P.Kit && P.Kit.dirty();
+const msg = (m, err) => { if (P.UIM){ P.UIM.msg = m; P.UIM.err = !!err; } dirty(); };
+const errText = e => { const c = e && e.error; const key = "err_" + c; return (P.UI[key] ? t(key) : (e && e.message) || t("err_generic")); };
+
+function candidates(){
+  const out = [];
+  if (window.P2050_API) out.push(window.P2050_API);
+  const saved = ls.get("p2050-api"); if (saved) out.push(saved);
+  if (/^https?:$/.test(location.protocol)) out.push("/api");
+  out.push("http://localhost:8080/api");
+  return [...new Set(out)];
+}
+const Net = {
+  base:null, online:false, checking:false, cfg:null, user:null, owned:new Set(), chars:{}, busy:false, cloud:null,
+  board:null, boardMode:"normal", boardPeriod:"week", certs:null, pendingGoogle:null,
+  get access(){ return ls.get("p2050-at"); }, get refreshTok(){ return ls.get("p2050-rt"); },
+  setTokens(a, r){ ls.set("p2050-at", a); ls.set("p2050-rt", r); },
+  async req(method, path, body, auth = true, retry = true){
+    if (!this.base) throw {error:"offline"};
+    const h = {"Content-Type":"application/json"};
+    if (auth && this.access) h.Authorization = "Bearer " + this.access;
+    let r;
+    try { r = await fetch(this.base + path, {method, headers:h, body:body ? JSON.stringify(body) : undefined}); }
+    catch(e){ throw {error:"offline"}; }
+    if (r.status === 401 && auth && retry && this.refreshTok){ if (await this.doRefresh()) return this.req(method, path, body, auth, false); }
+    let j = null; try { j = await r.json(); } catch(e) {}
+    if (!r.ok) throw (j || {error:"http" + r.status});
+    return j;
+  },
+  async doRefresh(){
+    try { const j = await this.req("POST", "/auth/refresh", {refresh:this.refreshTok}, false); this.setTokens(j.access, j.refresh); return true; }
+    catch(e){ if (e.error !== "offline"){ this.setTokens(null, null); this.user = null; } return false; }
+  },
+  /* find the server and load config + the signed-in player */
+  async init(){
+    if (this._init) return this._init;
+    this._init = (async () => {
+      this.checking = true; dirty();
+      for (const b of candidates()){
+        try {
+          const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 3500);
+          const r = await fetch(b + "/config", {signal:ctl.signal}); clearTimeout(tm);
+          if (r.ok){ const j = await r.json(); if (j && j.game === "p2050"){ this.base = b; this.cfg = j; this.online = true; break; } }
+        } catch(e) {}
+      }
+      this.checking = false;
+      if (this.online && this.access) await this.me();
+      if (this.online && this.cfg.googleClientId) this.loadGoogle();
+      dirty();
+    })();
+    return this._init;
+  },
+  async refresh(){ await this.init(); if (this.online && this.user){ await this.me(); this.syncAch(); this.syncProgress(); this.loadCloud(); } dirty(); },
+  async me(){
+    try { const j = await this.req("GET", "/me"); this.applyMe(j); }
+    catch(e){ if (e.error !== "offline"){ this.user = null; this.owned = new Set(); } }
+  },
+  applyMe(j){ if (!j) return; if (j.user) this.user = j.user; if (j.owned) this.owned = new Set(j.owned); if (j.chars) this.chars = j.chars; dirty(); },
+  owns(item){
+    if (item === "char_sci") return true;
+    return !!this.user && this.owned.has(item);
+  },
+  charXp(id){
+    if (this.user) return (this.chars[id] || 0);
+    try { return (JSON.parse(ls.get("p2050-xp") || "{}")[id]) || 0; } catch(e) { return 0; }
+  },
+  addGuestXp(id, xp){ let o = {}; try { o = JSON.parse(ls.get("p2050-xp") || "{}") || {}; } catch(e) {} o[id] = (o[id] || 0) + xp; ls.set("p2050-xp", JSON.stringify(o)); },
+  maxLevel(){ return Math.max(...P.CHARS.map(c => P.levelOf(this.charXp(c.id)))); },
+  async auth(path, body){
+    this.busy = true; msg("");
+    try { const j = await this.req("POST", path, body, false); return this.afterAuth(j); }
+    catch(e){ msg(errText(e), true); return false; }
+    finally { this.busy = false; dirty(); }
+  },
+  afterAuth(j){
+    if (j.needUsername){ this.pendingGoogle = j.ticket; msg(""); return false; }
+    this.setTokens(j.access, j.refresh); this.pendingGoogle = null; this.applyMe(j);
+    msg(`${t("welcome")} ${j.user.displayName}`); this.syncAch(); this.syncProgress(); this.loadCloud(); P.Audio.play("start");
+    return true;
+  },
+  register(o){
+    if (!/^[a-z0-9_]{3,16}$/.test(o.username)) return msg(t("err_bad_username"), true);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(o.email)) return msg(t("err_bad_email"), true);
+    if ((o.password || "").length < 8) return msg(t("err_weak_password"), true);
+    if (!o.displayName) o.displayName = o.username;
+    return this.auth("/auth/register", o);
+  },
+  login(login, password){ if (!login || !password) return msg(t("err_missing"), true); return this.auth("/auth/login", {login, password}); },
+  googleCredential(idToken){ return this.auth("/auth/google", {idToken}); },
+  googleComplete(username){ if (!/^[a-z0-9_]{3,16}$/.test(username)) return msg(t("err_bad_username"), true); return this.auth("/auth/google/complete", {ticket:this.pendingGoogle, username}); },
+  async logout(){ try { await this.req("POST", "/auth/logout", {refresh:this.refreshTok}, false); } catch(e) {} this.setTokens(null, null); this.user = null; this.owned = new Set(); this.chars = {}; this.cloud = null; msg(t("signedOut")); },
+  async rename(name){
+    name = (name || "").trim(); if (name.length < 2 || name.length > 20) return msg(t("err_bad_display"), true);
+    this.busy = true;
+    try { const j = await this.req("POST", "/me/display-name", {displayName:name}); this.applyMe(j); msg(t("renamed")); }
+    catch(e){ msg(errText(e), true); } finally { this.busy = false; dirty(); }
+  },
+  async buy(item){
+    this.busy = true;
+    try { const j = await this.req("POST", "/shop/buy", {item}); this.applyMe(j); msg(t("bought")); P.Audio.play("buy"); }
+    catch(e){ msg(errText(e), true); P.Audio.play("error"); } finally { this.busy = false; dirty(); }
+  },
+  /* ---- game runs ---- */
+  async startRun(){
+    S.runId = null; await this.init();
+    if (!this.user) return;
+    try { const j = await this.req("POST", "/runs", {mode:S.mode, char:S.char, seed:S.seed}); if (S.started && !S.over) S.runId = j.runId; } catch(e) {}
+  },
+  async finishRun(){
+    const UIM = P.UIM, xp = P.xpFor(), sum = P.summary();
+    if (!this.user || !sum.runId){
+      this.addGuestXp(S.char, xp); UIM.reward = this.user ? {error:true, xp} : {guest:true, xp};
+      if (this.user && !sum.runId) UIM.reward.note = t("rewardNoRun");
+      if (!this.user) UIM.reward.xp = xp;
+      dirty(); P.Ach.check(); return;
+    }
+    try {
+      const j = await this.req("POST", `/runs/${sum.runId}/finish`, sum);
+      UIM.reward = {terra:j.terra, xp:j.xp, level:j.level, levelUp:j.levelUp, note:j.note ? (P.UI["note_" + j.note] ? t("note_" + j.note) : j.note) : ""};
+      if (j.user) this.user = j.user; if (j.chars) this.chars = j.chars;
+    } catch(e){ UIM.reward = {error:true, xp:0}; }
+    this.syncProgress(); P.Ach.check(); dirty();
+  },
+  /* ---- achievements & learning progress (server pays Terra once per achievement) ---- */
+  syncAch(){
+    if (!this.user) return;
+    clearTimeout(this._achT);
+    this._achT = setTimeout(async () => {
+      const ids = Object.keys(P.AchStore.data.got);
+      try { const j = await this.req("POST", "/achievements", {ids}); if (j.user) this.user = j.user; if (j.awarded) this.toastTerra(j.awarded); dirty(); } catch(e) {}
+    }, 800);
+  },
+  toastTerra(n){ if (n > 0 && P.UIM) P.UIM.toastQ.push({icon:"terra", title:t("terraGot"), msg:`+${n} Terra`}); },
+  async syncProgress(){ if (!this.user) return; try { await this.req("PUT", "/progress", {cards:P.cardCount()}); } catch(e) {} },
+  /* ---- cloud saves ---- */
+  async loadCloud(){ if (!this.user) return; try { this.cloud = await this.req("GET", "/saves"); dirty(); } catch(e) {} },
+  async cloudSave(slot){
+    if (!this.user) return false;
+    const all = P.readSaves(); const s = all && all[slot]; if (!s) return false;
+    try { await this.req("PUT", `/saves/${slot}`, {meta:s.meta, state:s.S}); (this.cloud = this.cloud || {})[slot] = {meta:s.meta}; return true; } catch(e) { return false; }
+  },
+  async cloudLoad(slot){ try { const j = await this.req("GET", `/saves/${slot}`); return j.state; } catch(e) { return null; } },
+  /* ---- leaderboard ---- */
+  async loadBoard(){
+    await this.init(); const m = this.boardMode, p = this.boardMode === "daily" ? "day" : this.boardPeriod;
+    this.board = {loading:true}; dirty();
+    try { const j = await this.req("GET", `/leaderboard?mode=${m}&period=${p}`); if (this.boardMode === m) this.board = j; }
+    catch(e){ this.board = {error:true}; }
+    dirty();
+  },
+  /* ---- certificates ---- */
+  async loadCerts(){ await this.init(); if (!this.user) return; try { this.certs = await this.req("GET", "/certificates"); } catch(e){ this.certs = {error:true}; } dirty(); },
+  async requestCert(fullName){
+    this.busy = true;
+    try { const j = await this.req("POST", "/certificates", {fullName}); this.certs = j; msg(t("certDone")); P.Audio.play("win"); }
+    catch(e){ msg(errText(e), true); } finally { this.busy = false; dirty(); }
+  },
+  certUrl(code){ return `${this.base}/certificates/${encodeURIComponent(code)}/pdf`; },
+  /* ---- Google sign-in button (an HTML element placed over the game canvas) ---- */
+  loadGoogle(){
+    if (this._g || !this.cfg.googleClientId) return; this._g = 1;
+    const sc = document.createElement("script"); sc.src = "https://accounts.google.com/gsi/client"; sc.async = true;
+    sc.onload = () => {
+      try {
+        google.accounts.id.initialize({client_id:this.cfg.googleClientId, callback:r => this.googleCredential(r.credential)});
+        const d = this._gDiv = document.createElement("div");
+        Object.assign(d.style, {position:"fixed", zIndex:50, display:"none"});
+        document.body.appendChild(d);
+        google.accounts.id.renderButton(d, {theme:"filled_black", size:"large", shape:"pill", text:"continue_with", width:300});
+        this._gReady = true; dirty();
+      } catch(e) { console.warn("Google sign-in", e); }
+    };
+    document.head.appendChild(sc);
+  },
+  googleOverlay(rect){
+    const d = this._gDiv; if (!d) return;
+    if (!rect || this.user || !this._gReady){ if (d.style.display !== "none") d.style.display = "none"; return; }
+    const cv = P.Kit.canvas; if (!cv) return;
+    const b = cv.getBoundingClientRect(), s = b.width / 1280;
+    const vis = !rect.clip || (rect.y >= rect.clip.y && rect.y + rect.h <= rect.clip.y + rect.clip.h);
+    d.style.display = vis ? "block" : "none";
+    d.style.left = (b.left + rect.x * s) + "px"; d.style.top = (b.top + rect.y * s) + "px";
+    d.style.transform = `scale(${Math.min(1.4, Math.max(.6, s * 1.05))})`; d.style.transformOrigin = "0 0";
+  },
+};
+P.Net = Net;
+/* character outfit: base · alt (bought in the shop) · gold (level 10) */
+P.outfitPref = () => ls.get("p2050-outfit") || "base";
+P.outfitOf = id => { const p = P.outfitPref(); if (p === "alt" && Net.owns("outfit")) return "alt"; if (p === "gold" && P.levelOf(Net.charXp(id)) >= 10) return "gold"; return "base"; };
+H.achUnlocked = () => Net.syncAch();
+H.autosaved = () => {};
+Net.init();
+
+};
+gdjs.LoadingCode.userFunc0x1013320 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* UI toolkit · วาดแผง/ข้อความ/ไอคอนด้วย UIPainter, UIText, UIIcon */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.kit) return;
+(P.mods = P.mods || {}).kit = 1;
+/* =========================================================================
+   UI toolkit — draws the interface with GDevelop objects:
+     UIPainter (Shape painter)  → panels, bars, lines, charts
+     UIText    (Text)           → every label (pooled, only re-rendered when its text/style changes)
+     UIIcon    (Sprite, 1 animation per Lucide icon)
+     TutImage  (Sprite, 1 animation per tutorial screenshot)
+   Layout is written in "design units" (1280×720). The game runs at 1920×1080, so K = 1.5.
+   Each UI layer redraws only when marked dirty.
+   ========================================================================= */
+const K = 1.5, W = 1280, Hh = 720;
+/* clean flat palette: one main colour (sea teal), one warning colour (orange-red), the rest greys */
+const COL = {
+  bg:"#061015", glass:"#0b181e", panel:"#0e1d24", panel2:"#15272f", line:"#24414b", fg:"#e6f0ee", muted:"#8fa9a6",
+  accent:"#4fd1c5", ink:"#04201d", good:"#5fd39a", warn:"#f2b441", hot:"#f07a3c", bad:"#ff5a4a",
+  purple:"#c3a6ff", cloud:"#b7c7cf", vuln:"#ff8a7a", white:"#ffffff", black:"#000000", gold:"#f2c14e", sky:"#8fd0ff", terra:"#5fd39a",
+};
+const ICON_COL = {leaf:"good", sprout:"good", landmark:"purple", users:"accent", thermometer:"hot", cloud:"cloud", handshake:"warn", "shield-alert":"vuln", siren:"bad", newspaper:"muted"};
+const FONT = {
+  body:"PlexThai-Regular", bodyB:"PlexThai-SemiBold", disp:"Kanit-Bold", dispS:"Kanit-SemiBold", dispM:"Kanit-Medium", logo:"Chakra-Bold", logoS:"Chakra-SemiBold", mono:"PlexMono-Medium", monoB:"PlexMono-SemiBold",
+};
+const hexCache = {};
+function hexNum(c){ c = COL[c] || c; if (typeof c === "number") return c; return hexCache[c] ?? (hexCache[c] = parseInt(c.slice(1), 16)); }
+function rgbStr(c){ const n = hexNum(c); return `${(n >> 16) & 255};${(n >> 8) & 255};${n & 255}`; }
+function mix(a, b, f){ const x = hexNum(a), y = hexNum(b); const ch = s => Math.round(((x >> s) & 255) + ((((y >> s) & 255) - ((x >> s) & 255)) * f)); return (ch(16) << 16) | (ch(8) << 8) | ch(0); }
+
+/* ---------- text measurement (Thai-aware line breaking) ---------- */
+let game = null;
+const mctx = document.createElement("canvas").getContext("2d");
+const famCache = {};
+function family(fk){
+  const res = FONT[fk] || fk; if (famCache[res]) return famCache[res];
+  const f = game ? game.getFontManager().getFontFamily(res) : "sans-serif";
+  if (f && f !== "Arial") famCache[res] = f;
+  return f;
+}
+const wCache = new Map();
+function measure(str, fk, px){
+  const key = fk + "|" + px + "|" + str; let w = wCache.get(key);
+  if (w === undefined){ mctx.font = `${px}px "${family(fk)}"`; w = mctx.measureText(str).width; if (wCache.size > 20000) wCache.clear(); wCache.set(key, w); }
+  return w;
+}
+const seg = (typeof Intl !== "undefined" && Intl.Segmenter) ? new Intl.Segmenter("th", {granularity:"word"}) : null;
+const gseg = (typeof Intl !== "undefined" && Intl.Segmenter) ? new Intl.Segmenter("th", {granularity:"grapheme"}) : null;
+function words(s){
+  const raw = seg ? Array.from(seg.segment(s), x => x.segment) : s.split(/(\s+)/).filter(Boolean);
+  // keep units and closing punctuation with the word before them (no line break before "°C", "%", ")", ",")
+  const out = [];
+  for (const w of raw){
+    if (out.length && /^[°%)\]},.;:!?…·×]/.test(w) && !/\s$/.test(out[out.length - 1])) out[out.length - 1] += w;
+    else if (out.length && /[(\[{+−-]$/.test(out[out.length - 1]) && !/^\s/.test(w)) out[out.length - 1] += w;
+    else out.push(w);
+  }
+  return out;
+}
+function graphemes(s){ return gseg ? Array.from(gseg.segment(s), x => x.segment) : Array.from(s); }
+/* Rich text = plain text with [[icon]] tokens. Returns lines of items {t:"s"|"i", v, w}. */
+const layoutCache = new Map();
+function layout(str, fk, size, maxW){
+  str = String(str ?? "");
+  const key = fk + "|" + size + "|" + maxW + "|" + str; const hit = layoutCache.get(key); if (hit) return hit;
+  const px = size * K, iconW = size * 1.15 * K, gap = size * 0.12 * K, limit = maxW ? maxW * K : Infinity;
+  const lines = [];
+  for (const para of str.split("\n")){
+    let line = [], lw = 0;
+    const push = (trim = true) => { while (trim && line.length && line[line.length - 1].t === "s" && /^\s+$/.test(line[line.length - 1].v)){ lw -= line[line.length - 1].w; line.pop(); } lines.push({items:line, w:lw}); line = []; lw = 0; };
+    const parts = para.split(/(\[\[[a-z0-9-]+\]\])/).filter(p => p !== "");
+    for (const part of parts){
+      const m = part.match(/^\[\[([a-z0-9-]+)\]\]$/);
+      if (m){
+        const w = iconW + gap;
+        if (lw + iconW > limit && line.length) push();
+        line.push({t:"i", v:m[1], w}); lw += w; continue;
+      }
+      for (const wd of words(part)){
+        const w = measure(wd, fk, px);
+        if (lw + w > limit && line.length){
+          if (/^\s+$/.test(wd)){ push(); continue; }
+          push();
+        }
+        if (w > limit){                       // a single word wider than the line: break by grapheme
+          let chunk = "";
+          for (const g of graphemes(wd)){
+            const cw = measure(chunk + g, fk, px);
+            if (lw + cw > limit && chunk){ line.push({t:"s", v:chunk, w:measure(chunk, fk, px)}); lw += measure(chunk, fk, px); push(); chunk = g; }
+            else chunk += g;
+          }
+          if (chunk){ const cw = measure(chunk, fk, px); line.push({t:"s", v:chunk, w:cw}); lw += cw; }
+          continue;
+        }
+        line.push({t:"s", v:wd, w}); lw += w;
+      }
+    }
+    push(!!maxW);
+  }
+  // merge adjacent strings so each run is one Text object
+  for (const ln of lines){
+    const out = [];
+    for (const it of ln.items){ const last = out[out.length - 1]; if (it.t === "s" && last && last.t === "s"){ last.v += it.v; last.w += it.w; } else out.push({...it}); }
+    ln.items = out; ln.w = out.reduce((s, x) => s + x.w, 0);
+    if (out.length && out[out.length - 1].t === "i") ln.w -= gap;
+  }
+  const res = {lines, w: Math.max(0, ...lines.map(l => l.w)) / K, iconW: iconW / K, gap: gap / K};
+  if (layoutCache.size > 4000) layoutCache.clear();
+  layoutCache.set(key, res);
+  return res;
+}
+
+/* ---------- layers ---------- */
+class Layer {
+  constructor(name){ this.name = name; this.pools = {}; this.idx = {}; this.hits = []; this.dirty = true; this.clip = null; this.scroll = 0; this.content = 0; this.render = null; this.enabled = true; this.blocks = false; this.alpha = 1; this.ox = 0; this.oy = 0; this.baseX = 0; this.baseY = 0; this.master = null; }
+  /* shift everything drawn on this layer (used for scrolling panels): moves the layer camera */
+  setOffset(x, y){ if (x === this.ox && y === this.oy) return; this.ox = x; this.oy = y; const l = this.scene.getLayer(this.name); l.setCameraX(960 - x * K); l.setCameraY(540 - y * K); }
+  /* content origin + clip rectangle (screen design units) for a scrolling panel */
+  frame(x, y, clip, content){ this.baseX = x; this.baseY = y; this.clip = clip; this.content = content; const max = Math.max(0, content - clip.h); if (this.scroll > max) this.scroll = max; this.setOffset(x, y - this.scroll); }
+  attach(scene){
+    this.scene = scene; this.pools = {}; this.idx = {}; this.hits = [];
+    this.painter00 = scene.createObject("UIPainter");         // cards drawn after their content (sized afterwards)
+    this.painter00.setLayer(this.name); this.painter00.setZOrder(-2); this.painter00.setPosition(0, 0);
+    if (this.painter00.setClearBetweenFrames) this.painter00.setClearBetweenFrames(false);
+    this.g00 = this.painter00.getRendererObject();
+    this.painter0 = scene.createObject("UIPainter");          // backgrounds (buttons, pills, panels)
+    this.painter0.setLayer(this.name); this.painter0.setZOrder(-1); this.painter0.setPosition(0, 0);
+    if (this.painter0.setClearBetweenFrames) this.painter0.setClearBetweenFrames(false);
+    this.g0 = this.painter0.getRendererObject();
+    this.painter = scene.createObject("UIPainter");           // details drawn over the backgrounds
+    this.painter.setLayer(this.name); this.painter.setZOrder(0); this.painter.setPosition(0, 0);
+    if (this.painter.setClearBetweenFrames) this.painter.setClearBetweenFrames(false);
+    this.g = this.painter.getRendererObject();
+    this.dirty = true;
+  }
+  obj(type){
+    const pool = this.pools[type] || (this.pools[type] = []), i = this.idx[type] || 0;
+    this.idx[type] = i + 1;
+    let o = pool[i];
+    if (!o){
+      const go = this.scene.createObject(type); go.setLayer(this.name); go.setZOrder(type === "UIText" ? 20 : 10);
+      o = pool[i] = {go, c:{}};
+      if (type === "UIText"){ go.setString(" "); }
+    }
+    if (o.c.hidden !== false){ o.go.hide(false); o.c.hidden = false; }
+    return o;
+  }
+  begin(){ this.g.clear(); this.g0.clear(); this.g00.clear(); this.idx = {}; this.hits = []; this.inputs = 0; }
+  end(){
+    for (const type in this.pools){ const pool = this.pools[type], n = this.idx[type] || 0; for (let i = n; i < pool.length; i++) if (pool[i].c.hidden !== true){ pool[i].go.hide(true); pool[i].c.hidden = true; pool[i].c.vis = undefined; } }
+  }
+  setAlpha(a){ if (this.alpha === a) return; this.alpha = a; const l = this.scene.getLayer(this.name); l.getRenderer().getRendererObject().alpha = a; }
+}
+const Kit = {
+  K, W, H:Hh, COL, FONT, ICON_COL, hexNum, rgbStr, mix, layout, measure,
+  layers:{}, order:[], scene:null, mouse:{x:0, y:0, down:false, sx:0, sy:0, moved:0, onUI:false}, hover:null, hoverLayer:null, pressHit:null,
+  /* call once per scene with the layer names, bottom → top */
+  setup(scene, names){
+    this.scene = scene; game = scene.getGame(); this.layers = {}; this.order = names.slice(); this.hover = null;
+    for (const n of names){ const l = new Layer(n); l.attach(scene); this.layers[n] = l; }
+    this.canvas = game.getRenderer().getCanvas ? game.getRenderer().getCanvas() : null;
+  },
+  L(name){ return this.layers[name]; },
+  /* fonts finished loading: forget cached measurements and re-apply font families */
+  resetFonts(){
+    for (const key in famCache) delete famCache[key];
+    wCache.clear(); layoutCache.clear();
+    for (const n in this.layers){ const pool = this.layers[n].pools.UIText || []; for (const o of pool) o.c.font = null; }
+    this.dirty();
+  },
+  /* draw into a slave (scrolling) layer from its master's render function */
+  slave(name, fn){
+    const l = this.layers[name]; if (!l) return;
+    l.begin(); try { fn(l); } catch(e){ console.error("UI render", name, e); } l.end(); this._applyClip(l);
+  },
+  clearSlave(name){ const l = this.layers[name]; if (!l) return; l.begin(); l.end(); l.clip = null; l.content = 0; l.scroll = 0; l.setOffset(0, 0); this._applyClip(l); },
+  /* a GDevelop Text input (save codes) placed like any other element */
+  input(l, x, y, w, h, o = {}){
+    const ob = l.obj("CodeInput"), go = ob.go, c = ob.c;
+    const type = o.type || "text area", fs = o.fontSize || 11;
+    if (c.type !== type){ c.type = type; go.setInputType && go.setInputType(type); c.val = undefined; c.ph = undefined; if (go.setString) go.setString(""); }
+    if (c.fs !== fs){ c.fs = fs; go.setFontSize && go.setFontSize(Math.round(fs * K)); }
+    if (o.key !== undefined && c.key !== o.key){ c.key = o.key; if (go.setString) go.setString(o.value || ""); c.val = o.value; }
+    if (c.w !== w || c.h !== h){ go.setWidth(w * K); go.setHeight(h * K); c.w = w; c.h = h; }
+    if (c.ro !== !!o.readOnly){ go.setReadOnly(!!o.readOnly); c.ro = !!o.readOnly; }
+    if (o.placeholder !== undefined && c.ph !== o.placeholder){ go.setPlaceholder(o.placeholder); c.ph = o.placeholder; }
+    if (o.value !== undefined && c.val !== o.value){ go.setString(o.value); c.val = o.value; }
+    this._pos(ob, x * K, y * K);
+    // hide when scrolled outside the clip rectangle
+    const cl = l.clip; const vis = !cl || (y + l.oy >= cl.y - 2 && y + h + l.oy <= cl.y + cl.h + 2);
+    if (c.vis !== vis){ go.hide(!vis); c.vis = vis; }
+    return go;
+  },
+  dirty(name){ if (name){ const l = this.layers[name]; if (l) l.dirty = true; } else for (const n in this.layers) this.layers[n].dirty = true; },
+  /* ---- drawing primitives (design units) ---- */
+  rect(l, x, y, w, h, fill, o = {}){
+    const g = o.under ? l.g00 : o.bg ? l.g0 : l.g, r = (o.r || 0) * K;
+    if (o.stroke) g.lineStyle({width:(o.sw || 1) * K, color:hexNum(o.stroke), alpha:o.sa ?? 1, alignment:1}); else g.lineStyle(0);
+    if (fill != null) g.beginFill(hexNum(fill), o.a ?? 1); else g.beginFill(0, 0);
+    if (r > 0) g.drawRoundedRect(x * K, y * K, w * K, h * K, Math.min(r, w * K / 2, h * K / 2)); else g.drawRect(x * K, y * K, w * K, h * K);
+    g.endFill(); g.lineStyle(0);
+  },
+  /* horizontal gradient (stops: [[pos, color], ...]) drawn as thin slices, clipped to a rounded bar */
+  hgrad(l, x, y, w, h, stops, o = {}){
+    const g = o.under ? l.g00 : o.bg ? l.g0 : l.g, n = Math.max(8, Math.round(w / 3)), a = o.a ?? 1, r = o.r || 0;
+    const col = f => { for (let i = 0; i < stops.length - 1; i++){ const [p0, c0] = stops[i], [p1, c1] = stops[i + 1]; if (f <= p1) return mix(c0, c1, (f - p0) / Math.max(1e-6, p1 - p0)); } return hexNum(stops[stops.length - 1][1]); };
+    const X0 = Math.round(x * K), X1 = Math.round((x + w) * K);
+    for (let i = 0; i < n; i++){
+      // slice edges on whole pixels so neighbouring slices never overlap (no seams with alpha < 1)
+      const p0 = Math.round(X0 + (X1 - X0) * i / n), p1 = Math.round(X0 + (X1 - X0) * (i + 1) / n);
+      if (p1 <= p0) continue;
+      const x0 = p0 / K, x1 = p1 / K;
+      // rounded ends: shrink the slice height near the ends
+      let yy = y, hh = h;
+      if (r){ const dl = x0 - x + (x1 - x0) / 2, dr = x + w - (x0 + (x1 - x0) / 2); const d = Math.min(dl, dr); if (d < r){ const k = r - Math.sqrt(Math.max(0, r * r - (r - d) * (r - d))); yy = y + k; hh = h - 2 * k; } }
+      g.lineStyle(0); g.beginFill(col(Math.min(1, ((i + .5) / n) * w / (o.span || w))), a); g.drawRect(x0 * K, yy * K, (x1 - x0) * K, hh * K); g.endFill();
+    }
+  },
+  circle(l, x, y, r, fill, o = {}){
+    const g = l.g;
+    if (o.stroke) g.lineStyle({width:(o.sw || 1) * K, color:hexNum(o.stroke), alpha:o.sa ?? 1}); else g.lineStyle(0);
+    if (fill != null) g.beginFill(hexNum(fill), o.a ?? 1); else g.beginFill(0, 0);
+    g.drawCircle(x * K, y * K, r * K); g.endFill(); g.lineStyle(0);
+  },
+  line(l, x1, y1, x2, y2, color, o = {}){
+    const g = l.g; g.lineStyle({width:(o.w || 1) * K, color:hexNum(color), alpha:o.a ?? 1, cap:"round"});
+    if (o.dash){
+      const len = Math.hypot(x2 - x1, y2 - y1), n = Math.max(1, Math.floor(len / (o.dash * 2)));
+      for (let i = 0; i < n; i++){ const f0 = i / n, f1 = (i + .5) / n; g.moveTo((x1 + (x2 - x1) * f0) * K, (y1 + (y2 - y1) * f0) * K); g.lineTo((x1 + (x2 - x1) * f1) * K, (y1 + (y2 - y1) * f1) * K); }
+    } else { g.moveTo(x1 * K, y1 * K); g.lineTo(x2 * K, y2 * K); }
+    g.lineStyle(0);
+  },
+  poly(l, pts, fill, o = {}){
+    const g = l.g; if (o.stroke) g.lineStyle({width:(o.sw || 1) * K, color:hexNum(o.stroke), alpha:o.sa ?? 1}); else g.lineStyle(0);
+    g.beginFill(hexNum(fill), o.a ?? 1); g.drawPolygon(pts.map(v => v * K)); g.endFill(); g.lineStyle(0);
+  },
+  path(l, pts, color, o = {}){            // polyline
+    const g = l.g; if (pts.length < 4) return;
+    g.lineStyle({width:(o.w || 1) * K, color:hexNum(color), alpha:o.a ?? 1, join:"round", cap:"round"});
+    g.moveTo(pts[0] * K, pts[1] * K); for (let i = 2; i < pts.length; i += 2) g.lineTo(pts[i] * K, pts[i + 1] * K);
+    g.lineStyle(0);
+  },
+  bezier(l, x1, y1, cx1, cy1, cx2, cy2, x2, y2, color, o = {}){
+    const g = l.g;
+    if (o.dash){                                   // sample the curve and draw dashes
+      const pt = s => { const u = 1 - s; return [u*u*u*x1 + 3*u*u*s*cx1 + 3*u*s*s*cx2 + s*s*s*x2, u*u*u*y1 + 3*u*u*s*cy1 + 3*u*s*s*cy2 + s*s*s*y2]; };
+      g.lineStyle({width:(o.w || 1) * K, color:hexNum(color), alpha:o.a ?? 1});
+      const N = 40; for (let i = 0; i < N; i += 2){ const a = pt(i / N), b = pt((i + 1) / N); g.moveTo(a[0] * K, a[1] * K); g.lineTo(b[0] * K, b[1] * K); }
+      g.lineStyle(0); return;
+    }
+    g.lineStyle({width:(o.w || 1) * K, color:hexNum(color), alpha:o.a ?? 1});
+    g.moveTo(x1 * K, y1 * K); g.bezierCurveTo(cx1 * K, cy1 * K, cx2 * K, cy2 * K, x2 * K, y2 * K); g.lineStyle(0);
+  },
+  /* ---- text ---- */
+  _setText(o, str, fk, size, color, alpha, lhPx, align){
+    const go = o.go, c = o.c, px = Math.round(size * K * 100) / 100;
+    if (c.font !== fk){ go.setFontName(FONT[fk] || fk); c.font = fk; }
+    if (c.size !== px){ go.setCharacterSize(px); c.size = px; if (go.setPadding) go.setPadding(Math.ceil(px * 0.4)); }
+    if (c.lh !== lhPx){ go.setLineHeight(lhPx); c.lh = lhPx; }
+    if (c.align !== align){ go.setTextAlignment(align); c.align = align; }
+    const col = typeof color === "number" ? color : hexNum(color);
+    if (c.color !== col){ go.setColor(`${(col >> 16) & 255};${(col >> 8) & 255};${col & 255}`); c.color = col; }
+    const a = Math.round(alpha * 255); if (c.alpha !== a){ go.setOpacity(a); c.alpha = a; }
+    if (c.str !== str){ go.setString(str); c.str = str; }
+  },
+  _pos(o, x, y){ const c = o.c; if (c.x !== x || c.y !== y){ o.go.setPosition(x, y); c.x = x; c.y = y; } },
+  /* text(layer, "rich [[leaf]] text", x, y, {font, size, color, a, w, align, lh, max}) → {w, h, lines} */
+  text(l, str, x, y, o = {}){
+    const fk = o.font || "body", size = o.size || 14, color = o.color || "fg", alpha = o.a ?? 1, lh = (o.lh || 1.45) * size;
+    let lay = layout(str, fk, size, o.w || 0);
+    let lines = lay.lines;
+    if (o.max && lines.length > o.max){
+      lines = lines.slice(0, o.max).map(l2 => ({...l2, items:l2.items.map(i => ({...i}))}));
+      const last = lines[o.max - 1], it = last.items[last.items.length - 1];
+      if (it && it.t === "s"){
+        let s = it.v; const lim = (o.w || 1e9) * K - (last.w - it.w) - measure("…", fk, size * K);
+        while (s.length && measure(s, fk, size * K) > lim) s = graphemes(s).slice(0, -1).join("");
+        it.v = s.replace(/\s+$/, "") + "…";
+      }
+    }
+    const h = lines.length * lh, bw = Math.max(0, ...lines.map(q => q.w)) / K;
+    if (o.measure) return {w:bw, h, lines:lines.length};
+    const colN = hexNum(color), lhPx = lh * K;
+    const hasIcon = lines.some(q => q.items.some(i => i.t === "i"));
+    const ax = o.align === "center" ? .5 : o.align === "right" ? 1 : 0;
+    const boxW = o.w || bw;
+    if (!hasIcon){
+      const s = lines.map(q => q.items.map(i => i.v).join("")).join("\n");
+      if (!s.trim()) return {w:0, h, lines:lines.length};
+      const t = l.obj("UIText");
+      this._setText(t, s, fk, size, colN, alpha, lhPx, o.align || "left");
+      const xx = x + (boxW - bw) * ax;
+      this._pos(t, xx * K, y * K);
+      return {w:bw, h, lines:lines.length};
+    }
+    lines.forEach((ln, li) => {
+      let cx = x + (boxW - ln.w / K) * ax; const cy = y + li * lh;
+      for (const it of ln.items){
+        if (it.t === "i"){
+          const isz = lay.iconW, ic = it.v === "terra" ? "#ffffff" : (o.iconColor || ICON_COL[it.v] || color);
+          this.icon(l, it.v, cx, cy + (lh - isz) / 2, isz, ic, alpha);
+        } else {
+          const t = l.obj("UIText");
+          this._setText(t, it.v, fk, size, colN, alpha, lhPx, "left");
+          this._pos(t, cx * K, cy * K);
+        }
+        cx += it.w / K;
+      }
+    });
+    return {w:bw, h, lines:lines.length};
+  },
+  textW(str, o = {}){ return layout(str, o.font || "body", o.size || 14, 0).w; },
+  textH(str, o = {}){ return this.text(null, str, 0, 0, {...o, measure:true}).h; },
+  icon(l, name, x, y, size, color = "fg", alpha = 1){
+    const o = l.obj("UIIcon"), go = o.go, c = o.c;
+    if (c.name !== name){ go.setAnimationName(name); c.name = name; }
+    const s = size * K; if (c.s !== s){ go.setWidth(s); go.setHeight(s); c.s = s; }
+    const col = hexNum(ICON_COL[color] ? COL[ICON_COL[color]] : color); if (c.col !== col){ go.setColor(`${(col >> 16) & 255};${(col >> 8) & 255};${col & 255}`); c.col = col; }
+    const a = Math.round(alpha * 255); if (c.a !== a){ go.setOpacity(a); c.a = a; }
+    const ang = arguments[7] || 0;
+    if (ang){ if (c.ang !== ang){ go.setAngle(ang); c.ang = ang; } this._pos(o, x * K + s / 2 - go.getCenterX(), y * K + s / 2 - go.getCenterY()); }
+    else { if (c.ang){ go.setAngle(0); c.ang = 0; } this._pos(o, x * K, y * K); }
+  },
+  sprite(l, type, anim, x, y, w, h, alpha = 1){
+    const o = l.obj(type), go = o.go, c = o.c;
+    if (c.anim !== anim){ go.setAnimationName(anim); c.anim = anim; }
+    if (c.w !== w || c.h !== h){ go.setWidth(w * K); go.setHeight(h * K); c.w = w; c.h = h; }
+    const a = Math.round(alpha * 255); if (c.a !== a){ go.setOpacity(a); c.a = a; }
+    this._pos(o, x * K, y * K);
+    return go;
+  },
+  /* ---- interaction ---- */
+  hit(l, id, x, y, w, h, fn, o = {}){ l.hits.push({id, x, y, w, h, fn, dis:!!o.disabled, cursor:o.cursor !== false, drag:o.drag || null, layer:l}); },
+  isHover(l, id){ return this.hoverLayer === l.name && this.hover === id; },
+  isPress(l, id){ return this.mouse.down && this.isHover(l, id) && this.pressHit && this.pressHit.id === id; },
+  _find(mx, my){
+    for (let i = this.order.length - 1; i >= 0; i--){
+      const l = this.layers[this.order[i]]; if (!l || !l.enabled) continue;
+      const c = l.clip, lx = mx - l.ox, ly = my - l.oy;
+      for (let j = l.hits.length - 1; j >= 0; j--){
+        const h = l.hits[j];
+        if (lx >= h.x && lx <= h.x + h.w && ly >= h.y && ly <= h.y + h.h){
+          if (c && (mx < c.x || mx > c.x + c.w || my < c.y || my > c.y + c.h)) continue;
+          return {layer:l, hit:h};
+        }
+      }
+      if (l.blocks) return {layer:l, hit:null};
+    }
+    return null;
+  },
+  /* per-frame: pointer, hover, wheel, drag-scroll, redraw dirty layers */
+  update(scene){
+    const im = scene.getGame().getInputManager();
+    const mx = im.getCursorX() / K, my = im.getCursorY() / K, down = im.isMouseButtonPressed(0);
+    const m = this.mouse;
+    if (down && !m.down){ m.sx = mx; m.sy = my; m.moved = 0; const f = this._find(mx, my); m.onUI = !!f && !(f.layer.name === "MapUI" && !f.hit); this.pressHit = f && f.hit; m.scrollL = this._scrollAt(mx, my); m.scroll0 = m.scrollL ? m.scrollL.scroll : 0; }
+    if (down) m.moved = Math.max(m.moved, Math.abs(mx - m.sx) + Math.abs(my - m.sy));
+    if (down && this.pressHit && this.pressHit.drag){ const h = this.pressHit, l = h.layer; h.drag(Math.max(0, Math.min(1, (mx - l.ox - h.x) / h.w))); this.dirty(l.master || l.name); }
+    else if (down && m.scrollL && m.moved > 6){ this.setScroll(m.scrollL, m.scroll0 - (my - m.sy)); }
+    m.x = mx; m.y = my; m.down = down;
+    const f = this._find(mx, my), hv = f && f.hit && !f.hit.dis ? f.hit.id : null, hl = f && f.hit ? f.layer.name : null;
+    if (hv !== this.hover || hl !== this.hoverLayer){
+      if (this.hoverLayer && this.layers[this.hoverLayer]) this.layers[this.hoverLayer].dirty = true;
+      if (hl) this.layers[hl].dirty = true;
+      this.hover = hv; this.hoverLayer = hl;
+      if (this.canvas) this.canvas.style.cursor = hv && f.hit.cursor ? "pointer" : "";
+    }
+    // labels and markers on the map layer do not block map zoom / pan
+    this.overUI = !!f && f.layer.name !== "MapUI";
+    const wheel = im.getMouseWheelDelta ? im.getMouseWheelDelta() : 0;
+    this.wheelUsed = false;
+    if (wheel){ const sl = this._scrollAt(mx, my); if (sl){ this.setScroll(sl, sl.scroll - wheel * 0.6); this.wheelUsed = true; } else if (this.overUI) this.wheelUsed = true; }
+    for (const n of this.order){ const l = this.layers[n]; if (l && l.dirty && l.master){ l.dirty = false; this.layers[l.master].dirty = true; } }
+    for (const n of this.order){ const l = this.layers[n]; if (l && l.dirty && l.render){ l.dirty = false; l.begin(); try { l.render(l); } catch(e){ console.error("UI render", n, e); } l.end(); this._applyClip(l); } }
+  },
+  _scrollAt(mx, my){
+    for (let i = this.order.length - 1; i >= 0; i--){
+      const l = this.layers[this.order[i]]; if (!l || !l.enabled) continue;
+      const c = l.clip; if (c && l.content > c.h + 1 && mx >= c.x && mx <= c.x + c.w && my >= c.y && my <= c.y + c.h) return l;
+      if (l.blocks) return null;
+    }
+    return null;
+  },
+  setScroll(l, v){ const max = Math.max(0, l.content - (l.clip ? l.clip.h : 0)); const nv = Math.max(0, Math.min(max, v)); if (nv !== l.scroll){ l.scroll = nv; l.setOffset(l.baseX, l.baseY - nv); this.hover = null; this.hoverLayer = null; if (l.master) this.layers[l.master].dirty = true; } },
+  _applyClip(l){
+    const cont = l.scene.getLayer(l.name).getRenderer().getRendererObject();
+    if (!l.clip){ if (cont.mask){ cont.mask = null; } return; }
+    const c = l.clip, key = `${c.x},${c.y},${c.w},${c.h}`;
+    if (!l.maskG){ l.maskG = new PIXI.Graphics(); }
+    if (l.maskKey !== key){ l.maskKey = key; l.maskG.clear(); l.maskG.beginFill(0xffffff, 1); l.maskG.drawRect(c.x * K, c.y * K, c.w * K, c.h * K); l.maskG.endFill(); }
+    if (cont.mask !== l.maskG) cont.mask = l.maskG;
+  },
+  /* mouse released: run the hit under the pointer. Returns true when the UI used the click. */
+  release(){
+    const m = this.mouse;
+    const f = this._find(m.x, m.y);
+    const wasDrag = m.moved > 8;
+    if (!f) return false;
+    if (wasDrag && m.scrollL) return true;
+    if (f.hit && !f.hit.dis && f.hit.fn && !f.hit.drag && (!this.pressHit || this.pressHit.id === f.hit.id)){ try { f.hit.fn(); } catch(e){ console.error(e); } this.dirty(); }
+    return true;
+  },
+};
+P.Kit = Kit;
+
+};
+gdjs.LoadingCode.userFunc0x10133f8 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Audio · เสียงเอฟเฟกต์และเสียงบรรยากาศของเหตุการณ์ */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.audio) return;
+(P.mods = P.mods || {}).audio = 1;
+/* =========================================================================
+   Audio · real recordings (see assets/audio/CREDITS.txt)
+   sfx-*  : one-shot interface sounds        → GDevelop "play a sound"
+   amb-*  : event ambience, looped on sound channel 2, faded in/out
+   music-*: played by the scene events on music channel 1 (global variables MusicOn / MusicVol)
+   ========================================================================= */
+const snd = () => gdjs.evtTools.sound;
+const pref = k => { try { return localStorage.getItem(k) !== "0"; } catch(e) { return true; } };
+const savePref = (k, v) => { try { localStorage.setItem(k, v ? "1" : "0"); } catch(e) {} };
+const lvl = (k, d) => { try { const v = parseFloat(localStorage.getItem(k)); return isNaN(v) ? d : Math.max(0, Math.min(1, v)); } catch(e) { return d; } };
+const VOL = {sfx:60, amb:55, music:30, musicDuck:12};
+const A = {
+  SFX:["click","open","close","select","speed","pause","buy","action","error","event","choose","pop","aid","miss","spawnGreen","spawnRed","news","year","done","warn","save","start","win","lose"],
+  AMB:["heat","factory","construction","harbor","ocean","storm","flood","fire","wind","arctic","crowd","city","siren","forest","birds","bees","lab","office","air","train","farm","underwater","market","explosion"],
+  scene:null, on:pref("p2050-sfx"), musicOn:pref("p2050-music"),
+  lvMusic:lvl("p2050-vol-music", 0.8), lvSfx:lvl("p2050-vol-sfx", 0.8),
+  amb:null, ambVol:0, ambTarget:0, ambStop:false, musVol:null,
+  setScene(scene){ this.scene = scene; this.amb = null; this.ambVol = 0; this.syncGlobals(); },
+  musicTarget(){ return (this.amb ? VOL.musicDuck : VOL.music) * this.lvMusic; },
+  syncGlobals(){
+    if (!this.scene) return;
+    const gv = this.scene.getGame().getVariables();
+    gv.get("MusicOn").setNumber(this.musicOn ? 1 : 0);
+    gv.get("MusicVol").setNumber(this.musicTarget());
+  },
+  play(n){
+    if (!this.on || !this.scene) return;
+    try { snd().playSound(this.scene, `sfx-${n}.mp3`, false, VOL.sfx * this.lvSfx, 1); } catch(e) {}
+  },
+  ambience(n){
+    this.stopAmb(0);
+    if (!this.on || !n || !this.scene) return;
+    this.amb = n; this.ambVol = 0; this.ambTarget = VOL.amb * this.lvSfx; this.ambStop = false;
+    try { snd().playSoundOnChannel(this.scene, `amb-${n}.mp3`, 2, true, 0, 1); } catch(e) {}
+    this.syncGlobals();
+  },
+  stopAmb(ms = 800){
+    if (!this.amb) return;
+    if (!ms){ try { snd().stopSoundOnChannel(this.scene, 2); } catch(e) {} this.amb = null; this.ambVol = 0; }
+    else { this.ambStop = true; this.ambTarget = 0; this.ambFade = ms / 1000; }
+    this.syncGlobals();
+  },
+  /* per frame: ambience / music volume fades */
+  update(dt){
+    if (!this.scene) return;
+    if (this.amb){
+      const speed = (this.ambStop ? VOL.amb / (this.ambFade || .8) : VOL.amb / .7) * dt;
+      if (this.ambVol < this.ambTarget) this.ambVol = Math.min(this.ambTarget, this.ambVol + speed);
+      else if (this.ambVol > this.ambTarget) this.ambVol = Math.max(this.ambTarget, this.ambVol - speed);
+      try { snd().setSoundOnChannelVolume(this.scene, 2, this.ambVol); } catch(e) {}
+      if (this.ambStop && this.ambVol <= 0){ try { snd().stopSoundOnChannel(this.scene, 2); } catch(e) {} this.amb = null; this.ambStop = false; this.syncGlobals(); }
+    }
+    if (this.musicOn){
+      const target = (this.amb && !this.ambStop ? VOL.musicDuck : VOL.music) * this.lvMusic;
+      if (this.musVol === null) this.musVol = target;
+      const step = 30 * dt;
+      this.musVol = this.musVol < target ? Math.min(target, this.musVol + step) : Math.max(target, this.musVol - step);
+      try { if (snd().isMusicOnChannelPlaying(this.scene, 1)) snd().setMusicOnChannelVolume(this.scene, 1, this.musVol); } catch(e) {}
+    }
+  },
+  setLevel(kind, v){
+    v = Math.max(0, Math.min(1, v));
+    if (kind === "music"){ this.lvMusic = v; try { localStorage.setItem("p2050-vol-music", v); } catch(e) {} this.musVol = this.musicTarget(); try { snd().setMusicOnChannelVolume(this.scene, 1, this.musVol); } catch(e) {} }
+    else { this.lvSfx = v; try { localStorage.setItem("p2050-vol-sfx", v); } catch(e) {} if (this.amb) this.ambTarget = VOL.amb * v; }
+    this.syncGlobals();
+  },
+  toggle(){ this.on = !this.on; savePref("p2050-sfx", this.on); if (!this.on) this.stopAmb(0); else this.play("click"); },
+  toggleMusic(){
+    this.musicOn = !this.musicOn; savePref("p2050-music", this.musicOn);
+    if (!this.musicOn){ try { snd().stopMusicOnChannel(this.scene, 1); } catch(e) {} }
+    this.musVol = null; this.syncGlobals();   // the scene events start the next track when MusicOn = 1
+  },
+};
+P.Audio = A;
+const H = P.H = P.H || {};
+H.sfx = n => A.play(n);
+H.amb = n => A.ambience(n);
+H.stopAmb = () => A.stopAmb();
+
+};
+gdjs.LoadingCode.userFunc0x10134d0 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Map · แผนที่โลก 2D, สีภูมิภาค, ควันมลพิษ, ฟอง, กล้อง */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.map) return;
+(P.mods = P.mods || {}).map = 1;
+/* =========================================================================
+   Map · 2D world map (Robinson projection) on the base layer
+   Objects placed in the scene: Ocean, MapRim, ArcticIce, Region ×6, RegionLine ×6, Plume ×N
+   Created at runtime: Bubble (green = Eco-Points, red = disaster aid), 2 UIPainter objects in world space
+   (country borders + the selected country), drawn once and moved by the camera.
+   Controls: drag = pan · wheel / pinch / + − buttons = zoom · double-tap or H = whole world
+   Tap a region (zoomed out) = zoom into it · tap a country (zoomed in) = select the country
+   ========================================================================= */
+const MAPMETA = {"meta":{"LON0":11,"LAT_TOP":84,"LAT_BOT":-56,"MW":1920,"SS":1.5,"SW":2880,"SH":1211,"U":540.0804007360181,"XR":2.6662696851016574,"YT":1.310054148},"grid":{"w":480,"h":202,"cell":4,"rle":"05l.19.0c0.1j.0d.1j.0bt.1j.03.115.0be.17.01.1d.04.114.0u.27.01i.26.08l.12.08.1f.07.115.0p.28.01q.25.01.22.089.11.07.12.02.12.08.19.02.11a.0r.26.02.21.01u.24.07z.13.0o.18.08.118.0t.23.021.23.07t.16.05.11.07.12.02.14.03.18.08.117.023.23.0s.2b.07p.16.01.13.04.13.05.13.02.15.0k.1z.01x.24.0p.2l.0k.27.06w.14.0d.12.01.1b.0k.1y.01w.24.0o.2n.0o.22.06o.17.0j.14.0w.1w.01w.24.0p.2p.07a.19.06.13.04.13.01.14.03.12.02.13.01.13.0k.1u.01y.23.0m.210.02.26.06t.1j.03.15.01.11.04.1d.0j.1t.01z.23.0d.23.02.21.05.219.0a.29.068.13.02.1d.05.16.03.1f.01.11.0h.1u.01x.24.0b.24.02.21g.03.24.01.2d.0r.22.04d.17.0x.1d.07.14.03.1i.0f.1r.02.11.018.26.0z.26.01.229.04s.1k.0a.15.09.1f.03.11.02.13.06.16.02.19.0d.1u.015.2b.0z.25.01.22b.0a.23.04b.1p.02.1h.04.17.02.12.05.11.02.14.04.15.04.19.0g.1o.016.2j.0n.25.03.24.01.22k.01.2a.03z.11e.06.14.06.12.02.16.02.14.08.17.0d.1o.017.2n.05.22.05.23.01.2i.01.22y.03v.12a.04.12.02.19.0a.1l.01a.2q.03.22.03.2o.02.230.03s.128.09.1b.09.1j.01b.2s.03.2r.02.236.03h.12a.0c.16.02.13.09.1h.0d.23.01.25.0r.2b.01.2b.06.23w.01.28.03d.129.01.12.06.1b.03.11.0b.1c.0h.2a.0p.2b.03.2a.05.23y.04.24.03h.123.02.14.04.13.01.19.0e.1b.0j.28.0p.2b.03.2c.01.241.07.21.035.11.0a.121.04.12.02.12.09.17.0e.1b.0l.22.0s.2b.02.24h.03i.125.0k.14.01.11.0f.19.01f.2b.04.24j.03e.124.0f.15.05.12.0i.17.01e.2d.04.244.01.2c.03e.124.0h.16.0o.17.01e.2d.04.23y.03.23.01.2a.03g.1i.01.11k.0h.19.0p.13.01f.2d.04.23y.08.29.03d.11.02.1b.02.14.06.11e.0j.18.05.11.022.2e.05.21.05.23q.07.26.03l.18.0g.11c.0i.19.04.12.022.2e.06.23q.02.24.06.23.03r.14.0i.11c.0g.1b.01.14.022.24.02.26.08.23j.0j.23.03q.15.0l.118.0h.1h.01p.22.0h.25.09.23h.0j.25.03n.12.02.12.0l.11c.0e.1h.01o.25.0c.21.02.25.05.22.01.23i.0j.27.03i.12.0s.11d.0d.1g.01q.23.0c.23.02.24.05.23k.0k.28.03d.14.0u.11f.0a.1i.01p.24.0b.22.01.24.07.23k.0l.27.03a.12.0z.11i.05.1l.01m.21.01.24.0b.22.0c.21g.34.220.0m.27.04a.11h.04.1p.01i.23.03.23.0a.23.01.21.03.21j.39.220.0l.25.047.11.03.11h.04.1p.01h.24.03.24.09.21n.3f.21.33.21z.0h.25.04a.11h.04.1p.01h.24.01.26.05.21s.3j.21c.36.2k.0e.23.04b.11h.03.1q.01h.23.02.27.03.21s.3l.21c.36.2j.0f.23.049.11i.02.1q.01n.27.03.21h.33.29.3l.2m.33.2m.37.2h.01.21.0f.22.049.127.02.11.01n.25.02.21j.37.21.33.21.3s.29.31.26.35.2k.39.2f.02.21.04n.120.0a.11.01n.21.07.21h.318.26.35.23.3b.28.31.25.3a.2f.02.22.04m.12.01.11u.04.12.05.13.01q.21.01.21j.31a.22.3n.25.3j.2d.02.23.04m.12.01.11r.01.14.07.16.01m.21.01.21l.32p.2c.02.21.04n.11.02.11v.07.17.01l.21o.32q.23.32.26.02.21.04n.11y.0a.14.01n.21o.32t.26.03.21.04l.11z.0c.11.01p.219.02.2c.33.03.32n.26.04.21.04k.11z.01.11.01.12.01x.212.03.22.04.2d.05.32o.25.04o.124.01y.2h.01.2j.04.24.01.2d.06.32o.24.04o.11w.02.13.022.2h.03.2h.05.21.04.2b.05.32o.26.06.32.04g.11u.03.12.024.2c.01.24.03.2g.0d.2a.04.32p.25.07.34.04c.11t.022.2j.04.24.04.2e.0e.29.04.32p.24.08.35.04a.11t.023.2e.0a.24.04.2c.0h.28.05.32n.21.0a.35.04b.11t.023.2e.07.21.03.24.05.2b.0g.28.05.32n.0c.31.04d.11s.025.2d.0d.25.03.2b.04.26.06.29.07.32k.0d.31.04b.11r.027.2b.0a.21.06.24.02.26.02.22.02.2p.06.32a.01.39.0d.32.04a.11p.028.2c.0a.21.07.22.04.23.05.2s.05.32a.02.38.0e.33.049.11p.028.2b.0b.21.08.21.04.24.04.2m.51.22.31.51.21.05.329.03.31.04.33.0f.32.049.11o.029.2b.0k.21.05.23.04.2m.52.41.52.21.06.327.09.34.0e.32.049.11n.02a.2b.0i.21.08.23.03.2m.56.06.32.43.3f.41.51.31m.08.35.0d.32.049.11l.02c.2a.0h.23.08.22.05.2i.31.41.32.56.05.41.56.37.41.51.41.32.41.52.32.51.42.31i.01.33.06.33.0b.34.048.11m.02e.23.09.5a.0e.21.07.2a.31.43.5p.41.35.5a.64.31l.06.34.08.36.048.11l.02g.21.06.5e.0v.31.5v.32.41.59.66.51.31j.07.34.08.36.049.11k.02g.51.04.5g.0v.5w.42.5b.68.31g.09.33.05.39.048.11k.02g.5m.0r.21.03.519.69.31g.08.32.05.39.04b.11g.02h.5m.0w.518.6a.51.31g.0d.37.04f.11d.02i.5o.0v.518.6b.31h.0b.32.02.31.04j.11b.02h.5u.0q.518.6c.41.31h.0a.33.04k.11a.02j.5v.06.56.0d.518.6c.31j.0b.31.04k.13.01.115.02k.5w.05.59.04.52.04.516.6e.51.31i.0b.31.04l.11.03.114.02k.5z.02.51o.6h.41.31g.04x.11.03.1u.04.16.02k.522.01.5m.6k.41.31e.04w.12.02.1n.04.12.08.13.02j.523.03.5d.62.51.6p.51.41.3f.41.3w.04x.11.02.1l.0h.12.02i.524.03.5e.6t.51.3b.64.3w.04x.12.02.1i.0i.13.02h.51n.01.5h.04.5e.6v.43.31.52.42.67.3u.04w.13.02.1h.0j.13.02f.51o.03.5h.05.5d.61a.3s.04y.13.02.1g.0k.12.02.11.02b.51p.03.5i.05.52.02.58.61a.41.3r.04z.12.02.1g.0k.12.02d.51r.03.5i.09.56.61b.51.3r.04z.12.03.1f.0k.12.02d.51s.03.5j.05.51.04.52.61c.3r.050.12.03.1e.0p.11.029.51t.03.5i.05.52.0e.613.51.3r.03.31.04x.12.03.1d.0p.11.028.51v.03.5i.02.55.0d.614.51.3p.03.32.04y.11.04.1b.02z.51v.04.5q.0d.613.41.37.41.3f.04.32.054.1a.0j.15.02a.51w.04.5r.0d.613.41.33.42.51.62.41.3b.06.32.054.1a.0l.15.028.51x.04.5q.0d.6s.01.6a.41.32.51.66.38.05f.1a.0p.12.027.51y.03.5q.0e.6n.06.6c.51.67.03.32.05h.1a.09.15.0b.14.025.51y.03.5p.0j.6i.07.6j.04.31.05h.1c.08.14.0d.14.024.51y.04.5n.0k.6i.08.6i.04.31.03n.11.01u.1b.08.14.0j.14.01y.51y.05.5m.0k.6g.0b.6g.04.33.05i.1b.06.15.0j.16.01w.51z.05.5l.0k.6f.0d.6g.03.32.05k.1k.0d.12.03.11.02.11.05.12.01t.520.04.5k.0l.6f.0d.6g.0j.62.056.1h.02n.520.05.5h.0o.6d.0f.6g.0i.62.058.1f.02n.521.05.5e.0q.6c.0g.6h.0h.63.059.1d.02n.521.05.5c.0s.6b.0h.62.02.6e.0g.62.05g.1d.02g.523.04.5c.0t.68.0n.6f.0f.62.05h.1d.02f.524.03.5a.0v.68.0o.6e.0f.62.05i.1b.02g.525.02.58.0y.67.0o.6f.0f.63.05j.18.02g.526.02.55.010.68.0n.6f.0f.61.01.62.05l.15.02g.527.01.52.014.67.0o.62.01.6b.0f.61.03.61.05k.15.0f.41.021.527.016.66.0p.62.03.69.0k.62.05j.13.0f.42.01.41.01z.526.09.52.0x.65.0p.62.04.68.0h.61.03.61.05k.12.0c.49.01z.525.04.56.0x.65.0p.61.05.67.0i.62.05n.13.0a.45.01.47.02.42.01s.52f.0x.65.0p.61.07.63.0l.62.05n.13.09.45.01.4d.01r.52e.0y.63.0q.61.08.62.0f.61.05.61.05p.13.01.12.01.11.02.4l.01r.52c.0z.63.01.62.0n.62.07.61.0p.62.05n.13.02.11.31.4n.01q.52c.010.61.02.63.0m.63.0u.64.05o.12.03.4p.01p.52c.013.63.0n.62.0t.66.05s.4q.01q.529.015.62.0o.62.0u.62.05u.4r.01q.5i.02.51o.015.61.0q.62.0j.62.09.61.05u.4v.31.01m.5e.06.51m.01x.63.0h.64.063.4v.23.01l.55.04.52.09.51l.01q.64.03.64.0f.66.062.4v.23.31.028.51g.01s.63.03.64.0e.66.063.4v.31.22.41.029.51e.01u.63.03.63.0d.66.064.4v.22.31.42.028.51d.01w.64.01.63.0b.68.063.4w.32.43.028.51d.01x.63.02.63.0a.68.062.413.027.51b.020.65.01.61.07.6c.0c.61.05n.414.027.51a.021.65.09.6c.03.62.02.62.03.62.05m.413.028.519.023.65.08.6b.03.61.09.61.05m.416.025.519.024.65.08.6b.060.41a.021.518.026.65.07.6b.02.62.01.62.0b.64.05e.41c.020.517.027.65.07.69.03.64.0d.63.05e.41c.020.515.029.66.06.69.03.64.0f.61.03.65.057.41h.01v.514.02a.66.07.66.04.64.08.63.03.63.01.69.053.41k.01u.512.02c.65.0b.62.04.62.01.61.0e.6f.050.41m.01t.512.02c.64.0j.61.01.62.0g.6e.08.61.04p.41o.01s.510.02f.62.0i.62.02.61.0j.6c.07.61.04q.41p.01r.5z.02g.61.017.6b.03.64.04.61.04m.41p.01r.5z.02h.63.015.6c.0a.61.04m.41o.01r.510.02h.68.0z.6b.04z.41n.01s.5z.02j.67.0x.6d.04y.41n.01s.5z.02q.63.03.61.02.61.0p.65.04.62.04z.41m.01s.5z.035.62.0k.63.04.63.04y.41l.01t.5z.02y.61.05.61.0u.63.04y.41j.01u.510.041.61.04x.41i.01w.5z.03r.61.058.41h.01w.5z.03e.61.0c.61.059.41f.01w.510.0b.51.030.68.06.62.059.41f.01v.511.0b.51.02z.68.07.62.05a.41d.01w.511.0a.53.02x.68.08.62.05a.41d.01w.511.0a.53.02s.62.03.68.08.63.05a.41c.01v.512.09.54.02q.65.01.68.08.65.05a.41b.01v.512.08.55.02q.6f.07.65.05b.41a.01v.511.06.57.02q.6i.05.65.05d.418.01v.510.07.57.02o.6l.03.66.05f.416.01v.5y.08.58.02n.6n.01.68.015.61.049.415.01v.5x.09.57.02o.6v.05g.414.01x.5v.0b.56.02n.6x.05g.413.01x.5u.0c.56.02m.6z.05f.413.01y.5s.0d.55.02k.613.05e.412.01z.5s.0c.56.02h.616.0l.61.04s.412.020.5s.0a.56.02g.619.0l.61.04r.412.020.5s.0a.56.02e.61b.05d.411.021.5s.0a.56.02e.61c.05c.4x.025.5s.0a.56.02e.61c.05c.4v.028.5r.0b.54.02e.61e.05b.4u.029.5p.0d.54.02e.61f.05a.4t.02a.5n.02x.61f.05a.4t.02a.5n.02x.61f.05a.4t.02a.5n.02x.61e.05b.4t.02b.5m.02x.61e.05b.4t.02b.5m.02x.61e.05b.4t.02c.5k.02y.61e.05b.4s.02e.5i.02z.61d.05d.4r.02e.5h.030.61d.05d.4q.02g.5g.030.61c.05e.4q.02g.5f.031.6i.02.6s.05e.4p.02h.5e.032.6f.07.6p.05f.4o.02i.5d.033.6b.0c.6n.05g.4o.02i.5b.034.6b.0e.6l.05h.4n.02k.54.039.66.0k.61.02.6h.05i.4i.03.41.060.62.0o.6h.05j.4j.06u.6f.0t.61.04q.4k.06u.6d.0u.61.04q.4k.06u.6c.0v.61.04q.4k.06u.6b.0v.62.04q.4k.06u.68.0y.64.04p.4e.075.61.0y.65.04p.4e.083.63.04s.4e.083.63.04s.4e.07z.61.03.61.04u.4b.074.64.0t.63.01.61.04w.4b.073.64.0s.63.04z.41.01.4a.072.62.0s.63.053.49.073.61.0s.63.054.49.07t.64.055.4a.07r.65.056.49.07r.64.058.49.07q.64.05a.49.0d3.4b.0d1.4a.0d2.4a.0d3.49.0d3.48.0d5.47.0d5.48.09.43.0ct.47.0d7.46.0d7.47.0d7.46.0d9.43.0mf"}};
+const CGEO = [{"g":"Fiji","c":null,"r":"SEA","p":[[1838.8,661.3,1840.7,660.1,1841.8,662,1840.5,665.6,1836.6,666.2,1834.2,665.6,1834.3,662.6,1836.8,660.7,1838.8,661.3],[1850.8,652.9,1852,652.3,1850.7,655.3,1850.1,655.9,1846.6,657.1,1842.7,658.3,1842.7,655.9,1845.6,654.7,1847.2,654.7,1850.8,652.9]],"b":[1834.2,652.3,1852,666.2],"cx":1837.9,"cy":663.4},{"g":"Tanzania","c":null,"r":"MEAF","p":[[1082.1,561.7,1083.2,562.3,1102.3,574.4,1102.8,578,1110.2,584.1,1107.4,591.3,1107.9,594.9,1111.1,596.7,1111.6,598.6,1109.9,602.2,1110.4,604,1109.9,607,1111.4,610.6,1113.9,616.7,1115.5,617.9,1111.2,621.5,1105.3,623.9,1102.1,623.9,1100.4,625.7,1096.7,625.7,1095.1,626.3,1088.8,624.5,1085.1,625.1,1083.7,617.3,1081.6,614.3,1080.6,612.4,1075.8,611.2,1072.6,609.4,1069.4,608.8,1067.3,607.6,1064.7,605.8,1062.1,598.6,1059,594.9,1057.9,591.3,1058.5,588.3,1057.5,582.9,1060.1,582.9,1061.7,580.4,1063.9,577.4,1065.5,576.2,1065,573.8,1063.9,572.6,1063.9,570.2,1065.5,569.6,1065.5,566,1063.4,562.3,1065.6,561.7,1071.4,561.7,1082.1,561.7]],"b":[1057.5,561.7,1115.5,626.3],"cx":1086.3,"cy":593.4},{"g":"W. Sahara","c":null,"r":"MEAF","p":[[858.5,388.4,858.4,390.3,858,399.3,840.9,399.3,840.8,414.4,835.6,415,834.4,418,835.1,427.1,814.7,427.1,813.1,428.9,813.7,426.5,825.2,425.9,826.4,423.5,828.6,421.1,830.5,412.6,838,406,841,398.7,842.5,398.1,844.3,393.3,849,392.7,850.5,393.3,853.1,393.3,854.7,392.1,857.8,392.1,858,388.4]],"b":[813.1,388.4,858.5,428.9],"cx":839.5,"cy":409.3},{"g":"Canada","c":"CAN","r":"NA","p":[[336.6,260.9,335.7,260.9,330.9,255,329.6,252.7,323.3,250.4,324.9,245.2,328.7,241.7,325.3,238.8,328.3,234.2,326.4,230.1,328.9,227.3,333.7,224.4,337,221,333.4,217.1,335.1,210.9,336,207,334.9,204.2,334.6,201.9,334.9,199.1,328.9,200.8,321.2,204.2,321.8,200.3,321.1,198,318.7,196.4,314.5,196.4,350.8,165.7,375.5,146.5,381.4,147.6,384.4,150.2,387.6,150.7,393.7,148.6,400.2,147.1,405.3,147.6,413.6,145.5,421.7,144,421.8,146,425.7,145,430.3,142.5,432.3,143,432.7,147.6,442.4,144,437.9,148.1,443.7,147.1,447,145.5,451,146,454.9,148.1,461.5,150.2,465.8,151.2,470.2,150.7,472.6,153.3,464.3,155.9,470.3,156.9,481.5,156.4,486,155.4,486.8,158.5,493.8,155.9,491.9,153.8,496.4,151.7,501,151.7,505,151.2,507.1,152.2,508,155.4,512.8,154.8,517,157.4,524.3,156.4,530.2,156.4,532.3,153.3,536.7,152.2,541.1,154.3,536.9,159,543,154.8,546.1,154.8,552.7,149.7,551.2,146.5,548.5,144.5,554.6,139.1,562.8,135.7,567.1,136.2,568.3,138.6,568.2,144,562.4,146.5,568.8,147.6,564.3,152.8,572.9,148.6,574.5,152.2,570.3,155.9,571.2,159.5,578.1,155.9,584.7,151.2,589.7,145.5,594.7,146,600,146.5,603,149.1,601.4,151.7,595.8,154.8,596.5,157.4,594.1,160,583.7,163.6,577.7,164.2,574.6,162.6,571.3,165.2,563.8,169.9,560.9,172,553.1,175.8,547,176.3,542,178.5,539.1,181.7,533.7,182.8,524.8,187.2,515.9,193.1,510.7,197.5,505.3,204.2,511.3,204.8,509,210.4,508.4,214.3,515.3,213.2,522,215.4,524.9,217.7,526.1,220.5,530.2,222.2,533.6,224.4,540.3,225,544.9,225.5,541.8,230.1,539.8,235.9,539.4,242.3,543.1,248.1,547.7,246.3,553.4,240,555.9,231.3,554.7,227.8,563.1,225.5,570.4,221.6,575.4,217.7,577.4,213.7,577.4,208.7,574.6,204.8,583.6,198.6,584.7,193.7,589,185.5,593,183.9,599,185.5,602.8,186.1,607.3,185,610,186.6,612.9,189.9,612.8,192,620.4,192,617.4,196.9,614.9,203.6,618.1,204.8,619.3,208.1,627.6,204.8,635.2,198.6,638.9,196.4,639.7,201.4,641.8,208.1,643.2,214.9,639.5,218.8,643.8,221.6,646.1,225,652.5,226.7,654.9,228.4,654.8,233,657.4,234.2,658.5,235.9,656.2,242.9,652.3,244.6,648.1,246.9,639.6,248.6,631.9,253.8,623.7,254.4,614.1,253.2,607.2,253.2,602.3,253.8,596.8,257.9,589.9,260.3,579.4,268.5,572,273.8,576.3,272.7,587,265,598.7,260.3,605.9,259.7,609,262.6,603.4,266.2,602.3,272.7,601.9,277.4,606.9,280.3,615.4,279.1,622.6,272.7,621.1,276.8,623.5,279.1,616.5,282.7,604.3,286.2,599.1,288.6,591.7,293.4,588.6,292.8,590,287.4,600.3,282.7,592.7,282.7,586.9,283.8,585,280.3,588.4,272.1,587.2,270.3,583.4,271.5,582.5,270.3,577,274.4,573.6,279.1,570.7,281.5,568.3,282.7,566.9,282.7,565.7,284.4,557.1,284.4,549.4,284.4,547,285.6,540.1,289.8,539.4,290.4,537,292.8,532.7,292.8,527.9,292.8,525.2,293.4,525.7,294.6,525.4,296.4,517.7,300,511.8,301.2,505.2,304.1,503.8,304.1,502.6,303.5,502.6,302.3,504.6,300,508.5,296.4,511.5,292.8,512.5,288,513.5,282.7,510.1,279.7,511.2,278.5,509.6,278,509.2,276.8,509.8,275.6,508.5,276.2,507.1,276.2,507.9,275.6,506.7,275,507.1,273.2,504.2,271.5,501.6,269.1,498.3,267.4,494.8,265,489.7,266.8,488.3,266.8,483.6,265,479.2,266.2,475.8,263.8,471.4,263.2,468.5,262.6,467.4,262,468.4,258.5,466.5,258.5,465.2,260.9,455.9,260.9,439.6,260.9,423.8,260.9,410.2,260.9,395.8,260.9,382.3,260.9,368.3,260.9,363.6,260.9,349.7,260.9,336.6,260.9],[565.2,184.5,570.1,182.3,575.5,182.3,574.7,183.4,567.8,186.1,564.9,186.1,565.2,184.5],[624.3,131.3,622.5,128.9,624.6,126.9,626.5,126.4,634.5,126.9,638.5,129.9,637.3,131.3,634,130.8,629.9,130.8,625,131.8,624.3,131.3],[579.1,186.6,581.9,185,583.6,185,583.6,186.1,579.7,189.3,578.4,188.8,578.3,187.2,579.1,186.6],[584.4,120.6,580.3,122.5,575.7,122.1,572.4,121.1,577.1,118.8,583.3,117.9,584.8,119.3,584.4,120.6],[598.2,109.4,596.5,109.4,590.5,109,591,108.1,597.9,108.1,599.2,109,598.2,109.4],[595.6,103.6,597.3,105.4,594.9,106.8,587.9,108.1,587,106.8,587.7,105,590.2,103.2,593.9,103.6,595.6,103.6],[601.3,123.5,595.6,123,587.8,121.6,589.6,118.8,592.1,116.6,590.9,114.8,584.1,114.4,582.6,112.6,586.4,110.8,592.8,111.2,594.9,112.6,601.8,112.6,603.3,113.9,600,115.7,602.6,117,603.6,117.9,608.6,117.9,613,118.4,619.8,117.5,627.4,117,632.9,117.5,634.4,119.3,633.6,121.1,630.1,122.1,623.8,123.5,620,122.5,608.6,123.5,601.3,123.5],[542.6,106.3,546,107.2,543,108.6,534.4,109.9,531.6,108.6,537.1,106.8,542.6,106.3],[547.6,103.6,550.7,104.5,545.3,105.4,539.8,105.4,541.2,104.5,546.6,103.2,547.6,103.6],[654.8,247.5,651.1,250.9,645.8,256.2,649.6,254.4,652,255.6,650,257.3,653.6,259.1,656,257.3,659.9,259.7,657.1,263.8,660.8,262.6,660.3,265.6,660.8,269.7,656.9,274.4,654.8,275,651.9,273.8,654.4,269.1,653.9,267.9,646.4,273.2,643.6,273.2,647.9,270.3,643.6,269.1,638.9,269.1,629.5,269.1,629.7,267.4,633.3,265,631.9,263.8,636.9,260.3,645.1,250.9,649.7,247.5,654.1,245.7,656.4,245.7,654.8,247.5],[575.9,170.4,579.2,172,582.9,173.6,581,176.3,584.6,175.8,586,177.9,581.1,179.6,576.1,177.9,575.2,175.8,569.2,178.5,561.4,181.2,561.8,178.5,556,179,561.3,176.3,565.4,172,570.4,167.3,573.2,167.3,571.9,169.9,574.7,168.8,575.9,170.4],[626.3,133.3,631.7,131.3,637.3,134.3,640.9,136.2,639.2,138.6,647.6,137.2,648.5,140.6,656.1,142.5,658,144.5,658.3,149.1,649.6,151.7,656.5,154.8,661.8,156.4,664.7,161,670.7,161,667.3,164.7,656.5,170.9,653,168.8,649.9,163.6,644.4,164.2,641.9,167.3,643.9,170.4,648,173.1,649,174.1,648.3,179.6,644.8,183.4,640.1,182.3,632.4,177.9,635.5,182.3,638.1,185.5,637.3,187.7,627.3,185.5,620.6,182.3,617.4,179.6,619.6,177.9,615.2,175.2,611.3,172.5,610.2,174.1,597.7,175.2,595.5,173.1,601,169.3,608.6,169.3,617.5,168.3,617.4,166.7,620.8,164.2,629.3,159,630,156.9,629.9,154.8,625.9,152.2,618.9,150.7,622.4,149.7,620.8,146,617.4,146,615.9,144,612.8,145.5,605,146.5,592.5,145,585.5,143.5,579.8,143,578.7,141.1,584.4,139.1,579.2,139.1,582.9,134.3,590.3,129.9,595.9,127.9,606.8,126.4,601.1,129.4,600.7,132.8,607.8,128.9,619.6,126.4,620.9,131.8,617.5,134.7,626.3,133.3],[576.6,125,584.2,125,590.2,126,580.2,130.4,574.8,131.3,566.6,135.2,563,134.7,564.9,130.8,567.5,128.4,571.9,126,576.6,125],[487.4,115.7,499.3,112.1,510.9,109.4,516.1,109.4,521.6,109,516.3,112.1,510.7,113.9,507.6,113.9,498,115.7,490.9,116.6,487.4,115.7],[315,231.9,320,231.3,312.7,237.7,312.8,242.3,310.9,242.3,310.2,240,310.9,237.1,310.2,235.3,312.3,232.5,313.8,230.7,315,231.9],[569.5,101.4,575.5,101.9,582.1,103.6,581.4,105.9,580.3,107.7,575.4,107.2,571.9,105.9,564.7,105.4,570,104.1,567.2,103.2,569.5,101.4],[331.3,263.8,328.6,264.4,322.3,262,322.5,259.7,320.1,257.9,320.4,256.2,316.1,255,317.2,252.1,318.7,250.4,322.7,251.5,324.5,252.7,328.2,253.2,328.2,255.6,328.9,257.9,331.9,260.3,331.3,263.8],[480.4,123.5,484.2,124.5,493.3,124.5,495.1,126,496.6,127.9,490,129.4,476.8,132.8,467.5,136.2,464.9,138.2,451.9,140.6,452.6,138.6,447.9,135.7,452.1,133.8,459.3,130.4,467.2,126.9,467.5,124,480.4,123.5],[538.7,117,543.2,116.1,546.8,116.1,544.2,118.4,538.8,120.6,526.1,121.1,514.1,123.5,508.7,123.5,509.7,122.1,520.5,119.7,502.9,120.6,499.3,119.7,511.4,115.2,516.7,113.9,523.8,115.7,526.1,118.4,532.1,118.4,533.2,114.4,539,112.6,541.8,113,539.9,115.2,538.7,117],[527.3,129.9,529.1,131.8,525.7,136.7,522.9,140.1,526.6,142.5,530.8,145,528.4,147.1,521.7,147.6,522.1,149.7,519.4,151.2,512.9,150.7,507.5,149.1,502.7,149.7,493.8,151.2,483,152.2,475.4,152.8,475.8,150.2,472.5,148.6,468.4,149.1,468.3,145,471.2,144.5,477.9,144,483.3,144,489.5,143,483.4,142.1,474.4,142.5,469.1,142.5,469.7,140.6,480.9,138.6,474.9,138.6,470.3,137.2,477.7,133.8,482.8,131.8,496.5,128.9,499,129.9,494.7,131.8,505,130.4,506.8,132.8,514.2,130.4,515.2,132.3,513,136.7,517.1,134.7,520.3,129.9,524.2,129.4,527.3,129.9],[547.6,131.8,547.4,128.4,553.6,126.4,556.9,127.4,564.5,126.4,564,127.9,557.7,130.4,561.5,132.3,556.1,136.7,547.6,138.6,544.7,138.2,543.7,136.7,538.7,132.8,540.4,131.3,547.6,131.8],[529.8,127.4,534.6,127.4,536.4,128.4,529.7,131.3,528.1,127.9,529.8,127.4],[577.2,113,577.5,114.8,573.9,117.5,567.9,120.6,561.6,121.1,558.9,120.1,562,117.9,556.3,117.9,560.3,114.8,564.2,114.8,571.3,113.5,576.2,113.5,577.2,113],[608.8,96.2,612.8,95.1,616.6,94.7,616.4,94,624.4,93.6,625.4,95.8,629.9,96.5,634.2,97.2,633.6,99.6,635.5,101.4,629.2,102.8,619.2,105.9,612.5,106.3,605.9,105.9,605.1,103.6,607.2,102.3,611.6,101,605.2,101,603.3,99.6,604.3,97.6,608.8,96.2],[630.2,91.5,636.1,90.8,640,90.8,647.1,90.1,653.9,88.6,657.2,89,659.2,90.1,664.7,87.9,669.3,87.6,675.4,87.2,685.4,86.9,686.8,87.2,696.4,86.9,703,86.9,709.5,87.2,717.6,87.6,723.8,87.9,728.4,89,727.6,89.7,718,91.5,709.1,92.2,705.4,92.9,712.5,92.9,702.6,95.1,695.8,96.2,686.7,99.2,679.1,100.1,675.9,101,665.3,101.4,669.5,101.9,666.2,102.8,666.5,105,662,106.3,655.1,107.7,651.4,109.4,645.1,110.8,644.7,111.7,650.7,111.7,649.7,112.6,637.2,115.2,629.6,113.9,618.4,114.8,613.6,114.4,607.5,113.9,609.9,111.7,617.3,110.8,619.4,107.7,622.4,107.2,628.6,109.4,627.9,106.3,623.2,105.4,628.1,103.6,635.2,102.8,637.8,101.4,635.3,99.6,637.1,97.2,645.5,97.6,647.7,97.9,654.9,96.5,647.9,96.2,635.9,96.5,632,95.1,631.6,93.6,629.3,92.6,630.2,91.5],[619.8,158.5,615.9,160,611.5,160,612.7,157.4,616.2,154.8,620.5,153.8,622.5,155.4,621,157.4,619.8,158.5],[546.4,147.6,547.2,149.7,543.1,151.2,539.5,149.7,535.9,150.2,532.4,148.1,537.4,146.5,542,144.5,544.8,145.5,546.2,146.5,546.4,147.6],[610.3,255.6,611.9,255,617.3,256.7,621.5,259.1,621,260.3,618.7,260.3,613.3,258.5,610.3,255.6],[606,272.7,606.3,275.6,609.9,276.2,614.2,276.2,610.9,278.5,609,278.5,604.2,276.2,603.5,274.4,606,272.7]],"b":[310.2,86.9,728.4,304.1],"cx":456.4,"cy":245},{"g":"United States of America","c":"USA","r":"NA","p":[[336.6,260.9,349.7,260.9,363.6,260.9,368.3,260.9,382.3,260.9,395.8,260.9,410.2,260.9,423.8,260.9,439.6,260.9,455.9,260.9,465.2,260.9,466.5,258.5,468.4,258.5,467.4,262,468.5,262.6,471.4,263.2,475.8,263.8,479.2,266.2,483.6,265,488.3,266.8,489.7,266.8,494.8,265,498.3,267.4,501.6,269.1,504.2,271.5,507.1,273.2,506.7,275,507.9,275.6,507.1,276.2,508.5,276.2,509.8,275.6,509.2,276.8,509.6,278,511,278,510.1,279.7,513.5,282.7,512.5,288,511.5,292.8,508.5,296.4,504.6,300,502.8,301.7,502.6,302.3,502.6,303.5,503.8,304.1,505.2,304.1,511.8,301.2,517.7,300,525.2,297,525.4,296.4,525.7,294.6,525.2,293.4,527.9,292.8,532.7,292.8,537,292.8,539.4,290.4,540.1,289.8,547,285.6,549.4,284.4,557.1,284.4,565.7,284.4,566.9,282.7,568.3,282.7,570.7,281.5,573.6,279.1,577,274.4,582.5,270.3,583.4,271.5,587.2,270.3,588.4,272.1,585,280.3,586.9,283.8,586.8,285.6,580.9,288.6,575,290.4,569.5,292.2,565.8,295.8,564.4,297,563,300.6,563.4,303.5,565.3,303.5,565.5,301.7,566.5,302.9,565.4,304.7,562.2,305.3,559.8,305.3,555.4,306.5,553.5,306.5,550.3,307.1,545.7,308.9,553.5,307.7,554.6,308.9,547,310.7,543.6,310.7,544.1,309.5,541.9,311.3,543.1,311.9,540.6,316.1,535.7,320.9,535.7,319.1,534.8,319.1,533.9,317.3,533.9,320.3,534.5,321.5,533.7,323.9,531.4,326.3,527.4,331.1,527.1,330.5,529.8,326.9,528.1,324.5,528.6,319.7,527.4,322.1,527.2,325.7,523.9,325.1,526.8,326.9,525,332.3,526.3,332.9,526.2,334.7,525.3,340.8,520.3,345.6,514.7,347.4,510.2,351,507.7,351,504.5,353.4,503.5,355.2,496.8,359.5,492.9,362.5,489.8,366.1,487.6,370.3,487.4,374.6,487.9,379.4,489.6,383.6,489,386.6,489.7,393.3,488.8,397.5,488.3,399.9,485.9,403.5,484.3,404.1,481.8,403.5,481.8,401.1,480.1,399.3,478.6,394.5,477,389.7,476.5,387.2,478.4,383,478.1,380,475,375.2,473.3,374,467.4,377,466.5,376.4,464.7,373.4,462,372.1,456.2,372.8,451.8,372.1,447.5,372.8,445.3,373.4,445.8,375.2,445.3,377.6,446,378.8,444.8,379.4,442.9,378.8,440.6,380,437,380,434.3,376.4,429.5,377,426.2,375.8,423,376.4,418.1,377.6,412.3,382.4,406.6,384.8,403.2,387.8,401.1,390.3,400,394.5,399.8,397.5,400.4,399.3,398.2,399.9,395,398.1,391.3,396.3,390.4,393.9,390.4,389.7,388.2,386,387.1,382.4,385.6,378.2,382.7,375.8,378.6,375.8,374.2,380.6,370.6,378.8,368,377,367.8,374,367.4,370.9,365.4,367.9,363.5,366.1,362.3,363.7,353.7,363.7,352.6,366.7,348.5,366.7,338.3,366.7,328.2,362.5,321.7,359.5,322.7,358.3,315.9,358.9,310,359.5,310.2,356.5,308.6,352.8,306.3,352.2,306.5,350.4,303.7,349.8,302.7,348.6,297.9,348,297.4,346.8,298.4,343.2,296.4,337.2,296.6,328.7,297.2,327.5,295.6,325.7,294.9,320.3,296.3,315.5,295.6,312.5,299.5,307.7,302.8,302.3,304.3,297.6,309.5,292.2,313.3,286.8,317.3,281.5,322,273.2,323.9,268.5,324.5,265.6,325.8,264.4,331.2,266.8,329.9,272.1,332.5,270.3,334.8,265.6,336.6,260.9],[88.5,434.3,89.4,434.9,89.8,435.5,90.8,438,88.3,439.8,86.6,440.4,85.2,441.6,84.5,440.4,84.7,439.2,84.2,436.7,84.9,436.1,85.7,434.9,86,433.7,88.5,434.3],[86.5,430.1,85.6,431.3,84.1,431.3,83.4,430.1,83,429.5,83.7,428.9,85.1,429.5,86.5,430.1],[83,427.7,80.2,428.3,83,427.7],[77.5,424.7,78.4,427.1,76.3,427.1,75.6,425.9,75.8,425.3,77.5,424.7],[71.1,421.7,71.2,422.9,70,423.5,68.8,422.3,70,421.7,71.1,421.7],[206.9,195.8,209.6,196.4,207.1,198.6,203.9,199.1,202,198.6,201.2,196.9,206.9,195.8],[247.9,209.3,249.9,209.8,250.1,211.5,243,214.3,236.1,216.6,235.8,214.9,238.2,212.1,244,210.4,247.9,209.3],[375.5,146.5,350.8,165.7,314.5,196.4,318.7,196.4,321.1,198,321.8,200.3,321.2,204.2,328.9,200.8,334.9,199.1,334.6,201.9,334.9,204.2,336,207,335.1,210.9,333.4,217.1,337,221,333.7,224.4,328.9,227.3,328.3,225,325.9,223.3,330.1,218.2,328.8,213.7,331.3,208.7,328,208.1,321,208.1,317.6,206.4,314.4,200.8,311.7,199.7,306.4,197.5,299.8,198,295,195.3,292.5,193.1,286.6,194.2,282.8,198,279.6,198.6,273.7,199.7,267.9,201.4,262,202.5,264.3,199.7,273,194.2,279.7,192.6,280.4,191,270.9,194.2,263.9,197.5,253.4,201.4,253.2,204.2,244.2,208.7,236.8,210.9,230.5,212.6,226.6,214.9,216.8,217.7,212.2,220.5,204.2,222.7,201.1,222.7,195.8,223.9,188.7,226.1,182.8,227.8,173.4,229.6,174.2,228.4,181.6,226.1,187.6,224.4,196.5,221,202.5,220.5,207.3,218.2,217.4,214.9,219.6,213.7,225.8,211.5,230.8,207.6,237.3,204.2,230.1,205.9,230.2,204.8,224.9,207,225.7,204.2,222.4,205.9,224,203.1,217,205.3,214.4,205.3,218,201.9,220.9,200.3,221,198,214.1,199.1,213.8,196.4,212.8,195.3,216.7,192,216.7,189.9,222.8,186.6,229.8,183.9,234.7,181.2,238.7,180.7,240.9,181.2,247,179,250.3,179,255.4,177.4,257.4,175.2,256.8,174.1,262.5,172,260.1,172,254.1,173.1,250.8,174.7,250.1,173.1,242.5,174.1,239,172.5,240.4,170.4,239.8,167.3,248.6,165.2,261.2,162.6,264.4,162.6,260.2,165.2,268.6,165.2,270,162.1,268.2,160,269.3,157.4,268.5,155.4,266.1,153.3,272.3,150.7,279.3,150.7,287.8,148.1,292.8,145.5,299.9,143.5,304.5,143,315.9,140.6,318.5,141.1,329,138.2,332.3,139.6,332.1,141.6,335.2,140.6,340.9,141.1,338.9,142.1,343.4,143,348,142.5,353.7,144,360.2,144.5,362.5,145,369,144,372.6,145.5,375.5,146.5],[1687.2,177.4,1691.1,178.5,1692.9,177.9,1698.4,179.6,1702,180.1,1702.8,180.7,1702.2,181.7,1697.4,180.7,1694.3,179.6,1691.3,180.1,1689.7,179.6,1687.2,177.4]],"b":[68.8,138.2,1702.8,441.6],"cx":419.4,"cy":328.5},{"g":"Kazakhstan","c":"KAZ","r":"EA","p":[[1315.5,259.7,1313.4,263.8,1309.6,263.8,1311.4,269.7,1310.2,272.7,1300.1,270.9,1300.7,281.5,1298.2,282.7,1290,285,1297.5,295.2,1294.7,297,1296.1,300,1292.5,299.4,1289.4,297,1282.4,296.4,1274.2,296.4,1272.4,297,1265,294.6,1262.4,295.8,1263,299.4,1254.2,297.6,1251.5,298.2,1251.2,300.6,1248.6,301.7,1243.4,305.9,1242,310.1,1240.6,310.1,1238.5,307.7,1232,307.1,1229.8,302.3,1227.4,302.3,1226.3,296.4,1219.5,292.2,1211.5,292.8,1205.8,293.4,1200.3,288,1195.4,285.6,1187.3,281.5,1186.2,280.9,1174.6,284.4,1179.6,306.5,1177.2,306.5,1172.9,302.3,1169.2,300.6,1163.6,301.7,1162,303.5,1161.2,302.3,1162.3,300,1160.8,297.6,1154.7,295.8,1151.8,290.4,1148.6,288.6,1148.3,286.8,1153.2,287.4,1152.4,283.3,1156.4,282.1,1160.4,282.7,1160.2,277.4,1158.3,273.2,1153.7,273.8,1149.7,272.7,1144.5,275,1140.5,276.2,1137.9,275,1137.8,272.1,1134.3,268.5,1130.5,268.5,1126,264.4,1127.5,259.7,1126.4,258.5,1128.8,252.1,1134.2,255.6,1133.7,251.5,1141.9,245.2,1148.7,245.2,1159.8,249.2,1166,251.5,1170.4,249.2,1177.6,248.6,1184.1,252.1,1185,250.4,1191.4,250.4,1191.9,247.5,1183.4,243.4,1186.8,241.1,1185.3,239.4,1189.3,237.7,1184.9,233.6,1186.2,231.9,1202.5,229.6,1204.4,228.4,1214.7,226.1,1217.8,223.9,1226.3,225,1230,231.3,1233.8,229.6,1240.5,231.9,1241.2,234.8,1245.7,234.8,1254.6,229,1253.5,230.7,1261.2,235.3,1277.2,249.8,1278.7,246.9,1286.2,250.4,1292.3,248.6,1295.1,249.8,1299,253.2,1302.7,254.4,1305.5,256.7,1311.3,256.2,1315.5,259.7]],"b":[1126,223.9,1315.5,310.1],"cx":1223.5,"cy":266.3},{"g":"Uzbekistan","c":"UZB","r":"EA","p":[[1179.6,306.5,1174.6,284.4,1186.2,280.9,1187.3,281.5,1195.4,285.6,1200.3,288,1205.8,293.4,1211.5,292.8,1219.5,292.2,1226.3,296.4,1227.4,302.3,1229.8,302.3,1232,307.1,1238.5,307.7,1240.6,310.1,1242,310.1,1243.4,305.9,1248.6,301.7,1251.2,300.6,1252.8,301.2,1249.5,305.3,1254.1,307.7,1257,305.9,1263.7,308.9,1258.7,313.7,1254.6,313.1,1252.6,313.1,1251.6,311.3,1251.8,308.3,1245.5,310.1,1244.9,313.7,1243.3,317.3,1239.2,316.7,1238.4,319.7,1242.6,320.9,1244.5,325.1,1242.9,331.7,1239,329.9,1236,329.9,1235.3,326.3,1228.4,323.9,1222.8,320.9,1218.8,317.9,1212.5,313.7,1208.7,307.7,1206.4,306.5,1201.7,307.1,1199.5,305.9,1197.9,301.2,1190.4,297.6,1187.2,301.2,1183.4,303.5,1185,306.5,1179.6,306.5]],"b":[1174.6,280.9,1263.7,331.7],"cx":1214.5,"cy":304},{"g":"Papua New Guinea","c":null,"r":"SEA","p":[[1652.8,571.4,1661.8,575.6,1671.8,579.2,1675.4,582.3,1677.9,585.3,1678.8,588.9,1687,592.5,1688.4,595.5,1683.5,596.1,1684.3,600.4,1688.8,604,1691.4,610.6,1694.6,610.6,1694.4,613,1698.1,614.3,1696.4,615.5,1701.9,617.9,1701.2,619.7,1697.4,620.3,1696.5,618.5,1691.8,617.9,1686.7,616.7,1682.8,613,1680.4,609.4,1677.6,604.6,1670.9,601.6,1666.5,603.4,1663.2,605.2,1663.3,610,1659,611.8,1656.3,611.2,1650.5,610.6,1652,591.3,1652.8,571.4],[1714.4,578,1716.5,579.8,1716.9,582.9,1715.3,584.7,1714.3,581,1713.3,578.6,1711.3,576.8,1708.2,573.8,1704.5,572,1705.6,570.8,1708.7,572.6,1710.3,573.8,1712.4,575,1714.4,578],[1706.8,590.7,1704,592.5,1700.7,593.7,1698.1,593.7,1694,591.9,1690.9,590.1,1691.6,588.3,1696.3,589.5,1699,588.9,1700.3,585.9,1701.1,588.9,1704.3,588.9,1706.1,586.5,1708.9,584.7,1708.5,581,1711.7,580.4,1712.7,581.7,1712.6,585.3,1710.7,588.9,1708,589.5,1706.8,590.7],[1725.7,587.7,1727.2,589.5,1729,593.1,1731.5,594.9,1730.8,596.7,1729.2,597.3,1727.3,594.9,1724.9,591.3,1724.2,586.5,1725.3,585.9,1725.7,587.7]],"b":[1650.5,570.8,1731.5,620.3],"cx":1669.2,"cy":595.9},{"g":"Indonesia","c":"IDN","r":"SEA","p":[[1652.8,571.4,1652,591.3,1650.5,610.6,1646.1,605.8,1640.9,604.6,1639.7,606.4,1632.8,606.4,1635.3,601.6,1639.1,599.8,1638,593.1,1635.7,588.3,1625.8,582.9,1621.6,582.9,1613.8,576.8,1612.1,579.8,1609.9,580.4,1608.9,578,1609,575.6,1604.8,572.6,1610.7,570.8,1614.5,570.8,1614,569,1606,569,1604,565.3,1599.2,564.1,1597.2,561.1,1604.7,559.9,1607.4,558.1,1615.9,560.5,1616.3,562.9,1617.6,572.6,1623.4,576.2,1627.8,569.6,1633.8,566,1638.6,566,1643.3,568.4,1647,570.2,1652.8,571.4],[1565.6,609.4,1566.1,610.6,1566,612.4,1562,616.7,1557.5,618.5,1557.1,617.3,1557.8,615.5,1560.2,611.8,1565.6,609.4],[1615.3,597.3,1615.2,592.5,1616.3,590.7,1617.6,588.3,1618.5,590.1,1618.3,593.1,1615.3,597.3],[1529.5,530.9,1526.4,536.4,1530.3,541.8,1529.8,544.8,1535.9,550.3,1529.5,550.9,1528,555.1,1527.9,560.5,1523,564.7,1522.3,570.8,1519.9,579.8,1519.4,578,1513.5,580.4,1511.5,576.8,1507.7,576.2,1505.1,574.4,1498.7,576.8,1496.6,573.8,1492.9,573.8,1488.6,573.2,1488.3,565.3,1485.7,563.5,1483.1,558.7,1482.6,553.3,1483,547.8,1486.1,543.6,1486.7,547.8,1490.5,550.9,1494.3,549.7,1497.5,550.3,1500.6,547.2,1503.2,546.6,1508.1,548.4,1512.3,547.2,1514.8,538.8,1516.8,536.4,1518.8,529.7,1524.7,529.7,1529.5,530.9],[1591,572.6,1596.8,574.4,1598.2,579.2,1594.1,576.2,1589.8,576.2,1586.6,576.2,1582.9,576.2,1584,572.6,1591,572.6],[1577.5,578.6,1573.8,577.4,1572.8,575,1578.1,574.4,1579.1,576.8,1577.5,578.6],[1583.1,542.4,1583.7,546,1586.9,546.6,1587.5,549,1587.1,553.9,1584.5,553.3,1583.9,557.5,1586,560.5,1584.4,561.1,1582.3,557.5,1580.6,549.7,1581.6,544.8,1583.1,542.4],[1556.6,550.3,1563,550.3,1568.3,546,1568.8,547.2,1564.7,553.3,1561,554.5,1555.7,553.3,1547.1,553.3,1542.4,554.5,1541.3,558.7,1545.9,564.1,1549.2,561.7,1558.8,559.3,1558.7,562.3,1556.1,561.1,1553.9,564.7,1549,567.2,1554.1,575,1553,576.8,1557.6,584.1,1557.4,587.7,1554.1,589.5,1552.1,587.7,1555,582.9,1549.6,585.3,1548.6,583.5,1549.2,581,1545.5,577.4,1546.2,571.4,1542.5,573.2,1542.8,580.4,1542.5,588.9,1539.2,590.1,1537.2,588.3,1539,582.9,1538.1,576.8,1536,576.8,1534.5,572.6,1536.7,568.4,1537.4,564.1,1540.2,554.5,1541.2,552.1,1545.9,547.8,1550.2,549.7,1556.6,550.3],[1540.1,617.9,1533.5,613.7,1538.4,612.4,1540.9,614.3,1542.9,616.1,1542.2,617.3,1540.1,617.9],[1546.1,607,1549.8,607,1554.8,604.6,1554,608.2,1546,609.4,1538.6,608.8,1538.7,606.4,1543,605.2,1546.1,607],[1530.2,606.4,1533.4,605.8,1534.4,608.2,1528.4,609.4,1524.7,610,1521.5,610,1523.8,607,1526.5,606.4,1528.2,604.6,1530.2,606.4],[1478.8,594.3,1479.2,596.7,1489.3,597.3,1491,594.9,1500.4,597.3,1502.3,601.6,1510.2,602.8,1516.4,606.4,1510.4,608.8,1504.7,605.8,1499.9,606.4,1494.1,605.8,1489.4,604.6,1483.2,602.2,1479.5,601.6,1477.3,602.8,1467.8,600.4,1466.9,597.3,1462.1,597.3,1466.2,591.3,1472.6,591.9,1476.7,593.7,1478.8,594.3],[1458,562.3,1458.4,566.6,1460.5,569.6,1464.2,570.2,1466.8,574.4,1465.5,581.7,1464.6,591.3,1458.7,591.3,1454.8,585.9,1448,581,1445.9,577.4,1441.8,572.6,1439.2,568.4,1435.1,559.9,1430.9,554.5,1429.2,549.7,1427,544.8,1422.1,540.6,1419.3,535.8,1415,532.1,1409.5,525.5,1408.8,522.5,1412.1,523.1,1420.6,524.3,1425.6,529.7,1429.4,534,1432.6,536.4,1437.6,543,1443.4,543,1447.8,547.2,1451.1,552.1,1454.9,555.1,1452.7,559.9,1455.8,562.3,1458,562.3]],"b":[1408.8,522.5,1652.8,618.5],"cx":1479.3,"cy":561.2},{"g":"Argentina","c":"ARG","r":"SA","p":[[598.8,871.4,601.6,874.3,605.8,878.3,613.5,882.4,620.3,883.5,619.9,886.4,615.5,886.4,612.4,884.7,609.7,884.7,605.2,884.7,598.8,871.4],[609,738,608.5,742.9,608.8,748.9,610,754.9,608.9,756.7,609.7,760.4,609.8,763.4,617.6,768.8,617.6,773,621.8,775.4,622,778.4,619.5,786.3,612.9,789.3,603.3,790.5,597.7,789.9,599.7,793.5,600.1,798.3,602.1,801.3,599.7,803.1,594.8,804.3,589.6,801.9,588.2,803.7,590.8,809.6,594.8,811.4,596.4,809,599.1,812.6,595.3,814.4,592.7,818,594.3,824,593.9,826.9,589.6,826.9,587.2,830.5,587.4,834.6,593.8,838.7,599,839.9,599.2,845.2,595,848.7,595,855.8,591.9,858.1,591.2,860.4,595.7,866.8,600.1,870.3,598,869.7,593.3,868.5,582.1,867.9,578.5,864.5,576.5,860.4,573.2,860.4,571,858.7,567.5,852.3,570.3,849.9,569.9,845.8,568.2,842.8,568.5,838.1,566.7,830.5,564.7,826.9,566.7,825.7,565.3,823.4,562.4,822.2,563,819.8,560.2,817.4,556.2,810.8,558.2,809.6,554.3,801.9,553.1,795.9,552.9,790.5,555.4,788.7,552,782.7,550.4,777.2,552.6,773,551.1,768.2,552.6,762.2,551.2,756.7,549.4,755.5,544.8,745.3,546.2,738.6,544.6,733.2,545.1,727.8,547.6,721.7,550.6,718.1,548.6,715.7,549.3,713.9,547.6,703.6,552.9,700.6,553.7,694.6,553,692.7,556.4,687.3,563.4,689.1,567.1,693.3,568.6,688.5,574.9,688.5,575.5,689.7,586.6,700,590.9,700.6,597.6,705.4,603.2,707.8,604.6,710.3,600.8,719.3,606.3,721.1,612.1,721.7,616.1,721.1,620,716.3,620.2,710.9,622.6,709.6,625.8,713.3,626.5,718.1,622.4,721.7,619.1,724.1,614.4,730.2,609,738]],"b":[544.6,687.3,626.5,886.4],"cx":579.8,"cy":766.2},{"g":"Chile","c":"CHL","r":"SA","p":[[598.8,871.4,605.2,884.7,609.7,884.7,612.4,884.7,612.2,887,609.6,888.6,607.4,888.6,604.4,888.1,599.9,886.4,595.1,885.8,587.6,882.4,581.6,879.5,571.7,872.6,576.4,873.7,584.8,877.8,591.8,880.1,592.6,877.2,592,873.1,595.4,870.8,598.8,871.4],[536.2,662,539.3,666.2,540.3,670.4,543.7,672.8,542.3,678.9,546.3,685.5,549.5,693.9,553,692.7,553.7,694.6,552.9,700.6,547.6,703.6,549.3,713.9,548.6,715.7,550.6,718.1,547.6,721.7,545.1,727.8,544.6,733.2,546.2,738.6,544.8,745.3,549.4,755.5,551.2,756.7,552.6,762.2,551.1,768.2,552.6,773,550.4,777.2,552,782.7,555.4,788.7,552.9,790.5,553.1,795.9,554.3,801.9,558.2,809.6,556.2,810.8,560.2,817.4,563,819.8,562.4,822.2,565.3,823.4,566.7,825.7,564.7,826.9,566.7,830.5,568.5,838.1,568.2,842.8,569.9,845.8,570.3,849.9,567.5,852.3,571,858.7,573.2,860.4,576.5,860.4,578.5,864.5,582.1,867.9,593.3,868.5,598,869.7,593.9,869.7,592.6,870.8,589.7,873.1,591.4,878.3,589.9,878.9,583.3,876.6,576.3,872.6,569.3,869.7,565.4,865.6,564.9,862.2,560.8,858.7,555.7,848.7,555,842.8,558.1,838.1,550.3,836.4,552.4,831.7,549.7,821.6,556.4,824,554,811.4,550,809.6,551.5,817.4,548.1,816.2,546.4,807.8,543.5,796.5,544.8,792.9,541.4,786.9,538.8,780.2,540.6,779.6,540.6,770,541.5,760.4,541.8,751.3,537.9,742.3,538.3,737.4,536.3,730.2,537.9,722.3,536.8,710.9,536.5,698.2,536.3,684.9,534.5,675.2,532.4,666.2,534.9,665,536.2,662]],"b":[532.4,662,612.4,888.6],"cx":556.2,"cy":737},{"g":"Dem. Rep. Congo","c":"COD","r":"MEAF","p":[[1057.5,582.9,1058.5,588.3,1057.9,591.3,1059,594.9,1062.1,598.6,1064.7,605.8,1062.6,605.2,1055.7,606.4,1054.1,607,1052.4,611.2,1054,613.7,1052.8,620.9,1052.2,626.9,1053.2,628.1,1056.9,630.6,1058.5,629.3,1058.9,636,1054.7,635.4,1052.6,632.4,1051.1,630,1046.9,628.7,1045.9,625.7,1042.6,627.5,1038.4,626.9,1036.3,623.9,1033.2,623.3,1030.5,623.9,1030.5,622.1,1028.4,621.5,1026.3,621.5,1022.6,622.1,1020.5,622.1,1019.4,622.7,1019.5,615.5,1017.9,613,1017.4,609.4,1017.9,605.8,1016.9,603.4,1016.9,599.8,1010.5,599.8,1011.1,597.3,1008.4,597.3,1007.9,598.6,1004.7,599.2,1003.6,602.2,1002.5,604,999.9,602.8,997.7,604,994.5,604.6,992.4,601,991.4,599.2,989.8,595.5,988.2,591.3,972.8,591.3,970.6,591.9,969,591.9,966.9,592.5,966.4,590.7,967.5,590.1,968,587.1,968.5,585.9,970.7,584.7,972.2,585.3,973.8,582.9,976.5,582.9,977,584.7,979.2,585.9,982.4,581.7,985.6,579.2,986.6,576.8,986.6,572,988.8,566,991.5,562.9,994.7,559.9,995.2,558.1,995.7,556.3,996.3,553.9,996.3,550.3,996.8,545.4,997.8,541.2,999.4,538.2,1000,534.6,1000,530.3,1002.1,527.3,1005.3,525.5,1009.5,527.3,1012.7,529.7,1017,530.3,1020.7,531.5,1022.3,527.9,1022.9,527.3,1025.5,527.9,1031.4,524.9,1033.5,526.1,1035.1,526.1,1036.2,524.3,1038.3,523.7,1042,524.3,1045.2,524.9,1047.3,524.3,1050.6,529.1,1052.7,529.7,1054.3,528.5,1056.9,529.1,1059.6,527.9,1061.2,530.3,1065.5,534.6,1065.5,541.8,1067.7,542.4,1066.1,544.8,1064,546,1061.8,549,1060.8,552.1,1060.3,556.9,1059.2,559.3,1059.2,563.5,1057.6,565.3,1057.5,569,1056.5,569.6,1055.9,572.6,1057.5,575.6,1057.5,582.9]],"b":[966.4,523.7,1067.7,636],"cx":1027,"cy":572.8},{"g":"Somalia","c":null,"r":"MEAF","p":[[1123.1,566,1120,561.1,1119.9,538.8,1124.6,532.1,1125.7,530.3,1129.4,529.7,1134.2,525.5,1141.1,525.5,1155.6,507.4,1159.2,502.6,1161.3,498.3,1161.2,495.3,1161,489.3,1160.9,486.9,1163,486.9,1165.1,485.7,1168.3,485.1,1170.3,483.2,1172.4,483.2,1172.5,485.1,1172.1,488.1,1172.2,491.7,1171.2,493.5,1170.3,500.1,1167.8,506.8,1164.8,514.6,1160.2,523.7,1155.5,530.3,1149.7,538.2,1144.4,543.6,1136.5,549,1131.2,553.9,1125.3,561.1,1124.2,564.1,1123.1,566]],"b":[1119.9,483.2,1172.5,566],"cx":1144.9,"cy":526.9},{"g":"Kenya","c":"KEN","r":"MEAF","p":[[1110.2,584.1,1102.8,578,1102.3,574.4,1083.2,562.3,1082.1,561.7,1082.1,555.1,1083.7,552.7,1086.4,548.4,1087.9,544.2,1085.8,537,1085.2,534,1082.5,529.7,1085.7,526.7,1089.4,522.5,1092.1,523.7,1092.1,526.7,1094.2,529.1,1098,529.1,1104.4,534,1106,534,1107.6,534,1108.7,534.6,1112.4,535.2,1114,532.7,1118.7,529.7,1120.9,532.1,1124.6,532.1,1119.9,538.8,1120,561.1,1123.1,566,1119.4,568.4,1117.8,570.8,1116.2,571.4,1115.1,575.6,1113.4,578,1112.3,581.7,1110.2,584.1]],"b":[1082.1,522.5,1124.6,584.1],"cx":1102.9,"cy":552.2},{"g":"Sudan","c":null,"r":"MEAF","p":[[1032.3,506.2,1028,503.2,1026.4,501.4,1025.9,499.5,1026.9,497.1,1026.9,494.7,1023.7,491.1,1023.1,488.7,1023.1,486.9,1020.9,485.1,1020.9,481.4,1019.8,479.6,1017.7,479.6,1018.2,477.2,1019.8,474.8,1019.2,472.4,1020.8,470.6,1019.7,469.4,1021.3,465.7,1023.3,460.9,1028,461.5,1027.1,437.4,1027.1,434.9,1033.3,434.9,1033.1,422.9,1053.9,422.9,1074.3,422.9,1095.2,422.9,1097,428.9,1096,430.1,1096.8,436.1,1099.1,443.4,1101.3,444.6,1104,447,1101.5,450.6,1097.8,451.2,1096.3,453.1,1095.9,457.3,1093.6,466.3,1094.2,468.7,1093.8,473.6,1091.8,479.6,1088.7,482.6,1086.2,487.5,1085.7,489.9,1083.6,491.7,1082.1,497.7,1082.2,503.2,1082.1,498.3,1081.1,498.3,1081,495.3,1080.5,493.5,1077.8,491.1,1077.1,486.9,1077.6,482,1074.9,482,1075,483.2,1071.8,483.2,1072.9,485.1,1073.5,488.7,1070.9,492.3,1068.3,496.5,1065.1,497.1,1060.8,493.5,1058.7,494.7,1058.2,496.5,1055.6,497.7,1055.6,498.9,1050.3,498.9,1049.2,497.7,1045.5,497.7,1043.9,498.3,1042.3,497.7,1039.6,494.7,1038.5,492.9,1034.8,493.5,1033.3,496.5,1031.7,502,1030.1,503.2,1028.5,503.8,1032.3,506.2]],"b":[1017.7,422.9,1104,506.2],"cx":1059.4,"cy":459.2},{"g":"Chad","c":null,"r":"MEAF","p":[[1027.1,437.4,1028,461.5,1023.3,460.9,1021.3,465.7,1019.7,469.4,1020.8,470.6,1019.2,472.4,1019.8,474.8,1018.2,477.2,1017.7,479.6,1019.8,479.6,1020.9,481.4,1020.9,485.1,1023.1,486.9,1023.1,488.7,1019.4,489.3,1016.8,491.7,1013.1,498.3,1008.3,501.4,1003,500.7,1001.4,501.4,1002,503.8,999.3,505.6,997.2,508,990.3,510.4,989.2,509.2,988.2,508.6,987.1,510.4,982.9,511,983.4,509.2,981.8,505,981.3,502.6,978.6,501.4,975.9,498.3,977,495.3,979.1,495.9,980.7,495.3,983.9,495.3,980.7,489.9,981.2,485.7,980.7,482,978.5,477.8,979,475.4,975.9,474.8,975.9,471.2,973.2,468.7,975.8,460.9,982.1,455.5,982.6,447.6,984.6,434.9,985.6,432.5,983.5,430.7,983.5,428.9,981.4,427.1,980.3,417.4,985.5,414.4,1006,425.9,1027.1,437.4]],"b":[973.2,414.4,1028,511],"cx":999.9,"cy":463.3},{"g":"Haiti","c":"HTI","r":"NA","p":[[526.6,436.7,526.8,439.8,526,442.2,524.8,443.4,525.6,445.2,525.4,447,521.9,445.8,519.7,446.4,516.1,445.8,513.8,447,510.9,445.2,511.7,442.8,516.8,444,520.4,444.6,522.7,442.8,520.4,440.4,520.7,438,517.6,437.4,518.9,435.5,522,435.5,526.6,436.7]],"b":[510.9,435.5,526.8,447],"cx":520.9,"cy":441.6},{"g":"Dominican Rep.","c":"DOM","r":"NA","p":[[525.4,447,525.6,445.2,524.8,443.4,526,442.2,526.8,439.8,526.6,436.7,527.2,435.5,531.4,435.5,534.4,437.4,535.4,437.4,536.3,439.2,539.4,439.2,538.7,441,541.3,441,543.7,443.4,541.3,445.8,538.8,444.6,536.7,444.6,534.6,444.6,534,445.8,531.8,445.8,530.9,444.6,529.3,445.2,526.7,449.4,525.3,448.2,525.4,447]],"b":[524.8,435.5,543.7,449.4],"cx":532.6,"cy":441.7},{"g":"Russia","c":"RUS","r":"EU","p":[[1230,94.7,1235.5,93.6,1244.8,95.8,1256.6,99.2,1260,103.2,1253.4,103.6,1243,102.8,1235.4,101,1229.6,97.9,1224.5,97.2,1230,94.7],[1267.7,101.4,1279.6,104.1,1280.7,105.9,1263.2,107.7,1263.2,101.9,1265.4,101.4,1267.7,101.4],[1411.1,115.7,1420.6,115.7,1437,117.9,1439.9,121.6,1426.6,121.6,1422.1,122.5,1410.3,119.3,1407.9,116.6,1411.1,115.7],[1450.3,119.3,1460.8,120.1,1459.6,122.1,1453.2,121.6,1443.6,119.7,1442.4,118.4,1450.3,119.3],[1432.8,128.4,1433.6,126.4,1437.7,126,1445.4,127.9,1447.6,129.4,1442.1,129.4,1433.8,128.9,1432.8,128.4],[1070.9,96.2,1077.1,95.4,1082,95.4,1083.3,96.5,1084.7,95.4,1087.4,95.1,1092.7,95.8,1091.8,96.5,1087.8,96.9,1085,97.2,1081.3,98.3,1077.3,97.6,1078.5,96.2,1070.9,96.2],[1012.4,230.1,1004.3,230.1,998.9,229.6,999.7,226.7,1005.8,225,1010.3,226.1,1012.6,226.7,1011.8,228.4,1012.4,230.1],[1115.1,126.4,1122.1,122.5,1119.9,120.1,1126.8,117.9,1136.6,114.8,1147.9,114.4,1152.7,112.6,1159.4,112.1,1163.1,113.9,1161.6,115.2,1150.4,117.5,1140.8,119.3,1132.2,124,1128.9,128.9,1125,133.3,1127.7,137.7,1136.6,141.6,1134.6,142.1,1122,141.1,1120,139.1,1112.7,137.7,1111.3,135.2,1114.6,134.3,1113.1,131.3,1118.8,127.4,1115.1,126.4],[1553.4,233.6,1559.9,239.4,1563.6,244.6,1570.5,250.9,1582.9,260.9,1574.7,259.1,1577.5,267.4,1586.1,273.8,1588.9,278,1582.7,274.4,1582.7,278.5,1578.6,273.8,1575.1,267.9,1570.3,261.5,1568.4,257.3,1562.7,249.2,1555.8,244,1549.8,235.9,1551.6,233,1548,230.7,1549.3,229.6,1553.4,233.6],[1541.7,301.2,1540.1,300,1538.5,297,1540.9,297,1537.9,289.8,1533.6,284.4,1536.8,282.7,1543.2,283.8,1542.9,278,1540.2,271.5,1540.6,269.1,1539.6,263.8,1533.2,265.6,1530.5,267.9,1523.4,267.9,1518.3,262.6,1510.2,258.5,1500.9,256.2,1495.5,250.9,1490.8,246.9,1487.8,244.6,1480.6,238.8,1475.3,236.5,1467.4,234.8,1461.5,235.3,1456.4,235.9,1454.7,238.8,1458.2,240.5,1460.1,243.4,1459.3,245.7,1459,251.5,1460.9,254.4,1456.4,257.9,1449.6,255.6,1444.3,256.2,1441,254.4,1437.9,253.8,1433.2,257.9,1427.5,258.5,1424.2,260.3,1417.6,259.1,1413.4,259.1,1409.1,256.2,1402.9,253.2,1397.9,252.7,1392.3,253.2,1388.8,254.4,1381,252.1,1377.5,247.5,1371.4,246.3,1367,245.7,1360.7,243.4,1358.7,249.2,1362.4,252.7,1360.2,256.7,1352.5,255,1347.9,255,1343.2,252.1,1338.6,252.1,1333.6,250.4,1328.1,253.2,1321.3,257.9,1317.1,259.1,1315.5,259.7,1311.3,256.2,1305.5,256.7,1302.7,254.4,1299,253.2,1295.1,249.8,1292.3,248.6,1286.2,250.4,1278.7,246.9,1277.2,249.8,1261.2,235.3,1253.5,230.7,1254.6,229,1245.7,234.8,1241.2,234.8,1240.5,231.9,1233.8,229.6,1230,231.3,1226.3,225,1217.8,223.9,1214.7,226.1,1204.4,228.4,1202.5,229.6,1186.2,231.9,1184.9,233.6,1189.3,237.7,1185.3,239.4,1186.8,241.1,1183.4,243.4,1191.9,247.5,1191.4,250.4,1185,250.4,1184.1,252.1,1177.6,248.6,1170.4,249.2,1166,251.5,1159.8,249.2,1148.7,245.2,1141.9,245.2,1133.7,251.5,1134.2,255.6,1128.8,252.1,1126.4,258.5,1127.5,259.7,1126,264.4,1130.5,268.5,1134.3,268.5,1137.8,272.1,1137.9,275,1140.5,276.2,1138.8,279.7,1134.8,280.9,1131,286.8,1136.2,292.2,1136.4,296.4,1143,303.5,1140.5,305.9,1139.7,307.1,1137.7,307.1,1133.7,303.5,1132.2,302.9,1129.1,301.7,1127.2,299.4,1122.2,298.2,1119.4,298.8,1118.8,298.2,1111.6,295.2,1104.2,294,1100.2,292.8,1099.9,294,1092.9,288.6,1086.9,286.2,1082.7,283.3,1085.9,282.1,1089,277.4,1086.3,275,1092.6,272.7,1092.4,270.9,1088.3,272.1,1088.4,269.7,1090.5,267.9,1094.7,267.4,1095.3,265.6,1093.9,262,1095.3,259.1,1095,257.3,1087.8,255.6,1085.1,255.6,1081.8,252.7,1078.3,253.8,1072.4,251.5,1072.3,250.4,1070.1,248.1,1066.3,247.5,1065.6,245.7,1066.8,244.6,1063.7,241.7,1058.8,242.3,1057.3,241.7,1056.6,242.9,1054.7,242.9,1052.9,239.4,1051.8,237.1,1052.6,236.5,1056.3,237.1,1057.9,235.3,1056.4,234.2,1053.1,233,1053.4,231.9,1051.4,230.7,1048.3,227.3,1049,225.5,1048.2,222.7,1043.6,221.6,1041.4,222.2,1040.4,221,1035.8,219.4,1034.1,216,1033.4,213.7,1031,212.1,1032.6,210.4,1030.7,205.3,1033.3,201.9,1032.7,200.8,1037.1,198,1032.5,195.3,1040.3,188.2,1043.6,185,1044.8,182.3,1038.1,178.5,1039.2,175.2,1035,171.4,1037.1,166.7,1031.8,161,1034.7,156.9,1027.9,153.3,1028.1,149.7,1031.2,149.1,1037.4,147.1,1041,145.5,1048.1,148.6,1058.7,149.7,1075,155.9,1078.7,157.9,1079.6,161.6,1075.8,164.2,1069.8,165.7,1051,161.6,1048.4,162.6,1055.5,166.2,1056.4,168.8,1057.4,174.1,1063,175.8,1066.5,176.9,1066.5,174.7,1063.5,172,1066,170.4,1076.5,173.6,1079.4,172,1076.1,168.3,1084,163.1,1087.7,163.6,1092.1,165.2,1093.1,161.6,1089.1,158.5,1090.2,155.4,1086.6,152.2,1098.1,154.3,1100.8,156.9,1096.2,157.4,1097.2,160.5,1100.4,162.1,1106.4,161,1106.3,157.9,1113.7,155.4,1125.7,150.7,1129,151.2,1126.2,154.3,1131.1,154.8,1133.3,153.3,1140.5,152.8,1145.5,150.7,1151.1,153.8,1154.4,150.7,1148.9,147.6,1150.3,145.5,1162.4,147.6,1168.5,149.1,1185.2,154.8,1186.6,152.2,1181.5,149.7,1180.3,148.1,1175.5,147.6,1176,145.5,1171.6,141.6,1170.8,140.1,1175.1,135.7,1175.2,131.3,1177.2,130.4,1187.7,131.3,1190.3,134.3,1188.9,138.2,1192.4,139.6,1195.7,143,1198.8,150.2,1204.7,153.3,1204.7,156.9,1200.9,164.2,1205.5,164.7,1206.3,163.1,1209.9,161.6,1209.7,159,1211.8,156.4,1208.1,153.8,1207.7,150.2,1203.2,149.7,1201,147.1,1201.1,142.1,1193.8,138.2,1198.4,134.7,1195.5,131.3,1197,130.8,1200.8,133.8,1202.4,138.6,1206.8,139.1,1202.8,135.7,1207.8,133.8,1215.6,133.8,1224.4,136.7,1218,132.3,1214.2,127.4,1219.4,126,1228.9,126.4,1236.2,126,1231.1,123,1233.2,120.1,1237.1,120.1,1242.1,117.9,1250.4,117,1250.6,116.1,1259.7,115.7,1263.4,116.6,1268.8,114.4,1275.5,114.4,1273.7,112.1,1275.1,110.3,1281.4,108.6,1288.8,109.9,1285.5,111.2,1294,111.7,1297.4,113.9,1299.8,113,1310,113,1320.5,115.2,1325.6,117,1327.7,119.3,1325.5,120.6,1318.6,123,1317.1,124.5,1322.4,125.5,1328.9,126.4,1331.2,125.5,1336.5,128.9,1336.8,127.4,1341.6,126.4,1354.4,127.4,1357.7,129.9,1373.7,130.4,1370.3,126.9,1378.5,127.4,1384.4,127.4,1393.6,130.4,1398.9,133.3,1398.9,135.2,1408,139.1,1416.4,141.1,1414.3,136.2,1422.7,138.2,1427.3,136.7,1436.9,138.6,1437.6,137.2,1444.7,137.7,1436.1,133.3,1438.8,131.3,1476.1,134.3,1483.5,137.2,1498.7,141.1,1512.5,140.1,1520.8,140.6,1526.7,142.5,1531.9,146.5,1538.4,148.1,1542.5,147.1,1548.8,146.5,1557.1,147.6,1563.7,147.1,1576.9,151.7,1579.4,150.2,1571.5,146.5,1570.5,144.5,1584.6,146,1591.9,145.5,1606.7,148.1,1615.1,150.2,1630.8,154.3,1648.6,159.5,1652.8,162.6,1657.9,164.2,1650.6,160,1662.8,161,1677.8,165.7,1677.7,168.3,1672,168.8,1678.4,173.6,1678.2,174.7,1674.5,174.7,1669.1,173.1,1661.7,171.4,1657.1,168.8,1652.3,168.3,1648.2,168.8,1644,167.3,1641.8,165.2,1638.5,166.2,1644.2,168.8,1644.7,170.9,1643,173.6,1637,173.1,1644.1,175.8,1652.1,180.1,1656.3,181.7,1659.5,183.9,1660.3,185.5,1651.5,184.5,1644.6,188.2,1641.5,188.8,1640.1,193.1,1638.2,196.4,1639.1,198.6,1628.6,194.8,1622.7,199.1,1618,196.9,1617.3,199.7,1610.1,198.6,1613,202.5,1613.7,208.1,1616.5,210.4,1622.4,211.5,1630.3,219.4,1626.4,219.9,1629.4,224.4,1633.4,226.7,1629,230.1,1633,236.5,1627.2,237.7,1631.5,244,1629.8,249.2,1624.4,245.2,1614.9,236.5,1600.8,223.9,1595.2,216,1595.7,212.6,1593.4,210.4,1598.7,208.7,1599.1,201.9,1600.8,196.4,1603.4,192,1597.2,183.9,1592.9,184.5,1596,189.3,1592,195.3,1580.6,188.2,1572.1,190.4,1571,199.1,1578.4,203.1,1570,204.2,1564.1,204.8,1560.3,200.8,1552.8,199.7,1549.9,202.5,1536.5,201.9,1523.9,203.6,1519.6,214.3,1514,227.8,1521.5,228.4,1526.4,231.9,1531.8,233,1532.3,230.1,1537.7,230.7,1549,237.1,1553.5,242.3,1554.4,248.1,1559.4,255,1563.8,264.4,1562.2,272.7,1563,276.8,1561.4,283.8,1558.4,290.4,1557.6,294,1552.8,297.6,1549.9,297.6,1545.4,294.6,1540.9,298.8,1541.7,301.2],[1595.4,137.7,1595,137.2,1598.4,137.2,1606.1,138.6,1607.4,139.6,1605.3,140.6,1601.2,141.1,1597,141.1,1593.8,139.6,1595.4,137.7],[1066.4,278.5,1067.7,277.4,1071.1,278.5,1072.6,278.5,1073.7,279.7,1074.2,280.3,1076.8,282.1,1081.5,281.5,1080.9,283.8,1075.7,285,1069.8,288,1066.8,286.8,1067.5,284.4,1062.6,282.7,1062.9,281.5,1067.4,279.1,1066.4,278.5]],"b":[998.9,93.6,1678.4,307.1],"cx":1267.1,"cy":214},{"g":"Bahamas","c":null,"r":"NA","p":[[495.2,393.9,497.9,393.3,501.4,393.9,501.2,395.1,495.2,396.3,495.2,393.9],[501.6,392.7,505.3,395.1,503.4,399.3,502.5,398.7,503.6,395.7,501.5,393.3],[497.4,403.5,498.9,403.5,500.1,409,499.7,412,498.1,412.6,497.5,409,495.7,407.2,497.4,403.5]],"b":[495.2,392.7,505.3,412.6],"cx":498.3,"cy":407.7},{"g":"Falkland Is.","c":null,"r":"SA","p":[[630.4,866.8,634.6,863.9,638.8,865.1,641,862.8,645.6,865.1,645.2,867.4,639.6,869.1,636.8,866.8,633.9,869.7,630.4,866.8]],"b":[630.4,862.8,645.6,869.7],"cx":638.5,"cy":866.3},{"g":"Norway","c":"NOR","r":"EU","p":[[973.7,99.6,974.9,98.3,979.9,97.9,984.3,99.6,995.4,102.8,987.1,104.5,985.8,108.1,982.7,109,981.3,112.6,977.1,112.6,969.7,109.9,972.7,108.6,967.5,107.2,960.7,103.2,958,99.6,967.3,98.3,969,99.6,973.7,99.6],[1037.4,147.1,1031.2,149.1,1028.1,149.7,1029.1,146,1023.8,144,1018.4,146,1016.9,149.7,1013.3,152.2,1009.3,150.7,1004.3,151.2,999.4,148.1,997.2,149.7,994.8,149.7,994.7,153.3,987.3,152.2,986.3,155.4,982.7,155.4,980.1,159,976.4,164.7,970.6,172,971.8,174.1,970.6,176.3,966.5,175.8,963.7,181.2,964.2,188.2,966.7,191,965.5,197.5,962.1,201.4,960,204.2,957.4,200.8,948.8,207.6,942.7,208.7,937.1,205.9,935.7,199.7,934.9,187.2,938.8,183.9,950.1,179,958,173.6,965.6,166.2,974.9,156.4,981,152.2,991.5,146,999.7,143.5,1005.9,144,1011.1,140.1,1018.3,140.1,1024.9,139.1,1037.3,142.5,1032.6,144,1037.4,147.1],[1014.3,97.9,1009.8,100.5,1000.2,101,990.4,100.1,989.6,99.2,984.9,98.7,981.1,97.2,991.2,96.2,995.9,96.9,999,95.8,1007.4,96.9,1014.3,97.9],[1007,107.7,999.8,109.9,993.4,108.6,995.7,107.7,993.4,105.9,1000.4,105,1002.1,106.8,1007,107.7]],"b":[934.9,95.8,1037.4,208.7],"cx":964.1,"cy":193.4},{"g":"Greenland","c":null,"r":"NA","p":[[776.3,89,788.9,86.9,799.9,86.9,804.7,85.8,815.9,85.4,840.7,85.8,859.1,88.6,852.4,90.1,840.3,90.1,822.8,90.4,823.9,91.1,835.4,90.8,844.7,91.9,851.4,90.8,853.3,92.2,848.8,94,857.8,92.9,873.9,91.5,883.3,92.2,884.7,93.6,870.4,96.2,868.3,97.2,857.6,97.6,865,97.9,859.9,101,856.2,103.6,854.2,109,857.3,111.7,852,112.1,845.5,113.5,851.3,115.7,850.5,119.7,846.5,119.7,849.8,124,841.7,124.5,845.4,126.4,843.5,127.9,838.1,128.9,832.9,128.9,836.6,132.3,835.9,134.3,829.2,132.3,826.8,133.8,831.7,134.7,835.5,137.7,835.4,141.6,828.6,142.5,826.3,140.6,822.6,138.2,822.7,141.1,817,144,827.3,144,832.5,144.5,820.9,148.6,809.1,152.8,796.7,154.8,792.4,154.8,787.7,156.9,780.2,162.1,770,165.7,767.4,166.2,761.4,167.3,755.3,168.3,750.1,172,748.6,175.8,745.3,179,736.9,183.4,736.8,187.7,732.9,192,728.5,197.5,722.3,198,718.1,193.1,709.6,193.1,707.1,190.4,706.7,185,702.7,178.5,702.5,174.7,704.1,169.9,701,165.2,704.5,161.6,702.9,159.5,710.2,153.3,716.9,151.7,719.5,149.7,722.5,145.5,717.4,147.1,714.6,148.1,710.8,148.6,707.1,147.1,708.8,143.5,711.9,141.1,715.7,141.1,722.7,142.1,718.1,139.1,715.6,137.7,711.5,138.2,709.5,136.7,716.5,132.3,715.5,130.4,714.9,126.9,713.8,122.1,710.5,120.1,712,118.4,704.8,115.7,697.8,115.2,687.9,115.7,679.4,115.7,676.5,114.4,673.3,111.7,683.6,110.3,691,109.9,677.4,109,671.3,107.2,673.5,105.4,688.7,103.2,703.3,101,706.3,99.2,698.6,97.9,703.3,96.5,717.2,94,722.4,93.6,723.1,91.9,731.2,91.1,741.9,90.4,751.8,90.4,754.3,91.5,764.3,89.7,771,90.8,775.2,91.1,781,92.2,774.8,90.4,776.3,89]],"b":[671.3,85.4,884.7,198],"cx":768.5,"cy":127.9},{"g":"Timor-Leste","c":null,"r":"SEA","p":[[1565.6,609.4,1566.2,608.2,1570.6,606.4,1574.3,606.4,1576.5,605.8,1578,606.4,1576.3,608.2,1570.3,610.6,1566,612.4,1566.1,610.6,1565.6,609.4]],"b":[1565.6,605.8,1578,612.4],"cx":1570.9,"cy":608.6},{"g":"South Africa","c":"ZAF","r":"MEAF","p":[[987.2,728.4,989.8,725.3,991.9,727.2,992.9,729.6,994.9,730.2,998.5,730.8,1001.1,730.8,1005.8,727.8,1006.2,705.4,1007.8,706,1010.7,712.1,1010.1,715.7,1011.1,717.5,1014.8,716.9,1017.4,714.5,1020,712.7,1021.2,709.6,1023.8,708.4,1025.8,709,1028.4,710.9,1032.5,710.9,1036.2,709.6,1036.8,707.8,1037.4,704.8,1040.5,704.2,1042.1,701.8,1043.8,698.2,1048.6,693.3,1056,689.1,1058.1,689.1,1060.7,690.3,1062.8,689.7,1065.4,690.3,1067.7,698.8,1068.6,703,1067.8,709.6,1067.7,711.5,1065.1,710.9,1063.6,710.9,1063.5,712.7,1061.8,715.1,1061.8,716.9,1064.7,720.5,1067.8,719.9,1069,716.9,1072.6,716.9,1071.3,721.7,1070.6,726.6,1068.9,729.6,1065.2,732.6,1064.1,733.2,1061.9,736.2,1060.2,739.2,1057.4,743.5,1050.9,750.1,1047.2,753.7,1043.5,756.1,1037.8,758.6,1035.3,759.2,1034.7,760.4,1031.7,759.8,1029.1,761,1023.6,759.8,1020.6,760.4,1018.6,760.4,1012.9,762.8,1008.9,763.4,1005.8,765.8,1003.3,765.8,1001.3,764,999.8,763.4,997.3,761,996.3,760.4,996.9,756.7,995,752.5,996.5,751.3,996.6,747.1,993.7,741,991.2,736.2,987.2,728.4],[1052.4,730.8,1049.9,728.4,1047.8,730.2,1044.7,732,1041.9,736.2,1045.8,740.4,1047.4,739.8,1048.5,738,1051.1,737.4,1052.2,735,1053.9,732.6,1052.4,730.8]],"b":[987.2,689.1,1072.6,765.8],"cx":1032.6,"cy":730.4},{"g":"Lesotho","c":null,"r":"MEAF","p":[[1052.4,730.8,1053.9,732.6,1052.2,735,1051.1,737.4,1048.5,738,1047.4,739.8,1045.8,740.4,1041.9,736.2,1044.7,732,1047.8,730.2,1049.9,728.4,1052.4,730.8]],"b":[1041.9,728.4,1053.9,740.4],"cx":1047.9,"cy":734.5},{"g":"Mexico","c":"MEX","r":"NA","p":[[310,359.5,315.9,358.9,322.7,358.3,321.7,359.5,328.2,362.5,338.3,366.7,348.5,366.7,352.6,366.7,353.7,363.7,362.3,363.7,363.5,366.1,365.4,367.9,367.4,370.9,367.8,374,368,377,370.6,378.8,374.2,380.6,378.6,375.8,382.7,375.8,385.6,378.2,387.1,382.4,388.2,386,390.4,389.7,390.4,393.9,391.3,396.3,395,398.1,398.2,399.9,400.4,399.3,397,404.8,395.2,409,393.2,417.4,392.1,420.4,392.6,423.5,393.6,426.5,393.8,431.3,396.8,435.5,397.3,439.2,398.9,442.2,404.5,443.4,406.2,446.4,411.2,444.6,415,444,419.3,442.8,422.7,441.6,426.1,439.2,428.2,435.5,429,430.7,430.3,428.9,434.3,427.1,440.2,425.9,444.4,425.9,447.6,425.9,448.9,427.1,448.5,430.1,444.8,433.1,443.2,437.4,444.1,438,442.7,441,441,445.2,439.6,444,438.6,444,437.5,444,435.5,447.6,434.5,447,433.8,448.2,428.5,448.2,423.8,448.2,423.4,451.2,420.8,451.2,422.5,453.7,424.5,454.9,424.8,456.1,425.8,456.7,425,458.5,418.7,458.5,415.4,463.3,415.7,464.5,415,466.3,414.8,468.1,409.3,461.5,406.9,459.7,403,457.9,399.7,458.5,395.2,460.3,392.5,460.9,389,459.7,385.5,458.5,381.2,455.5,377.1,454.9,371.7,451.8,367.4,449.4,366.6,447.6,363.6,447,358.6,445.2,356.9,442.8,351.7,439.2,349.6,435.5,349.1,432.5,350.8,431.9,350.6,430.1,352,428.3,352.4,426.5,351.4,423.5,351.3,421.1,350.3,418,346.8,412,342.4,407.8,340.7,403.5,336.7,401.1,336.5,399.9,338.1,396.3,336,394.5,333.7,391.5,333.9,387.2,330.8,387.2,328.7,383.6,327.5,380.6,327.5,378.8,326.1,374.6,325.9,369.7,327.4,367.3,324.2,364.9,322.4,365.5,320.1,363.7,318.6,366.1,318,369.1,316.9,373.4,318.1,375.8,320.5,380,321,381.8,321.9,384.2,322.4,387.8,323.4,389.7,324.4,391.5,326.7,394.5,326.5,400.5,327.4,402.9,328.2,406,327.6,409,330.2,409,331.7,412,333.3,414.4,333.1,415.6,330,418,328.6,414.4,326.2,410.8,322.7,407.8,320.3,406.6,321.5,401.7,321.9,398.7,319.8,396.9,317,393.9,316.2,395.1,315.7,393.3,312.4,392.1,310.3,388.4,311,387.8,312.9,388.4,315.7,386,316.5,383,314.2,378.8,311.6,377,310.7,373.4,310.1,369.7,309.9,364.9,310,359.5]],"b":[309.9,358.3,448.9,468.1],"cx":370.8,"cy":411.5},{"g":"Uruguay","c":null,"r":"SA","p":[[609,738,612,737.4,618.1,742.3,620.1,742.3,625.9,745.9,630.6,748.9,634.5,753.1,633.1,756.1,634.8,759.8,633.5,763.4,628.7,767,624.4,765.8,622,766.4,616.9,763.4,613.5,764,609.7,760.4,608.9,756.7,610,754.9,608.8,748.9,608.5,742.9,609,738]],"b":[608.5,737.4,634.8,767],"cx":620.5,"cy":753.7},{"g":"Brazil","c":"BRA","r":"SA","p":[[634.8,759.8,633.1,756.1,634.5,753.1,630.6,748.9,625.9,745.9,620.1,742.3,618.1,742.3,612,737.4,609,738,614.4,730.2,619.1,724.1,622.4,721.7,626.5,718.1,625.8,713.3,622.6,709.6,620.2,710.9,620.8,707.8,620.9,704.2,620.5,700.6,618.3,699.4,616.9,700.6,614.8,700.6,614,698.2,612.9,692.7,611.6,690.9,607.8,689.1,605.8,690.3,600.5,689.1,599.5,680.7,597.6,677.6,599.1,676.4,598.2,672.8,599.6,670.4,600.1,665.6,598.8,662,595.4,660.1,594.7,657.7,595.4,654.1,584.8,654.1,582.5,646.9,583.6,646.9,583.4,643.8,582.2,642.6,582,639,578.7,637.2,575.5,637.2,573.3,635.4,569.5,634.2,567.2,631.8,561.3,631.2,555.1,625.7,555.3,621.5,554.6,619.1,554.9,614.9,548,615.5,545,617.9,540.9,620.3,539.5,622.1,536.8,622.1,533.1,622.1,530,622.7,527.8,622.1,527.2,613,523.1,616.7,518.4,616.7,516,613,512.9,613,513.8,610,510.4,606.4,508,601,509.6,599.8,509.4,597.3,512.6,595.5,511.9,592.5,512.8,590.1,513.2,587.7,519.5,583.5,523.7,582.3,524.3,581.7,529.1,581.7,531.4,565.3,531.3,562.3,530.2,558.7,528,556.9,528.1,552.7,530.8,551.5,531.8,552.1,532.4,549.7,529.2,549,529.3,545.4,539.4,545.4,541.6,543.6,542.6,545.4,543.6,549,544.7,547.8,547.8,551.5,552.1,550.9,552.7,549,556.9,547.8,559.1,546.6,559.7,544.2,563.4,542.4,563.5,541.2,558.7,540.6,558.2,537,558.3,532.7,556.2,530.9,557.3,530.9,561,531.5,565.2,532.7,566.8,531.5,570.6,530.3,576.5,528.5,578.7,526.1,578.2,524.3,580.8,524.3,581.9,525.5,581.3,527.9,582.9,529.1,584.4,531.5,582.8,534,581.6,538.8,583.2,542.4,583.7,544.8,586.8,547.8,589.5,547.8,590,546.6,591.6,546.6,593.8,545.4,595.9,544.2,598.6,544.2,600.2,544.2,602.8,544.8,603.4,543.6,602.4,542.4,602.9,540.6,605,541.2,607.7,540.6,610.9,541.8,613,543,614.6,541.2,615.7,541.8,616.7,543,619.4,543,621,540.6,623.2,536.4,626,530.3,628.1,530.3,629.1,534,632.2,544.2,634.8,545.4,635.3,549.7,631,554.5,632.5,556.3,642.2,556.9,642.2,562.9,646.5,559.3,652.9,561.1,662,565.3,664.7,568.4,663.7,572,670.1,570.2,680.2,573.2,688.2,573.2,696.3,578,703.3,584.7,707,586.5,711.8,586.5,714,588.9,715.8,596.1,717,599.8,715.1,610,712.5,613.7,705.5,622.1,702.1,629.3,698.6,634.2,697,634.8,695.7,639,696.8,650.5,695.9,659.5,695.6,663.8,694.2,666.2,693.7,674,689.1,681.9,689.1,687.9,684.7,690.9,683.9,694.6,678.2,694.6,670.6,697,666.7,699.4,661.1,701.2,655.8,706,652,712.1,652,716.3,653,719.9,652.8,725.9,652.2,729,649.1,732,645.2,742.9,641.6,747.7,638.5,750.1,637.6,756.1,634.8,759.8]],"b":[508,524.3,717,759.8],"cx":621,"cy":620.5},{"g":"Bolivia","c":null,"r":"SA","p":[[533.1,622.1,536.8,622.1,539.5,622.1,540.9,620.3,545,617.9,548,615.5,554.9,614.9,554.6,619.1,555.3,621.5,555.1,625.7,561.3,631.2,567.2,631.8,569.5,634.2,573.3,635.4,575.5,637.2,578.7,637.2,582,639,582.2,642.6,583.4,643.8,583.6,646.9,582.5,646.9,584.8,654.1,595.4,654.1,594.7,657.7,595.4,660.1,598.8,662,600.1,665.6,599.6,670.4,598.2,672.8,599.1,676.4,597.6,677.6,597.4,675.8,592.4,672.8,587.7,672.2,578.4,674,576.4,679.5,576.8,683.1,575.5,689.7,574.9,688.5,568.6,688.5,567.1,693.3,563.4,689.1,556.4,687.3,553,692.7,549.5,693.9,546.3,685.5,542.3,678.9,543.7,672.8,540.3,670.4,539.3,666.2,536.2,662,538.6,655.3,536,650.5,536.7,648.1,536,646.3,537.9,643.2,537.5,637.8,537.2,633.6,538.1,631.8,533.1,622.1]],"b":[533.1,614.9,600.1,693.9],"cx":561.7,"cy":656.6},{"g":"Peru","c":"PER","r":"SA","p":[[529.1,581.7,524.3,581.7,523.7,582.3,519.5,583.5,513.2,587.7,512.8,590.1,511.9,592.5,512.6,595.5,509.4,597.3,509.6,599.8,508,601,510.4,606.4,513.8,610,512.9,613,516,613,518.4,616.7,523.1,616.7,527.2,613,527.8,622.1,530,622.7,533.1,622.1,538.1,631.8,537.2,633.6,537.5,637.8,537.9,643.2,536,646.3,536.7,648.1,536,650.5,538.6,655.3,536.2,662,534.9,665,532.4,666.2,526.8,663.2,526,660.7,515.4,654.7,505.1,648.1,500.4,643.8,497.9,639,498.3,637.2,493.4,629.3,487.2,618.5,481.7,606.4,479.4,603.4,477.1,599.2,473.2,594.9,468.8,592.5,470.8,590.1,467.8,584.1,469.4,579.8,473.5,576.2,474.1,578.6,472.6,580.4,473.1,582.3,475.3,581.7,477.4,582.9,479.6,585.9,482.7,582.9,483.2,579.2,486.8,573.8,493.1,571.4,498.9,565.3,500.4,561.1,499.2,556.9,500.8,556.3,504.6,558.7,506.3,561.7,508.4,563.5,511.8,569.6,516,570.2,518.7,569,520.8,569.6,524,569.6,528.3,572,524.7,578,526.3,578.6,529.1,581.7]],"b":[467.8,556.3,538.6,666.2],"cx":506.8,"cy":611.2},{"g":"Colombia","c":"COL","r":"SA","p":[[544.7,547.8,543.6,549,542.6,545.4,541.6,543.6,539.4,545.4,529.3,545.4,529.2,549,532.4,549.7,531.8,552.1,530.8,551.5,528.1,552.7,528,556.9,530.2,558.7,531.3,562.3,531.4,565.3,529.1,581.7,526.3,578.6,524.7,578,528.3,572,524,569.6,520.8,569.6,518.7,569,516,570.2,511.8,569.6,508.4,563.5,506.3,561.7,504.6,558.7,500.8,556.3,499.2,556.9,497.1,555.1,494.5,553.3,492.8,553.9,488.6,553.3,487,550.9,486,550.9,480.7,547.2,480.2,545.4,482.4,544.8,481.9,541.8,483.5,540,486.2,539.4,488.4,535.8,490.6,532.7,488.5,530.9,489.7,527.3,488.8,521.9,490,520.7,489.2,515.2,487.2,512.2,487.9,509.2,490,509.8,491.1,508,489.7,504.4,490.3,503.2,493.5,503.8,497.4,499.5,499.5,498.9,499.7,496.5,501.1,491.7,504.5,488.7,507.7,488.7,508.3,487.5,512.5,488.1,517,485.1,519.3,483.2,521.6,480.8,523.7,480.8,525.1,482.6,523.9,484.4,520.1,485.7,518.8,488.7,516.6,490.5,514.8,492.3,514,497.1,512.2,500.1,514.9,500.7,515.3,503.8,516.8,505,516.7,507.4,516,509.8,516.5,511,517.5,511.6,518.5,513.4,525.5,512.8,528.6,513.4,532.1,518.9,534.3,518.3,538,518.3,541.2,517.7,543.3,518.9,542.1,521.9,540.9,524.3,540.3,528.5,541.2,532.7,542.8,534.6,542.8,535.8,540.1,538.8,542.2,540,543.2,542.4,544.7,547.8]],"b":[480.2,480.8,544.7,581.7],"cx":512.4,"cy":532.1},{"g":"Panama","c":"PAN","r":"NA","p":[[490.3,503.2,489.7,504.4,491.1,508,490,509.8,487.9,509.2,487.2,512.2,485.7,510.4,484.8,506.8,485.9,505.6,484.9,505,483.9,503.2,481.4,501.4,478.7,502,477.5,503.8,475.3,505.6,474.2,505.6,473.7,506.8,476.1,510.4,474.5,511,473.9,511.6,471.2,512.2,470.4,508.6,469.8,509.8,468.2,509.2,467.3,506.8,465.2,506.2,463.6,505.6,461.5,505.6,461.4,506.8,460.4,506.2,461,505,461.6,503.8,461.1,502.6,462.2,502,461.2,500.7,461.3,498.3,463.5,497.7,465,500.1,464.9,501.4,467,501.4,469.1,502.6,471.8,502,474,500.7,477.2,499.5,478.9,497.7,482.1,497.7,481.5,498.3,484.7,498.9,486.7,500.1,488.8,502,490.3,503.2]],"b":[460.4,497.7,491.1,512.2],"cx":475.8,"cy":504.2},{"g":"Costa Rica","c":null,"r":"NA","p":[[463.5,497.7,461.3,498.3,461.2,500.7,462.2,502,461.1,502.6,461.6,503.8,461,505,460.4,506.2,457.8,505,456.8,503.2,457.4,502.6,457.5,500.7,456,499.5,453.9,498.3,452.3,497.7,451.9,495.9,450.4,494.7,450.8,496.5,449.7,497.7,448.7,496.5,446.6,495.9,446.2,494.7,446.3,492.9,447.1,490.5,446.1,489.9,447.3,488.7,447.8,488.1,451.4,489.3,452.6,488.7,454.1,489.3,455,490.5,456.6,491.1,457.7,489.9,459.1,492.9,461,495.3,463.5,497.7]],"b":[446.1,488.1,463.5,506.2],"cx":454.8,"cy":495.6},{"g":"Nicaragua","c":null,"r":"NA","p":[[457.7,489.9,456.6,491.1,455,490.5,454.1,489.3,452.6,488.7,451.4,489.3,447.8,488.1,447.3,488.7,445.3,486.9,443.4,484.4,442.5,482.6,440.1,480.2,437.7,477.8,438.3,476.6,439.3,477.8,439.8,477.2,441.4,477.2,442.1,475.4,443.2,475.4,442.9,472.4,444.5,472.4,445.6,472.4,446.8,471.2,448.2,472.4,448.9,471.2,450,470.6,451.7,468.7,452.4,467.5,453.5,466.3,455.1,466.9,456.1,467.5,457.2,466.9,458.2,466.9,460.5,465.7,461,465.1,463.2,465.1,462.6,465.7,461.9,466.9,462.2,469.4,461,471.2,460.3,473.6,459.5,476.6,459.9,477.8,459.6,480.8,459,481.4,458.3,483.8,458.1,485.7,457,486.9,457.3,488.7,457.7,489.9]],"b":[437.7,465.1,463.2,491.1],"cx":451.8,"cy":478.1},{"g":"Honduras","c":null,"r":"NA","p":[[463.2,465.1,461,465.1,460.5,465.7,458.2,466.9,457.2,466.9,456.1,467.5,455.1,466.9,454.1,466.3,452.4,467.5,451.7,468.7,450,470.6,448.9,471.2,448.2,472.4,446.8,471.2,445.6,472.4,444.5,472.4,442.9,472.4,443.2,475.4,442.1,475.4,441.4,477.2,439.8,477.2,439,475.4,437.4,474.8,438.2,472.4,437.2,471.8,436.2,471.2,434,472.4,434.1,471.2,432.5,470.6,431.1,469.4,429.5,468.7,431.3,466.9,430.9,465.7,431,464.5,433.8,463.3,436.8,460.9,438.5,459.7,440.1,459.7,440.6,460.3,443.7,460.3,446.4,460.3,448,459.7,448.6,459.1,450.2,459.1,451.7,459.7,452.8,459.7,453.9,459.1,456.5,459.7,456.9,460.3,458.3,461.5,459.8,462.7,461.8,463.3,463.2,465.1]],"b":[429.5,459.1,463.2,477.2],"cx":444.6,"cy":466.2},{"g":"El Salvador","c":null,"r":"NA","p":[[429.5,468.7,431.1,469.4,432.5,470.6,434.1,471.2,434,472.4,436.2,471.2,437.2,471.8,438.2,472.4,437.4,474.8,436.7,476.6,433.6,476,432.1,475.4,429.5,474.2,426.9,474.2,425.4,473,425.6,471.8,427.8,470.6,428.9,470,428.5,468.7,429.5,468.7]],"b":[425.4,468.7,438.2,476.6],"cx":432,"cy":472.9},{"g":"Guatemala","c":"GTM","r":"NA","p":[[414.8,468.1,415,466.3,415.7,464.5,415.4,463.3,418.7,458.5,425,458.5,425.8,456.7,424.8,456.1,424.5,454.9,422.5,453.7,420.8,451.2,423.4,451.2,423.8,448.2,428.5,448.2,433.8,448.2,433.1,453.1,431.7,459.7,433.3,459.7,434.7,460.9,435.4,459.7,436.8,460.9,433.8,463.3,431,464.5,430.9,465.7,431.3,466.9,429.5,468.7,428.5,468.7,428.9,470,427.8,470.6,425.6,471.8,425.4,473,422.9,471.8,419.7,471.8,417.2,470.6,414.8,468.1]],"b":[414.8,448.2,436.8,473],"cx":425.4,"cy":460.9},{"g":"Belize","c":null,"r":"NA","p":[[433.8,448.2,434,447,435.5,447.6,437.5,444,438.6,444,439.5,445.2,439.3,446.4,437.8,449.4,438.3,450,437.4,452.4,437.9,453.1,436.4,456.1,435.2,457.3,434.6,457.9,433.3,459.7,431.7,459.7,433.1,453.1,433.8,448.2]],"b":[431.7,444,439.5,459.7],"cx":435.5,"cy":451.8},{"g":"Venezuela","c":"VEN","r":"SA","p":[[578.2,524.3,578.7,526.1,576.5,528.5,570.6,530.3,566.8,531.5,565.2,532.7,561,531.5,557.3,530.9,556.2,530.9,558.3,532.7,558.2,537,558.7,540.6,563.5,541.2,563.4,542.4,559.7,544.2,559.1,546.6,556.9,547.8,552.7,549,552.1,550.9,547.8,551.5,544.7,547.8,543.2,542.4,542.2,540,540.1,538.8,542.8,535.8,542.8,534.6,541.2,532.7,540.3,528.5,540.9,524.3,542.1,521.9,543.3,518.9,541.2,517.7,538,518.3,534.3,518.3,532.1,518.9,528.6,513.4,525.5,512.8,518.5,513.4,517.5,511.6,516.5,511,516,509.8,516.7,507.4,516.8,505,515.3,503.8,514.9,500.7,512.2,500.1,514,497.1,514.8,492.3,516.6,490.5,518.8,488.7,520.1,485.7,523.9,484.4,523.3,486.3,520.6,486.9,522,489.3,521.7,492.9,518.8,495.9,520.7,500.7,522.8,500.7,524.7,495.9,522.6,494.1,523,489.3,529.6,486.9,529.2,484.4,531.5,482,532.8,486.3,536.5,486.9,540,489.9,539.8,491.7,544.5,492.3,550.4,491.7,552.9,494.1,557.1,494.7,560.4,492.9,560.5,491.7,566.9,491.1,573.3,491.1,568.9,492.9,570.3,495.9,574.6,495.9,578.7,498.9,579,503.8,581.7,503.8,583.8,505,579.4,508.6,579.3,511,580.8,513.4,579.7,514,575.9,515.2,576.3,518.3,574.7,519.5,578.2,524.3]],"b":[512.2,482,583.8,551.5],"cx":549.7,"cy":512.4},{"g":"Guyana","c":null,"r":"SA","p":[[600.2,544.2,598.6,544.2,595.9,544.2,593.8,545.4,591.6,546.6,590,546.6,589.5,547.8,586.8,547.8,583.7,544.8,583.2,542.4,581.6,538.8,582.8,534,584.4,531.5,582.9,529.1,581.3,527.9,581.9,525.5,580.8,524.3,578.2,524.3,574.7,519.5,576.3,518.3,575.9,515.2,579.7,514,580.8,513.4,579.3,511,579.4,508.6,583.8,505,587.4,507.4,590.4,511.6,590.3,514.6,592.4,514.6,595.5,517.7,597.5,519.5,596.3,524.9,593,526.7,593,527.9,592.4,530.9,594.5,535.8,596.1,535.8,597.1,538.8,600.2,544.2]],"b":[574.7,505,600.2,547.8],"cx":587.5,"cy":526.7},{"g":"Suriname","c":null,"r":"SA","p":[[610.9,541.8,607.7,540.6,605,541.2,602.9,540.6,602.4,542.4,603.4,543.6,602.8,544.8,600.2,544.2,597.1,538.8,596.1,535.8,594.5,535.8,592.4,530.9,593,527.9,593,526.7,596.3,524.9,597.5,519.5,603.9,520.7,604.5,519.5,608.7,519.5,614,520.7,611.1,526.1,611.6,530.3,613.7,534,612.6,536.4,612,539.4,610.9,541.8]],"b":[592.4,519.5,614,544.8],"cx":603.6,"cy":530.8},{"g":"France","c":"FRA","r":"EU","p":[[626,530.3,623.2,536.4,621,540.6,619.4,543,616.7,543,615.7,541.8,614.6,541.2,613,543,610.9,541.8,612,539.4,612.6,536.4,613.7,534,611.6,530.3,611.1,526.1,614,520.7,616.1,521.9,619.8,523.1,625.5,527.9,626,530.3],[937.7,257.9,940,259.7,946.5,260.9,944.1,265,943.5,269.1,942.1,270.3,939.8,269.7,940.2,270.9,936.4,274.4,936.3,276.8,938.7,276.2,940.1,278.5,940,280.3,941.4,282.7,939.4,284.4,940.8,288.6,943.7,289.8,942.7,292.2,938.3,295.8,929.1,294,921.8,295.8,921.2,299.4,915.4,300.6,910.2,297.6,908.2,298.8,899.6,296.4,897.8,294,900.4,290.4,902.1,278.5,897.7,272.1,894.2,269.1,887.3,266.8,887.2,262.6,893.3,261.5,901.1,263.2,900.2,256.2,904.2,259.1,915.1,254.4,916.8,249.8,921,248.6,921.8,250.4,923.7,250.4,925.9,252.7,929,255.6,931.3,255,935.4,257.9,936.3,258.5,937.7,257.9],[948.9,298.8,952.3,296.4,953.2,301.2,951.2,305.9,949.3,304.7,947.9,300.6,948.9,298.8]],"b":[610.9,248.6,953.2,543],"cx":919.1,"cy":275.3},{"g":"Ecuador","c":"ECU","r":"SA","p":[[499.2,556.9,500.4,561.1,498.9,565.3,493.1,571.4,486.8,573.8,483.2,579.2,482.7,582.9,479.6,585.9,477.4,582.9,475.3,581.7,473.1,582.3,472.6,580.4,474.1,578.6,473.5,576.2,476.1,572,475,569,472.9,572,469.6,569,470.7,567.8,470,562.3,471.6,561.1,472.6,557.5,474.7,553.3,474.2,550.9,477.5,549.7,480.7,547.2,486,550.9,487,550.9,488.6,553.3,492.8,553.9,494.5,553.3,497.1,555.1,499.2,556.9]],"b":[469.6,547.2,500.4,585.9],"cx":483.5,"cy":564.5},{"g":"Puerto Rico","c":null,"r":"NA","p":[[554.1,444,556.7,444.6,557.6,445.8,556.4,447,552.2,447,549,447.6,549.3,444.6,549.9,444,554.1,444]],"b":[549,444,557.6,447.6],"cx":552.9,"cy":445.6},{"g":"Jamaica","c":null,"r":"NA","p":[[494.8,444,498.4,444.6,500.9,445.8,501.7,447.6,498,447.6,496.3,448.8,493.3,447.6,490.9,445.8,491.6,444,493.7,444,494.8,444]],"b":[490.9,444,501.7,448.8],"cx":496,"cy":446.1},{"g":"Cuba","c":"CUB","r":"NA","p":[[474.2,415.6,478.8,416.2,482.9,416.2,487.4,418,489.1,420.4,494.4,419.8,495.8,421.1,500,424.7,502.7,427.7,504.2,427.7,507.2,428.9,506.4,430.7,510.6,430.7,513.9,433.1,513.2,434.3,509.4,435.5,506.3,435.5,502.7,434.9,494.8,435.5,498.8,432.5,497,430.7,493.9,430.7,492,428.9,491.5,425.3,488.4,425.3,483.9,424.1,482.5,422.9,475.9,421.7,474,420.4,476.2,419.2,471.1,418.6,467,421.7,464.9,421.7,463.6,423.5,461.4,424.1,458.9,423.5,462.3,421.7,463.7,419.2,466,418,468.8,416.8,473.1,416.2,474.2,415.6]],"b":[458.9,415.6,513.9,435.5],"cx":490.1,"cy":424.9},{"g":"Zimbabwe","c":null,"r":"MEAF","p":[[1065.4,690.3,1062.8,689.7,1060.7,690.3,1058.1,689.1,1056,689.1,1053,686.1,1048.8,685.5,1047.3,681.9,1047.4,679.5,1045.3,678.9,1039.7,672.2,1038.2,668.6,1036.7,667.4,1035.2,662.6,1041,663.2,1042.5,664.4,1044.1,663.8,1047.3,660.1,1052.2,655.3,1053.8,654.7,1054.4,652.3,1057.6,649.9,1061.8,649.3,1061.8,651.7,1066.5,651.7,1068.6,652.9,1070.1,654.1,1072.2,654.7,1074.8,656.5,1074.6,664.4,1073.9,668.6,1073.3,672.8,1074.3,674.6,1073.6,678.3,1072.5,678.9,1070.8,683.1,1065.4,690.3]],"b":[1035.2,649.3,1074.8,690.3],"cx":1058.5,"cy":669.9},{"g":"Botswana","c":null,"r":"MEAF","p":[[1056,689.1,1048.6,693.3,1043.8,698.2,1042.1,701.8,1040.5,704.2,1037.4,704.8,1036.8,707.8,1036.2,709.6,1032.5,710.9,1028.4,710.9,1025.8,709,1023.8,708.4,1021.2,709.6,1020,712.7,1017.4,714.5,1014.8,716.9,1011.1,717.5,1010.1,715.7,1010.7,712.1,1007.8,706,1006.2,705.4,1006.5,687.3,1011.7,687.3,1012,666.2,1016.2,665.6,1024.1,663.8,1026.2,666.2,1029.4,663.8,1031,663.8,1034.1,662.6,1035.2,662.6,1036.7,667.4,1038.2,668.6,1039.7,672.2,1045.3,678.9,1047.4,679.5,1047.3,681.9,1048.8,685.5,1053,686.1,1056,689.1]],"b":[1006.2,662.6,1056,717.5],"cx":1026.7,"cy":689.1},{"g":"Namibia","c":null,"r":"MEAF","p":[[1006.2,705.4,1005.8,727.8,1001.1,730.8,998.5,730.8,994.9,730.2,992.9,729.6,991.9,727.2,989.8,725.3,987.2,728.4,983.7,723.5,981.7,719.3,980.7,713.3,979.2,709,977.7,700,977.7,692.7,977.2,689.1,975.1,686.7,972.6,681.9,969.4,674.6,968.4,670.4,964.2,665,963.7,660.1,966.3,658.9,969.5,657.7,973.2,658.3,976.3,660.7,998.4,660.1,1002.1,663.2,1014.7,663.8,1024.2,661.3,1028.4,660.1,1032.1,660.7,1034.1,662,1031,663.8,1029.4,663.8,1026.2,666.2,1024.1,663.8,1016.2,665.6,1012,666.2,1011.7,687.3,1006.5,687.3,1006.2,705.4]],"b":[963.7,657.7,1034.1,730.8],"cx":992.1,"cy":689},{"g":"Senegal","c":null,"r":"MEAF","p":[[813.5,473.6,811.5,468.7,808.9,466.9,811.1,465.7,813.9,461.5,815.1,458.5,817.3,456.1,819.9,456.7,822.5,455.5,825.2,455.5,827.7,457.3,831.4,459.1,834.4,463.3,837.5,467.5,837.9,471.2,838.9,474.8,840.4,476.6,840.9,478.4,840.9,480.8,839.8,480.8,837.2,480.2,836.6,480.8,835.6,481.4,831.9,479.6,829.2,479.6,819.7,479.6,818.1,480.2,816.5,480.2,813.3,480.8,812.9,476,817.7,476.6,818.8,475.4,819.8,475.4,822,474.2,824.1,475.4,826.2,475.4,828.8,474.2,827.8,472.4,825.7,473.6,824.1,473.6,822,471.8,820.4,471.8,819.3,473.6,813.5,473.6]],"b":[808.9,455.5,840.9,481.4],"cx":825.2,"cy":469},{"g":"Mali","c":null,"r":"MEAF","p":[[840.9,480.8,840.9,478.4,840.4,476.6,838.9,474.8,837.9,471.2,837.5,467.5,839.6,466.3,840.2,462.7,842.3,462.7,845.4,464.5,848.6,463.3,850.8,463.3,851.8,462.1,872.9,462.1,874.1,457.9,873.1,457.3,871,431.3,869.2,404.8,877.5,404.8,894.9,418,911.9,431.3,913.4,434.3,916.5,435.5,918.6,436.7,919.1,440.4,924.9,439.8,924.7,453.7,921.5,457.9,921,461.5,916.2,462.7,909.3,463.3,907.2,465.1,904,465.7,900.3,465.7,899.3,464.5,896.1,465.1,891.3,467.5,890.2,470,886,472.4,885.4,474.2,883.3,475.4,880.7,474.2,879.1,476,878.5,480.2,874.2,485.1,874.1,486.9,872.5,489.3,873,492.9,870.8,494.1,869.8,494.7,868.7,492.3,867.1,492.9,866.1,492.9,865.5,494.7,861.3,494.7,859.7,493.5,859.2,494.1,857.6,492.3,857.6,490.5,857.1,489.9,856,490.5,856.1,488.7,857.2,486.9,855.1,484.4,854.6,482.6,853.6,481.4,852.5,481.4,850.9,482,849.3,482.6,847.7,484.4,845.6,483.8,844,482,841.9,482.6,840.8,482.6,840.9,480.8]],"b":[837.5,404.8,924.9,494.7],"cx":883.4,"cy":451.4},{"g":"Mauritania","c":null,"r":"MEAF","p":[[813.1,428.9,814.7,427.1,835.1,427.1,834.4,418,835.6,415,840.8,414.4,840.9,399.3,858,399.3,858.4,390.3,877.5,404.8,869.2,404.8,871,431.3,873.1,457.3,874.1,457.9,872.9,462.1,851.8,462.1,850.8,463.3,848.6,463.3,845.4,464.5,842.3,462.7,840.2,462.7,839.6,466.3,837.5,467.5,834.4,463.3,831.4,459.1,827.7,457.3,825.2,455.5,822.5,455.5,819.9,456.7,817.3,456.1,815.1,458.5,814.7,454.9,816.4,451.8,817.6,446.4,816.8,440.4,816.4,437.4,817,434.3,816.1,431.3,813.1,428.9]],"b":[813.1,390.3,877.5,467.5],"cx":848.3,"cy":433.8},{"g":"Benin","c":null,"r":"MEAF","p":[[915.8,517.7,911.6,518.9,910,514.6,910.6,500.7,909.5,499.5,909,496.5,907.5,494.1,905.9,492.3,906.4,489.3,908,488.7,909.1,486.3,911.8,485.7,913.4,483.8,915,482,916.6,482,920.8,485.1,920.8,487.5,921.8,491.1,920.7,493.5,921.2,494.7,918.6,498.9,917,500.7,915.9,504.4,915.9,508,915.8,517.7]],"b":[905.9,482,921.8,518.9],"cx":914,"cy":497.5},{"g":"Niger","c":null,"r":"MEAF","p":[[980.3,417.4,981.4,427.1,983.5,428.9,983.5,430.7,985.6,432.5,984.6,434.9,982.6,447.6,982.1,455.5,975.8,460.9,973.2,468.7,975.9,471.2,975.9,474.8,979,475.4,978.5,477.8,976.9,478.4,976.9,480.2,975.9,480.2,972.2,473.6,971.1,473.6,966.9,477.2,962.6,475.4,960,474.8,958.4,476,955.2,475.4,952.1,477.8,949.4,478.4,943.1,475.4,940.4,476.6,937.8,476.6,935.7,474.2,930.4,471.8,925.1,473,923.5,474.2,923,477.2,921.4,479.6,920.8,485.1,916.6,482,915,482,913.4,483.8,913.4,479.6,907.1,477.8,907.1,475.4,904,471.2,903.5,468.7,904,465.7,907.2,465.1,909.3,463.3,916.2,462.7,921,461.5,921.5,457.9,924.7,453.7,924.9,439.8,932.2,437.4,947.5,425.3,965.2,413.8,973.5,416.8,976.2,419.8,980.3,417.4]],"b":[903.5,413.8,985.6,485.1],"cx":951.1,"cy":451},{"g":"Nigeria","c":"NGA","r":"MEAF","p":[[915.8,517.7,915.9,508,915.9,504.4,917,500.7,918.6,498.9,921.2,494.7,920.7,493.5,921.8,491.1,920.8,487.5,920.8,485.1,921.4,479.6,923,477.2,923.5,474.2,925.1,473,930.4,471.8,935.7,474.2,937.8,476.6,940.4,476.6,943.1,475.4,949.4,478.4,952.1,477.8,955.2,475.4,958.4,476,960,474.8,962.6,475.4,966.9,477.2,971.1,473.6,972.2,473.6,975.9,480.2,976.9,480.2,979.1,482.6,978.5,483.8,978,485.7,973.8,490.5,972.2,494.1,971.7,497.7,970.6,498.9,969.6,503.2,966.4,505.6,965.8,508.6,964.3,511,963.7,513.4,960.5,515.8,957.3,512.8,955.2,513.4,952,516.4,950.4,517,948.3,522.5,946.7,526.7,941.4,529.1,939.2,528.5,937.1,530.3,932.8,529.7,930.2,526.1,928.1,521.9,924.3,517.7,920.6,517.7,915.8,517.7]],"b":[915.8,471.8,979.1,530.3],"cx":944.1,"cy":498.1},{"g":"Cameroon","c":null,"r":"MEAF","p":[[978.5,477.8,980.7,482,981.2,485.7,980.7,489.9,983.9,495.3,980.7,495.3,979.1,495.9,977,495.3,975.9,498.3,978.6,501.4,981.3,502.6,981.8,505,983.4,509.2,982.9,511,980.2,517,978.6,518.3,978.6,522.5,979.2,525.5,978.6,527.3,981.3,530.3,981.3,532.1,983.4,535.8,986.1,537.6,986.1,540,986.6,541.8,986.1,545.4,981.9,543.6,977.6,542.4,971.2,541.8,967.5,542.4,964.3,541.8,961.6,541.8,952.5,541.8,953.6,537,951.5,533.4,948.8,532.1,947.7,529.1,946.7,528.5,946.7,526.7,948.3,522.5,950.4,517,952,516.4,955.2,513.4,957.3,512.8,960.5,515.8,963.7,513.4,964.3,511,965.8,508.6,966.4,505.6,969.6,503.2,970.6,498.9,971.7,497.7,972.2,494.1,973.8,490.5,978,485.7,978.5,483.8,979.1,482.6,976.9,480.2,976.9,478.4,978.5,477.8]],"b":[946.7,477.8,986.6,545.4],"cx":968.6,"cy":521.5},{"g":"Togo","c":null,"r":"MEAF","p":[[906.4,489.3,905.9,492.3,907.5,494.1,909,496.5,909.5,499.5,910.6,500.7,910,514.6,911.6,518.9,907.3,520.1,905.7,517.7,904.7,514,904.2,511,905.3,505.6,904.2,503.2,903.7,498.3,903.7,494.1,901.6,491.1,901.7,489.3,906.4,489.3]],"b":[901.6,489.3,911.6,520.1],"cx":906.9,"cy":504.9},{"g":"Ghana","c":null,"r":"MEAF","p":[[901.7,489.3,901.6,491.1,903.7,494.1,903.7,498.3,904.2,503.2,905.3,505.6,904.2,511,904.7,514,905.7,517.7,907.3,520.1,898.8,523.7,895.6,525.5,890.8,527.3,886,525.5,886.5,523.1,884.4,517.7,885.6,511,887.7,506.2,886.7,497.7,885.7,492.9,886.3,489.3,895.3,489.3,897.4,489.9,899.6,488.7,901.7,489.3]],"b":[884.4,488.7,907.3,527.3],"cx":895,"cy":507.8},{"g":"Côte d'Ivoire","c":null,"r":"MEAF","p":[[859.2,494.1,859.7,493.5,861.3,494.7,865.5,494.7,866.1,492.9,867.1,492.9,868.7,492.3,869.8,494.7,870.8,494.1,873,492.9,875.1,494.1,876.1,496.5,878.8,497.7,880.4,495.9,883,495.9,886.7,497.7,887.7,506.2,885.6,511,884.4,517.7,886.5,523.1,886,525.5,883.8,525.5,880.1,524.3,876.9,524.3,870.5,525.5,866.8,527.3,861.5,529.7,860.4,529.1,861,524.3,861.5,523.7,861,521.3,858.9,518.9,857.3,518.3,855.7,516.4,856.8,514,856.3,511,856.9,509.2,857.9,506.8,857.4,505.6,858,504.4,860.1,503.8,858.6,498.9,857.5,496.5,858.1,494.7,859.2,494.1]],"b":[855.7,492.3,887.7,529.7],"cx":871.7,"cy":510.1},{"g":"Guinea","c":null,"r":"MEAF","p":[[829.2,479.6,831.9,479.6,835.6,481.4,836.6,480.8,837.2,480.2,839.8,480.8,840.9,480.8,840.8,482.6,841.9,482.6,843.5,482,845.6,483.8,847.7,484.4,849.3,482.6,850.9,482,852.5,481.4,853.6,481.4,854.6,482.6,855.1,484.4,857.2,486.9,856.1,488.7,856,490.5,857.1,489.9,857.6,490.5,857.6,492.3,859.2,494.1,858.1,494.7,857.5,496.5,858.6,498.9,860.1,503.8,858,504.4,857.4,505.6,857.9,506.8,857.4,509.2,855.3,509.2,854.2,511.6,852.6,511.6,851.5,510.4,852.1,508,849.5,504.4,848.4,505,847.3,505,845.7,505.6,845.8,503.2,844.7,501.4,845.3,499.5,844.2,497.1,842.7,495.3,838.4,495.3,836.8,495.9,835.8,496.5,834.7,497.7,834.1,499.5,831.4,502,828.8,498.3,826.7,495.9,825.7,495.3,824.1,494.1,823.7,491.1,823.2,489.9,821.6,489.3,823.8,486.3,825.4,486.3,827,485.1,828.1,485.1,829.1,484.4,828.6,482.6,829.2,482,829.2,479.6]],"b":[821.6,479.6,860.1,511.6],"cx":843,"cy":492.7},{"g":"Guinea-Bissau","c":null,"r":"MEAF","p":[[813.3,480.8,816.5,480.2,818.1,480.2,819.7,479.6,829.2,479.6,829.2,482,828.6,482.6,829.1,484.4,828.1,485.1,827,485.1,825.4,486.3,823.8,486.3,821.6,489.3,818.5,486.3,816.4,486.3,815.4,484.4,815.4,483.2,813.8,482,813.3,480.8]],"b":[813.3,479.6,829.2,489.3],"cx":821.8,"cy":483.2},{"g":"Liberia","c":null,"r":"MEAF","p":[[856.9,509.2,856.3,511,856.8,514,855.7,516.4,857.3,518.3,858.9,518.9,861,521.3,861.5,523.7,861,524.3,860.4,529.1,858.8,529.1,853.5,526.7,848.7,521.9,844,518.9,840.8,514.6,841.9,512.8,842.5,511,844.6,508,847.3,505,848.4,505,849.5,504.4,852.1,508,851.5,510.4,852.6,511.6,854.2,511.6,855.3,509.2,856.9,509.2]],"b":[840.8,504.4,861.5,529.1],"cx":851.4,"cy":517},{"g":"Sierra Leone","c":null,"r":"MEAF","p":[[831.4,502,834.1,499.5,834.7,497.7,835.8,496.5,836.8,495.9,838.4,495.3,842.7,495.3,844.2,497.1,845.3,499.5,844.7,501.4,845.8,503.2,845.7,505.6,847.3,505,844.6,508,842.5,511,841.9,512.8,840.8,514.6,839.3,514,835.6,511.6,832.9,508.6,831.9,506.2,831.4,502]],"b":[831.4,495.3,847.3,514.6],"cx":839,"cy":504.2},{"g":"Burkina Faso","c":null,"r":"MEAF","p":[[873,492.9,872.5,489.3,874.1,486.9,874.2,485.1,878.5,480.2,879.1,476,880.7,474.2,883.3,475.4,885.4,474.2,886,472.4,890.2,470,891.3,467.5,896.1,465.1,899.3,464.5,900.3,465.7,904,465.7,903.5,468.7,904,471.2,907.1,475.4,907.1,477.8,913.4,479.6,913.4,483.8,911.8,485.7,909.1,486.3,908,488.7,906.4,489.3,901.7,489.3,899.6,488.7,897.4,489.9,895.3,489.3,886.3,489.3,885.7,492.9,886.7,497.7,883,495.9,880.4,495.9,878.8,497.7,876.1,496.5,875.1,494.1,873,492.9]],"b":[872.5,464.5,913.4,497.7],"cx":892.4,"cy":481.4},{"g":"Central African Rep.","c":null,"r":"MEAF","p":[[1047.3,524.3,1045.2,524.9,1042,524.3,1038.3,523.7,1036.2,524.3,1035.1,526.1,1033.5,526.1,1031.4,524.9,1025.5,527.9,1022.9,527.3,1022.3,527.9,1020.7,531.5,1017,530.3,1012.7,529.7,1009.5,527.3,1005.3,525.5,1002.1,527.3,1000,530.3,1000,534.6,996.2,534,992.5,533.4,989.3,536.4,986.6,541.8,986.1,540,986.1,537.6,983.4,535.8,981.3,532.1,981.3,530.3,978.6,527.3,979.2,525.5,978.6,522.5,978.6,518.3,980.2,517,982.9,511,987.1,510.4,988.2,508.6,989.2,509.2,990.3,510.4,997.2,508,999.3,505.6,1002,503.8,1001.4,501.4,1003,500.7,1008.3,501.4,1013.1,498.3,1016.8,491.7,1019.4,489.3,1023.1,488.7,1023.7,491.1,1026.9,494.7,1026.9,497.1,1025.9,499.5,1026.4,501.4,1028,503.2,1032.3,506.2,1035,508.6,1035,510.4,1038.7,513.4,1040.9,516.4,1042.5,520.1,1046.2,521.9,1047.3,524.3]],"b":[978.6,488.7,1047.3,541.8],"cx":1009.9,"cy":516.1},{"g":"Congo","c":null,"r":"MEAF","p":[[1000,534.6,999.4,538.2,997.8,541.2,996.8,545.4,996.3,550.3,996.3,553.9,995.7,556.3,995.2,558.1,994.7,559.9,991.5,562.9,988.8,566,986.6,572,986.6,576.8,985.6,579.2,982.4,581.7,979.2,585.9,977,584.7,976.5,582.9,973.8,582.9,972.2,585.3,970.7,584.7,968.5,582.3,966.9,583.5,964.8,585.9,960.5,579.8,964.8,576.2,962.7,572.6,964.3,570.8,968,570.2,968.5,567.2,971.2,570.2,976,570.8,977.6,567.8,978.1,563.5,977.6,559.3,974.9,555.7,977.6,548.4,976,547.2,972.3,547.8,970.7,544.8,971.2,541.8,977.6,542.4,981.9,543.6,986.1,545.4,986.6,541.8,989.3,536.4,992.5,533.4,996.2,534,1000,534.6]],"b":[960.5,533.4,1000,585.9],"cx":982.1,"cy":560.7},{"g":"Gabon","c":null,"r":"MEAF","p":[[961.6,541.8,964.3,541.8,967.5,542.4,970.7,541.8,970.7,544.8,972.3,547.8,976,547.2,977.6,548.4,974.9,555.7,977.6,559.3,978.1,563.5,977.6,567.8,976,570.8,971.2,570.2,968.5,567.2,968,570.2,964.3,570.8,962.7,572.6,964.8,576.2,960.5,579.8,955.2,573.8,951.5,568.4,948.3,562.3,948.3,560.5,949.3,558.7,950.9,553.9,952,549.7,953.6,549,961.6,549,961.6,541.8]],"b":[948.3,541.8,978.1,579.8],"cx":963.6,"cy":559.6},{"g":"Eq. Guinea","c":null,"r":"MEAF","p":[[952.5,541.8,961.6,541.8,961.6,549,953.6,549,952,549.7,950.9,548.4,952.5,541.8]],"b":[950.9,541.8,961.6,549.7],"cx":956.6,"cy":545.5},{"g":"Zambia","c":null,"r":"MEAF","p":[[1064.7,605.8,1067.3,607.6,1069.4,608.8,1072.6,609.4,1075.8,611.2,1077.9,614.3,1079.4,619.1,1078.3,620.9,1077.1,625.7,1078.1,630.6,1076.4,633,1074.7,638.4,1077.3,640.2,1061.4,645,1061.8,649.3,1057.6,649.9,1054.4,652.3,1053.8,654.7,1052.2,655.3,1047.3,660.1,1044.1,663.8,1042.5,664.4,1041,663.2,1035.2,662.6,1034.1,662.6,1032.1,660.7,1028.4,660.1,1024.2,661.3,1021.1,657.7,1017.5,652.9,1017.7,633.6,1028.8,633.6,1028.3,631.8,1029.4,629.3,1028.4,626.3,1028.9,623.3,1028.4,621.5,1030.5,622.1,1030.5,623.9,1033.2,623.3,1036.3,623.9,1038.4,626.9,1042.6,627.5,1045.9,625.7,1046.9,628.7,1051.1,630,1052.6,632.4,1054.7,635.4,1058.9,636,1058.5,629.3,1056.9,630.6,1053.2,628.1,1052.2,626.9,1052.8,620.9,1054,613.7,1052.4,611.2,1054.1,607,1055.7,606.4,1062.6,605.2,1064.7,605.8]],"b":[1017.5,605.2,1079.4,664.4],"cx":1048.5,"cy":636.4},{"g":"Malawi","c":null,"r":"MEAF","p":[[1075.8,611.2,1080.6,612.4,1081.6,614.3,1083.7,617.3,1085.1,625.1,1083.4,630,1084.8,637.8,1086.4,637.8,1088.5,639.6,1090.5,643.8,1090.8,651.7,1088.1,652.9,1086.4,657.1,1083.3,653.5,1082.9,649.3,1084.1,646.3,1084.1,643.8,1082,642.6,1080.4,643.2,1077.3,640.2,1074.7,638.4,1076.4,633,1078.1,630.6,1077.1,625.7,1078.3,620.9,1079.4,619.1,1077.9,614.3,1075.8,611.2]],"b":[1074.7,611.2,1090.8,657.1],"cx":1082.7,"cy":635.1},{"g":"Mozambique","c":null,"r":"MEAF","p":[[1085.1,625.1,1088.8,624.5,1095.1,626.3,1096.7,625.7,1100.4,625.7,1102.1,623.9,1105.3,623.9,1111.2,621.5,1115.5,617.9,1116.5,620.9,1115.8,626.9,1116.7,631.8,1116.4,641.4,1117.4,644.4,1115.7,648.7,1113.4,652.9,1110.1,656.5,1104.7,658.9,1098.8,662,1092.8,668.6,1090.7,669.2,1086.8,674,1084.7,675.2,1084,679.5,1086.5,684.3,1087.4,687.3,1087.3,689.1,1088.4,689.1,1087.6,695.2,1087,697.6,1088,698.8,1087.4,701.2,1084.7,703.6,1080.4,705.4,1074,709,1071.9,710.9,1072.3,713.3,1073.3,713.9,1072.6,716.9,1069,716.9,1068.6,714.5,1067.7,711.5,1067.8,709.6,1068.6,703,1067.7,698.8,1065.4,690.3,1070.8,683.1,1072.5,678.9,1073.6,678.3,1074.3,674.6,1073.3,672.8,1073.9,668.6,1074.6,664.4,1074.8,656.5,1072.2,654.7,1070.1,654.1,1068.6,652.9,1066.5,651.7,1061.8,651.7,1061.8,649.3,1061.4,645,1077.3,640.2,1080.4,643.2,1082,642.6,1084.1,643.8,1084.1,646.3,1082.9,649.3,1083.3,653.5,1086.4,657.1,1088.1,652.9,1090.8,651.7,1090.5,643.8,1088.5,639.6,1086.4,637.8,1084.8,637.8,1083.4,630,1085.1,625.1]],"b":[1061.4,617.9,1117.4,716.9],"cx":1088.8,"cy":659.6},{"g":"eSwatini","c":null,"r":"MEAF","p":[[1069,716.9,1067.8,719.9,1064.7,720.5,1061.8,716.9,1061.8,715.1,1063.5,712.7,1063.6,710.9,1065.1,710.9,1067.7,711.5,1068.6,714.5,1069,716.9]],"b":[1061.8,710.9,1069,720.5],"cx":1065.5,"cy":715.7},{"g":"Angola","c":null,"r":"MEAF","p":[[970.7,584.7,968.5,585.9,968,587.1,967.5,590.1,966.4,590.7,964.8,585.9,966.9,583.5,968.5,582.3,970.7,584.7],[966.9,592.5,969,591.9,970.6,591.9,972.8,591.3,988.2,591.3,989.8,595.5,991.4,599.2,992.4,601,994.5,604.6,997.7,604,999.9,602.8,1002.5,604,1003.6,602.2,1004.7,599.2,1007.9,598.6,1008.4,597.3,1011.1,597.3,1010.5,599.8,1016.9,599.8,1016.9,603.4,1017.9,605.8,1017.4,609.4,1017.9,613,1019.5,615.5,1019.4,622.7,1020.5,622.1,1022.6,622.1,1026.3,621.5,1028.4,621.5,1028.9,623.3,1028.4,626.3,1029.4,629.3,1028.3,631.8,1028.8,633.6,1017.7,633.6,1017.5,652.9,1021.1,657.7,1024.2,661.3,1014.7,663.8,1002.1,663.2,998.4,660.1,976.8,660.7,973.2,658.3,969.5,657.7,966.3,658.9,963.7,660.1,963.2,656.5,964.2,651.1,965.8,645.6,966.3,642.6,967.9,637.2,969,634.8,972.2,631.2,973.8,628.1,974.3,623.9,974.3,620.3,972.7,618.5,971.1,614.9,970.1,611.2,970.1,610,971.7,607.6,970.1,601.6,969,597.3,966.4,593.7,966.9,592.5]],"b":[963.2,582.3,1029.4,663.8],"cx":994.4,"cy":629.8},{"g":"Burundi","c":null,"r":"MEAF","p":[[1063.9,570.2,1063.9,572.6,1065,573.8,1065.5,576.2,1063.9,577.4,1061.7,580.4,1060.1,582.9,1057.5,582.9,1057.5,575.6,1055.9,572.6,1059.1,573.2,1060.7,569.6,1063.9,570.2]],"b":[1055.9,569.6,1065.5,582.9],"cx":1060.8,"cy":576.1},{"g":"Israel","c":"ISR","r":"MEAF","p":[[1085.2,358.3,1084.4,360.1,1082.8,359.5,1082,363.1,1083.1,363.7,1082.2,364.9,1081.8,366.1,1084.3,365.5,1084.4,367.9,1082.5,377.6,1081.9,375.8,1078.8,367.3,1080.2,365.5,1079.6,364.9,1080.9,361.9,1081.6,357.7,1082,355.8,1084,355.8,1084.5,354.6,1085.5,354.6,1085.6,357.1,1085.2,358.3]],"b":[1078.8,354.6,1085.6,377.6],"cx":1082.3,"cy":365.6},{"g":"Lebanon","c":null,"r":"MEAF","p":[[1085.5,354.6,1084.5,354.6,1084,355.8,1082,355.8,1083.7,351,1085.9,346.8,1087.9,346.8,1089.1,349.2,1086.8,351.6,1085.5,354.6]],"b":[1082,346.8,1089.1,355.8],"cx":1085.5,"cy":351.1},{"g":"Madagascar","c":null,"r":"MEAF","p":[[1163.8,631.2,1165.3,633.6,1166.8,637.8,1167,645,1168.5,647.5,1167.8,650.5,1166.6,652.3,1165.3,648.7,1164.1,650.5,1164.9,655.3,1164.3,657.7,1162.6,658.9,1161.8,664.4,1159.3,671,1156.3,679.5,1152.4,690.9,1149.8,699.4,1147.4,706,1143.1,707.8,1138.2,710.3,1135.3,708.4,1131.2,706.6,1130.4,703.6,1130.1,698.2,1128.3,693.3,1128.5,689.1,1129.3,684.3,1132,683.7,1132.1,681.3,1134.9,677,1135.7,672.8,1134.2,670.4,1133.3,666.2,1133.6,660.7,1135.3,657.7,1136,653.5,1138.7,653.5,1141.9,652.3,1144,651.1,1146.1,651.1,1149.5,647.5,1153.9,643.8,1155.6,640.8,1155.1,638.4,1157.2,639,1160,634.8,1160.7,631.2,1162.4,628.1,1163.8,631.2]],"b":[1128.3,628.1,1168.5,710.3],"cx":1147.1,"cy":672.4},{"g":"Palestine","c":null,"r":"MEAF","p":[[1084.3,365.5,1081.8,366.1,1082.2,364.9,1083.1,363.7,1082,363.1,1082.8,359.5,1084.4,360.1,1084.6,363.7,1084.3,365.5]],"b":[1081.8,359.5,1084.6,366.1],"cx":1083.4,"cy":362.9},{"g":"Gambia","c":null,"r":"MEAF","p":[[813.5,473.6,819.3,473.6,820.4,471.8,822,471.8,824.1,473.6,825.7,473.6,827.8,472.4,828.8,474.2,826.2,475.4,824.1,475.4,822,474.2,819.8,475.4,818.8,475.4,817.7,476.6,812.9,476,813.5,473.6]],"b":[812.9,471.8,828.8,476.6],"cx":820.3,"cy":474.3},{"g":"Tunisia","c":null,"r":"MEAF","p":[[952.3,372.8,950.3,361.9,946.8,359.5,946.8,358.3,942.8,354.6,942.3,349.8,945.4,346.2,947,341.4,946,335.9,947,332.9,952.5,329.9,956,331.1,956,334.1,960,331.7,960.5,332.9,958,335.9,958,339,959.5,340.2,959,345.6,956,348.6,956.5,351.6,959.5,351.6,960.5,354.6,962.5,355.8,962,360.1,959.5,361.9,958,363.7,954.4,366.1,955.4,368.5,954.9,371.5,952.3,372.8]],"b":[942.3,329.9,962.5,372.8],"cx":952.5,"cy":349.4},{"g":"Algeria","c":"DZA","r":"MEAF","p":[[858.4,390.3,858.5,389.1,858.8,381.8,867.2,377,872.4,376.4,877.1,374.6,878.7,371.5,885,369.1,885.7,364.9,888.3,364.3,890.9,361.9,897.5,360.7,898.7,358.3,897.2,357.1,895.9,351,895.5,347.4,893.7,343.2,898.9,340.2,904.4,339,907.5,336.6,912.6,334.7,921.1,333.5,929.1,332.9,931.6,334.1,936.6,331.7,941.6,331.7,943.5,332.9,947,332.9,946,335.9,947,341.4,945.4,346.2,942.3,349.8,942.8,354.6,946.8,358.3,946.8,359.5,950.3,361.9,952.3,372.8,953.8,378.2,954.4,380.6,953.3,386,953.8,388.4,952.8,392.1,953.3,395.7,951.2,398.1,954.3,402.3,954.3,405.4,956.4,408.4,959,407.2,963.1,410.2,965.2,413.8,947.5,425.3,932.2,437.4,924.9,439.8,919.1,440.4,918.6,436.7,916.5,435.5,913.4,434.3,911.9,431.3,894.9,418,877.5,404.8,858.4,390.3]],"b":[858.4,331.7,965.2,440.4],"cx":916.8,"cy":385.8},{"g":"Jordan","c":null,"r":"MEAF","p":[[1084.4,360.1,1085.2,358.3,1091,360.7,1100.6,354,1103.2,361.3,1102.3,362.5,1092.4,365.5,1098,371.5,1096.6,372.8,1095.7,374.6,1091.6,375.2,1090.7,377.6,1088.8,379.4,1083.1,378.2,1082.5,377.6,1084.4,367.9,1084.3,365.5,1084.6,363.7,1084.4,360.1]],"b":[1082.5,354,1103.2,379.4],"cx":1091.4,"cy":367},{"g":"United Arab Emirates","c":"ARE","r":"MEAF","p":[[1171,409.6,1172,409,1172.1,410.8,1176.2,409.6,1180.4,409.6,1183.5,410.2,1186.9,406,1190.2,402.3,1193.4,398.1,1194.6,400.5,1195.6,405.4,1193,405.4,1192.8,409,1193.9,410.2,1191.4,411.4,1191.6,413.8,1190.2,416.2,1190.4,418.6,1189.4,419.8,1173.6,416.8,1171.1,410.8,1171,409.6]],"b":[1171,398.1,1195.6,419.8],"cx":1184.7,"cy":411.5},{"g":"Qatar","c":"QAT","r":"MEAF","p":[[1166.6,406,1165.7,401.7,1167,398.7,1168.5,398.1,1170.2,399.9,1170.6,403.5,1169.8,407.2,1168.2,407.2,1166.6,406]],"b":[1165.7,398.1,1170.6,407.2],"cx":1168.3,"cy":402.8},{"g":"Kuwait","c":"KWT","r":"MEAF","p":[[1149.4,374.6,1150.7,377.6,1150.3,378.8,1152.2,383,1148.7,383.6,1147.4,380.6,1142.7,380,1145.8,374,1149.4,374.6]],"b":[1142.7,374,1152.2,383.6],"cx":1147.7,"cy":378.6},{"g":"Iraq","c":"IRQ","r":"MEAF","p":[[1103.2,361.3,1100.6,354,1111.2,348,1112.4,340.8,1111.4,335.9,1113.7,334.7,1115.8,331.1,1118.2,329.9,1123.7,330.5,1125.9,332.3,1128.3,331.1,1132.2,338.4,1135.9,340.2,1136.9,343.8,1134.7,346.2,1133.6,350.4,1137.8,356.5,1144.2,359.5,1147.3,364.3,1147.2,368.5,1148.8,368.5,1149.1,371.5,1152.6,375.2,1149.4,374.6,1145.8,374,1142.7,380,1132.9,379.4,1117.5,367.3,1109.5,363.1,1103.2,361.3]],"b":[1100.6,329.9,1152.6,380],"cx":1125.9,"cy":356.2},{"g":"Oman","c":null,"r":"MEAF","p":[[1190.4,418.6,1190.2,416.2,1191.6,413.8,1191.4,411.4,1193.9,410.2,1192.8,409,1193,405.4,1195.6,405.4,1198,409.6,1201.3,411.4,1205,412.6,1208.2,413.2,1211.1,416.8,1212.3,418.6,1214.4,419.8,1214.5,421.1,1212.7,424.7,1212.4,426.5,1210.4,428.3,1208.6,432.5,1206,431.9,1205.1,433.7,1204.7,436.7,1205.5,440.4,1205.1,441.6,1202.4,441.6,1199.4,443.4,1199.1,446.4,1198.1,447.6,1194.9,447.6,1192.9,449.4,1193.1,451.8,1190.6,453.7,1187.4,453.1,1184.3,454.9,1181.7,454.9,1179.9,451.2,1175.1,441,1190.5,434.9,1193.3,422.9,1190.4,418.6],[1194.6,400.5,1193.4,398.1,1194.7,396.3,1195.3,396.9,1195,399.3,1194.6,400.5]],"b":[1175.1,396.3,1214.5,454.9],"cx":1195.9,"cy":431.6},{"g":"Vanuatu","c":null,"r":"SEA","p":[[1783.6,651.7,1785.9,655.3,1784.2,655.9,1783.2,653.5,1783.6,651.7],[1781.7,650.5,1781.6,648.7,1781.9,643.8,1784.3,645.6,1784.4,650.5,1782.9,649.9,1781.7,650.5]],"b":[1781.6,643.8,1785.9,655.9],"cx":1783,"cy":647.5},{"g":"Cambodia","c":"KHM","r":"SEA","p":[[1445.1,482,1442.9,474.8,1446.2,470,1452.9,468.7,1457.8,469.4,1462.2,471.8,1464.5,467.5,1469.4,470,1470.9,474.2,1471,481.4,1462.4,485.7,1464.8,489.3,1459.6,489.9,1455,492.3,1450.7,491.7,1448.3,488.1,1445.1,482]],"b":[1442.9,467.5,1471,492.3],"cx":1456.9,"cy":479.1},{"g":"Thailand","c":"THA","r":"SEA","p":[[1457.8,469.4,1452.9,468.7,1446.2,470,1442.9,474.8,1445.1,482,1440.1,479.6,1435.4,479.6,1436,474.8,1431.3,474.8,1431.3,481.4,1429.4,490.5,1428.2,495.3,1428.5,500.1,1432.2,500.1,1434.6,505.6,1435.9,511,1438.7,514,1442,515.2,1444.8,518.3,1443.3,520.7,1440.2,521.3,1439.5,518.3,1435.1,515.8,1434.1,516.4,1431.9,514.6,1430.6,511.6,1427.8,508,1425,505,1424.1,508.6,1422.9,505.6,1423.8,501.4,1425.1,495.9,1426.7,489.3,1429.4,483.8,1426.8,478.4,1426.6,475.4,1425.8,472.4,1421.7,467.5,1420.3,464.5,1421.8,463.3,1423.2,457.9,1420.7,454.3,1417,449.4,1413.7,444.6,1415.7,443.4,1417.5,436.7,1421.1,436.1,1423.4,433.7,1426.4,432.5,1428.7,434.3,1429.7,438,1433.4,438,1432.7,444.6,1433.9,450,1438.7,446.4,1440.4,447.6,1443.5,447,1444.3,445.2,1448.6,445.8,1452.9,450.6,1454.2,456.7,1459,461.5,1459.1,466.9,1457.8,469.4]],"b":[1413.7,432.5,1459.1,521.3],"cx":1434.9,"cy":465.2},{"g":"Laos","c":null,"r":"SEA","p":[[1469.4,470,1464.5,467.5,1462.2,471.8,1457.8,469.4,1459.1,466.9,1459,461.5,1454.2,456.7,1452.9,450.6,1448.6,445.8,1444.3,445.2,1443.5,447,1440.4,447.6,1438.7,446.4,1433.9,450,1432.7,444.6,1433.4,438,1429.7,438,1428.7,434.3,1426.4,432.5,1427.1,430.1,1431.3,426.5,1432,427.7,1434.6,427.7,1433.1,421.1,1435.5,419.8,1439.4,424.7,1442.3,430.1,1448.5,430.1,1451.4,435.5,1448.5,437.4,1447.2,439.2,1454,442.8,1459.1,450,1463.5,455.5,1467.7,459.7,1469.9,463.9,1469.4,470]],"b":[1426.4,419.8,1469.9,471.8],"cx":1447,"cy":444.3},{"g":"Myanmar","c":"MMR","r":"SEA","p":[[1426.4,432.5,1423.4,433.7,1421.1,436.1,1417.5,436.7,1415.7,443.4,1413.7,444.6,1417,449.4,1420.7,454.3,1423.2,457.9,1421.8,463.3,1420.3,464.5,1421.7,467.5,1425.8,472.4,1426.6,475.4,1426.8,478.4,1429.4,483.8,1426.7,489.3,1425.1,495.9,1424.2,491.1,1425.4,486.9,1423,483.2,1423,476.6,1420.6,473.6,1418.4,466.3,1416.5,458.5,1413.8,453.7,1410.4,456.7,1405.1,460.9,1401.9,460.3,1398.6,459.1,1399.3,451.2,1397.6,445.8,1392.6,438.6,1393.4,436.7,1390.1,435.5,1385.8,430.7,1384.7,425.9,1386.9,427.1,1386.4,422.9,1388.7,421.1,1387.9,418.6,1388.7,416.8,1387.8,410.2,1392.1,411.4,1394.1,406.6,1393.6,403.5,1395.8,398.7,1394.6,395.1,1400.4,390.9,1404.3,392.1,1403.6,388.4,1404.9,387.2,1403.9,384.8,1407,384.8,1409.2,388.4,1412.1,389.7,1413,394.5,1414,399.3,1409.8,404.1,1410.3,411.4,1415.9,410.2,1417.8,416.2,1421.1,417.4,1420.2,422.3,1424.7,424.7,1426.9,425.3,1430.4,424.1,1431.3,426.5,1427.1,430.1,1426.4,432.5]],"b":[1384.7,384.8,1431.3,495.9],"cx":1406.8,"cy":428.9},{"g":"Vietnam","c":"VNM","r":"SEA","p":[[1455,492.3,1459.6,489.9,1464.8,489.3,1462.4,485.7,1471,481.4,1470.9,474.2,1469.4,470,1469.9,463.9,1467.7,459.7,1463.5,455.5,1459.1,450,1454,442.8,1447.2,439.2,1448.5,437.4,1451.4,435.5,1448.5,430.1,1442.3,430.1,1439.4,424.7,1435.5,419.8,1437.9,418.6,1442.1,418.6,1447.2,418,1450.8,414.4,1453.8,416.8,1458.7,418,1458.7,421.7,1461.2,424.1,1466.6,425.3,1460.7,430.7,1457.3,436.1,1456.8,440.4,1461.3,447,1467.6,454.9,1472.9,458.5,1476.7,463.3,1479.9,474.8,1480.4,485.1,1476.5,489.3,1470.5,492.9,1466.6,498.3,1460.5,503.8,1458.2,500.1,1459.6,495.9,1455,492.3]],"b":[1435.5,414.4,1480.4,503.8],"cx":1461.5,"cy":455.5},{"g":"North Korea","c":"PRK","r":"EA","p":[[1540.1,300,1541.7,301.2,1539.4,300.6,1538.8,302.9,1538.3,304.7,1540.5,308.9,1538.7,310.1,1538.4,311.3,1537.4,313.1,1535.1,314.3,1533.1,315.5,1534.5,318.5,1534.2,319.1,1536.5,319.7,1540.7,322.7,1540.3,323.9,1538.6,324.5,1535.1,324.5,1534.4,327.5,1531.9,327.5,1532.2,328.1,1529.2,326.9,1529,327.5,1527.7,328.1,1526.7,326.9,1525.7,326.9,1523.7,325.7,1524.2,323.3,1524.7,322.1,1523.9,321.5,1523.8,317.9,1522.8,316.7,1519.6,316.1,1517.1,314.9,1519,310.7,1522.8,307.7,1524,303.5,1526.9,305.3,1531.3,305.3,1529.2,302.3,1535.2,300,1535.2,296.4,1540.1,300]],"b":[1517.1,296.4,1541.7,328.1],"cx":1530.3,"cy":313.6},{"g":"South Korea","c":"KOR","r":"EA","p":[[1532.2,328.1,1531.9,327.5,1534.4,327.5,1535.1,324.5,1538.6,324.5,1540.3,323.9,1540.7,322.7,1547.9,329.9,1551,333.5,1554.2,340.8,1553.5,343.8,1549.5,345,1546.3,347.4,1542,348,1540.4,345,1539.4,340.2,1534.3,334.1,1537.8,332.9,1532.2,328.1]],"b":[1531.9,322.7,1554.2,348],"cx":1543.7,"cy":335.8},{"g":"Mongolia","c":"MNG","r":"EA","p":[[1317.1,259.1,1321.3,257.9,1328.1,253.2,1333.6,250.4,1338.6,252.1,1343.2,252.1,1347.9,255,1352.5,255,1360.2,256.7,1362.4,252.7,1358.7,249.2,1360.7,243.4,1367,245.7,1371.4,246.3,1377.5,247.5,1381,252.1,1388.8,254.4,1392.3,253.2,1397.9,252.7,1402.9,253.2,1409.1,256.2,1413.4,259.1,1417.6,259.1,1424.2,260.3,1427.5,258.5,1433.2,257.9,1437.9,253.8,1441,254.4,1444.3,256.2,1449.6,255.6,1449.8,260.3,1449.7,266.2,1451.9,268.5,1454.1,267.4,1459.4,268.5,1461.9,266.2,1466.9,268.5,1473.5,272.7,1474,274.4,1469.9,273.8,1463.1,274.4,1460.8,276.2,1459.7,280.3,1453.8,282.7,1450.5,285.6,1444.7,284.4,1442,283.8,1440.8,287.4,1443.8,289.8,1445.3,292.2,1442.8,294,1440.8,297,1436,299.4,1428.8,299.4,1422,301.7,1418,304.7,1414.8,302.9,1408.9,302.9,1400.1,299.4,1394.8,298.2,1389,299.4,1378.8,298.2,1373,298.2,1369.2,294.6,1364.8,289.2,1361.4,288,1354.3,284.4,1347.4,283.8,1341.2,282.7,1338.8,280.3,1337.8,273.2,1332.6,268.5,1325.1,266.2,1319.7,263.2,1317.1,259.1]],"b":[1317.1,243.4,1474,304.7],"cx":1394.7,"cy":274},{"g":"India","c":"IND","r":"SEA","p":[[1403.9,384.8,1404.9,387.2,1403.6,388.4,1404.3,392.1,1400.4,390.9,1394.6,395.1,1395.8,398.7,1393.6,403.5,1394.1,406.6,1392.1,411.4,1387.8,410.2,1388.7,416.8,1387.9,418.6,1388.7,421.1,1386.4,422.9,1382,413.2,1380.9,413.2,1380.4,416.8,1377.4,413.8,1378.5,410.2,1380.5,410.2,1382.4,404.8,1379.2,404.1,1374.5,404.1,1369.1,402.9,1367.8,398.7,1365.8,398.7,1361.2,396.3,1359.8,399.9,1364,403.5,1361.2,405.4,1360.5,407.8,1363.8,409.6,1363.2,413.2,1365.9,417.4,1367,422.3,1366.8,424.7,1363.1,424.7,1357,425.9,1357.6,430.7,1355.4,433.7,1348.5,438,1342.9,445.2,1339.6,448.8,1334.8,453.1,1335,455.5,1332.5,457.3,1328,459.1,1325.4,459.7,1324.3,464.5,1325.9,472.4,1326.7,477.2,1324.9,482.6,1325.6,492.9,1322.5,493.5,1320.6,498.3,1322.2,500.1,1317.5,502,1315.5,505.6,1313.5,507.4,1308.5,502,1305.5,493.5,1303,487.5,1301.2,484.4,1298.2,479,1296.2,471.2,1294.9,467.5,1289.5,459.1,1286.4,447.6,1284.1,439.8,1283.5,432.5,1281.8,426.5,1274.9,430.1,1271.2,429.5,1263.7,422.3,1265.5,419.8,1263.8,418,1257.6,412.6,1260.3,408.4,1271.7,408.4,1270.2,403.5,1267.2,400.5,1266,395.7,1262,393.3,1266.8,386.6,1273.1,387.2,1277.3,380.6,1279.5,374.6,1283.4,368.5,1282.6,364.3,1286.5,360.7,1281.8,357.7,1279.1,354,1276,348.6,1278.1,346.2,1286.4,347.4,1291.7,346.2,1295.1,341.4,1302.3,348.6,1302.8,353.4,1305.4,356.5,1306,359.5,1302.4,358.9,1304.8,365.5,1310.6,369.1,1318.7,373.4,1316.1,376.4,1314.9,381.8,1320.5,384.2,1325.6,387.2,1332.8,390.3,1340.2,391.5,1343.8,394.5,1347.5,395.1,1353.9,396.3,1358.6,396.3,1358.7,393.9,1357,390.3,1357,387.2,1359.9,386,1361.2,390.9,1361.5,392.1,1366.5,394.5,1369.9,393.3,1374.2,393.9,1378.3,393.9,1378,389.7,1375.6,387.8,1379.7,387.2,1383.5,383,1388.8,378.8,1393.3,380.6,1396.3,377.6,1399.7,381.8,1398.1,384.2,1403.9,384.8]],"b":[1257.6,341.4,1404.9,507.4],"cx":1316.7,"cy":417.7},{"g":"Bangladesh","c":"BGD","r":"SEA","p":[[1386.4,422.9,1386.9,427.1,1384.7,425.9,1385.8,430.7,1383.9,427.7,1383,424.7,1381.5,421.7,1379,418,1374.3,418,1375.1,420.4,1374,424.1,1371.2,422.9,1370.8,423.5,1369.2,422.9,1367,422.3,1365.9,417.4,1363.2,413.2,1363.8,409.6,1360.5,407.8,1361.2,405.4,1364,403.5,1359.8,399.9,1361.2,396.3,1365.8,398.7,1367.8,398.7,1369.1,402.9,1374.5,404.1,1379.2,404.1,1382.4,404.8,1380.5,410.2,1378.5,410.2,1377.4,413.8,1380.4,416.8,1380.9,413.2,1382,413.2,1386.4,422.9]],"b":[1359.8,396.3,1386.9,430.7],"cx":1372.2,"cy":411.8},{"g":"Bhutan","c":null,"r":"SEA","p":[[1375.6,387.8,1378,389.7,1378.3,393.9,1374.2,393.9,1369.9,393.3,1366.5,394.5,1361.5,392.1,1361.2,390.9,1364.1,386.6,1366.3,384.8,1370.2,386,1373.4,386.6,1375.6,387.8]],"b":[1361.2,384.8,1378.3,394.5],"cx":1369.7,"cy":390.1},{"g":"Nepal","c":null,"r":"SEA","p":[[1357,387.2,1357,390.3,1358.7,393.9,1358.6,396.3,1353.9,396.3,1347.5,395.1,1343.8,394.5,1340.2,391.5,1332.8,390.3,1325.6,387.2,1320.5,384.2,1314.9,381.8,1316.1,376.4,1318.7,373.4,1320.4,372.1,1324.9,374,1330.7,377.6,1334,378.8,1336,381.8,1340.3,383,1344.8,385.4,1351.2,386.6,1357,387.2]],"b":[1314.9,372.1,1358.7,396.3],"cx":1335.8,"cy":385.3},{"g":"Pakistan","c":"PAK","r":"SEA","p":[[1295.1,341.4,1291.7,346.2,1286.4,347.4,1278.1,346.2,1276,348.6,1279.1,354,1281.8,357.7,1286.5,360.7,1282.6,364.3,1283.4,368.5,1279.5,374.6,1277.3,380.6,1273.1,387.2,1266.8,386.6,1262,393.3,1266,395.7,1267.2,400.5,1270.2,403.5,1271.7,408.4,1260.3,408.4,1257.6,412.6,1253.3,411.4,1251.3,406.6,1247.2,402.3,1237.5,403.5,1229.2,403.5,1222,404.1,1223.3,397.5,1230.1,393.9,1229.3,391.5,1227.1,390.3,1225.9,384.8,1221,382.4,1218.5,378.8,1215.6,375.8,1224.2,378.8,1229.2,377.6,1232.4,378.8,1233.2,377,1236.9,377.6,1243.2,375.2,1242.9,370.3,1244.9,366.7,1248.9,366.7,1249.1,364.9,1253.1,364.3,1254.7,364.9,1256.5,363.1,1255.8,359.5,1257.2,355.8,1259.9,354,1257.2,350.4,1262.3,350.4,1263.4,348.6,1262.5,346.2,1264.4,343.2,1263.2,340.2,1261.7,337.8,1263.6,335.3,1268.8,334.1,1274.7,333.5,1276.9,332.3,1279.7,331.7,1283.8,334.1,1286.5,339,1295.1,341.4]],"b":[1215.6,331.7,1295.1,412.6],"cx":1258.4,"cy":375},{"g":"Afghanistan","c":null,"r":"MEAF","p":[[1236,329.9,1239,329.9,1242.9,331.7,1244.5,332.3,1248.1,330.5,1249.7,331.1,1250.7,328.7,1253.7,328.7,1254.5,328.1,1254.5,325.7,1255.9,323.3,1258.7,324.5,1258.6,326.3,1260.2,326.9,1260.8,331.7,1263.4,334.1,1265.1,332.9,1266.9,332.3,1269.7,329.3,1273.3,329.9,1278.3,329.9,1279.7,331.7,1276.9,332.3,1274.7,333.5,1268.8,334.1,1263.6,335.3,1261.7,337.8,1263.2,340.2,1264.4,343.2,1262.5,346.2,1263.4,348.6,1262.3,350.4,1257.2,350.4,1259.9,354,1257.2,355.8,1255.8,359.5,1256.5,363.1,1254.7,364.9,1253.1,364.3,1249.1,364.9,1248.9,366.7,1244.9,366.7,1242.9,370.3,1243.2,375.2,1236.9,377.6,1233.2,377,1232.4,378.8,1229.2,377.6,1224.2,378.8,1215.6,375.8,1219.4,370.3,1218.3,366.1,1214.1,365.5,1213.5,361.3,1210.7,356.5,1212.8,353.4,1210.1,352.2,1210.9,348,1211.7,340.8,1217.1,342.6,1221,342,1221.4,339,1225.3,338.4,1227.4,336.6,1227.5,331.7,1231.7,330.5,1231.7,328.1,1234.5,329.9,1236,329.9]],"b":[1210.1,323.3,1279.7,378.8],"cx":1237.9,"cy":351.4},{"g":"Tajikistan","c":null,"r":"EA","p":[[1242.9,331.7,1244.5,325.1,1242.6,320.9,1238.4,319.7,1239.2,316.7,1243.3,317.3,1244.9,313.7,1245.5,310.1,1251.8,308.3,1251.6,311.3,1252.6,313.1,1254.6,313.1,1253.1,314.9,1247.9,313.7,1248.2,317.3,1253,316.7,1259.8,318.5,1269,317.9,1271.3,323.3,1273.1,322.7,1276.4,323.9,1276.5,326.3,1278.3,329.9,1273.3,329.9,1269.7,329.3,1266.9,332.3,1265.1,332.9,1263.4,334.1,1260.8,331.7,1260.2,326.9,1258.6,326.3,1258.7,324.5,1255.9,323.3,1254.5,325.7,1254.5,328.1,1253.7,328.7,1250.7,328.7,1249.7,331.1,1248.1,330.5,1244.5,332.3,1242.9,331.7]],"b":[1238.4,308.3,1278.3,334.1],"cx":1257,"cy":322.9},{"g":"Kyrgyzstan","c":null,"r":"EA","p":[[1251.2,300.6,1251.5,298.2,1254.2,297.6,1263,299.4,1262.4,295.8,1265,294.6,1272.4,297,1274.2,296.4,1282.4,296.4,1289.4,297,1292.5,299.4,1296.1,300,1295.7,301.7,1288.8,304.7,1288.1,307.1,1281.9,307.7,1281.2,311.9,1276,310.7,1272.9,311.9,1268.8,314.9,1270.1,316.1,1269,317.9,1259.8,318.5,1253,316.7,1248.2,317.3,1247.9,313.7,1253.1,314.9,1254.6,313.1,1258.7,313.7,1263.7,308.9,1257,305.9,1254.1,307.7,1249.5,305.3,1252.8,301.2,1251.2,300.6]],"b":[1247.9,294.6,1296.1,318.5],"cx":1270.1,"cy":305.3},{"g":"Turkmenistan","c":null,"r":"EA","p":[[1162,303.5,1163.6,301.7,1169.2,300.6,1172.9,302.3,1177.2,306.5,1179.6,306.5,1185,306.5,1183.4,303.5,1187.2,301.2,1190.4,297.6,1197.9,301.2,1199.5,305.9,1201.7,307.1,1206.4,306.5,1208.7,307.7,1212.5,313.7,1218.8,317.9,1222.8,320.9,1228.4,323.9,1235.3,326.3,1236,329.9,1234.5,329.9,1231.7,328.1,1231.7,330.5,1227.5,331.7,1227.4,336.6,1225.3,338.4,1221.4,339,1221,342,1217.1,342.6,1211.7,340.8,1210.2,335.3,1206.7,335.3,1199.7,329.9,1195.6,329.3,1189.7,326.3,1186.1,325.7,1184.3,326.9,1180.7,326.3,1177.8,329.9,1173.6,331.1,1171.9,326.9,1171.8,320.3,1167.6,318.5,1168.4,314.3,1165,314.3,1164.9,308.9,1170.2,310.7,1173.6,308.3,1169.5,304.7,1167.4,301.7,1163.8,302.9,1164.2,307.7,1162,303.5]],"b":[1162,297.6,1236,342.6],"cx":1198.4,"cy":319.9},{"g":"Iran","c":"IRN","r":"MEAF","p":[[1152.6,375.2,1149.1,371.5,1148.8,368.5,1147.2,368.5,1147.3,364.3,1144.2,359.5,1137.8,356.5,1133.6,350.4,1134.7,346.2,1136.9,343.8,1135.9,340.2,1132.2,338.4,1128.3,331.1,1124.7,326.3,1125.4,324.5,1123.1,317.9,1126.4,316.1,1127.7,318.5,1130.4,320.9,1133.6,322.1,1135.4,321.5,1140.8,317.3,1142.7,316.7,1144.4,318.5,1142.9,321.5,1146.3,324.5,1147.7,324.5,1149.8,328.7,1154.5,329.9,1158.4,332.9,1166.1,334.1,1173.3,332.3,1173.6,331.1,1177.8,329.9,1180.7,326.3,1184.3,326.9,1186.1,325.7,1189.7,326.3,1195.6,329.3,1199.7,329.9,1206.7,335.3,1210.2,335.3,1211.7,340.8,1210.9,348,1210.1,352.2,1212.8,353.4,1210.7,356.5,1213.5,361.3,1214.1,365.5,1218.3,366.1,1219.4,370.3,1215.6,375.8,1218.5,378.8,1221,382.4,1225.9,384.8,1227.1,390.3,1229.3,391.5,1230.1,393.9,1223.3,397.5,1222,404.1,1211.9,402.3,1206.1,401.1,1200.3,400.5,1197.4,392.7,1194.8,392.1,1190.7,392.7,1185.9,395.7,1179.5,393.9,1173.9,389.1,1168.5,387.2,1165,381.8,1160.1,374,1157.6,374.6,1153.8,372.8,1152.6,375.2]],"b":[1123.1,316.1,1230.1,404.1],"cx":1179.7,"cy":359.6},{"g":"Syria","c":null,"r":"MEAF","p":[[1085.2,358.3,1085.6,357.1,1085.5,354.6,1086.8,351.6,1089.1,349.2,1087.9,346.8,1085.9,346.8,1085,342,1085.7,339.6,1087.1,338.4,1088.5,336.6,1088.2,333.5,1090.3,334.7,1095.6,332.9,1098.2,334.1,1102.2,334.1,1107.9,331.7,1110.4,331.7,1115.8,331.1,1113.7,334.7,1111.4,335.9,1112.4,340.8,1111.2,348,1100.6,354,1091,360.7,1085.2,358.3]],"b":[1085,331.1,1115.8,360.7],"cx":1098.4,"cy":344.4},{"g":"Armenia","c":null,"r":"EU","p":[[1135.4,321.5,1133.6,322.1,1131.1,318.5,1130.9,317.3,1129,317.3,1127.3,316.1,1126.4,316.1,1124.2,314.3,1120.5,312.5,1120.6,310.1,1119.3,307.7,1126,307.1,1127.2,308.3,1129.3,309.5,1128.5,310.7,1131.4,313.1,1130.1,314.9,1132.3,316.7,1134.9,317.3,1135.4,321.5]],"b":[1119.3,307.1,1135.4,322.1],"cx":1127.1,"cy":313.1},{"g":"Sweden","c":"SWE","r":"EU","p":[[960,204.2,962.1,201.4,965.5,197.5,966.7,191,964.2,188.2,963.7,181.2,966.5,175.8,970.6,176.3,971.8,174.1,970.6,172,976.4,164.7,980.1,159,982.7,155.4,986.3,155.4,987.3,152.2,994.7,153.3,994.8,149.7,997.2,149.7,1002.8,152.2,1009.1,155.9,1010.3,163.6,1011.7,165.7,1005,167.3,1001.3,170.9,1002.4,174.1,996.2,178.5,988.2,183.4,985.7,191,988.8,194.8,993.2,197.5,989.7,203.6,985,205.3,983.6,214.9,981.6,219.9,976.3,219.4,973.8,223.9,968.4,223.9,967,218.8,963.5,212.6,960,204.2]],"b":[960,149.7,1011.7,223.9],"cx":982.4,"cy":184.2},{"g":"Belarus","c":null,"r":"EU","p":[[1035.8,219.4,1040.4,221,1041.4,222.2,1043.6,221.6,1048.2,222.7,1049,225.5,1048.3,227.3,1051.4,230.7,1053.4,231.9,1053.1,233,1056.4,234.2,1057.9,235.3,1056.3,237.1,1052.6,236.5,1051.8,237.1,1052.9,239.4,1054.7,242.9,1050.7,243.4,1049.5,244.6,1049.8,247.5,1047.9,246.9,1043.8,246.9,1042.3,245.7,1040.6,246.9,1038.6,245.7,1035.4,245.7,1029.9,244.6,1025.2,244,1022,244,1019.4,245.7,1017.2,245.7,1017,243.4,1015.4,240.5,1018,239.4,1017.9,237.1,1016.3,234.8,1016.1,232.5,1020.2,232.5,1024.9,230.1,1026,227.3,1029.4,225,1028.7,222.7,1031.2,221.6,1035.8,219.4]],"b":[1015.4,219.4,1057.9,247.5],"cx":1036.5,"cy":234.8},{"g":"Ukraine","c":"UKR","r":"EU","p":[[1054.7,242.9,1056.6,242.9,1057.3,241.7,1058.8,242.3,1063.7,241.7,1066.8,244.6,1065.6,245.7,1066.3,247.5,1070.1,248.1,1072.3,250.4,1072.4,251.5,1078.3,253.8,1081.8,252.7,1085.1,255.6,1087.8,255.6,1095,257.3,1095.3,259.1,1093.9,262,1095.3,265.6,1094.7,267.4,1090.5,267.9,1088.4,269.7,1088.3,272.1,1084.6,272.7,1082,274.4,1077.3,275,1073.8,276.8,1074.2,280.3,1073.7,279.7,1072.6,278.5,1071.1,278.5,1067.7,277.4,1066.4,278.5,1065.8,278,1058.1,276.8,1057.9,274.4,1053.2,275,1052.1,278.5,1048.7,282.7,1046.7,281.5,1044.4,282.7,1042,281.5,1043.3,280.9,1044.1,279.1,1044.9,276.8,1045.7,275.6,1046.2,276.2,1049.1,276.8,1050,276.2,1049,275.6,1049.4,274.4,1047.8,273.2,1046.7,270.9,1045.1,269.7,1045,267.9,1042.9,266.2,1041,265.6,1037.1,263.8,1034.4,264.4,1033.1,265.6,1031.2,265.6,1029.9,266.8,1026.6,267.4,1025.3,268.5,1022.8,266.8,1020,266.8,1016.7,266.2,1014.9,267.4,1014.3,265.6,1011.9,264.4,1012.7,262,1014,260.3,1015,260.9,1013.4,257.9,1017.3,253.2,1019.5,252.7,1019.9,250.9,1017.2,245.7,1019.4,245.7,1022,244,1025.2,244,1029.9,244.6,1035.4,245.7,1038.6,245.7,1040.6,246.9,1042.3,245.7,1043.8,246.9,1047.9,246.9,1049.8,247.5,1049.5,244.6,1050.7,243.4,1054.7,242.9]],"b":[1011.9,241.7,1095.3,282.7],"cx":1054.3,"cy":260.2},{"g":"Poland","c":"POL","r":"EU","p":[[1016.1,232.5,1016.3,234.8,1017.9,237.1,1018,239.4,1015.4,240.5,1017,243.4,1017.2,245.7,1019.9,250.9,1019.5,252.7,1017.3,253.2,1013.4,257.9,1015,260.9,1014,260.3,1009.2,257.9,1006,259.1,1003.7,258.5,1000.9,259.7,998.5,257.3,996.7,258.5,994.3,255,990.6,255,990.5,252.7,987.2,252.1,986.3,253.8,984,252.7,983.9,250.9,980.7,250.4,978.4,248.6,976.4,245.2,976.9,242.9,975.4,240,974,237.7,975.4,236.5,973.9,233,977,231.3,984.1,229,989.4,226.7,993.9,227.8,994.5,229.6,998.9,229.6,1004.3,230.1,1012.4,230.1,1014.7,230.7,1016.1,232.5]],"b":[973.9,226.7,1019.9,260.9],"cx":997.8,"cy":242.7},{"g":"Austria","c":null,"r":"EU","p":[[988.1,266.2,987.7,268.5,984.9,268.5,985.9,269.7,984.6,273.2,983.6,274.4,979.4,274.4,977.1,276.2,973.3,275.6,966.6,273.8,965.7,272.1,960.9,273.2,960.5,273.8,957.2,273.2,954.8,273.2,952.9,272.1,953.4,270.9,953.4,269.7,954.8,269.1,957.2,270.9,957.6,269.1,961.9,269.7,965.2,268.5,967.5,268.5,968.9,269.7,969.4,269.1,968.9,265,970.3,264.4,972.1,261.5,975.4,263.2,978.2,260.9,980,260.9,983.3,262.6,985.7,262,988,263.2,987.6,263.8,988.1,266.2]],"b":[952.9,260.9,988.1,276.2],"cx":974.4,"cy":269},{"g":"Hungary","c":null,"r":"EU","p":[[1011.9,264.4,1014.3,265.6,1014.9,267.4,1012.2,268.5,1010,272.7,1007.4,276.8,1003.7,278,1000.8,277.4,997.1,279.1,995.7,279.7,991.3,278.5,988,276.2,986.5,275.6,985.5,273.8,984.6,273.2,985.9,269.7,984.9,268.5,987.7,268.5,988.1,266.2,990.5,267.4,992.4,267.9,996.1,267.4,996.6,266.2,998.4,266.2,1000.7,265,1001.2,265.6,1003.1,265,1004.4,263.2,1005.8,263.2,1011,265,1011.9,264.4]],"b":[984.6,263.2,1014.9,279.7],"cx":999.3,"cy":271.4},{"g":"Moldova","c":null,"r":"EU","p":[[1033.1,265.6,1034.4,264.4,1037.1,263.8,1041,265.6,1042.9,266.2,1045,267.9,1045.1,269.7,1046.7,270.9,1047.8,273.2,1049.4,274.4,1049,275.6,1050,276.2,1049.1,276.8,1046.2,276.2,1045.7,275.6,1044.8,276.2,1044.1,279.1,1043.3,280.9,1042,281.5,1041.3,279.1,1041.5,276.2,1040.8,273.8,1038.1,270.3,1036.1,267.9,1034.5,266.2,1033.1,265.6]],"b":[1033.1,263.8,1050,281.5],"cx":1042,"cy":271.3},{"g":"Romania","c":"ROU","r":"EU","p":[[1042,281.5,1044.4,282.7,1046.7,281.5,1048.7,282.7,1048.9,284.4,1046.6,285.6,1045.1,285,1044.7,292.2,1041.8,291.6,1037.8,289.2,1032.6,291,1030.3,292.2,1023.1,292.2,1019.2,291,1017.3,291.6,1016.2,289.2,1015.2,288,1016,286.8,1015.1,286.2,1013.2,287.4,1010.7,285.6,1010.1,283.3,1007.2,282.1,1006.6,280.3,1003.7,278,1007.4,276.8,1010,272.7,1012.2,268.5,1014.9,267.4,1016.7,266.2,1020,266.8,1022.8,266.8,1025.3,268.5,1026.6,267.4,1029.9,266.8,1031.2,265.6,1033.1,265.6,1034.5,266.2,1036.1,267.9,1038.1,270.3,1040.8,273.8,1041.5,276.2,1041.3,279.1,1042,281.5]],"b":[1003.7,265.6,1048.9,292.2],"cx":1026.3,"cy":279.5},{"g":"Lithuania","c":null,"r":"EU","p":[[1028.7,222.7,1029.4,225,1026,227.3,1024.9,230.1,1020.2,232.5,1016.1,232.5,1014.7,230.7,1012.4,230.1,1011.8,228.4,1012.6,226.7,1010.3,226.1,1005.8,225,1004.6,220.5,1009.3,218.8,1016.8,218.8,1021.1,218.2,1021.7,219.4,1024,219.9,1028.7,222.7]],"b":[1004.6,218.2,1029.4,232.5],"cx":1017.4,"cy":224.6},{"g":"Latvia","c":null,"r":"EU","p":[[1031,212.1,1033.4,213.7,1034.1,216,1035.8,219.4,1031.2,221.6,1028.7,222.7,1024,219.9,1021.7,219.4,1021.1,218.2,1016.8,218.8,1009.3,218.8,1004.6,220.5,1004.3,216,1006.2,212.6,1010,210.4,1013.8,214.9,1017.3,214.9,1017.8,210.4,1021.6,209.3,1023.4,210.4,1027.5,212.1,1031,212.1]],"b":[1004.3,209.3,1035.8,222.7],"cx":1020.7,"cy":215.9},{"g":"Estonia","c":null,"r":"EU","p":[[1032.7,200.8,1033.3,201.9,1030.7,205.3,1032.6,210.4,1031,212.1,1027.5,212.1,1023.4,210.4,1021.6,209.3,1017.8,210.4,1017.9,207,1016.7,207.6,1013.5,205.9,1012.8,202.5,1018.2,200.8,1023.7,200.3,1028.1,201.4,1032.7,200.8]],"b":[1012.8,200.3,1033.3,212.1],"cx":1023.8,"cy":205.6},{"g":"Germany","c":"DEU","r":"EU","p":[[973.9,233,975.4,236.5,974,237.7,975.4,240,976.9,242.9,976.4,245.2,978.4,248.6,976.5,249.2,975.1,248.6,974.3,249.8,970.6,250.9,969.2,252.1,965.5,253.2,966.5,255,967,257.9,969.3,259.1,972.1,261.5,970.3,264.4,968.9,265,969.4,269.1,968.9,269.7,967.5,268.5,965.2,268.5,961.9,269.7,957.6,269.1,957.2,270.9,954.8,269.1,953.4,269.7,948.3,267.9,947.3,269.1,943.5,269.1,944.1,265,946.5,260.9,940,259.7,937.7,257.9,937.8,255.6,936.9,254.4,937.9,250.4,937.2,244,939.9,244,940.9,242.3,942.4,237.1,941.5,234.8,942.5,233.6,946.1,233.6,946.9,234.8,950.1,231.9,949.3,229.6,948.9,226.1,952.4,227.3,955.1,226.1,955.1,228.4,959.6,229.6,959.6,231.9,964.5,230.7,966.7,229,971.7,231.3,973.9,233]],"b":[936.9,226.1,978.4,270.9],"cx":956.7,"cy":248.7},{"g":"Bulgaria","c":null,"r":"EU","p":[[1016.2,289.2,1017.3,291.6,1019.2,291,1023.1,292.2,1030.3,292.2,1032.6,291,1037.8,289.2,1041.8,291.6,1044.7,292.2,1042,294.6,1040.9,298.8,1042.6,302.3,1038.2,301.7,1033.5,303.5,1033.7,306.5,1029.3,307.1,1025.8,304.7,1022,306.5,1018.6,306.5,1017.8,302.3,1015.3,300.6,1015.7,299.4,1015.2,298.8,1016.1,297,1017.9,295.2,1015.4,292.8,1014.8,290.4,1016.2,289.2]],"b":[1014.8,289.2,1044.7,307.1],"cx":1028.7,"cy":297.9},{"g":"Greece","c":"GRC","r":"EU","p":[[1036.8,342.6,1036.4,344.4,1028.9,345,1028.8,343.8,1022.8,342.6,1023.7,340.2,1026.2,342,1030.3,342,1034.3,342,1033.8,343.2,1036.8,342.6],[1018.6,306.5,1022,306.5,1025.8,304.7,1029.3,307.1,1033.7,306.5,1033.5,303.5,1036,304.7,1034.8,308.9,1033.9,309.5,1030.4,308.9,1028,308.9,1022.2,310.1,1025.8,313.7,1023.4,314.3,1020.5,314.3,1017.8,311.3,1016.9,312.5,1018.6,316.1,1021.2,319.1,1019.3,320.3,1021.9,323.3,1024.4,325.1,1024.6,328.1,1020,326.9,1021.7,329.9,1018.7,330.5,1021,335.9,1017.5,335.9,1013.4,333.5,1011.2,328.7,1010,324.5,1007.9,321.5,1005.4,318.5,1005.3,316.7,1007.2,313.7,1007.6,311.9,1009,310.7,1008.9,309.5,1012.3,308.9,1014.2,307.1,1016.7,307.7,1017.6,306.5,1018.6,306.5]],"b":[1005.3,303.5,1036.8,345],"cx":1016.9,"cy":318.4},{"g":"Turkey","c":"TUR","r":"EU","p":[[1128.3,331.1,1125.9,332.3,1123.7,330.5,1118.2,329.9,1115.8,331.1,1110.4,331.7,1107.9,331.7,1102.2,334.1,1098.2,334.1,1095.6,332.9,1090.3,334.7,1088.2,333.5,1088.5,336.6,1087.1,338.4,1085.7,339.6,1084,336.6,1085.7,334.1,1082.8,334.7,1078.2,333.5,1075,337.2,1067.6,337.8,1063.3,334.7,1057.8,334.1,1057,336.6,1053.6,337.8,1048.3,334.1,1042.8,334.1,1039.5,328.1,1035.8,325.1,1038,320.3,1034.9,317.3,1039.9,311.9,1047.2,311.3,1048.9,307.1,1058.2,307.7,1063.7,304.1,1069.4,302.3,1077.6,302.3,1086.4,306.5,1093.5,308.9,1099.2,307.7,1103.7,308.3,1109.2,305.3,1114,304.7,1119.3,307.7,1120.6,310.1,1120.5,312.5,1124.2,314.3,1126.4,316.1,1123.1,317.9,1125.4,324.5,1124.7,326.3,1128.3,331.1],[1033.5,303.5,1038.2,301.7,1042.6,302.3,1043.3,304.7,1047.8,306.5,1047,307.7,1041.1,308.3,1039.3,310.1,1035.6,313.1,1033.5,310.7,1033.9,309.5,1034.8,308.9,1036,304.7,1033.5,303.5]],"b":[1033.5,301.7,1128.3,339.6],"cx":1080.4,"cy":320.5},{"g":"Albania","c":null,"r":"EU","p":[[1008.9,309.5,1009,310.7,1007.6,311.9,1007.2,313.7,1005.3,316.7,1004.3,316.1,1004.3,314.9,1001.2,312.5,1000.6,310.1,1001,305.9,1001.4,304.1,1000.9,302.9,1000.3,301.2,1002.1,298.2,1002.7,299.4,1004.1,298.8,1005.1,300.6,1006.1,301.2,1006.7,302.9,1006.3,305.3,1006.9,307.7,1008.9,309.5]],"b":[1000.3,298.2,1009,316.7],"cx":1004.1,"cy":307.5},{"g":"Croatia","c":null,"r":"EU","p":[[986.5,275.6,988,276.2,991.3,278.5,995.7,279.7,997.1,279.1,998.6,281.5,1000.1,283.3,998.3,285,996.3,283.8,993,283.8,988.6,283.3,986.3,283.3,985.3,284.4,983.9,283.3,982.5,285.6,984.9,288,986.4,290.4,988.4,292.2,990.4,294,992.4,296.4,996.8,298.8,995.9,299.4,991.5,297.6,988.5,295.2,984.1,293.4,980.2,289.2,981.1,288.6,978.7,286.2,978.6,283.8,975.8,283.3,974.4,285.6,972.9,283.8,972.9,281.5,976.2,281.5,977.1,280.9,978.6,281.5,980.5,281.5,980.5,280.3,982.4,279.7,982.8,277.4,986.5,275.6]],"b":[972.9,275.6,1000.1,299.4],"cx":986.6,"cy":284.5},{"g":"Switzerland","c":null,"r":"EU","p":[[953.4,269.7,953.4,270.9,952.9,272.1,954.8,273.2,957.2,273.2,957.2,275.6,954.8,276.8,951.5,276.2,950.5,278.5,948.1,278.5,947.2,277.4,944.8,279.7,942.4,279.7,940.1,278.5,938.7,276.2,936.3,276.8,936.4,274.4,940.2,270.9,939.8,269.7,942.1,270.3,943.5,269.1,947.3,269.1,948.3,267.9,953.4,269.7]],"b":[936.3,267.9,957.2,279.7],"cx":946.4,"cy":274},{"g":"Luxembourg","c":null,"r":"EU","p":[[936.9,254.4,937.8,255.6,937.7,257.9,936.3,258.5,935.4,257.9,935.9,254.4,936.9,254.4]],"b":[935.4,254.4,937.8,258.5],"cx":936.6,"cy":256.5},{"g":"Belgium","c":"BEL","r":"EU","p":[[937.9,250.4,936.9,254.4,935.9,254.4,935.4,257.9,931.3,255,929,255.6,925.9,252.7,923.7,250.4,921.8,250.4,921,248.6,924.7,247.5,927.9,247.5,932.5,246.3,935.2,249.2,937.9,250.4]],"b":[921,246.3,937.9,257.9],"cx":930.6,"cy":251.2},{"g":"Netherlands","c":"NLD","r":"EU","p":[[941.5,234.8,942.4,237.1,940.9,242.3,939.9,244,937.2,244,937.9,250.4,935.2,249.2,932.5,246.3,927.9,247.5,924.7,247.5,927.1,245.7,931.5,237.1,937.9,234.8,941.5,234.8]],"b":[924.7,234.8,942.4,250.4],"cx":935,"cy":241.7},{"g":"Portugal","c":"PRT","r":"EU","p":[[862.7,302.9,864.3,301.7,866.3,300.6,867.5,303.5,870.5,303.5,871,302.9,873.9,302.9,875.1,305.9,872.6,307.7,872.2,312.5,871.6,313.1,870.9,316.1,868.9,316.7,870.6,320.3,868.9,323.9,870.8,325.7,869.6,327.5,868,329.9,867.9,331.7,865.7,333.5,863.3,332.3,860.8,332.9,862.2,328.1,861.9,324.5,859.5,323.9,858.6,322.1,859.5,317.9,861.6,315.5,861.8,313.1,863.1,309.5,863.3,307.1,862.5,305.3,862.7,302.9]],"b":[858.6,300.6,875.1,333.5],"cx":866.2,"cy":316.5},{"g":"Spain","c":"ESP","r":"EU","p":[[867.9,331.7,868,329.9,869.6,327.5,870.8,325.7,868.9,323.9,870.6,320.3,868.9,316.7,870.9,316.1,871.6,313.1,872.2,312.5,872.6,307.7,875.1,305.9,873.9,302.9,871,302.9,870.5,303.5,867.5,303.5,866.3,300.6,864.3,301.7,862.7,302.9,863.1,298.8,861.4,296.4,868.5,292.2,874.2,292.8,881,292.8,886.2,294,890.1,293.4,897.8,294,899.6,296.4,908.2,298.8,910.2,297.6,915.4,300.6,921.2,299.4,921.1,302.9,916.5,307.1,910.1,308.3,909.6,310.1,906.5,313.7,904.3,318.5,906.1,322.1,903,324.5,901.9,328.7,898.3,329.9,894.6,334.1,888.2,334.1,883.2,334.1,880,336.6,877.9,339,875.4,338.4,874.1,335.9,872.8,332.9,867.9,331.7]],"b":[861.4,292.2,921.2,339],"cx":888.3,"cy":312.4},{"g":"Ireland","c":null,"r":"EU","p":[[882.7,232.5,883.2,236.5,879,241.7,870.4,245.2,864.1,244.6,868.6,238.2,867,232.5,873.8,227.8,877.2,225.5,877.8,228.4,876.6,231.3,879.3,231.3,882.7,232.5]],"b":[864.1,225.5,883.2,245.2],"cx":874,"cy":236.6},{"g":"New Caledonia","c":null,"r":"SEA","p":[[1769.2,683.1,1772.5,686.7,1774.3,689.7,1772,690.9,1769.8,689.1,1766.8,686.7,1764,683.1,1761.9,678.9,1761.3,677,1763.9,677,1766,679.5,1768.1,681.3,1769.2,683.1]],"b":[1761.3,677,1774.3,690.9],"cx":1767.6,"cy":684},{"g":"Solomon Is.","c":null,"r":"SEA","p":[[1761.7,619.1,1763.1,620.9,1759.3,620.9,1757.7,617.3,1760.8,618.5,1761.7,619.1],[1760.2,613.7,1759.1,614.9,1755.8,609.4,1755.1,605.8,1756.7,605.8,1758.4,610.6,1760.2,613.7],[1755.8,615.5,1753.7,615.5,1750.6,614.9,1749.1,613.7,1749.8,611.2,1753.4,612.4,1754.9,613.7,1755.8,615.5],[1749.9,604,1751.3,605.8,1751.2,607,1747.2,604.6,1744.7,602.8,1742.8,600.4,1743.9,599.8,1745.9,601.6,1749.9,604],[1737.1,598,1739.1,599.8,1738,600.4,1735.9,599.2,1734,596.7,1734.1,595.5,1737.1,598]],"b":[1734,595.5,1763.1,620.9],"cx":1752.2,"cy":613.6},{"g":"New Zealand","c":"NZL","r":"SEA","p":[[1775,797.7,1770.8,800.7,1765.2,804.9,1759.5,807.2,1760.4,805.5,1758.9,804.9,1764.9,800.1,1766,796.5,1762,794.1,1764,791.7,1768.5,789.9,1772,785.1,1774.2,781.4,1774.8,777.2,1775.5,776,1774.5,773.6,1774.3,768.2,1774,764,1776,764,1777.5,767,1779.9,768.8,1778.1,774.2,1777.9,780.2,1781,776,1781.9,777.8,1779.9,782.7,1782.8,784.5,1785.4,785.1,1789.9,782.7,1792,783.3,1787.6,788.7,1783.8,792.3,1780.3,791.7,1777.7,793.5,1776.3,796.5,1775,797.7],[1724.6,818.6,1731,815,1736.1,812,1741.5,807.8,1744.8,806,1747.5,803.1,1753.1,800.1,1752.3,802.5,1751.5,804.9,1757.2,802.5,1756.4,804.9,1754.2,807.8,1751,810.2,1744.1,815,1739.9,817.4,1739.6,820.4,1735.8,820.4,1730.6,822.2,1726.1,826.3,1718.5,832.2,1712.3,835.2,1709,836.4,1704.7,836.4,1703.3,834.6,1698.6,834,1699,832.2,1705.2,827.5,1715.7,821.6,1719.4,820.4,1724.6,818.6]],"b":[1698.6,764,1792,836.4],"cx":1726.9,"cy":820.8},{"g":"Australia","c":"AUS","r":"SEA","p":[[1628.9,801.9,1631.5,802.5,1627.5,809.6,1624.5,811.4,1621,816.2,1620.7,814.4,1614.7,818.6,1613.8,818.6,1610.8,818,1610.8,813.2,1612.8,809,1612.8,804.3,1614.6,801.3,1617.7,801.9,1621.5,803.7,1624.3,803.1,1628.9,801.9],[1544.6,750.1,1538.5,753.1,1533.3,754.9,1531.3,757.9,1528.9,760.4,1524.4,760.4,1521.1,761,1517,759.8,1513.3,760.4,1509.5,761,1505.5,764,1504,764,1501.1,765.2,1497.7,767.6,1494.4,767,1490.9,767,1487.1,763.4,1484.4,762.2,1485.6,758.6,1488.3,757.9,1489.7,756.7,1490.5,754.3,1492.3,750.1,1493,746.5,1492.4,740.4,1492.5,736.8,1493.2,733.8,1492.2,729.6,1492.6,727.8,1491.1,725.3,1491.2,720.5,1489.8,715.7,1489.3,713.3,1491.3,715.7,1490.5,710.3,1492.7,712.1,1493.7,714.5,1494.4,711.5,1492.9,706.6,1492.7,704.8,1492,703,1493.1,699.4,1494.4,698.2,1495.4,695.2,1495.5,691.5,1498.3,687.3,1498.1,691.5,1500.9,687.3,1505.9,685.5,1508.4,683.1,1513,680.7,1515.7,680.1,1516.6,680.7,1521.1,678.9,1524.4,678.3,1525.7,676.4,1527.3,676.4,1529.9,676.4,1536,674.6,1539.1,671.6,1541.1,668.6,1544.2,665.6,1545.1,663.2,1545.5,660.1,1550.1,654.7,1551.3,660.1,1554.1,658.9,1552.5,655.9,1554.6,652.9,1557,654.1,1558.2,649.9,1561.3,646.9,1563.2,644.4,1565.9,643.2,1566.1,641.4,1568.2,642,1568.3,640.8,1571,640.2,1573.8,639,1577.2,642,1579.9,645.6,1583.1,645.6,1586.2,646.3,1585.6,642.6,1588.8,637.8,1591,636.6,1590.7,634.8,1593.2,631.2,1596.6,629.3,1599.2,630,1604.1,628.7,1604.4,625.7,1600.4,623.9,1603.7,622.7,1606.7,624.5,1609.6,626.9,1613.7,628.1,1615.3,627.5,1618.3,629.3,1621.6,628.1,1623.7,628.1,1624.9,627.5,1627.2,630.6,1625.2,633.6,1622.8,636,1621.2,636,1621.5,638.4,1619.5,641.4,1617,644.4,1617.4,646.3,1621,649.9,1624.9,651.7,1627.2,653.5,1630.2,657.1,1631.8,657.1,1634.1,658.9,1634.9,660.7,1639.3,662.6,1643.3,660.7,1645,657.1,1646.5,654.7,1647.6,651.1,1650.1,646.3,1649.9,643.8,1650.1,642,1650,638.4,1651.7,633.6,1652.4,632.4,1652.1,630.6,1653.5,627.5,1655,623.9,1655.2,622.1,1657.6,620.3,1658.8,623.3,1658.9,626.9,1659.8,627.5,1660.1,630,1661.3,633,1661.4,636.6,1661,639,1662.1,643.2,1666,641.4,1667.3,643.8,1669.6,646.3,1668.7,648.7,1668.7,654.1,1668.7,657.1,1670.1,657.7,1670.7,663.2,1669.6,666.2,1670.4,670.4,1675.6,673.4,1678.7,676.4,1681.3,678.9,1680.5,680.1,1682.7,684.3,1683.4,690.3,1685.8,689.1,1687.2,692.1,1688.5,690.9,1688,697.6,1690.9,701.2,1692.9,703.6,1695.8,708.4,1695.2,713.3,1694.8,716.3,1692.9,720.5,1693.9,725.3,1691.6,730.8,1689.6,733.8,1686.5,739.2,1685.2,742.3,1682.3,746.5,1677.2,752.5,1672.6,754.9,1668.5,759.8,1665.7,762.8,1661.7,768.2,1658.2,771.2,1655,775.4,1651.8,779.6,1651.3,781.4,1647.1,783.9,1641.7,783.9,1636,786.3,1632.3,788.7,1628.1,791.1,1625.3,788.7,1623,787.5,1625,784.5,1621.9,785.7,1615.3,789.9,1611.8,788.1,1609.6,787.5,1606.9,786.9,1602.8,785.1,1601.6,781.4,1602.9,776.6,1603.4,773.6,1602,771.2,1597.3,770.6,1600.2,767.6,1600.9,763.4,1596.7,767.6,1591.6,768.8,1596.2,765.2,1598.1,761.6,1601.3,758.6,1602.4,754.3,1596.3,759.8,1592.6,761.6,1588.7,766.4,1585.6,764,1587,760.4,1585.5,756.1,1583.9,753.7,1585.4,752.5,1580.1,748.9,1576.6,748.9,1572.6,745.9,1563.2,746.5,1556,748.3,1549.5,750.7,1544.6,750.1]],"b":[1484.4,620.3,1695.8,818.6],"cx":1597.4,"cy":709.5},{"g":"Sri Lanka","c":"LKA","r":"SEA","p":[[1336.5,510.4,1335.6,516.4,1333.6,518.3,1328.8,519.5,1326.5,514.6,1325.1,506.2,1326.9,496.5,1330.7,499.5,1333.5,503.8,1336.5,510.4]],"b":[1325.1,496.5,1336.5,519.5],"cx":1330.4,"cy":509.1},{"g":"China","c":"CHN","r":"EA","p":[[1477.5,445.8,1473,444,1471.8,438.6,1474.1,436.1,1479.6,434.3,1482.7,434.3,1484.1,436.7,1482.3,439.2,1481.2,442.8,1477.5,445.8],[1296.1,300,1294.7,297,1297.5,295.2,1290,285,1298.2,282.7,1300.7,281.5,1300.1,270.9,1310.2,272.7,1311.4,269.7,1309.6,263.8,1313.4,263.8,1315.5,259.7,1317.1,259.1,1319.7,263.2,1325.1,266.2,1332.6,268.5,1337.8,273.2,1338.8,280.3,1341.2,282.7,1347.4,283.8,1354.3,284.4,1361.4,288,1364.8,289.2,1369.2,294.6,1373,298.2,1378.8,298.2,1389,299.4,1394.8,298.2,1400.1,299.4,1408.9,302.9,1414.8,302.9,1418,304.7,1422,301.7,1428.8,299.4,1436,299.4,1440.8,297,1442.8,294,1445.3,292.2,1443.8,289.8,1440.8,287.4,1442,283.8,1444.7,284.4,1450.5,285.6,1453.8,282.7,1459.7,280.3,1460.8,276.2,1463.1,274.4,1469.9,273.8,1474,274.4,1473.5,272.7,1466.9,268.5,1461.9,266.2,1459.4,268.5,1454.1,267.4,1451.9,268.5,1449.7,266.2,1449.8,260.3,1449.6,255.6,1456.4,257.9,1460.9,254.4,1459,251.5,1459.3,245.7,1460.1,243.4,1458.2,240.5,1454.7,238.8,1456.4,235.9,1461.5,235.3,1467.4,234.8,1475.3,236.5,1480.6,238.8,1487.8,244.6,1490.8,246.9,1495.5,250.9,1500.9,256.2,1510.2,258.5,1518.3,262.6,1523.4,267.9,1530.5,267.9,1533.2,265.6,1539.6,263.8,1540.6,269.1,1540.2,271.5,1542.9,278,1543.2,283.8,1536.8,282.7,1533.6,284.4,1537.9,289.8,1540.9,297,1538.5,297,1540.1,300,1535.2,296.4,1535.2,300,1529.2,302.3,1531.3,305.3,1526.9,305.3,1524,303.5,1522.8,307.7,1519,310.7,1517.1,314.9,1511,316.7,1508.1,319.1,1503.9,320.9,1505.1,317.9,1503.1,315.5,1505.4,311.9,1500.9,308.9,1497.9,310.7,1494,314.9,1492.5,318.5,1487.9,319.1,1486.6,322.1,1491,325.7,1495.4,326.9,1496.7,329.9,1501.1,331.1,1504.9,326.9,1510.3,329.3,1513.8,329.3,1515.8,332.9,1509.3,334.1,1508.3,337.8,1505,340.8,1504.2,345,1510.2,348,1514.3,354,1519.1,359.5,1524.3,364.3,1526,369.1,1523.3,370.3,1525.6,374,1529.1,375.8,1529.3,380.6,1529.5,385.4,1526.6,386,1524.5,392.1,1522.5,400.5,1519.4,407.8,1513.1,413.2,1506.6,418,1501,418.6,1498.4,421.7,1496,419.8,1493.3,422.3,1486.4,425.3,1481.4,426.5,1480.4,433.1,1477.8,433.1,1475.5,428.9,1476.7,426.5,1469.1,424.7,1466.6,425.3,1461.2,424.1,1458.7,421.7,1458.7,418,1453.8,416.8,1450.8,414.4,1447.2,418,1442.1,418.6,1437.9,418.6,1435.5,419.8,1433.1,421.1,1434.6,427.7,1432,427.7,1431.3,426.5,1430.4,424.1,1426.9,425.3,1424.7,424.7,1420.2,422.3,1421.1,417.4,1417.8,416.2,1415.9,410.2,1410.3,411.4,1409.8,404.1,1414,399.3,1413,394.5,1412.1,389.7,1409.2,388.4,1407,384.8,1403.9,384.8,1398.1,384.2,1399.7,381.8,1396.3,377.6,1393.3,380.6,1388.8,378.8,1383.5,383,1379.7,387.2,1375.6,387.8,1373.4,386.6,1370.2,386,1366.3,384.8,1364.1,386.6,1361.2,390.9,1359.9,386,1357,387.2,1351.2,386.6,1344.8,385.4,1340.3,383,1336,381.8,1334,378.8,1330.7,377.6,1324.9,374,1320.4,372.1,1318.7,373.4,1310.6,369.1,1304.8,365.5,1302.4,358.9,1306,359.5,1305.4,356.5,1302.8,353.4,1302.3,348.6,1295.1,341.4,1286.5,339,1283.8,334.1,1279.7,331.7,1278.3,329.9,1276.5,326.3,1276.4,323.9,1273.1,322.7,1271.3,323.3,1269,317.9,1270.1,316.1,1268.8,314.9,1272.9,311.9,1276,310.7,1281.2,311.9,1281.9,307.7,1288.1,307.1,1288.8,304.7,1295.7,301.7,1296.1,300]],"b":[1268.8,234.8,1543.2,445.8],"cx":1421.1,"cy":336.5},{"g":"Taiwan","c":"TWN","r":"EA","p":[[1535.6,408.4,1534.2,418,1532.5,422.9,1529,418,1527.7,413.2,1529.8,407.8,1533,402.9,1536,404.8,1535.6,408.4]],"b":[1527.7,402.9,1536,422.9],"cx":1532.1,"cy":412.4},{"g":"Italy","c":"ITA","r":"EU","p":[[957.2,273.2,960.5,273.8,960.9,273.2,965.7,272.1,966.6,273.8,973.3,275.6,972.8,278.5,973.8,280.9,970,280.3,966.2,282.1,966.7,285,966.2,286.8,967.7,289.8,972,292.8,974.5,297.6,979.9,302.3,983.8,302.3,985.3,304.1,983.9,305.3,988.3,307.1,991.8,308.9,996.3,311.9,996.8,313.1,995.9,315.5,992.9,312.5,988.9,311.9,987.1,315.5,990.6,317.9,990.1,320.9,987.7,321.5,985.3,326.3,983.3,326.9,983.3,325.1,984.2,321.5,985.2,320.3,983.2,317.3,981.6,314.3,979.6,313.1,978.1,310.7,975.2,309.5,972.7,307.1,969.3,306.5,965.4,304.1,961,300,957.6,297,956.2,291,953.8,290.4,949.9,288,947.5,289.2,944.6,291.6,942.7,292.2,943.7,289.8,940.8,288.6,939.4,284.4,941.4,282.7,940,280.3,940.1,278.5,942.4,279.7,944.8,279.7,947.2,277.4,948.1,278.5,950.5,278.5,951.5,276.2,954.8,276.8,957.2,275.6,957.2,273.2],[978.8,325.7,982.3,325.1,980.9,329.9,981.4,331.7,980.5,334.7,976.4,332.3,973.9,331.7,967,328.7,967.9,325.7,973.4,326.3,978.8,325.7],[948.8,308.9,951.2,307.1,954.1,311.3,953.6,319.1,951.1,319.1,949.1,320.9,947.2,319.1,947.2,311.9,946.3,308.3,948.8,308.9]],"b":[939.4,272.1,996.8,334.7],"cx":966.4,"cy":293.9},{"g":"Denmark","c":null,"r":"EU","p":[[955.1,226.1,952.4,227.3,948.9,226.1,947.1,223.3,947.3,217.7,948.2,216,949.1,214.3,953,213.7,954.8,212.6,958.3,210.9,957.8,213.7,956.9,215.4,957.4,217.1,959.6,217.7,958.7,219.9,957.4,219.4,953.8,223.3,955.1,226.1],[966.2,219.9,967.5,222.7,964.9,227.3,960,223.9,959.6,221.6,966.2,219.9]],"b":[947.1,210.9,967.5,227.3],"cx":952.5,"cy":219.3},{"g":"United Kingdom","c":"GBR","r":"EU","p":[[882.7,232.5,879.3,231.3,876.6,231.3,877.8,228.4,877.2,225.5,881.3,225,885.4,228.4,882.7,232.5],[896.4,235.3,897.6,231.9,894.8,228.4,889.5,227.3,888.4,225.5,890.4,223.3,889.2,221.6,886.3,224.4,886.9,218.8,884.6,216,887,210.4,891,205.9,894.4,205.9,899.6,205.9,894.3,211.5,898.7,210.9,903.5,210.9,902.2,215.4,897.8,220.5,902.1,221,902.5,221.6,905.9,228.4,909,229,911.3,235.9,912.5,238.2,917.8,239.4,917.2,242.9,914.3,244.6,916,247.5,911.7,250.4,905.7,250.4,897.7,252.1,895.5,250.9,892.5,253.8,888.4,253.2,885,255,882.4,253.8,889.8,248.1,894.1,246.9,886.8,245.7,885.7,243.4,890.9,241.7,888.4,238.8,889.7,234.8,896.4,235.3]],"b":[876.6,205.9,917.8,255],"cx":898.8,"cy":233},{"g":"Iceland","c":null,"r":"EU","p":[[858.4,163.1,856.8,166.7,860.4,170.4,854.4,174.1,841.8,177.9,837.8,179,832.6,178.5,821.6,176.3,826.3,174.1,818,171.4,825.6,170.4,826.1,168.8,817.9,167.8,821.4,164.2,827.9,163.6,832.9,167.3,839.8,164.2,844.6,165.7,851.6,163.1,858.4,163.1]],"b":[817.9,163.1,860.4,179],"cx":839.4,"cy":170.7},{"g":"Azerbaijan","c":null,"r":"EU","p":[[1132.2,302.9,1133.7,303.5,1137.7,307.1,1139.7,307.1,1140.5,305.9,1143,303.5,1145.9,306.5,1149.1,310.7,1151.7,311.3,1153.3,312.5,1149.5,313.1,1149.3,317.9,1148.6,320.3,1147.3,321.5,1147.7,324.5,1146.3,324.5,1142.9,321.5,1144.4,318.5,1142.7,316.7,1140.8,317.3,1135.4,321.5,1134.9,317.3,1132.3,316.7,1130.1,314.9,1131.4,313.1,1128.5,310.7,1129.3,309.5,1127.2,308.3,1126,307.1,1126.8,305.9,1131,307.7,1133.4,307.7,1133.8,307.1,1130.9,304.1,1132.2,302.9],[1133.6,322.1,1130.4,320.9,1127.7,318.5,1126.4,316.1,1127.3,316.1,1129,317.3,1130.9,317.3,1131.1,318.5,1133.6,322.1]],"b":[1126,302.9,1153.3,324.5],"cx":1140,"cy":312.6},{"g":"Georgia","c":null,"r":"EU","p":[[1099.9,294,1100.2,292.8,1104.2,294,1111.6,295.2,1118.8,298.2,1119.4,298.8,1122.2,298.2,1127.2,299.4,1129.1,301.7,1132.2,302.9,1130.9,304.1,1133.8,307.1,1133.4,307.7,1131,307.7,1126.8,305.9,1126,307.1,1119.3,307.7,1114,304.7,1109.2,305.3,1109.2,302.3,1107.8,298.8,1104.5,296.4,1101.6,295.8,1099.9,294]],"b":[1099.9,292.8,1133.8,307.7],"cx":1117.7,"cy":301.4},{"g":"Philippines","c":"PHL","r":"SEA","p":[[1541.2,479,1538,474.2,1542.9,474.8,1544.6,476.6,1544.2,482,1541.2,479],[1552.5,495.3,1553.3,493.5,1553.5,489.9,1556.7,489.9,1556,493.5,1559.6,488.1,1559.7,493.5,1557.8,495.9,1556.4,499.5,1555,501.4,1551.5,497.1,1552.5,495.3],[1573.3,505,1574,508.6,1574.3,512.2,1573,517.7,1570.5,511.6,1568.6,514.6,1570.5,519.5,1569,521.9,1562.4,518.3,1560.6,514,1562,511,1558.6,508.6,1557.2,511,1554.5,510.4,1551,514,1549.8,512.2,1551.6,507.4,1554.7,505.6,1557.7,503.2,1559.5,506.2,1563.7,504.4,1564.5,501.4,1568.2,501.4,1567.4,496.5,1571.8,499.5,1572.6,502.6,1573.3,505],[1531,499.5,1524.4,505,1526.8,500.7,1530.3,497.1,1533.1,492.9,1535.1,486.9,1536.7,491.7,1533.4,495.3,1531,499.5],[1544.7,445.8,1544.5,448.2,1546.8,452.4,1546.5,457.3,1543.7,459.7,1543.3,464.5,1544.9,469.4,1548.2,470,1550.2,469.4,1557.4,472.4,1557.3,476,1559,477.2,1558.8,480.2,1554.2,477.2,1551.7,473.6,1550.9,476,1546.8,472.4,1542.2,473.6,1539.4,471.8,1539.7,469.4,1541.1,468.1,1539.3,466.3,1539.1,468.7,1536,465.1,1534.6,462.7,1533.7,456.7,1536.2,459.1,1535.3,449.4,1536,444,1539.2,444,1542.6,445.8,1543.9,444,1544.7,445.8],[1548.4,486.9,1547.5,483.8,1550.9,485.7,1554.1,485.7,1554.3,488.1,1552,491.1,1549,492.9,1548.7,489.9,1548.4,486.9],[1566.4,482,1568.8,489.3,1564.3,487.5,1564.5,489.3,1566.5,492.9,1564.1,494.7,1563.6,490.5,1562,489.9,1560.5,486.3,1563.8,486.9,1563.5,484.4,1559.8,479.6,1564.6,480.2,1566.4,482]],"b":[1524.4,444,1574.3,521.9],"cx":1543,"cy":460.7},{"g":"Malaysia","c":"MYS","r":"SEA","p":[[1434.1,516.4,1435.1,515.8,1439.5,518.3,1440.2,521.3,1443.3,520.7,1444.8,518.3,1446.4,518.9,1449.8,522.5,1452.1,526.1,1452.2,530.3,1451.8,533.4,1452.3,535.2,1452.9,538.8,1455.1,540.6,1456.8,546,1456.9,547.8,1453.2,548.4,1448.3,543.6,1441.8,538.8,1441.2,535.8,1437.9,532.1,1437.2,526.7,1435,523.7,1435.3,519.5,1434.1,516.4],[1529.5,530.9,1524.7,529.7,1518.8,529.7,1516.8,536.4,1514.8,538.8,1512.3,547.2,1508.1,548.4,1503.2,546.6,1500.6,547.2,1497.5,550.3,1494.3,549.7,1490.5,550.9,1486.7,547.8,1486.1,543.6,1489.9,545.4,1494.1,544.2,1495.1,539.4,1497.2,538.2,1503.5,537,1507.1,532.1,1509.7,528.5,1512.4,531.5,1513.5,529.7,1515.6,529.7,1516,525.5,1516.4,523.1,1519.9,518.9,1522.3,514,1524.4,514,1527.2,517,1527.9,519.5,1531.2,521.3,1536.1,523.1,1535.7,525.5,1532,525.5,1533.1,528.5,1529.5,530.9]],"b":[1434.1,514,1536.1,550.9],"cx":1472.2,"cy":528.4},{"g":"Brunei","c":null,"r":"SEA","p":[[1516.4,523.1,1516,525.5,1515.6,529.7,1513.5,529.7,1512.4,531.5,1509.7,528.5,1511.8,526.1,1516.4,523.1]],"b":[1509.7,523.1,1516.4,531.5],"cx":1513.4,"cy":527.5},{"g":"Slovenia","c":null,"r":"EU","p":[[973.3,275.6,977.1,276.2,979.4,274.4,983.6,274.4,984.6,273.2,985.5,273.8,986.5,275.6,982.8,277.4,982.4,279.7,980.5,280.3,980.5,281.5,978.6,281.5,977.1,280.9,976.2,281.5,972.9,281.5,973.8,280.9,972.8,278.5,973.3,275.6]],"b":[972.8,273.2,986.5,281.5],"cx":978.9,"cy":277.7},{"g":"Finland","c":null,"r":"EU","p":[[1028.1,149.7,1027.9,153.3,1034.7,156.9,1031.8,161,1037.1,166.7,1035,171.4,1039.2,175.2,1038.1,178.5,1044.8,182.3,1043.6,185,1040.3,188.2,1032.5,195.3,1024.9,195.8,1017.4,197.5,1010.8,199.1,1007.9,195.8,1003.6,194.2,1004,188.8,1001.9,183.9,1003.3,180.7,1006.8,177.4,1015.6,171.4,1018.3,170.4,1017.6,168.3,1011.7,165.7,1010.3,163.6,1009.1,155.9,1002.8,152.2,997.2,149.7,999.4,148.1,1004.3,151.2,1009.3,150.7,1013.3,152.2,1016.9,149.7,1018.4,146,1023.8,144,1029.1,146,1028.1,149.7]],"b":[997.2,144,1044.8,199.1],"cx":1021.8,"cy":174.5},{"g":"Slovakia","c":null,"r":"EU","p":[[1014,260.3,1012.7,262,1011.9,264.4,1011,265,1005.8,263.2,1004.4,263.2,1003.1,265,1001.2,265.6,1000.7,265,998.4,266.2,996.6,266.2,996.1,267.4,992.4,267.9,990.5,267.4,988.1,266.2,987.6,263.8,988,263.2,988.5,262,990.3,262,992.2,261.5,993.1,260.9,993.5,259.1,994.4,259.1,995.3,257.9,996.7,257.9,998.5,257.3,1000.9,259.7,1003.7,258.5,1006,259.1,1009.2,257.9,1014,260.3]],"b":[987.6,257.3,1014,267.9],"cx":999.9,"cy":262.4},{"g":"Czechia","c":"CZE","r":"EU","p":[[978.4,248.6,980.7,250.4,983.9,250.9,984,252.7,986.3,253.8,987.2,252.1,990.5,252.7,990.6,255,994.3,255,996.7,257.9,995.3,257.9,994.4,259.1,993.5,259.1,993.1,260.9,992.1,260.9,990.3,262,988.5,262,988,263.2,985.7,262,983.3,262.6,980,260.9,978.2,260.9,975.4,263.2,972.1,261.5,969.3,259.1,967,257.9,966.5,255,965.5,253.2,969.2,252.1,970.6,250.9,974.3,249.8,975.1,248.6,976.5,249.2,978.4,248.6]],"b":[965.5,248.6,996.7,263.2],"cx":980.1,"cy":256.3},{"g":"Eritrea","c":null,"r":"MEAF","p":[[1094.2,468.7,1093.6,466.3,1095.9,457.3,1096.3,453.1,1097.8,451.2,1101.5,450.6,1104,447,1107.4,454.3,1109.2,459.7,1112,462.7,1119.5,468.1,1122.3,471.8,1125.6,475.4,1127.2,477.2,1129.9,479,1128.4,480.2,1126.2,480.2,1124.1,477.8,1121.8,474.2,1119.7,472.4,1118,470.6,1113.2,468.1,1109.5,468.1,1108.4,466.9,1105.3,468.1,1102,465.1,1100.6,470,1094.2,468.7]],"b":[1093.6,447,1129.9,480.2],"cx":1105.9,"cy":462.5},{"g":"Japan","c":"JPN","r":"EA","p":[[1605.8,319.1,1604.2,325.1,1607.5,331.7,1607.8,336.6,1610.3,339.6,1609.8,343.8,1604.3,346.2,1595.4,346.8,1590.9,353.4,1586.7,351.6,1584.9,346.8,1576.2,348,1571.8,351,1565.8,351,1572.6,355.8,1572.6,365.5,1570.7,368.5,1567.2,366.1,1566.3,360.7,1562.6,358.9,1559,354.6,1563.4,352.8,1564.6,349.2,1568.3,345.6,1570.3,342,1579.5,340.2,1585.6,341.4,1585.5,330.5,1590.4,333.5,1595,327.5,1596.3,325.1,1596.3,317.9,1591.5,310.7,1591.3,307.1,1596,305.9,1603.4,314.3,1605.8,319.1],[1602.2,290.4,1604.1,288,1609.1,294.6,1603.4,296.4,1602.6,302.3,1592.4,298.2,1593.8,304.7,1588.5,304.7,1584,298.8,1584,294.6,1588.9,294,1585.4,285.6,1583.8,280.9,1593.2,287.4,1598.1,289.2,1602.2,290.4],[1573.7,353.4,1574.9,349.8,1578.4,351,1579.3,348,1583.5,349.8,1585.2,351.6,1583.5,355.2,1580.8,353.4,1578.7,354.6,1578.6,358.3,1574.8,356.5,1573.7,353.4]],"b":[1559,280.9,1610.3,368.5],"cx":1589.7,"cy":338.4},{"g":"Paraguay","c":null,"r":"SA","p":[[597.6,677.6,599.5,680.7,600.5,689.1,605.8,690.3,607.8,689.1,611.6,690.9,612.9,692.7,614,698.2,614.8,700.6,616.9,700.6,618.3,699.4,620.5,700.6,620.9,704.2,620.8,707.8,620.2,710.9,620,716.3,616.1,721.1,612.1,721.7,606.3,721.1,600.8,719.3,604.6,710.3,603.2,707.8,597.6,705.4,590.9,700.6,586.6,700,575.5,689.7,576.8,683.1,576.4,679.5,578.4,674,587.7,672.2,592.4,672.8,597.4,675.8,597.6,677.6]],"b":[575.5,672.2,620.9,721.7],"cx":598.7,"cy":695.9},{"g":"Yemen","c":null,"r":"MEAF","p":[[1175.1,441,1179.9,451.2,1181.7,454.9,1178.1,456.7,1177.2,459.7,1177.3,461.5,1172.2,463.9,1163.9,466.9,1159.3,471.2,1156.7,471.8,1155,471.2,1152.5,473.6,1148.8,474.8,1144.6,475.4,1143,475.4,1142,477.2,1140.4,477.2,1140,479,1137.3,479,1135.8,479.6,1132,479.6,1130.3,476,1130.8,472.4,1129.7,470.6,1128.5,466.3,1126.8,463.9,1127.8,463.3,1127.2,460.9,1127.7,459.7,1127.6,457.3,1129.6,454.9,1128.9,452.4,1130.4,449.4,1132.6,451.2,1134.1,450.6,1139.9,450.6,1141,451.2,1146.3,451.8,1147.8,451.2,1149.5,453.7,1152.1,452.4,1155.4,445.8,1160,443.4,1175.1,441]],"b":[1126.8,441,1181.7,479.6],"cx":1152.6,"cy":459.7},{"g":"Saudi Arabia","c":"SAU","r":"MEAF","p":[[1083.1,378.2,1088.8,379.4,1090.7,377.6,1091.6,375.2,1095.7,374.6,1096.6,372.8,1098,371.5,1092.4,365.5,1102.3,362.5,1103.2,361.3,1109.5,363.1,1117.5,367.3,1132.9,379.4,1142.7,380,1147.4,380.6,1148.7,383.6,1152.2,383,1154.7,388.4,1157.4,389.7,1158.7,392.1,1162.5,394.5,1162.7,396.9,1162.4,399.3,1163.1,401.1,1164.8,402.9,1166,404.8,1166.6,406,1168.2,407.2,1169.8,407.2,1171,409.6,1171.1,410.8,1173.6,416.8,1189.4,419.8,1190.4,418.6,1193.3,422.9,1190.5,434.9,1175.1,441,1160,443.4,1155.4,445.8,1152.1,452.4,1149.5,453.7,1147.8,451.2,1146.3,451.8,1141,451.2,1139.9,450.6,1134.1,450.6,1132.6,451.2,1130.4,449.4,1128.9,452.4,1129.6,454.9,1127.6,457.3,1126.4,454.3,1124.7,452.4,1124.6,450,1121.9,448.2,1118.5,442.8,1116.8,438,1112.9,433.7,1110.8,433.1,1106.8,427.1,1106.1,422.9,1106.5,419.2,1103.1,412.6,1100.4,410.2,1097.7,409,1096,405.4,1095.9,404.1,1094.2,401.1,1092.6,399.9,1090.7,395.1,1086.8,390.3,1084,386,1081.5,386,1082.3,383,1082.2,380.6,1083.1,378.2]],"b":[1081.5,361.3,1193.3,457.3],"cx":1134.3,"cy":410.2},{"g":"N. Cyprus","c":null,"r":"EU","p":[[1069.1,343.8,1069.9,342,1073.9,342,1078.3,340.2,1075,343.2,1075.6,343.8,1074.1,344.4,1073.1,344.4,1072.5,343.2,1071.5,343.2,1070.1,343.8,1069.1,343.8]],"b":[1069.1,340.2,1078.3,344.4],"cx":1073.3,"cy":342.7},{"g":"Cyprus","c":null,"r":"EU","p":[[1069.1,343.8,1070.1,343.8,1071.5,343.2,1072.5,343.2,1073.1,343.8,1074.1,344.4,1075.1,343.8,1075.6,344.4,1070.8,346.8,1068.2,346.2,1067,343.8,1069.1,343.8]],"b":[1067,343.2,1075.6,346.8],"cx":1070.9,"cy":344.9},{"g":"Morocco","c":"MAR","r":"MEAF","p":[[893.7,343.2,895.5,347.4,895.9,351,897.2,357.1,898.7,358.3,897.5,360.7,890.9,361.9,888.3,364.3,885.7,364.9,885,369.1,878.7,371.5,877.1,374.6,872.4,376.4,867.2,377,858.8,381.8,858.5,388.4,857.8,392.1,854.7,392.1,853.1,393.3,850.5,393.3,849,392.7,844.3,393.3,842.5,398.1,841,398.7,838,406,830.5,412.6,828.6,421.1,826.4,423.5,825.2,425.9,813.7,426.5,813.8,423.5,816,421.7,817.7,418.6,817.8,416.8,819.5,412.6,822.8,408.4,824.4,407.8,826.2,404.1,826.3,401.1,828.6,396.9,831.9,395.1,835.8,389.1,838.5,386.6,843.2,386,847.5,381.8,850.2,380,854.5,375.2,854,367.3,856.3,362.5,857,358.9,860.3,355.2,865.5,352.2,869.7,349.8,873.6,343.8,875.3,339.6,878.8,339.6,881.7,342.6,886.7,342,891.7,343.2,893.7,343.2]],"b":[813.7,339.6,898.7,426.5],"cx":860.3,"cy":375.6},{"g":"Egypt","c":"EGY","r":"MEAF","p":[[1095.2,422.9,1074.3,422.9,1053.9,422.9,1033.1,422.9,1032.5,400.5,1031.8,379.4,1030.1,374.6,1031.5,370.3,1030.4,367.9,1032.3,364.9,1038.9,364.9,1044.1,366.7,1048.8,368.5,1051.4,369.1,1055.3,367.3,1057.3,365.5,1061.8,364.9,1065.4,366.1,1067.2,369.1,1068,366.7,1072.2,368.5,1076.3,368.5,1078.8,367.3,1081.9,375.8,1082.5,377.6,1081.1,380,1080.4,384.8,1079.5,387.8,1078,389.1,1076.3,386.6,1073.6,384.2,1069.6,375.2,1069.1,375.8,1071.5,382.4,1074.9,388.4,1079.5,398.1,1081.8,401.1,1083.5,404.8,1088.4,411.4,1087.4,412,1087.6,416.2,1094.1,421.7,1095.2,422.9]],"b":[1030.1,364.9,1095.2,422.9],"cx":1057.3,"cy":395.8},{"g":"Libya","c":null,"r":"MEAF","p":[[1033.1,422.9,1033.3,434.9,1027.1,434.9,1027.1,437.4,1006,425.9,985.5,414.4,980.3,417.4,976.2,419.8,973.5,416.8,965.2,413.8,963.1,410.2,959,407.2,956.4,408.4,954.3,405.4,954.3,402.3,951.2,398.1,953.3,395.7,952.8,392.1,953.8,388.4,953.3,386,954.4,380.6,953.8,378.2,952.3,372.8,954.9,371.5,955.4,368.5,954.4,366.1,958,363.7,959.5,361.9,962,360.1,962.5,355.8,968.6,357.7,970.6,357.1,974.7,358.3,981.3,360.7,983.9,366.1,988.5,367.3,995.7,369.7,1001.4,372.8,1004,371.5,1006.4,368.5,1004.8,363.7,1006.2,361.3,1010.2,358.3,1013.2,357.7,1020.4,358.9,1022,361.3,1024,361.3,1025.6,362.5,1030.7,363.1,1032.3,364.9,1030.4,367.9,1031.5,370.3,1030.1,374.6,1031.8,379.4,1032.5,400.5,1033.1,422.9]],"b":[951.2,355.8,1033.3,437.4],"cx":996,"cy":392.9},{"g":"Ethiopia","c":"ETH","r":"MEAF","p":[[1155.6,507.4,1141.1,525.5,1134.2,525.5,1129.4,529.7,1125.7,530.3,1124.6,532.1,1120.9,532.1,1118.7,529.7,1114,532.7,1112.4,535.2,1108.7,534.6,1107.6,534,1106,534,1104.4,534,1098,529.1,1094.2,529.1,1092.1,526.7,1092.1,523.7,1089.4,522.5,1086.1,515.8,1083.4,514.6,1082.9,512.2,1080.2,509.2,1077,508.6,1078.5,505,1081.2,505,1082.2,503.2,1082.1,497.7,1083.6,491.7,1085.7,489.9,1086.2,487.5,1088.7,482.6,1091.8,479.6,1093.8,473.6,1094.2,468.7,1100.6,470,1102,465.1,1105.3,468.1,1108.4,466.9,1109.5,468.1,1113.2,468.1,1118,470.6,1119.7,472.4,1121.8,474.2,1124.1,477.8,1126.2,480.2,1124.2,482.6,1122.7,485.7,1122.7,486.9,1123.3,488.7,1126,489.3,1127.6,488.7,1128.7,489.9,1127.6,491.7,1129.4,495.3,1131.5,498.3,1133.7,500.1,1150.8,507.4,1155.6,507.4]],"b":[1077,465.1,1155.6,535.2],"cx":1111.7,"cy":503.5},{"g":"Djibouti","c":null,"r":"MEAF","p":[[1126.2,480.2,1128.4,480.2,1129.9,479,1131,480.8,1131.1,483.2,1128,485.1,1130.1,486.3,1128.7,489.9,1127.6,488.7,1126,489.3,1123.3,488.7,1122.7,486.9,1122.7,485.7,1124.2,482.6,1126.2,480.2]],"b":[1122.7,479,1131.1,489.9],"cx":1126.9,"cy":484.6},{"g":"Somaliland","c":null,"r":"MEAF","p":[[1160.9,486.9,1161,489.3,1161.2,495.3,1161.3,498.3,1159.2,502.6,1155.6,507.4,1150.8,507.4,1133.7,500.1,1131.5,498.3,1129.4,495.3,1127.6,491.7,1128.7,489.9,1130.1,486.3,1132.3,487.5,1133.4,489.9,1135.6,492.9,1138.3,492.9,1143.5,491.1,1148.8,490.5,1153.5,488.7,1156.2,488.1,1158.2,486.9,1160.9,486.9]],"b":[1127.6,486.3,1161.3,507.4],"cx":1147,"cy":496.8},{"g":"Uganda","c":null,"r":"MEAF","p":[[1082.1,561.7,1071.4,561.7,1065.6,561.7,1063.4,562.3,1060.2,564.1,1059.2,563.5,1059.2,559.3,1060.3,556.9,1060.8,552.1,1061.8,549,1064,546,1066.1,544.8,1067.7,542.4,1065.5,541.8,1065.5,534.6,1067.6,532.7,1071.4,534,1075.6,532.7,1079.3,532.7,1082.5,529.7,1085.2,534,1085.8,537,1087.9,544.2,1086.4,548.4,1083.7,552.7,1082.1,555.1,1082.1,561.7]],"b":[1059.2,529.7,1087.9,564.1],"cx":1074,"cy":547.7},{"g":"Rwanda","c":null,"r":"MEAF","p":[[1063.4,562.3,1065.5,566,1065.5,569.6,1063.9,570.2,1060.7,569.6,1059.1,573.2,1055.9,572.6,1056.5,569.6,1057.5,569,1057.6,565.3,1059.2,563.5,1060.2,564.1,1063.4,562.3]],"b":[1055.9,562.3,1065.5,573.2],"cx":1060.9,"cy":567.7},{"g":"Bosnia and Herz.","c":null,"r":"EU","p":[[996.8,298.8,992.4,296.4,990.4,294,988.4,292.2,986.4,290.4,984.9,288,982.5,285.6,983.9,283.3,985.3,284.4,986.3,283.3,988.6,283.3,993,283.8,996.3,283.8,998.3,285,1000.2,285,998.8,288,1001.3,290.4,1001,292.8,999.5,293.4,998.6,294,997.2,295.2,996.8,298.8]],"b":[982.5,283.3,1001.3,298.8],"cx":992.8,"cy":289.4},{"g":"Macedonia","c":null,"r":"EU","p":[[1015.3,300.6,1017.8,302.3,1018.6,306.5,1017.6,306.5,1016.7,307.7,1014.2,307.1,1012.3,308.9,1008.9,309.5,1006.9,307.7,1006.3,305.3,1006.7,302.9,1007.2,303.5,1007.6,301.7,1010.5,301.2,1011.5,301.2,1012.9,300.6,1015.3,300.6]],"b":[1006.3,300.6,1018.6,309.5],"cx":1012.2,"cy":304.8},{"g":"Serbia","c":null,"r":"EU","p":[[997.1,279.1,1000.8,277.4,1003.7,278,1006.6,280.3,1007.2,282.1,1010.1,283.3,1010.7,285.6,1013.2,287.4,1015.1,286.2,1016,286.8,1015.2,288,1016.2,289.2,1014.8,290.4,1015.4,292.8,1017.9,295.2,1016.1,297,1015.2,298.8,1015.7,299.4,1015.3,300.6,1012.9,300.6,1011.5,301.2,1011,300.6,1011.9,300,1012.3,298.2,1011.3,298.2,1010.3,297,1008.8,295.8,1007.3,294.6,1006.4,295.2,1005.9,297,1005,297.6,1003.5,295.8,1001.5,295.2,1001,294,999.5,293.4,1001,292.8,1001.3,290.4,998.8,288,1000.2,285,998.3,285,1000.1,283.3,998.6,281.5,997.1,279.1]],"b":[997.1,277.4,1017.9,301.2],"cx":1007.2,"cy":289.1},{"g":"Montenegro","c":null,"r":"EU","p":[[1004.1,298.8,1002.7,299.4,1002.1,298.2,1000.3,301.2,1000.9,302.9,999.9,302.3,998.3,300.6,995.9,299.4,996.8,298.8,997.2,295.2,998.6,294,999.5,293.4,1001,294,1001.5,295.2,1003.5,295.8,1005,297,1004.1,298.8]],"b":[995.9,293.4,1005,302.9],"cx":1000.1,"cy":297.6},{"g":"Kosovo","c":null,"r":"EU","p":[[1006.7,302.9,1006.1,301.2,1005.1,300.6,1004.1,298.8,1005,297.6,1005.9,297,1006.4,295.2,1007.3,294.6,1008.3,295.8,1009.8,297,1011.3,298.2,1012.3,298.2,1011.9,300,1011,300.6,1011.5,301.2,1010.5,301.2,1007.6,301.7,1007.2,303.5,1006.7,302.9]],"b":[1004.1,294.6,1012.3,303.5],"cx":1008,"cy":298.9},{"g":"Trinidad and Tobago","c":null,"r":"NA","p":[[574.4,490.5,577.6,489.9,578.7,489.9,578.3,494.7,573.5,495.3,572.5,494.7,574.2,492.9,574.4,490.5]],"b":[572.5,489.9,578.7,495.3],"cx":576.1,"cy":492.7},{"g":"S. Sudan","c":null,"r":"MEAF","p":[[1065.5,534.6,1061.2,530.3,1059.6,527.9,1056.9,529.1,1054.3,528.5,1052.7,529.7,1050.6,529.1,1047.3,524.3,1046.2,521.9,1042.5,520.1,1040.9,516.4,1038.7,513.4,1035,510.4,1035,508.6,1032.3,506.2,1028.5,503.8,1030.1,503.2,1031.7,502,1033.3,496.5,1034.8,493.5,1038.5,492.9,1039.6,494.7,1042.3,497.7,1043.9,498.3,1045.5,497.7,1049.2,497.7,1050.3,498.9,1055.6,498.9,1055.6,497.7,1058.2,496.5,1058.7,494.7,1060.8,493.5,1065.1,497.1,1068.3,496.5,1070.9,492.3,1073.5,488.7,1072.9,485.1,1071.8,483.2,1075,483.2,1074.9,482,1077.6,482,1077.1,486.9,1077.8,491.1,1080.5,493.5,1081,495.3,1081.1,498.3,1082.1,498.3,1082.2,503.2,1081.2,505,1078.5,505,1077,508.6,1080.2,509.2,1082.9,512.2,1083.4,514.6,1086.1,515.8,1089.4,522.5,1085.7,526.7,1082.5,529.7,1079.3,532.7,1075.6,532.7,1071.4,534,1067.6,532.7,1065.5,534.6]],"b":[1028.5,482,1089.4,534.6],"cx":1062,"cy":511.6}];         // [{g:geo name, c:country id|null, r:region, p:[[x,y,…] rings in world px], b:[x0,y0,x1,y1], cx, cy}]
+const {S, Kit, RMETA, CITIES, clamp, COUNTRY, SHORT} = P;
+const M = MAPMETA.meta, GRID = MAPMETA.grid;
+const MAP_TOP = 84;                        // world y of the map's top edge (px)
+const ZMIN = 0.8, ZMAX = 3.4, ZCOUNTRY = 1.3;
+const ROB = [[1.0000,0.0000],[0.9986,0.0620],[0.9954,0.1240],[0.9900,0.1860],[0.9822,0.2480],[0.9730,0.3100],[0.9600,0.3720],[0.9427,0.4340],[0.9216,0.4958],[0.8962,0.5571],[0.8679,0.6176],[0.8350,0.6769],[0.7986,0.7346],[0.7597,0.7903],[0.7186,0.8435],[0.6732,0.8936],[0.6213,0.9394],[0.5722,0.9761],[0.5322,1.0000]];
+/* lat/lon → world px */
+function toWorld(lat, lon){
+  let l = lon - M.LON0; while (l < -180) l += 360; while (l > 180) l -= 360;
+  const a = Math.min(90, Math.abs(lat)) / 5, i = Math.min(17, Math.floor(a)), f = a - i;
+  const X = ROB[i][0] + (ROB[i+1][0] - ROB[i][0]) * f, Y = ROB[i][1] + (ROB[i+1][1] - ROB[i][1]) * f;
+  return [(0.8487 * X * l * Math.PI / 180 + M.XR) * M.U / M.SS, MAP_TOP + (M.YT - 1.3523 * Y * Math.sign(lat)) * M.U / M.SS];
+}
+/* decode the region hit grid (RLE: digit + base36 count, '.' separated) */
+const grid = new Uint8Array(GRID.w * GRID.h);
+(() => { let p = 0; for (const run of GRID.rle.split(".")){ const v = +run[0], n = parseInt(run.slice(1), 36); grid.fill(v, p, p + n); p += n; } })();
+const RIDX = ["", "NA", "EU", "EA", "SA", "MEAF", "SEA"];
+function regionAtWorld(x, y){
+  const gx = Math.floor(x / GRID.cell), gy = Math.floor((y - MAP_TOP) / GRID.cell);
+  if (gx < 0 || gy < 0 || gx >= GRID.w || gy >= GRID.h) return null;
+  for (const [dx, dy] of [[0,0],[1,0],[-1,0],[0,1],[0,-1],[2,0],[-2,0],[0,2],[0,-2]]){
+    const xx = gx + dx, yy = gy + dy; if (xx < 0 || yy < 0 || xx >= GRID.w || yy >= GRID.h) continue;
+    const v = grid[yy * GRID.w + xx]; if (v) return RIDX[v];
+  }
+  return null;
+}
+/* point in polygon (even-odd over all rings) */
+function inRings(rings, x, y){
+  let inside = false;
+  for (const p of rings){ for (let i = 0, j = p.length - 2; i < p.length; j = i, i += 2){ const xi = p[i], yi = p[i + 1], xj = p[j], yj = p[j + 1]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) inside = !inside; } }
+  return inside;
+}
+/* world px → {geo entry} (exact polygon; small islands get a few px of slack) */
+function geoAtWorld(x, y){
+  for (const g of CGEO) if (x >= g.b[0] && x <= g.b[2] && y >= g.b[1] && y <= g.b[3] && inRings(g.p, x, y)) return g;
+  for (const [dx, dy] of [[4,0],[-4,0],[0,4],[0,-4]]) for (const g of CGEO) if (x + dx >= g.b[0] && x + dx <= g.b[2] && y + dy >= g.b[1] && y + dy <= g.b[3] && inRings(g.p, x + dx, y + dy)) return g;
+  return null;
+}
+const GEO_OF = {}; for (const g of CGEO) if (g.c) GEO_OF[g.c] = g;
+/* where to put a country's label / bubble / hazard marker (world px) */
+function countryPoint(id){
+  if (!id) return null;
+  if (id.startsWith("R_")){ const [lat, lon] = RMETA[id.slice(2)].lab; return toWorld(lat, lon); }
+  const g = GEO_OF[id]; return g ? [g.cx, g.cy] : null;
+}
+/* ---- colours ---- */
+const HEAT = [[31,158,120],[217,166,43],[208,97,47],[224,48,42]];
+const HEAT_PAINT = [[134,201,170],[236,211,140],[233,160,128],[226,120,120]];
+const HEAT_NIGHT = [[22,96,82],[128,104,40],[128,64,36],[140,36,34]];
+function regionHeatValue(r){ return clamp(0.55 * (r.co2 / r.co2_0) + 0.35 * (r.vuln / 100) + (S.temp - 1.2) * 0.35 - 0.2, 0, 1); }
+function heatRGB(v, pal = HEAT){ const x = clamp(v, 0, 0.999) * (pal.length - 1), i = Math.floor(x), f = x - i, a = pal[i], b = pal[i + 1]; return [0,1,2].map(k => Math.round(a[k] + (b[k] - a[k]) * f)); }
+const theme = () => { try { const v = localStorage.getItem("p2050-theme") || ""; return P.Net && v && P.Net.owns("theme_" + v) ? v : ""; } catch(e) { return ""; } };
+const CITY_TOT = Object.fromEntries(Object.entries(CITIES).map(([k, l]) => [k, l.reduce((s, c) => s + c[2], 0)]));
+const W = 1920, Hh = 1080;
+const Map = {
+  scene:null, mode:"game", cam:{x:960, y:540, z:1}, target:null, regions:{}, lines:{}, plumes:[], bubbles:{}, drag:null, floats:[], fx:[], pinch:null, lastTap:0,
+  init(scene, mode){
+    this.scene = scene; this.mode = mode; this.regions = {}; this.lines = {}; this.plumes = []; this.bubbles = {}; this.floats = []; this.fx = []; this.drag = null; this.pinch = null;
+    const vs = (o, n) => o.getVariables().get(n);
+    for (const o of scene.getObjects("Region") || []) this.regions[vs(o, "Reg").getAsString()] = o;
+    for (const o of scene.getObjects("RegionLine") || []) this.lines[vs(o, "Reg").getAsString()] = o;
+    for (const o of scene.getObjects("Plume") || []){ o.setBlendMode(1); this.plumes.push(o); }
+    this.ocean = (scene.getObjects("Ocean") || [])[0]; this.rim = (scene.getObjects("MapRim") || [])[0]; this.ice = (scene.getObjects("ArcticIce") || [])[0];
+    if (this.rim) this.rim.setBlendMode(1);
+    if (this.ice){ this.iceW = this.ice.getWidth(); this.iceH = this.ice.getHeight(); }
+    this.borders = null; this.selPaint = null; this._selKey = null;
+    if (mode === "game") this.makePainters();
+    if (mode === "menu") this.cam = {x:690, y:500, z:0.66};
+    else this.cam = {x:960, y:516, z:1};
+    this.target = null; this.applyCam(); this.refresh();
+  },
+  /* country borders: drawn once in world coordinates on the map layer, faded in when zoomed */
+  makePainters(){
+    const mk = z => { const o = this.scene.createObject("UIPainter"); o.setLayer(""); o.setZOrder(z); o.setPosition(0, 0); if (o.setClearBetweenFrames) o.setClearBetweenFrames(false); return o; };
+    this.borders = mk(25); this.selPaint = mk(26);
+    const g = this.borders.getRendererObject(); g.clear();
+    g.lineStyle({width:0.9, color:0x04100c, alpha:.75, join:"round"});
+    for (const c of CGEO) for (const p of c.p){ g.moveTo(p[0], p[1]); for (let i = 2; i < p.length; i += 2) g.lineTo(p[i], p[i + 1]); g.closePath(); }
+    g.lineStyle(0);
+    g.alpha = 0;
+  },
+  drawSelected(){
+    if (!this.selPaint) return;
+    const key = (S.selC || "") + "|" + (this.cam.z >= ZCOUNTRY ? 1 : 0);
+    if (key === this._selKey) return; this._selKey = key;
+    const g = this.selPaint.getRendererObject(); g.clear();
+    const id = S.selC; if (!id) return;
+    const list = id.startsWith("R_") ? CGEO.filter(x => !x.c && x.r === id.slice(2)) : [GEO_OF[id]].filter(Boolean);
+    for (const c of list){
+      g.lineStyle({width:2.2, color:0xe6fffb, alpha:.95, join:"round"}); g.beginFill(0x4fd1c5, .28);
+      for (const p of c.p){ g.moveTo(p[0], p[1]); for (let i = 2; i < p.length; i += 2) g.lineTo(p[i], p[i + 1]); g.closePath(); }
+      g.endFill();
+    }
+    g.lineStyle(0);
+  },
+  layer(){ return this.scene.getLayer(""); },
+  applyCam(){ const l = this.layer(); l.setCameraX(this.cam.x); l.setCameraY(this.cam.y); l.setCameraZoom(this.cam.z); },
+  /* world px → screen design units (for labels drawn on the MapUI layer) */
+  toScreen(x, y){ return [((x - this.cam.x) * this.cam.z + W / 2) / Kit.K, ((y - this.cam.y) * this.cam.z + Hh / 2) / Kit.K]; },
+  toWorldFromScreen(dx, dy){ return [(dx * Kit.K - W / 2) / this.cam.z + this.cam.x, (dy * Kit.K - Hh / 2) / this.cam.z + this.cam.y]; },
+  latlonScreen(lat, lon){ const [x, y] = toWorld(lat, lon); return this.toScreen(x, y); },
+  clampCam(){
+    const z = this.cam.z, halfW = W / 2 / z, halfH = Hh / 2 / z;
+    this.cam.x = clamp(this.cam.x, Math.min(960, 0 + halfW - 500 / z), Math.max(960, 1920 - halfW + 500 / z));
+    this.cam.y = clamp(this.cam.y, Math.min(516, MAP_TOP + halfH - 300 / z), Math.max(516, MAP_TOP + 807 - halfH + 300 / z));
+  },
+  freeCx(){ const dw = P.Screens ? P.Screens.drawerWidth() : 0; return (1264 - dw - 16) / 2 * Kit.K; },
+  /* move the camera so a world point is centred in the part of the screen the drawer doesn't cover */
+  lookAt(x, y, z){ this.target = {x: x - (this.freeCx() - W / 2) / z, y: y + 20 / z, z}; },
+  focus(reg, zoomIn){
+    if (this.mode !== "game" || !RMETA[reg]) return;
+    const [lat, lon] = RMETA[reg].lab; const [x, y] = toWorld(lat, lon);
+    const z = zoomIn ? Math.max(this.cam.z, 1.6) : this.cam.z;
+    if (z > 1.05) this.lookAt(x, y, z); else this.target = {x: x - (this.freeCx() - W / 2) / z, y:516, z};
+  },
+  focusCountry(id){ const pt = countryPoint(id); if (!pt || this.mode !== "game") return; this.lookAt(pt[0], pt[1], Math.max(this.cam.z, id.startsWith("R_") ? 1.6 : 2.0)); },
+  /* drawer closed: slide back to the whole-world view (when not zoomed in) */
+  recenter(){ if (this.mode === "game" && this.cam.z <= 1.05) this.target = {x:960, y:516, z:1}; },
+  resetView(){ if (this.mode === "game"){ this.target = {x:960, y:516, z:1}; Kit.dirty(); } },
+  zoomBy(f){ if (this.mode !== "game") return; const z0 = this.target ? this.target.z : this.cam.z, z1 = clamp(z0 * f, ZMIN, ZMAX); const cx = this.target ? this.target.x : this.cam.x, cy = this.target ? this.target.y : this.cam.y; this.target = {x:cx, y:cy, z:z1}; },
+  refresh(){
+    if (!this.scene || !S.regions) return;
+    const sel = this.mode === "game" ? S.sel : null, th = theme();
+    const pal = th === "paint" ? HEAT_PAINT : th === "night" ? HEAT_NIGHT : HEAT;
+    for (const r of S.regions){
+      const o = this.regions[r.id]; if (!o) continue;
+      let c = heatRGB(regionHeatValue(r), pal); if (sel === r.id) c = c.map(v => Math.min(255, v + 35));
+      o.setColor(c.join(";"));
+      const ln = this.lines[r.id]; if (ln) ln.hide(sel !== r.id || this.cam.z >= ZCOUNTRY);
+    }
+    const T = S.temp || 1.2, warm = clamp((T - 1.2) / 1.6, 0, 1);
+    let oc = [10 + warm * 26, 52 - warm * 10, 80 - warm * 24].map(v => v * 1.45);
+    if (th === "night") oc = oc.map(v => v * .45); else if (th === "paint") oc = [150, 196, 214];
+    if (this.ocean) this.ocean.setColor(oc.map(v => Math.round(Math.min(255, v))).join(";"));
+    const aw = clamp((T - 1.2) / 1.4, 0, 1);
+    if (this.rim) this.rim.setColor([0.37 + aw * 0.6, 0.72 - aw * 0.35, 1 - aw * 0.8].map(v => Math.round(clamp(v, 0, 1) * 255)).join(";"));
+    if (this.ice){
+      const iceLat = clamp(70 + (T - 1.2) * 9, 70, 88);
+      const yEdge = toWorld(iceLat - 4, 0)[1] - MAP_TOP, f = clamp(yEdge / this.iceH, 0, 1);
+      this.ice.setHeight(Math.max(1, this.iceH * f)); this.ice.hide(f <= 0.01);
+    }
+    for (const p of this.plumes){
+      const v = p.getVariables(), reg = v.get("Reg").getAsString(), w = v.get("W").getAsNumber();
+      const r = S.regions.find(q => q.id === reg); if (!r) continue;
+      const amt = r.co2 * w / CITY_TOT[reg];
+      const size = amt <= 0.02 ? 0 : (0.035 + Math.sqrt(amt) * 0.075) * 300;   // px
+      v.get("Base").setNumber(size / 96);
+      const g = clamp(0.55 - r.co2 / r.co2_0 * 0.35, 0.15, 0.7);
+      p.setColor(th === "night" ? `255;${Math.round(200 + g * 50)};120` : `255;${Math.round(g * 255)};38`);
+    }
+    this.syncBubbles(); this._selKey = null; this.drawSelected();
+  },
+  bubblePoint(b){
+    if (b.cid){ const pt = countryPoint(b.cid); if (pt) return pt; }
+    return toWorld(b.lat, b.lon);
+  },
+  syncBubbles(){
+    if (this.mode !== "game") return;
+    const live = new Set();
+    for (const b of S.bubbles || []){
+      live.add(b.id);
+      let o = this.bubbles[b.id];
+      if (!o){
+        o = this.scene.createObject("Bubble"); o.setLayer(""); o.setZOrder(50);
+        o.setAnimationName(b.type); o.setScale(0.5);
+        const [x, y] = this.bubblePoint(b); o.setPosition(x, y);
+        const v = o.getVariables(); v.get("Id").setNumber(b.id); v.get("BaseY").setNumber(y); v.get("Phase").setNumber(Math.random() * 6.28);
+        this.bubbles[b.id] = o;
+      }
+    }
+    for (const id in this.bubbles) if (!live.has(+id)){ this.bubbles[id].deleteFromScene(this.scene); delete this.bubbles[id]; }
+  },
+  /* tap on a bubble (called from the scene events with the picked Bubble) */
+  popBubbleObject(o){
+    if (this.pinch || Kit.mouse.moved > 8) return false;
+    const id = o.getVariables().get("Id").getAsNumber();
+    const [sx, sy] = this.toScreen(o.getX(), o.getY() - 40);
+    return P.popBubble(id, sx, sy);
+  },
+  /* tap on the map (no UI or bubble under the pointer) */
+  click(){
+    const m = Kit.mouse; if (m.moved > 8 || this.pinchEnded > performance.now() - 250) return false;
+    const now = performance.now();
+    if (now - this.lastTap < 320 && Math.abs(m.x - this.lastTapX) + Math.abs(m.y - this.lastTapY) < 24){ this.lastTap = 0; this.resetView(); return true; }
+    this.lastTap = now; this.lastTapX = m.x; this.lastTapY = m.y;
+    const [x, y] = this.toWorldFromScreen(m.x, m.y);
+    if (this.cam.z >= ZCOUNTRY){
+      const g = geoAtWorld(x, y);
+      if (g && g.r && RMETA[g.r] && P.Screens){ P.Screens.selectCountry(g.c || "R_" + g.r); return true; }
+    }
+    const reg = regionAtWorld(x, y);
+    if (reg && P.Screens){ P.Screens.selectRegion(reg, true); return true; }
+    // tap on the empty sea closes the drawer
+    if (S.tab && P.Screens){ P.Screens.closeTab(); return true; }
+    return false;
+  },
+  floatText(x, y, txt, color){ this.floats.push({x, y, txt, color, t:0}); Kit.dirty("MapUI"); },
+  /* hazard strike animation: an icon sweeping across the country + an expanding ring */
+  hazardFx(h, d){ const pt = countryPoint(h.c); if (!pt) return; this.fx.push({x:pt[0], y:pt[1], type:h.type, d, t:0}); Kit.dirty("MapUI"); },
+  update(dt){
+    if (!this.scene) return;
+    const m = Kit.mouse, im = this.scene.getGame().getInputManager();
+    if (this.mode === "game"){
+      const modal = P.UIM && P.UIM.modalOpen();
+      // two-finger pinch zoom (touch screens)
+      const ids = im.getAllTouchIdentifiers ? im.getAllTouchIdentifiers() : [];
+      if (ids.length >= 2 && !modal){
+        const ax = im.getTouchX(ids[0]), ay = im.getTouchY(ids[0]), bx = im.getTouchX(ids[1]), by = im.getTouchY(ids[1]);
+        const dist = Math.hypot(ax - bx, ay - by), mx = (ax + bx) / 2, my = (ay + by) / 2;
+        if (!this.pinch){ this.pinch = {d:dist, z:this.cam.z, w:this.toWorldFromScreen(mx / Kit.K, my / Kit.K)}; this.target = null; }
+        else {
+          const z1 = clamp(this.pinch.z * dist / Math.max(20, this.pinch.d), ZMIN, ZMAX);
+          this.cam.z = z1; this.cam.x = this.pinch.w[0] - (mx - W / 2) / z1; this.cam.y = this.pinch.w[1] - (my - Hh / 2) / z1; this.clampCam();
+        }
+        this.drag = null;
+      } else {
+        if (this.pinch){ this.pinch = null; this.pinchEnded = performance.now(); m.moved = 99; }
+        // drag to pan (only when the press started on the map)
+        if (m.down && !m.onUI && !modal){
+          if (!this.drag) this.drag = {x:m.x, y:m.y};
+          else if (m.moved > 6){ this.cam.x -= (m.x - this.drag.x) * Kit.K / this.cam.z; this.cam.y -= (m.y - this.drag.y) * Kit.K / this.cam.z; this.target = null; this.drag = {x:m.x, y:m.y}; this.clampCam(); }
+        } else this.drag = null;
+      }
+      const wheel = im.getMouseWheelDelta ? im.getMouseWheelDelta() : 0;
+      if (wheel && !Kit.wheelUsed && !Kit.overUI && !modal){
+        const z0 = this.target ? this.target.z : this.cam.z, z1 = clamp(z0 * (wheel > 0 ? 1.12 : 1 / 1.12), ZMIN, ZMAX);
+        const [wx, wy] = this.toWorldFromScreen(m.x, m.y);
+        this.target = null; this.cam.z = z1; this.cam.x = wx - (m.x * Kit.K - W / 2) / z1; this.cam.y = wy - (m.y * Kit.K - Hh / 2) / z1; this.clampCam();
+      }
+    } else {
+      this.cam.x = 690 + Math.sin(this.scene.getTimeManager().getTimeFromStart() / 9000) * 40;   // menu: slow drift
+    }
+    if (this.target){
+      const k = 1 - Math.pow(0.88, dt * 60);
+      this.cam.x += (this.target.x - this.cam.x) * k; this.cam.y += (this.target.y - this.cam.y) * k; this.cam.z += (this.target.z - this.cam.z) * k;
+      if (Math.abs(this.target.x - this.cam.x) < 0.5 && Math.abs(this.target.y - this.cam.y) < 0.5 && Math.abs(this.target.z - this.cam.z) < 0.002){ this.cam.x = this.target.x; this.cam.y = this.target.y; this.cam.z = this.target.z; this.target = null; this.clampCam(); }
+    }
+    const key = `${this.cam.x.toFixed(1)},${this.cam.y.toFixed(1)},${this.cam.z.toFixed(3)}`;
+    if (key !== this._ck){
+      const wasC = this._z >= ZCOUNTRY, isC = this.cam.z >= ZCOUNTRY; this._z = this.cam.z;
+      this._ck = key; this.applyCam(); Kit.dirty("MapUI");
+      if (this.borders) this.borders.getRendererObject().alpha = clamp((this.cam.z - 1.05) / (ZCOUNTRY - 1.05), 0, 1);
+      if (wasC !== isC){ Kit.dirty("HUD"); for (const r of S.regions){ const ln = this.lines[r.id]; if (ln) ln.hide(S.sel !== r.id || isC); } this.drawSelected(); }
+    }
+    if (this.floats.length){ this.floats.forEach(f => f.t += dt); this.floats = this.floats.filter(f => f.t < 1.2); Kit.dirty("MapUI"); }
+    if (this.fx.length){ this.fx.forEach(f => f.t += dt); this.fx = this.fx.filter(f => f.t < 2.2); Kit.dirty("MapUI"); }
+    if (this.mode === "game" && S.haz && S.haz.length){ this._pulse = (this._pulse || 0) + dt; if (this._pulse > 0.05){ this._pulse = 0; Kit.dirty("MapUI"); } }
+  },
+  isCountryZoom(){ return this.cam.z >= ZCOUNTRY; },
+};
+P.Map = Map; P.toWorld = toWorld; P.heatRGB = heatRGB; P.regionHeatValue = regionHeatValue; P.regionAtWorld = regionAtWorld; P.countryPoint = countryPoint; P.CGEO = CGEO; P.ZCOUNTRY = ZCOUNTRY;
+const H = P.H = P.H || {};
+H.mapRefresh = () => Map.refresh();
+H.mapFocus = reg => Map.focus(reg, false);
+H.floatText = (x, y, txt, color) => Map.floatText(x, y, txt, color);
+H.hazardStrike = (h, d) => {
+  Map.hazardFx(h, d);
+  const A = P.Audio, n = P.HAZARDS[h.type].snd;
+  if (A && !S.event && !A.amb){ A.ambience(n); setTimeout(() => { if (A.amb === n && !S.event) A.stopAmb(900); }, 2600); }
+};
+H.hazardWarn = h => Kit.dirty("MapUI");
+
+};
+gdjs.LoadingCode.userFunc0x10135a8 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Screens · วิดเจ็ต, สถานะหน้าจอ, ตั้งค่าฉาก, ลูปทุกเฟรม */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.screens) return;
+(P.mods = P.mods || {}).screens = 1;
+/* =========================================================================
+   Screens · common widgets, UI state, keyboard shortcuts, scene setup and the per-frame loop
+   ========================================================================= */
+const {Kit, S, t, L, UI, Audio} = P;
+const k = Kit;
+const H = P.H = P.H || {};
+
+/* ---------------------------- UI state ----------------------------
+   modal kinds (top = highest priority): tutorial · pause · story · skills · learn · end · event · charsel */
+const EVENT_LOCK = 1.5;      // seconds before an event's choices can be pressed (stops accidental taps)
+const UIM = P.UIM = {
+  screen:"menu", sub:null, modal:null, msg:"", err:false, tutI:0, thenIntro:false, prevSpeed:1, codeIn:"",
+  toastQ:[], toast:null, toastT:0, evAt:0, storyAct:0, storyI:0, reward:null, charSel:null, modeSel:"normal",
+  kind(){
+    if (this.modal === "tutorial" || this.modal === "pause" || this.modal === "learn") return this.modal;
+    if (this.screen !== "game") return this.modal;
+    if (this.modal === "story") return "story";
+    if (S.over) return "end";
+    if (S.event) return "event";
+    return this.modal;   // "skills" | "charsel"
+  },
+  modalOpen(){ return !!this.kind(); },
+  get paused(){ return this.modal === "pause"; },
+  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn"].includes(this.modal); },
+  eventLocked(){ return (performance.now() - this.evAt) / 1000 < EVENT_LOCK; },
+  eventLockFrac(){ return Math.min(1, (performance.now() - this.evAt) / 1000 / EVENT_LOCK); },
+};
+const tutSeen = () => { try { return localStorage.getItem("p2050-tut") === "1"; } catch(e) { return false; } };
+const tutMarkSeen = () => { try { localStorage.setItem("p2050-tut", "1"); } catch(e) {} };
+
+/* ---------------------------- widgets ---------------------------- */
+/* upper-case for English labels, keeping [[icon]] tokens intact */
+P.up = s => S.lang === "en" ? String(s).split(/(\[\[[a-z0-9-]+\]\])/).map(x => /^\[\[/.test(x) ? x : x.toUpperCase()).join("") : String(s);
+const W = {};
+W.glass = (l, x, y, w, h, r = 10) => k.rect(l, x, y, w, h, "glass", {a:.9, r, stroke:"line", bg:true});
+W.panel = (l, x, y, w, h, r = 10, fill = "panel") => k.rect(l, x, y, w, h, fill, {r, stroke:"line", bg:true});
+W.card  = (l, x, y, w, h, o = {}) => k.rect(l, x, y, w, h, o.fill || "panel2", {r:o.r ?? 9, stroke:o.stroke || "line", sa:o.sa ?? 1, a:o.a ?? 1, under:true, sw:o.sw});
+/* button: kind = primary | ghost | danger; returns width */
+W.btn = (l, id, x, y, label, fn, o = {}) => {
+  const size = o.size || 14, h = o.h || 36, font = o.font || "dispS";
+  const tw = k.textW(label, {font, size}), w = o.w || Math.ceil(tw + 30);
+  const dis = !!o.disabled, hov = !dis && k.isHover(l, id), kind = o.kind || "primary";
+  let fill = null, stroke = "accent", col = "ink", a = 1;
+  if (dis){ stroke = "line"; col = "muted"; }
+  else if (kind === "primary"){ fill = hov ? k.mix("accent", "#ffffff", .25) : "accent"; }
+  else if (kind === "ghost"){ fill = hov ? "accent" : null; a = .14; col = "accent"; }
+  else if (kind === "danger"){ fill = hov ? k.mix("bad", "#ffffff", .2) : "bad"; stroke = "bad"; col = "#2b0603"; }
+  else if (kind === "gold"){ fill = hov ? k.mix("gold", "#ffffff", .25) : "gold"; stroke = "gold"; col = "#2b1d00"; }
+  if (fill != null) k.rect(l, x, y, w, h, fill, {r:8, a, stroke, bg:true}); else k.rect(l, x, y, w, h, null, {r:8, stroke, bg:true});
+  k.text(l, label, x, y + (h - size * 1.45) / 2, {font, size, color:col, w, align:"center", max:1, iconColor:col});
+  k.hit(l, id, x, y, w, h, () => { if (o.sound !== false) Audio.play("click"); fn(); }, {disabled:dis});
+  return w;
+};
+W.btnW = (label, o = {}) => o.w || Math.ceil(k.textW(label, {font:o.font || "dispS", size:o.size || 14}) + 30);
+W.hbtn = (l, id, x, y, icon, fn, o = {}) => {
+  const s = o.s || 30, hov = k.isHover(l, id);
+  k.rect(l, x, y, s, s, hov ? "panel2" : (o.fill || null), {r:7, stroke:hov ? "accent" : "line", bg:true, a:o.a ?? 1});
+  const is = o.is || 16;
+  k.icon(l, icon, x + (s - is) / 2, y + (s - is) / 2, is, o.color || (hov ? "accent" : "fg"));
+  k.hit(l, id, x, y, s, s, fn, {disabled:o.disabled});
+  return s;
+};
+/* segmented control: items [{id, label?, icon?, on, fn}] */
+W.seg = (l, x, y, items, o = {}) => {
+  const iw = o.w || 36, h = o.h || 30, w = iw * items.length;
+  k.rect(l, x, y, w, h, null, {r:8, stroke:"line", bg:true});
+  items.forEach((it, i) => {
+    const xx = x + i * iw, hov = k.isHover(l, it.id);
+    if (it.on) k.rect(l, xx + 1, y + 1, iw - 2, h - 2, "accent", {r:i === 0 ? 7 : i === items.length - 1 ? 7 : 0, bg:true});
+    else if (hov) k.rect(l, xx + 1, y + 1, iw - 2, h - 2, "panel2", {r:6, bg:true});
+    if (i) k.line(l, xx, y + 4, xx, y + h - 4, "line");
+    const col = it.on ? "ink" : it.dis ? "line" : hov ? "fg" : "muted";
+    if (it.icon) k.icon(l, it.icon, xx + (iw - 15) / 2, y + (h - 15) / 2, 15, col);
+    else k.text(l, it.label, xx, y + (h - (o.size || 13) * 1.45) / 2, {font:it.on ? (o.fontOn || "monoB") : (o.font || "mono"), size:o.size || 13, color:col, w:iw, align:"center", max:1});
+    k.hit(l, it.id, xx, y, iw, h, it.fn, {disabled:it.dis});
+  });
+  return w;
+};
+/* tabs with text: items [{id, label, on, fn, badge}] auto width */
+W.tabs = (l, x, y, items, o = {}) => {
+  const h = o.h || 32, size = o.size || 13; let cx = x;
+  for (const it of items){
+    const w = Math.ceil(k.textW(it.label, {font:"dispS", size})) + 28 + (it.badge ? 26 : 0), hov = k.isHover(l, it.id);
+    k.rect(l, cx, y, w, h, it.on ? "accent" : hov ? "panel2" : null, {r:8, stroke:it.on || hov ? "accent" : "line", bg:true});
+    k.text(l, it.label, cx + 14, y + (h - size * 1.45) / 2, {font:"dispS", size, color:it.on ? "ink" : "fg", iconColor:it.on ? "ink" : "accent"});
+    if (it.badge){ const bx = cx + w - 14 - 20; k.rect(l, bx, y + (h - 18) / 2, 20, 18, it.on ? "ink" : "good", {r:9}); k.text(l, String(it.badge), bx, y + (h - 18) / 2 + 1, {font:"mono", size:11, color:it.on ? "accent" : "#04130c", w:20, align:"center"}); }
+    k.hit(l, it.id, cx, y, w, h, () => { Audio.play("click"); it.fn(); });
+    cx += w + (o.gap ?? 6);
+  }
+  return cx - x;
+};
+const PILL = {good:["good", "good", .4], bad:["bad", "bad", .4], acc:["accent", "accent", .4], warn:["warn", "warn", .4], gold:["gold", "gold", .5], "":["muted", "line", 1]};
+W.pillW = (txt) => k.textW(txt, {font:"mono", size:11}) + 16;
+W.pill = (l, x, y, txt, kind = "") => {
+  const [col, st, sa] = PILL[kind] || PILL[""], w = W.pillW(txt);
+  k.rect(l, x, y, w, 21, null, {r:10.5, stroke:st, sa, bg:true});
+  k.text(l, txt, x + 8, y + 2, {font:"mono", size:11, color:col, iconColor:col});
+  return w;
+};
+/* wrapping row of pills: list [{txt, kind}] → height */
+W.pills = (l, x, y, maxW, list, gap = 5, measureOnly = false) => {
+  let cx = x, cy = y;
+  for (const p of list){
+    const w = W.pillW(p.txt);
+    if (cx > x && cx + w > x + maxW){ cx = x; cy += 21 + gap; }
+    if (!measureOnly) W.pill(l, cx, cy, p.txt, p.kind);
+    cx += w + gap;
+  }
+  return list.length ? cy - y + 21 : 0;
+};
+W.meter = (l, x, y, w, h, frac, color = "warn", bg = "panel2") => {
+  k.rect(l, x, y, w, h, bg, {r:h / 2});
+  const fw = Math.max(0, Math.min(1, frac)) * w;
+  if (fw > 0.5) k.rect(l, x, y, Math.max(fw, h), h, color, {r:h / 2});
+};
+/* relation bar −100 … +100, centre line at 0 */
+W.relBar = (l, x, y, w, rel) => {
+  k.rect(l, x, y, w, 6, "panel2", {r:3});
+  const mid = x + w / 2, f = Math.max(-1, Math.min(1, rel / 100)), col = rel >= 50 ? "good" : rel >= 0 ? "accent" : rel > -40 ? "warn" : "bad";
+  if (f >= 0) k.rect(l, mid, y, Math.max(2, w / 2 * f), 6, col, {r:3}); else k.rect(l, mid + w / 2 * f, y, Math.max(2, -w / 2 * f), 6, col, {r:3});
+  k.rect(l, mid - .5, y - 2, 1, 10, "muted", {a:.6});
+};
+W.relCol = rel => rel >= 50 ? "good" : rel >= 0 ? "accent" : rel > -40 ? "warn" : "bad";
+W.slider = (l, id, x, y, w, v, onSet) => {
+  const hov = k.isHover(l, id) || k.isPress(l, id);
+  k.rect(l, x, y + 9, w, 4, "panel2", {r:2});
+  k.rect(l, x, y + 9, Math.max(4, w * v), 4, "accent", {r:2});
+  k.circle(l, x + w * v, y + 11, hov ? 8 : 7, "accent", {stroke:"#ffffff", sw:hov ? 2 : 0, sa:.6});
+  k.hit(l, id, x - 8, y, w + 16, 22, null, {drag:f => onSet(Math.round(f * 20) / 20)});
+};
+W.check = (l, id, x, y, w, on, label, fn) => {
+  const hov = k.isHover(l, id);
+  k.rect(l, x, y + 1, 20, 20, on ? "accent" : null, {r:5, stroke:on || hov ? "accent" : "line", bg:true});
+  if (on) k.icon(l, "check", x + 3, y + 4, 14, "ink");
+  const h = k.text(l, label, x + 30, y, {size:12.5, color:"fg", w:w - 30}).h;
+  k.hit(l, id, x, y, w, Math.max(22, h), () => { Audio.play("click"); fn(); });
+  return Math.max(22, h);
+};
+/* sequence of rich-text runs on one line: [[text, opts], ...] → end x */
+W.runs = (l, x, y, parts) => { let cx = x; for (const [txt, o] of parts){ if (!txt) continue; const r = k.text(l, txt, cx, y, o); cx += r.w; } return cx; };
+W.runsW = parts => parts.reduce((s, [txt, o]) => s + (txt ? k.textW(txt, o) : 0), 0);
+/* label for small uppercase headings */
+W.h3 = (l, txt, x, y, o = {}) => k.text(l, P.up(String(txt)), x, y, {font:"dispS", size:o.size || 12, color:o.color || "muted", w:o.w});
+/* character portrait in a rounded frame */
+W.portrait = (l, x, y, s, charId, o = {}) => {
+  const ch = P.CHAR[charId], col = o.ring || (ch ? ch.color : "#8fd0ff");
+  k.rect(l, x, y, s, s, "panel2", {r:o.r ?? s / 2, stroke:col, sw:o.sw || 2, bg:true});
+  const anim = charId === "adv" ? "adv" : `${charId}-${P.outfitOf ? P.outfitOf(charId) : "base"}`;
+  k.sprite(l, "Portrait", anim, x + 2, y + 2, s - 4, s - 4, o.a ?? 1);
+};
+/* Terra amount with the coin icon */
+W.terra = (l, x, y, amount, o = {}) => {
+  const size = o.size || 14, is = size * 1.2;
+  k.icon(l, "terra", x, y + (size * 1.45 - is) / 2, is, "#ffffff", o.a ?? 1);
+  return is + 4 + k.text(l, String(amount), x + is + 4, y, {font:o.font || "monoB", size, color:o.color || "fg", a:o.a ?? 1}).w;
+};
+/* volume rows */
+W.vol = (l, x, y, w) => {
+  const row = (yy, kind, icon, iconOff, on, lv, label) => {
+    W.hbtn(l, "vol-" + kind, x, yy, on && lv > 0 ? icon : iconOff, () => { if (kind === "music") Audio.toggleMusic(); else Audio.toggle(); k.dirty(); });
+    k.text(l, label, x + 40, yy + 5, {size:12.5, color:"muted", w:92, max:1});
+    W.slider(l, "sl-" + kind, x + 140, yy + 4, w - 140 - 52, lv, v => { Audio.setLevel(kind, v); k.dirty(); });
+    k.text(l, Math.round(lv * 100) + "%", x + w - 44, yy + 6, {font:"mono", size:12, w:44, align:"right"});
+  };
+  row(y, "music", "music", "music-off", Audio.musicOn, Audio.lvMusic, t("musicLbl"));
+  row(y + 38, "sfx", "volume-2", "volume-x", Audio.on, Audio.lvSfx, t("sfxLbl"));
+  return 70;
+};
+W.langSeg = (l, x, y) => W.seg(l, x, y, [
+  {id:"lg-th", label:"TH", on:S.lang === "th", fn:() => { Audio.play("click"); P.setLang("th"); k.dirty(); }},
+  {id:"lg-en", label:"EN", on:S.lang === "en", fn:() => { Audio.play("click"); P.setLang("en"); k.dirty(); }},
+], {w:40});
+/* keyboard hint chip (PC) */
+W.key = (l, x, y, txt) => { const w = k.textW(txt, {font:"mono", size:9.5}) + 8; k.rect(l, x, y, w, 15, null, {r:3, stroke:"line", bg:true}); k.text(l, txt, x + 4, y + 1, {font:"mono", size:9.5, color:"muted"}); return w; };
+P.W = W;
+const hasKeyboard = () => !(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
+P.hasKeyboard = hasKeyboard;
+
+/* ---------------------------- actions ---------------------------- */
+const Screens = P.Screens = P.Screens || {};
+Object.assign(Screens, {
+  scene:null, kind:null,
+  drawerWidth(){ return this.kind === "game" && S.tab ? 420 : 0; },
+  selectRegion(id, zoom = false){
+    Audio.play("select");
+    if (S.sel !== id) S.selC = null;
+    S.sel = id; S.tab = "region"; P.Map.focus(id, zoom); const dl = k.L("DrawerScroll"); if (dl) dl.scroll = 0; P.changed();
+  },
+  selectCountry(id){
+    Audio.play("select");
+    const c = P.C(id); if (!c) return;
+    S.sel = c.reg; S.selC = id; S.tab = "region"; P.Map.focusCountry(id); const dl = k.L("DrawerScroll"); if (dl) dl.scroll = 0; P.changed();
+  },
+  setTab(tab){
+    if (tab === "tech"){ this.openSkills(); return; }
+    Audio.play(S.tab === tab ? "close" : "open");
+    S.tab = S.tab === tab ? null : tab;
+    const dl = k.L("DrawerScroll"); if (dl) dl.scroll = 0;
+    if (S.tab === "region") P.Map.focus(S.sel, false); else if (!S.tab) P.Map.recenter();
+    P.changed();
+  },
+  closeTab(){ Audio.play("close"); S.tab = null; P.Map.recenter(); P.changed(); },
+  openSkills(){ if (!S.started || S.over || S.event || (UIM.modal && UIM.modal !== "skills")) return; Audio.play("open"); UIM.modal = "skills"; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); },
+  closeSkills(){ if (UIM.modal !== "skills") return; Audio.play("close"); UIM.modal = null; k.dirty(); },
+  goScene(name){ this.scene.getVariables().get("GoTo").setString(name); },
+  pause(){ if (!S.started || S.over || S.event || (UIM.modal && UIM.modal !== "skills")) return; Audio.play("pause"); UIM.prevSpeed = S.speed || 1; UIM.modal = "pause"; UIM.msg = ""; k.dirty(); },
+  resume(){ UIM.modal = null; k.dirty(); },
+  toMenu(){ P.autosave(); Audio.stopAmb(0); UIM.modal = null; S.tab = null; UIM.screen = "menu"; UIM.sub = null; this.goScene("Menu"); },
+  openTutorial(start = 0, thenIntro = false){ UIM.tutI = start; UIM.thenIntro = thenIntro; UIM.tutFrom = UIM.modal; UIM.modal = "tutorial"; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); },
+  tutAct(a){
+    const n = P.TUT.length;
+    if (a === "next"){ UIM.tutI = Math.min(n - 1, UIM.tutI + 1); }
+    else if (a === "back"){ UIM.tutI = Math.max(0, UIM.tutI - 1); }
+    else {
+      if (UIM.tutI === n - 1) P.Ach.unlock("tutorial");
+      tutMarkSeen();
+      UIM.modal = UIM.thenIntro ? "charsel" : (UIM.tutFrom === "pause" ? "pause" : UIM.tutFrom === "learn" ? "learn" : null);
+    }
+    const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0;
+    k.dirty();
+  },
+  openLearn(tab){ UIM.learnFrom = UIM.modal; UIM.learnTab = tab || UIM.learnTab || "cards"; UIM.modal = "learn"; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; Audio.play("open"); k.dirty(); },
+  closeLearn(){ UIM.modal = UIM.learnFrom === "pause" ? "pause" : null; Audio.play("close"); k.dirty(); },
+  showStory(act){ UIM.storyAct = act; UIM.storyI = 0; UIM.storyT = performance.now(); UIM.modal = "story"; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); },
+  storyNext(){
+    const st = P.STORY.find(a => a.act === UIM.storyAct);
+    if (st && UIM.storyI < st.panels.length - 1){ UIM.storyI++; UIM.storyT = performance.now(); Audio.play("click"); k.dirty(); return; }
+    UIM.modal = null; Audio.play("start"); k.dirty();
+  },
+  storySkip(){ UIM.modal = null; k.dirty(); },
+  newGame(){ P.newGame(S.lang); UIM.screen = "game"; UIM.sub = null; UIM.modal = null; UIM.pendingIntro = true; this.goScene("Game"); },
+  loadSave(obj){
+    if (!P.loadState(obj)) return false;
+    UIM.screen = "game"; UIM.sub = null; UIM.modal = null; UIM.pendingIntro = false; this.goScene("Game"); return true;
+  },
+  /* ---- keyboard (PC) ---- T = skills · Esc = close · Space = pause · 1/2/3 = speed · H = whole world · +/− = zoom · R = regions · S = stats · N = news */
+  key(name){
+    if (this.kind !== "game"){
+      if (name === "esc"){ if (UIM.modal === "tutorial") this.tutAct("skip"); else if (UIM.modal === "learn") this.closeLearn(); else if (UIM.sub){ UIM.sub = null; UIM.msg = ""; k.dirty(); } }
+      return;
+    }
+    const m = UIM.modal;
+    if (name === "esc"){
+      if (m === "pause") this.resume();
+      else if (m === "tutorial") this.tutAct("skip");
+      else if (m === "learn") this.closeLearn();
+      else if (m === "story") this.storyNext();
+      else if (m === "skills") this.closeSkills();
+      else if (S.tab){ S.tab = null; P.Map.recenter(); P.changed(); }
+      else if (!S.event && !S.over && !m) this.pause();
+      return;
+    }
+    if (m === "story" && (name === "space" || name === "enter")){ this.storyNext(); return; }
+    if (S.event && /^[123]$/.test(name)){ const i = +name - 1, e = P.currentEvent(); if (e && i < e.options.length && !UIM.eventLocked() && P.affordable(e.options[i].fx)) P.chooseOption(i); return; }
+    if (name === "t"){ if (m === "skills") this.closeSkills(); else this.openSkills(); return; }
+    if (m && m !== "skills") return;
+    if (name === "space"){ if (S.started && !S.over && !S.event) P.setSpeed(S.speed === 0 ? (UIM.prevSpeed || 1) : (UIM.prevSpeed = S.speed, 0)); }
+    else if (name === "1" || name === "2" || name === "3"){ if (S.started && !S.over) P.setSpeed(+name); }
+    else if (name === "h") P.Map.resetView();
+    else if (name === "+" || name === "=") P.Map.zoomBy(1.25);
+    else if (name === "-") P.Map.zoomBy(1 / 1.25);
+    else if (!m && name === "r") this.setTab("region");
+    else if (!m && name === "s") this.setTab("stats");
+    else if (!m && name === "n") this.setTab("news");
+    k.dirty();
+  },
+  /* ---- scene setup (called from each scene's "At the beginning of the scene" event) ---- */
+  setup(scene, kind){
+    this.scene = scene; this.kind = kind; UIM.screen = kind === "loading" ? "menu" : kind;
+    const layers = kind === "loading" ? ["Loader", "Toast"]
+      : kind === "menu" ? ["MapUI", "Menu", "MenuScroll", "Modal", "ModalScroll", "Toast"]
+      : ["MapUI", "HUD", "Drawer", "DrawerScroll", "Modal", "ModalScroll", "Toast"];
+    k.setup(scene, layers);
+    const set = (n, fn, master) => { const l = k.L(n); if (!l) return; if (fn) l.render = fn; if (master) l.master = master; };
+    set("Loader", l => this.renderLoader(l));
+    set("MapUI", l => this.renderMapUI(l));
+    set("HUD", l => this.renderHUD(l));
+    set("Drawer", l => this.renderDrawer(l)); set("DrawerScroll", null, "Drawer");
+    set("Menu", l => this.renderMenu(l)); set("MenuScroll", null, "Menu");
+    set("Modal", l => this.renderModal(l)); set("ModalScroll", null, "Modal");
+    set("Toast", l => this.renderToast(l));
+    Audio.setScene(scene);
+    if (kind !== "loading") P.Map.init(scene, kind);
+    if (kind === "game"){
+      if (!S.started){
+        UIM.modal = null; UIM.charSel = UIM.charSel || S.char || "sci";
+        if (!tutSeen()) this.openTutorial(0, true); else UIM.modal = "charsel";
+      } else { UIM.modal = null; P.Map.focus(S.sel, false); }
+      UIM.pendingIntro = false;
+    }
+    if (kind === "menu"){ UIM.modal = null; UIM.sub = null; if (P.Net) P.Net.refresh(); }
+    this.toastLayerSetup();
+    k.dirty();
+  },
+  /* ---- every frame ---- */
+  frame(scene){
+    if (scene !== this.scene) return;
+    const dt = Math.min(0.25, scene.getTimeManager().getElapsedTime() / 1000);
+    k.update(scene);
+    if (this.kind !== "loading") P.Map.update(dt);
+    Audio.update(dt);
+    this.toastUpdate(dt);
+    if (this.kind === "game"){
+      const v = scene.getVariables();
+      v.get("Running").setNumber(P.running() ? 1 : 0);
+      v.get("TickSeconds").setNumber(P.SPEEDS[S.speed] || 4);
+      if (S.started && !S.over){ S.realSec += dt; const sec = Math.floor(S.realSec); if (sec !== this._sec && UIM.modal === "pause"){ this._sec = sec; k.dirty("Modal"); } }
+      if (S.event && UIM.evAt && UIM.eventLockFrac() < 1){ k.dirty("Modal"); this._lockDirty = true; } else if (this._lockDirty){ this._lockDirty = false; k.dirty("Modal"); }
+      if (UIM.modal === "story" && performance.now() - (UIM.storyT || 0) < 700) k.dirty("Modal");
+      if (P.Net && P.Net.googleOverlay) P.Net.googleOverlay(null);
+    }
+    if (this.kind === "loading") this.loaderUpdate(dt);
+  },
+  /* mouse released: UI first. Returns 1 when the UI used the click (scene variable UIConsumed). */
+  release(scene){ if (scene !== this.scene) return 1; return k.release() ? 1 : 0; },
+});
+
+/* keyboard: one listener for the whole game (ignored while typing in a text box) */
+if (!P._keys){
+  P._keys = true;
+  window.addEventListener("keydown", e => {
+    const tg = e.target, tag = tg && tg.tagName;
+    if (tag === "INPUT" || tag === "TEXTAREA" || (tg && tg.isContentEditable)) return;
+    const map = {" ":"space", Escape:"esc", Enter:"enter"}, kk = map[e.key] || (e.key.length === 1 ? e.key.toLowerCase() : null);
+    if (!kk || !P.Screens || !P.Screens.scene) return;
+    if (kk === "space") e.preventDefault();
+    try { P.Screens.key(kk); } catch(err){ console.error(err); }
+  });
+}
+
+/* hooks used by the engine */
+H.dirty = () => k.dirty();
+H.showEvent = () => { if (UIM.modal === "skills" || UIM.modal === "charsel") UIM.modal = null; UIM.evAt = performance.now(); const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); };
+H.showEnd = () => {
+  if (UIM.modal === "skills") UIM.modal = null; UIM.reward = null; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0;
+  const e = P.ENDINGS[S.over]; if (e && e.amb) setTimeout(() => { if (S.over) Audio.ambience(e.amb); }, 1200);   // each ending has its own soundscape
+  k.dirty();
+};
+H.closeModal = () => { if (UIM.modal === "charsel") UIM.modal = null; k.dirty(); };
+H.toast = a => { UIM.toastQ.push(a); };
+H.story = act => { if (UIM.modal === "skills") UIM.modal = null; Screens.showStory(act); };
+H.gameStart = () => { Screens.showStory(1); if (P.Net) P.Net.startRun(); };
+H.gameOver = () => { if (P.Net) P.Net.finishRun(); };
+H.stopAmb = () => Audio.stopAmb();
+
+};
+gdjs.LoadingCode.userFunc0x1013680 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Screens · HUD และป้ายภูมิภาค */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.hud) return;
+(P.mods = P.mods || {}).hud = 1;
+/* =========================================================================
+   Screens · HUD (top bar, KPIs, character + abilities, meters, ticker, tab buttons, zoom buttons)
+   and the map overlay (region / country labels, hazard warnings, bubble timers, floating texts)
+   ========================================================================= */
+const {Kit, S, t, L, UI, Audio, W, UIM, Screens, RMETA, IC, MONTHS, HAZARDS, COUNTRY, SHORT, CHAR} = P;
+const k = Kit;
+
+Screens.renderHUD = function(l){
+  if (this.kind !== "game") return;
+  /* ---- brand ---- */
+  const bx = 16, by = 10, bh = 44;
+  const p1 = "PROJECT ", p2 = ":", p3 = " 2050";
+  const bw = W.runsW([[p1, {font:"logo", size:20}], [p2, {font:"logo", size:20}], [p3, {font:"logo", size:20}]]) + 26;
+  W.glass(l, bx, by, bw, bh);
+  W.runs(l, bx + 13, by + 7, [[p1, {font:"logo", size:20}], [p2, {font:"logo", size:20, color:"accent"}], [p3, {font:"logo", size:20}]]);
+  /* ---- KPIs ---- */
+  const acls = S.appr < 25 ? "bad" : S.appr < 45 ? "warn" : "good";
+  const kpis = [
+    {k:t("ep"), v:String(Math.floor(S.ep)), s:`+${P.epGain()}${t("perMo")}`, c:"fg"},
+    {k:t("pc"), v:String(Math.floor(S.pc)), s:`+${P.pcGain()}${t("perMo")}`, c:"fg"},
+    {k:t("appr"), v:`${S.appr.toFixed(0)}%`, meter:S.appr / 100, c:acls},
+  ];
+  let kx = bx + bw + 8;
+  const has3 = P.Net && P.Net.owns("speed3");
+  const ctrlW = 4 * 30 + 3 * 6 + 8 + 104 + 8 + (has3 ? 136 : 102) + 8 + 80 + 14;
+  const cx0 = 1264 - ctrlW;
+  const kw = Math.max(112, Math.min(150, (cx0 - 8 - kx) / 3 - 8));
+  kpis.forEach((q, i) => {
+    const danger = i === 2 && S.appr < 25;
+    k.rect(l, kx, by, kw, bh, "glass", {a:.9, r:10, stroke:danger ? "bad" : "line", bg:true});
+    k.text(l, P.up(q.k), kx + 10, by + 4, {size:10.5, color:"muted", w:kw - 20, max:1});
+    k.text(l, q.v, kx + 10, by + 17, {font:"monoB", size:18, color:q.c});
+    if (q.s) k.text(l, q.s, kx + kw - 10 - k.textW(q.s, {font:"mono", size:10.5}), by + 24, {font:"mono", size:10.5, color:"muted"});
+    if (q.meter !== undefined){
+      const blink = danger && (Date.now() % 1000 < 500);
+      W.meter(l, kx + 62, by + 27, kw - 72, 5, q.meter, blink ? "panel2" : acls);
+      if (danger && !Screens._blink) Screens._blink = setTimeout(() => { Screens._blink = null; k.dirty("HUD"); }, 520);
+    }
+    kx += kw + 8;
+  });
+  /* ---- controls (right) ---- */
+  W.glass(l, cx0, by, ctrlW, bh);
+  let cx = cx0 + 7; const cy = by + 7;
+  const fs = !!(document.fullscreenElement);
+  W.hbtn(l, "fs", cx, cy, fs ? "minimize" : "maximize", () => { Audio.play("click"); const g = this.scene.getGame().getRenderer(); try { g.setFullScreen(!fs); } catch(e) {} setTimeout(() => k.dirty(), 300); }); cx += 36;
+  W.hbtn(l, "mus", cx, cy, Audio.musicOn ? "music" : "music-off", () => { Audio.toggleMusic(); k.dirty(); }); cx += 36;
+  W.hbtn(l, "sfx", cx, cy, Audio.on ? "volume-2" : "volume-x", () => { Audio.toggle(); k.dirty(); }); cx += 36;
+  W.hbtn(l, "menu", cx, cy, "menu", () => Screens.pause()); cx += 30 + 8;
+  k.text(l, P.dateStr(), cx, by + 8, {font:"dispS", size:18, w:104, align:"center"}); cx += 104 + 8;
+  const sp = [
+    {id:"sp0", icon:"pause", on:S.speed === 0, fn:() => P.setSpeed(0)},
+    {id:"sp1", label:"1×", on:S.speed === 1, fn:() => P.setSpeed(1)},
+    {id:"sp2", label:"2×", on:S.speed === 2, fn:() => P.setSpeed(2)},
+  ];
+  if (has3) sp.push({id:"sp3", label:"3×", on:S.speed === 3, fn:() => P.setSpeed(3)});
+  cx += W.seg(l, cx, cy, sp, {w:34}) + 8;
+  W.langSeg(l, cx, cy);
+  /* ---- character + abilities (left column) ---- */
+  this.abilityBar(l, 16, 64);
+  /* ---- zoom buttons (right edge, beside the drawer) ---- */
+  const zx = 1264 - this.drawerWidth() - (S.tab ? 8 : 0) - 34, zy = 400;
+  W.glass(l, zx - 4, zy - 4, 38, 3 * 34 + 6, 9);
+  W.hbtn(l, "zin", zx, zy, "plus", () => P.Map.zoomBy(1.3));
+  W.hbtn(l, "zout", zx, zy + 34, "minus", () => P.Map.zoomBy(1 / 1.3));
+  W.hbtn(l, "zhome", zx, zy + 68, "locate-fixed", () => P.Map.resetView());
+  if (P.Map.isCountryZoom()){
+    const ht = `[[pointer]] ${t("tapCountry")}`, hw = k.textW(ht, {size:11.5}) + 24, hx = (16 + 1264 - this.drawerWidth()) / 2 - hw / 2;
+    k.rect(l, hx, 540, hw, 24, "bg", {r:12, a:.8, stroke:"line", bg:true});
+    k.text(l, ht, hx + 12, 543, {size:11.5, color:"muted", iconColor:"accent"});
+  }
+  /* ---- bottom meters ---- */
+  const mbx = 16, mby = 572, mbw = 1248, mbh = 86;
+  W.glass(l, mbx, mby, mbw, mbh);
+  const half = (mbw - 24 - 40) / 2;
+  this.meterNZ(l, mbx + 14, mby + 10, half);
+  this.meterT(l, mbx + 14 + half + 40, mby + 10, half);
+  /* ---- ticker + tab buttons ---- */
+  const ny = 666, nh = 40, keys = P.hasKeyboard();
+  const tabs = [["tech", "network", "nbTech", "T"], ["region", "map", "nbRegion", "R"], ["stats", "chart-line", "nbStats", "S"], ["news", "newspaper", "nbNews", "N"]];
+  const readyCount = P.SKILLS.filter(n => P.nodeState(n) === "ready" && !P.atCapacity(n) && S.ep >= P.nodeCost(n).ep && S.pc >= P.nodeCost(n).pc).length;
+  const widths = tabs.map(([id, ic, key, kk]) => { const lab = P.up(t(key)); return 14 + 16 + 6 + k.textW(lab, {font:"dispS", size:13}) + 14 + (id === "tech" && readyCount ? 26 : 0) + (keys ? 20 : 0); });
+  let nx = 1264 - widths.reduce((a, b) => a + b, 0) - 6 * (tabs.length - 1);
+  const tickerW = nx - 8 - 16;
+  W.glass(l, 16, ny, tickerW, nh);
+  const lg = S.log[0];
+  if (lg){
+    const d = P.dateStr(lg.tk), dw = k.textW(d, {font:"mono", size:12}) + 10;
+    k.text(l, d, 28, ny + 11, {font:"mono", size:12, color:"muted"});
+    const col = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg"}[lg.cls] || "fg";
+    k.text(l, lg.txt, 28 + dw, ny + 10, {size:13, color:col, w:tickerW - dw - 26, max:1});
+  }
+  tabs.forEach(([id, ic, key, kk], i) => {
+    const on = id === "tech" ? UIM.modal === "skills" : S.tab === id, hov = k.isHover(l, "tab-" + id), w = widths[i];
+    k.rect(l, nx, ny, w, nh, on ? "accent" : "glass", {a:on ? 1 : .9, r:10, stroke:on ? "accent" : hov ? "accent" : "line", bg:true});
+    const col = on ? "ink" : "fg";
+    k.icon(l, ic, nx + 14, ny + 12, 16, col);
+    const lab = P.up(t(key));
+    const tx = W.runs(l, nx + 36, ny + 10, [[lab, {font:"dispS", size:13, color:col}]]);
+    if (keys && !on) W.key(l, tx + 6, ny + 13, kk);
+    if (id === "tech" && readyCount){
+      const bx2 = nx + w - 14 - 20;
+      k.rect(l, bx2, ny + 11, 20, 18, "good", {r:9});
+      k.text(l, String(readyCount), bx2, ny + 12, {font:"mono", size:11, color:"#04130c", w:20, align:"center"});
+    }
+    k.hit(l, "tab-" + id, nx, ny, w, nh, () => Screens.setTab(id));
+    nx += w + 6;
+  });
+};
+
+/* character portrait + ability buttons (left side of the map) */
+Screens.abilityBar = function(l, x, y){
+  const ch = CHAR[S.char]; if (!ch) return;
+  const list = P.abilityList();
+  const w = 54, h = 62 + list.length * 48;
+  W.glass(l, x, y, w, h, 12);
+  W.portrait(l, x + 5, y + 5, 44, S.char);
+  k.rect(l, x + 30, y + 37, 22, 15, "bg", {r:4, stroke:ch.color, bg:true});
+  k.text(l, String(S.charLv), x + 30, y + 37, {font:"monoB", size:10, color:ch.color, w:22, align:"center"});
+  k.hit(l, "charinfo", x, y, w, 54, () => { UIM.abTip = UIM.abTip === "char" ? null : "char"; k.dirty("HUD"); }, {cursor:true});
+  let yy = y + 60;
+  list.forEach(a => {
+    const ready = P.abilityReady(a), cd = S.actCd[a.id] || 0, id = "ab-" + a.id, hov = k.isHover(l, id);
+    const lockedLv = a.lock;
+    k.rect(l, x + 7, yy, 40, 40, ready ? (hov ? "accent" : "panel2") : "bg", {r:9, stroke:ready ? "accent" : "line", bg:true, a:ready ? 1 : .9});
+    k.icon(l, lockedLv ? "lock" : a.icon, x + 17, yy + 10, 20, ready ? (hov ? "ink" : "accent") : "muted", ready ? 1 : .55);
+    if (cd > 0){ k.rect(l, x + 7, yy + 40 - 40 * Math.min(1, cd / a.cd), 40, 40 * Math.min(1, cd / a.cd), "bad", {r:4, a:.18}); k.text(l, String(cd), x + 7, yy + 24, {font:"monoB", size:10, color:"warn", w:40, align:"center"}); }
+    else if (lockedLv) k.text(l, `Lv${lockedLv}`, x + 7, yy + 26, {font:"mono", size:9, color:"muted", w:40, align:"center"});
+    k.hit(l, id, x + 7, yy, 40, 40, () => {
+      if (ready){ if (P.useAbility(a.id)) UIM.abTip = null; }
+      else { UIM.abTip = a.id; Audio.play("error"); }
+      k.dirty();
+    }, {cursor:true});
+    if (hov || UIM.abTip === a.id) this.abilityTip(l, x + w + 8, yy - 4, a);
+    yy += 48;
+  });
+  if (UIM.abTip === "char") this.charTip(l, x + w + 8, y);
+};
+Screens.abilityTip = function(l, x, y, a){
+  const w = 270; let h = 0;
+  const cd = S.actCd[a.id] || 0;
+  const note = a.lock ? `${t("unlockAtLv")} ${a.lock}` : cd ? `${t("cooldown")} ${cd} ${t("months")}` : a.target === "country" && !(S.selC && !S.selC.startsWith("R_")) ? t("needCountry") : `${t("cooldownLen")} ${a.cd} ${t("months")}`;
+  const draw = (dry) => {
+    let yy = y + 8;
+    yy += k.text(dry ? null : l, L(a.name), x + 10, yy, {font:"dispS", size:14, w:w - 20, measure:dry}).h;
+    yy += k.text(dry ? null : l, L(a.desc), x + 10, yy, {size:12, color:"muted", w:w - 20, lh:1.35, measure:dry}).h + 4;
+    yy += k.text(dry ? null : l, note, x + 10, yy, {font:"mono", size:11, color:cd || a.lock ? "warn" : "accent", w:w - 20, measure:dry}).h;
+    return yy - y + 8;
+  };
+  h = draw(true);
+  k.rect(l, x, y, w, h, "panel", {r:9, stroke:"accent", sa:.6, bg:true}); draw(false);
+};
+Screens.charTip = function(l, x, y){
+  const ch = CHAR[S.char], w = 290; const xp = P.Net ? P.Net.charXp(S.char) : 0;
+  const draw = dry => {
+    let yy = y + 8;
+    yy += k.text(dry ? null : l, `${L(ch.person)} · ${L(ch.name)}`, x + 10, yy, {font:"dispS", size:14, w:w - 20, measure:dry}).h;
+    yy += k.text(dry ? null : l, `${t("level")} ${S.charLv} · XP ${xp}`, x + 10, yy, {font:"mono", size:11, color:"accent", w:w - 20, measure:dry}).h + 2;
+    yy += k.text(dry ? null : l, `${t("passive")}: ${L(ch.pas)}`, x + 10, yy, {size:12, color:"muted", w:w - 20, lh:1.35, measure:dry}).h;
+    return yy - y + 8;
+  };
+  const h = draw(true);
+  k.rect(l, x, y, w, h, "panel", {r:9, stroke:ch.color, sa:.7, bg:true}); draw(false);
+};
+
+/* Net Zero meter: scale 0 (win, right) … 50 Gt (left). Marker = current net CO₂, ghost tick = 2026 level. */
+Screens.meterNZ = function(l, x, y, w){
+  const NZ_MAX = 50, net = P.netCO2(), start = 36, prev = S.hist.length > 12 ? S.hist[S.hist.length - 13].net : start;
+  const trend = net - prev;
+  let proj, projCls;
+  if (trend < -0.05){ const yrs = net / -trend, yr = 2026 + (S.tick / 12) + yrs; proj = yr <= 2051 ? `${t("onTrack")} ${Math.floor(yr)}` : t("offTrack"); projCls = yr <= 2051 ? "good" : "bad"; }
+  else { proj = t("rising"); projCls = "bad"; }
+  const pos = v => P.clamp(v / NZ_MAX, 0, 1);
+  const nzCls = net <= 8 ? "good" : net <= 20 ? "warn" : "bad";
+  const title = P.up(t("nzTitle"));
+  k.text(l, `[[flag]] ${title}`, x, y + 2, {font:"dispS", size:13});
+  const vs = net.toFixed(1), vw = k.textW(vs, {font:"monoB", size:21}), uw = k.textW(" Gt", {font:"mono", size:12});
+  k.text(l, vs, x + w - vw - uw, y - 4, {font:"monoB", size:21, color:nzCls});
+  k.text(l, " Gt", x + w - uw, y + 4, {font:"mono", size:12, color:"muted"});
+  const tx = x + 22, tw = w - 48, ty = y + 26, th = 16;
+  k.hgrad(l, tx, ty, tw, th, [[0, "#ff5448"], [.5, "#d9a62b"], [1, "#5fd39a"]], {r:8, a:.17});
+  const fillW = tw * (1 - pos(net));
+  if (fillW > 1) k.hgrad(l, tx, ty, Math.max(fillW, 16), th, [[0, "#e0302a"], [.35, "#e0612f"], [.65, "#d9a62b"], [1, "#1f9e78"]], {r:8, span:tw});
+  k.icon(l, "trophy", tx + tw + 6, ty - 1, 18, "good");
+  const gx = tx + tw * (1 - pos(start));
+  k.rect(l, gx - 1, ty - 3, 2, th + 6, "fg", {a:.45});
+  const mx = tx + tw * (1 - pos(net)), mc = k.COL[nzCls];
+  k.circle(l, mx, ty + th / 2, 12, mc, {a:.25});
+  k.circle(l, mx, ty + th / 2, 9, "bg"); k.circle(l, mx, ty + th / 2, 6, mc);
+  const fy = y + 48;
+  W.runs(l, x, fy, [[`${t("vs2026")} `, {size:11.5, color:"muted"}], [P.fmt(net - start), {font:"monoB", size:11.5, color:net < start ? "good" : "bad"}],
+    [` · ${trend <= 0 ? "▼" : "▲"} `, {size:11.5, color:"muted"}], [P.fmt(trend), {font:"monoB", size:11.5, color:trend <= 0 ? "good" : "bad"}], [`/12${t("perMo").replace("/", "")}`, {size:11.5, color:"muted"}]]);
+  const pw = k.textW(proj, {size:11.5});
+  k.text(l, proj, x + w - pw, fy, {size:11.5, color:projCls});
+};
+/* Warming meter: +1.0 → +3.0 °C with coloured danger zones */
+Screens.meterT = function(l, x, y, w){
+  const monthsLeft = Math.max(0, P.TOTAL_TICKS - S.tick), yearsLeft = monthsLeft / 12;
+  const tCls = S.temp >= 2.5 ? "bad" : S.temp >= 2.0 ? "hot" : S.temp >= 1.5 ? "warn" : "good";
+  const title = P.up(t("tTitle"));
+  k.text(l, `[[thermometer]] ${title}`, x, y + 2, {font:"dispS", size:13});
+  const vs = `+${S.temp.toFixed(2)}`, vw = k.textW(vs, {font:"monoB", size:21}), uw = k.textW("°C", {font:"mono", size:12});
+  k.text(l, vs, x + w - vw - uw, y - 4, {font:"monoB", size:21, color:tCls});
+  k.text(l, "°C", x + w - uw, y + 4, {font:"mono", size:12, color:"muted"});
+  const tx = x, tw = w - 26, ty = y + 24, th = 14;
+  const zones = [["#5fd39a", .28], ["#f2b441", .3], ["#f07a3c", .35], ["#ff5448", .45]];
+  k.rect(l, tx, ty, tw, th, "panel2", {r:7});
+  zones.forEach(([c, a], i) => k.rect(l, tx + tw * i / 4, ty, tw / 4, th, c, {a, r:i === 0 || i === 3 ? 7 : 0}));
+  ["1.5", "2.0", "2.5"].forEach((s, i) => k.text(l, s, tx + tw * (i + 1) / 4 - 12, ty + th + 1, {font:"mono", size:9.5, color:"muted", w:24, align:"center"}));
+  k.icon(l, "triangle-alert", tx + tw + 6, ty - 2, 18, "bad");
+  const mx = tx + tw * P.clamp((S.temp - 1.0) / 2.0, 0, 1), mc = k.COL[tCls];
+  k.circle(l, mx, ty + th / 2, 12, mc, {a:.25});
+  k.circle(l, mx, ty + th / 2, 9, "bg"); k.circle(l, mx, ty + th / 2, 6, mc);
+  const fy = y + 48;
+  W.runs(l, x, fy, [[`${Math.max(0, 3 - S.temp).toFixed(2)}°C`, {font:"monoB", size:11.5, color:tCls}], [` ${t("toLose")} (3.0°C)`, {size:11.5, color:"muted"}]]);
+  const right = [[`${t("left")} `, {size:11.5, color:"muted"}], [String(Math.floor(yearsLeft)), {font:"monoB", size:11.5}], [` ${t("yrs")} ${monthsLeft % 12} ${t("months")}`, {size:11.5, color:"muted"}]];
+  W.runs(l, x + w - W.runsW(right), fy, right);
+};
+
+/* ---- MapUI layer: region / country labels, hazard warnings, bubble timers, floating texts ---- */
+const HZ_COL = {hurricane:"#c3a6ff", typhoon:"#c3a6ff", flood:"#8fd0ff", heat:"#ff8a3c", drought:"#f2c14e", wildfire:"#ff5a4a", saltwater:"#4fd1c5"};
+Screens.renderMapUI = function(l){
+  const Map = P.Map; if (!Map || !Map.scene) return;
+  if (this.kind === "game"){
+    const ry = 62, rb = 566, zoomed = Map.isCountryZoom();
+    const leftLimit = 74, rightLimit = 1264 - this.drawerWidth();
+    if (!zoomed){
+      for (const r of S.regions){
+        const [lat, lon] = RMETA[r.id].lab; const [sx, sy] = Map.latlonScreen(lat, lon);
+        if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;
+        const a = r.id, b = r.co2.toFixed(1);
+        const w = k.textW(a, {font:"monoB", size:11}) + 5 + k.textW(b, {font:"mono", size:11}) + 16 + (S.alli[r.id] ? 18 : 0), h = 21;
+        const x = sx - w / 2, y = sy - h / 2, sel = S.sel === r.id, hov = k.isHover(l, "lab-" + r.id);
+        if (sel) k.rect(l, x - 3, y - 3, w + 6, h + 6, "accent", {r:9, a:.22, bg:true});
+        k.rect(l, x, y, w, h, "bg", {a:.8, r:7, stroke:sel || hov ? "accent" : "line", bg:true});
+        const ex = W.runs(l, x + 8, y + 2, [[a, {font:"monoB", size:11}]]);
+        const ex2 = W.runs(l, ex + 5, y + 2, [[b, {font:"mono", size:11, color:"hot"}]]);
+        if (S.alli[r.id]) k.icon(l, "handshake", ex2 + 4, y + 4, 13, "good");
+        k.hit(l, "lab-" + r.id, x, y, w, h, () => Screens.selectRegion(r.id, true));
+      }
+    } else {
+      // country labels (major countries in view) with a relation dot
+      for (const c of S.countries){
+        if (c.rest) continue;
+        const pt = P.countryPoint(c.id); if (!pt) continue;
+        const [sx, sy] = Map.toScreen(pt[0], pt[1]);
+        if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;
+        const big = COUNTRY[c.id].w >= 250 || Map.cam.z > 2.2;
+        if (!big) continue;
+        const nm = L(SHORT[c.id] || COUNTRY[c.id].name), sel = S.selC === c.id;
+        const w = k.textW(nm, {font:"bodyB", size:10.5}) + 22, h = 18;
+        const x = sx - w / 2, y = sy - h / 2;
+        k.rect(l, x, y, w, h, "bg", {a:sel ? .92 : .66, r:9, stroke:sel ? "accent" : null, bg:true});
+        k.circle(l, x + 9, y + 9, 3.5, W.relCol(c.rel));
+        k.text(l, nm, x + 16, y + 1, {font:"bodyB", size:10.5, color:sel ? "accent" : "fg"});
+        k.hit(l, "cl-" + c.id, x, y, w, h, () => Screens.selectCountry(c.id));
+      }
+    }
+    // hazard forecasts: pulsing ring + icon + months left; tap = evacuate
+    const now = performance.now() / 1000;
+    for (const h of S.haz || []){
+      const pt = P.countryPoint(h.c); if (!pt) continue;
+      const [sx, sy0] = Map.toScreen(pt[0], pt[1]); const sy = sy0 - 26;
+      if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;
+      const Z = HAZARDS[h.type], col = HZ_COL[h.type] || "#ff5a4a", left = Math.max(0, h.at - S.tick);
+      const ph = (now * 1.6) % 1;
+      k.circle(l, sx, sy, 16 + ph * 16, col, {a:(1 - ph) * .35});
+      k.circle(l, sx, sy, 17, "bg", {stroke:col, sw:2, a:.92});
+      k.icon(l, Z.icon, sx - 10, sy - 10, 20, col);
+      const lab = h.evac ? `[[check]] ${t("evacShort")}` : `${left} ${t("moShort")} · ${t("evacShort")} ${IC.ep}${P.evacCost()}`;
+      const lw = k.textW(lab, {font:"mono", size:10}) + 12;
+      k.rect(l, sx - lw / 2, sy + 20, lw, 17, h.evac ? "good" : "bg", {a:h.evac ? .9 : .86, r:5, stroke:col, bg:true});
+      k.text(l, lab, sx - lw / 2, sy + 21, {font:"mono", size:10, color:h.evac ? "#04130c" : "fg", w:lw, align:"center", iconColor:"#04130c"});
+      k.hit(l, "hz-" + h.id, sx - Math.max(22, lw / 2), sy - 20, Math.max(44, lw), 58, () => { if (!h.evac){ if (P.evacuate(h.id)) Map.floatText(sx, sy - 20, t("evacuated"), "good"); } });
+    }
+    for (const b of S.bubbles){
+      const o = Map.bubbles[b.id]; if (!o) continue;
+      const [sx, sy] = Map.toScreen(o.getX(), o.getVariables().get("BaseY").getAsNumber());
+      if (sy < ry || sy > rb) continue;
+      const txt = b.type === "red" ? `${IC.ep}−${P.aidCost()} · ${b.ttl}` : `${b.ttl}`;
+      const w = k.textW(txt, {font:"mono", size:10}) + 8;
+      k.rect(l, sx - w / 2, sy + 3, w, 16, "bg", {a:.8, r:4, bg:true});
+      k.text(l, txt, sx - w / 2, sy + 4, {font:"mono", size:10, w, align:"center"});
+    }
+    // hazard strike animation
+    for (const f of Map.fx){
+      const [sx, sy] = Map.toScreen(f.x, f.y), p = f.t / 2.2, Z = HAZARDS[f.type], col = HZ_COL[f.type] || "#ff5a4a";
+      const a = p < .8 ? 1 : 1 - (p - .8) / .2;
+      k.circle(l, sx, sy, 20 + p * 70, col, {a:(1 - p) * .25});
+      k.circle(l, sx, sy, 10 + p * 40, null, {stroke:col, sw:2, sa:(1 - p) * .9});
+      const swing = Math.sin(p * Math.PI * 2) * 36, size = 34 + 10 * Math.sin(p * Math.PI);
+      k.icon(l, Z.icon, sx - size / 2 + swing, sy - size / 2 - 6, size, col, a, (f.type === "hurricane" || f.type === "typhoon") ? p * 720 : 0);
+    }
+  }
+  for (const f of Map.floats){
+    const p = f.t / 1.2, a = p < .7 ? 1 : 1 - (p - .7) / .3;
+    const col = f.color === "good" ? "good" : f.color === "bad" ? "bad" : "accent";
+    const w = k.textW(f.txt, {font:"monoB", size:14});
+    k.text(l, f.txt, f.x - w / 2, f.y - 18 - p * 40, {font:"monoB", size:14, color:col, a, iconColor:col});
+  }
+};
+
+};
+gdjs.LoadingCode.userFunc0x1013758 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Screens · แผงเทคโนโลยี / ภูมิภาค / สถิติ / ข่าว */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.drawer) return;
+(P.mods = P.mods || {}).drawer = 1;
+/* =========================================================================
+   Screens · right-hand drawer: Region / Country, Stats, News
+   (the skill tree has its own full screen, see 65-skills.js)
+   The drawer frame is drawn on layer "Drawer"; its content scrolls on "DrawerScroll".
+   Tapping the empty map (or Esc) closes it.
+   ========================================================================= */
+const {Kit, S, t, L, UI, Audio, W, UIM, Screens, ACTIONS, RMETA, RESERVE, IC, COUNTRY, HAZARDS} = P;
+const k = Kit;
+
+Screens.renderDrawer = function(l){
+  if (this.kind !== "game" || !S.tab){ k.clearSlave("DrawerScroll"); return; }
+  const dw = this.drawerWidth(), x = 1264 - dw, y = 64, h = 566 - y;
+  W.panel(l, x, y, dw, h, 10, "panel");
+  const titles = {region:S.selC ? "dCountry" : "dRegion", stats:"dStats", news:"dNews"};
+  const title = t(titles[S.tab]);
+  let tx = x + 14;
+  if (S.tab === "region" && S.selC){ W.hbtn(l, "dback", x + 10, y + 7, "arrow-left", () => { Audio.play("click"); S.selC = null; P.Map.focus(S.sel, false); P.changed(); }, {color:"muted"}); tx = x + 48; }
+  k.text(l, P.up(title), tx, y + 11, {font:"dispS", size:14});
+  if (P.hasKeyboard()) W.key(l, x + dw - 14 - 30 - 34, y + 15, "Esc");
+  W.hbtn(l, "dclose", x + dw - 14 - 30, y + 7, "x", () => Screens.closeTab(), {color:"muted"});
+  k.line(l, x, y + 44, x + dw, y + 44, "line");
+  const clip = {x:x + 1, y:y + 45, w:dw - 2, h:h - 46};
+  const cw = dw - 28;
+  k.slave("DrawerScroll", sl => {
+    let hh = 0;
+    if (S.tab === "region") hh = S.selC ? this.paneCountry(sl, cw) : this.paneRegion(sl, cw);
+    else if (S.tab === "stats") hh = this.paneStats(sl, cw);
+    else hh = this.paneNews(sl, cw);
+    sl.frame(x + 14, clip.y + 12, clip, hh + 24);
+  });
+  const sl = k.L("DrawerScroll");
+  if (sl && sl.content > clip.h){
+    const th = Math.max(30, clip.h * clip.h / sl.content), ty = clip.y + (clip.h - th) * (sl.scroll / (sl.content - clip.h));
+    k.rect(l, x + dw - 6, ty, 3, th, "line", {r:1.5});
+  }
+};
+
+/* region switcher (6 buttons) */
+Screens.regionButtons = function(l, y, cw){
+  const bw = (cw - 10) / 3, bh = 32;
+  S.regions.forEach((x, i) => {
+    const bx = (i % 3) * (bw + 5), by = y + Math.floor(i / 3) * (bh + 5), on = x.id === S.sel && !S.selC, hov = k.isHover(l, "reg-" + x.id);
+    k.rect(l, bx, by, bw, bh, "panel2", {r:7, stroke:on || hov ? "accent" : "line", bg:true});
+    k.text(l, x.id, bx + 9, by + 7, {font:"mono", size:12, color:x.id === S.sel ? "accent" : "fg"});
+    const c = P.heatRGB(P.regionHeatValue(x)); k.circle(l, bx + bw - 13, by + bh / 2, 4.5, (c[0] << 16) | (c[1] << 8) | c[2]);
+    k.hit(l, "reg-" + x.id, bx, by, bw, bh, () => Screens.selectRegion(x.id, true));
+  });
+  return 2 * (bh + 5) + 8;
+};
+const statGrid = (l, y, cw, stats) => {
+  const sw = (cw - 6) / 2, sh = 52;
+  stats.forEach(([a, b, col], i) => {
+    const sx = (i % 2) * (sw + 6), sy = y + Math.floor(i / 2) * (sh + 6);
+    k.rect(l, sx, sy, sw, sh, "panel2", {r:8, bg:true});
+    k.text(l, a, sx + 10, sy + 6, {size:10.5, color:"muted", w:sw - 20, max:1});
+    k.text(l, b, sx + 10, sy + 22, {font:"monoB", size:16, color:col || "fg"});
+  });
+  return Math.ceil(stats.length / 2) * (sh + 6);
+};
+/* regional orders; scope = "region" | "country" */
+Screens.orderCards = function(l, y, cw, scope){
+  const r = P.R(S.sel);
+  for (const a of ACTIONS){
+    const cc = scope === "country";
+    const c = P.actionCost(a, r, cc), cd = r.cd[a.id] || 0, ok = !cd && S.ep >= c.ep && S.pc >= c.pc;
+    const label = cd ? `${t("cooldown")} ${cd}` : [c.ep ? `${IC.ep} ${c.ep}` : "", c.pc ? `${IC.pc} ${c.pc}` : ""].filter(Boolean).join("  ");
+    const btnW = Math.ceil(k.textW(label, {font:"dispS", size:14})) + 30;
+    const tw = cw - 22 - btnW - 10;
+    const h1 = k.text(l, L(a.name), 11, y + 9, {font:"bodyB", size:13.5, w:tw}).h;
+    const h2 = k.text(l, cc ? L(UI["cact_" + a.id]) : L(a.desc), 11, y + 9 + h1, {size:12, color:"muted", w:tw}).h;
+    const ch = Math.max(9 + h1 + h2 + 9, 56);
+    W.card(l, 0, y, cw, ch);
+    W.btn(l, "act-" + a.id, cw - 11 - btnW, y + (ch - 36) / 2, label, () => P.doAction(a.id, scope), {disabled:!ok, kind:ok ? "primary" : "ghost", w:btnW, sound:false});
+    y += ch + 7;
+  }
+  return y;
+};
+
+/* ---------------- Region ---------------- */
+Screens.paneRegion = function(l, cw){
+  const meta = RMETA[S.sel], r = P.R(S.sel);
+  let y = this.regionButtons(l, 0, cw);
+  y += k.text(l, L(meta.name), 0, y, {font:"dispS", size:17, w:cw}).h + 8;
+  y += statGrid(l, y, cw, [[t("co2Now"), `${r.co2.toFixed(2)} Gt`], [t("co2Start"), `${r.co2_0.toFixed(1)} Gt`], [t("compliance"), `${r.comp.toFixed(0)}%`], [t("vuln"), `${r.vuln.toFixed(0)}%`]]) + 6;
+  // alliance
+  const al = S.alli[S.sel];
+  if (al){
+    const hh = 12 + k.text(l, `[[handshake]] ${t("allyOn")}`, 12, y + 9, {font:"bodyB", size:13, color:"good", w:cw - 24}).h + k.text(l, P.joinNames(al.members), 12, y + 30, {size:12, color:"muted", w:cw - 24}).h + 10;
+    W.card(l, 0, y, cw, hh, {stroke:"good", sa:.5}); y += hh + 8;
+  } else if (S.owned.D3){
+    const n = P.allyCandidates(S.sel).length, ok = P.canAlly(S.sel);
+    const lab = `${IC.pc} ${P.ALLY_COST.pc}`, bw = W.btnW(lab);
+    const h1 = k.text(l, `[[handshake]] ${t("allyForm")}`, 12, y + 9, {font:"bodyB", size:13, w:cw - bw - 34}).h;
+    const h2 = k.text(l, `${t("allyNeed")} (${n}/3)`, 12, y + 9 + h1, {size:12, color:"muted", w:cw - bw - 34}).h;
+    const ch = Math.max(56, h1 + h2 + 18);
+    W.card(l, 0, y, cw, ch);
+    W.btn(l, "ally", cw - 11 - bw, y + (ch - 36) / 2, lab, () => P.formAlliance(S.sel), {disabled:!ok, kind:ok ? "primary" : "ghost", w:bw});
+    y += ch + 8;
+  }
+  // countries in the region
+  W.h3(l, t("countriesIn"), 0, y, {w:cw}); y += 22;
+  const list = P.regCountries(S.sel).slice().sort((a, b) => b.co2 - a.co2);
+  const tot = r.co2 || 1;
+  for (const c of list){
+    const id = "cr-" + c.id, hov = k.isHover(l, id), rh = 38;
+    k.rect(l, 0, y, cw, rh, hov ? "panel2" : null, {r:7, stroke:hov ? "accent" : "line", sa:hov ? 1 : .5, bg:true});
+    k.text(l, c.rest ? P.cname(c.id) : L(COUNTRY[c.id].name), 10, y + 3, {font:"bodyB", size:12.5, w:cw * .5, max:1});
+    k.text(l, `${c.co2.toFixed(2)} Gt · ${Math.round(c.co2 / tot * 100)}%`, 10, y + 20, {font:"mono", size:10.5, color:"muted"});
+    if (!c.rest){
+      W.relBar(l, cw * .56, y + 16, cw * .3, c.rel);
+      k.text(l, String(Math.round(c.rel)), cw * .88, y + 10, {font:"monoB", size:11, color:W.relCol(c.rel), w:cw * .1, align:"right"});
+      if (S.haz.some(h => h.c === c.id)) k.icon(l, HAZARDS[S.haz.find(h => h.c === c.id).type].icon, cw * .5, y + 11, 14, "bad");
+    }
+    k.hit(l, id, 0, y, cw, rh, () => Screens.selectCountry(c.id));
+    y += rh + 4;
+  }
+  y += 10;
+  W.h3(l, t("ordersRegion"), 0, y, {w:cw}); y += 22;
+  return this.orderCards(l, y, cw, "region");
+};
+
+/* ---------------- Country ---------------- */
+Screens.paneCountry = function(l, cw){
+  const c = P.C(S.selC); if (!c){ S.selC = null; return 0; }
+  const r = P.R(c.reg), meta = c.rest ? null : COUNTRY[c.id];
+  let y = 0;
+  y += k.text(l, P.cname(c.id), 0, y, {font:"dispS", size:19, w:cw}).h;
+  y += k.text(l, L(RMETA[c.reg].name) + (S.alli[c.reg] && S.alli[c.reg].members.includes(c.id) ? ` · [[handshake]] ${t("allyMember")}` : ""), 0, y, {size:12, color:"muted", w:cw, iconColor:"good"}).h + 8;
+  if (!c.rest){
+    // relation
+    W.card(l, 0, y, cw, 58);
+    k.text(l, t("relation"), 12, y + 8, {size:11, color:"muted"});
+    k.text(l, `${c.rel >= 0 ? "+" : ""}${Math.round(c.rel)}`, cw - 70, y + 4, {font:"monoB", size:20, color:W.relCol(c.rel), w:58, align:"right"});
+    W.relBar(l, 12, y + 36, cw - 24, c.rel);
+    k.text(l, t(c.rel >= 50 ? "relHigh" : c.rel >= 0 ? "relMid" : "relLow"), 12, y + 44, {size:10.5, color:"muted", w:cw - 24, max:1});
+    y += 66;
+  }
+  const share = c.co2 / (r.co2 || 1);
+  y += statGrid(l, y, cw, [[t("co2Now"), `${c.co2.toFixed(2)} Gt`, "hot"], [t("shareOfRegion"), `${Math.round(share * 100)}%`], [t("risk"), c.rest ? "—" : `${meta.risk}%`, meta && meta.risk >= 65 ? "bad" : "fg"], [t("adapt"), `${Math.round(c.adapt)}`]]) + 4;
+  if (meta){
+    const hz = meta.hz.map(h => `[[${HAZARDS[h].icon}]] ${L(HAZARDS[h].name)}`).join("   ");
+    y += k.text(l, `${t("hazardsHere")}: ${hz}`, 0, y, {size:11.5, color:"muted", w:cw, iconColor:"warn"}).h + 10;
+  }
+  const hz = S.haz.find(h => h.c === c.id);
+  if (hz){
+    const Z = HAZARDS[hz.type], left = Math.max(0, hz.at - S.tick);
+    const lab = hz.evac ? `[[check]] ${t("evacuated")}` : `${t("evacuate")} · ${IC.ep} ${P.evacCost()}`;
+    const bw = W.btnW(lab);
+    const h1 = k.text(l, `[[${Z.icon}]] ${t("forecast")}: ${L(Z.name)} · ${left} ${t("months")}`, 12, y + 10, {font:"bodyB", size:13, color:"bad", w:cw - bw - 34, iconColor:"bad"}).h;
+    const ch = Math.max(56, h1 + 22);
+    W.card(l, 0, y, cw, ch, {stroke:"bad", sa:.6});
+    W.btn(l, "evac", cw - 11 - bw, y + (ch - 36) / 2, lab, () => P.evacuate(hz.id), {disabled:hz.evac || S.ep < P.evacCost(), kind:hz.evac ? "ghost" : "danger", w:bw});
+    y += ch + 8;
+  }
+  if (!c.rest){
+    W.h3(l, t("ordersCountry"), 0, y, {w:cw}); y += 22;
+    for (const a of P.CACTS){
+      if (a.req && !S.owned[a.req]) continue;
+      const kk = P.cactCost(a), cd = c.cd[a.id] || 0, ok = P.cactOk(a, c);
+      const label = cd ? `${t("cooldown")} ${cd}` : [kk.ep ? `${IC.ep} ${kk.ep}` : "", kk.pc ? `${IC.pc} ${kk.pc}` : ""].filter(Boolean).join("  ");
+      const btnW = Math.ceil(k.textW(label, {font:"dispS", size:14})) + 30, tw = cw - 22 - btnW - 10;
+      const h1 = k.text(l, `[[${a.icon}]] ${L(a.name)}`, 11, y + 9, {font:"bodyB", size:13.5, w:tw, iconColor:"accent"}).h;
+      const h2 = k.text(l, L(a.desc), 11, y + 9 + h1, {size:12, color:"muted", w:tw}).h;
+      const ch = Math.max(9 + h1 + h2 + 9, 56);
+      W.card(l, 0, y, cw, ch);
+      W.btn(l, "ca-" + a.id, cw - 11 - btnW, y + (ch - 36) / 2, label, () => P.countryAction(a.id), {disabled:!ok, kind:ok ? "primary" : "ghost", w:btnW, sound:false});
+      y += ch + 7;
+    }
+    // bilateral agreement
+    y += 4;
+    W.h3(l, t("bilatTitle"), 0, y, {w:cw}); y += 20;
+    y += k.text(l, `${t("bilatDesc")} · ${IC.ep} ${P.BILAT_COST.ep} ${IC.pc} ${P.BILAT_COST.pc}`, 0, y, {size:12, color:"muted", w:cw}).h + 6;
+    if (c.rel < 40) y += k.text(l, t("bilatNeedRel"), 0, y, {size:12, color:"warn", w:cw}).h + 8;
+    else {
+      const ps = P.bilatPartners().sort((a, b) => b.rel - a.rel).slice(0, 12);
+      if (!ps.length) y += k.text(l, t("bilatNone"), 0, y, {size:12, color:"muted", w:cw}).h + 8;
+      let cx = 0, rowY = y; const afford = S.ep >= P.BILAT_COST.ep && S.pc >= P.BILAT_COST.pc;
+      for (const p of ps){
+        const nm = L(COUNTRY[p.id].name), w = k.textW(nm, {size:12}) + 26, id = "bl-" + p.id, hov = afford && k.isHover(l, id);
+        if (cx + w > cw){ cx = 0; rowY += 30; }
+        k.rect(l, cx, rowY, w, 26, hov ? "accent" : null, {r:13, stroke:afford ? "accent" : "line", a:hov ? .2 : 1, bg:true});
+        k.circle(l, cx + 10, rowY + 13, 3.5, W.relCol(p.rel));
+        k.text(l, nm, cx + 18, rowY + 4, {size:12, color:afford ? "fg" : "muted"});
+        k.hit(l, id, cx, rowY, w, 26, () => P.bilateral(p.id), {disabled:!afford});
+        cx += w + 6;
+      }
+      if (ps.length) y = rowY + 36;
+    }
+  }
+  y += 6;
+  W.h3(l, `${t("ordersRegion")} · ${c.rest ? L(RMETA[c.reg].name) : t("thisCountryOnly")}`, 0, y, {w:cw}); y += 22;
+  return this.orderCards(l, y, cw, c.rest ? "region" : "country");
+};
+
+/* ---------------- Stats ---------------- */
+Screens.paneStats = function(l, cw){
+  let y = 0;
+  W.h3(l, t("chartCo2"), 0, y, {w:cw, size:11.5}); y += 20;
+  this.lineChart(l, 0, y, cw, 150, S.hist.map(h => h.net), {min:-5, max:45, ticks:[0,10,20,30,40], color:"hot", refs:[{v:0, c:"good"}]}); y += 150 + 14;
+  W.h3(l, t("chartTemp"), 0, y, {w:cw, size:11.5}); y += 20;
+  this.lineChart(l, 0, y, cw, 150, S.hist.map(h => h.temp), {min:1.0, max:3.0, ticks:[1.0,1.5,2.0,2.5,3.0], color:"accent", refs:[{v:1.5, c:"warn"}, {v:2.0, c:"bad"}]}); y += 150 + 14;
+  W.h3(l, t("shares"), 0, y, {w:cw, size:11.5}); y += 22;
+  const g = P.grossCO2() || 1;
+  for (const r of S.regions){
+    k.text(l, r.id, 0, y, {font:"mono", size:12});
+    W.meter(l, 56, y + 6, cw - 56 - 64, 8, r.co2 / g, "hot");
+    k.text(l, r.co2.toFixed(2), cw - 56, y, {font:"mono", size:12, w:56, align:"right"});
+    y += 24;
+  }
+  y += 8; W.h3(l, t("topEmitters"), 0, y, {w:cw, size:11.5}); y += 22;
+  for (const c of S.countries.filter(x => !x.rest).sort((a, b) => b.co2 - a.co2).slice(0, 8)){
+    k.text(l, L(COUNTRY[c.id].name), 0, y, {size:12, w:120, max:1});
+    W.meter(l, 124, y + 6, cw - 124 - 64, 8, c.co2 / g, "warn");
+    k.text(l, c.co2.toFixed(2), cw - 56, y, {font:"mono", size:12, w:56, align:"right"});
+    y += 24;
+  }
+  y += 6; W.h3(l, S.lang === "th" ? "แถบอุณหภูมิรายเดือน" : "Warming stripes", 0, y, {w:cw, size:11.5}); y += 20;
+  k.rect(l, 0, y, cw, 12, "panel2", {r:3});
+  const sw = cw / (P.TOTAL_TICKS + 1);
+  S.hist.forEach((h, i) => k.rect(l, i * sw, y, sw + 0.4, 12, tempColor(h.temp)));
+  y += 22;
+  k.text(l, `${t("timePlayed")}: ${P.fmtTime(S.realSec)}`, 0, y, {font:"mono", size:12, color:"muted"}); y += 22;
+  return y;
+};
+const STRIPE = ["#08306b","#2171b5","#6baed6","#c6dbef","#fee0d2","#fc9272","#ef3b2c","#a50f15","#67000d"];
+function tempColor(v){
+  const x = P.clamp((v - 0.9) / (2.7 - 0.9), 0, 1) * (STRIPE.length - 1), i = Math.floor(x), f = x - i;
+  return k.mix(STRIPE[i], STRIPE[Math.min(i + 1, STRIPE.length - 1)], f);
+}
+Screens.lineChart = function(l, x, y, w, hgt, data, o){
+  k.rect(l, x, y, w, hgt, "bg", {r:8, bg:true});
+  const pad = {l:34, r:10, t:10, b:20}, Wd = w - pad.l - pad.r, Hd = hgt - pad.t - pad.b, lo = o.min, hi = o.max;
+  const sx = i => x + pad.l + i / P.TOTAL_TICKS * Wd, sy = v => y + pad.t + (1 - (P.clamp(v, lo, hi) - lo) / (hi - lo)) * Hd;
+  o.ticks.forEach(v => { const yy = sy(v); k.line(l, x + pad.l, yy, x + w - pad.r, yy, "line"); k.text(l, String(v), x + 3, yy - 8, {font:"mono", size:10, color:"muted"}); });
+  [2026, 2034, 2042, 2050].forEach(yr => k.text(l, String(yr), sx((yr - 2026) * 12) - 12, y + hgt - 17, {font:"mono", size:10, color:"muted"}));
+  (o.refs || []).forEach(rf => k.line(l, x + pad.l, sy(rf.v), x + w - pad.r, sy(rf.v), rf.c, {dash:4}));
+  if (data.length < 2) return;
+  const base = sy(Math.max(lo, 0)), pts = [];
+  data.forEach((v, i) => pts.push(sx(i), sy(v)));
+  k.poly(l, [...pts, sx(data.length - 1), base, sx(0), base], o.color, {a:.15});
+  k.path(l, pts, o.color, {w:2});
+  const li = data.length - 1; k.circle(l, sx(li), sy(data[li]), 4, o.color);
+};
+
+/* ---------------- News ---------------- */
+Screens.paneNews = function(l, cw){
+  let y = 0;
+  const COLS = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg"};
+  for (const lg of S.log.slice(0, 80)){
+    const hh = k.text(l, lg.txt, 80, y + 5, {size:13, color:COLS[lg.cls] || "fg", w:cw - 80}).h;
+    k.text(l, P.dateStr(lg.tk), 0, y + 6, {font:"mono", size:12, color:"muted"});
+    y += hh + 10;
+    k.line(l, 0, y, cw, y, "line", {dash:3});
+  }
+  return y;
+};
+
+};
+gdjs.LoadingCode.userFunc0x1013830 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Screens · หน้าต่างเริ่มภารกิจ, เหตุการณ์, จบเกม, หยุดเกม, คู่มือ */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.modals) return;
+(P.mods = P.mods || {}).modals = 1;
+/* =========================================================================
+   Screens · pop-up windows: character select, story, dilemma event, end of game, pause, tutorial
+   Veil + window frame on layer "Modal"; content (scrollable) on "ModalScroll".
+   Pause / skills / learning page close when you tap outside the window.
+   ========================================================================= */
+const TUT_SIZES = {"t1-goal":[1280,720],"t2-meters":[1280,720],"t3-resources":[1280,720],"t4-regions":[1280,720],"t5-bubbles":[1280,720],"t6-tree":[1280,720],"t7-event":[1280,720],"t8-win":[1280,720]};
+const {Kit, S, t, L, UI, Audio, W, UIM, Screens, TUT, CHARS, CHAR, STORY, ADVISOR, ENDINGS, HAZARDS, COUNTRY, IC} = P;
+const k = Kit;
+const WIDTH = {tutorial:720, charsel:1150, story:800, learn:980, end:640, event:660, pause:620};
+
+Screens.renderModal = function(l){
+  const kind = UIM.kind();
+  l.blocks = !!kind; const sl = k.L("ModalScroll");
+  if (!kind){ k.clearSlave("ModalScroll"); return; }
+  if (kind === "skills") return this.renderSkills(l);
+  const pw = WIDTH[kind] || 620;
+  const px = kind === "end" ? 1280 - pw - 40 : (1280 - pw) / 2;
+  let ch = 0;
+  k.slave("ModalScroll", s => {
+    if (kind === "event") ch = this.mEvent(s, pw);
+    else if (kind === "end") ch = this.mEnd(s, pw);
+    else if (kind === "charsel") ch = this.mCharSel(s, pw);
+    else if (kind === "story") ch = this.mStory(s, pw);
+    else if (kind === "pause") ch = this.mPause(s, pw);
+    else if (kind === "tutorial") ch = this.mTutorial(s, pw);
+    else if (kind === "learn") ch = this.mLearn(s, pw);
+    const ph = Math.min(ch, 690), py = (720 - ph) / 2;
+    s.frame(px, py, {x:px, y:py, w:pw, h:ph}, ch);
+    this._modalBox = {px, py, pw, ph};
+  });
+  const {py, ph} = this._modalBox;
+  if (kind === "end"){
+    const e = ENDINGS[S.over] || ENDINGS.l3;
+    const art = k.sprite(l, "EndArt", S.over === "win" ? `end-win-${S.grade || "A"}` : e.img, 0, 0, 1280, 720);
+    if (art.getZOrder() !== -10) art.setZOrder(-10);   // under the window frame
+    k.hgrad(l, 0, 0, 1280, 720, [[0, "#020609"], [.35, "#020609"], [1, "#020609"]], {a:.0, bg:true});
+    k.rect(l, px - 40, 0, pw + 80, 720, "#020609", {a:.55, bg:true});
+  } else k.rect(l, 0, 0, 1280, 720, "#020609", {a:kind === "story" ? .78 : .62, bg:true});
+  const closer = {pause:() => Screens.resume(), learn:() => Screens.closeLearn()}[kind];
+  if (closer){ k.hit(l, "veil", 0, 0, 1280, 720, () => { Audio.play("close"); closer(); }, {cursor:false}); }
+  k.hit(l, "mbox", px, py, pw, ph, () => {}, {cursor:false});
+  const border = kind === "end" ? (S.over === "win" ? "good" : "bad") : "line";
+  k.rect(l, px + 4, py + 10, pw, ph, "#000000", {a:.35, r:14, bg:true});
+  k.rect(l, px, py, pw, ph, "panel", {r:14, stroke:border, sw:kind === "end" ? 1.5 : 1, bg:true, a:kind === "end" ? .94 : 1});
+  if (closer){ W.hbtn(l, "mclose", px + pw - 40, py + 10, "x", () => { Audio.play("close"); closer(); }, {color:"muted"}); }
+  if (sl && sl.content > sl.clip.h){
+    const th = Math.max(30, sl.clip.h * sl.clip.h / sl.content), ty = sl.clip.y + (sl.clip.h - th) * (sl.scroll / (sl.content - sl.clip.h));
+    k.rect(l, px + pw - 7, ty, 3, th, "line", {r:1.5});
+  }
+};
+const tag = (l, s, x, y, col = "warn") => k.text(l, P.up(s), x, y, {font:"mono", size:11, color:col, iconColor:col});
+const h3 = (l, s, x, y, w, size = 23) => k.text(l, s, x, y, {font:"disp", size, lh:1.25, w});
+const bullets = (l, list, x, y, w, size = 14, gap = 4) => {
+  let yy = y;
+  for (const it of list){
+    k.text(l, "•", x, yy, {size, color:"muted"});
+    yy += k.text(l, it, x + 16, yy, {size, w:w - 16}).h + gap;
+  }
+  return yy - y;
+};
+
+/* ---------------- dilemma event ----------------
+   question on top · short situation · each choice as a card with impact arrows (no exact numbers)
+   choices unlock after a 1.5 s countdown so a stray tap can't pick one */
+const arrows = (up, mag) => { const n = mag < 1 ? 1 : mag < 2.5 ? 2 : 3; return (up ? "▲" : "▼").repeat(n); };
+Screens.mEvent = function(l, pw){
+  const e = P.currentEvent(); if (!e) return 100;
+  const x = 22, w = pw - 44; let y = 18;
+  const where = e.country ? t("evCountryTag") : e.target ? `${t("eventTag")} · ${L(P.RMETA[e.target].name)}` : `${t("eventTag")} · ${t("global")}`;
+  tag(l, `[[${e.country ? "globe" : "siren"}]] ${where}`, x, y, e.country ? "accent" : "warn"); y += 20;
+  y += h3(l, L(e.title), x, y, w).h + 6;
+  if (e.country){
+    const row = (lab, ids, col) => {
+      let yy = y; k.text(l, lab, x, yy + 3, {font:"bodyB", size:12, color:col}); let cx = x + 92;
+      for (const id of ids){
+        const c = P.C(id), nm = L(COUNTRY[id].name), cw2 = k.textW(nm, {size:12}) + 52;
+        if (cx + cw2 > x + w){ cx = x + 92; yy += 28; }
+        k.rect(l, cx, yy, cw2, 24, null, {r:12, stroke:col, sa:.6, bg:true});
+        k.circle(l, cx + 11, yy + 12, 3.5, W.relCol(c.rel));
+        k.text(l, nm, cx + 19, yy + 3, {size:12});
+        k.text(l, String(Math.round(c.rel)), cx + cw2 - 30, yy + 4, {font:"mono", size:10.5, color:W.relCol(c.rel), w:24, align:"right"});
+        cx += cw2 + 6;
+      }
+      y = yy + 30;
+    };
+    row(t("sideA"), e.A, "good"); row(t("sideB"), e.B, "bad"); y += 2;
+  }
+  y += k.text(l, L(e.desc), x, y, {size:14, w, color:"muted"}).h + 12;
+  // the question + countdown
+  const locked = UIM.eventLocked(), f = UIM.eventLockFrac();
+  k.text(l, `[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`, x, y, {font:"dispS", size:16, color:"fg", iconColor:"accent"});
+  if (P.hasKeyboard()) k.text(l, t("evKeys"), x + w - 140, y + 4, {font:"mono", size:10.5, color:"muted", w:140, align:"right"});
+  y += 28;
+  W.meter(l, x, y, w, 4, f, locked ? "warn" : "accent"); y += 12;
+  const hard = S.mode === "hard";
+  const opts = e.options.map((o, i) => ({o, i, ok:P.affordable(o.fx)}));
+  const none = opts.every(q => !q.ok);
+  if (none) opts.push({o:{label:{th:UI.postpone.th, en:UI.postpone.en}, fx:P.POSTPONE}, i:-1, ok:true});
+  for (const {o, i, ok} of opts){
+    const id = "opt" + i, usable = ok && !locked, hov = usable && k.isHover(l, id), a = !ok ? .45 : locked ? .6 : 1;
+    const oy = y;
+    let cy = oy + 12;
+    const letter = i === -1 ? "!" : "ABC"[i];
+    k.rect(l, x + 12, cy, 26, 26, hov ? "accent" : "panel", {r:7, stroke:"accent", sa:.6});
+    k.text(l, letter, x + 12, cy + 2, {font:"monoB", size:14, color:hov ? "ink" : "accent", w:26, align:"center", a});
+    cy += k.text(l, L(o.label), x + 48, cy + 1, {font:"bodyB", size:15, w:w - 60, a}).h + 8;
+    if (!hard){
+      const chips = P.fxChips(o.fx, e.target);
+      let cx = x + 48;
+      for (const c of chips){
+        const lab = (c.txt.includes(t("sideA")) ? t("sideA") : c.txt.includes(t("sideB")) ? t("sideB") : "") + (c.txt.includes(t("delayed")) ? " " + t("later") : "");
+        const ar = arrows(c.up, c.mag || 1), cw2 = 16 + 4 + (lab ? k.textW(lab, {size:11}) + 4 : 0) + k.textW(ar, {font:"mono", size:11}) + 14;
+        if (cx + cw2 > x + w - 12){ cx = x + 48; cy += 26; }
+        const col = c.good ? "good" : "bad";
+        k.rect(l, cx, cy, cw2, 22, null, {r:11, stroke:col, sa:.45, bg:true});
+        k.icon(l, c.icon || "circle", cx + 7, cy + 3, 16, "fg", a);
+        let tx = cx + 27; if (lab){ k.text(l, lab, tx, cy + 2, {size:11, color:"muted", a}); tx += k.textW(lab, {size:11}) + 4; }
+        k.text(l, ar, tx, cy + 3, {font:"mono", size:11, color:col, a});
+        cx += cw2 + 6;
+      }
+      if (!chips.length) k.text(l, "—", cx, cy, {size:12, color:"muted"});
+      cy += 26;
+    } else { cy += k.text(l, `[[eye-off]] ${t("hardHidden")}`, x + 48, cy, {size:11.5, color:"muted", iconColor:"muted"}).h + 2; }
+    if (!ok){ cy += 2; cy += k.text(l, t("cantAfford"), x + 48, cy, {size:12, color:"bad"}).h; }
+    cy += 10;
+    k.rect(l, x, oy, w, cy - oy, "panel2", {r:12, stroke:hov ? "accent" : "line", sw:hov ? 1.5 : 1, under:true, a:ok ? 1 : .6});
+    k.hit(l, id, x, oy, w, cy - oy, () => { if (!UIM.eventLocked()) P.chooseOption(i); }, {disabled:!usable});
+    y = cy + 9;
+  }
+  return y + 12;
+};
+
+/* ---------------- end of game ---------------- */
+const QUOTES = {
+  win:{th:"เราทำได้! แต่การดูแลโลกใบนี้ไม่มีวันจบ",en:"We did it! But looking after this planet never really ends."},
+  l1:{th:"เราช้าไป... ขอให้คนรุ่นต่อไปเรียนรู้จากวันนี้",en:"We were too slow... may the next generation learn from today."},
+  l2:{th:"ถ้าประชาชนไม่เชื่อมั่น นโยบายที่ดีที่สุดก็ไปต่อไม่ได้",en:"Without the people's trust, even the best policy goes nowhere."},
+  l3:{th:"ใกล้แล้ว แต่ยังไม่พอ ครั้งหน้าเราต้องเร็วกว่านี้",en:"Close, but not enough. Next time we have to move faster."},
+};
+Screens.mEnd = function(l, pw){
+  const o = S.over, win = o === "win", x = 22, w = pw - 44; let y = 18;
+  tag(l, `${P.dateStr()} · ${t("mode_" + S.mode)}`, x, y, win ? "good" : "bad"); y += 18;
+  y += h3(l, t(win ? "winTitle" : o + "Title"), x, y, w, 28).h + 2;
+  if (win) y += k.text(l, L(ENDINGS.win.grades[S.grade || "A"]), x, y, {font:"dispS", size:16, color:"gold"}).h + 4;
+  y += k.text(l, t(win ? "winBody" + (S.grade || "A") : o + "Body"), x, y, {size:14, w}).h + 10;
+  // character quote
+  const qh = Math.max(56, k.text(null, L(QUOTES[o]), 0, 0, {size:13, w:w - 90, measure:true}).h + 28);
+  W.card(l, x, y, w, qh, {fill:"panel2"});
+  W.portrait(l, x + 10, y + (qh - 48) / 2, 48, S.char);
+  k.text(l, L(CHAR[S.char].person), x + 70, y + 6, {font:"bodyB", size:12, color:CHAR[S.char].color});
+  k.text(l, `“${L(QUOTES[o])}”`, x + 70, y + 24, {size:13, w:w - 90, color:"fg"});
+  y += qh + 10;
+  const net = P.netCO2();
+  const stats = [[t("temp"), `+${S.temp.toFixed(2)}°C`], [t("co2"), `${net.toFixed(1)} Gt`], [t("appr"), `${S.appr.toFixed(0)}%`],
+    ["Net Zero", `${Math.round(P.clamp((36 - net) / 36, 0, 1) * 100)}%`], [t("skillsTitle"), `${Object.keys(S.owned).length}/${P.SKILLS.length}`], [t("timePlayed"), P.fmtTime(S.realSec)]];
+  const cw = (w - 16) / 3, chh = 54;
+  stats.forEach(([a, b], i) => {
+    const cx = x + (i % 3) * (cw + 8), cy = y + Math.floor(i / 3) * (chh + 8);
+    k.rect(l, cx, cy, cw, chh, "panel2", {r:8, bg:true});
+    k.text(l, P.up(a), cx + 10, cy + 6, {size:11, color:"muted", w:cw - 20, max:1});
+    k.text(l, b, cx + 10, cy + 24, {font:"monoB", size:17});
+  });
+  y += 2 * (chh + 8) + 6;
+  // your story
+  const st = P.endStory();
+  W.h3(l, t("yourStory"), x, y, {w}); y += 20;
+  const lines = [];
+  if (st.best) lines.push(`[[heart-handshake]] ${t("storyBest")}: ${P.cname(st.best)}`);
+  if (st.worst) lines.push(`[[${HAZARDS[st.worst.type].icon}]] ${t("storyWorst")}: ${L(HAZARDS[st.worst.type].name)} · ${P.cname(st.worst.c)} · ${P.dateStr(st.worst.tick)}`);
+  st.dec.forEach(d => lines.push(`[[git-branch]] ${L(d.title)} → ${L(d.label)}`));
+  if (!lines.length) lines.push(t("storyNone"));
+  for (const s of lines) y += k.text(l, s, x, y, {size:12.5, w, color:"fg", iconColor:"accent"}).h + 3;
+  y += 10;
+  // reward
+  const rw = UIM.reward;
+  let rtxt;
+  if (!rw) rtxt = `[[loader]] ${t("rewardWait")}`;
+  else if (rw.guest) rtxt = `${t("rewardGuest")} · XP +${rw.xp}`;
+  else if (rw.error) rtxt = `${t("rewardFail")} · XP +${rw.xp || 0}`;
+  else rtxt = null;
+  const rh = 50;
+  W.card(l, x, y, w, rh, {fill:"bg", stroke:rw && !rw.guest && !rw.error ? "good" : "line"});
+  if (rtxt) k.text(l, rtxt, x + 12, y + 14, {size:12.5, color:"muted", w:w - 24, max:2, iconColor:"muted"});
+  else {
+    let cx = x + 12;
+    cx += W.terra(l, cx, y + 13, `+${rw.terra}`, {size:16, color:"good"}) + 12;
+    cx = W.runs(l, cx, y + 14, [[`XP +${rw.xp}`, {font:"monoB", size:14, color:"accent"}]]) + 12;
+    if (rw.levelUp) k.text(l, `[[star]] ${t("levelUp")} ${rw.level}`, cx, y + 15, {size:13, color:"gold", iconColor:"gold"});
+    if (rw.note) k.text(l, rw.note, x + 12, y + 34, {size:10.5, color:"muted", w:w - 24, max:1});
+  }
+  y += rh + 12;
+  k.text(l, P.up(t("finalScore")), x, y, {size:12, color:"muted"});
+  k.text(l, P.score().toLocaleString(), x, y + 16, {font:"disp", size:38, color:"accent", lh:1.1});
+  let bx = x + w;
+  const wR = W.btnW(t("restart")), wM = W.btnW(t("mainMenu"));
+  bx -= wR; W.btn(l, "restart", bx, y + 22, t("restart"), () => { Audio.stopAmb(300); UIM.reward = null; UIM.modal = "charsel"; S.over = null; S.started = false; P.newGame(S.lang, {mode:S.mode, char:S.char}); P.Map.refresh(); k.dirty(); });
+  bx -= wM + 8; W.btn(l, "tomenu", bx, y + 22, t("mainMenu"), () => Screens.toMenu(), {kind:"ghost"});
+  return y + 22 + 36 + 22;
+};
+
+/* ---------------- character select + mode ---------------- */
+Screens.mCharSel = function(l, pw){
+  const x = 24, w = pw - 48; let y = 18;
+  tag(l, t("introTag"), x, y, "accent"); y += 18;
+  y += h3(l, t("charTitle"), x, y, w).h + 2;
+  y += k.text(l, t("charSub"), x, y, {size:13.5, color:"muted", w}).h + 12;
+  const sel = UIM.charSel || "sci", cw = (w - 3 * 12) / 4, chH = 330;
+  CHARS.forEach((c, i) => {
+    const cx = x + i * (cw + 12), owned = P.Net.owns("char_" + c.id), on = sel === c.id, id = "ch-" + c.id, hov = k.isHover(l, id);
+    const xp = P.Net.charXp(c.id), lv = P.levelOf(xp), a = owned ? 1 : .55;
+    k.rect(l, cx, y, cw, chH, on ? "panel2" : "bg", {r:12, stroke:on ? c.color : hov ? "accent" : "line", sw:on ? 2 : 1, bg:true});
+    k.rect(l, cx + 10, y + 10, cw - 20, 150, c.color, {r:10, a:.12});
+    k.sprite(l, "Portrait", `${c.id}-${P.outfitOf(c.id)}`, cx + (cw - 150) / 2, y + 10, 150, 150, a);
+    if (!owned){ k.rect(l, cx + cw - 46, y + 16, 30, 30, "bg", {r:15, stroke:"line"}); k.icon(l, "lock", cx + cw - 39, y + 23, 16, "muted"); }
+    let ty = y + 168;
+    ty += k.text(l, L(c.name), cx + 12, ty, {font:"dispS", size:16, w:cw - 24, max:1, a}).h;
+    ty += k.text(l, `${L(c.person)} · ${t("level")} ${lv}`, cx + 12, ty, {font:"mono", size:11, color:c.color, w:cw - 24, max:1, a}).h + 2;
+    const nx = P.LEVELS[lv] ?? null, pv = P.LEVELS[lv - 1];
+    W.meter(l, cx + 12, ty + 2, cw - 24, 4, nx ? (xp - pv) / (nx - pv) : 1, c.color); ty += 12;
+    ty += k.text(l, L(c.pas), cx + 12, ty, {size:11.5, color:"muted", w:cw - 24, lh:1.3, a}).h + 4;
+    for (const ab of c.acts) ty += k.text(l, `[[${ab.icon}]] ${L(ab.name)}${ab.lv ? ` (Lv${ab.lv})` : ""}`, cx + 12, ty, {size:11.5, w:cw - 24, max:1, a, iconColor:c.color}).h;
+    if (!owned) k.text(l, P.Net.user ? `[[terra]] ${c.price} · ${t("buyInShop")}` : `[[terra]] ${c.price} · ${t("loginToBuy")}`, cx + 12, y + chH - 24, {font:"mono", size:11, color:"gold", w:cw - 24, max:1, iconColor:"#ffffff"});
+    k.hit(l, id, cx, y, cw, chH, () => { Audio.play(owned ? "select" : "error"); if (owned) UIM.charSel = c.id; else UIM.msg = t("charLocked"); k.dirty(); });
+  });
+  y += chH + 14;
+  // mode
+  W.h3(l, t("modeTitle"), x, y, {w}); y += 22;
+  const modes = [["normal", "globe"], ["hard", "skull"], ["daily", "calendar-check"]];
+  const mw = (w - 2 * 10) / 3;
+  modes.forEach(([m, ic], i) => {
+    const mx = x + i * (mw + 10), on = UIM.modeSel === m, id = "md-" + m, hov = k.isHover(l, id);
+    const dis = m === "daily" && false;
+    k.rect(l, mx, y, mw, 64, on ? "panel2" : "bg", {r:10, stroke:on ? (m === "hard" ? "bad" : "accent") : hov ? "accent" : "line", sw:on ? 2 : 1, bg:true});
+    k.icon(l, ic, mx + 12, y + 12, 20, on ? (m === "hard" ? "bad" : "accent") : "muted");
+    k.text(l, t("mode_" + m), mx + 42, y + 9, {font:"dispS", size:15});
+    k.text(l, t("modeD_" + m), mx + 42, y + 32, {size:11, color:"muted", w:mw - 52, max:2, lh:1.3});
+    k.hit(l, id, mx, y, mw, 64, () => { Audio.play("click"); UIM.modeSel = m; k.dirty(); }, {disabled:dis});
+  });
+  y += 76;
+  if (UIM.msg){ k.text(l, UIM.msg, x, y, {size:12.5, color:"warn", w}); }
+  const go = () => {
+    const ch = UIM.charSel || "sci"; if (!P.Net.owns("char_" + ch)) return;
+    UIM.msg = ""; UIM.modal = null;
+    P.startGame(S.lang, {mode:UIM.modeSel, char:ch, charLv:P.levelOf(P.Net.charXp(ch)), seed:UIM.modeSel === "daily" ? P.dailySeed() : undefined});
+  };
+  const sl = t("start"), sw = W.btnW(sl, {size:15}) + 20;
+  W.btn(l, "start", x + w - sw, y, sl, go, {size:15, w:sw, h:40});
+  let bx = x + w - sw - 8;
+  const tl = `[[graduation-cap]] ${t("tutMenu")}`, tw2 = W.btnW(tl); bx -= tw2; W.btn(l, "csTut", bx, y + 2, tl, () => Screens.openTutorial(0, true), {kind:"ghost"});
+  const ml = t("mainMenu"), mw2 = W.btnW(ml); bx -= mw2 + 8; W.btn(l, "csMenu", bx, y + 2, ml, () => Screens.toMenu(), {kind:"ghost"});
+  return y + 40 + 22;
+};
+
+/* ---------------- story (comic panels) ---------------- */
+Screens.mStory = function(l, pw){
+  const st = STORY.find(a => a.act === UIM.storyAct) || STORY[0];
+  const x = 22, w = pw - 44; let y = 18;
+  tag(l, `[[book-open]] ${t("storyTag")}`, x, y, "accent"); y += 18;
+  y += h3(l, L(st.title), x, y, w).h + 10;
+  const n = st.panels.length, cols = 2, gw = (w - 12) / cols, gh = 150;
+  const age = Math.min(1, (performance.now() - (UIM.storyT || 0)) / 450);
+  st.panels.forEach((p, i) => {
+    if (i > UIM.storyI) return;
+    const cx = x + (i % cols) * (gw + 12), cy = y + Math.floor(i / cols) * (gh + 12), a = i === UIM.storyI ? age : 1;
+    k.rect(l, cx, cy, gw, gh, p.bg, {r:12, stroke:"line", a, bg:true});
+    k.icon(l, p.icon, cx + gw - 92, cy + 16, 76, "#ffffff", .16 * a);
+    const who = p.who === "me" ? S.char : "adv";
+    W.portrait(l, cx + 12, cy + 12, 56, who, {a, ring:p.who === "me" ? CHAR[S.char].color : "#c3a6ff"});
+    const nm = p.who === "me" ? L(CHAR[S.char].person) : L(ADVISOR.name);
+    k.text(l, nm, cx + 78, cy + 14, {font:"bodyB", size:12, color:p.who === "me" ? CHAR[S.char].color : "purple", w:gw - 90, max:1, a});
+    // speech bubble
+    const th2 = k.text(null, L(p.say), 0, 0, {size:13.5, w:gw - 40, measure:true}).h;
+    const by2 = cy + 76;
+    k.rect(l, cx + 12, by2 - 6, gw - 24, Math.min(gh - 76, th2 + 12), "#ffffff", {r:10, a:.94 * a});
+    k.poly(l, [cx + 34, by2 - 6, cx + 46, by2 - 6, cx + 38, by2 - 16], "#ffffff", {a:.94 * a});
+    k.text(l, L(p.say), cx + 20, by2, {size:13.5, color:"#0b1a20", w:gw - 40, a});
+  });
+  y += Math.ceil((UIM.storyI + 1) / cols) * (gh + 12) + 6;
+  const last = UIM.storyI >= n - 1;
+  const nl = last ? `${t("storyGo")} [[play]]` : `${t("tutNext")} [[chevron-right]]`, nw = W.btnW(nl);
+  W.btn(l, "snext", x + w - nw, y, nl, () => Screens.storyNext());
+  W.btn(l, "sskip", x, y, t("tutSkip"), () => Screens.storySkip(), {kind:"ghost"});
+  if (P.hasKeyboard()) k.text(l, t("storyKeys"), x + 90, y + 10, {font:"mono", size:10.5, color:"muted"});
+  return y + 36 + 20;
+};
+
+/* ---------------- pause ---------------- */
+Screens.mPause = function(l, pw){
+  const x = 20, w = pw - 40; let y = 18;
+  tag(l, `${P.dateStr()} · ${t("mode_" + S.mode)}`, x, y); y += 18;
+  y += h3(l, t("pTitle"), x, y, w - 40).h + 4;
+  y += k.text(l, `[[timer]] ${t("timePlayed")} ${P.fmtTime(S.realSec)}`, x, y, {font:"mono", size:12, color:"muted", iconColor:"muted"}).h + 10;
+  W.btn(l, "resume", x, y, t("pResume"), () => Screens.resume());
+  W.langSeg(l, x + w - 80, y + 3);
+  y += 36 + 14;
+  y += W.vol(l, x, y, w) + 12;
+  const saves = P.readSaves();
+  if (S.mode === "hard") y += k.text(l, `[[skull]] ${t("hardSaves")}`, x, y, {size:12.5, color:"warn", w, iconColor:"warn"}).h + 10;
+  else if (saves === null){ y += k.text(l, t("noStore"), x, y, {size:12.5, color:"bad", w}).h + 10; }
+  else for (const slot of ["s1", "s2", "s3"]){
+    const m = saves[slot] && saves[slot].meta, lines = P.slotMetaLines(m);
+    const sh = 22 + lines.length * 17 + 8;
+    W.card(l, x, y, w, sh, {r:10});
+    k.text(l, P.slotName(slot), x + 12, y + 7, {font:"dispS", size:15});
+    lines.forEach((s, i) => k.text(l, s, x + 12, y + 28 + i * 17, {font:"mono", size:11.5, color:"muted", w:w - 120, max:1}));
+    const bw = W.btnW(t("save"));
+    W.btn(l, "save-" + slot, x + w - 12 - bw, y + (sh - 36) / 2, t("save"), () => {
+      Audio.play("save"); P.Ach.unlock("saver");
+      const ok = P.writeSlot(slot);
+      UIM.msg = ok ? `${t("saved")} · ${P.slotName(slot)}` : t("noStore"); UIM.err = !ok;
+      if (ok && P.Net.user) P.Net.cloudSave(slot).then(r => { UIM.msg = r ? `${t("saved")} · ${P.slotName(slot)} · ${t("cloudOk")}` : UIM.msg; k.dirty(); });
+      k.dirty();
+    }, {kind:"ghost", sound:false});
+    y += sh + 7;
+  }
+  y += 8;
+  if (S.mode !== "hard"){
+    k.text(l, t("codeTitle"), x, y, {size:12, color:"muted"}); y += 20;
+    if (!UIM.codeOut || UIM.codeOutTick !== S.tick){ UIM.codeOut = P.exportCode(); UIM.codeOutTick = S.tick; }
+    k.rect(l, x, y, w, 62, "bg", {r:8, stroke:"line", bg:true});
+    k.text(l, UIM.codeOut.slice(0, 360), x + 10, y + 7, {font:"mono", size:11, color:"muted", w:w - 20, max:3, lh:1.45});
+    y += 70;
+    const cbw = W.btn(l, "copy", x, y, t("codeCopy"), () => {
+      const txt = UIM.codeOut;
+      const done = ok => { UIM.msg = ok ? t("codeCopied") : t("codeFail"); UIM.err = !ok; k.dirty(); };
+      const legacy = () => { try { const ta = document.createElement("textarea"); ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); done(ok); } catch(e) { done(false); } };
+      try { navigator.clipboard.writeText(txt).then(() => done(true), legacy); } catch(e) { legacy(); }
+    }, {kind:"ghost"});
+    if (UIM.msg) k.text(l, UIM.msg, x + cbw + 12, y + 9, {size:12.5, color:UIM.err ? "bad" : "good", w:w - cbw - 12, max:1});
+    y += 36 + 16;
+  } else if (UIM.msg){ k.text(l, UIM.msg, x, y, {size:12.5, color:UIM.err ? "bad" : "good", w}); y += 24; }
+  let bx = x;
+  bx += W.btn(l, "ptut", bx, y, `[[graduation-cap]] ${t("tutMenu")}`, () => Screens.openTutorial(0, false), {kind:"ghost"}) + 8;
+  bx += W.btn(l, "plearn", bx, y, `[[book-open]] ${t("mLearn")}`, () => Screens.openLearn(), {kind:"ghost"}) + 8;
+  y += 44;
+  W.btn(l, "pmain", x, y, t("pMain"), () => Screens.toMenu(), {kind:"ghost"});
+  if (P.hasKeyboard()) k.text(l, t("keysHelp"), x, y + 46, {font:"mono", size:10.5, color:"muted", w});
+  return y + 36 + (P.hasKeyboard() ? 50 : 20);
+};
+
+/* ---------------- tutorial (real screenshots) ---------------- */
+Screens.mTutorial = function(l, pw){
+  const n = TUT.length, i = UIM.tutI, st = TUT[i], last = i === n - 1;
+  const anim = st.img.replace(/\.(jpg|png)$/, "");
+  const sz = TUT_SIZES[anim] || [16, 9];
+  const boxH = 300, maxW = pw;
+  let iw = maxW, ih = iw * sz[1] / sz[0]; if (ih > boxH){ ih = boxH; iw = ih * sz[0] / sz[1]; }
+  k.rect(l, 0, 0, pw, boxH, "#000000", {r:14, bg:true});
+  k.sprite(l, "TutImage", anim, (pw - iw) / 2, (boxH - ih) / 2, iw, ih);
+  k.line(l, 0, boxH, pw, boxH, "line");
+  const x = 20, w = pw - 40; let y = boxH + 14;
+  k.text(l, `${i + 1} / ${n}`, x, y, {font:"mono", size:11, color:"accent"}); y += 18;
+  y += h3(l, L(st.title), x, y, w).h + 6;
+  y += bullets(l, st.body[S.lang], x, y, w, 14.5, 5) + 8;
+  const dw = (n - 1) * 14 + 26; let dx = (pw - dw) / 2;
+  for (let d = 0; d < n; d++){ const on = d === i; k.rect(l, dx, y, on ? 20 : 8, 8, on ? "accent" : "line", {r:4}); dx += (on ? 20 : 8) + 6; }
+  y += 22;
+  W.btn(l, "tskip", x, y, t("tutSkip"), () => Screens.tutAct("skip"), {kind:"ghost"});
+  const nl = last ? t("tutDone") : `${t("tutNext")} [[chevron-right]]`;
+  const nw = W.btnW(nl);
+  W.btn(l, "tnext", x + w - nw, y, nl, () => Screens.tutAct(last ? "done" : "next"));
+  if (i){ const bl = `[[chevron-left]] ${t("tutBack")}`, bw = W.btnW(bl); W.btn(l, "tback", x + w - nw - 8 - bw, y, bl, () => Screens.tutAct("back"), {kind:"ghost"}); }
+  return y + 36 + 20;
+};
+
+};
+gdjs.LoadingCode.userFunc0x1013908 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Screens · หน้าโหลด, เมนูหลัก, บัญชี, ร้านค้า, อันดับ, เกียรติบัตร, แจ้งเตือน */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.menu) return;
+(P.mods = P.mods || {}).menu = 1;
+/* =========================================================================
+   Screens · loading card, main menu (new game / continue / load / learning / achievements / how to play /
+   shop / leaderboard / certificate / account), achievement toasts
+   ========================================================================= */
+const {Kit, S, t, L, UI, Audio, W, UIM, Screens, ACH, SHOP, CHARS, CHAR, PRICE} = P;
+const k = Kit;
+
+/* ---------------- loading ---------------- */
+Screens.preloadExtra = function(){
+  if (P._extra) return P._extra;
+  const g = this.scene.getGame(), fm = g.getFontManager(), sm = g.getSoundManager();
+  const fonts = [...new Set(Object.values(Kit.FONT))], sounds = [...Audio.SFX.map(n => `sfx-${n}.mp3`), ...Audio.AMB.map(n => `amb-${n}.mp3`)];
+  const st = P._extra = {total:fonts.length + sounds.length, done:0, fonts:0, nf:fonts.length};
+  const fin = () => { st.done++; };
+  fonts.forEach(f => Promise.resolve().then(() => fm.loadResource(f)).catch(() => {}).finally(() => { fin(); st.fonts++; if (st.fonts === fonts.length) Kit.resetFonts(); }));
+  sounds.forEach(s => Promise.resolve().then(() => sm.loadResource(s)).catch(() => {}).finally(fin));
+  return st;
+};
+Screens.loaderUpdate = function(dt){
+  const g = this.scene.getGame(), ex = this.preloadExtra();
+  let p = 1;
+  try { p = (g.getSceneLoadingProgress("Menu") + g.getSceneLoadingProgress("Game")) / 2; } catch(e) {}
+  if (!(p >= 0)) p = 1;
+  p = p * 0.6 + (ex.done / ex.total) * 0.4;
+  const shown = this._ldShown || 0, np = Math.min(p, shown + dt * 2.5);
+  if (Math.abs(np - shown) > 0.001){ this._ldShown = np; k.dirty("Loader"); }
+  const ready = np >= 0.999;
+  if (ready !== this._ldReady){ this._ldReady = ready; k.dirty("Loader"); }
+};
+Screens.renderLoader = function(l){
+  if (!P._extra || P._extra.fonts < P._extra.nf) return;
+  const w = 440, x = (1280 - w) / 2, y = 210, p = this._ldShown || 0;
+  k.sprite(l, "Logo", "Logo", (1280 - 150) / 2, y - 120, 150, 150);
+  k.text(l, "GLOBAL CLIMATE TASKFORCE · 2026 – 2050", x, y + 40, {font:"mono", size:11, color:"accent", w, align:"center"});
+  const parts = [["PROJECT ", {font:"logo", size:52}], [":", {font:"logo", size:52, color:"accent"}], [" 2050", {font:"logo", size:52}]];
+  W.runs(l, x + (w - W.runsW(parts)) / 2, y + 62, parts);
+  const by = y + 148;
+  k.rect(l, x, by, w, 10, "panel2", {r:5});
+  if (p > 0.01) k.hgrad(l, x, by, Math.max(10, w * p), 10, [[0, "#1f9e78"], [1, "#4fd1c5"]], {r:5});
+  const stage = p < .15 ? t("ldFonts") : p < .35 ? t("ldGlobe") : p < .9 ? t("ldAudio") : p < .999 ? t("ldImg") : t("ldReady");
+  k.text(l, p >= .999 ? t("ldReady") : `${t("loading")} · ${stage}`, x, by + 18, {size:12.5, color:"muted"});
+  const pct = `${Math.round(p * 100)}%`;
+  k.text(l, pct, x + w - k.textW(pct, {font:"mono", size:12.5}), by + 18, {font:"mono", size:12.5, color:"muted"});
+  if (this._ldReady){
+    const lab = t("enter"), bw = k.textW(lab, {font:"dispS", size:15}) + 40;
+    W.btn(l, "enter", x + (w - bw) / 2, by + 52, lab, () => { Audio.play("start"); try { localStorage.setItem("p2050-entered", "1"); } catch(e) {} Screens.goScene("Menu"); }, {w:bw, h:42, size:15, sound:false});
+    k.hit(l, "enterAll", 0, 0, 1280, 720, () => { Audio.play("start"); Screens.goScene("Menu"); }, {cursor:false});
+    l.hits.unshift(l.hits.pop());
+  }
+  k.text(l, t("disclaimer"), 0, 690, {size:11.5, color:"muted", w:1280, align:"center"});
+};
+
+/* ---------------- main menu ---------------- */
+const SUBW = {load:430, ach:640, account:480, shop:640, board:640, cert:540};
+Screens.renderMenu = function(l){
+  if (this.kind !== "menu"){ k.clearSlave("MenuScroll"); return; }
+  const sub = UIM.sub, w = SUBW[sub] || 430, x = 56;
+  const shade = (this.scene.getObjects("MenuShade") || [])[0];
+  if (shade) shade.setWidth((w + (w > 430 ? 420 : 200)) * k.K);
+  let ch = 0; UIM._googleRect = null;
+  k.slave("MenuScroll", s => {
+    ch = this.menuCard(s, w);
+    const top = Math.max(16, (720 - ch) / 2);
+    s.frame(x, top, {x:0, y:0, w:x + w + 40, h:720}, ch + Math.max(0, top - 16));
+  });
+  if (P.Net) P.Net.googleOverlay(UIM._googleRect);
+  this.accountChip(l);
+};
+/* top-right: account + Terra, or a sign-in button */
+Screens.accountChip = function(l){
+  const N = P.Net, y = 16;
+  if (!N.online){
+    const txt = N.checking ? t("netChecking") : `[[wifi-off]] ${t("netOffline")}`, w = k.textW(txt, {size:12}) + 26;
+    k.rect(l, 1264 - w, y, w, 32, "glass", {r:16, stroke:"line", a:.9, bg:true});
+    k.text(l, txt, 1264 - w + 13, y + 6, {size:12, color:"muted", iconColor:"muted"});
+    return;
+  }
+  if (!N.user){
+    const lab = `[[log-in]] ${t("signIn")}`, w = W.btnW(lab);
+    W.btn(l, "chip-login", 1264 - w, y, lab, () => { UIM.sub = "account"; UIM.accTab = "login"; UIM.msg = ""; k.dirty(); });
+    return;
+  }
+  const name = N.user.displayName, tw = k.textW(name, {font:"bodyB", size:13}), terra = String(N.user.terra);
+  const w = 16 + tw + 16 + 22 + k.textW(terra, {font:"monoB", size:14}) + 16, id = "chip-acc", hov = k.isHover(l, id);
+  k.rect(l, 1264 - w, y, w, 36, "glass", {r:18, stroke:hov ? "accent" : "line", a:.92, bg:true});
+  k.text(l, name, 1264 - w + 16, y + 7, {font:"bodyB", size:13});
+  W.terra(l, 1264 - w + 16 + tw + 16, y + 8, terra, {size:14, color:"good"});
+  k.hit(l, id, 1264 - w, y, w, 36, () => { Audio.play("click"); UIM.sub = "account"; UIM.msg = ""; k.dirty(); });
+};
+const back = (l, y) => { W.btn(l, "back", 0, y, t("mBack"), () => { UIM.sub = null; UIM.msg = ""; k.dirty(); const s = k.L("MenuScroll"); if (s) s.scroll = 0; }, {kind:"ghost"}); return 36; };
+const msgLine = (l, y, w) => UIM.msg ? k.text(l, UIM.msg, 0, y, {size:12.5, color:UIM.err ? "bad" : "good", w}).h + 8 : 0;
+const go = sub => () => { UIM.sub = sub; UIM.msg = ""; UIM.err = false; const s = k.L("MenuScroll"); if (s) s.scroll = 0; if (sub === "board") P.Net.loadBoard(); if (sub === "cert") P.Net.loadCerts(); if (sub === "shop" || sub === "account") P.Net.refresh(); k.dirty(); };
+
+Screens.menuCard = function(l, w){
+  const sub = UIM.sub; let y = 0;
+  k.text(l, "GLOBAL CLIMATE TASKFORCE · 2026 – 2050", 0, y, {font:"mono", size:11.5, color:"accent"}); y += 22;
+  W.runs(l, 0, y, [["PROJECT ", {font:"logo", size:46, lh:1}], [":", {font:"logo", size:46, color:"accent", lh:1}], [" 2050", {font:"logo", size:46, lh:1}]]); y += 46 + 12;
+  const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert"};
+  const tag2 = sub ? t(TITLES[sub]) : t("mDesc");
+  y += k.text(l, tag2, 0, y, {size:sub ? 17 : 14, font:sub ? "dispS" : "body", color:sub ? "fg" : "muted", w:Math.min(w, 400)}).h + 14;
+  if (sub === "load") y = this.subLoad(l, y, w);
+  else if (sub === "ach"){ y += this.achList(l, 0, y, w) + 12; y += back(l, y); }
+  else if (sub === "account") y = this.subAccount(l, y, w);
+  else if (sub === "shop") y = this.subShop(l, y, w);
+  else if (sub === "board") y = this.subBoard(l, y, w);
+  else if (sub === "cert") y = this.subCert(l, y, w);
+  else {
+    const saves = P.readSaves(), auto = saves && saves.auto, n = P.Ach.count();
+    const items = [
+      {id:"new", ic:"globe", t1:t("mNew"), t2:t("mNewS"), primary:!auto, fn:() => Screens.newGame()},
+      {id:"continue", ic:"play", t1:t("mCont"), t2:auto ? `${P.dateStr(auto.meta.tick)} · ΔT +${auto.meta.temp.toFixed(2)}°C · ${auto.meta.net.toFixed(1)} Gt` : t("mNoSave"), primary:!!auto, dis:!auto, fn:() => { const s2 = P.readSaves(); if (s2 && s2.auto && !Screens.loadSave(s2.auto.S)){ UIM.msg = t("oldSave"); UIM.err = true; k.dirty(); } }},
+    ];
+    for (const it of items){
+      const hh = 54, hov = !it.dis && k.isHover(l, it.id);
+      const fill = it.primary ? (hov ? k.mix("accent", "#ffffff", .2) : "accent") : "panel";
+      k.rect(l, 0, y, w, hh, fill, {r:12, a:it.primary ? 1 : .92, stroke:it.primary ? "accent" : hov ? "accent" : "line", bg:true});
+      const a = it.dis ? .45 : 1, ink = it.primary ? "ink" : "fg";
+      k.icon(l, it.ic, 16, y + (hh - 22) / 2, 22, it.primary ? "ink" : "accent", a);
+      k.text(l, it.t1, 54, y + 5, {font:"dispS", size:17, color:ink, a});
+      k.text(l, it.t2, 54, y + 30, {font:"mono", size:12, color:it.primary ? "ink" : "muted", a:it.primary ? .75 : a, w:w - 70, max:1});
+      k.hit(l, it.id, 0, y, w, hh, () => { Audio.play("click"); it.fn(); }, {disabled:!!it.dis});
+      y += hh + 7;
+    }
+    y += msgLine(l, y, w);
+    const tiles = [
+      {id:"loadmenu", ic:"save", t1:t("mLoad"), fn:go("load")},
+      {id:"learn", ic:"book-open", t1:t("mLearn"), t2:`${P.cardCount()}/${P.cardTotal()}`, fn:() => Screens.openLearn("cards")},
+      {id:"ach", ic:"trophy", t1:t("mAch"), t2:`${n}/${ACH.length}`, fn:go("ach")},
+      {id:"tutorial", ic:"graduation-cap", t1:t("mHow"), fn:() => Screens.openTutorial(0, false)},
+      {id:"shop", ic:"shopping-bag", t1:t("mShop"), fn:go("shop")},
+      {id:"board", ic:"medal", t1:t("mBoard"), fn:go("board")},
+      {id:"cert", ic:"award", t1:t("mCert"), fn:go("cert")},
+      {id:"account", ic:"user-round", t1:P.Net.user ? t("mAccount") : t("signIn"), fn:go("account")},
+    ];
+    const tw = (w - 7) / 2, th = 48;
+    tiles.forEach((it, i) => {
+      const tx = (i % 2) * (tw + 7), ty = y + Math.floor(i / 2) * (th + 7), hov = k.isHover(l, it.id);
+      k.rect(l, tx, ty, tw, th, "panel", {r:11, a:.92, stroke:hov ? "accent" : "line", bg:true});
+      k.icon(l, it.ic, tx + 14, ty + 14, 20, "accent");
+      k.text(l, it.t1, tx + 44, ty + 12, {font:"dispS", size:14.5, w:tw - 54 - (it.t2 ? 50 : 0), max:1});
+      if (it.t2) k.text(l, it.t2, tx + tw - 60, ty + 15, {font:"mono", size:11, color:"muted", w:50, align:"right"});
+      k.hit(l, it.id, tx, ty, tw, th, () => { Audio.play("click"); it.fn(); });
+    });
+    y += Math.ceil(tiles.length / 2) * (th + 7);
+  }
+  y += 12;
+  k.line(l, 0, y, w, y, "line"); y += 12;
+  k.text(l, P.up(t("teamK")), 0, y, {font:"mono", size:10.5, color:"muted"}); y += 18;
+  y += k.text(l, t("team"), 0, y, {font:"dispS", size:14, lh:1.35, w}).h + 2;
+  y += k.text(l, t("disclaimer"), 0, y, {size:11.5, color:"muted", w}).h + 12;
+  y += W.vol(l, 0, y, w) + 10;
+  const ft = k.text(l, t("mTag"), 0, y + 6, {size:11.5, color:"muted", w:w - 96});
+  W.langSeg(l, w - 80, y);
+  y += Math.max(30, ft.h + 6);
+  return y + 10;
+};
+
+/* ---------------- load ---------------- */
+Screens.subLoad = function(l, y, w){
+  const saves = P.readSaves();
+  if (saves === null) y += k.text(l, t("noStore"), 0, y, {size:12.5, color:"bad", w}).h + 8;
+  else for (const slot of P.SLOTS){
+    const ok = saves[slot] && P.validSave(saves[slot].S);
+    const m = ok && saves[slot].meta, lines = saves[slot] && !ok ? [t("oldSave")] : P.slotMetaLines(m), sh = 22 + lines.length * 17 + 8;
+    W.card(l, 0, y, w, sh, {r:10});
+    k.text(l, P.slotName(slot), 12, y + 7, {font:"dispS", size:15});
+    lines.forEach((s, i) => k.text(l, s, 12, y + 28 + i * 17, {font:"mono", size:11.5, color:"muted", w:w - 110, max:1}));
+    const bw = W.btnW(t("load"));
+    W.btn(l, "load-" + slot, w - 12 - bw, y + (sh - 36) / 2, t("load"), () => { const s2 = P.readSaves(); if (s2 && s2[slot]) Screens.loadSave(s2[slot].S); }, {disabled:!ok});
+    y += sh + 7;
+  }
+  if (P.Net.user){
+    y += 6; W.h3(l, t("cloudSaves"), 0, y, {w}); y += 22;
+    const cs = P.Net.cloud || {};
+    for (const slot of ["s1", "s2", "s3"]){
+      const c = cs[slot], lines = c ? P.slotMetaLines(c.meta) : [t("empty")], sh = 22 + lines.length * 17 + 8;
+      W.card(l, 0, y, w, sh, {r:10});
+      k.text(l, `[[cloud]] ${P.slotName(slot)}`, 12, y + 7, {font:"dispS", size:15, iconColor:"accent"});
+      lines.forEach((s, i) => k.text(l, s, 12, y + 28 + i * 17, {font:"mono", size:11.5, color:"muted", w:w - 110, max:1}));
+      const bw = W.btnW(t("load"));
+      W.btn(l, "cload-" + slot, w - 12 - bw, y + (sh - 36) / 2, t("load"), () => P.Net.cloudLoad(slot).then(st => { if (!st || !Screens.loadSave(st)){ UIM.msg = t("codeBad"); UIM.err = true; k.dirty(); } }), {disabled:!c, kind:"ghost"});
+      y += sh + 7;
+    }
+  }
+  y += 6;
+  k.text(l, t("codePaste"), 0, y, {size:12, color:"muted"}); y += 20;
+  const inp = k.input(l, 0, y, w, 70, {placeholder:"P2050:...", key:"code"});
+  y += 78;
+  const bw = W.btn(l, "import", 0, y, t("codeLoad"), () => {
+    const o = P.importCode(inp.getString ? inp.getString() : "");
+    if (!Screens.loadSave(o)){ UIM.msg = t("codeBad"); UIM.err = true; Audio.play("error"); k.dirty(); }
+  }, {kind:"ghost"});
+  if (UIM.msg) k.text(l, UIM.msg, bw + 12, y + 2, {size:12.5, color:UIM.err ? "bad" : "good", w:w - bw - 12});
+  y += 36 + 14;
+  return y + back(l, y);
+};
+
+/* ---------------- account: sign in / sign up / profile ---------------- */
+const field = (l, y, w, key, label, type = "text", ph = "") => {
+  k.text(l, label, 0, y, {size:12, color:"muted"});
+  const go2 = k.input(l, 0, y + 18, w, 34, {type, placeholder:ph, key, fontSize:14});
+  (UIM.inputs = UIM.inputs || {})[key] = go2;
+  return 58;
+};
+const val = key => { const g = UIM.inputs && UIM.inputs[key]; return g && g.getString ? g.getString().trim() : ""; };
+Screens.subAccount = function(l, y, w){
+  const N = P.Net;
+  if (!N.online){ y += k.text(l, t("netOfflineLong"), 0, y, {size:13, color:"muted", w}).h + 12; return y + back(l, y); }
+  if (!N.user){
+    const tab = UIM.accTab || "login";
+    W.tabs(l, 0, y, [{id:"at-login", label:t("signIn"), on:tab === "login", fn:() => { UIM.accTab = "login"; UIM.msg = ""; k.dirty(); }},
+                     {id:"at-reg", label:t("signUp"), on:tab === "reg", fn:() => { UIM.accTab = "reg"; UIM.msg = ""; k.dirty(); }}]);
+    y += 44;
+    if (tab === "login"){
+      y += field(l, y, w, "li-user", t("fUserOrEmail"), "text", "username / email");
+      y += field(l, y, w, "li-pass", t("fPassword"), "password");
+      y += 4;
+      W.btn(l, "do-login", 0, y, `[[log-in]] ${t("signIn")}`, () => N.login(val("li-user"), val("li-pass")), {w, h:40, disabled:N.busy});
+      y += 48;
+      y += k.text(l, t("noReset"), 0, y, {size:11.5, color:"muted", w}).h + 10;
+    } else {
+      y += field(l, y, w, "rg-user", t("fUsername"), "text", "a–z 0–9 _ (3–16)");
+      y += field(l, y, w, "rg-email", t("fEmail"), "email", "name@example.com");
+      y += field(l, y, w, "rg-name", t("fDisplay"), "text", t("fDisplayPh"));
+      y += field(l, y, w, "rg-pass", t("fPassword"), "password", t("fPassPh"));
+      y += W.check(l, "rg-consent", 0, y, w, !!UIM.consent, t("pdpaConsent"), () => { UIM.consent = !UIM.consent; k.dirty(); }) + 10;
+      W.btn(l, "do-reg", 0, y, `[[user-plus]] ${t("signUp")}`, () => {
+        if (!UIM.consent){ UIM.msg = t("needConsent"); UIM.err = true; k.dirty(); return; }
+        N.register({username:val("rg-user"), email:val("rg-email"), displayName:val("rg-name"), password:val("rg-pass")});
+      }, {w, h:40, disabled:N.busy});
+      y += 48;
+      y += k.text(l, t("noReset"), 0, y, {size:11.5, color:"muted", w}).h + 10;
+    }
+    if (N.cfg && N.cfg.googleClientId){
+      k.line(l, 0, y + 10, w, y + 10, "line"); k.rect(l, w / 2 - 22, y + 2, 44, 16, "panel"); k.text(l, t("or"), w / 2 - 22, y + 1, {size:11, color:"muted", w:44, align:"center"});
+      y += 26;
+      const sl = k.L("MenuScroll");
+      UIM._googleRect = {x:sl.ox, y:y + sl.oy, w:Math.min(w, 320), h:44, clip:sl.clip};
+      k.rect(l, 0, y, Math.min(w, 320), 44, "panel2", {r:8, stroke:"line"});
+      k.text(l, t("googleLoading"), 0, y + 12, {size:12, color:"muted", w:Math.min(w, 320), align:"center"});
+      y += 54;
+    }
+    if (N.pendingGoogle){
+      y += k.text(l, t("googlePickName"), 0, y, {size:13, color:"accent", w}).h + 6;
+      y += field(l, y, w, "gg-user", t("fUsername"), "text", "a–z 0–9 _ (3–16)");
+      y += W.check(l, "gg-consent", 0, y, w, !!UIM.consent, t("pdpaConsent"), () => { UIM.consent = !UIM.consent; k.dirty(); }) + 8;
+      W.btn(l, "gg-done", 0, y, t("signUp"), () => { if (!UIM.consent){ UIM.msg = t("needConsent"); UIM.err = true; k.dirty(); return; } N.googleComplete(val("gg-user")); }, {w, disabled:N.busy});
+      y += 46;
+    }
+    y += msgLine(l, y, w);
+    return y + back(l, y);
+  }
+  /* profile */
+  const u = N.user;
+  W.card(l, 0, y, w, 92, {fill:"panel2"});
+  k.text(l, u.displayName, 16, y + 10, {font:"disp", size:22, w:w - 160, max:1});
+  k.text(l, `@${u.username}${u.email ? " · " + u.email : ""}`, 16, y + 44, {font:"mono", size:11.5, color:"muted", w:w - 32, max:1});
+  k.text(l, t("balance"), w - 140, y + 12, {size:11, color:"muted", w:124, align:"right"});
+  const tw2 = k.textW(String(u.terra), {font:"monoB", size:22}) + 30;
+  W.terra(l, w - 16 - tw2, y + 30, u.terra, {size:22, color:"good"});
+  k.text(l, t("terraHow"), 16, y + 66, {size:11, color:"muted", w:w - 32, max:1});
+  y += 104;
+  // levels
+  W.h3(l, t("charLevels"), 0, y, {w}); y += 22;
+  const cw = (w - 3 * 8) / 4;
+  CHARS.forEach((c, i) => {
+    const cx = i * (cw + 8), xp = N.charXp(c.id), lv = P.levelOf(xp), own = N.owns("char_" + c.id);
+    k.rect(l, cx, y, cw, 92, "panel2", {r:10, stroke:own ? c.color : "line", sa:.6, bg:true});
+    W.portrait(l, cx + (cw - 48) / 2, y + 6, 48, c.id, {a:own ? 1 : .4});
+    k.text(l, L(c.name), cx, y + 56, {size:11, w:cw, align:"center", max:1, color:own ? "fg" : "muted"});
+    k.text(l, own ? `Lv ${lv}` : "[[lock]]", cx, y + 72, {font:"mono", size:11, color:own ? c.color : "muted", w:cw, align:"center"});
+  });
+  y += 104;
+  // rename
+  W.h3(l, t("renameTitle"), 0, y, {w}); y += 20;
+  const free = !u.renamed;
+  const cost = free ? t("free") : `${PRICE.rename} Terra`;
+  (UIM.inputs = UIM.inputs || {})["rn-name"] = k.input(l, 0, y, w - 150, 36, {type:"text", placeholder:u.displayName, key:"rn-name", fontSize:14});
+  W.btn(l, "do-rename", w - 140, y, `${t("rename")} · ${cost}`, () => N.rename(val("rn-name")), {w:140, disabled:N.busy || (!free && u.terra < PRICE.rename)});
+  y += 46;
+  // appearance: map theme + outfit
+  W.h3(l, t("appearance"), 0, y, {w}); y += 22;
+  const curT = (() => { try { return localStorage.getItem("p2050-theme") || ""; } catch(e) { return ""; } })();
+  const themes = [["", t("themeDefault")], ["night", t("themeNight")], ["paint", t("themePaint")]];
+  let tx = 0;
+  for (const [id, lab] of themes){
+    const own = !id || N.owns("theme_" + id), on = curT === id || (!own && false);
+    tx += W.btn(l, "th-" + (id || "def"), tx, y, `${own ? "" : "[[lock]] "}${lab}`, () => { try { localStorage.setItem("p2050-theme", id); } catch(e) {} k.dirty(); }, {kind:on ? "primary" : "ghost", disabled:!own, size:12.5, h:32}) + 6;
+  }
+  y += 40;
+  const curO = P.outfitPref();
+  const outs = [["base", t("outfitBase"), true], ["alt", t("outfitAlt"), N.owns("outfit")], ["gold", t("outfitGold"), N.maxLevel() >= 10]];
+  tx = 0;
+  for (const [id, lab, own] of outs){
+    tx += W.btn(l, "of-" + id, tx, y, `${own ? "" : "[[lock]] "}${lab}`, () => { try { localStorage.setItem("p2050-outfit", id); } catch(e) {} k.dirty(); }, {kind:curO === id ? "primary" : "ghost", disabled:!own, size:12.5, h:32}) + 6;
+  }
+  y += 44;
+  y += msgLine(l, y, w);
+  const bw = back(l, y);
+  W.btn(l, "logout", w - W.btnW(`[[log-out]] ${t("signOut")}`), y, `[[log-out]] ${t("signOut")}`, () => N.logout(), {kind:"ghost"});
+  return y + bw;
+};
+
+/* ---------------- shop ---------------- */
+Screens.subShop = function(l, y, w){
+  const N = P.Net;
+  if (!N.online){ y += k.text(l, t("netOfflineLong"), 0, y, {size:13, color:"muted", w}).h + 12; return y + back(l, y); }
+  if (!N.user){
+    y += k.text(l, t("shopLogin"), 0, y, {size:13.5, color:"muted", w}).h + 10;
+    W.btn(l, "shop-login", 0, y, `[[log-in]] ${t("signIn")}`, go("account")); y += 46;
+    return y + back(l, y);
+  }
+  W.card(l, 0, y, w, 50, {fill:"panel2"});
+  k.text(l, t("balance"), 14, y + 15, {size:12.5, color:"muted"});
+  const amt = String(N.user.terra), aw = k.textW(amt, {font:"monoB", size:20}) + 30;
+  W.terra(l, w - 14 - aw, y + 12, amt, {size:20, color:"good"});
+  y += 60;
+  y += k.text(l, t("shopNote"), 0, y, {size:12, color:"muted", w}).h + 10;
+  for (const it of SHOP){
+    const own = N.owns(it.id), afford = N.user.terra >= it.price;
+    const desc = it.kind === "char" ? L(CHAR[it.id.slice(5)].pas) : L(it.desc);
+    const lab = own ? `[[check]] ${t("owned2")}` : `[[terra]] ${it.price}`, bw = W.btnW(lab) + 6;
+    const h1 = k.text(l, L(it.name), 56, y + 10, {font:"dispS", size:15, w:w - 56 - bw - 20}).h;
+    const h2 = k.text(l, desc, 56, y + 10 + h1, {size:12, color:"muted", w:w - 56 - bw - 20}).h;
+    const ch = Math.max(62, h1 + h2 + 20);
+    W.card(l, 0, y, w, ch);
+    if (it.kind === "char") W.portrait(l, 10, y + (ch - 38) / 2, 38, it.id.slice(5));
+    else { k.rect(l, 10, y + (ch - 38) / 2, 38, 38, "accent", {r:9, a:.14}); k.icon(l, it.icon, 19, y + (ch - 20) / 2, 20, "accent"); }
+    W.btn(l, "buy-" + it.id, w - 12 - bw, y + (ch - 36) / 2, lab, () => N.buy(it.id), {w:bw, disabled:own || !afford || N.busy, kind:own ? "ghost" : "gold"});
+    y += ch + 7;
+  }
+  y += msgLine(l, y, w);
+  return y + back(l, y);
+};
+
+/* ---------------- leaderboard ---------------- */
+Screens.subBoard = function(l, y, w){
+  const N = P.Net, B = N.board || {};
+  if (!N.online){ y += k.text(l, t("netOfflineLong"), 0, y, {size:13, color:"muted", w}).h + 12; return y + back(l, y); }
+  const mode = N.boardMode || "normal", period = N.boardPeriod || "week";
+  const sw = (m, p) => () => { N.boardMode = m; N.boardPeriod = p; N.loadBoard(); k.dirty(); };
+  let tw = W.tabs(l, 0, y, [["normal", "mode_normal"], ["hard", "mode_hard"], ["daily", "mode_daily"]].map(([m, key]) => ({id:"bm-" + m, label:t(key), on:mode === m, fn:sw(m, period)})), {size:12.5});
+  if (mode !== "daily") W.seg(l, w - 160, y + 1, [{id:"bp-w", label:t("week"), on:period === "week", fn:sw(mode, "week")}, {id:"bp-a", label:t("allTime"), on:period === "all", fn:sw(mode, "all")}], {w:80, h:30, font:"body", fontOn:"bodyB", size:12});
+  y += 44;
+  if (mode === "daily") y += k.text(l, `${t("dailyToday")} ${new Date().toISOString().slice(0, 10)}`, 0, y, {font:"mono", size:11.5, color:"muted"}).h + 6;
+  if (!B.rows) y += k.text(l, B.error ? t("boardFail") : t("netChecking"), 0, y, {size:13, color:"muted"}).h + 10;
+  else if (!B.rows.length) y += k.text(l, t("boardEmpty"), 0, y, {size:13, color:"muted"}).h + 10;
+  else {
+    const END_IC = {win:"trophy", l1:"flame", l2:"megaphone", l3:"timer"};
+    B.rows.forEach((r, i) => {
+      const me = N.user && r.username === N.user.username, rh = 34;
+      k.rect(l, 0, y, w, rh, me ? "accent" : i % 2 ? null : "panel", {r:7, a:me ? .16 : .7, stroke:r.frame ? "gold" : null, sw:1.5, bg:true});
+      const medal = i < 3 ? ["#f2c14e", "#c9d3d6", "#d08a52"][i] : null;
+      if (medal) k.circle(l, 22, y + rh / 2, 11, medal, {a:.9});
+      k.text(l, String(r.rank), 8, y + 8, {font:"monoB", size:12, color:medal ? "#1a1300" : "muted", w:28, align:"center"});
+      if (r.char) k.sprite(l, "Portrait", `${r.char}-base`, 44, y + 4, 26, 26);
+      k.text(l, r.displayName, 78, y + 7, {font:r.frame ? "bodyB" : "body", size:13, color:r.frame ? "gold" : "fg", w:w - 78 - 150, max:1});
+      k.icon(l, END_IC[r.ending] || "circle", w - 140, y + 9, 16, r.ending === "win" ? "good" : "muted");
+      k.text(l, Number(r.score).toLocaleString(), w - 118, y + 7, {font:"monoB", size:13, w:108, align:"right"});
+      y += rh + 3;
+    });
+  }
+  if (B.me) { y += 6; k.text(l, `${t("yourRank")}: #${B.me.rank} · ${Number(B.me.score).toLocaleString()}`, 0, y, {font:"monoB", size:13, color:"accent"}); y += 26; }
+  else if (N.user && B.rows) { y += 6; k.text(l, t("noRankYet"), 0, y, {size:12.5, color:"muted"}); y += 24; }
+  y += 8;
+  return y + back(l, y);
+};
+
+/* ---------------- certificate ---------------- */
+Screens.subCert = function(l, y, w){
+  const N = P.Net, C = N.certs || {};
+  if (!N.online){ y += k.text(l, t("netOfflineLong"), 0, y, {size:13, color:"muted", w}).h + 12; return y + back(l, y); }
+  if (!N.user){ y += k.text(l, t("certLogin"), 0, y, {size:13.5, color:"muted", w}).h + 10; W.btn(l, "cert-login", 0, y, `[[log-in]] ${t("signIn")}`, go("account")); y += 46; return y + back(l, y); }
+  y += k.text(l, t("certIntro"), 0, y, {size:13, color:"muted", w}).h + 10;
+  const el = C.eligibility;
+  if (!el) y += k.text(l, t("netChecking"), 0, y, {size:13, color:"muted"}).h + 10;
+  else {
+    const row = (ok, txt) => { y += k.text(l, `[[${ok ? "circle-check" : "circle"}]] ${txt}`, 0, y, {size:13, color:ok ? "good" : "muted", w, iconColor:ok ? "good" : "muted"}).h + 4; };
+    row(el.wins >= 1, `${t("certCondWin")} (${el.wins})`);
+    row(el.cards >= el.needCards, `${t("certCondCards")} ${el.needCards} (${el.cards})`);
+    y += 8;
+    if (el.eligible){
+      y += k.text(l, t("certNameHelp"), 0, y, {size:12, color:"muted", w}).h + 6;
+      y += field(l, y, w, "ct-name", t("fFullName"), "text", t("fFullNamePh"));
+      y += W.check(l, "ct-consent", 0, y, w, !!UIM.certConsent, t("certConsent"), () => { UIM.certConsent = !UIM.certConsent; k.dirty(); }) + 8;
+      W.btn(l, "do-cert", 0, y, `[[award]] ${t("certRequest")}`, () => {
+        const nm = val("ct-name"); if (nm.length < 3){ UIM.msg = t("certNameShort"); UIM.err = true; k.dirty(); return; }
+        if (!UIM.certConsent){ UIM.msg = t("needConsent"); UIM.err = true; k.dirty(); return; }
+        N.requestCert(nm);
+      }, {w, h:40, kind:"gold", disabled:N.busy});
+      y += 48;
+    }
+  }
+  y += msgLine(l, y, w);
+  if (C.list && C.list.length){
+    W.h3(l, t("certMine"), 0, y, {w}); y += 22;
+    for (const c of C.list){
+      W.card(l, 0, y, w, 58);
+      k.text(l, c.fullName, 12, y + 7, {font:"bodyB", size:14, w:w - 150, max:1});
+      k.text(l, `${t("certCode")} ${c.code} · ${new Date(c.issuedAt).toLocaleDateString(S.lang === "th" ? "th-TH" : "en-GB")}`, 12, y + 31, {font:"mono", size:11, color:"muted", w:w - 150, max:1});
+      W.btn(l, "pdf-" + c.code, w - 132, y + 11, `[[download]] PDF`, () => window.open(N.certUrl(c.code), "_blank"), {w:120, kind:"ghost"});
+      y += 64;
+    }
+  }
+  return y + back(l, y);
+};
+
+/* ---------------- achievements list (used by the menu and the learning page) ---------------- */
+Screens.achList = function(l, x, y0, w){
+  const d = P.AchStore.data, n = P.Ach.count(), pct = Math.round(n / ACH.length * 100);
+  let y = y0;
+  W.runs(l, x, y, [[String(n), {font:"disp", size:22}], [` / ${ACH.length} · ${pct}%`, {size:13, color:"muted"}]]); y += 32;
+  W.meter(l, x, y, w, 5, pct / 100, "accent"); y += 14;
+  const cw = (w - 8) / 2, loc = S.lang === "th" ? "th-TH" : "en-GB";
+  let col = 0, rowH = 0, rowY = y;
+  ACH.forEach((a, i) => {
+    const got = d.got[a.id], secret = a.hidden && !got, p = a.prog && !got ? a.prog(d) : null;
+    const cx = x + col * (cw + 8), alpha = got ? 1 : .62;
+    let ty = rowY + 9;
+    ty += k.text(l, secret ? t("achSecret") : L(a.t), cx + 64, ty, {font:"bodyB", size:13.5, w:cw - 74, a:alpha}).h;
+    ty += k.text(l, secret ? "???" : L(a.d), cx + 64, ty, {size:12, color:"muted", lh:1.35, w:cw - 74, a:alpha}).h;
+    if (got){ ty += k.text(l, `${t("achOn")} ${new Date(got).toLocaleDateString(loc, {dateStyle:"medium"})}`, cx + 64, ty + 1, {font:"mono", size:11, color:"warn"}).h; }
+    if (p){ W.meter(l, cx + 64, ty + 4, cw - 74, 5, Math.min(1, p[0] / p[1]), "accent"); ty += 10; ty += k.text(l, `${Math.min(p[0], p[1])} / ${p[1]}`, cx + 64, ty, {font:"mono", size:11, color:"warn", a:alpha}).h; }
+    const hh = Math.max(64, ty - rowY + 9);
+    a._h = hh; a._x = cx; a._y = rowY;
+    rowH = Math.max(rowH, hh);
+    if (got) k.hgrad(l, cx + 10, rowY + 10, 44, 44, [[0, "#f2b441"], [1, "#e0612f"]], {r:9});
+    else k.rect(l, cx + 10, rowY + 10, 44, 44, "panel2", {r:9, stroke:"line", a:alpha});
+    k.icon(l, secret ? "lock" : a.icon, cx + 21, rowY + 21, 22, got ? "#2b1300" : "muted", got ? 1 : alpha);
+    col++;
+    if (col === 2 || i === ACH.length - 1){
+      for (let j = i - col + 1; j <= i; j++){ const b = ACH[j]; k.rect(l, b._x, b._y, cw, rowH, "panel", {r:10, a:.92, stroke:"line", under:true}); }
+      rowY += rowH + 8; rowH = 0; col = 0;
+    }
+  });
+  return rowY - y0;
+};
+
+/* ---------------- achievement toast ---------------- */
+Screens.toastLayerSetup = function(){ UIM.toast = null; UIM.toastT = 0; const l = k.L("Toast"); if (l) l.setOffset(0, 0); };
+Screens.toastUpdate = function(dt){
+  const l = k.L("Toast"); if (!l) return;
+  // wait while a window is open (except the end screen, where the toast shows top-left)
+  const kind = UIM.kind();
+  if (!UIM.toast && UIM.toastQ.length && (!kind || kind === "end")){ UIM.toast = UIM.toastQ.shift(); UIM.toastT = 0; Audio.play("done"); l.dirty = true; }
+  if (!UIM.toast) return;
+  UIM.toastT += dt;
+  const T = UIM.toastT, inT = .35, hold = 4.2, outT = .4;
+  let f = T < inT ? T / inT : T < hold ? 1 : Math.max(0, 1 - (T - hold) / outT);
+  f = 1 - Math.pow(1 - f, 3);
+  l.setOffset((1 - f) * 380, 0); l.setAlpha(f);
+  if (T > hold + outT){ UIM.toast = null; l.dirty = true; }
+};
+Screens.renderToast = function(l){
+  const a = UIM.toast; if (!a) return;
+  const w = 340, end = UIM.kind() === "end", x = end ? 16 : 1264 - w, h = 78, y = end ? 16 : this.kind === "game" ? 720 - 130 - h - 8 : 720 - 16 - h;
+  k.rect(l, x, y, w, h, "panel", {r:12, stroke:"warn", sa:.6, bg:true});
+  k.hgrad(l, x + 12, y + 13, 52, 52, [[0, "#f2b441"], [1, "#e0612f"]], {r:10});
+  k.icon(l, a.icon, x + 25, y + 26, 26, "#2b1300");
+  k.text(l, P.up(a.msg ? a.title : t("achUnlocked")), x + 76, y + 10, {size:11, color:"warn"});
+  k.text(l, a.msg ? a.msg : L(a.t), x + 76, y + 26, {font:"dispS", size:16, w:w - 88, max:1});
+  if (!a.msg) k.text(l, L(a.d), x + 76, y + 50, {size:12, color:"muted", w:w - 88, max:1});
+};
+
+};
+gdjs.LoadingCode.userFunc0x10139e0 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Screens · หน้าสกิล (เต็มจอ) */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.skills) return;
+(P.mods = P.mods || {}).skills = 1;
+/* =========================================================================
+   Screens · Skill screen (full screen, like Plague Inc)
+   Left: hexagon grid of the selected category · Right: details of the tapped skill · Bottom: category tabs
+   Opening it pauses the game. Close with ✕, Esc, T, or by tapping outside the window.
+   Only owned skills and the NEXT skills you can buy are shown; anything further away is "???".
+   ========================================================================= */
+const {Kit, S, t, L, Audio, W, UIM, Screens, SKILLS, SKILL, SKILL_CATS, SKILL_TYPE, IC, HAZARDS} = P;
+const k = Kit;
+const BX = 36, BY = 26, BW = 1208, BH = 668;           // window
+const GX = BX + 24, GY = BY + 74, GW = 720, GH = 470;   // grid area
+const DX = GX + GW + 20, DW = BX + BW - 24 - DX;        // detail panel
+const HEXR = 50, COLW = 168, ROWH = 128;
+
+const hexPts = (cx, cy, r) => { const p = []; for (let i = 0; i < 6; i++){ const a = Math.PI / 180 * (60 * i - 30); p.push(cx + r * Math.cos(a), cy + r * Math.sin(a)); } return p; };
+const centre = n => [GX + 92 + n.pos[0] * COLW, GY + 70 + n.pos[1] * ROWH + (n.pos[0] % 2 ? 26 : 0)];
+/* "next" = all requirements owned; anything else that isn't owned stays hidden */
+const visible = n => S.owned[n.id] || n.req.every(q => S.owned[q]);
+const typeTags = n => {
+  const out = [];
+  out.push(n.type === "active" ? "active" : "passive");
+  if (n.trade) out.push("trade");
+  if (n.resp) out.push("resp");
+  if (n.target === "country") out.push("country");
+  return out;
+};
+
+Screens.renderSkills = function(l){
+  k.clearSlave("ModalScroll");
+  const cat = S.skillCat || "energy";
+  k.rect(l, 0, 0, 1280, 720, "#020609", {a:.7, bg:true});
+  k.hit(l, "sk-veil", 0, 0, 1280, 720, () => Screens.closeSkills(), {cursor:false});
+  k.hit(l, "sk-box", BX, BY, BW, BH, () => {}, {cursor:false});
+  k.rect(l, BX + 4, BY + 10, BW, BH, "#000000", {a:.35, r:16, bg:true});
+  k.rect(l, BX, BY, BW, BH, "panel", {r:16, stroke:"line", bg:true});
+  /* header */
+  k.text(l, `[[network]] ${P.up(t("skillsTitle"))}`, BX + 24, BY + 18, {font:"disp", size:22, iconColor:"accent"});
+  let hx = BX + 300;
+  W.runs(l, hx, BY + 22, [[`${IC.ep} ${Math.floor(S.ep)}`, {font:"monoB", size:16}], [`  +${P.epGain()}${t("perMo")}`, {font:"mono", size:11, color:"muted"}]]);
+  hx += 170;
+  W.runs(l, hx, BY + 22, [[`${IC.pc} ${Math.floor(S.pc)}`, {font:"monoB", size:16}], [`  +${P.pcGain()}${t("perMo")}`, {font:"mono", size:11, color:"muted"}]]);
+  hx += 160;
+  const busy = P.busyIds().length;
+  k.text(l, `[[loader]] ${t("inProgress")} ${busy}/${P.MAX_PROJECTS}`, hx, BY + 24, {size:12.5, color:busy >= P.MAX_PROJECTS ? "warn" : "muted", iconColor:"muted"});
+  if (P.recentBuys()) k.text(l, `[[chart-line]] ${t("rush")} +${P.recentBuys() * 20}%`, hx + 220, BY + 24, {size:12.5, color:"bad", iconColor:"bad"});
+  if (S.buff.instant) k.text(l, `[[lightbulb]] ${t("buffInstant")}`, hx + 220, BY + 44, {size:11.5, color:"good", iconColor:"good"});
+  else if (S.buff.disc) k.text(l, `[[flask-round]] ${t("buffDisc")}`, hx + 220, BY + 44, {size:11.5, color:"good", iconColor:"good"});
+  k.text(l, `[[pause]] ${t("pausedHere")}`, BX + 24, BY + 50, {size:11, color:"muted", iconColor:"muted"});
+  if (P.hasKeyboard()){ W.key(l, BX + BW - 60 - 44, BY + 26, "T"); W.key(l, BX + BW - 60 - 22, BY + 26, "Esc"); }
+  W.hbtn(l, "sk-close", BX + BW - 54, BY + 16, "x", () => Screens.closeSkills(), {s:36, is:20, color:"fg"});
+  k.line(l, BX, BY + 66, BX + BW, BY + 66, "line");
+  /* grid */
+  k.rect(l, GX, GY, GW, GH, "bg", {r:12, bg:true, a:.7});
+  const nodes = SKILLS.filter(n => n.cat === cat);
+  // edges
+  for (const n of nodes) for (const q of n.req){
+    const qn = SKILL[q]; if (!qn || qn.cat !== cat) continue;
+    if (!visible(n) && !S.owned[q]) continue;
+    const [x1, y1] = centre(qn), [x2, y2] = centre(n);
+    const st = S.owned[n.id] ? "good" : S.owned[q] ? "accent" : "line";
+    const ang = Math.atan2(y2 - y1, x2 - x1), r0 = HEXR - 2;
+    k.line(l, x1 + Math.cos(ang) * r0, y1 + Math.sin(ang) * r0, x2 - Math.cos(ang) * (r0 + 6), y2 - Math.sin(ang) * (r0 + 6), st, {w:st === "line" ? 1.4 : 2.4, dash:st === "line" ? 5 : 0, a:.9});
+    const ax = x2 - Math.cos(ang) * (r0 + 2), ay = y2 - Math.sin(ang) * (r0 + 2);
+    k.poly(l, [ax, ay, ax - Math.cos(ang - .45) * 10, ay - Math.sin(ang - .45) * 10, ax - Math.cos(ang + .45) * 10, ay - Math.sin(ang + .45) * 10], st, {a:.95});
+  }
+  for (const n of nodes){
+    const [cx, cy] = centre(n), vis = visible(n), own = !!S.owned[n.id], c = P.nodeCost(n);
+    const p = P.rollProgress(n.id), sel = S.node === n.id, id = "hx-" + n.id, hov = k.isHover(l, id);
+    const afford = vis && !own && S.ep >= c.ep && S.pc >= c.pc && !P.atCapacity(n);
+    if (afford) k.poly(l, hexPts(cx, cy, HEXR + 7), "accent", {a:.18});
+
+    const fill = own ? (n.type === "active" ? "#2c5a7a" : "#1f7a5c") : vis ? "panel2" : "bg";
+    k.poly(l, hexPts(cx, cy, HEXR), fill, {stroke:own ? "good" : vis ? (afford ? "accent" : "line") : "line", sw:hov ? 2 : 1.3, a:vis ? 1 : .8});
+    if (p !== null){ k.poly(l, hexPts(cx, cy, HEXR - 5), "accent", {a:.12 + .25 * p}); }
+    if (sel){ const q = hexPts(cx, cy, HEXR + 5); k.path(l, [...q, q[0], q[1]], "#ffffff", {w:2.5}); }
+    const icon = vis ? n.icon : "circle-help";
+    k.icon(l, icon, cx - 16, cy - 24, 32, own ? "#ffffff" : vis ? (afford ? "accent" : "fg") : "line", vis ? 1 : .7);
+    const lab = vis ? (p !== null ? `${Math.round(p * 100)}%` : own ? (n.type === "active" ? (S.actCd[n.id] ? `${S.actCd[n.id]} ${t("moShort")}` : t("ready")) : "[[check]]") : `${c.ep}·${c.pc}`) : "???";
+    k.text(l, lab, cx - HEXR, cy + 12, {font:"mono", size:11, color:own ? "#e8fff6" : vis ? (afford ? "accent" : "muted") : "line", w:HEXR * 2, align:"center", iconColor:"#e8fff6"});
+    if (n.type === "active") k.icon(l, "zap", cx + HEXR - 22, cy - HEXR + 8, 13, own ? "gold" : "muted");
+    if (n.trade) k.icon(l, "scale", cx - HEXR + 10, cy - HEXR + 8, 13, "warn", vis ? 1 : 0);
+    if (n.resp) k.icon(l, "shield", cx - HEXR + 10, cy - HEXR + 8, 13, "sky", vis ? 1 : 0);
+    // name under the hex
+    k.text(l, vis ? L(n.name) : t("hiddenSkill"), cx - 78, cy + HEXR + 4, {size:11.5, lh:1.25, color:vis ? "fg" : "muted", w:156, align:"center", max:2});
+    k.hit(l, id, cx - HEXR, cy - HEXR, HEXR * 2, HEXR * 2 + 34, () => { Audio.play("click"); S.node = n.id; k.dirty(); });
+  }
+  // rollouts in progress (under the grid)
+  let ry = GY + GH + 10;
+  if (S.rollouts.length){
+    let rx = GX;
+    for (const ro of S.rollouts.slice(0, 6)){
+      const n = SKILL[ro.id], w = 230;
+      k.rect(l, rx, ry, w, 34, "panel2", {r:8, bg:true});
+      k.icon(l, n.icon, rx + 8, ry + 9, 16, "accent");
+      k.text(l, L(n.name), rx + 30, ry + 3, {size:11, w:w - 40, max:1});
+      W.meter(l, rx + 30, ry + 22, w - 90, 4, 1 - ro.left / ro.months, "accent");
+      k.text(l, `${ro.left} ${t("moShort")}`, rx + w - 56, ry + 16, {font:"mono", size:10, color:"muted", w:48, align:"right"});
+      rx += w + 8; if (rx + w > GX + GW){ break; }
+    }
+  } else k.text(l, t("noRollouts"), GX, ry + 8, {size:12, color:"muted"});
+  /* detail panel */
+  this.skillDetail(l, DX, GY, DW, GH + 44);
+  /* category tabs */
+  const ty = BY + BH - 62, tw = (BW - 48 - 4 * 8) / 5;
+  SKILL_CATS.forEach((c, i) => {
+    const tx = BX + 24 + i * (tw + 8), on = cat === c.id, id = "cat-" + c.id, hov = k.isHover(l, id);
+    const list = SKILLS.filter(n => n.cat === c.id), own = list.filter(n => S.owned[n.id]).length;
+    const ready = list.filter(n => !S.owned[n.id] && visible(n) && S.ep >= P.nodeCost(n).ep && S.pc >= P.nodeCost(n).pc && !P.atCapacity(n)).length;
+    k.rect(l, tx, ty, tw, 46, on ? "accent" : hov ? "panel2" : "bg", {r:10, stroke:on || hov ? "accent" : "line", bg:true});
+    k.icon(l, c.icon, tx + 12, ty + 13, 20, on ? "ink" : "accent");
+    k.text(l, L(c.name), tx + 40, ty + 4, {font:"dispS", size:13, color:on ? "ink" : "fg", w:tw - 74, max:1});
+    k.text(l, `${own}/${list.length}`, tx + 40, ty + 24, {font:"mono", size:11, color:on ? "ink" : "muted"});
+    if (ready){ k.rect(l, tx + tw - 32, ty + 13, 22, 20, on ? "ink" : "good", {r:10}); k.text(l, String(ready), tx + tw - 32, ty + 14, {font:"monoB", size:11, color:on ? "accent" : "#04130c", w:22, align:"center"}); }
+    k.hit(l, id, tx, ty, tw, 46, () => { Audio.play("click"); S.skillCat = c.id; const first = SKILLS.find(n => n.cat === c.id && !S.owned[n.id] && visible(n)) || SKILLS.find(n => n.cat === c.id); S.node = first.id; k.dirty(); });
+  });
+};
+
+Screens.skillDetail = function(l, x, y, w, h){
+  const n = SKILL[S.node] && SKILL[S.node].cat === (S.skillCat || "energy") ? SKILL[S.node] : SKILLS.find(q => q.cat === (S.skillCat || "energy"));
+  k.rect(l, x, y, w, h, "panel2", {r:12, stroke:"line", bg:true});
+  const vis = visible(n), own = !!S.owned[n.id], c = P.nodeCost(n), st = P.nodeState(n);
+  const px = x + 18, iw = w - 36; let cy = y + 18;
+  k.rect(l, px, cy, 64, 64, own ? "good" : vis ? "accent" : "line", {r:14, a:.16});
+  k.icon(l, vis ? n.icon : "circle-help", px + 14, cy + 14, 36, own ? "good" : vis ? "accent" : "muted");
+  if (!vis){
+    k.text(l, t("hiddenSkill"), px + 80, cy + 8, {font:"dispS", size:20, w:iw - 80});
+    const req = n.req.filter(q => !S.owned[q]).map(q => S.owned[q] || visible(SKILL[q]) ? L(SKILL[q].name) : "???");
+    k.text(l, `${t("hiddenHint")} ${req.join(", ")}`, px, cy + 84, {size:13, color:"muted", w:iw});
+    return;
+  }
+  const nh = k.text(l, L(n.name), px + 80, cy + 2, {font:"dispS", size:19, w:iw - 80, lh:1.25}).h;
+  let tx = px + 80, tyy = cy + Math.max(nh + 6, 34);
+  for (const tg of typeTags(n)){ const lab = L(SKILL_TYPE[tg]), kind = tg === "trade" ? "warn" : tg === "active" ? "gold" : tg === "resp" ? "acc" : ""; tx += W.pill(l, tx, tyy, lab, kind) + 5; }
+  cy += 80;
+  cy += k.text(l, L(n.desc), px, cy, {size:14, w:iw, lh:1.45}).h + 10;
+  if (n.resp){
+    const list = Object.entries(n.resp).map(([hz, v]) => `[[${HAZARDS[hz].icon}]] ${L(HAZARDS[hz].name)} −${Math.round(v * 100)}%`).join("   ");
+    cy += k.text(l, list, px, cy, {size:12, color:"sky", w:iw, iconColor:"sky"}).h + 8;
+  }
+  const pills = [];
+  if (!own){ pills.push({txt:`${IC.ep} ${c.ep}`, kind:S.ep >= c.ep ? "acc" : "bad"}); pills.push({txt:`${IC.pc} ${c.pc}`, kind:S.pc >= c.pc ? "acc" : "bad"}); }
+  pills.push({txt:`${t("needs")}: ${n.req.length ? n.req.map(q => L(SKILL[q].name)).join(" + ") : t("none")}`, kind:""});
+  if (n.months) pills.push({txt:`${t("rollout")} ${n.months} ${t("months")}`, kind:""});
+  if (n.type === "active") pills.push({txt:`${t("cooldownLen")} ${n.cd} ${t("months")}`, kind:"gold"});
+  cy += W.pills(l, px, cy, iw, pills) + 14;
+  const full = st === "ready" && P.atCapacity(n);
+  const can = st === "ready" && !full && S.ep >= c.ep && S.pc >= c.pc;
+  if (!own){
+    const lab = `[[lock-open]] ${t("unlock")}`;
+    W.btn(l, "buy", px, cy, lab, () => { if (P.buyNode(n.id)) Audio.play("buy"); k.dirty(); }, {disabled:!can, sound:false, h:42, size:15, w:iw});
+    cy += 48;
+    if (full) cy += k.text(l, t("capFull"), px, cy, {size:12, color:"bad", w:iw}).h + 4;
+    else if (st === "locked") cy += k.text(l, t("needReq"), px, cy, {size:12, color:"warn", w:iw}).h + 4;
+    else if (!can) cy += k.text(l, t("cantAfford"), px, cy, {size:12, color:"bad", w:iw}).h + 4;
+  } else if (n.type === "active"){
+    const a = P.abilityList().find(q => q.id === n.id), ready = a && P.abilityReady(a), cd = S.actCd[n.id] || 0;
+    const lab = cd ? `${t("cooldown")} ${cd} ${t("months")}` : `[[zap]] ${t("useNow")}`;
+    W.btn(l, "use", px, cy, lab, () => { if (P.useAbility(n.id)) k.dirty(); }, {disabled:!ready, kind:"gold", h:42, size:15, w:iw});
+    cy += 48;
+    if (!cd && n.target === "country" && !(S.selC && !S.selC.startsWith("R_"))) cy += k.text(l, t("needCountry"), px, cy, {size:12, color:"warn", w:iw}).h + 4;
+    else if (n.target === "country" && S.selC) cy += k.text(l, `${t("target")}: ${P.cname(S.selC)}`, px, cy, {size:12, color:"muted", w:iw}).h + 4;
+  } else {
+    const p = P.rollProgress(n.id);
+    k.text(l, p !== null ? `[[loader]] ${t("rollingOut")} ${Math.round(p * 100)}%` : `[[check]] ${t("owned")}`, px, cy + 8, {font:"dispS", size:15, color:p !== null ? "accent" : "good", iconColor:p !== null ? "accent" : "good"});
+    cy += 40;
+  }
+  // tip at the bottom
+  k.text(l, t("skillTip"), px, y + h - 54, {size:11.5, color:"muted", w:iw, lh:1.35});
+};
+
+};
+gdjs.LoadingCode.userFunc0x1013ab8 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+/* Screens · หน้าเรียนรู้ */
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.learn) return;
+(P.mods = P.mods || {}).learn = 1;
+/* =========================================================================
+   Screens · Learning page: knowledge cards ("Did you know?" facts unlocked by events),
+   local weather cards, endings gallery and achievements. Opens from the menu and the pause window.
+   ========================================================================= */
+const {Kit, S, t, L, Audio, W, UIM, Screens, EVENTS, HAZARDS, ENDINGS} = P;
+const k = Kit;
+const FACT_EVENTS = EVENTS.filter(e => e.fact);
+const HZ_IDS = Object.keys(HAZARDS);
+const END_KEYS = ["winS", "winA", "winB", "l3", "l2", "l1"];
+P.cardTotal = () => FACT_EVENTS.length + HZ_IDS.length;
+P.cardCount = () => { const d = P.AchStore.data; return FACT_EVENTS.filter(e => d.seen.includes(e.id)).length + HZ_IDS.filter(h => (d.haz || []).includes(h)).length; };
+
+Screens.mLearn = function(l, pw){
+  const x = 22, w = pw - 44; let y = 18;
+  const tab = UIM.learnTab || "cards";
+  k.text(l, `[[book-open]] ${P.up(t("mLearn"))}`, x, y, {font:"disp", size:22, iconColor:"accent"}); y += 40;
+  W.tabs(l, x, y, [
+    {id:"lt-cards", label:`[[lightbulb]] ${t("lCards")}`, on:tab === "cards", fn:() => { UIM.learnTab = "cards"; k.L("ModalScroll").scroll = 0; k.dirty(); }},
+    {id:"lt-haz", label:`[[cloud-lightning]] ${t("lHazards")}`, on:tab === "haz", fn:() => { UIM.learnTab = "haz"; k.L("ModalScroll").scroll = 0; k.dirty(); }},
+    {id:"lt-end", label:`[[image]] ${t("lEndings")}`, on:tab === "end", fn:() => { UIM.learnTab = "end"; k.L("ModalScroll").scroll = 0; k.dirty(); }},
+    {id:"lt-ach", label:`[[trophy]] ${t("mAch")}`, on:tab === "ach", fn:() => { UIM.learnTab = "ach"; k.L("ModalScroll").scroll = 0; k.dirty(); }},
+  ]);
+  y += 46;
+  const d = P.AchStore.data;
+  if (tab === "cards"){
+    const got = FACT_EVENTS.filter(e => d.seen.includes(e.id));
+    y += k.text(l, `${t("lCardsHelp")} · ${got.length}/${FACT_EVENTS.length}`, x, y, {size:12.5, color:"muted", w}).h + 10;
+    const cw = (w - 10) / 2; let col = 0, rowY = y, rowH = 0;
+    const list = [...got, ...FACT_EVENTS.filter(e => !d.seen.includes(e.id)).slice(0, Math.max(0, 6 - got.length))];
+    list.forEach((e, i) => {
+      const on = d.seen.includes(e.id), cx = x + col * (cw + 10);
+      let ty = rowY + 12;
+      ty += k.text(l, on ? `[[lightbulb]] ${L(e.title)}` : `[[lock]] ${t("lLocked")}`, cx + 12, ty, {font:"bodyB", size:13.5, w:cw - 24, color:on ? "fg" : "muted", iconColor:on ? "warn" : "muted"}).h + 4;
+      ty += k.text(l, on ? L(e.fact) : t("lLockedHelp"), cx + 12, ty, {size:12.5, color:"muted", w:cw - 24, lh:1.4}).h;
+      const hh = ty - rowY + 12; e._h = hh; e._x = cx; e._y = rowY; rowH = Math.max(rowH, hh);
+      col++;
+      if (col === 2 || i === list.length - 1){ for (let j = i - col + 1; j <= i; j++){ const b = list[j]; k.rect(l, b._x, b._y, cw, rowH, d.seen.includes(b.id) ? "panel2" : "bg", {r:10, stroke:"line", under:true}); } rowY += rowH + 10; rowH = 0; col = 0; }
+    });
+    y = rowY;
+  } else if (tab === "haz"){
+    y += k.text(l, t("lHazHelp"), x, y, {size:12.5, color:"muted", w}).h + 10;
+    for (const id of HZ_IDS){
+      const Z = HAZARDS[id], on = (d.haz || []).includes(id);
+      const th = k.text(null, on ? L(Z.fact) : t("lHazLocked"), 0, 0, {size:12.5, w:w - 90, measure:true}).h;
+      const ch = Math.max(64, th + 40);
+      W.card(l, x, y, w, ch, {fill:on ? "panel2" : "bg"});
+      k.rect(l, x + 12, y + (ch - 44) / 2, 44, 44, on ? "accent" : "line", {r:10, a:.16});
+      k.icon(l, Z.icon, x + 22, y + (ch - 24) / 2, 24, on ? "accent" : "muted");
+      k.text(l, L(Z.name), x + 70, y + 9, {font:"bodyB", size:14, color:on ? "fg" : "muted"});
+      k.text(l, on ? L(Z.fact) : t("lHazLocked"), x + 70, y + 30, {size:12.5, color:"muted", w:w - 90, lh:1.4});
+      y += ch + 8;
+    }
+  } else if (tab === "end"){
+    y += k.text(l, t("lEndHelp"), x, y, {size:12.5, color:"muted", w}).h + 10;
+    const cw = (w - 20) / 3, chh = cw * 9 / 16;
+    END_KEYS.forEach((key, i) => {
+      const cx = x + (i % 3) * (cw + 10), cy = y + Math.floor(i / 3) * (chh + 46), on = !!(d.ends || {})[key];
+      const anim = key.startsWith("win") ? `end-win-${key.slice(3)}` : ENDINGS[key].img;
+      k.rect(l, cx, cy, cw, chh, "bg", {r:8, stroke:"line", bg:true});
+      if (on) k.sprite(l, "EndArt", anim, cx + 2, cy + 2, cw - 4, chh - 4);
+      else k.icon(l, "lock", cx + cw / 2 - 14, cy + chh / 2 - 14, 28, "muted");
+      const title = key.startsWith("win") ? L(ENDINGS.win.grades[key.slice(3)]) : t(key + "Title");
+      k.text(l, on ? title : "???", cx, cy + chh + 6, {font:"bodyB", size:12.5, w:cw, align:"center", max:2, color:on ? "fg" : "muted"});
+    });
+    y += 2 * (chh + 46);
+  } else {
+    y += this.achList(l, x, y, w) + 8;
+  }
+  W.btn(l, "lclose", x, y + 6, t("mBack"), () => Screens.closeLearn(), {kind:"ghost"});
+  return y + 6 + 36 + 20;
+};
+P.ready = true;
+
+};
+gdjs.LoadingCode.eventsList0 = function(runtimeScene) {
+
+{
+
+
+gdjs.LoadingCode.userFunc0xfe7130(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0xfec880(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0xfec970(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0xff3d30(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0xff8148(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x1001878(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x1007c38(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x1013248(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x1013320(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x10133f8(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x10134d0(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x10135a8(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x1013680(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x1013758(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x1013830(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x1013908(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x10139e0(runtimeScene);
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0x1013ab8(runtimeScene);
+
+}
+
+
+};gdjs.LoadingCode.userFunc0xfe6658 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+window.P2050.Screens.setup(runtimeScene, "loading");
+};
+gdjs.LoadingCode.eventsList1 = function(runtimeScene) {
+
+{
+
+
+gdjs.LoadingCode.userFunc0xfe6658(runtimeScene);
+
+}
+
+
+};gdjs.LoadingCode.userFunc0xfe67b0 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+const P = window.P2050; if (!P || !P.ready) return;
+P.Screens.frame(runtimeScene);
+};
+gdjs.LoadingCode.userFunc0xfe6a00 = function GDJSInlineCode(runtimeScene) {
+"use strict";
+const P = window.P2050; if (!P || !P.ready) return;
+runtimeScene.getVariables().get("UIConsumed").setNumber(P.Screens.release(runtimeScene));
+};
+gdjs.LoadingCode.eventsList2 = function(runtimeScene) {
+
+{
+
+
+gdjs.LoadingCode.userFunc0xfe6a00(runtimeScene);
+
+}
+
+
+};gdjs.LoadingCode.eventsList3 = function(runtimeScene) {
+
+{
+
+
+let isConditionTrue_0 = false;
+isConditionTrue_0 = false;
+isConditionTrue_0 = gdjs.evtTools.runtimeScene.sceneJustBegins(runtimeScene);
+if (isConditionTrue_0) {
+
+{ //Subevents
+gdjs.LoadingCode.eventsList0(runtimeScene);} //End of subevents
+}
+
+}
+
+
+{
+
+
+let isConditionTrue_0 = false;
+isConditionTrue_0 = false;
+isConditionTrue_0 = gdjs.evtTools.runtimeScene.sceneJustBegins(runtimeScene);
+if (isConditionTrue_0) {
+
+{ //Subevents
+gdjs.LoadingCode.eventsList1(runtimeScene);} //End of subevents
+}
+
+}
+
+
+{
+
+
+gdjs.LoadingCode.userFunc0xfe67b0(runtimeScene);
+
+}
+
+
+{
+
+
+let isConditionTrue_0 = false;
+isConditionTrue_0 = false;
+isConditionTrue_0 = gdjs.evtTools.input.isMouseButtonReleased(runtimeScene, "Left");
+if (isConditionTrue_0) {
+
+{ //Subevents
+gdjs.LoadingCode.eventsList2(runtimeScene);} //End of subevents
+}
+
+}
+
+
+{
+
+
+let isConditionTrue_0 = false;
+isConditionTrue_0 = false;
+{isConditionTrue_0 = (runtimeScene.getScene().getVariables().getFromIndex(0).getAsString() == "Menu");
+}
+if (isConditionTrue_0) {
+{runtimeScene.getScene().getVariables().getFromIndex(0).setString("");
+}
+{gdjs.evtTools.runtimeScene.replaceScene(runtimeScene, "Menu", false);
+}
+}
+
+}
+
+
+};
+
+gdjs.LoadingCode.func = function(runtimeScene) {
+runtimeScene.getOnceTriggers().startNewFrame();
+
+gdjs.LoadingCode.GDUIPainterObjects1.length = 0;
+gdjs.LoadingCode.GDUIPainterObjects2.length = 0;
+gdjs.LoadingCode.GDUITextObjects1.length = 0;
+gdjs.LoadingCode.GDUITextObjects2.length = 0;
+gdjs.LoadingCode.GDUIIconObjects1.length = 0;
+gdjs.LoadingCode.GDUIIconObjects2.length = 0;
+gdjs.LoadingCode.GDTutImageObjects1.length = 0;
+gdjs.LoadingCode.GDTutImageObjects2.length = 0;
+gdjs.LoadingCode.GDCodeInputObjects1.length = 0;
+gdjs.LoadingCode.GDCodeInputObjects2.length = 0;
+gdjs.LoadingCode.GDBackdropObjects1.length = 0;
+gdjs.LoadingCode.GDBackdropObjects2.length = 0;
+gdjs.LoadingCode.GDPortraitObjects1.length = 0;
+gdjs.LoadingCode.GDPortraitObjects2.length = 0;
+gdjs.LoadingCode.GDEndArtObjects1.length = 0;
+gdjs.LoadingCode.GDEndArtObjects2.length = 0;
+gdjs.LoadingCode.GDLogoObjects1.length = 0;
+gdjs.LoadingCode.GDLogoObjects2.length = 0;
+
+gdjs.LoadingCode.eventsList3(runtimeScene);
+gdjs.LoadingCode.GDUIPainterObjects1.length = 0;
+gdjs.LoadingCode.GDUIPainterObjects2.length = 0;
+gdjs.LoadingCode.GDUITextObjects1.length = 0;
+gdjs.LoadingCode.GDUITextObjects2.length = 0;
+gdjs.LoadingCode.GDUIIconObjects1.length = 0;
+gdjs.LoadingCode.GDUIIconObjects2.length = 0;
+gdjs.LoadingCode.GDTutImageObjects1.length = 0;
+gdjs.LoadingCode.GDTutImageObjects2.length = 0;
+gdjs.LoadingCode.GDCodeInputObjects1.length = 0;
+gdjs.LoadingCode.GDCodeInputObjects2.length = 0;
+gdjs.LoadingCode.GDBackdropObjects1.length = 0;
+gdjs.LoadingCode.GDBackdropObjects2.length = 0;
+gdjs.LoadingCode.GDPortraitObjects1.length = 0;
+gdjs.LoadingCode.GDPortraitObjects2.length = 0;
+gdjs.LoadingCode.GDEndArtObjects1.length = 0;
+gdjs.LoadingCode.GDEndArtObjects2.length = 0;
+gdjs.LoadingCode.GDLogoObjects1.length = 0;
+gdjs.LoadingCode.GDLogoObjects2.length = 0;
+
+
+return;
+
+}
+
+gdjs['LoadingCode'] = gdjs.LoadingCode;
