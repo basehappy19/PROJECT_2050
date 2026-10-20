@@ -1,32 +1,30 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8"/>
-    <base href="game/">
-
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
-    <meta name="theme-color" content="#061015" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>Project : 2050 — ภารกิจกู้วิกฤตโลก</title>
-<meta name="description" content="เกมวางแผนกลยุทธ์บนแผนที่โลก รับบทผู้นำ GCT นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 ตามเป้าหมาย SDG 13 · 67 ประเทศ ภัยเฉพาะถิ่น 40 สกิล 4 ตัวละคร · เล่นได้ทั้งภาษาไทยและอังกฤษ · จัดทำเพื่อกิจกรรม Garena Academy Game Maker">
+<meta name="description" content="เกมวางแผนกลยุทธ์กู้วิกฤตโลกร้อน ลูกโลก 3 มิติ แผนที่ดาวเทียม 67 ประเทศ ภัยเฉพาะถิ่น 40 สกิล 4 ตัวละคร นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 ตามเป้าหมาย SDG 13 · เล่นได้ทั้งภาษาไทยและอังกฤษ · จัดทำเพื่อกิจกรรม Garena Academy Game Maker">
 <meta name="keywords" content="Project 2050, climate game, SDG 13, Net Zero, เกมภาวะโลกร้อน, Garena Academy Game Maker, strategy game">
 <meta name="author" content="ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์">
+<meta name="theme-color" content="#061015">
 <meta name="color-scheme" content="dark">
 <link rel="canonical" href="https://basehappy19.github.io/PROJECT_2050/">
-<link rel="icon" href="../favicon.svg" type="image/svg+xml">
-<link rel="icon" href="../icon-32.png" type="image/png" sizes="32x32">
-<link rel="icon" href="../icon-16.png" type="image/png" sizes="16x16">
-<link rel="apple-touch-icon" href="../apple-touch-icon.png">
-<link rel="manifest" href="../site.webmanifest">
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="icon-32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="icon-16.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Project 2050">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Project : 2050">
 <meta property="og:locale" content="th_TH">
 <meta property="og:locale:alternate" content="en_US">
 <meta property="og:title" content="Project : 2050 — ภารกิจกู้วิกฤตโลก">
-<meta property="og:description" content="นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 เกมวางแผนกลยุทธ์บนแผนที่โลก สำหรับกิจกรรม Garena Academy Game Maker">
+<meta property="og:description" content="นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 · เกมวางแผนกลยุทธ์บนลูกโลก 3 มิติและแผนที่ดาวเทียม สำหรับกิจกรรม Garena Academy Game Maker">
 <meta property="og:url" content="https://basehappy19.github.io/PROJECT_2050/">
 <meta property="og:image" content="https://basehappy19.github.io/PROJECT_2050/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -34,141 +32,16 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Project : 2050 — ภารกิจกู้วิกฤตโลก">
 <meta name="twitter:image" content="https://basehappy19.github.io/PROJECT_2050/og-image.png">
-<script>
-  /* Game server address. Empty = the same site ("/api"), which is what the Docker server in server/ uses.
-     When the game is hosted somewhere else (e.g. GitHub Pages), put the server here, e.g. "https://p2050.example.com/api".
-     (set it at build time with:  P2050_API=https://p2050.example.com/api node make-project.mjs --export) */
-  window.P2050_API = "";
-</script>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-
-	<style>
-		body {
-			margin: 0;
-			padding: 0;
-			background-color: #061015;
-            overflow: hidden;
-		}
-        #canvasArea {
-            margin-left: auto;
-            margin-right: auto;
-            overflow: hidden;
-        }
-
-        
-	</style>
-    <!-- Libs and GDJS core files : -->
-		<script src="libs/jshashtable.js" crossorigin="anonymous"></script>
-	<script src="logger.js" crossorigin="anonymous"></script>
-	<script src="gd.js" crossorigin="anonymous"></script>
-	<script src="libs/rbush.js" crossorigin="anonymous"></script>
-	<script src="AsyncTasksManager.js" crossorigin="anonymous"></script>
-	<script src="inputmanager.js" crossorigin="anonymous"></script>
-	<script src="jsonmanager.js" crossorigin="anonymous"></script>
-	<script src="Model3DManager.js" crossorigin="anonymous"></script>
-	<script src="ResourceLoader.js" crossorigin="anonymous"></script>
-	<script src="ResourceCache.js" crossorigin="anonymous"></script>
-	<script src="timemanager.js" crossorigin="anonymous"></script>
-	<script src="polygon.js" crossorigin="anonymous"></script>
-	<script src="runtimeobject.js" crossorigin="anonymous"></script>
-	<script src="profiler.js" crossorigin="anonymous"></script>
-	<script src="RuntimeInstanceContainer.js" crossorigin="anonymous"></script>
-	<script src="runtimescene.js" crossorigin="anonymous"></script>
-	<script src="scenestack.js" crossorigin="anonymous"></script>
-	<script src="force.js" crossorigin="anonymous"></script>
-	<script src="RuntimeLayer.js" crossorigin="anonymous"></script>
-	<script src="layer.js" crossorigin="anonymous"></script>
-	<script src="RuntimeCustomObjectLayer.js" crossorigin="anonymous"></script>
-	<script src="timer.js" crossorigin="anonymous"></script>
-	<script src="runtimewatermark.js" crossorigin="anonymous"></script>
-	<script src="runtimegame.js" crossorigin="anonymous"></script>
-	<script src="variable.js" crossorigin="anonymous"></script>
-	<script src="variablescontainer.js" crossorigin="anonymous"></script>
-	<script src="oncetriggers.js" crossorigin="anonymous"></script>
-	<script src="runtimebehavior.js" crossorigin="anonymous"></script>
-	<script src="SpriteAnimator.js" crossorigin="anonymous"></script>
-	<script src="spriteruntimeobject.js" crossorigin="anonymous"></script>
-	<script src="affinetransformation.js" crossorigin="anonymous"></script>
-	<script src="CustomRuntimeObjectInstanceContainer.js" crossorigin="anonymous"></script>
-	<script src="CustomRuntimeObject.js" crossorigin="anonymous"></script>
-	<script src="CustomRuntimeObject2D.js" crossorigin="anonymous"></script>
-	<script src="indexeddb.js" crossorigin="anonymous"></script>
-	<script src="events-tools/commontools.js" crossorigin="anonymous"></script>
-	<script src="events-tools/variabletools.js" crossorigin="anonymous"></script>
-	<script src="events-tools/runtimescenetools.js" crossorigin="anonymous"></script>
-	<script src="events-tools/inputtools.js" crossorigin="anonymous"></script>
-	<script src="events-tools/objecttools.js" crossorigin="anonymous"></script>
-	<script src="events-tools/cameratools.js" crossorigin="anonymous"></script>
-	<script src="events-tools/soundtools.js" crossorigin="anonymous"></script>
-	<script src="events-tools/storagetools.js" crossorigin="anonymous"></script>
-	<script src="events-tools/stringtools.js" crossorigin="anonymous"></script>
-	<script src="events-tools/windowtools.js" crossorigin="anonymous"></script>
-	<script src="events-tools/networktools.js" crossorigin="anonymous"></script>
-	<script src="splash/gd-logo-light.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/pixi.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/pixi-filters-tools.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/runtimegame-pixi-renderer.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/runtimescene-pixi-renderer.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/layer-pixi-renderer.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/pixi-image-manager.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/pixi-bitmapfont-manager.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/spriteruntimeobject-pixi-renderer.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/CustomRuntimeObject2DPixiRenderer.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/DebuggerPixiRenderer.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/loadingscreen-pixi-renderer.js" crossorigin="anonymous"></script>
-	<script src="pixi-renderers/pixi-effects-manager.js" crossorigin="anonymous"></script>
-	<script src="howler-sound-manager/howler.min.js" crossorigin="anonymous"></script>
-	<script src="howler-sound-manager/howler-sound-manager.js" crossorigin="anonymous"></script>
-	<script src="fontfaceobserver-font-manager/fontfaceobserver.js" crossorigin="anonymous"></script>
-	<script src="fontfaceobserver-font-manager/fontfaceobserver-font-manager.js" crossorigin="anonymous"></script>
-	<script src="Extensions/PrimitiveDrawing/pixi-graphics-extras/graphics-extras.min.js" crossorigin="anonymous"></script>
-	<script src="Extensions/PrimitiveDrawing/shapepainterruntimeobject-pixi-renderer.js" crossorigin="anonymous"></script>
-	<script src="Extensions/PrimitiveDrawing/shapepainterruntimeobject.js" crossorigin="anonymous"></script>
-	<script src="Extensions/TextInput/textinputruntimeobject-pixi-renderer.js" crossorigin="anonymous"></script>
-	<script src="Extensions/TextInput/textinputruntimeobject.js" crossorigin="anonymous"></script>
-	<script src="Extensions/TextObject/textruntimeobject-pixi-renderer.js" crossorigin="anonymous"></script>
-	<script src="Extensions/TextObject/textruntimeobject.js" crossorigin="anonymous"></script>
-	<script src="object-capabilities/AnimatableBehavior.js" crossorigin="anonymous"></script>
-	<script src="object-capabilities/EffectBehavior.js" crossorigin="anonymous"></script>
-	<script src="object-capabilities/FlippableBehavior.js" crossorigin="anonymous"></script>
-	<script src="object-capabilities/OpacityBehavior.js" crossorigin="anonymous"></script>
-	<script src="object-capabilities/ResizableBehavior.js" crossorigin="anonymous"></script>
-	<script src="object-capabilities/ScalableBehavior.js" crossorigin="anonymous"></script>
-	<script src="object-capabilities/TextContainerBehavior.js" crossorigin="anonymous"></script>
-	<script src="code0.js" crossorigin="anonymous"></script>
-	<script src="code1.js" crossorigin="anonymous"></script>
-	<script src="code2.js" crossorigin="anonymous"></script>
-	<script src="data.js" crossorigin="anonymous"></script>
-
-
+<link rel="preload" href="assets/data/world.json" as="fetch" crossorigin>
+<link rel="stylesheet" href="assets/app-57440c83e1.css">
+<style>
+  html,body{margin:0;height:100%;background:#061015;color:#e6f0ee;overflow:hidden}
+  #boot{position:fixed;inset:0;display:grid;place-items:center;font:600 14px/1.4 system-ui,sans-serif;letter-spacing:.2em;color:#4fd1c5}
+</style>
 </head>
 <body>
-
-    
-	<script>
-
-    (function() {
-        //Initialization
-        var game = new gdjs.RuntimeGame(gdjs.projectData, {});
-
-        //Create a renderer
-        game.getRenderer().createStandardCanvas(document.body);
-
-        //Bind keyboards/mouse/touch events
-        game.getRenderer().bindStandardEvents(game.getInputManager(), window, document);
-
-        //Load all assets and start the game
-        game.loadAllAssets(function() {
-            game.startGameLoop();
-        });
-    })();
-
-	</script>
-<script>
-  // offline play: the service worker lives next to this page (not in game/)
-  if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
-    window.addEventListener("load", () => navigator.serviceWorker.register(new URL("sw.js", location.href)).catch(() => {}));
-  }
-</script>
+<div id="app"><div id="boot">PROJECT : 2050</div></div>
+<noscript><p style="padding:24px">Project : 2050 ต้องเปิด JavaScript · This game needs JavaScript.</p></noscript>
+<script type="module" src="assets/app-eb9bef6b5c.js"></script>
 </body>
 </html>

@@ -1,0 +1,33 @@
+Project : 2050 — sound and music credits (web version)
+All files were trimmed, loudness-matched and re-encoded for the game. They are used inside the game only;
+please do not redistribute them as a standalone sound pack.
+
+MUSIC
+- music-menu, music-game1, music-game2 — "Theme_1", "Ambient_1", "Ambient_2" by Maximiliano Stradex (CC0 1.0)
+  via https://github.com/lavenderdotpet/CC0-Public-Domain-Sounds
+- music-field — "The Field Of Dreams" by pauliuw (CC0) https://opengameart.org/content/the-field-of-dreams
+- music-snow — "November Snow" by cynicmusic (CC0) https://opengameart.org/content/november-snow
+- music-eye — "Eye of the Storm" by Joth (CC0) https://opengameart.org/content/eye-of-the-storm
+- music-city — "EmptyCity: Background Music" by yd (CC0) https://opengameart.org/content/emptycity-background-music
+- music-bleeding — "Bleeding out" by HaelDB (CC0) https://opengameart.org/content/bleeding-out
+- music-soliloquy — "Soliloquy" by Matthew Pablo, www.matthewpablo.com (CC-BY 3.0) https://opengameart.org/content/soliloquy
+- music-pursuit — "Tactical Pursuit" by Matthew Pablo, www.matthewpablo.com (CC-BY 3.0) https://opengameart.org/content/tactical-pursuit
+- music-descent — "Dark Descent" by Matthew Pablo, www.matthewpablo.com (CC-BY 3.0) https://opengameart.org/content/dark-descent
+- music-demise — "Heroic Demise (New)" by Matthew Pablo, www.matthewpablo.com (CC-BY 3.0) https://opengameart.org/content/heroic-demise-updated-version
+- music-decision — "Decision" by Alexandr Zhelanov, https://soundcloud.com/alexandr-zhelanov (CC-BY 3.0) https://opengameart.org/content/decision
+- music-machine — "Heart of Machine" by Alexandr Zhelanov (CC-BY 3.0) https://opengameart.org/content/heart-of-machine
+- music-rise — "Rise of spirit" by Alexandr Zhelanov (CC-BY 3.0) https://opengameart.org/content/rise-of-spirit
+- music-omens — "Omens" by el-corleo (CC-BY 3.0) https://opengameart.org/content/omens
+- music-lastmin — "Last Minute" by HorrorPen (CC-BY 3.0) https://opengameart.org/content/last-minute
+
+INTERFACE SOUNDS AND JINGLES (CC0 1.0, Kenney — https://kenney.nl, via the CC0-Public-Domain-Sounds collection)
+- sfx-*: Interface Sounds, UI Audio, RPG Audio, Sci-fi Sounds, Impact Sounds, Digital Audio, Music Jingles
+- sfx-spawnRed: "alarm_01" from "30 CC0 SFX loops"
+
+AMBIENCES
+- amb-* recordings from the Moodist project (https://github.com/remvze/moodist): Pixabay Content License or CC0
+  (https://pixabay.com/service/license-summary/) — thunder, rain, gale, campfire, night, gulls, jungle, river,
+  fireworks, keyboard, radio, clock, chimes, bowl, street, highway, crows, boil, temple, morse, and the older amb-* files
+- amb-factory mixes "machine_01" (30 CC0 SFX loops) and "sfx100v2_loop_machine_02" (100 CC0 SFX 2), CC0
+- amb-explosion mixes "explosion" (100 CC0 SFX, CC0) with a Moodist siren recording
+- amb-space: "loop_ambient_01" (50 CC0 Sci-Fi SFX, CC0); amb-hum: "sfx100v2_loop_ambient_01" (100 CC0 SFX 2, CC0)

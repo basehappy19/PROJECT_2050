@@ -18,3 +18,6 @@ gdevelop/_source/build/export/
 server/.env
 server/backups/
 server/api/node_modules/
+web/node_modules/
+web/tools/.cache/
+web/src/gen/

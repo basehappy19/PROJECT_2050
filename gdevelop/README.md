@@ -1,6 +1,6 @@
 # PROJECT : 2050 — เวอร์ชัน GDevelop (v2)
 
-เกมทั้งหมดอยู่ในโปรเจกต์ GDevelop 5 นี้ (สร้างจาก GDevelop 5.6.269 ควรเปิดด้วยเวอร์ชันนี้หรือใหม่กว่า) เวอร์ชันเว็บ (`../index.html` + `../game/`) เป็นไฟล์ที่ export จากโปรเจกต์นี้ เล่นได้เหมือนกันทุกอย่าง
+เกมทั้งหมดอยู่ในโปรเจกต์ GDevelop 5 นี้ (สร้างจาก GDevelop 5.6.269 ควรเปิดด้วยเวอร์ชันนี้หรือใหม่กว่า) เวอร์ชันเว็บ (`../index.html` + `../assets/`) เขียนแยกเป็นเว็บแอปอยู่ในโฟลเดอร์ `../web/` แต่ใช้กฎเกม ข้อมูล และตัวเชื่อม server ชุดเดียวกับโปรเจกต์นี้ (`_source/src/1x-*.js`, `20-engine.js`, `21-net.js`) แก้ที่เดียวได้ทั้งสองเวอร์ชัน
 
 ## วิธีเปิด
 1. เปิด GDevelop → **Open a project** → เลือก `game.json` ในโฟลเดอร์นี้
@@ -28,18 +28,18 @@
 
 ถ้าแก้ใน GDevelop โดยตรง `game.json` จะเป็นฉบับล่าสุด แต่ถ้าสั่ง build ใหม่จาก `_source` โค้ดใน `game.json` จะถูกเขียนทับด้วยไฟล์ใน `_source/src` ควรเลือกแก้ที่เดียว (แนะนำให้แก้ที่ `_source/src`)
 
-## สร้าง game.json และเวอร์ชันเว็บใหม่
+## สร้าง game.json ใหม่
 ต้องมี Node.js 20 ขึ้นไป
 
 ```bash
 cd gdevelop/_source/build
 npm install
-node make-project.mjs --export     # เขียน ../../game.json และ ../../../game/, ../../../index.html, ../../../sw.js
+node make-project.mjs --export     # เขียน ../../game.json และ export HTML5 ไว้ทดสอบที่ build/export/
 ```
 
 - `node gen-assets.mjs` สร้างไอคอน, รูปตัวละคร, ภาพฉากจบ, โลโก้ และเส้นเขตแดนประเทศ (`assetgen/countrygeo.json`) ใหม่ ใช้เมื่อเพิ่มไอคอน Lucide ใหม่ในโค้ดหรือแก้ภาพ
 - `node tutshots.mjs` ถ่ายภาพหน้าคู่มือใหม่จากเกมจริง แล้วสั่ง build อีกครั้ง
-- ถ้าวางเกมบนเว็บที่ไม่ใช่ server ของเรา ให้ build ด้วย `P2050_API=https://<server>/api node make-project.mjs --export`
+- เวอร์ชันเว็บ build ด้วย `cd ../../web && npm install && node build.mjs` (ดู `../web/README.md`)
 
 ## โครงสร้างโปรเจกต์
 | ส่วน | อยู่ที่ไหน |

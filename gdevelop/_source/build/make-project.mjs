@@ -1,5 +1,5 @@
 // Builds the GDevelop 5 project (gdevelop/game.json) for Project : 2050 from the JavaScript in ../src,
-// and with --export also builds the web version: <project>/game/ (HTML5 export), <project>/index.html and <project>/sw.js.
+// and with --export also makes an HTML5 test build in build/export/ (the website is the separate web/ project).
 //   cd gdevelop/_source/build && npm install && node make-project.mjs [--export]
 import { gd, loadProject, saveProject, exportProject } from "gdcore-tools";
 import fs from "node:fs";
@@ -265,7 +265,5 @@ if (process.argv.includes("--export")){
   const loaded = await loadProject(`${OUT}/game.json`);
   const dir = `${HERE}/export`; fs.rmSync(dir, {recursive:true, force:true}); fs.mkdirSync(dir, {recursive:true});
   exportProject(loaded, dir);
-  console.log("exported to", dir, fs.readdirSync(dir).length, "files");
-  const {buildWeb} = await import("./build-web.mjs");
-  buildWeb(dir, REPO);
+  console.log("exported to", dir, fs.readdirSync(dir).length, "files (HTML5 test build; the website itself is the separate web/ project)");
 }

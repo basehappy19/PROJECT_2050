@@ -1,0 +1,58 @@
+/* Screenshot walk-through of the web build (for checking the UI). Usage: node tools/shots.mjs [outDir] [w] [h] */
+import {chromium} from "playwright";
+import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
+import {fileURLToPath} from "node:url";
+
+const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, "../..");
+const OUT = process.argv[2] || "/tmp/shots", W = +(process.argv[3] || 1600), H = +(process.argv[4] || 900), DPR = +(process.argv[5] || 1);
+fs.mkdirSync(OUT, {recursive:true});
+const TYPES = {".html":"text/html; charset=utf-8", ".js":"text/javascript", ".css":"text/css", ".json":"application/json", ".jpg":"image/jpeg", ".png":"image/png", ".svg":"image/svg+xml", ".mp3":"audio/mpeg", ".woff2":"font/woff2"};
+const srv = http.createServer((req, res) => {
+  let p = decodeURIComponent(req.url.split("?")[0]); if (p.endsWith("/")) p += "index.html";
+  const f = path.join(ROOT, p);
+  if (!fs.existsSync(f) || fs.statSync(f).isDirectory()){ res.writeHead(404); return res.end(); }
+  res.writeHead(200, {"Content-Type":TYPES[path.extname(f)] || "application/octet-stream"}); fs.createReadStream(f).pipe(res);
+}).listen(0);
+const port = srv.address().port;
+const browser = await chromium.launch({executablePath:process.env.CHROME || "/opt/pw-browsers/chromium", args:["--disable-accelerated-2d-canvas", "--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--autoplay-policy=no-user-gesture-required"]});
+const page = await browser.newPage({viewport:{width:W, height:H}, deviceScaleFactor:DPR, hasTouch:W < 800, isMobile:W < 800});
+const errs = [];
+page.on("console", m => { if (m.type() === "error" || m.type() === "warning") errs.push(m.type() + ": " + m.text()); });
+page.on("pageerror", e => errs.push("pageerror: " + e.message));
+const idle = () => page.evaluate(() => new Promise(r => requestAnimationFrame(() => requestAnimationFrame(() => setTimeout(r, 50)))));
+const shot = async n => { await page.waitForTimeout(500); await idle(); await idle(); await page.screenshot({path:`${OUT}/${n}.png`, timeout:90000}); console.log("shot", n); };
+const ev = (fn, ...a) => page.evaluate(fn, ...a);
+await page.goto(`http://localhost:${port}/index.html`);
+await page.waitForSelector(".loading .enter", {timeout:60000});
+await shot("01-loading");
+await page.click(".loading .enter");
+await page.waitForTimeout(3500);
+await shot("02-menu");
+await page.click(".tile:nth-child(5)"); await page.waitForTimeout(600); await shot("03-shop-offline");
+await page.click(".menu-panel .btn-ghost"); await page.waitForTimeout(300);
+await page.click(".bigbtn"); await page.waitForTimeout(2600);
+await shot("04-tutorial");
+await page.click(".tutorial .mfoot .btn-ghost"); await page.waitForTimeout(500);
+await shot("05-charsel");
+await page.click(".charsel .mfoot .btn-lg"); await page.waitForTimeout(1500);
+await shot("06-story");
+await page.click(".story .mfoot .btn-ghost"); await page.waitForTimeout(1200);
+await shot("07-game");
+await ev(() => { const P = window.P2050; P.S.ep = 400; P.S.pc = 120; P.Game.selectRegion("SEA", true); });
+await page.waitForTimeout(1500); await shot("08-region");
+await ev(() => window.P2050.Game.selectCountry("THA")); await page.waitForTimeout(1500); await shot("09-country");
+await ev(() => { const P = window.P2050; P.Game.closeTab(); P.Game.openSkills(); }); await page.waitForTimeout(800); await shot("10-skills");
+await ev(() => { const P = window.P2050; P.buyNode("E1"); P.Game.closeSkills(); P.S.haz.push({id:99, type:"typhoon", c:"PHL", at:P.S.tick + 3, sev:1, evac:false}); P.S.bubbles.push({id:98, type:"green", reg:"EU", lat:48.9, lon:2.35, ttl:4}); P.S.bubbles.push({id:97, type:"red", reg:"SA", cid:"BRA", ttl:5}); P.Map.strike({c:"IND", type:"wildfire"}); P.changed(); });
+await page.waitForTimeout(900); await shot("11-hazards");
+await ev(() => { const P = window.P2050; P.Game.setTab("stats"); }); await page.waitForTimeout(700); await shot("12-stats");
+await ev(() => { const P = window.P2050; P.Game.closeTab(); P.triggerEvent(); }); await page.waitForTimeout(2200); await shot("13-event");
+await ev(() => { const P = window.P2050; if (P.S.event) P.chooseOption(0); P.S.event = null; P.S.cev = null; const ok = (() => { for (let i = 0; i < 30; i++){ P.S.lastEv = -9; if (P.S.event) return true; P.S.tick += 0; } })(); }); await page.waitForTimeout(300);
+await ev(() => { const P = window.P2050; P.S.ceUsed = []; for (let i = 0; i < 20 && !P.S.cev; i++){ P.S.event = null; P.S.tick = 30; const r = Math.random; Math.random = () => 0.01; try { P.triggerEvent(); } finally { Math.random = r; } } }); await page.waitForTimeout(2200); await shot("14-country-event");
+await ev(() => { const P = window.P2050; if (P.S.event) P.chooseOption(0); P.Game.pause(); }); await page.waitForTimeout(600); await shot("15-pause");
+await ev(() => { const P = window.P2050; P.Game.openLearn("cards"); }); await page.waitForTimeout(600); await shot("16-learn");
+await ev(() => { const P = window.P2050; P.Game.closeLearn(); P.Game.resume(); P.S.regions.forEach(r => r.co2 = 0.1); P.S.sink = 5; P.checkEnd(); }); await page.waitForTimeout(2500); await shot("17-end");
+fs.writeFileSync(`${OUT}/errors.txt`, errs.join("\n"));
+console.log("errors:", errs.length); errs.slice(0, 30).forEach(e => console.log(" ", e));
+await browser.close(); srv.close();

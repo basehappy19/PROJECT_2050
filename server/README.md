@@ -6,7 +6,7 @@ Server ของเกม ทำหน้าที่เก็บบัญชี
 |---|---|
 | `db` | PostgreSQL 16 เก็บข้อมูลไว้ใน volume `pgdata` (ลบ container แล้วข้อมูลยังอยู่) |
 | `api` | Node.js + Fastify (โค้ดอยู่ใน `api/`) สร้างตารางฐานข้อมูลให้เองตอนเริ่มทำงาน |
-| `web` | Nginx เสิร์ฟไฟล์เกม (`../index.html` + `../game/`) และส่งต่อ `/api` กับ `/verify` ไปที่ api |
+| `web` | Nginx เสิร์ฟเกมเวอร์ชันเว็บ (`../index.html` + `../assets/`) และส่งต่อ `/api` กับ `/verify` ไปที่ api |
 
 ## เริ่มใช้งาน (เครื่องที่ลง Docker Desktop แล้ว)
 
@@ -22,7 +22,7 @@ docker compose up -d --build
 - ดูสถานะ: `docker compose ps`
 - ดู log ของ API: `docker compose logs -f api`
 - หยุด server: `docker compose down` (ข้อมูลยังอยู่) · ถ้าจะลบข้อมูลทั้งหมด: `docker compose down -v`
-- อัปเดตเกม: build เกมใหม่ (ดู `../gdevelop/README.md`) แล้วรีเฟรชหน้าเว็บ ไม่ต้องรีสตาร์ต server เพราะ Nginx อ่านไฟล์จากโฟลเดอร์โปรเจกต์ตรง ๆ
+- อัปเดตเกม: build เวอร์ชันเว็บใหม่ (`cd web && node build.mjs` ดู `../web/README.md`) แล้วรีเฟรชหน้าเว็บ ไม่ต้องรีสตาร์ต server เพราะ Nginx อ่านไฟล์จากโฟลเดอร์โปรเจกต์ตรง ๆ
 - อัปเดตโค้ด API: `docker compose up -d --build api`
 
 ## Google Sign-In
@@ -66,7 +66,7 @@ docker compose up -d --build
 
 ## วางเกมไว้ที่อื่น (เช่น GitHub Pages) แต่ใช้ server นี้
 
-1. build เกมพร้อมบอกที่อยู่ server: `P2050_API=https://<โดเมน server>/api node make-project.mjs --export` (หรือแก้บรรทัด `window.P2050_API = "..."` ใน `index.html` ตรง ๆ)
+1. build เกมพร้อมบอกที่อยู่ server: `cd web && P2050_API=https://<โดเมน server>/api node build.mjs`
 2. ใน `.env` ตั้ง `CORS_ORIGIN=https://basehappy19.github.io`
 3. server ต้องเปิดผ่าน https ไม่อย่างนั้นเบราว์เซอร์จะบล็อก (ใช้ reverse proxy ที่มี SSL เช่น Caddy หรือ Cloudflare Tunnel วางหน้า port 8080)
 
