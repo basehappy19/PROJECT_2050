@@ -25,3 +25,6 @@ P.achExtra = (unlock, d) => {
   if (S.world && S.era === "thrive") unlock("thrive");
 };
 P.newsIds = NEWS_IDS;
+
+/* Hard Core opens after the first Mission 2050 win in the normal mode (this device, or the signed-in account) */
+P.hardUnlocked = () => !!(P.AchStore && P.AchStore.data.got.win) || !!(P.Net && P.Net.user && P.Net.user.cleared && P.Net.user.cleared.normal);

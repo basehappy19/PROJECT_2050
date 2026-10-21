@@ -34,27 +34,46 @@ test("gems, items, levels and certificate rights; every change is logged", async
   r = await call("POST", "/api/admin/users/student1/items", {add:["char_dip", "speed3"]}, admin); assert.deepEqual(r.body.owned.sort(), ["char_dip", "speed3"]);
   r = await call("POST", "/api/admin/users/student1/xp", {char:"dip", level:5}, admin); assert.equal(r.body.level, 5);
   r = await call("GET", "/api/certificates", null, player); assert.equal(r.body.eligibility.eligible, false);
-  r = await call("POST", "/api/admin/users/student1/flags", {certOverride:true, abGroup:"B"}, admin); assert.equal(r.body.flags.abGroup, "B");
+  r = await call("POST", "/api/admin/users/student1/flags", {certOverride:true, note:"สอบแทน"}, admin); assert.equal(r.body.flags.certOverride, true);
   r = await call("GET", "/api/certificates", null, player); assert.equal(r.body.eligibility.eligible, true);
-  r = await call("GET", "/api/me", null, player); assert.equal(r.body.user.abGroup, "B");
   r = await call("GET", "/api/admin/log", null, admin); assert.ok(r.body.rows.length >= 4); assert.equal(r.body.rows[0].target, "student1");
+  assert.deepEqual(r.body.rows[0].detail.changes.certOverride, [null, true]);
+  r = await call("GET", "/api/admin/log?action=gems", null, admin); assert.equal(r.body.rows.length, 1); assert.equal(r.body.rows[0].detail.amount, 500);
+  r = await call("GET", "/api/admin/users/student1", null, admin); assert.equal(r.body.ledger[0].amount, 500); assert.ok(r.body.history.length >= 4);
 });
-test("online settings reach the game", async () => {
-  let r = await call("PUT", "/api/admin/config/balance", {value:{presets:{A:{inc:1}, B:{inc:0.8, haz:1.3}}, weights:{A:30, B:70}}}, admin); assert.equal(r.status, 200);
-  r = await call("PUT", "/api/admin/config/balance", {value:{presets:{A:{inc:99}}}}, admin); assert.equal(r.body.error, "bad_value");
-  r = await call("PUT", "/api/admin/config/disabledEvents", {value:["EVT_43"]}, admin);
-  r = await call("PUT", "/api/admin/config/prices", {value:{speed3:150}}, admin);
-  r = await call("GET", "/api/config"); assert.equal(r.body.balance.weights.B, 70); assert.deepEqual(r.body.disabledEvents, ["EVT_43"]); assert.equal(r.body.prices.speed3, 150);
+test("settings live in the database and reach the game", async () => {
+  let r = await call("PUT", "/api/admin/settings/disabledEvents", {value:["EVT_43", "NW_REDSEA"]}, admin); assert.equal(r.status, 200);
+  r = await call("PUT", "/api/admin/settings/prices", {value:{speed3:150}}, admin);
+  r = await call("PUT", "/api/admin/settings/prices", {value:{speed3:-1}}, admin); assert.equal(r.body.error, "bad_value");
+  r = await call("PUT", "/api/admin/settings/googleClientId", {value:"not a client id"}, admin); assert.equal(r.body.error, "bad_value");
+  r = await call("PUT", "/api/admin/settings/googleClientId", {value:"123456-abc.apps.googleusercontent.com"}, admin); assert.equal(r.status, 200);
+  r = await call("PUT", "/api/admin/settings/certMinCards", {value:7}, admin);
+  r = await call("PUT", "/api/admin/settings/announcement", {value:{th:"ปิดปรับปรุงคืนนี้", en:""}}, admin);
+  r = await call("PUT", "/api/admin/settings/nope", {value:1}, admin); assert.equal(r.body.error, "bad_key");
+  r = await call("GET", "/api/config");
+  assert.deepEqual(r.body.disabledEvents, ["EVT_43", "NW_REDSEA"]); assert.equal(r.body.prices.speed3, 150); assert.equal(r.body.googleClientId, "123456-abc.apps.googleusercontent.com");
+  assert.equal(r.body.certMinCards, 7); assert.equal(r.body.announcement.th, "ปิดปรับปรุงคืนนี้"); assert.equal(r.body.balance, undefined);
+  r = await call("PUT", "/api/admin/settings/googleClientId", {value:null}, admin); r = await call("GET", "/api/config"); assert.equal(r.body.googleClientId, null);
+  r = await call("GET", "/api/admin/log?action=setting", null, admin); assert.equal(r.body.rows[0].detail.key, "googleClientId");
+  r = await call("GET", "/api/admin/settings", null, admin); assert.equal(r.body.settings.certMinCards, 7); assert.equal(r.body.updated.certMinCards.by, "teacher");
 });
-test("play statistics for the A/B test, guests included", async () => {
-  let r = await call("POST", "/api/stats/start", {ab:"A", mode:"normal"}); const g = r.body.id; assert.ok(g);
+test("dashboard overview, guests' games included", async () => {
+  let r = await call("POST", "/api/stats/start", {mode:"normal"}); const g = r.body.id; assert.ok(g);
   r = await call("POST", `/api/stats/${g}`, {tick:290, ending:"win", temp:1.85, realSec:2700}); assert.equal(r.status, 200);
-  r = await call("POST", "/api/stats/start", {ab:"B", mode:"normal"}, player); const b = r.body.id;
-  await call("POST", `/api/stats/${b}`, {tick:120});
-  await pool.query("UPDATE play_stats SET updated_at = now() - interval '2 hours' WHERE id = $1", [b]);
-  r = await call("GET", "/api/admin/stats/ab", null, admin);
-  const A = r.body.rows.find(x => x.ab === "A"), B = r.body.rows.find(x => x.ab === "B");
-  assert.equal(A.wins, 1); assert.equal(A.grade_a, 1); assert.equal(B.quit, 1); assert.equal(Number(B.quit_year), 2036);
+  r = await call("POST", "/api/stats/start", {mode:"normal"}, player);
+  r = await call("GET", "/api/admin/overview", null, admin);
+  assert.equal(r.body.players.total, 2); assert.equal(r.body.games.started, 2); assert.equal(r.body.games.wins, 1); assert.equal(r.body.games.minutes, 45);
+  assert.equal(r.body.days.length, 14); assert.equal(r.body.days[13].games, 2);
+});
+test("sessions last a year and survive two tabs refreshing at once", async () => {
+  let r = await call("POST", "/api/auth/login", {login:"teacher", password:"secret123"}); const rt = r.body.refresh;
+  const exp = (await pool.query("SELECT MAX(expires_at) AS e FROM refresh_tokens")).rows[0].e;
+  assert.ok(new Date(exp) - Date.now() > 360 * 864e5);
+  const [a, b] = await Promise.all([call("POST", "/api/auth/refresh", {refresh:rt}), call("POST", "/api/auth/refresh", {refresh:rt})]);
+  assert.equal(a.status, 200); assert.equal(b.status, 200);
+  await pool.query("UPDATE refresh_tokens SET expires_at = now() - interval '1 second' WHERE expires_at < now() + interval '2 minutes'");
+  r = await call("POST", "/api/auth/refresh", {refresh:rt}); assert.equal(r.status, 401);
+  r = await call("POST", "/api/auth/refresh", {refresh:a.body.refresh}); assert.equal(r.status, 200);
 });
 test("banned players can't sign in", async () => {
   let r = await call("POST", "/api/admin/users/student1/flags", {banned:true}, admin); assert.equal(r.body.banned, true);

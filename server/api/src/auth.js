@@ -5,7 +5,7 @@ import { config } from "./config.js";
 
 const key = new TextEncoder().encode(config.jwtSecret);
 export const ACCESS_TTL = "15m";
-export const REFRESH_DAYS = 60;
+export const REFRESH_DAYS = 365;   // stay signed in for a year (renewed every time the game refreshes), until the player signs out
 
 export const hashPassword = pw => hash(pw, {memoryCost:19456, timeCost:2, parallelism:1});
 export const checkPassword = (h, pw) => (h ? verify(h, pw).catch(() => false) : Promise.resolve(false));
@@ -29,21 +29,21 @@ export async function issueRefresh(db, userId){
   await db.query("INSERT INTO refresh_tokens(user_id, token_hash, expires_at) VALUES ($1, $2, now() + ($3 || ' days')::interval)", [userId, sha(token), String(REFRESH_DAYS)]);
   return token;
 }
-/* refresh tokens are single-use: the old one is deleted when a new pair is issued */
+/* refresh tokens rotate: using one issues a new pair, and the old one stays valid for one more minute only
+   (so two tabs, or the game and the admin page, refreshing at the same moment don't sign the player out) */
 export async function useRefresh(db, token){
-  const r = await db.query("DELETE FROM refresh_tokens WHERE token_hash = $1 RETURNING user_id, expires_at", [sha(String(token || ""))]);
-  const row = r.rows[0];
-  if (!row || new Date(row.expires_at) < new Date()) return null;
-  return row.user_id;
+  await db.query("DELETE FROM refresh_tokens WHERE expires_at < now()");
+  const r = await db.query("UPDATE refresh_tokens SET expires_at = LEAST(expires_at, now() + interval '1 minute') WHERE token_hash = $1 AND expires_at > now() RETURNING user_id", [sha(String(token || ""))]);
+  return r.rows[0] ? r.rows[0].user_id : null;
 }
 export async function revokeRefresh(db, token){ await db.query("DELETE FROM refresh_tokens WHERE token_hash = $1", [sha(String(token || ""))]); }
 
-/* Google ID token check (only when GOOGLE_CLIENT_ID is set) */
-let gclient = null;
-export async function verifyGoogle(idToken){
-  if (!config.googleClientId) return null;
-  if (!gclient){ const {OAuth2Client} = await import("google-auth-library"); gclient = new OAuth2Client(config.googleClientId); }
-  const ticket = await gclient.verifyIdToken({idToken, audience:config.googleClientId});
+/* Google ID token check (only when a Google client id is set on the admin page) */
+const gclients = new Map();
+export async function verifyGoogle(idToken, clientId){
+  if (!clientId) return null;
+  if (!gclients.has(clientId)){ const {OAuth2Client} = await import("google-auth-library"); gclients.set(clientId, new OAuth2Client(clientId)); }
+  const ticket = await gclients.get(clientId).verifyIdToken({idToken, audience:clientId});
   const p = ticket.getPayload();
   if (!p || !p.sub) return null;
   return {sub:p.sub, email:p.email_verified ? (p.email || "").toLowerCase() : null, name:p.name || null};

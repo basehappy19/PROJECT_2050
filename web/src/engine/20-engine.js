@@ -22,23 +22,17 @@ const TIP_TO_TEMP = 0.004;          // 1 'tipping %' ≈ +0.004 °C
 const SPEEDS = [0, 9, 4.5, 3];      // seconds per month: 1× ≈ 45 min for the whole game, 2× ≈ 22 min, 3× ≈ 15 min
 const MAX_PROJECTS = 3;
 const MODES = {normal:{ep:25, pc:20, haz:1, dmg:1}, hard:{ep:10, pc:12, haz:1.6, dmg:1.25}, daily:{ep:25, pc:20, haz:1.15, dmg:1}};
-/* A/B balance test: each new game gets one preset (the server can change the values and how many players get each).
-   inc = monthly income · cost = prices of skills and orders · haz = how often disasters come · growth = how fast emissions grow */
-/* A/B balance (bot test, tools/sim.mjs): A = a sensible player wins ~60%, usually in 2049–2050; B = harder, ~30%. Both are meant to be won narrowly. */
+/* Balance presets: inc = monthly income · cost = prices of skills and orders · haz = how often disasters come · growth = how fast emissions grow.
+   Bot test (tools/sim.mjs): A = a sensible player wins ~60%, usually in 2049–2050; B = harder, ~30%. Players get A; B is for testing during development. */
 const BALANCE = {A:{inc:1.22, cost:.88, haz:1, growth:1}, B:{inc:1.2, cost:.9, haz:1, growth:1}};
-const HARD = {inc:.98, cost:1.02, haz:1.25, growth:1};   // Hard Core on top of the A/B preset
+const HARD = {inc:.98, cost:1.02, haz:1.25, growth:1};   // Hard Core on top of the preset
 const bal = () => { const b = BALANCE[S.ab] || BALANCE.A; return S.mode === "hard" ? {inc:b.inc * HARD.inc, cost:b.cost * HARD.cost, haz:b.haz * HARD.haz, growth:b.growth * HARD.growth} : b; };
 function setBalance(id, values){ if (values) BALANCE[id] = Object.assign({inc:1, cost:1, haz:1, growth:1}, values); if (S) S.ab = BALANCE[id] ? id : "A"; }
+/* Every game uses preset A. Developers can try another preset with ?ab=B in the address or localStorage "p2050-ab" (bot tests: web/tools/sim.mjs). */
 function pickBalance(){
-  const cfg = P.Net && P.Net.cfg && P.Net.cfg.balance;   // {presets:{A:{…}, B:{…}}, weights:{A:50, B:50}, force:"B"?}
-  if (cfg && cfg.presets) Object.entries(cfg.presets).forEach(([k, v]) => { BALANCE[k] = Object.assign({inc:1, cost:1, haz:1, growth:1}, v); });
-  const force = (P.Net && P.Net.user && P.Net.user.abGroup) || (cfg && cfg.force);
-  if (force && BALANCE[force]) return force;
-  const w = (cfg && cfg.weights) || {A:50, B:50}, ids = Object.keys(w).filter(k => BALANCE[k] && w[k] > 0);
-  if (!ids.length) return "A";
-  let r = Math.random() * ids.reduce((a, k) => a + w[k], 0);
-  for (const k of ids){ r -= w[k]; if (r <= 0) return k; }
-  return ids[0];
+  let k = null;
+  try { k = (typeof location !== "undefined" && new URLSearchParams(location.search).get("ab")) || (typeof localStorage !== "undefined" && localStorage.getItem("p2050-ab")); } catch(e){}
+  return k && BALANCE[k] ? k : "A";
 }
 
 /* ---------------------------- Random numbers (seeded, so a Daily Challenge is the same for everyone) ---------------------------- */
@@ -522,7 +516,8 @@ function pickGroup(pool, role, avoid, n){
   return out;
 }
 function triggerCountryEvent(){
-  const pool = CEVENTS.filter(e => !S.ceUsed.includes(e.id)); if (!pool.length){ S.ceUsed = []; return false; }
+  const off = (P.Net && P.Net.cfg && P.Net.cfg.disabledEvents) || [];
+  const pool = CEVENTS.filter(e => !S.ceUsed.includes(e.id) && !off.includes(e.id)); if (!pool.length){ S.ceUsed = []; return false; }
   const e = pool[Math.floor(rand() * pool.length)];
   let A, B;
   const fixed = CE_FIXED[e.id];
@@ -695,7 +690,7 @@ function slotMetaLines(m){
   if (!m) return [t("empty")];
   const when = new Date(m.at).toLocaleString(S.lang === "th" ? "th-TH" : "en-GB", {dateStyle:"short", timeStyle:"short"});
   const tag = m.mode === "hard" ? " · HARD CORE" : m.mode === "daily" ? " · DAILY" : "";
-  return [`${dateStr(m.tick)} · ΔT +${m.temp.toFixed(2)}°C · CO₂ ${m.net.toFixed(1)} Gt · ${t("appr")} ${m.appr.toFixed(0)}%`, when + tag];
+  return [`${dateStr(m.tick)} · ΔT +${m.temp.toFixed(2)}°C · CO₂ ${m.net.toFixed(1)} Gt · ${String(t("appr")).replace(/\[\[\$?[a-z0-9-]+\]\]\s?/g, "")} ${m.appr.toFixed(0)}%`, when + tag];
 }
 const fmtTime = sec => { sec = Math.max(0, Math.round(sec)); const h = Math.floor(sec / 3600), m = Math.floor(sec / 60) % 60, s = sec % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(s).padStart(2, "0"); };
 

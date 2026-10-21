@@ -49,7 +49,9 @@ test("register, duplicate, bad input, login", async () => {
 });
 test("refresh tokens rotate", async () => {
   let r = await call("POST", "/api/auth/refresh", {refresh}); assert.equal(r.status, 200);
-  const r2 = await call("POST", "/api/auth/refresh", {refresh}); assert.equal(r2.status, 401);   // the old one is used up
+  let r2 = await call("POST", "/api/auth/refresh", {refresh}); assert.equal(r2.status, 200);   // the old one still works for one minute (two tabs)
+  await pool.query("UPDATE refresh_tokens SET expires_at = now() - interval '1 second' WHERE expires_at < now() + interval '2 minutes'");
+  r2 = await call("POST", "/api/auth/refresh", {refresh}); assert.equal(r2.status, 401);   // then it is used up
   refresh = r.body.refresh; tok = r.body.access;
   r = await call("GET", "/api/me", null, tok); assert.equal(r.body.user.username, "phukhieo");
   r = await call("GET", "/api/me", null, "garbage"); assert.equal(r.status, 401);
@@ -122,9 +124,17 @@ test("certificate: eligibility, PDF and verify page", async () => {
   let r = await call("GET", "/api/certificates", null, tok); assert.equal(r.body.eligibility.wins, 1); assert.equal(r.body.eligibility.eligible, false);
   r = await call("POST", "/api/certificates", {fullName:"เด็กชายภูเขียว ใจดี"}, tok); assert.equal(r.body.error, "not_eligible");
   await call("PUT", "/api/progress", {cards:5}, tok);
+  r = await call("GET", "/api/certificates", null, tok); assert.equal(r.body.eligibility.winsNormal, 1); assert.equal(r.body.eligibility.winsHard, 0); assert.equal(r.body.eligibility.eligible, false);   // Hard Core still needed
+  const uid = (await pool.query("SELECT id FROM users WHERE username = 'phukhieo'")).rows[0].id;
+  await pool.query("INSERT INTO game_results(user_id, mode, char, day, finished_at, ending, temp, score) VALUES ($1, 'hard', 'sci', CURRENT_DATE, now(), 'win', 1.7, 9000)", [uid]);
+  r = await call("GET", "/api/me", null, tok); assert.deepEqual(r.body.user.cleared, {normal:true, hard:true});
   r = await call("POST", "/api/certificates", {fullName:"<script>"}, tok); assert.equal(r.body.error, "bad_name");
   r = await call("POST", "/api/certificates", {fullName:"เด็กชายภูเขียว ใจดี"}, tok); assert.equal(r.status, 200, JSON.stringify(r.body));
-  const c = r.body.list[0]; assert.match(c.code, /^P2050-[A-Z2-9]{4}-[A-Z2-9]{4}$/); assert.equal(c.grade, "A");
+  assert.equal(r.body.eligibility.issued, true); assert.equal(r.body.eligibility.eligible, false);
+  r = await call("POST", "/api/certificates", {fullName:"เด็กชายภูเขียว ใจดี"}, tok); assert.equal(r.body.error, "already_issued");   // one per player
+  await pool.query("UPDATE users SET flags = flags || '{\"certOverride\": true}' WHERE id = $1", [uid]);      // admin gives a one-time right
+  r = await call("POST", "/api/certificates", {fullName:"เด็กชายภูเขียว ใจดี"}, tok); assert.equal(r.status, 200); assert.equal(r.body.list.length, 2); assert.equal(r.body.eligibility.eligible, false);
+  const c = r.body.list[1]; assert.match(c.code, /^P2050-[A-Z2-9]{4}-[A-Z2-9]{4}$/); assert.equal(c.grade, "A");
   r = await call("GET", `/api/certificates/${c.code}/pdf`); assert.equal(r.status, 200); assert.equal(r.raw.headers["content-type"], "application/pdf");
   fs.writeFileSync("/tmp/p2050-cert.pdf", r.raw.rawPayload);
   r = await call("GET", `/verify/${c.code}`); assert.equal(r.status, 200); assert.match(r.raw.body, /เด็กชายภูเขียว ใจดี/);

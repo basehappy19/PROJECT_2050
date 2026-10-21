@@ -23,7 +23,8 @@
     "jose": "^5.10.0",
     "pdfkit": "^0.15.2",
     "pg": "^8.23.1",
-    "prisma": "7.10.0"
+    "prisma": "7.10.0",
+    "qrcode": "1.5.4"
   },
   "type": "module",
   "private": true,

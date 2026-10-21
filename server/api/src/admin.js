@@ -3,18 +3,13 @@
    Make the first admin from the server:  docker compose exec api node scripts/make-admin.js <username> */
 import { tx } from "./db.js";
 import { SHOP, CHARS, levelOf, LEVELS } from "./game-rules.js";
+import { SETTINGS, SETTING_KEYS, getSettings, forgetSettings } from "./settings.js";
 
 const fail = (reply, code, error, extra = {}) => reply.code(code).send({error, ...extra});
-const CONFIG_KEYS = ["balance", "announcement", "disabledEvents", "prices", "certMinCards"];
 const ROLES = ["player", "tester", "admin"];
 
-/* settings stored in game_config, merged over the defaults */
-export async function readConfig(db){
-  const rows = (await db.query("SELECT key, value FROM game_config")).rows;
-  return Object.fromEntries(rows.map(r => [r.key, r.value]));
-}
 export async function priceOf(db, item){
-  const cfg = await readConfig(db), p = cfg.prices && Number(cfg.prices[item]);
+  const p = (await getSettings(db)).prices[item];
   return Number.isFinite(p) && p >= 0 ? p : (SHOP[item] ? SHOP[item].price : null);
 }
 
@@ -48,10 +43,13 @@ export function registerAdmin(app, pool, {balance, meBody}){
     const u = (await pool.query("SELECT id, username, email, display_name, role, flags, banned, created_at, last_login FROM users WHERE id = $1", [id])).rows[0];
     const me = await meBody(pool, id);
     const cards = ((await pool.query("SELECT cards FROM progress WHERE user_id = $1", [id])).rows[0] || {cards:0}).cards;
-    const runs = (await pool.query("SELECT id, mode, ab, char, ending, tick, temp, score, terra, xp, flagged, note, started_at, finished_at FROM game_results WHERE user_id = $1 ORDER BY started_at DESC LIMIT 30", [id])).rows;
+    const runs = (await pool.query("SELECT id, mode, world, char, ending, tick, temp, score, terra, xp, flagged, note, started_at, finished_at FROM game_results WHERE user_id = $1 ORDER BY started_at DESC LIMIT 30", [id])).rows;
     const certs = (await pool.query("SELECT code, full_name, grade, issued_at FROM certificates WHERE user_id = $1 ORDER BY issued_at DESC", [id])).rows;
     const ach = (await pool.query("SELECT ach FROM achievements WHERE user_id = $1", [id])).rows.map(r => r.ach);
-    return {user:{...u, gems:await balance(pool, id), cards}, owned:me.owned, chars:me.chars, runs, certs, ach, shop:Object.keys(SHOP), charsList:CHARS, levels:LEVELS};
+    const ledger = (await pool.query("SELECT amount, reason, ref, created_at FROM wallet_ledger WHERE user_id = $1 ORDER BY id DESC LIMIT 20", [id])).rows;
+    const history = (await pool.query("SELECT l.action, l.detail, l.created_at, a.username AS admin FROM admin_log l LEFT JOIN users a ON a.id = l.admin_id WHERE l.target_id = $1 ORDER BY l.id DESC LIMIT 20", [id])).rows;
+    const flags = {...(u.flags || {})}; delete flags.abGroup;
+    return {user:{...u, flags, gems:await balance(pool, id), cards}, owned:me.owned, chars:me.chars, runs, certs, ach, ledger, history, shop:Object.keys(SHOP), charsList:CHARS, levels:LEVELS};
   });
   app.post("/api/admin/users/:id/gems", ADMIN, async (req, reply) => {
     const id = await userId(pool, req.params.id); if (!id) return fail(reply, 404, "not_found");
@@ -67,9 +65,11 @@ export function registerAdmin(app, pool, {balance, meBody}){
     const id = await userId(pool, req.params.id); if (!id) return fail(reply, 404, "not_found");
     const add = [].concat((req.body || {}).add || []).map(String).filter(k => SHOP[k]), remove = [].concat((req.body || {}).remove || []).map(String).filter(k => SHOP[k]);
     return tx(pool, async db => {
+      const had = new Set((await db.query("SELECT item FROM owned_items WHERE user_id = $1", [id])).rows.map(r => r.item));
       for (const k of add) await db.query("INSERT INTO owned_items(user_id, item) VALUES ($1, $2) ON CONFLICT DO NOTHING", [id, k]);
       for (const k of remove) await db.query("DELETE FROM owned_items WHERE user_id = $1 AND item = $2", [id, k]);
-      await log(db, req, id, "items", {add, remove});
+      const given = add.filter(k => !had.has(k)), taken = remove.filter(k => had.has(k));
+      if (given.length || taken.length) await log(db, req, id, "items", {add:given, remove:taken});
       return {ok:true, owned:(await db.query("SELECT item FROM owned_items WHERE user_id = $1", [id])).rows.map(r => r.item)};
     });
   });
@@ -81,8 +81,9 @@ export function registerAdmin(app, pool, {balance, meBody}){
     if (b.level !== undefined){ const lv = Math.max(1, Math.min(LEVELS.length, Math.round(Number(b.level)))); xp = LEVELS[lv - 1]; }
     if (!Number.isFinite(xp) || xp < 0 || xp > 100000) return fail(reply, 400, "bad_xp");
     return tx(pool, async db => {
+      const old = ((await db.query("SELECT xp FROM character_progress WHERE user_id = $1 AND char = $2", [id, ch])).rows[0] || {xp:0}).xp;
       await db.query("INSERT INTO character_progress(user_id, char, xp) VALUES ($1, $2, $3) ON CONFLICT (user_id, char) DO UPDATE SET xp = EXCLUDED.xp", [id, ch, xp]);
-      await log(db, req, id, "xp", {char:ch, xp, level:levelOf(xp)});
+      await log(db, req, id, "xp", {char:ch, xp, level:levelOf(xp), from:levelOf(old)});
       return {ok:true, xp, level:levelOf(xp)};
     });
   });
@@ -90,27 +91,32 @@ export function registerAdmin(app, pool, {balance, meBody}){
     const id = await userId(pool, req.params.id); if (!id) return fail(reply, 404, "not_found");
     const cards = Math.max(0, Math.min(500, Math.round(Number((req.body || {}).cards) || 0)));
     return tx(pool, async db => {
+      const old = ((await db.query("SELECT cards FROM progress WHERE user_id = $1", [id])).rows[0] || {cards:0}).cards;
       await db.query("INSERT INTO progress(user_id, cards) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET cards = EXCLUDED.cards, updated_at = now()", [id, cards]);
-      await log(db, req, id, "cards", {cards});
+      await log(db, req, id, "cards", {cards, from:old});
       return {ok:true, cards};
     });
   });
-  /* special settings: certOverride (true = may request a certificate now, false = never) · abGroup ("A"/"B"/…, null = random) · role · banned */
+  /* special settings: certOverride (true = may request a certificate now, false = never, null = usual rules) · note · role · banned */
   app.post("/api/admin/users/:id/flags", ADMIN, async (req, reply) => {
     const id = await userId(pool, req.params.id); if (!id) return fail(reply, 404, "not_found");
     const b = req.body || {};
     return tx(pool, async db => {
       const u = (await db.query("SELECT flags, role, banned FROM users WHERE id = $1 FOR UPDATE", [id])).rows[0];
-      const flags = {...u.flags};
+      const flags = {...u.flags}; delete flags.abGroup;
       if ("certOverride" in b) b.certOverride === null ? delete flags.certOverride : flags.certOverride = !!b.certOverride;
-      if ("abGroup" in b) b.abGroup ? flags.abGroup = String(b.abGroup).slice(0, 8) : delete flags.abGroup;
       if ("note" in b) flags.note = String(b.note || "").slice(0, 200);
       let role = u.role, banned = u.banned;
       if (b.role !== undefined){ if (!ROLES.includes(b.role)) return fail(reply, 400, "bad_role"); if (id === req.uid && b.role !== "admin") return fail(reply, 400, "cant_demote_self"); role = b.role; }
       if (b.banned !== undefined){ if (id === req.uid) return fail(reply, 400, "cant_ban_self"); banned = !!b.banned; }
       await db.query("UPDATE users SET flags = $2, role = $3, banned = $4 WHERE id = $1", [id, flags, role, banned]);
       if (banned) await db.query("DELETE FROM refresh_tokens WHERE user_id = $1", [id]);
-      await log(db, req, id, "flags", {flags, role, banned});
+      const changes = {};
+      if ((u.flags || {}).certOverride !== flags.certOverride) changes.certOverride = [(u.flags || {}).certOverride ?? null, flags.certOverride ?? null];
+      if (((u.flags || {}).note || "") !== (flags.note || "")) changes.note = [(u.flags || {}).note || "", flags.note || ""];
+      if (u.role !== role) changes.role = [u.role, role];
+      if (u.banned !== banned) changes.banned = [u.banned, banned];
+      if (Object.keys(changes).length) await log(db, req, id, "flags", {changes});
       return {ok:true, flags, role, banned};
     });
   });
@@ -132,41 +138,53 @@ export function registerAdmin(app, pool, {balance, meBody}){
     });
   });
 
-  /* ---------- online game settings ---------- */
-  app.get("/api/admin/config", ADMIN, async () => ({config:await readConfig(pool), keys:CONFIG_KEYS, shop:SHOP}));
-  app.put("/api/admin/config/:key", ADMIN, async (req, reply) => {
-    const key = String(req.params.key); if (!CONFIG_KEYS.includes(key)) return fail(reply, 400, "bad_key");
-    const value = (req.body || {}).value;
-    if (value === undefined || JSON.stringify(value).length > 20000) return fail(reply, 400, "bad_value");
-    if (key === "balance"){
-      const p = value && value.presets; if (!p || typeof p !== "object" || !Object.keys(p).length) return fail(reply, 400, "bad_value");
-      for (const v of Object.values(p)) for (const k of ["inc", "cost", "haz", "growth"]) if (v[k] !== undefined && !(Number(v[k]) > 0 && Number(v[k]) < 5)) return fail(reply, 400, "bad_value");
-    }
+  /* ---------- game settings (database) ---------- */
+  app.get("/api/admin/settings", ADMIN, async () => {
+    const st = await getSettings(pool, true);
+    const rows = (await pool.query("SELECT c.key, c.updated_at, u.username FROM game_config c LEFT JOIN users u ON u.id = c.updated_by")).rows;
+    return {settings:st, updated:Object.fromEntries(rows.map(r => [r.key, {at:r.updated_at, by:r.username}])), shop:SHOP, chars:CHARS, levels:LEVELS};
+  });
+  app.put("/api/admin/settings/:key", ADMIN, async (req, reply) => {
+    const key = String(req.params.key), def = SETTINGS[key]; if (!def) return fail(reply, 400, "bad_key");
+    const raw = (req.body || {}).value, value = raw === null ? null : def.check(raw);
+    if (value === undefined) return fail(reply, 400, "bad_value");
     return tx(pool, async db => {
-      await db.query("INSERT INTO game_config(key, value, updated_at, updated_by) VALUES ($1, $2, now(), $3) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now(), updated_by = EXCLUDED.updated_by", [key, JSON.stringify(value), req.uid]);
-      await log(db, req, null, "config", {key, value});
-      return {ok:true};
+      const before = (await getSettings(db, true))[key];
+      if (value === null) await db.query("DELETE FROM game_config WHERE key = $1", [key]);
+      else await db.query("INSERT INTO game_config(key, value, updated_at, updated_by) VALUES ($1, $2, now(), $3) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value, updated_at = now(), updated_by = EXCLUDED.updated_by", [key, JSON.stringify(value), req.uid]);
+      forgetSettings();
+      const after = (await getSettings(db, true))[key];
+      if (JSON.stringify(before) !== JSON.stringify(after)) await log(db, req, null, "setting", {key, before, after});
+      return {ok:true, value:after};
     });
   });
 
-  /* ---------- A/B test results ---------- */
-  app.get("/api/admin/stats/ab", ADMIN, async req => {
-    const days = Math.max(1, Math.min(365, Number(req.query.days) || 30));
-    const rows = (await pool.query(`SELECT ab, COUNT(*)::int AS games,
-        COUNT(*) FILTER (WHERE ending = 'win')::int AS wins,
-        COUNT(*) FILTER (WHERE ending IN ('l1','l2','l3'))::int AS losses,
-        COUNT(*) FILTER (WHERE ending IS NULL AND updated_at < now() - interval '1 hour')::int AS quit,
-        COUNT(*) FILTER (WHERE ending = 'win' AND temp < 1.6)::int AS grade_s,
-        COUNT(*) FILTER (WHERE ending = 'win' AND temp >= 1.6 AND temp < 2.0)::int AS grade_a,
-        COUNT(*) FILTER (WHERE ending = 'win' AND temp >= 2.0)::int AS grade_b,
-        ROUND(AVG(temp) FILTER (WHERE ending = 'win')::numeric, 2) AS win_temp,
-        ROUND(AVG(real_sec) FILTER (WHERE ending IS NOT NULL)::numeric / 60, 1) AS minutes,
-        ROUND(AVG(last_tick) FILTER (WHERE ending IS NULL AND updated_at < now() - interval '1 hour')::numeric / 12 + 2026, 1) AS quit_year
-      FROM play_stats WHERE NOT world AND mode = 'normal' AND started_at > now() - ($1 || ' days')::interval GROUP BY ab ORDER BY ab`, [String(days)])).rows;
-    return {days, rows};
+  /* ---------- overview numbers for the dashboard ---------- */
+  app.get("/api/admin/overview", ADMIN, async () => {
+    const one = async (sql, args = []) => (await pool.query(sql, args)).rows[0];
+    const players = await one(`SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE created_at > now() - interval '7 days')::int AS new7,
+      COUNT(*) FILTER (WHERE last_login > now() - interval '1 day')::int AS active1, COUNT(*) FILTER (WHERE last_login > now() - interval '7 days')::int AS active7,
+      COUNT(*) FILTER (WHERE banned)::int AS banned, COUNT(*) FILTER (WHERE role = 'admin')::int AS admins FROM users`);
+    const games = await one(`SELECT COUNT(*)::int AS started, COUNT(*) FILTER (WHERE ending IS NOT NULL)::int AS finished, COUNT(*) FILTER (WHERE ending = 'win')::int AS wins,
+      COUNT(*) FILTER (WHERE started_at > now() - interval '1 day')::int AS today, ROUND(AVG(real_sec) FILTER (WHERE ending IS NOT NULL)::numeric / 60)::int AS minutes,
+      COUNT(*) FILTER (WHERE world)::int AS world FROM play_stats WHERE started_at > now() - interval '30 days'`);
+    const gems = await one(`SELECT COALESCE(SUM(amount) FILTER (WHERE amount > 0), 0)::int AS earned, COALESCE(-SUM(amount) FILTER (WHERE amount < 0), 0)::int AS spent FROM wallet_ledger WHERE created_at > now() - interval '30 days'`);
+    const certs = await one(`SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE issued_at > now() - interval '30 days')::int AS month FROM certificates`);
+    const days = (await pool.query(`SELECT to_char(d, 'YYYY-MM-DD') AS day, (SELECT COUNT(*) FROM play_stats p WHERE p.started_at >= d AND p.started_at < d + interval '1 day')::int AS games
+      FROM generate_series(date_trunc('day', now() AT TIME ZONE 'Asia/Bangkok') - interval '13 days', date_trunc('day', now() AT TIME ZONE 'Asia/Bangkok'), interval '1 day') d ORDER BY d`)).rows;
+    const top = (await pool.query(`SELECT u.username, u.display_name, MAX(g.score)::int AS score FROM game_results g JOIN users u ON u.id = g.user_id
+      WHERE g.ending = 'win' AND NOT g.flagged AND g.finished_at > now() - interval '30 days' GROUP BY u.id ORDER BY score DESC LIMIT 5`)).rows;
+    return {players, games, gems, certs, days, top};
   });
-  app.get("/api/admin/log", ADMIN, async () => ({rows:(await pool.query(`SELECT l.id, l.action, l.detail, l.created_at, a.username AS admin, t.username AS target
-      FROM admin_log l LEFT JOIN users a ON a.id = l.admin_id LEFT JOIN users t ON t.id = l.target_id ORDER BY l.created_at DESC LIMIT 200`)).rows}));
+
+  app.get("/api/admin/log", ADMIN, async req => {
+    const q = req.query || {}, action = String(q.action || ""), who = String(q.user || "").toLowerCase().replace(/^@/, ""), before = Number(q.before) || null;
+    const rows = (await pool.query(`SELECT l.id, l.action, l.detail, l.created_at, a.username AS admin, a.display_name AS admin_name, t.username AS target, t.display_name AS target_name
+      FROM admin_log l LEFT JOIN users a ON a.id = l.admin_id LEFT JOIN users t ON t.id = l.target_id
+      WHERE ($1 = '' OR l.action = $1) AND ($2 = '' OR a.username = $2 OR t.username = $2) AND ($3::bigint IS NULL OR l.id < $3)
+      ORDER BY l.id DESC LIMIT 50`, [action, who, before])).rows;
+    return {rows, more:rows.length === 50};
+  });
 }
 
 /* ---------- play statistics (guests too): one row per game, updated once a year of game time ---------- */

@@ -7,7 +7,8 @@ import { hashPassword, checkPassword, accessToken, readAccess, issueRefresh, use
 import { SHOP, RENAME_PRICE, CHARS, MODES, levelOf, ACH_TERRA, terraFor, scoreFor, xpFor, dailyFactor, dailySeed, gradeOf, checkSummary } from "./game-rules.js";
 import { badWord } from "./words.js";
 import { certificatePdf, verifyHtml } from "./certificate.js";
-import { registerAdmin, registerStats, readConfig, priceOf } from "./admin.js";
+import { registerAdmin, registerStats, priceOf } from "./admin.js";
+import { getSettings, originAllowed } from "./settings.js";
 
 const fail = (reply, code, error, extra = {}) => reply.code(code).send({error, ...extra});
 const USERNAME = /^[a-z0-9_]{3,16}$/;
@@ -17,7 +18,8 @@ const bkkDate = d => new Intl.DateTimeFormat("en-CA", {timeZone:"Asia/Bangkok", 
 
 export function buildApp(pool, opts = {}){
   const app = Fastify({logger:opts.logger ?? {level:config.logLevel}, trustProxy:true, bodyLimit:2 * 1024 * 1024});
-  app.register(cors, {origin:config.corsOrigin.includes("*") ? true : config.corsOrigin, methods:["GET", "POST", "PUT", "DELETE"]});
+  app.register(cors, {origin:(origin, cb) => cb(null, originAllowed(origin)), methods:["GET", "POST", "PUT", "DELETE"]});
+  app.addHook("onReady", async () => { await getSettings(pool, true); });   // settings from the database (admin page)
   app.register(rateLimit, {global:true, max:240, timeWindow:"1 minute", errorResponseBuilder:() => ({statusCode:429, error:"rate_limited"})});
   const authLimit = {config:{rateLimit:{max:12, timeWindow:"1 minute"}}};
 
@@ -26,7 +28,9 @@ export function buildApp(pool, opts = {}){
   async function publicUser(db, uid){
     const u = (await db.query("SELECT id, username, email, display_name, renamed, role, flags FROM users WHERE id = $1", [uid])).rows[0];
     if (!u) return null;
-    return {username:u.username, email:u.email, displayName:u.display_name, renamed:u.renamed, terra:await balance(db, uid), role:u.role, abGroup:(u.flags || {}).abGroup || null};
+    const w = (await db.query(`SELECT COUNT(*) FILTER (WHERE mode IN ('normal', 'daily')) > 0 AS normal, COUNT(*) FILTER (WHERE mode = 'hard') > 0 AS hard
+      FROM game_results WHERE user_id = $1 AND ending = 'win' AND NOT flagged`, [uid])).rows[0];
+    return {username:u.username, email:u.email, displayName:u.display_name, renamed:u.renamed, terra:await balance(db, uid), role:u.role, cleared:{normal:!!w.normal, hard:!!w.hard}};
   }
   async function meBody(db, uid){
     const user = await publicUser(db, uid);
@@ -52,9 +56,9 @@ export function buildApp(pool, opts = {}){
   /* ---------- public ---------- */
   /* game settings: the server's defaults, overridden by what an admin set online (game_config) */
   app.get("/api/config", async () => {
-    const c = await readConfig(pool), prices = {...Object.fromEntries(Object.entries(SHOP).map(([k, v]) => [k, v.price])), rename:RENAME_PRICE, ...(c.prices || {})};
-    return {game:"p2050", version:2, googleClientId:config.googleClientId || null, certMinCards:Number(c.certMinCards) || config.certMinCards, prices,
-      balance:c.balance || null, announcement:c.announcement || null, disabledEvents:Array.isArray(c.disabledEvents) ? c.disabledEvents : []};
+    const c = await getSettings(pool), prices = {...Object.fromEntries(Object.entries(SHOP).map(([k, v]) => [k, v.price])), rename:RENAME_PRICE, ...c.prices};
+    return {game:"p2050", version:3, googleClientId:c.googleClientId || null, certMinCards:c.certMinCards, prices,
+      announcement:c.announcement.th || c.announcement.en ? c.announcement : null, disabledEvents:c.disabledEvents};
   });
   app.get("/api/health", async () => { await pool.query("SELECT 1"); return {ok:true}; });
 
@@ -88,8 +92,9 @@ export function buildApp(pool, opts = {}){
     return tx(pool, db => session(db, u.id));
   });
   app.post("/api/auth/google", authLimit, async (req, reply) => {
-    if (!config.googleClientId) return fail(reply, 400, "google_disabled");
-    let g; try { g = await verifyGoogle(String((req.body || {}).idToken || "")); } catch { g = null; }
+    const gid = (await getSettings(pool)).googleClientId;
+    if (!gid) return fail(reply, 400, "google_disabled");
+    let g; try { g = await verifyGoogle(String((req.body || {}).idToken || ""), gid); } catch { g = null; }
     if (!g) return fail(reply, 401, "google_bad");
     const u = (await pool.query("SELECT id FROM users WHERE google_sub = $1", [g.sub])).rows[0];
     if (u) return tx(pool, db => session(db, u.id));
@@ -112,7 +117,7 @@ export function buildApp(pool, opts = {}){
       });
     } catch (e){ if (e.code === "23505") return fail(reply, 409, /email/.test(e.constraint || "") ? "email_taken" : "username_taken"); throw e; }
   });
-  app.post("/api/auth/refresh", authLimit, async (req, reply) => {
+  app.post("/api/auth/refresh", {config:{rateLimit:{max:120, timeWindow:"1 minute"}}}, async (req, reply) => {
     return tx(pool, async db => {
       const uid = await useRefresh(db, (req.body || {}).refresh);
       if (!uid) return fail(reply, 401, "unauthorized");
@@ -180,7 +185,7 @@ export function buildApp(pool, opts = {}){
       let terra = 0, xp = 0, score = 0, note = problem;
       if (!problem){
         score = scoreFor(sum); xp = xpFor(sum, score);
-        if (elapsed < config.minGameSeconds) note = "too_short";
+        if (elapsed < (await getSettings(db)).minGameSeconds) note = "too_short";
         else {
           const before = (await db.query("SELECT COUNT(*)::int AS n FROM game_results WHERE user_id = $1 AND day = $2 AND finished_at IS NOT NULL AND NOT flagged AND terra > 0", [req.uid, run.day])).rows[0].n;
           const [f, n] = dailyFactor(before);
@@ -252,15 +257,19 @@ export function buildApp(pool, opts = {}){
   });
 
   /* ---------- certificates ---------- */
+  /* Certificate rules: win Mission 2050 in the normal mode (Daily counts) AND in Hard Core, and unlock enough knowledge cards.
+     One certificate per player. An admin can give a one-time right to request one now (certOverride = true; used up when the
+     certificate is issued) or block a player (certOverride = false). */
   async function certInfo(db, uid){
-    const wins = (await db.query("SELECT COUNT(*)::int AS n, MIN(temp) AS best FROM game_results WHERE user_id = $1 AND ending = 'win' AND NOT flagged", [uid])).rows[0];
+    const w = (await db.query(`SELECT COUNT(*) FILTER (WHERE mode IN ('normal', 'daily'))::int AS normal, COUNT(*) FILTER (WHERE mode = 'hard')::int AS hard, MIN(temp) AS best
+      FROM game_results WHERE user_id = $1 AND ending = 'win' AND NOT flagged`, [uid])).rows[0];
     const cards = ((await db.query("SELECT cards FROM progress WHERE user_id = $1", [uid])).rows[0] || {cards:0}).cards;
     const list = (await db.query("SELECT code, full_name, grade, issued_at FROM certificates WHERE user_id = $1 ORDER BY issued_at DESC", [uid])).rows;
     const flags = ((await db.query("SELECT flags FROM users WHERE id = $1", [uid])).rows[0] || {}).flags || {};
-    const need = Number((await readConfig(db)).certMinCards) || config.certMinCards;
-    // an admin can allow (certOverride = true) or block (false) a player regardless of the usual rules
-    const eligible = flags.certOverride === true ? true : flags.certOverride === false ? false : wins.n >= 1 && cards >= need;
-    return {eligibility:{eligible, wins:wins.n, cards, needCards:need, override:flags.certOverride ?? null}, bestTemp:wins.best,
+    const need = (await getSettings(db)).certMinCards, issued = list.length > 0;
+    const rules = w.normal >= 1 && w.hard >= 1 && cards >= need;
+    const eligible = flags.certOverride === true ? true : flags.certOverride === false ? false : rules && !issued;
+    return {eligibility:{eligible, issued, rules, winsNormal:w.normal, winsHard:w.hard, wins:w.normal + w.hard, cards, needCards:need, override:flags.certOverride ?? null}, bestTemp:w.best,
       list:list.map(c => ({code:c.code, fullName:c.full_name, grade:c.grade, issuedAt:c.issued_at}))};
   }
   app.get("/api/certificates", AUTH, async req => { const c = await certInfo(pool, req.uid); delete c.bestTemp; return c; });
@@ -270,16 +279,21 @@ export function buildApp(pool, opts = {}){
     const name = raw;
     return tx(pool, async db => {
       const info = await certInfo(db, req.uid);
-      if (!info.eligibility.eligible) return fail(reply, 403, "not_eligible");
-      if (info.list.length >= 5) return fail(reply, 400, "too_many");
-      await db.query("INSERT INTO certificates(code, user_id, full_name, grade) VALUES ($1, $2, $3, $4)", [newCode(), req.uid, name, info.bestTemp != null ? gradeOf(info.bestTemp) : null]);
+      if (!info.eligibility.eligible) return fail(reply, 403, info.eligibility.issued ? "already_issued" : "not_eligible");
+      if (info.list.length >= 10) return fail(reply, 400, "too_many");
+      const code = newCode();
+      await db.query("INSERT INTO certificates(code, user_id, full_name, grade) VALUES ($1, $2, $3, $4)", [code, req.uid, name, info.bestTemp != null ? gradeOf(info.bestTemp) : null]);
+      if (info.eligibility.override === true){   // the admin's one-time right is used up
+        await db.query("UPDATE users SET flags = flags - 'certOverride' WHERE id = $1", [req.uid]);
+        await db.query("INSERT INTO admin_log(admin_id, target_id, action, detail) VALUES (NULL, $1, 'cert_used', $2)", [req.uid, {code}]);
+      }
       const c = await certInfo(db, req.uid); delete c.bestTemp; return c;
     });
   });
   app.get("/api/certificates/:code/pdf", async (req, reply) => {
     const c = (await pool.query("SELECT * FROM certificates WHERE code = $1", [String(req.params.code).toUpperCase()])).rows[0];
     if (!c) return fail(reply, 404, "not_found");
-    const pdf = await certificatePdf(c, req);
+    const st = await getSettings(pool), pdf = await certificatePdf(c, req, {issuer:st.certIssuer, partner:st.certPartner});
     return reply.type("application/pdf").header("Content-Disposition", `inline; filename="${c.code}.pdf"`).send(pdf);
   });
   app.get("/verify/:code", async (req, reply) => {

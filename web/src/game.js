@@ -87,6 +87,7 @@ export const G = P.Game = {
   storySkip(){ UIM.modal = null; Audio.play("close"); bump(); },
   startGame(char, mode){
     if (!P.Net.owns("char_" + char)) return;
+    if (mode === "hard" && !UIM.worldNext && !P.hardUnlocked()){ UIM.msg = t("hardLockedMsg"); UIM.err = true; bump(); return; }
     UIM.msg = ""; UIM.modal = null;
     P.startGame(S.lang, {mode:UIM.worldNext ? "normal" : mode, char, charLv:P.levelOf(P.Net.charXp(char)), seed:mode === "daily" && !UIM.worldNext ? P.dailySeed() : undefined, world:UIM.worldNext});
     GameMap.refresh(); GameMap.resetView(); Audio.setMood("calm", true);

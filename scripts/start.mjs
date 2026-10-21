@@ -43,6 +43,7 @@ function resolveFile(urlPath, adminOnly){
   let p; try { p = decodeURIComponent(urlPath.split("?")[0]); } catch { return null; }
   if (p.includes("\0") || p.includes("\\") || p.split("/").includes("..")) return null;
   if (p === "/admin") return {redirect:"/admin/"};
+  if (adminOnly && (p.startsWith("/assets/") || p === "/favicon.svg")) return resolveFile(urlPath, false);   // fonts, logo and pictures for the admin page
   if (p.startsWith("/admin/") || adminOnly){
     const rel = adminOnly ? p.replace(/^\/(admin\/)?/, "") : p.slice(7);
     return {file:path.join(ADMIN_DIR, rel || "index.html"), cache:"no-cache"};

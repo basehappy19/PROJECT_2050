@@ -73,3 +73,30 @@ export function GfxSeg(){
   const items = [["auto", "gfxAuto"], ["low", "gfxLow"], ["medium", "gfxMed"], ["high", "gfxHigh"]].map(([id, k]) => ({id, label:t(k), on:Gfx.pref === id, fn:() => { Gfx.choose(id); P._bump(); }}));
   return <div class="gfxrow"><Icon n="monitor" size={18}/><span class="lbl">{t("gfxLbl")}</span><Seg cls="gfx" items={items}/>{Gfx.pref === "auto" ? <small class="muted">{t("gfx_" + Gfx.level)}</small> : null}</div>;
 }
+
+/* A save slot at a glance: when in the game, how far to 2050, how close to Net Zero, temperature and approval */
+export function SlotInfo({name, meta, icon, bad}){
+  if (!meta) return <div class="slotinfo empty"><b>{name}</b><small class="muted">{bad || t("empty")}</small></div>;
+  const m = meta, th = S.lang === "th";
+  const yearP = Math.max(0, Math.min(1, m.tick / (P.TOTAL_TICKS || 300))), nzP = Math.max(0, Math.min(1, (36 - m.net) / 36));
+  const tCol = m.temp >= 2.5 ? "bad" : m.temp >= 2 ? "hot" : m.temp >= 1.5 ? "warn" : "good", aCol = m.appr >= 50 ? "good" : m.appr >= 25 ? "warn" : "bad";
+  const when = new Date(m.at).toLocaleString(th ? "th-TH" : "en-GB", {dateStyle:"medium", timeStyle:"short"});
+  return <div class="slotinfo">
+    <div class="sitop">
+      {m.char ? <Portrait id={m.char} size={34}/> : icon ? <Icon n={icon} size={20} color="accent"/> : null}
+      <b>{name}</b>
+      {m.mode === "hard" ? <span class="sitag hard">HARD CORE</span> : m.mode === "daily" ? <span class="sitag">DAILY</span> : null}
+      <span class="grow"/><span class="mono sidate">{P.dateStr(m.tick)}</span>
+    </div>
+    <div class="sibars">
+      <div class="sibar"><span>{th ? "เวลา" : "Time"}</span><Meter v={yearP} color="sky" h={6}/><small class="mono">{Math.round(yearP * 100)}%</small></div>
+      <div class="sibar"><span>Net Zero</span><Meter v={nzP} color={nzP >= .99 ? "good" : "accent"} h={6}/><small class="mono">{Math.round(nzP * 100)}%</small></div>
+    </div>
+    <div class="sichips">
+      <span class={"sichip " + tCol}><Icon n="thermometer" size={13}/>+{m.temp.toFixed(2)}°C</span>
+      <span class="sichip"><Icon n="cloud" size={13}/>{m.net.toFixed(1)} Gt</span>
+      <span class={"sichip " + aCol}><Icon n="smile" size={13}/>{m.appr.toFixed(0)}%</span>
+      <span class="grow"/><small class="muted">{th ? "บันทึก" : "Saved"} {when}</small>
+    </div>
+  </div>;
+}

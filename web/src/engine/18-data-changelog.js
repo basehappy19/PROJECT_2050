@@ -24,6 +24,10 @@ P.CHANGELOG = [
     "ตั้งค่ากราฟิกได้ 3 ระดับ และเกมลดระดับให้เองถ้าเครื่องเล่นไม่ลื่น แผนที่ลื่นขึ้นมาก",
     "ฤดูกาลมีผลกับภัยพิบัติ: มรสุม ฤดูพายุ หน้าร้อน และฤดูไฟป่า",
     "เอารหัสเซฟออก ถ้าจะเล่นต่อบนเครื่องอื่นให้ใช้เซฟบนคลาวด์",
+    "โหมด Hard Core เปิดให้เล่นหลังชนะโหมดปกติครั้งแรก",
+    "เกียรติบัตรแบบใหม่: ต้องชนะทั้งโหมดปกติและ Hard Core ขอได้คนละ 1 ใบ มีผลการเรียนรู้ที่ได้จากเกม และ QR สำหรับตรวจสอบ",
+    "ช่องบันทึกเกมแสดงความคืบหน้าเป็นแถบ ดูง่ายว่าไปถึงไหนแล้ว",
+    "เข้าสู่ระบบครั้งเดียวอยู่ได้นาน 1 ปี จนกว่าจะกดออกจากระบบเอง",
   ], [
     "The game is now called Project Zero, with a new logo and a new preview picture for shared links.",
     "New “Continuous World” mode with no end year: seasons, season goals and a yearly COP summit. Unlocks after your first Mission 2050 win; you can also press “Keep playing this world” when you win.",
@@ -44,6 +48,10 @@ P.CHANGELOG = [
     "Three graphics levels, and the game lowers them itself if your computer struggles. The map is much smoother.",
     "Seasons change the disasters: monsoon, storm season, summer heat and fire season.",
     "Save codes are gone; use cloud saves to continue on another device.",
+    "Hard Core opens after your first Normal win.",
+    "New certificate: win both Normal and Hard Core, one per player, with the learning outcomes from the game and a QR code to check it.",
+    "Save slots show your progress as bars, so you can see at a glance how far you are.",
+    "Sign in once and stay signed in for a year, until you sign out yourself.",
   ]),
   V("0.9", "2026-10-21", {th:"เว็บเต็มตัว", en:"The Full Web Game"}, [
     "เขียนเกมเวอร์ชันเว็บใหม่ทั้งหมด ภาพคมชัดเต็มจอ",

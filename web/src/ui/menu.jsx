@@ -6,7 +6,7 @@ import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {Globe} from "../globe.js";
 import {Icon, Rich} from "./icon.jsx";
-import {Btn, IconBtn, Tabs, Seg, Check, Terra, Portrait, Volume, GfxSeg, LangSeg, Msg, H3} from "./widgets.jsx";
+import {Btn, IconBtn, Tabs, Seg, Check, Terra, Portrait, Volume, GfxSeg, LangSeg, Msg, H3, SlotInfo} from "./widgets.jsx";
 import {AchList} from "./learn.jsx";
 
 const N = () => P.Net;
@@ -133,13 +133,13 @@ function SubLoad(){
   const saves = P.readSaves();
   return <>
     {saves === null ? <p class="bad">{t("noStore")}</p> : P.SLOTS.map(slot => {
-      const ok = saves[slot] && P.validSave(saves[slot].S), lines = saves[slot] && !ok ? [t("oldSave")] : P.slotMetaLines(ok && saves[slot].meta);
-      return <div class="card row" key={slot}><div class="grow"><b>{P.slotName(slot)}</b>{lines.map((s, i) => <small class="mono muted" key={i}>{s}</small>)}</div>
+      const ok = saves[slot] && P.validSave(saves[slot].S);
+      return <div class="card slotrow" key={slot}><SlotInfo name={P.slotName(slot)} meta={ok ? saves[slot].meta : null} bad={saves[slot] && !ok ? t("oldSave") : null}/>
         <Btn disabled={!ok} sound="start" onClick={() => { const s2 = P.readSaves(); if (s2 && s2[slot]) G.loadSave(s2[slot].S); }}>{t("load")}</Btn></div>;
     })}
     {N().user ? <><H3>{t("cloudSaves")}</H3>{["s1", "s2", "s3"].map(slot => {
-      const c = (N().cloud || {})[slot], lines = c ? P.slotMetaLines(c.meta) : [t("empty")];
-      return <div class="card row" key={slot}><div class="grow"><b><Rich t={`[[$co2]] ${P.slotName(slot)}`} iconColor="accent"/></b>{lines.map((s, i) => <small class="mono muted" key={i}>{s}</small>)}</div>
+      const c = (N().cloud || {})[slot];
+      return <div class="card slotrow" key={slot}><SlotInfo name={`☁ ${P.slotName(slot)}`} meta={c ? c.meta : null}/>
         <Btn kind="ghost" disabled={!c} onClick={() => N().cloudLoad(slot).then(st => { if (!st || !G.loadSave(st)){ UIM.msg = t("codeBad"); UIM.err = true; bump(); } })}>{t("load")}</Btn></div>;
     })}</> : null}
     <Msg UIM={UIM}/>
@@ -279,9 +279,11 @@ function SubCert(){
     <p class="muted">{t("certIntro")}</p>
     {!el ? <p class="muted">{t("netChecking")}</p> : <>
       <ul class="conds">
-        <li class={el.wins >= 1 ? "good" : "muted"}><Icon n={el.wins >= 1 ? "circle-check" : "circle"} size={16}/> {t("certCondWin")} ({el.wins})</li>
+        <li class={el.winsNormal >= 1 ? "good" : "muted"}><Icon n={el.winsNormal >= 1 ? "circle-check" : "circle"} size={16}/> {t("certCondNormal")} ({el.winsNormal || 0})</li>
+        <li class={el.winsHard >= 1 ? "good" : "muted"}><Icon n={el.winsHard >= 1 ? "circle-check" : "circle"} size={16}/> {t("certCondHard")} ({el.winsHard || 0})</li>
         <li class={el.cards >= el.needCards ? "good" : "muted"}><Icon n={el.cards >= el.needCards ? "circle-check" : "circle"} size={16}/> {t("certCondCards")} {el.needCards} ({el.cards})</li>
       </ul>
+      {el.override === true ? <p class="gold small"><Rich t={`[[sparkles]] ${t("certSpecial")}`} iconColor="inherit"/></p> : null}
       {el.eligible ? <form class="form" onSubmit={e => {
         e.preventDefault(); const nm = (form(e).fullName || "").trim();
         if (nm.length < 3){ UIM.msg = t("certNameShort"); UIM.err = true; bump(); return; }
@@ -292,7 +294,10 @@ function SubCert(){
         <Field label={t("fFullName")} name="fullName" ph={t("fFullNamePh")} autocomplete="name"/>
         <Check on={!!UIM.certConsent} onClick={() => { UIM.certConsent = !UIM.certConsent; bump(); }}>{t("certConsent")}</Check>
         <Btn type="submit" kind="gold" block size="lg" disabled={n.busy}>{`[[award]] ${t("certRequest")}`}</Btn>
-      </form> : null}
+      </form> : el.issued ? <div class="certdone">
+        <p class="good"><Rich t={`[[circle-check]] ${t("certIssued")}`} iconColor="inherit"/></p>
+        <Btn block size="lg" disabled>{`[[award]] ${t("certIssuedBtn")}`}</Btn>
+      </div> : <Btn block size="lg" disabled>{`[[lock]] ${t("certNotYet")}`}</Btn>}
     </>}
     <Msg UIM={UIM}/>
     {C.list && C.list.length ? <><H3>{t("certMine")}</H3>{C.list.map(c => <div class="card row" key={c.code}>

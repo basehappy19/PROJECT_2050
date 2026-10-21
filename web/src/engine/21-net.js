@@ -40,9 +40,15 @@ const Net = {
     if (!r.ok) throw (j || {error:"http" + r.status});
     return j;
   },
-  async doRefresh(){
-    try { const j = await this.req("POST", "/auth/refresh", {refresh:this.refreshTok}, false); this.setTokens(j.access, j.refresh); return true; }
-    catch(e){ if (e.error !== "offline"){ this.setTokens(null, null); this.user = null; } return false; }
+  /* one refresh at a time (several requests can hit 401 together); only a refused token signs the player out, never a network or server hiccup */
+  doRefresh(){
+    if (this._refreshing) return this._refreshing;
+    this._refreshing = (async () => {
+      try { const j = await this.req("POST", "/auth/refresh", {refresh:this.refreshTok}, false); this.setTokens(j.access, j.refresh); return true; }
+      catch(e){ if (e.error === "unauthorized"){ this.setTokens(null, null); this.user = null; } return false; }
+      finally { setTimeout(() => { this._refreshing = null; }, 0); }
+    })();
+    return this._refreshing;
   },
   /* find the server and load config + the signed-in player */
   async init(){

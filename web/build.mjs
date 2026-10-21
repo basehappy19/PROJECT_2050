@@ -13,6 +13,7 @@ import path from "node:path";
 import crypto from "node:crypto";
 import {fileURLToPath} from "node:url";
 import * as esbuild from "esbuild";
+import * as _vm from "node:vm";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const REPO = path.resolve(HERE, "..");
@@ -85,6 +86,41 @@ function fonts(){
   return css;
 }
 
+/* ---------- data for the admin page (server/admin/game-data.json): names instead of codes ---------- */
+function writeAdminData(){
+  const vm = require_vm();
+  const ctx = {console, Math, JSON, Date, Object, Array, Set, Map, Number, String, Boolean, Symbol, Promise, setTimeout, clearTimeout, isNaN, parseFloat, parseInt, Intl,
+    localStorage:{getItem:() => null, setItem(){}, removeItem(){}}, location:{protocol:"file:", hostname:"build", search:""}, navigator:{}, performance:{now:() => Date.now()}};
+  ctx.window = ctx; vm.createContext(ctx);
+  for (const f of fs.readdirSync(SHARED).filter(f => /^(1\d|2\d)-.*\.js$/.test(f)).sort()) vm.runInContext(`(function(){${fs.readFileSync(path.join(SHARED, f), "utf8")}})();`, ctx, {filename:f});
+  const P = ctx.P2050, th = o => (o && (o.th || o.en)) || "";
+  const GROUP = {heat:"disaster", storm:"disaster", flood:"disaster", fire:"disaster", arctic:"disaster", ocean:"disaster", underwater:"disaster", wind:"disaster",
+    forest:"nature", jungle:"nature", birds:"nature", bees:"nature", river:"nature", farm:"nature",
+    lab:"tech", construction:"tech", factory:"tech", explosion:"tech", keyboard:"tech",
+    crowd:"society", office:"society", market:"society", city:"society", siren:"society", harbor:"transport", air:"transport", train:"transport"};
+  const ev = P.EVENTS.map(e => ({id:e.id, title:th(e.title), desc:th(e.desc).slice(0, 160), region:e.target ? th(P.RMETA[e.target].name) : "ทั่วโลก",
+    group:/^NW_/.test(e.id) ? "news" : GROUP[e.snd] || "society", year:e.news ? e.news.y : null}));
+  const cev = P.CEVENTS.map(e => ({id:e.id, title:th(e.title), desc:th(e.desc).slice(0, 160), region:"ระหว่างประเทศ", group:"country", year:null}));
+  const out = {
+    events:[...ev, ...cev],
+    groups:{disaster:"ภัยพิบัติและสภาพอากาศ", nature:"ธรรมชาติ ป่า และเกษตร", tech:"เทคโนโลยีและพลังงาน", society:"สังคม การเมือง และเศรษฐกิจ", transport:"คมนาคม", news:"ข่าวจริง", country:"ข้อพิพาทระหว่างประเทศ"},
+    shop:P.SHOP.map(x => ({id:x.id, name:th(x.name), desc:th(x.desc), icon:x.icon, kind:x.kind, price:x.price})),
+    renamePrice:P.PRICE.rename,
+    chars:P.CHARS.map(c => ({id:c.id, name:th(c.name), person:th(c.person), color:c.color})),
+    levels:P.LEVELS,
+    ach:P.ACH.map(a => ({id:a.id, name:th(a.t)})),
+    version:VERSION,
+    icons:Object.fromEntries(ADMIN_ICONS.map(n => [n, fs.readFileSync(path.join(HERE, "node_modules/lucide-static/icons", n + ".svg"), "utf8").replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "").replace(/\s+/g, " ").trim()])),
+  };
+  fs.writeFileSync(path.join(REPO, "server/admin/game-data.json"), JSON.stringify(out));
+  return out.events.length;
+}
+const require_vm = () => _vm;
+const ADMIN_ICONS = ["layout-dashboard", "users", "shopping-bag", "newspaper", "settings", "history", "log-out", "search", "gem", "plus", "minus", "check", "x", "shield", "ban",
+  "award", "trophy", "user-round", "refresh-cw", "chevron-left", "chevron-right", "eye", "eye-off", "megaphone", "key-round", "clock", "sparkles", "lock", "lock-open", "triangle-alert",
+  "filter", "rotate-ccw", "save", "gamepad-2", "calendar", "fast-forward", "handshake", "chart-candlestick", "moon", "palette", "shirt", "square-dashed", "book-open", "star", "trash-2",
+  "circle-check", "circle-x", "info", "globe", "pencil", "user-cog", "mail", "timer", "link", "flag"];
+
 /* ---------- protection: make the shipped code hard to read and re-use ---------- */
 async function obfuscate(code){
   const {default:JO} = await import("javascript-obfuscator");
@@ -103,7 +139,7 @@ const hash = buf => crypto.createHash("sha1").update(buf).digest("hex").slice(0,
 
 async function build(){
   const t0 = Date.now();
-  const files = writeEngine(), nIcons = writeIcons();
+  const files = writeEngine(), nIcons = writeIcons(), nEvents = writeAdminData();
   const fontCss = fonts();
   const res = await esbuild.build({
     entryPoints:[path.join(HERE, "src/main.jsx")], bundle:true, minify:!WATCH, sourcemap:WATCH ? "inline" : false,
@@ -132,7 +168,7 @@ async function build(){
   let sw = fs.readFileSync(path.join(HERE, "sw.js"), "utf8");
   sw = sw.replace("/*CORE*/[]", JSON.stringify(core)).replace("__CACHE__", `p2050-web-${hash(core.join() + jsName + cssName)}`);
   fs.writeFileSync(path.join(OUT, "sw.js"), sw);
-  console.log(`built ${PROTECT ? "protected " : ""}${jsName} (${(fs.statSync(path.join(ASSETS, jsName)).size / 1024).toFixed(0)} KB) ${cssName} · ${files.length} shared modules · ${nIcons} icons · ${Date.now() - t0} ms`);
+  console.log(`built ${PROTECT ? "protected " : ""}${jsName} (${(fs.statSync(path.join(ASSETS, jsName)).size / 1024).toFixed(0)} KB) ${cssName} · ${files.length} shared modules · ${nIcons} icons · admin data ${nEvents} events · ${Date.now() - t0} ms`);
 }
 
 await build();

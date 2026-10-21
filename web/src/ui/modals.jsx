@@ -4,7 +4,7 @@ import {P, S, UIM, t, L, up, COL, relCol, bump} from "../core.js";
 import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {Icon, Rich, plain} from "./icon.jsx";
-import {Btn, IconBtn, Seg, Meter, Portrait, portraitSrc, H3, Terra, Volume, GfxSeg, LangSeg, Msg, Key} from "./widgets.jsx";
+import {Btn, IconBtn, Seg, Meter, Portrait, portraitSrc, H3, Terra, Volume, GfxSeg, LangSeg, Msg, Key, SlotInfo} from "./widgets.jsx";
 
 import {mapCrop, eventPoint, eventSnd, eventImg, SND_ICON, SND_TINT} from "./hero.js";
 const mapCropBg = pt => mapCrop(pt, pt ? 3.4 : 1.15, .3).backgroundImage;
@@ -123,9 +123,9 @@ export function CharSel(){
       </button>;
     })}</div>
     <H3>{t("modeTitle")}</H3>
-    <div class="modes">{modes.map(([m, ic]) => <button type="button" key={m} class={`mode ${UIM.modeSel === m ? "on " + m : ""}`} onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("toggle"); UIM.modeSel = m; bump(); }}>
-      <Icon n={ic} size={22}/><span><b>{t("mode_" + m)}</b><small>{t("modeD_" + m)}</small></span>
-    </button>)}</div>
+    <div class="modes">{modes.map(([m, ic]) => { const locked = m === "hard" && !P.hardUnlocked(); return <button type="button" key={m} class={`mode ${UIM.modeSel === m ? "on " + m : ""} ${locked ? "locked" : ""}`} onPointerEnter={() => Audio.hover()} onClick={() => { if (locked){ Audio.play("error"); UIM.msg = t("hardLockedMsg"); UIM.err = true; bump(); return; } Audio.play("toggle"); UIM.modeSel = m; UIM.msg = ""; bump(); }}>
+      <Icon n={locked ? "lock" : ic} size={22}/><span><b>{t("mode_" + m)}</b><small>{locked ? t("hardLocked") : t("modeD_" + m)}</small></span>
+    </button>; })}</div>
     <Msg UIM={UIM}/>
     <div class="mfoot">
       <Btn kind="ghost" onClick={() => G.toMenu()}>{t("mainMenu")}</Btn>
@@ -189,9 +189,9 @@ export function Pause(){
     {S.mode === "hard" ? <p class="warn small"><Rich t={`[[skull]] ${t("hardSaves")}`} iconColor="inherit"/></p>
       : saves === null ? <p class="bad small">{t("noStore")}</p>
       : <div class="slots">{["s1", "s2", "s3"].map(slot => {
-        const m = saves[slot] && saves[slot].meta, lines = P.slotMetaLines(m);
-        return <div class="card row" key={slot}>
-          <div class="grow"><b>{P.slotName(slot)}</b>{lines.map((s, i) => <small class="mono muted" key={i}>{s}</small>)}</div>
+        const m = saves[slot] && saves[slot].meta;
+        return <div class="card slotrow" key={slot}>
+          <SlotInfo name={P.slotName(slot)} meta={m}/>
           <Btn kind="ghost" sound="save" onClick={() => {
             P.Ach.unlock("saver"); const ok = P.writeSlot(slot);
             UIM.msg = ok ? `${t("saved")} · ${P.slotName(slot)}` : t("noStore"); UIM.err = !ok;
