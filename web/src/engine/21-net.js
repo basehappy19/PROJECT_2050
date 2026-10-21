@@ -69,7 +69,7 @@ const Net = {
         } catch(e) {}
       }
       this.checking = false;
-      if (this.online && this.access) await this.me();
+      if (this.online && this.access){ await this.me(); if (this.user){ this.syncAch(); this.syncProgress(); this.loadCloud(); } }   // 1.1: opening the game already signed in syncs progress and save slots right away
       if (this.online && this.cfg.googleClientId) this.loadGoogle();
       dirty();
     })();
