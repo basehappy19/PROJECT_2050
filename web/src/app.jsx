@@ -6,10 +6,10 @@ import {G} from "./game.js";
 import {GameMap} from "./map2d.js";
 import {Icon, Rich} from "./ui/icon.jsx";
 import {Btn} from "./ui/widgets.jsx";
-import {TopBar, AbilityBar, ZoomBtns, Bottom} from "./ui/hud.jsx";
+import {TopBar, AbilityBar, ZoomBtns, Bottom, WorldGoals} from "./ui/hud.jsx";
 import {Drawer} from "./ui/drawer.jsx";
 import {Skills} from "./ui/skills.jsx";
-import {EventModal, EndModal, CharSel, Story, Pause, Tutorial} from "./ui/modals.jsx";
+import {EventModal, EndModal, CharSel, Story, Pause, Tutorial, Market} from "./ui/modals.jsx";
 import {Learn} from "./ui/learn.jsx";
 import {Menu} from "./ui/menu.jsx";
 
@@ -73,6 +73,7 @@ function GameScreen(){
     <div class="hud" ref={hudRef}>
       <TopBar/>
       {S.started ? <AbilityBar/> : null}
+      <WorldGoals/>
       <ZoomBtns/>
       <Drawer/>
       <Bottom/>
@@ -91,6 +92,7 @@ function Windows(){
   if (k === "pause") return <Pause/>;
   if (k === "tutorial") return <Tutorial/>;
   if (k === "learn") return <Learn/>;
+  if (k === "market") return <Market/>;
   return null;
 }
 

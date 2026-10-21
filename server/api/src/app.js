@@ -7,6 +7,7 @@ import { hashPassword, checkPassword, accessToken, readAccess, issueRefresh, use
 import { SHOP, RENAME_PRICE, CHARS, MODES, levelOf, ACH_TERRA, terraFor, scoreFor, xpFor, dailyFactor, dailySeed, gradeOf, checkSummary } from "./game-rules.js";
 import { badWord } from "./words.js";
 import { certificatePdf, verifyHtml } from "./certificate.js";
+import { registerAdmin, registerStats, readConfig, priceOf } from "./admin.js";
 
 const fail = (reply, code, error, extra = {}) => reply.code(code).send({error, ...extra});
 const USERNAME = /^[a-z0-9_]{3,16}$/;
@@ -23,9 +24,9 @@ export function buildApp(pool, opts = {}){
   /* ---------- helpers ---------- */
   const balance = async (db, uid) => (await db.query("SELECT COALESCE(SUM(amount), 0)::int AS b FROM wallet_ledger WHERE user_id = $1", [uid])).rows[0].b;
   async function publicUser(db, uid){
-    const u = (await db.query("SELECT id, username, email, display_name, renamed FROM users WHERE id = $1", [uid])).rows[0];
+    const u = (await db.query("SELECT id, username, email, display_name, renamed, role, flags FROM users WHERE id = $1", [uid])).rows[0];
     if (!u) return null;
-    return {username:u.username, email:u.email, displayName:u.display_name, renamed:u.renamed, terra:await balance(db, uid)};
+    return {username:u.username, email:u.email, displayName:u.display_name, renamed:u.renamed, terra:await balance(db, uid), role:u.role, abGroup:(u.flags || {}).abGroup || null};
   }
   async function meBody(db, uid){
     const user = await publicUser(db, uid);
@@ -42,11 +43,19 @@ export function buildApp(pool, opts = {}){
     if (!req.routeOptions.config || !req.routeOptions.config.auth) return;
     const h = req.headers.authorization || "";
     try { req.uid = await readAccess(h.replace(/^Bearer\s+/i, "")); } catch { return fail(reply, 401, "unauthorized"); }
+    const u = (await pool.query("SELECT banned FROM users WHERE id = $1", [req.uid])).rows[0];
+    if (!u) return fail(reply, 401, "unauthorized");
+    if (u.banned) return fail(reply, 403, "banned");
   });
   const AUTH = {config:{auth:true}};
 
   /* ---------- public ---------- */
-  app.get("/api/config", async () => ({game:"p2050", version:1, googleClientId:config.googleClientId || null, certMinCards:config.certMinCards, prices:{...Object.fromEntries(Object.entries(SHOP).map(([k, v]) => [k, v.price])), rename:RENAME_PRICE}}));
+  /* game settings: the server's defaults, overridden by what an admin set online (game_config) */
+  app.get("/api/config", async () => {
+    const c = await readConfig(pool), prices = {...Object.fromEntries(Object.entries(SHOP).map(([k, v]) => [k, v.price])), rename:RENAME_PRICE, ...(c.prices || {})};
+    return {game:"p2050", version:2, googleClientId:config.googleClientId || null, certMinCards:Number(c.certMinCards) || config.certMinCards, prices,
+      balance:c.balance || null, announcement:c.announcement || null, disabledEvents:Array.isArray(c.disabledEvents) ? c.disabledEvents : []};
+  });
   app.get("/api/health", async () => { await pool.query("SELECT 1"); return {ok:true}; });
 
   /* ---------- accounts ---------- */
@@ -73,8 +82,9 @@ export function buildApp(pool, opts = {}){
   app.post("/api/auth/login", authLimit, async (req, reply) => {
     const login = String((req.body || {}).login || "").trim().toLowerCase(), password = String((req.body || {}).password || "");
     if (!login || !password) return fail(reply, 400, "missing");
-    const u = (await pool.query("SELECT id, password_hash FROM users WHERE username = $1 OR email = $1", [login])).rows[0];
+    const u = (await pool.query("SELECT id, password_hash, banned FROM users WHERE username = $1 OR email = $1", [login])).rows[0];
     if (!u || !(await checkPassword(u.password_hash, password))) return fail(reply, 401, "bad_login");
+    if (u.banned) return fail(reply, 403, "banned");
     return tx(pool, db => session(db, u.id));
   });
   app.post("/api/auth/google", authLimit, async (req, reply) => {
@@ -135,8 +145,9 @@ export function buildApp(pool, opts = {}){
     return tx(pool, async db => {
       await db.query("SELECT id FROM users WHERE id = $1 FOR UPDATE", [req.uid]);       // one purchase at a time per player
       if ((await db.query("SELECT 1 FROM owned_items WHERE user_id = $1 AND item = $2", [req.uid, item])).rowCount) return fail(reply, 400, "already_owned");
-      if (await balance(db, req.uid) < SHOP[item].price) return fail(reply, 400, "not_enough_terra");
-      await db.query("INSERT INTO wallet_ledger(user_id, amount, reason, ref) VALUES ($1, $2, 'shop', $3)", [req.uid, -SHOP[item].price, item]);
+      const price = await priceOf(db, item);
+      if (await balance(db, req.uid) < price) return fail(reply, 400, "not_enough_terra");
+      await db.query("INSERT INTO wallet_ledger(user_id, amount, reason, ref) VALUES ($1, $2, 'shop', $3)", [req.uid, -price, item]);
       await db.query("INSERT INTO owned_items(user_id, item) VALUES ($1, $2)", [req.uid, item]);
       return meBody(db, req.uid);
     });
@@ -149,8 +160,9 @@ export function buildApp(pool, opts = {}){
     if (ch !== "sci" && !(await pool.query("SELECT 1 FROM owned_items WHERE user_id = $1 AND item = $2", [req.uid, "char_" + ch])).rowCount) return fail(reply, 403, "char_locked");
     const now = new Date(), utc = now.toISOString().slice(0, 10);
     const daily = mode === "daily" ? (Number(b.seed) === dailySeed(utc) ? utc : null) : null;
-    const r = await pool.query("INSERT INTO game_results(user_id, mode, char, seed, day, daily_date) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id",
-      [req.uid, mode === "daily" && !daily ? "normal" : mode, ch, Number.isFinite(Number(b.seed)) ? Number(b.seed) : null, bkkDate(now), daily]);
+    const ab = /^[A-Z]{1,4}$/.test(String(b.ab || "")) ? String(b.ab) : null;
+    const r = await pool.query("INSERT INTO game_results(user_id, mode, char, seed, day, daily_date, ab, world) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING id",
+      [req.uid, mode === "daily" && !daily ? "normal" : mode, ch, Number.isFinite(Number(b.seed)) ? Number(b.seed) : null, bkkDate(now), daily, ab, !!b.world]);
     return {runId:r.rows[0].id};
   });
   app.post("/api/runs/:id/finish", AUTH, async (req, reply) => {
@@ -244,7 +256,11 @@ export function buildApp(pool, opts = {}){
     const wins = (await db.query("SELECT COUNT(*)::int AS n, MIN(temp) AS best FROM game_results WHERE user_id = $1 AND ending = 'win' AND NOT flagged", [uid])).rows[0];
     const cards = ((await db.query("SELECT cards FROM progress WHERE user_id = $1", [uid])).rows[0] || {cards:0}).cards;
     const list = (await db.query("SELECT code, full_name, grade, issued_at FROM certificates WHERE user_id = $1 ORDER BY issued_at DESC", [uid])).rows;
-    return {eligibility:{eligible:wins.n >= 1 && cards >= config.certMinCards, wins:wins.n, cards, needCards:config.certMinCards}, bestTemp:wins.best,
+    const flags = ((await db.query("SELECT flags FROM users WHERE id = $1", [uid])).rows[0] || {}).flags || {};
+    const need = Number((await readConfig(db)).certMinCards) || config.certMinCards;
+    // an admin can allow (certOverride = true) or block (false) a player regardless of the usual rules
+    const eligible = flags.certOverride === true ? true : flags.certOverride === false ? false : wins.n >= 1 && cards >= need;
+    return {eligibility:{eligible, wins:wins.n, cards, needCards:need, override:flags.certOverride ?? null}, bestTemp:wins.best,
       list:list.map(c => ({code:c.code, fullName:c.full_name, grade:c.grade, issuedAt:c.issued_at}))};
   }
   app.get("/api/certificates", AUTH, async req => { const c = await certInfo(pool, req.uid); delete c.bestTemp; return c; });
@@ -271,6 +287,10 @@ export function buildApp(pool, opts = {}){
     const c = (await pool.query("SELECT * FROM certificates WHERE code = $1", [code])).rows[0];
     return reply.type("text/html; charset=utf-8").code(c ? 200 : 404).send(verifyHtml(c, code));
   });
+
+  /* admin tools, online settings and play statistics */
+  registerAdmin(app, pool, {balance, meBody});
+  registerStats(app, pool, async req => { const h = req.headers.authorization || ""; if (!h) return null; try { return await readAccess(h.replace(/^Bearer\s+/i, "")); } catch { return null; } });
 
   app.setErrorHandler((err, req, reply) => {
     if (err.statusCode === 429) return reply.code(429).send({error:"rate_limited"});

@@ -5,3 +5,7 @@ Project : 2050 — image credits (web version)
 - Character portraits: vector illustrations drawn for this game (web/tools/make-portraits.mjs).
 - Ending pictures: illustrations from the GDevelop version of the game.
 - Icons: Lucide (ISC licence). Fonts: Kanit, IBM Plex Sans Thai, IBM Plex Mono, Chakra Petch (SIL Open Font Licence).
+- Event pictures (img/events/*.webp, version 1.0): generated for this game with Stability AI's SD-Turbo model
+  (semi-realistic painted style, landscapes and objects; every picture checked by eye, bad ones redrawn).
+  Check the SD-Turbo model licence on huggingface.co/stabilityai/sd-turbo before any commercial use.
+- 3D value icons (img/ui/3d/*.webp): rendered for this game with three.js (web/tools/make-icons3d.mjs).

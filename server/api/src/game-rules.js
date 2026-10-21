@@ -1,5 +1,5 @@
 /* Rules the server checks and pays out. Keep these numbers in sync with the game's data files
-   (gdevelop/_source/src/14-data-world.js: SHOP, PRICE, TERRA, LEVELS). */
+   (web/src/engine/14-data-world.js: SHOP, PRICE, TERRA, LEVELS). */
 
 export const SHOP = {
   speed3:{price:199}, char_dip:{price:249}, char_eco:{price:249}, char_act:{price:249},
@@ -12,11 +12,12 @@ export const LEVELS = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
 export const levelOf = xp => { let l = 1; LEVELS.forEach((v, i) => { if (xp >= v) l = i + 1; }); return l; };
 
 /* achievements: id → Terra paid once (easy 5 · medium 10 · hard 20) */
-const EASY = ["start", "tutorial", "tech1", "action1", "event1", "saver", "ability1"];
-const HARD = ["allTech", "win15", "winEarly", "hardWin", "readAll", "lvl10", "charAll", "friends20", "unity", "read100", "fusion"];
+const EASY = ["start", "tutorial", "tech1", "action1", "event1", "saver", "ability1", "ore1"];
+const HARD = ["allTech", "win15", "winEarly", "hardWin", "readAll", "lvl10", "charAll", "friends20", "unity", "read100", "fusion", "thrive", "green10"];
 const ALL = ["start","tutorial","tech1","action1","event1","saver","greens","aids","rush","rich","branchE","branchP","branchN","allTech","fusion","unity","safe","peak","half","decade",
   "win","winEarly","win15","winLoved","loseTime","loseHeat","loseVote","chaoPhraya","read25","read100","readAll",
-  "ability1","skill20","branchI","branchC","rel100","friends20","bilateral","alliance","cev10","stormSafe","evac5","hardWin","daily","charAll","lvl10","cards30"];
+  "ability1","skill20","branchI","branchC","rel100","friends20","bilateral","alliance","cev10","stormSafe","evac5","hardWin","daily","charAll","lvl10","cards30",
+  /* 1.0 */ "ore1","ore5c","pins30","green10","news10","world1","thrive"];
 export const ACH_TERRA = Object.fromEntries(ALL.map(id => [id, EASY.includes(id) ? 5 : HARD.includes(id) ? 20 : 10]));
 
 /* Terra for one finished game (before the daily limit) */
@@ -46,12 +47,12 @@ export function checkSummary(s, elapsedSec, hasSpeed3){
   const num = (v, lo, hi) => typeof v === "number" && isFinite(v) && v >= lo && v <= hi;
   if (!["win", "l1", "l2", "l3"].includes(s.ending)) return "bad_ending";
   if (!Number.isInteger(s.tick) || !num(s.tick, 1, 300)) return "bad_tick";
-  if (!num(s.temp, 0.8, 4) || !num(s.net, -60, 80) || !num(s.appr, 0, 100) || !num(s.rel, -100, 100) || !num(s.skills, 0, 40)) return "bad_values";
+  if (!num(s.temp, 0.8, 4) || !num(s.net, -60, 80) || !num(s.appr, 0, 100) || !num(s.rel, -100, 100) || !num(s.skills, 0, 60)) return "bad_values";
   if (s.ending === "win" && s.net > 0.05) return "bad_win";
   if (s.ending === "l1" && s.temp < 2.99) return "bad_l1";
   if (s.ending === "l2" && s.appr > 0.5) return "bad_l2";
   if (s.ending === "l3" && s.tick < 300) return "bad_l3";
-  // one month takes at least 4/3 s (x3) or 2 s (x2) of real time; allow 15% for timer jitter
+  // one month takes at least 3 s at 3× (4/3 s in versions before 1.0) or 2 s at 2×; allow 15% for timer jitter
   const minSec = s.tick * (hasSpeed3 ? 4 / 3 : 2) * 0.85;
   if (elapsedSec < minSec) return "too_fast";
   return null;

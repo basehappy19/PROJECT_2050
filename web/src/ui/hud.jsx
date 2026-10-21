@@ -1,17 +1,18 @@
 /* In-game HUD: top bar (KPIs, date, speed, buttons) · character + abilities · zoom · meters · ticker + tabs */
 import {useState} from "preact/hooks";
-import {P, S, UIM, t, L, up, COL} from "../core.js";
+import {P, S, UIM, t, L, up, COL, bump} from "../core.js";
 import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {GameMap} from "../map2d.js";
-import {Icon, Rich} from "./icon.jsx";
+import {Icon, Rich, plain} from "./icon.jsx";
 import {IconBtn, Seg, LangSeg, Portrait, Key, Meter} from "./widgets.jsx";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-function Kpi({label, value, sub, meter, cls = "", danger}){
-  return <div class={`kpi glass ${cls} ${danger ? "danger" : ""}`}>
-    <span class="k"><Rich t={label}/></span>
+function Kpi({label, value, sub, meter, cls = "", danger, stat}){
+  return <div class={`kpi glass ${cls} ${danger ? "danger" : ""} ${stat ? "has3d" : ""}`}>
+    {stat ? <Icon n={"$" + stat} size={30} cls="k3d"/> : null}
+    <span class="k">{stat ? plain(label) : <Rich t={label}/>}</span>
     <span class="v" key={value}>{value}</span>
     {sub ? <span class="s">{sub}</span> : null}
     {meter !== undefined ? <Meter v={meter.v} color={meter.c} h={4} cls="kmeter"/> : null}
@@ -27,13 +28,15 @@ export function TopBar(){
   return <header class="topbar">
     <div class="brand glass" onClick={() => G.pause()} title={t("pTitle")}><span>PROJECT</span><b>:</b><span>2050</span></div>
     <div class="kpis">
-      <Kpi label={t("ep")} value={Math.floor(S.ep)} sub={`+${P.epGain()}${t("perMo")}`}/>
-      <Kpi label={t("pc")} value={Math.floor(S.pc)} sub={`+${P.pcGain()}${t("perMo")}`}/>
-      <Kpi label={t("appr")} value={`${S.appr.toFixed(0)}%`} meter={{v:S.appr / 100, c:acls}} cls={"appr " + acls} danger={S.appr < 25}/>
+      <Kpi stat="money" label={t("ep")} value={Math.floor(S.ep)} sub={`+${P.epGain()}${t("perMo")}`}/>
+      <Kpi stat="policy" label={t("pc")} value={Math.floor(S.pc)} sub={`+${P.pcGain()}${t("perMo")}`}/>
+      {S.oreOn ? (P.isFullRes() ? <button type="button" class="kpibtn" title={S.lang === "th" ? "ตลาดแร่โลก" : "World minerals market"} onClick={() => { Audio.play("open"); UIM.modal = "market"; bump(); }}><Kpi stat="ore" label={t("oreLbl")} value={P.matTotal()} sub={`+${Math.round(P.oreGain())}${t("perMo")}`} cls="ore mkton"/></button>
+        : <Kpi stat="ore" label={t("oreLbl")} value={Math.floor(S.ore || 0)} sub={`+${Math.round(P.oreGain())}${t("perMo")}`} cls="ore"/>) : null}
+      <Kpi stat="appr" label={t("appr")} value={`${S.appr.toFixed(0)}%`} meter={{v:S.appr / 100, c:acls}} cls={"appr " + acls} danger={S.appr < 25}/>
     </div>
     <div class="ctrls glass">
       <div class="date">
-        <span>{P.dateStr()}</span>
+        <span title={L(P.seasonOf().name)}><Icon n={P.seasonOf().icon} size={14} cls="season"/> {P.dateStr()}</span>
         <i class="month"><b key={S.tick + ":" + S.speed} style={{animationDuration:`${P.SPEEDS[S.speed] || 4}s`, animationPlayState:running ? "running" : "paused"}}/></i>
       </div>
       <Seg cls="speed" items={sp}/>
@@ -79,6 +82,34 @@ export function AbilityBar(){
   </aside>;
 }
 
+/* Continuous World: this season's two goals */
+export function WorldGoals(){
+  if (!S.world) return null;
+  return <div class="wside">
+    {S.goals ? <div class="wgoals glass">
+      <b class="mono acc small"><Icon n="target" size={14}/> {up(t("goalsTitle"))} · {L(P.seasonOf().name)}</b>
+      {S.goals.map((g, i) => { const d = P.GOALS.find(x => x.id === g.id); return <div class={"wg " + (g.won ? "won" : "")} key={i}>
+        <Icon n={g.won ? "circle-check" : d.icon} size={18}/><span>{P.goalText(g)}</span>
+      </div>; })}
+    </div> : null}
+    <PlaceBar/>
+  </div>;
+}
+/* phase 4: builds waiting to be placed by hand */
+const KIND_ICON = {wind:"wind", solar:"sun", floatsolar:"waves", geo:"flame", nuclear:"atom"};
+function PlaceBar(){
+  const list = (S.toPlace || []).filter(x => x.n > 0); if (!list.length){ if (UIM.placing) UIM.placing = null; return null; }
+  const T = P.PLACE_TXT, on = UIM.placing;
+  return <div class={"placebar glass " + (on ? "on" : "")}>
+    <b class="mono warn small"><Icon n="map-pin" size={14}/> {up(L(T.bar))}</b>
+    <div class="ptoks">{list.map(x => <button type="button" key={x.k + x.sk} class={"ptok " + (on === x.k ? "on" : "")} onClick={() => { Audio.play("select"); UIM.placing = on === x.k ? null : x.k; GameMap.fxDirty = true; bump(); }}>
+      <Icon n={KIND_ICON[x.k] || "map-pin"} size={16}/><span>{L(P.KIND_NAME[x.k])}</span><i class="mono">×{x.n}</i>
+    </button>)}</div>
+    {on ? <><small class="muted">{L(T.pick)}</small><div class="plegend"><i/><span>{L(T.poor)}</span><i class="m"/><span>{L(T.ok)}</span><i class="g"/><span>{L(T.good)}</span></div><small class="muted tiny">{L(T.note)}</small></> : null}
+    <div class="row gap"><button type="button" class="linkbtn" onClick={() => { UIM.placing = null; P.placeAuto(); bump(); }}>{L(T.auto)}</button>{on ? <button type="button" class="linkbtn" onClick={() => { UIM.placing = null; bump(); }}>{L(T.done)}</button> : null}</div>
+  </div>;
+}
+
 export function ZoomBtns(){
   return <div class="zoom glass">
     <IconBtn n="plus" title="Zoom in (+)" onClick={() => GameMap.zoomBy(1.35)} sound={null}/>
@@ -106,21 +137,22 @@ function MeterNZ(){
   </div>;
 }
 function MeterT(){
-  const monthsLeft = Math.max(0, P.TOTAL_TICKS - S.tick), cls = S.temp >= 2.5 ? "bad" : S.temp >= 2.0 ? "hot" : S.temp >= 1.5 ? "warn" : "good";
+  const monthsLeft = Math.max(0, P.TOTAL_TICKS - S.tick), era = S.world && P.ERAS[S.era || "shift"], cls = S.temp >= 2.5 ? "bad" : S.temp >= 2.0 ? "hot" : S.temp >= 1.5 ? "warn" : "good";
   return <div class="mtr">
-    <div class="mtr-h"><Rich t={`[[thermometer]] ${up(t("tTitle"))}`} cls="ttl"/><span class={"big " + cls}>+{S.temp.toFixed(2)}<small>°C</small></span></div>
+    <div class="mtr-h"><Rich t={`[[$temp]] ${up(t("tTitle"))}`} cls="ttl"/><span class={"big " + cls}>+{S.temp.toFixed(2)}<small>°C</small></span></div>
     <div class="bar temp">
       <i class="z"/><i class="z"/><i class="z"/><i class="z"/>
       <span class="tk" style={{left:"25%"}}>1.5</span><span class="tk" style={{left:"50%"}}>2.0</span><span class="tk" style={{left:"75%"}}>2.5</span>
       <i class={"dot " + cls} style={{left:`${clamp((S.temp - 1) / 2, 0, 1) * 100}%`}}/>
       <Icon n="triangle-alert" size={17} cls="end bad"/>
     </div>
-    <div class="mtr-f"><span><b class={cls}>{Math.max(0, 3 - S.temp).toFixed(2)}°C</b> {t("toLose")} (3.0°C)</span><span>{t("left")} <b>{Math.floor(monthsLeft / 12)}</b> {t("yrs")} {monthsLeft % 12} {t("months")}</span></div>
+    {era ? <div class="mtr-f"><span><Rich t={`[[${era.icon}]] ${L(era.name)}`} iconColor="accent"/></span><span class="muted">{L(era.goal)}</span></div>
+      : <div class="mtr-f"><span><b class={cls}>{Math.max(0, 3 - S.temp).toFixed(2)}°C</b> {t("toLose")} (3.0°C)</span><span>{t("left")} <b>{Math.floor(monthsLeft / 12)}</b> {t("yrs")} {monthsLeft % 12} {t("months")}</span></div>}
   </div>;
 }
 export function Bottom(){
   const tabs = [["tech", "network", "nbTech", "T"], ["region", "map", "nbRegion", "R"], ["stats", "chart-line", "nbStats", "S"], ["news", "newspaper", "nbNews", "N"]];
-  const ready = P.SKILLS.filter(n => P.nodeState(n) === "ready" && !P.atCapacity(n) && S.ep >= P.nodeCost(n).ep && S.pc >= P.nodeCost(n).pc).length;
+  const ready = P.SKILLS.filter(n => P.nodeState(n) === "ready" && P.canAfford(n)).length;
   const lg = S.log[0], LCOL = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg"};
   return <footer class="bottom">
     <div class="meters glass"><MeterNZ/><MeterT/></div>

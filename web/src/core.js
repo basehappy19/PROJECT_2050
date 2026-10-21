@@ -8,7 +8,7 @@ export const S = P.S;
 export const H = P.H = P.H || {};
 export const t = k => P.t(k);
 export const L = o => P.L(o);
-export const up = s => (S.lang === "en" ? String(s).split(/(\[\[[a-z0-9-]+\]\])/).map(x => (/^\[\[/.test(x) ? x : x.toUpperCase())).join("") : String(s));
+export const up = s => (S.lang === "en" ? String(s).split(/(\[\[\$?[a-z0-9-]+\]\])/).map(x => (/^\[\[/.test(x) ? x : x.toUpperCase())).join("") : String(s));
 export const ls = {
   get(k, d = null){ try { const v = localStorage.getItem(k); return v === null ? d : v; } catch(e){ return d; } },
   set(k, v){ try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch(e){} },
@@ -31,7 +31,7 @@ export const UIM = P.UIM = {
     return this.modal;     // "skills" | "charsel"
   },
   get paused(){ return this.modal === "pause"; },
-  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn"].includes(this.modal) || !!this.transition; },
+  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market"].includes(this.modal) || !!this.transition; },
   eventLocked(){ return (performance.now() - this.evAt) / 1000 < EVENT_LOCK; },
   eventLockFrac(){ return Math.min(1, (performance.now() - this.evAt) / 1000 / EVENT_LOCK); },
 };

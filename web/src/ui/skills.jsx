@@ -27,6 +27,7 @@ export function Skills(){
         <div class="sk-res">
           <span><Rich t={`${P.IC.ep} `}/><b>{Math.floor(S.ep)}</b><small>+{P.epGain()}{t("perMo")}</small></span>
           <span><Rich t={`${P.IC.pc} `}/><b>{Math.floor(S.pc)}</b><small>+{P.pcGain()}{t("perMo")}</small></span>
+          {S.oreOn ? <span><Rich t={`${P.IC.ore} `}/><b>{P.isFullRes() ? P.matTotal() : Math.floor(S.ore)}</b><small>+{Math.round(P.oreGain())}{t("perMo")}</small></span> : null}
           <span class={busy >= P.MAX_PROJECTS ? "warn" : "muted"}><Icon n="loader" size={15}/> {t("inProgress")} {busy}/{P.MAX_PROJECTS}</span>
           {P.recentBuys() ? <span class="bad"><Icon n="chart-line" size={15}/> {t("rush")} +{P.recentBuys() * 20}%</span> : null}
           {S.buff.instant ? <span class="good"><Icon n="lightbulb" size={15}/> {t("buffInstant")}</span> : S.buff.disc ? <span class="good"><Icon n="flask-round" size={15}/> {t("buffDisc")}</span> : null}
@@ -51,7 +52,7 @@ export function Skills(){
             }))}
             {nodes.map(n => {
               const [cx, cy] = centre(n), vis = visible(n), own = !!S.owned[n.id], c = P.nodeCost(n), p = P.rollProgress(n.id), sel = S.node === n.id;
-              const afford = vis && !own && S.ep >= c.ep && S.pc >= c.pc && !P.atCapacity(n);
+              const afford = vis && !own && P.canAfford(n);
               const lab = vis ? (p !== null ? `${Math.round(p * 100)}%` : own ? (n.type === "active" ? (S.actCd[n.id] ? `${S.actCd[n.id]} ${t("moShort")}` : t("ready")) : "✓") : `${c.ep}·${c.pc}`) : "???";
               return <g key={n.id} class={`hex ${own ? "own" : vis ? (afford ? "afford" : "vis") : "hid"} ${n.type} ${sel ? "sel" : ""}`} onClick={() => pick(n.id)} onPointerEnter={() => Audio.hover()} tabIndex={0} role="button" aria-label={vis ? L(n.name) : t("hiddenSkill")} onKeyDown={e => { if (e.key === "Enter") pick(n.id); }}>
                 {afford ? <polygon class="halo" points={hexPts(cx, cy, R + 8)}/> : null}
@@ -76,7 +77,7 @@ export function Skills(){
       </div>
       <nav class="sk-cats">{P.SKILL_CATS.map(c => {
         const list = P.SKILLS.filter(n => n.cat === c.id), own = list.filter(n => S.owned[n.id]).length;
-        const ready = list.filter(n => !S.owned[n.id] && visible(n) && S.ep >= P.nodeCost(n).ep && S.pc >= P.nodeCost(n).pc && !P.atCapacity(n)).length;
+        const ready = list.filter(n => !S.owned[n.id] && visible(n) && P.canAfford(n)).length;
         return <button type="button" key={c.id} class={cat === c.id ? "on" : ""} onPointerEnter={() => Audio.hover()} onClick={() => {
           Audio.play("tab"); S.skillCat = c.id;
           const first = P.SKILLS.find(n => n.cat === c.id && !S.owned[n.id] && visible(n)) || P.SKILLS.find(n => n.cat === c.id); S.node = first.id; bump();
@@ -88,6 +89,16 @@ export function Skills(){
   </div>;
 }
 
+/* what a skill changes: one row per value, green = good for you, red = bad for you */
+export function Effects({chips}){
+  if (!chips.length) return null;
+  return <div class="effects">{chips.map((c, i) => <div class={"eff " + (c.good ? "good" : "bad")} key={i}>
+    <Icon n={c.icon || "$" + c.stat} size={26}/>
+    <span class="el">{c.label}</span>
+    <b class="ev"><i>{c.up ? "▲" : "▼"}</i>{c.val}</b>
+  </div>)}</div>;
+}
+
 function Detail({cat}){
   const n = P.SKILL[S.node] && P.SKILL[S.node].cat === cat ? P.SKILL[S.node] : P.SKILLS.find(q => q.cat === cat);
   const vis = visible(n), own = !!S.owned[n.id], c = P.nodeCost(n), st = P.nodeState(n);
@@ -96,17 +107,17 @@ function Detail({cat}){
     return <div class="sk-detail"><div class="dtop"><span class="dicon hid"><Icon n="circle-help" size={36}/></span><h3>{t("hiddenSkill")}</h3></div><p class="muted">{t("hiddenHint")} {req.join(", ")}</p></div>;
   }
   const tags = [n.type === "active" ? "active" : "passive", n.trade && "trade", n.resp && "resp", n.target === "country" && "country"].filter(Boolean);
-  const full = st === "ready" && P.atCapacity(n), can = st === "ready" && !full && S.ep >= c.ep && S.pc >= c.pc;
+  const oc = P.oreCost(n), full = st === "ready" && P.atCapacity(n), can = st === "ready" && !full && P.canAfford(n);
   const a = own && n.type === "active" ? P.abilityList().find(q => q.id === n.id) : null, cd = S.actCd[n.id] || 0, p = P.rollProgress(n.id);
   return <div class="sk-detail" key={n.id}>
     <div class="dtop">
       <span class={"dicon " + (own ? "own" : "")}><Icon n={n.icon} size={36}/></span>
       <div><h3>{L(n.name)}</h3><div class="pills">{tags.map(tg => <Pill key={tg} t={L(P.SKILL_TYPE[tg])} kind={tg === "trade" ? "warn" : tg === "active" ? "gold" : tg === "resp" ? "acc" : ""}/>)}</div></div>
     </div>
-    <p class="desc"><Rich t={L(n.desc)}/></p>
-    {n.resp ? <p class="sky small"><Rich t={Object.entries(n.resp).map(([hz, v]) => `[[${P.HAZARDS[hz].icon}]] ${L(P.HAZARDS[hz].name)} −${Math.round(v * 100)}%`).join("   ")} iconColor="inherit"/></p> : null}
+    <Effects chips={P.skillChips(n)}/>
+    <p class="desc muted"><Rich t={L(n.desc)}/></p>
     <div class="pills">
-      {!own ? <><Pill t={`${P.IC.ep} ${c.ep}`} kind={S.ep >= c.ep ? "acc" : "bad"}/><Pill t={`${P.IC.pc} ${c.pc}`} kind={S.pc >= c.pc ? "acc" : "bad"}/></> : null}
+      {!own ? <><Pill t={`${P.IC.ep} ${c.ep}`} kind={S.ep >= c.ep ? "acc" : "bad"}/><Pill t={`${P.IC.pc} ${c.pc}`} kind={S.pc >= c.pc ? "acc" : "bad"}/>{P.isFullRes() ? Object.entries(P.matCost(n) || {}).map(([g, v]) => <Pill key={g} t={`[[${P.MAT[g].icon}]] ${v}`} kind={(S.mat[g] || 0) >= v ? "acc" : "bad"}/>) : oc ? <Pill t={`${P.IC.ore} ${oc}`} kind={(S.ore || 0) >= oc ? "acc" : "bad"}/> : null}</> : null}
       <Pill t={`${t("needs")}: ${n.req.length ? n.req.map(q => L(P.SKILL[q].name)).join(" + ") : t("none")}`}/>
       {n.months ? <Pill t={`${t("rollout")} ${n.months} ${t("months")}`}/> : null}
       {n.type === "active" ? <Pill t={`${t("cooldownLen")} ${n.cd} ${t("months")}`} kind="gold"/> : null}

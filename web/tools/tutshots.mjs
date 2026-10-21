@@ -56,7 +56,14 @@ await shot("t5-bubbles.jpg");
 await ev(() => { const P = window.P2050, S = P.S; S.haz = []; S.bubbles = []; P.Game.openSkills(); });
 await page.waitForTimeout(900);
 await shot("t6-tree.jpg");
-await ev(() => { const P = window.P2050; P.Game.closeSkills(); P.Map.resetView(); const ev = P.EVENTS.find(e => e.id === "EVT_47") || P.EVENTS[3]; P.S.used = []; P.S.event = ev.id; P.S.cev = null; P.H.showEvent(); P.UIM.evAt = performance.now() - 5000; P.changed(); });
+// minerals + builds: zoom on a region with pins, open a mineral country
+await ev(() => { const P = window.P2050, S = P.S; P.Game.closeSkills(); S.ep = 400; S.pc = 120; S.ore = 30; ["E2", "E3", "N2", "R1"].forEach(id => { try { P.buyNode(id); } catch (e){} }); S.pins.forEach(p => p.done = true); S.bubbles.push({id:910, type:"ore", reg:"SA", cid:"CHL", lat:-24, lon:-69, ttl:5}); P.Game.selectCountry("CHL"); P.changed(); });
+await page.waitForTimeout(2200);
+await shot("t9-minerals.jpg", [".drawer .reslist", ".kpi.ore"]);
+await ev(() => { const P = window.P2050; P.Game.closeTab(); P.Map.resetView(); P.changed(); });
+await page.waitForTimeout(12000);   // let planes and ships fill the routes
+await shot("t10-traffic.jpg");
+await ev(() => { const P = window.P2050; P.Map.resetView(); const ev = P.EVENTS.find(e => e.id === "EVT_47") || P.EVENTS[3]; P.S.used = []; P.S.event = ev.id; P.S.cev = null; P.H.showEvent(); P.UIM.evAt = performance.now() - 5000; P.changed(); });
 await page.waitForTimeout(1500);
 await shot("t7-event.jpg");
 await ev(() => { const P = window.P2050, S = P.S; S.event = null; S.regions.forEach(r => r.co2 = 0.05); S.sink = 4; S.temp = 1.55; P.checkEnd(); });

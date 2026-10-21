@@ -5,7 +5,8 @@
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",
-    "test": "node --test test/*.test.js",
+    "test": "node --test --test-concurrency=1 test/*.test.js",
+    "make-admin": "node scripts/make-admin.js",
     "reset-password": "node scripts/reset-password.js"
   },
   "license": "UNLICENSED",

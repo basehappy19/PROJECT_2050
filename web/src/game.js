@@ -2,6 +2,8 @@
 import {P, S, H, UIM, bump, ls, t} from "./core.js";
 import {Audio} from "./audio.js";
 import {GameMap} from "./map2d.js";
+import {Gfx} from "./gfx.js";
+Gfx.onAutoDrop = lv => { UIM.toastQ.push({icon:"monitor", title:t("gfxLbl"), msg:t("gfxDropped").replace("{L}", t("gfx_" + lv))}); bump(); };
 
 const tutSeen = () => ls.get("p2050-tut") === "1";
 export const G = P.Game = {
@@ -22,7 +24,9 @@ export const G = P.Game = {
     const go = () => { UIM.screen = "game"; UIM.transition = "reveal"; after && after(); bump(); setTimeout(() => { UIM.transition = null; bump(); }, 900); };
     if (this.globe && this.globe.running) this.globe.zoomTo(13, 101, go, 1500); else go();
   },
-  newGame(){
+  newGame(world = false){
+    UIM.placing = null;
+    UIM.worldNext = !!world;
     P.newGame(S.lang);
     this.enterGame(() => {
       UIM.modal = null; UIM.charSel = UIM.charSel || S.char || "sci";
@@ -84,10 +88,17 @@ export const G = P.Game = {
   startGame(char, mode){
     if (!P.Net.owns("char_" + char)) return;
     UIM.msg = ""; UIM.modal = null;
-    P.startGame(S.lang, {mode, char, charLv:P.levelOf(P.Net.charXp(char)), seed:mode === "daily" ? P.dailySeed() : undefined});
+    P.startGame(S.lang, {mode:UIM.worldNext ? "normal" : mode, char, charLv:P.levelOf(P.Net.charXp(char)), seed:mode === "daily" && !UIM.worldNext ? P.dailySeed() : undefined, world:UIM.worldNext});
     GameMap.refresh(); GameMap.resetView(); Audio.setMood("calm", true);
   },
-  restart(){ Audio.stopAmb(300); UIM.reward = null; S.over = null; S.started = false; P.newGame(S.lang, {mode:S.mode, char:S.char}); UIM.modal = "charsel"; GameMap.refresh(); Audio.setMood("calm"); bump(); },
+  /* after a win: keep playing the same world with no end year */
+  continueWorld(){
+    if (S.over !== "win") return;
+    S.world = true; S.worldStart = S.tick; S.over = null; S.era = "heal"; S.firstNZ = S.firstNZ || S.tick; UIM.reward = null; UIM.modal = null;
+    P.addLog(`[[sprout]] ${t("worldCont")}`, "gd"); P.autosave();
+    Audio.stopAmb(400); Audio.setMood("calm", true); P.Ach.unlock("world1"); bump();
+  },
+  restart(){ Audio.stopAmb(300); UIM.reward = null; UIM.worldNext = !!S.world; S.over = null; S.started = false; P.newGame(S.lang, {mode:S.mode, char:S.char}); UIM.modal = "charsel"; GameMap.refresh(); Audio.setMood("calm"); bump(); },
   setSpeed(v){ P.setSpeed(v); },
   /* ---------- keyboard (PC): T skills · Esc close/pause · Space pause · 1/2/3 speed · H whole world · +/− zoom · R/S/N drawer tabs ---------- */
   key(name, e){
@@ -189,7 +200,7 @@ H.showEnd = () => {
 H.closeModal = () => { if (UIM.modal === "charsel") UIM.modal = null; bump(); };
 H.toast = a => { UIM.toastQ.push(a); bump(); };
 H.story = act => { if (UIM.modal === "skills") UIM.modal = null; G.showStory(act); };
-H.gameStart = () => { G.showStory(1); if (P.Net) P.Net.startRun(); };
+H.gameStart = () => { G.showStory(1); if (P.Net){ P.Net.startRun(); P.Net.statStart(); } };
 H.gameOver = () => { if (P.Net) P.Net.finishRun(); };
 const sfx0 = H.sfx;
 /* a few engine sounds get a second layer */

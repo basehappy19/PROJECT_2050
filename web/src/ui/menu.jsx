@@ -6,7 +6,7 @@ import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {Globe} from "../globe.js";
 import {Icon, Rich} from "./icon.jsx";
-import {Btn, IconBtn, Tabs, Seg, Check, Terra, Portrait, Volume, LangSeg, Msg, H3} from "./widgets.jsx";
+import {Btn, IconBtn, Tabs, Seg, Check, Terra, Portrait, Volume, GfxSeg, LangSeg, Msg, H3} from "./widgets.jsx";
 import {AchList} from "./learn.jsx";
 
 const N = () => P.Net;
@@ -16,7 +16,7 @@ const goSub = sub => () => {
   if (sub === "board") N().loadBoard(); if (sub === "cert") N().loadCerts(); if (sub === "shop" || sub === "account") N().refresh();
   bump();
 };
-const Back = () => <Btn kind="ghost" sound="close" onClick={() => { UIM.sub = null; UIM.msg = ""; bump(); }}>{`[[arrow-left]] ${t("mBack")}`}</Btn>;
+const Back = () => <div class="backrow"><Btn kind="ghost" sound="close" onClick={() => { UIM.sub = null; UIM.msg = ""; bump(); }}>{t("mBack")}</Btn></div>;
 const Offline = () => <><p class="muted">{t("netOfflineLong")}</p><Back/></>;
 
 /* the globe lives outside Preact so it survives re-renders */
@@ -36,7 +36,7 @@ function GlobeView(){
 
 export function Menu(){
   const sub = UIM.sub;
-  const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert"};
+  const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd"};
   return <div class={"home " + (UIM.transition ? "leaving" : "")}>
     <GlobeView/>
     <div class="home-vignette"/>
@@ -48,12 +48,15 @@ export function Menu(){
           <div><small class="mono acc">GLOBAL CLIMATE TASKFORCE · 2026 – 2050</small><h1>PROJECT <b>:</b> 2050</h1></div>
         </div>
         <p class={sub ? "subtitle" : "lead"}>{sub ? t(TITLES[sub]) : t("mDesc")}</p>
-        {sub === "load" ? <SubLoad/> : sub === "ach" ? <><AchList/><Back/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : <Main/>}
+        {!sub && N().cfg && N().cfg.announcement && L(N().cfg.announcement) ? <div class="announce card"><Icon n="megaphone" size={18} color="warn"/><span>{L(N().cfg.announcement)}</span></div> : null}
+        {sub === "load" ? <SubLoad/> : sub === "ach" ? <><AchList/><Back/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : <Main/>}
         <footer class="mfooter">
           <small class="mono muted">{up(t("teamK"))}</small>
           <p class="team">{t("team")}</p>
           <p class="muted small">{t("disclaimer")}</p>
           <Volume/>
+          <GfxSeg/>
+          <div class="row"><button type="button" class="linkbtn mono" onClick={() => { Audio.play("click"); goSub("updates")(); }}>{`${t("updVer")} ${P.VERSION_NAME}`}</button></div>
           <div class="row"><small class="muted grow">{t("mTag")}</small><LangSeg/></div>
           <small class="muted credits">Earth imagery: NASA Visible Earth (Blue Marble, Black Marble) · Sounds &amp; music: CC0 / CC-BY, see assets/audio/CREDITS.txt</small>
         </footer>
@@ -82,11 +85,39 @@ function Main(){
       <button type="button" class={"bigbtn " + (auto ? "primary" : "")} disabled={!auto} onPointerEnter={() => auto && Audio.hover()} onClick={() => { Audio.play("start"); const s2 = P.readSaves(); if (s2 && s2.auto && !G.loadSave(s2.auto.S)){ UIM.msg = t("oldSave"); UIM.err = true; bump(); } }}>
         <Icon n="play" size={26}/><span><b>{t("mCont")}</b><small class="mono">{auto ? `${P.dateStr(auto.meta.tick)} · ΔT +${auto.meta.temp.toFixed(2)}°C · ${auto.meta.net.toFixed(1)} Gt` : t("mNoSave")}</small></span><Icon n="chevron-right" size={20} cls="chev"/>
       </button>
+      {(() => { const on = P.worldUnlocked(); return <button type="button" class={"bigbtn world " + (on ? "" : "locked")} disabled={!on} onPointerEnter={() => on && Audio.hover()} onClick={() => { Audio.play("start"); G.newGame(true); }}>
+        <Icon n={on ? "infinity" : "lock"} size={26}/><span><b>{t("mWorld")}{on && P.prestige() ? <i class="stars" title={L(P.W2.prestHelp)}>{"★".repeat(P.prestige())}</i> : null}</b><small>{on ? t("mWorldS") : t("mWorldLock")}</small></span><Icon n="chevron-right" size={20} cls="chev"/>
+      </button>; })()}
     </div>
     <Msg UIM={UIM}/>
+    <WhatsNew/>
     <div class="tiles">{tiles.map(it => <button type="button" key={it.id} class="tile" onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("click"); it.fn(); }}>
       <Icon n={it.ic} size={20} color="accent"/><span>{it.t1}</span>{it.t2 ? <small class="mono muted">{it.t2}</small> : null}
     </button>)}</div>
+  </>;
+}
+
+/* ---------------- update log ---------------- */
+const SEEN_KEY = "p2050.seenVersion";
+const seenVer = () => { try { return localStorage.getItem(SEEN_KEY); } catch (e){ return null; } };
+function WhatsNew(){
+  const c = P.CHANGELOG[0], fresh = seenVer() !== c.v;
+  return <button type="button" class={"whatsnew " + (fresh ? "fresh" : "")} onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("click"); goSub("updates")(); }}>
+    <Icon n="sparkles" size={20} color="accent"/>
+    <span><small class="muted">{t("updNew")} {c.v}</small><b>{L(c.name)}</b></span>
+    {fresh ? <i class="newdot">NEW</i> : null}<Icon n="chevron-right" size={18} cls="chev"/>
+  </button>;
+}
+function SubUpdates(){
+  useEffect(() => { try { localStorage.setItem(SEEN_KEY, P.CHANGELOG[0].v); } catch (e){} }, []);
+  const lang = S.lang === "en" ? "en" : "th";
+  const fmt = d => { const [y, m, dd] = d.split("-").map(Number); return new Date(y, m - 1, dd).toLocaleDateString(lang === "th" ? "th-TH" : "en-GB", {day:"numeric", month:"short", year:"numeric"}); };
+  return <>
+    <div class="updlog">{P.CHANGELOG.map((c, i) => <article key={c.v} class={"upd " + (i === 0 ? "latest" : "")}>
+      <header><b class="mono">{c.v}</b><h4>{L(c.name)}</h4><small class="muted">{fmt(c.date)}</small></header>
+      <ul>{c.items[lang].map((x, j) => <li key={j}>{x}</li>)}</ul>
+    </article>)}</div>
+    <Back/>
   </>;
 }
 
@@ -99,7 +130,7 @@ function AccountChip(){
 
 /* ---------------- load ---------------- */
 function SubLoad(){
-  const saves = P.readSaves(), [code, setCode] = useState("");
+  const saves = P.readSaves();
   return <>
     {saves === null ? <p class="bad">{t("noStore")}</p> : P.SLOTS.map(slot => {
       const ok = saves[slot] && P.validSave(saves[slot].S), lines = saves[slot] && !ok ? [t("oldSave")] : P.slotMetaLines(ok && saves[slot].meta);
@@ -108,11 +139,10 @@ function SubLoad(){
     })}
     {N().user ? <><H3>{t("cloudSaves")}</H3>{["s1", "s2", "s3"].map(slot => {
       const c = (N().cloud || {})[slot], lines = c ? P.slotMetaLines(c.meta) : [t("empty")];
-      return <div class="card row" key={slot}><div class="grow"><b><Rich t={`[[cloud]] ${P.slotName(slot)}`} iconColor="accent"/></b>{lines.map((s, i) => <small class="mono muted" key={i}>{s}</small>)}</div>
+      return <div class="card row" key={slot}><div class="grow"><b><Rich t={`[[$co2]] ${P.slotName(slot)}`} iconColor="accent"/></b>{lines.map((s, i) => <small class="mono muted" key={i}>{s}</small>)}</div>
         <Btn kind="ghost" disabled={!c} onClick={() => N().cloudLoad(slot).then(st => { if (!st || !G.loadSave(st)){ UIM.msg = t("codeBad"); UIM.err = true; bump(); } })}>{t("load")}</Btn></div>;
     })}</> : null}
-    <label class="field"><span>{t("codePaste")}</span><textarea class="code" placeholder="P2050:..." value={code} onInput={e => setCode(e.currentTarget.value)}/></label>
-    <div class="row gap"><Btn kind="ghost" onClick={() => { const o = P.importCode(code); if (!G.loadSave(o)){ UIM.msg = t("codeBad"); UIM.err = true; Audio.play("error"); bump(); } }}>{t("codeLoad")}</Btn><Msg UIM={UIM}/></div>
+    <Msg UIM={UIM}/>
     <Back/>
   </>;
 }
@@ -176,7 +206,7 @@ function SubAccount(){
     <H3>{t("renameTitle")}</H3>
     <form class="row gap" onSubmit={e => { e.preventDefault(); n.rename(form(e).name || ""); }}>
       <input class="input grow" name="name" placeholder={u.displayName} maxLength={20}/>
-      <Btn type="submit" disabled={n.busy || (!free && u.terra < P.PRICE.rename)}>{`${t("rename")} · ${free ? t("free") : P.PRICE.rename + " Terra"}`}</Btn>
+      <Btn type="submit" disabled={n.busy || (!free && u.terra < P.PRICE.rename)}>{`${t("rename")} · ${free ? t("free") : P.PRICE.rename + " " + t("gemsWord")}`}</Btn>
     </form>
     <H3>{t("appearance")}</H3>
     <div class="row gap wrap">{[["", t("themeDefault")], ["night", t("themeNight")], ["paint", t("themePaint")]].map(([id, lab]) => { const own = !id || n.owns("theme_" + id); return <Btn key={id || "def"} size="sm" kind={curT === id ? "primary" : "ghost"} disabled={!own} onClick={() => { try { localStorage.setItem("p2050-theme", id); } catch(e){} bump(); }}>{`${own ? "" : "[[lock]] "}${lab}`}</Btn>; })}</div>
@@ -195,11 +225,11 @@ function SubShop(){
     <div class="card row"><span class="muted grow">{t("balance")}</span><Terra n={n.user.terra} cls="good big"/></div>
     <p class="muted small">{t("shopNote")}</p>
     <div class="shop">{P.SHOP.map(it => {
-      const own = n.owns(it.id), afford = n.user.terra >= it.price, ch = it.kind === "char" ? it.id.slice(5) : null;
+      const own = n.owns(it.id), afford = n.user.terra >= P.shopPrice(it), ch = it.kind === "char" ? it.id.slice(5) : null;
       return <div class={"card row shopitem " + (own ? "own" : "")} key={it.id}>
         {ch ? <Portrait id={ch} size={56}/> : <span class="sic"><Icon n={it.icon} size={22} color="accent"/></span>}
         <div class="grow"><b>{L(it.name)}</b><span class="muted small"><Rich t={ch ? L(P.CHAR[ch].pas) : L(it.desc)}/></span></div>
-        <Btn kind={own ? "ghost" : "gold"} disabled={own || !afford || n.busy} sound={null} onClick={() => { n.buy(it.id); Audio.play("coin"); }}>{own ? `[[check]] ${t("owned2")}` : `[[terra]] ${it.price}`}</Btn>
+        <Btn kind={own ? "ghost" : "gold"} disabled={own || !afford || n.busy} sound={null} onClick={() => { n.buy(it.id); Audio.play("coin"); }}>{own ? `[[check]] ${t("owned2")}` : `[[terra]] ${P.shopPrice(it)}`}</Btn>
       </div>;
     })}</div>
     <Msg UIM={UIM}/>

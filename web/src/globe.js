@@ -2,6 +2,7 @@
    NASA Blue Marble (day) + Black Marble (night lights) + cloud layer, sun-lit with a real day/night line,
    ocean glint, atmosphere glow, star field, glowing CO₂ hotspots and cooperation arcs between cities.
    Drag to spin. zoomTo(lat, lon) flies the camera down before the game's 2D map takes over. */
+import {Gfx} from "./gfx.js";
 import * as THREE from "three";
 import {P} from "./core.js";
 
@@ -80,7 +81,8 @@ export class Globe {
   constructor(canvas, {small = false, onReady} = {}){
     this.canvas = canvas; this.small = small;
     const r = this.renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false, powerPreference:"high-performance"});
-    r.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.5 : 2));
+    r.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.5 : 2, Gfx.cfg.globeDpr));
+    Gfx.onChange(() => { r.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.small ? 1.5 : 2, Gfx.cfg.globeDpr)); if (this.clouds) this.clouds.visible = Gfx.cfg.clouds; this.resize(); });
     r.setClearColor(0x02070a, 1);
     r.outputColorSpace = THREE.SRGBColorSpace;
     this.scene = new THREE.Scene();
@@ -96,13 +98,13 @@ export class Globe {
     const tex = (n, srgb = true) => { const t = loader.load(`assets/img/${n}${sfx}.jpg`, done, undefined, done); if (srgb) t.colorSpace = THREE.SRGBColorSpace; t.anisotropy = Math.min(8, r.capabilities.getMaxAnisotropy()); return t; };
     const uni = {day:{value:tex("globe-day")}, night:{value:tex("globe-night")}, water:{value:tex("globe-water", false)}, sun:{value:this.sun}, heat:{value:0}};
     this.uni = uni;
-    const seg = small ? 96 : 160;
+    const seg = Math.min(small ? 96 : 160, Gfx.cfg.globeSeg);
     this.earth = new THREE.Mesh(new THREE.SphereGeometry(1, seg, seg / 2), new THREE.ShaderMaterial({uniforms:uni, vertexShader:EARTH_VS, fragmentShader:EARTH_FS}));
     this.spinG.add(this.earth);
     const cloudTex = tex("globe-clouds", false); cloudTex.wrapS = THREE.RepeatWrapping;
     this.cloudU = {map:{value:cloudTex}, sun:{value:this.sun}, shift:{value:0}};
     this.clouds = new THREE.Mesh(new THREE.SphereGeometry(1.012, seg, seg / 2), new THREE.ShaderMaterial({uniforms:this.cloudU, vertexShader:EARTH_VS, fragmentShader:CLOUD_FS, transparent:true, depthWrite:false}));
-    this.spinG.add(this.clouds);
+    this.spinG.add(this.clouds); this.clouds.visible = Gfx.cfg.clouds;
     this.atm = new THREE.Mesh(new THREE.SphereGeometry(1.08, 96, 48), new THREE.ShaderMaterial({uniforms:{sun:{value:this.sun}, heat:uni.heat}, vertexShader:ATM_VS, fragmentShader:ATM_FS, side:THREE.BackSide, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false}));
     this.scene.add(this.atm);
     this.makeStars(); this.makeHotspots(); this.makeArcs();
@@ -115,7 +117,7 @@ export class Globe {
     this.clock = new THREE.Clock();
   }
   makeStars(){
-    const n = this.small ? 1400 : 2600, pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
+    const n = Math.round((this.small ? 1400 : 2600) * Gfx.cfg.stars), pos = new Float32Array(n * 3), col = new Float32Array(n * 3);
     for (let i = 0; i < n; i++){
       const u = Math.random() * 2 - 1, th = Math.random() * Math.PI * 2, r = 40 + Math.random() * 10, s = Math.sqrt(1 - u * u);
       pos.set([r * s * Math.cos(th), r * u, r * s * Math.sin(th)], i * 3);

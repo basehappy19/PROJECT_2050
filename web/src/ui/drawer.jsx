@@ -7,7 +7,26 @@ import {Icon, Rich} from "./icon.jsx";
 import {Btn, IconBtn, RelBar, Meter, H3, Key} from "./widgets.jsx";
 
 const IC = () => P.IC;
-const costLabel = c => [c.ep ? `${IC().ep} ${c.ep}` : "", c.pc ? `${IC().pc} ${c.pc}` : ""].filter(Boolean).join("  ");
+const costLabel = c => [c.ep ? `${IC().ep} ${c.ep}` : "", c.pc ? `${IC().pc} ${c.pc}` : "", c.ore ? `${IC().ore} ${c.ore}` : ""].filter(Boolean).join("  ");
+/* what a country has (real resources), what it sends us, and how far it has gone with green technology */
+function Resources({c}){
+  const cr = P.CRES[c.id], imp = P.IMPORTERS.includes(c.id), src = S.oreOn && P.oreSources().find(x => x.id === c.id), ban = (S.oreBan || {})[c.id];
+  return <>
+    <div class="card greencard">
+      <div class="row"><span class="muted"><Rich t={`[[leaf]] ${t("greenTech")}`} iconColor="good"/></span><b class="mono good">{Math.round(c.green || 0)}%</b></div>
+      <Meter v={(c.green || 0) / 100} color="good" h={6}/>
+      <small class="muted">{t("greenHelp")}</small>
+    </div>
+    {cr || imp ? <>
+      <H3>{t("resTitle")}</H3>
+      {cr ? <div class="reslist">{cr.r.map(k => { const R = P.RES[k]; return <span class="res" key={k} title={L(R.fact)} style={{"--rc":R.col}}><Icon n={R.icon} size={15}/>{L(R.name)}</span>; })}</div> : null}
+      {imp ? <p class="muted small"><Rich t={`[[ship]] ${t("resImporter")}`} iconColor="inherit"/></p> : null}
+      {ban ? <p class="bad small"><Rich t={`[[ban]] ${t("oreBanned")} ${ban} ${t("months")}`} iconColor="inherit"/></p>
+        : src ? <p class="small"><Rich t={`${IC().ore} ${t("oreSends")} +${src.amt.toFixed(1)}${t("perMo")}`}/></p>
+        : S.oreOn && cr && cr.w ? <p class="warn small">{t("oreNeedFriend")}</p> : null}
+    </> : null}
+  </>;
+}
 
 export function Drawer(){
   if (!S.tab) return null;
@@ -72,6 +91,24 @@ function PaneRegion(){
   </>;
 }
 
+/* Continuous World: ambassadors and the home base */
+function BaseCard({c}){
+  const W = P.W2, amb = (S.amb || []).includes(c.id), hq = S.hq === c.id, ka = P.w2cost(P.AMB_COST), kh = P.w2cost(P.HQ_COST);
+  return <div class="card basecard">
+    <b><Rich t={`[[flag]] ${L(W.title)}`} iconColor="accent"/></b>
+    {hq ? <p class="good small"><Rich t={`[[landmark]] ${L(W.hqHere)}`} iconColor="inherit"/></p> : null}
+    {amb ? <p class="good small"><Rich t={`[[flag]] ${L(W.ambHere)}`} iconColor="inherit"/></p> : null}
+    <small class="muted">{L(W.ambHelp)}</small>
+    <div class="row gap wrap">
+      {amb ? <Btn kind="ghost" onClick={() => P.ambRecall(c.id)}>{L(W.ambRecall)}</Btn>
+        : <Btn kind={P.ambOk(c) ? "primary" : "ghost"} disabled={!P.ambOk(c)} onClick={() => { if (P.ambSend(c.id)) Audio.play("bell", {vol:.7}); }}>{`${L(W.ambSend)} · ${IC().pc} ${ka.pc} · ${(S.amb || []).length}/${P.AMB_MAX}`}</Btn>}
+      {!hq ? <Btn kind={P.hqOk(c) ? "primary" : "ghost"} disabled={!P.hqOk(c)} onClick={() => { if (P.moveHQ(c.id)) Audio.play("bell", {vol:.7}); }}>{S.hqCd > 0 ? `${L(W.hqWait)} ${S.hqCd} ${t("months")}` : `${L(W.hqSet)} · ${IC().ep} ${kh.ep} ${IC().pc} ${kh.pc}`}</Btn> : null}
+    </div>
+    {!amb && (S.amb || []).length >= P.AMB_MAX ? <small class="warn">{L(W.ambFull)}</small> : null}
+    {!hq ? <small class="muted">{L(W.hqHelp)}</small> : null}
+  </div>;
+}
+
 function PaneCountry(){
   const c = P.C(S.selC); if (!c){ S.selC = null; return null; }
   const r = P.R(c.reg), meta = c.rest ? null : P.COUNTRY[c.id], hz = S.haz.find(h => h.c === c.id);
@@ -86,6 +123,8 @@ function PaneCountry(){
       <small class="muted">{t(c.rel >= 50 ? "relHigh" : c.rel >= 0 ? "relMid" : "relLow")}</small>
     </div> : null}
     <StatGrid stats={[[t("co2Now"), `${c.co2.toFixed(2)} Gt`, "hot"], [t("shareOfRegion"), `${Math.round(share * 100)}%`], [t("risk"), c.rest ? "—" : `${meta.risk}%`, meta && meta.risk >= 65 ? "bad" : ""], [t("adapt"), `${Math.round(c.adapt)}`]]}/>
+    {S.world && !c.rest ? <BaseCard c={c}/> : null}
+    {!c.rest ? <Resources c={c}/> : null}
     {meta ? <p class="muted small"><Rich t={`${t("hazardsHere")}: ${meta.hz.map(h => `[[${P.HAZARDS[h].icon}]] ${L(P.HAZARDS[h].name)}`).join("   ")}`} iconColor="warn"/></p> : null}
     {hz ? <div class="card row bad-b">
       <div class="grow"><b class="bad"><Rich t={`[[${P.HAZARDS[hz.type].icon}]] ${t("forecast")}: ${L(P.HAZARDS[hz.type].name)} · ${Math.max(0, hz.at - S.tick)} ${t("months")}`} iconColor="inherit"/></b></div>
@@ -116,23 +155,43 @@ function PaneCountry(){
 
 const STRIPE = ["#08306b","#2171b5","#6baed6","#c6dbef","#fee0d2","#fc9272","#ef3b2c","#a50f15","#67000d"];
 function tempColor(v){ const x = Math.max(0, Math.min(1, (v - .9) / 1.8)) * (STRIPE.length - 1), i = Math.floor(x); return STRIPE[Math.min(i, STRIPE.length - 1)]; }
-function LineChart({data, min, max, ticks, color, refs = []}){
+function LineChart({data, data2, min, max, ticks, color, refs = []}){
   const W = 380, Hh = 150, pad = {l:34, r:10, t:10, b:20}, wd = W - pad.l - pad.r, hd = Hh - pad.t - pad.b;
-  const sx = i => pad.l + i / P.TOTAL_TICKS * wd, sy = v => pad.t + (1 - (Math.max(min, Math.min(max, v)) - min) / (max - min)) * hd;
-  const pts = data.map((v, i) => `${sx(i).toFixed(1)},${sy(v).toFixed(1)}`).join(" ");
-  const base = sy(Math.max(min, 0));
+  const span = Math.max(P.TOTAL_TICKS, data.length - 1, (data2 || []).length - 1), y0 = 2026, yEnd = y0 + Math.ceil(span / 12);
+  const sx = i => pad.l + i / span * wd, sy = v => pad.t + (1 - (Math.max(min, Math.min(max, v)) - min) / (max - min)) * hd;
+  const line = d => d.map((v, i) => `${sx(i).toFixed(1)},${sy(v).toFixed(1)}`).join(" ");
+  const pts = line(data), base = sy(Math.max(min, 0));
+  const step = Math.max(8, Math.ceil((yEnd - y0) / 3 / 4) * 4), years = []; for (let y = y0; y <= yEnd; y += step) years.push(y);
   return <svg class="chart" viewBox={`0 0 ${W} ${Hh}`} preserveAspectRatio="none">
     {ticks.map(v => <g key={v}><line x1={pad.l} x2={W - pad.r} y1={sy(v)} y2={sy(v)} class="grid"/><text x={3} y={sy(v) + 4}>{v}</text></g>)}
-    {[2026, 2034, 2042, 2050].map(y => <text key={y} x={sx((y - 2026) * 12) - 12} y={Hh - 4}>{y}</text>)}
+    {years.map(y => <text key={y} x={sx((y - y0) * 12) - 12} y={Hh - 4}>{y}</text>)}
     {refs.map(r => <line key={r.v} x1={pad.l} x2={W - pad.r} y1={sy(r.v)} y2={sy(r.v)} stroke={COL[r.c]} stroke-dasharray="4 4" stroke-width="1"/>)}
+    {data2 && data2.length > 1 ? <polyline points={line(data2)} fill="none" stroke={COL.muted} stroke-width="1.6" stroke-dasharray="5 4" opacity=".9"/> : null}
     {data.length > 1 ? <><polygon points={`${pts} ${sx(data.length - 1)},${base} ${sx(0)},${base}`} fill={COL[color]} opacity=".15"/><polyline points={pts} fill="none" stroke={COL[color]} stroke-width="2"/><circle cx={sx(data.length - 1)} cy={sy(data[data.length - 1])} r="4" fill={COL[color]}/></> : null}
   </svg>;
+}
+/* phase 5: what the player's work changed */
+function Impact(){
+  const im = P.impactSummary(), th = S.lang === "th", tl = (S.tl || []).slice(-12).reverse();
+  return <>
+    <div class="card impact">
+      <small class="muted">{th ? "CO₂ ที่คุณช่วยลดได้ (เทียบกับถ้าไม่ทำอะไรเลย)" : "CO₂ you prevented (compared with doing nothing)"}</small>
+      <b class="mono good big">−{im.saved.toFixed(1)} <small>Gt/{th ? "ปี" : "yr"}</small></b>
+      <small class="muted">{th ? `ถ้าไม่ทำอะไรเลย ตอนนี้โลกจะปล่อย ${im.bau.toFixed(1)} Gt/ปี และร้อนขึ้นถึง +${im.bauTemp.toFixed(2)}°C (ตอนนี้ +${S.temp.toFixed(2)}°C)` : `Doing nothing, the world would now emit ${im.bau.toFixed(1)} Gt/yr and be +${im.bauTemp.toFixed(2)}°C warmer (now +${S.temp.toFixed(2)}°C)`}</small>
+    </div>
+    <H3>{th ? "ส่วนที่ช่วยลด CO₂" : "Where the cuts came from"}</H3>
+    {im.parts.map(x => <div class="barrow wide" key={x.k}><span><Rich t={`[[${x.icon}]] ${L(x.t)}`} iconColor={x.col}/></span><Meter v={im.total ? x.v / im.total : 0} color={x.col} h={8}/><span class="mono">{im.total ? Math.round(x.v / im.total * 100) : 0}%</span></div>)}
+    {tl.length ? <><H3>{th ? "ไทม์ไลน์" : "Timeline"}</H3>
+      <ul class="tline">{tl.map((e, i) => { const x = P.timelineText(e); return <li key={i}><span class="mono muted">{P.dateStr(e.tk)}</span><Rich t={`[[${x.icon}]] ${x.txt}`} iconColor={x.col}/></li>; })}</ul></> : null}
+  </>;
 }
 function PaneStats(){
   const g = P.grossCO2() || 1;
   return <>
+    <Impact/>
     <H3>{t("chartCo2")}</H3>
-    <LineChart data={S.hist.map(h => h.net)} min={-5} max={45} ticks={[0, 10, 20, 30, 40]} color="hot" refs={[{v:0, c:"good"}]}/>
+    <p class="muted small legend"><i class="lg solid"/>{S.lang === "th" ? "โลกของคุณ" : "Your world"} <i class="lg dash"/>{S.lang === "th" ? "ถ้าไม่ทำอะไรเลย" : "If nothing was done"}</p>
+    <LineChart data={S.hist.map(h => h.net)} data2={S.bau ? S.bau.hist : null} min={-5} max={60} ticks={[0, 15, 30, 45, 60]} color="hot" refs={[{v:0, c:"good"}]}/>
     <H3>{t("chartTemp")}</H3>
     <LineChart data={S.hist.map(h => h.temp)} min={1} max={3} ticks={[1, 1.5, 2, 2.5, 3]} color="accent" refs={[{v:1.5, c:"warn"}, {v:2, c:"bad"}]}/>
     <H3>{t("shares")}</H3>
@@ -140,7 +199,7 @@ function PaneStats(){
     <H3>{t("topEmitters")}</H3>
     {S.countries.filter(x => !x.rest).sort((a, b) => b.co2 - a.co2).slice(0, 8).map(c => <div class="barrow wide" key={c.id}><span>{L(P.COUNTRY[c.id].name)}</span><Meter v={c.co2 / g} color="warn" h={8}/><span class="mono">{c.co2.toFixed(2)}</span></div>)}
     <H3>{S.lang === "th" ? "แถบอุณหภูมิรายเดือน" : "Warming stripes"}</H3>
-    <div class="stripes">{S.hist.map((h, i) => <i key={i} style={{background:tempColor(h.temp), width:`${100 / (P.TOTAL_TICKS + 1)}%`}}/>)}</div>
+    <div class="stripes">{S.hist.map((h, i) => <i key={i} style={{background:tempColor(h.temp), width:`${100 / (Math.max(P.TOTAL_TICKS, S.hist.length - 1) + 1)}%`}}/>)}</div>
     <p class="mono muted small">{t("timePlayed")}: {P.fmtTime(S.realSec)}</p>
   </>;
 }

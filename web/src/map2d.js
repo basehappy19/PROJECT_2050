@@ -8,6 +8,9 @@ import {P, S, H, UIM, t, L, COL, relCol, HZ_COL, ls, bump} from "./core.js";
 import {MAP, ll} from "./geo.js";
 import {Audio} from "./audio.js";
 import ICONS from "./gen/icons.js";
+import {Gfx} from "./gfx.js";
+import {drawPins, drawTraffic, drawInfo, img3d} from "./mapfx.js";
+import {drawHex, hexCells} from "./hexgrid.js";
 
 const ZMIN = .9, ZMAX = 5, ZCOUNTRY = 1.55;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
@@ -57,14 +60,16 @@ export const GameMap = {
   },
   theme(){ const v = ls.get("p2050-theme", ""); return P.Net && v && P.Net.owns("theme_" + v) ? v : ""; },
   loadImage(){
-    const th = this.theme() || "day"; if (this.imgTheme === th) return;
+    const th = this.theme() || "day";
     this.imgTheme = th;
-    const big = Math.max(screen.width, screen.height) * (window.devicePixelRatio || 1) > 1700;
+    const big = Gfx.cfg.bigImg && Math.max(screen.width, screen.height) * Gfx.dpr() > 1700;
+    const key = th + (big ? "" : "-s"); if (this.imgKey === key) return; this.imgKey = key;
     const im = new Image(); im.decoding = "async";
-    im.onload = () => { if (this.imgTheme === th){ this.img = im; this.dirtyBase = true; } };
+    im.onload = () => { if (this.imgKey === key){ this.img = im; this.dirtyBase = true; } };
     im.src = `assets/img/map-${th === "night" ? "night" : th === "paint" ? "paint" : "day"}${big ? "" : "-s"}.jpg`;
     // load the small one first so something shows quickly
     if (big && !this.img){ const s = new Image(); s.onload = () => { if (!this.img){ this.img = s; this.dirtyBase = true; } }; s.src = im.src.replace(".jpg", "-s.jpg"); }
+    if (!Gfx.cfg.bigImg && !big && this.img && this.img.width > 2400) this.img = null;
   },
   mount(el){
     this.el = el;
@@ -85,13 +90,15 @@ export const GameMap = {
   unmount(){ this.active = false; cancelAnimationFrame(this.raf); if (this._ro) this._ro.disconnect(); this.base && this.base.remove(); this.fx && this.fx.remove(); },
   resize(){
     if (!this.el) return;
-    const w = this.el.clientWidth, h = this.el.clientHeight, dpr = Math.min(window.devicePixelRatio || 1, 2.5);
+    const w = this.el.clientWidth, h = this.el.clientHeight, dpr = Gfx.dpr();
     if (!w || !h) return;
     this.w = w; this.h = h; this.dpr = dpr;
     for (const c of [this.base, this.fx]){ c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); c.style.width = w + "px"; c.style.height = h + "px"; }
     this.s0 = Math.max(w / MAP.W, (h * .55) / MAP.H);
-    this.clampCam(); this.dirtyBase = true;
+    this.clampCam(); this.dirtyBase = true; this.fxDirty = true;
   },
+  /* the camera changed: redraw the base now (fast, from the cached picture) and sharply once it stops */
+  moved(){ this.dirtyBase = true; this.lastMove = performance.now(); },
   setInsets(o){ const k = JSON.stringify(o); if (k === this._ins) return; this._ins = k; this.insets = o; },
   scale(){ return this.s0 * this.cam.z; },
   toScreen(x, y){ const s = this.scale(); return [(x - this.cam.x) * s + this.w / 2, (y - this.cam.y) * s + this.h / 2]; },
@@ -139,11 +146,11 @@ export const GameMap = {
       if (this.pinch && this.ptrs.size >= 2){
         const [a, b] = [...this.ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
         const z = clamp(this.pinch.z * d / Math.max(20, this.pinch.d), ZMIN, ZMAX), s = this.s0 * z;
-        this.cam.z = z; this.cam.x = this.pinch.w[0] - (mx - this.w / 2) / s; this.cam.y = this.pinch.w[1] - (my - this.h / 2) / s; this.clampCam(); this.dirtyBase = true;
+        this.cam.z = z; this.cam.x = this.pinch.w[0] - (mx - this.w / 2) / s; this.cam.y = this.pinch.w[1] - (my - this.h / 2) / s; this.clampCam(); this.moved();
       } else if (this.drag){
         const dx = e.offsetX - this.drag.x, dy = e.offsetY - this.drag.y;
         this.drag.moved += Math.abs(dx) + Math.abs(dy);
-        if (this.drag.moved > 6){ const s = this.scale(); this.cam.x -= dx / s; this.cam.y -= dy / s; this.target = null; this.clampCam(); this.dirtyBase = true; c.style.cursor = "grabbing"; }
+        if (this.drag.moved > 6){ const s = this.scale(); this.cam.x -= dx / s; this.cam.y -= dy / s; this.target = null; this.clampCam(); this.moved(); c.style.cursor = "grabbing"; }
         this.drag.x = e.offsetX; this.drag.y = e.offsetY;
       }
     });
@@ -161,7 +168,7 @@ export const GameMap = {
       e.preventDefault();
       const f = Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0016)), z = clamp(this.cam.z * f, ZMIN, ZMAX);
       const [wx, wy] = this.toWorld(e.offsetX, e.offsetY), s = this.s0 * z;
-      this.target = null; this.cam.z = z; this.cam.x = wx - (e.offsetX - this.w / 2) / s; this.cam.y = wy - (e.offsetY - this.h / 2) / s; this.clampCam(); this.dirtyBase = true;
+      this.target = null; this.cam.z = z; this.cam.x = wx - (e.offsetX - this.w / 2) / s; this.cam.y = wy - (e.offsetY - this.h / 2) / s; this.clampCam(); this.moved();
     }, {passive:false});
   },
   shapeAt(sx, sy){
@@ -184,14 +191,14 @@ export const GameMap = {
     const sh = this.shapeAt(sx, sy);
     this.fx.style.cursor = sh && P.RMETA[sh.r] ? "pointer" : "";
     const key = sh ? sh.name : null;
-    if (!this.hover || this.hover.key !== key){ if (sh && this.hover && this.hover.key) Audio.hover(); this.hover = sh ? {key, sh, x:sx, y:sy} : null; this.dirtyBase = true; }
-    else if (this.hover){ this.hover.x = sx; this.hover.y = sy; }
+    if (!this.hover || this.hover.key !== key){ if (sh && this.hover && this.hover.key) Audio.hover(); this.hover = sh ? {key, sh, x:sx, y:sy} : null; this.fxDirty = true; }
+    else if (this.hover){ this.hover.x = sx; this.hover.y = sy; this.fxDirty = true; }
   },
   click(sx, sy){
     const now = performance.now();
     if (now - this.lastTap < 320 && Math.abs(sx - this.lastTapX) + Math.abs(sy - this.lastTapY) < 24){ this.lastTap = 0; this.resetView(); Audio.play("whoosh", {vol:.35}); return; }
     this.lastTap = now; this.lastTapX = sx; this.lastTapY = sy;
-    const h = this.hitAt(sx, sy); if (h){ h.fn(); return; }
+    const h = this.hitAt(sx, sy); if (h){ h.fn(sx, sy); return; }
     const sh = this.shapeAt(sx, sy), G = P.Game;
     if (sh && P.RMETA[sh.r]){
       if (this.cam.z >= ZCOUNTRY) G.selectCountry(sh.c || "R_" + sh.r);
@@ -202,61 +209,92 @@ export const GameMap = {
   },
   /* ---------- drawing ---------- */
   frame(){
-    const now = performance.now(), dt = Math.min(.05, (now - this.lastT) / 1000); this.lastT = now;
+    const now = performance.now(), dt = Math.min(.05, (now - this.lastT) / 1000), rawDt = (now - this.lastT) / 1000; this.lastT = now;
+    Gfx.sample(now, rawDt);
     if (this.target){
       const k = 1 - Math.pow(.86, dt * 60), T = this.target;
       this.cam.x += (T.x - this.cam.x) * k; this.cam.y += (T.y - this.cam.y) * k; this.cam.z += (T.z - this.cam.z) * k;
       if (Math.abs(T.x - this.cam.x) < .3 && Math.abs(T.y - this.cam.y) < .3 && Math.abs(T.z - this.cam.z) < .002){ Object.assign(this.cam, T); this.target = null; this.clampCam(); }
-      this.dirtyBase = true;
+      this.moved();
     }
     const zc = this.cam.z >= ZCOUNTRY; if (zc !== this._zc){ this._zc = zc; bump(); }
+    const moving = now - (this.lastMove || 0) < 160;
+    // once the camera stops, draw the base again from the full-size photo if the cached picture is too coarse at this zoom
+    if (!moving && this.baseFast && this.needSharp()) this.dirtyBase = true;
     const moved = this.dirtyBase;
-    if (this.dirtyBase){ this.drawBase(); this.dirtyBase = false; }
-    // the overlay animates gently; when nothing is happening draw it at half rate to save battery
-    const busy = moved || this.fx_.length || this.floats.length || (this.parts && this.parts.length) || (S.haz && S.haz.length) || (S.bubbles && S.bubbles.length) || this.hover;
-    this._f = (this._f || 0) + 1;
-    if (busy || this._f % 2 === 0) this.drawFx(busy ? dt : dt * 2, now / 1000);
+    if (this.dirtyBase){ this.drawBase(moving); this.dirtyBase = false; }
+    // the overlay must follow the base exactly while it moves; otherwise it only animates gently, so it runs at the quality's frame rate
+    const anim = this.fx_.length || this.floats.length || (this.parts && this.parts.length);
+    const live = (S.haz && S.haz.length) || (S.bubbles && S.bubbles.length) || (this.traffic && this.traffic.length) || this.hover;
+    const gap = 1000 / (anim ? 60 : live ? Gfx.cfg.fxFps : 8);
+    if (moved || this.fxDirty || now - (this._fxAt || 0) >= gap - 2){
+      const fdt = Math.min(.1, (now - (this._fxAt || now)) / 1000) || dt;
+      this._fxAt = now; this.fxDirty = false;
+      this.drawFx(fdt, now / 1000);
+    }
   },
-  drawBase(){
-    const c = this.bctx, d = this.dpr, s = this.scale();
-    c.setTransform(d, 0, 0, d, 0, 0);
-    c.fillStyle = COL.bg; c.fillRect(0, 0, this.w, this.h);
-    c.setTransform(d * s, 0, 0, d * s, d * (this.w / 2 - this.cam.x * s), d * (this.h / 2 - this.cam.y * s));
-    const px = 1 / s;   // one CSS pixel in map units
-    // glow around the map edge
+  /* cached picture of the whole map: photo + region colours + borders (rebuilt only when the colours change) */
+  tintKey(){
+    if (!S.regions) return "-";
+    return S.regions.map(r => heatRGB(regionHeatValue(r)).map(v => v >> 3).join(".")).join("|") + "|" + this.theme() + "|" + (this.img ? this.img.width : 0) + "|" + Gfx.level;
+  },
+  buildCache(){
+    const k = Gfx.cfg.cache, W = Math.round(MAP.W * k), Hh = Math.round(MAP.H * k);
+    if (!this.cache || this.cache.width !== W || this.cache.height !== Hh){ this.cache = document.createElement("canvas"); this.cache.width = W; this.cache.height = Hh; }
+    const c = this.cache.getContext("2d", {alpha:false});
+    c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = COL.bg; c.fillRect(0, 0, W, Hh);
+    c.setTransform(k, 0, 0, k, 0, 0);
+    this.paintWorld(c, 1 / k, .75);
+    this.cacheKey = this.tintKey();
+  },
+  /* how many cached pixels fall on one screen pixel at this zoom (below 1 = the cache looks soft) */
+  cacheDensity(){ return Gfx.cfg.cache / (this.scale() * this.dpr); },
+  needSharp(){ return this.cacheDensity() < .95; },
+  /* photo, region heat colours and country borders, in map units (px = one screen pixel in map units) */
+  paintWorld(c, px, bAlpha){
     if (this.edge){ c.fillStyle = "#08202a"; c.fill(this.edge); c.lineJoin = "round"; for (const [w, a] of [[16, .05], [8, .08], [3, .14]]){ c.strokeStyle = `rgba(79,209,197,${a})`; c.lineWidth = w * px; c.stroke(this.edge); } }
     if (this.img){ c.save(); if (this.edge) c.clip(this.edge); c.imageSmoothingQuality = "high"; c.drawImage(this.img, 0, 0, MAP.W, MAP.H); c.restore(); }
     if (!S.regions) return;
-    const th = this.theme(), zc = this.cam.z >= ZCOUNTRY, sel = S.sel, selC = S.selC;
-    const aBase = th === "night" ? .18 : th === "paint" ? .26 : .2;
-    const regCol = {};
-    for (const r of S.regions) regCol[r.id] = heatRGB(regionHeatValue(r));
-    // region heat tint
-    for (const reg of Object.keys(this.regPaths)){
-      const col = regCol[reg]; if (!col) continue;
-      const on = reg === sel;
-      c.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${on ? aBase + .1 : (sel && zc ? aBase * .55 : aBase)})`;
-      c.fill(this.regPaths[reg], "evenodd");
+    const th = this.theme(), aBase = th === "night" ? .18 : th === "paint" ? .26 : .2;
+    for (const r of S.regions){
+      const col = heatRGB(regionHeatValue(r)), path = this.regPaths[r.id]; if (!path) continue;
+      c.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${aBase})`; c.fill(path, "evenodd");
     }
-    // countries: borders (fade in with zoom)
-    const bAlpha = clamp((this.cam.z - .95) / .7, .25, 1);
     c.lineJoin = "round";
     c.strokeStyle = `rgba(4,16,12,${.55 * bAlpha})`; c.lineWidth = 1.1 * px;
     for (const sh of this.shapes) c.stroke(sh.path);
     c.strokeStyle = `rgba(230,255,250,${.16 * bAlpha})`; c.lineWidth = .6 * px;
     for (const sh of this.shapes) c.stroke(sh.path);
-    // selected region outline
-    if (sel && this.regPaths[sel]){
-      const rs = this.shapes.filter(sh => sh.r === sel);
-      if (!zc){ c.strokeStyle = "rgba(79,209,197,.22)"; c.lineWidth = 5 * px; for (const sh of rs) c.stroke(sh.path); }
-      c.strokeStyle = zc ? "rgba(79,209,197,.55)" : "rgba(160,255,245,.9)"; c.lineWidth = (zc ? 1.2 : 1.6) * px;
-      for (const sh of rs) c.stroke(sh.path);
+  },
+  drawBase(moving){
+    const c = this.bctx, d = this.dpr, s = this.scale();
+    if (this.shapes.length && this.cacheKey !== this.tintKey()) this.buildCache();
+    c.setTransform(d, 0, 0, d, 0, 0);
+    c.fillStyle = COL.bg; c.fillRect(0, 0, this.w, this.h);
+    const fast = !!this.cache && (moving || !this.needSharp());
+    this.baseFast = fast;
+    if (fast){
+      // copy the visible part of the cached picture (one image draw)
+      const k = Gfx.cfg.cache, [x0, y0] = this.toWorld(0, 0), [x1, y1] = this.toWorld(this.w, this.h);
+      const wx0 = clamp(x0, 0, MAP.W), wy0 = clamp(y0, 0, MAP.H), wx1 = clamp(x1, 0, MAP.W), wy1 = clamp(y1, 0, MAP.H);
+      if (wx1 > wx0 && wy1 > wy0){
+        const [sx0, sy0] = this.toScreen(wx0, wy0), [sx1, sy1] = this.toScreen(wx1, wy1);
+        c.imageSmoothingEnabled = true; c.imageSmoothingQuality = moving ? "low" : "medium";
+        c.drawImage(this.cache, wx0 * k, wy0 * k, (wx1 - wx0) * k, (wy1 - wy0) * k, sx0, sy0, sx1 - sx0, sy1 - sy0);
+      }
     }
-    // hover
-    if (this.hover && this.hover.sh){
-      const hs = this.hover.sh, list = zc ? [hs] : this.shapes.filter(x => x.r === hs.r);
-      c.fillStyle = "rgba(255,255,255,.08)"; for (const sh of list) c.fill(sh.path, "evenodd");
-      c.strokeStyle = "rgba(255,255,255,.6)"; c.lineWidth = 1.2 * px; for (const sh of list) c.stroke(sh.path);
+    c.setTransform(d * s, 0, 0, d * s, d * (this.w / 2 - this.cam.x * s), d * (this.h / 2 - this.cam.y * s));
+    const px = 1 / s;   // one CSS pixel in map units
+    if (!fast) this.paintWorld(c, px, clamp((this.cam.z - .95) / .7, .25, 1));
+    if (!S.regions) return;
+    const zc = this.cam.z >= ZCOUNTRY, sel = S.sel, selC = S.selC;
+    // selected region: a little brighter, with an outline
+    if (sel && this.regPaths[sel]){
+      const r = S.regions.find(q => q.id === sel), col = r ? heatRGB(regionHeatValue(r)) : [79, 209, 197];
+      c.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},.1)`; c.fill(this.regPaths[sel], "evenodd");
+      if (!zc){ c.strokeStyle = "rgba(79,209,197,.22)"; c.lineWidth = 5 * px; c.stroke(this.regPaths[sel]); }
+      c.strokeStyle = zc ? "rgba(79,209,197,.55)" : "rgba(160,255,245,.9)"; c.lineWidth = (zc ? 1.2 : 1.6) * px;
+      c.stroke(this.regPaths[sel]);
     }
     // selected country
     if (selC){
@@ -269,9 +307,22 @@ export const GameMap = {
     const warm = clamp((S.temp - 1.4) / 1.4, 0, 1);
     if (warm > 0){ c.setTransform(d, 0, 0, d, 0, 0); c.fillStyle = `rgba(255,90,40,${warm * .12})`; c.fillRect(0, 0, this.w, this.h); }
   },
+  /* soft glow sprite for the CO₂ plumes (one per heat step, so no gradient is built every frame) */
+  plumeSprite(hot){
+    const q = Math.round(clamp(hot, 0, 1.3) * 10), key = "p" + q;
+    this.sprites = this.sprites || {};
+    if (this.sprites[key]) return this.sprites[key];
+    const h = q / 10, cv = document.createElement("canvas"); cv.width = cv.height = 96;
+    const g = cv.getContext("2d"), gr = g.createRadialGradient(48, 48, 0, 48, 48, 48), a = Math.min(1, h + .2);
+    gr.addColorStop(0, `rgba(255,${Math.round(150 - h * 70)},40,${.42 * a})`); gr.addColorStop(.45, `rgba(255,${Math.round(110 - h * 50)},30,${.14 * a})`); gr.addColorStop(1, "rgba(255,80,20,0)");
+    g.fillStyle = gr; g.fillRect(0, 0, 96, 96);
+    return (this.sprites[key] = cv);
+  },
   pill(x, y, text, o = {}){
     const c = this.fctx; c.font = o.font || "600 11.5px 'IBM Plex Sans Thai', 'Kanit', sans-serif";
-    const tw = c.measureText(text).width, padL = o.dot || o.icon ? 22 : 9, w = tw + padL + 9 + (o.extraW || 0), h = o.h || 22;
+    const tk = c.font + "|" + text, TW = this._tw || (this._tw = new Map()); let tw = TW.get(tk);
+    if (tw === undefined){ tw = c.measureText(text).width; if (TW.size > 3000) TW.clear(); TW.set(tk, tw); }
+    const padL = o.dot || o.icon ? 22 : 9; const w = tw + padL + 9 + (o.extraW || 0), h = o.h || 22;
     const bx = Math.round(x - w / 2), by = Math.round(y - h / 2);
     c.fillStyle = o.bg || "rgba(6,16,21,.82)"; c.beginPath(); c.roundRect(bx, by, w, h, h / 2); c.fill();
     if (o.stroke){ c.strokeStyle = o.stroke; c.lineWidth = o.sw || 1; c.stroke(); }
@@ -288,16 +339,28 @@ export const GameMap = {
     const vis = (x, y, m = 40) => x > this.insets.l - m && x < this.w - this.insets.r + m && y > this.insets.t - m && y < this.h - this.insets.b + m;
     // CO₂ plumes (glowing smog over the big emitters)
     c.globalCompositeOperation = "lighter";
+    const regById = {}; for (const r of S.regions) regById[r.id] = r;
     for (const p of this.plumes){
-      const r = S.regions.find(q => q.id === p.reg); if (!r) continue;
+      const r = regById[p.reg]; if (!r) continue;
       const amt = r.co2 * p.w; if (amt < .02) continue;
       const [x, y] = this.toScreen(p.x, p.y); if (!vis(x, y, 80)) continue;
       const rad = (8 + Math.sqrt(amt) * 26) * Math.sqrt(this.cam.z) * (1 + .08 * Math.sin(now * 1.7 + p.ph));
-      const g = c.createRadialGradient(x, y, 0, x, y, rad), hot = clamp(r.co2 / r.co2_0, 0, 1.3);
-      g.addColorStop(0, `rgba(255,${Math.round(150 - hot * 70)},40,${.42 * Math.min(1, hot + .2)})`); g.addColorStop(.45, `rgba(255,${Math.round(110 - hot * 50)},30,${.14 * Math.min(1, hot + .2)})`); g.addColorStop(1, "rgba(255,80,20,0)");
-      c.fillStyle = g; c.beginPath(); c.arc(x, y, rad, 0, Math.PI * 2); c.fill();
+      c.drawImage(this.plumeSprite(r.co2 / r.co2_0), x - rad, y - rad, rad * 2, rad * 2);
     }
     c.globalCompositeOperation = "source-over";
+    // hovered country / region (drawn here so hovering never redraws the base)
+    if (this.hover && this.hover.sh){
+      const hs = this.hover.sh, list = zc ? [hs] : this.shapes.filter(x => x.r === hs.r), px = 1 / s;
+      c.setTransform(d * s, 0, 0, d * s, d * (this.w / 2 - this.cam.x * s), d * (this.h / 2 - this.cam.y * s));
+      c.fillStyle = "rgba(255,255,255,.08)"; for (const sh of list) c.fill(sh.path, "evenodd");
+      c.strokeStyle = "rgba(255,255,255,.6)"; c.lineWidth = 1.2 * px; for (const sh of list) c.stroke(sh.path);
+      c.setTransform(d, 0, 0, d, 0, 0);
+    }
+    // builds on the map and the traffic between countries
+    drawPins(this, c, now, vis);
+    drawTraffic(this, c, dt, now, vis);
+    const hexHit = drawHex(this, c, vis);
+    c.globalAlpha = 1; c.lineCap = "butt";
     // labels
     if (!zc){
       for (const r of S.regions){
@@ -337,14 +400,15 @@ export const GameMap = {
       const pt = bb.cid ? this.countryPoint(bb.cid) : ll(bb.lat, bb.lon); if (!pt) continue;
       const bob = Math.sin(now * 2.4 + bb.id) * 3;
       const [x, y0] = this.toScreen(pt[0], pt[1]), y = y0 - 22 + bob; if (!vis(x, y)) continue;
-      const red = bb.type === "red", col = red ? COL.bad : COL.good, R = 17;
-      const g = c.createRadialGradient(x, y, 2, x, y, R + 12); g.addColorStop(0, red ? "rgba(255,90,74,.5)" : "rgba(95,211,154,.5)"); g.addColorStop(1, "rgba(0,0,0,0)");
+      const red = bb.type === "red", ore = bb.type === "ore", col = red ? COL.bad : ore ? "#ff9a3c" : COL.good, R = 17;
+      const g = c.createRadialGradient(x, y, 2, x, y, R + 12); g.addColorStop(0, red ? "rgba(255,90,74,.5)" : ore ? "rgba(255,154,60,.5)" : "rgba(95,211,154,.5)"); g.addColorStop(1, "rgba(0,0,0,0)");
       c.fillStyle = g; c.beginPath(); c.arc(x, y, R + 12, 0, Math.PI * 2); c.fill();
-      c.fillStyle = red ? "#3a0d0a" : "#0a2e20"; c.beginPath(); c.arc(x, y, R, 0, Math.PI * 2); c.fill();
+      c.fillStyle = red ? "#3a0d0a" : ore ? "#3a220a" : "#0a2e20"; c.beginPath(); c.arc(x, y, R, 0, Math.PI * 2); c.fill();
       c.lineWidth = 2.2; c.strokeStyle = col; c.stroke();
       // remaining time ring
       const maxT = red ? 5 : 4; c.strokeStyle = "rgba(255,255,255,.75)"; c.lineWidth = 2; c.beginPath(); c.arc(x, y, R + 4, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * clamp(bb.ttl / maxT, 0, 1)); c.stroke();
-      const im = iconImg(red ? "heart-handshake" : "leaf", col); if (im) c.drawImage(im, x - 10, y - 10, 20, 20);
+      const im3 = img3d(red ? "heart" : ore ? "ore" : "money"), im = im3 || iconImg(red ? "heart-handshake" : "leaf", col);
+      if (im) c.drawImage(im, x - (im3 ? 13 : 10), y - (im3 ? 13 : 10), im3 ? 26 : 20, im3 ? 26 : 20);
       if (red) this.pill(x, y + R + 14, `${P.aidCost()} · ${bb.ttl}`, {font:"600 10px 'IBM Plex Mono', monospace", h:17, icon:"leaf", iconColor:COL.good, bg:"rgba(6,16,21,.88)"});
       this.hits.push({id:"bb-" + bb.id, x:x - R - 6, y:y - R - 6, w:2 * R + 12, h:2 * R + 12, fn:() => { if (P.popBubble(bb.id, x, y - 26)){ this.burst(x, y, col); if (!red) Audio.play("coin", {vol:.6}); } }});
     }
@@ -363,11 +427,13 @@ export const GameMap = {
       f.t += dt; const p = f.t / 1.4, a = p < .7 ? 1 : 1 - (p - .7) / .3;
       c.globalAlpha = Math.max(0, a); c.font = "700 15px 'IBM Plex Mono', 'Kanit', monospace"; c.textAlign = "center"; c.textBaseline = "middle";
       const col = f.color === "good" ? COL.good : f.color === "bad" ? COL.bad : COL.accent;
-      const txt = String(f.txt).replace(/\[\[[a-z0-9-]+\]\]/g, "").trim();
+      const txt = String(f.txt).replace(/\[\[\$?[a-z0-9-]+\]\]/g, "").trim();
       c.lineWidth = 4; c.strokeStyle = "rgba(0,0,0,.6)"; c.strokeText(txt, f.x, f.y - p * 46); c.fillStyle = col; c.fillText(txt, f.x, f.y - p * 46);
       c.textAlign = "left"; c.globalAlpha = 1;
     }
     this.floats = this.floats.filter(f => f.t < 1.4);
+    if (hexHit) this.hits.push(hexHit);   // placing a build: the grid takes every tap
+    drawInfo(this, c);
     // hover tooltip (country name, CO₂, relation)
     if (this.hover && this.hover.sh && !this.drag && P.RMETA[this.hover.sh.r]){
       const sh = this.hover.sh, cc = sh.c ? P.C(sh.c) : null;
@@ -390,20 +456,20 @@ export const GameMap = {
     const T = f.type;
     if (T === "flood" || T === "hurricane" || T === "typhoon"){
       c.strokeStyle = "rgba(170,210,255,.75)"; c.lineWidth = 1.2; c.globalAlpha = a * .9;
-      for (let i = 0; i < 60; i++){ const sx = x + ((f.seed[i] * 2 - 1) * R), sy = y - R + ((now * 380 + f.seed[i + 60] * 1000) % (2 * R)); c.beginPath(); c.moveTo(sx, sy); c.lineTo(sx - 4, sy + 12); c.stroke(); }
+      for (let i = 0, n = Math.round(60 * Gfx.cfg.particles); i < n; i++){ const sx = x + ((f.seed[i] * 2 - 1) * R), sy = y - R + ((now * 380 + f.seed[i + 60] * 1000) % (2 * R)); c.beginPath(); c.moveTo(sx, sy); c.lineTo(sx - 4, sy + 12); c.stroke(); }
       if (T !== "flood"){ c.save(); c.translate(x, y); c.rotate(-now * 3); c.strokeStyle = "rgba(220,230,255,.6)"; c.lineWidth = 3; for (let i = 0; i < 4; i++){ c.rotate(Math.PI / 2); c.beginPath(); c.arc(0, 0, R * .55, 0, Math.PI * .6); c.stroke(); } c.restore(); }
       else { c.fillStyle = "rgba(60,120,200,.25)"; c.beginPath(); c.ellipse(x, y + 6, R * .8 * a, R * .35 * a, 0, 0, Math.PI * 2); c.fill(); }
-      if (T !== "flood" && Math.floor(now * 7) % 9 === 0){ c.fillStyle = "rgba(230,240,255,.18)"; c.fillRect(0, 0, this.w, this.h); }
+      if (T !== "flood" && Gfx.level !== "low" && Math.floor(now * 7) % 9 === 0){ c.fillStyle = "rgba(230,240,255,.18)"; c.fillRect(0, 0, this.w, this.h); }
     } else if (T === "heat" || T === "drought"){
       const g = c.createRadialGradient(x, y, 0, x, y, R * 1.3); g.addColorStop(0, T === "heat" ? `rgba(255,120,40,${.45 * a})` : `rgba(230,180,80,${.4 * a})`); g.addColorStop(1, "rgba(255,120,40,0)");
       c.fillStyle = g; c.beginPath(); c.arc(x, y, R * 1.3, 0, Math.PI * 2); c.fill();
       c.globalAlpha = a * .7; c.strokeStyle = T === "heat" ? "rgba(255,200,140,.7)" : "rgba(230,200,140,.6)"; c.lineWidth = 1.5;
       for (let i = 0; i < 7; i++){ const yy = y - R * .6 + i * R * .2, ph = now * 4 + i; c.beginPath(); for (let xx = -R * .7; xx <= R * .7; xx += 6){ const py = yy + Math.sin(xx * .08 + ph) * 3; xx === -R * .7 ? c.moveTo(x + xx, py) : c.lineTo(x + xx, py); } c.stroke(); }
-      if (T === "drought"){ c.fillStyle = "rgba(200,160,90,.5)"; for (let i = 0; i < 40; i++){ const sx = x + ((f.seed[i] * 2 - 1) * R) + ((now * 60) % 40), sy = y + (f.seed[i + 40] * 2 - 1) * R * .5; c.fillRect(sx, sy, 2, 2); } }
+      if (T === "drought"){ c.fillStyle = "rgba(200,160,90,.5)"; for (let i = 0, n = Math.round(40 * Gfx.cfg.particles); i < n; i++){ const sx = x + ((f.seed[i] * 2 - 1) * R) + ((now * 60) % 40), sy = y + (f.seed[i + 40] * 2 - 1) * R * .5; c.fillRect(sx, sy, 2, 2); } }
     } else if (T === "wildfire"){
       const g = c.createRadialGradient(x, y, 0, x, y, R); g.addColorStop(0, `rgba(255,90,30,${.5 * a})`); g.addColorStop(1, "rgba(255,60,20,0)");
       c.fillStyle = g; c.beginPath(); c.arc(x, y, R, 0, Math.PI * 2); c.fill();
-      for (let i = 0; i < 50; i++){ const q = (now * .7 + f.seed[i]) % 1, sx = x + (f.seed[i + 50] * 2 - 1) * R * .7 + Math.sin(now * 3 + i) * 6, sy = y + R * .3 - q * R * 1.2; c.fillStyle = `rgba(255,${Math.round(140 + 100 * (1 - q))},60,${(1 - q) * a})`; c.beginPath(); c.arc(sx, sy, 1.5 + (1 - q) * 1.6, 0, Math.PI * 2); c.fill(); }
+      for (let i = 0, n = Math.round(50 * Gfx.cfg.particles); i < n; i++){ const q = (now * .7 + f.seed[i]) % 1, sx = x + (f.seed[i + 50] * 2 - 1) * R * .7 + Math.sin(now * 3 + i) * 6, sy = y + R * .3 - q * R * 1.2; c.fillStyle = `rgba(255,${Math.round(140 + 100 * (1 - q))},60,${(1 - q) * a})`; c.beginPath(); c.arc(sx, sy, 1.5 + (1 - q) * 1.6, 0, Math.PI * 2); c.fill(); }
       c.fillStyle = `rgba(60,50,45,${.25 * a})`; c.beginPath(); c.ellipse(x + 10, y - R * .8, R * .6, R * .3, 0, 0, Math.PI * 2); c.fill();
     } else if (T === "saltwater"){
       c.strokeStyle = "rgba(79,209,197,.7)"; c.lineWidth = 2; c.globalAlpha = a;
@@ -417,6 +483,9 @@ export const GameMap = {
   strike(h){ const seed = Array.from({length:120}, () => Math.random()); this.fx_.push({c:h.c, type:h.type, t:0, dur:3.2, seed}); },
 };
 P.Map = GameMap;
+GameMap.iconImg = iconImg;
+GameMap.hexCells = hexCells;
+Gfx.onChange(() => { GameMap.cacheKey = null; if (GameMap.active){ GameMap.loadImage(); GameMap.resize(); } });
 P.countryPoint = id => GameMap.countryPoint(id);
 
 /* engine hooks */

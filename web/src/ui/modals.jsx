@@ -4,9 +4,10 @@ import {P, S, UIM, t, L, up, COL, relCol, bump} from "../core.js";
 import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {Icon, Rich, plain} from "./icon.jsx";
-import {Btn, IconBtn, Seg, Meter, Portrait, portraitSrc, H3, Terra, Volume, LangSeg, Msg, Key} from "./widgets.jsx";
+import {Btn, IconBtn, Seg, Meter, Portrait, portraitSrc, H3, Terra, Volume, GfxSeg, LangSeg, Msg, Key} from "./widgets.jsx";
 
-import {mapCrop, eventPoint, eventSnd, SND_ICON, SND_TINT} from "./hero.js";
+import {mapCrop, eventPoint, eventSnd, eventImg, SND_ICON, SND_TINT} from "./hero.js";
+const mapCropBg = pt => mapCrop(pt, pt ? 3.4 : 1.15, .3).backgroundImage;
 const Tag = ({children, color = "warn"}) => <div class={"tag " + color}><Rich t={up(children)} iconColor="inherit"/></div>;
 export function Modal({kind, children, onClose, cls = "", wide}){
   return <div class={`veil ${kind}-veil`} onClick={onClose ? e => { if (e.target === e.currentTarget){ onClose(); } } : undefined}>
@@ -27,14 +28,14 @@ export function EventModal(){
   const where = e.country ? t("evCountryTag") : e.target ? `${t("eventTag")} · ${L(P.RMETA[e.target].name)}` : `${t("eventTag")} · ${t("global")}`;
   const side = (lab, ids, col) => <div class="side"><b class={col}>{lab}</b><div class="chips">{ids.map(id => { const c = P.C(id); return <span class="chip static" key={id} style={{borderColor:COL[col]}}><i style={{background:COL[relCol(c.rel)]}}/>{L(P.COUNTRY[id].name)}<small class={"mono " + relCol(c.rel)}>{Math.round(c.rel)}</small></span>; })}</div></div>;
   return <Modal kind="event">
-    <div class="hero" style={{...mapCrop(eventPoint(e), eventPoint(e) ? 3.4 : 1.15, .3), "--tint":SND_TINT[eventSnd(e)] || COL.accent}}>
-      <Icon n={SND_ICON[eventSnd(e)] || "siren"} size={120} cls="hero-ic"/>
-      <Tag color={e.country ? "accent" : "warn"}>{`[[${e.country ? "globe" : "siren"}]] ${where}`}</Tag>
+    <div class="hero photo" style={{backgroundImage:`url(${eventImg(e.id)}), ${mapCropBg(eventPoint(e))}`, "--tint":SND_TINT[eventSnd(e)] || COL.accent}}>
+      <div class="tags"><Tag color={e.country ? "accent" : "warn"}>{`[[${e.country ? "globe" : "siren"}]] ${where}`}</Tag>{e.news ? <Tag color="good">{`[[newspaper]] ${t("realNews")} ${e.news.y}`}</Tag> : null}</div>
       <h2>{L(e.title)}</h2>
     </div>
     <div class="mbody">
       {e.country ? <div class="sides">{side(t("sideA"), e.A, "good")}{side(t("sideB"), e.B, "bad")}</div> : null}
       <p class="desc"><Rich t={L(e.desc)}/></p>
+      {e.news ? <p class="newsrc muted small"><Icon n="link" size={13}/> {t("source")}: <a href={e.news.url} target="_blank" rel="noopener noreferrer">{e.news.src}</a></p> : null}
       <div class="ask"><Rich t={`[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`} iconColor="accent"/>{P.hasKeyboard() ? <small class="mono muted">{t("evKeys")}</small> : null}</div>
       <Meter v={f} color={locked ? "warn" : "accent"} h={4} cls="lockbar"/>
       <div class="opts">{opts.map(({o, i, ok}) => {
@@ -70,6 +71,8 @@ export function EndModal(){
   if (st.best) lines.push(`[[heart-handshake]] ${t("storyBest")}: ${P.cname(st.best)}`);
   if (st.worst) lines.push(`[[${P.HAZARDS[st.worst.type].icon}]] ${t("storyWorst")}: ${L(P.HAZARDS[st.worst.type].name)} · ${P.cname(st.worst.c)} · ${P.dateStr(st.worst.tick)}`);
   st.dec.forEach(d => lines.push(`[[git-branch]] ${L(d.title)} → ${L(d.label)}`));
+  { const os = P.oreSummary(); if (os.used) lines.push(`[[$ore]] ${t("oreUsed")} ${os.used}${os.top ? ` · ${t("oreMostFrom")} ${P.cname(os.top)} ${os.share}%` : ""}`); }
+  { const im = P.impactSummary && P.impactSummary(); if (im && im.saved > .1) lines.unshift(S.lang === "th" ? `[[leaf]] เทียบกับถ้าไม่ทำอะไรเลย คุณช่วยลด CO₂ ได้ ${im.saved.toFixed(1)} Gt ต่อปี และโลกเย็นกว่า ${Math.max(0, im.bauTemp - S.temp).toFixed(2)}°C` : `[[leaf]] Compared with doing nothing, you cut CO₂ by ${im.saved.toFixed(1)} Gt a year and kept the world ${Math.max(0, im.bauTemp - S.temp).toFixed(2)}°C cooler`); }
   if (!lines.length) lines.push(t("storyNone"));
   return <div class="veil end-veil">
     <div class="endart" style={{backgroundImage:`url(${endImg(o, S.grade)})`}}/>
@@ -90,7 +93,7 @@ export function EndModal(){
       </div>
       <div class="endfoot">
         <div><small class="muted">{up(t("finalScore"))}</small><div class="score">{P.score().toLocaleString()}</div></div>
-        <div class="btns"><Btn kind="ghost" onClick={() => G.toMenu()}>{t("mainMenu")}</Btn><Btn onClick={() => G.restart()}>{t("restart")}</Btn></div>
+        <div class="btns"><Btn kind="ghost" onClick={() => G.toMenu()}>{t("mainMenu")}</Btn><Btn kind={win ? "ghost" : "primary"} onClick={() => G.restart()}>{t("restart")}</Btn>{win ? <Btn kind="gold" onClick={() => G.continueWorld()}>{`[[infinity]] ${t("playOn")}`}</Btn> : null}</div>
       </div>
     </section>
   </div>;
@@ -115,7 +118,7 @@ export function CharSel(){
           <Meter v={nx ? (xp - pv) / (nx - pv) : 1} color={c.color} h={4}/>
           <span class="pas"><Rich t={L(c.pas)}/></span>
           <ul class="acts">{c.acts.map(ab => <li key={ab.id}><Icon n={ab.icon} size={14} color={c.color}/>{L(ab.name)}{ab.lv ? <small class="muted"> (Lv{ab.lv})</small> : null}</li>)}</ul>
-          {!owned ? <span class="price"><Icon n="terra"/> {c.price} · {P.Net.user ? t("buyInShop") : t("loginToBuy")}</span> : null}
+          {!owned ? <span class="price"><Icon n="terra"/> {P.shopPrice({id:"char_" + c.id, price:c.price})} · {P.Net.user ? t("buyInShop") : t("loginToBuy")}</span> : null}
         </div>
       </button>;
     })}</div>
@@ -176,17 +179,13 @@ export function Story(){
 /* ---------------- pause ---------------- */
 export function Pause(){
   const saves = P.readSaves();
-  if (!UIM.codeOut || UIM.codeOutTick !== S.tick){ UIM.codeOut = P.exportCode(); UIM.codeOutTick = S.tick; }
-  const copy = () => {
-    const txt = UIM.codeOut, done = ok => { UIM.msg = ok ? t("codeCopied") : t("codeFail"); UIM.err = !ok; bump(); };
-    try { navigator.clipboard.writeText(txt).then(() => done(true), () => done(false)); } catch(e){ done(false); }
-  };
   return <Modal kind="pause" onClose={() => G.resume()}>
     <Tag>{`${P.dateStr()} · ${t("mode_" + S.mode)}`}</Tag>
     <h2>{t("pTitle")}</h2>
     <p class="mono muted small"><Icon n="timer" size={14}/> {t("timePlayed")} {P.fmtTime(S.realSec)}</p>
     <div class="row gap"><Btn size="lg" onClick={() => G.resume()}>{`[[play]] ${t("pResume")}`}</Btn><span class="grow"/><LangSeg/></div>
     <Volume/>
+    <GfxSeg/>
     {S.mode === "hard" ? <p class="warn small"><Rich t={`[[skull]] ${t("hardSaves")}`} iconColor="inherit"/></p>
       : saves === null ? <p class="bad small">{t("noStore")}</p>
       : <div class="slots">{["s1", "s2", "s3"].map(slot => {
@@ -201,11 +200,7 @@ export function Pause(){
           }}>{`[[save]] ${t("save")}`}</Btn>
         </div>;
       })}</div>}
-    {S.mode !== "hard" ? <>
-      <p class="muted small">{t("codeTitle")}</p>
-      <textarea class="code" readOnly value={UIM.codeOut} onFocus={e => e.currentTarget.select()}/>
-      <div class="row gap"><Btn kind="ghost" onClick={copy}>{`[[copy]] ${t("codeCopy")}`}</Btn><Msg UIM={UIM}/></div>
-    </> : <Msg UIM={UIM}/>}
+    <Msg UIM={UIM}/>
     <div class="row gap wrap">
       <Btn kind="ghost" onClick={() => G.openTutorial(0, false)}>{`[[graduation-cap]] ${t("tutMenu")}`}</Btn>
       <Btn kind="ghost" onClick={() => G.openLearn()}>{`[[book-open]] ${t("mLearn")}`}</Btn>
@@ -234,5 +229,32 @@ export function Tutorial(){
         <Btn sound={null} onClick={() => G.tutAct(last ? "done" : "next")}>{last ? t("tutDone") : `${t("tutNext")} [[chevron-right]]`}</Btn>
       </div>
     </div>
+  </Modal>;
+}
+
+/* ---------------- Continuous World: the world minerals market ---------------- */
+export function Market(){
+  const close = () => { UIM.modal = null; bump(); };
+  P.marketInit();
+  const th = S.lang === "th", gain = P.matGain(), lot = P.MKT_LOT;
+  const users = g => P.SKILLS.filter(n => !S.owned[n.id] && P.matCost(n) && P.matCost(n)[g]).slice(0, 3).map(n => L(n.name));
+  return <Modal kind="market" wide onClose={close}>
+    <Tag color="warn">{th ? "โลกต่อเนื่อง" : "Continuous World"}</Tag>
+    <h2>{th ? "ตลาดแร่โลก" : "World minerals market"}</h2>
+    <p class="muted">{th ? "แร่แยกเป็น 5 กลุ่ม แต่ละสกิลใช้ไม่เหมือนกัน ประเทศที่เป็นมิตรส่งมาให้ทุกเดือน ขาดเมื่อไรซื้อจากตลาดได้ ราคาขึ้นเมื่อเราซื้อมากหรือมีประเทศห้ามส่งออก แล้วค่อย ๆ กลับสู่ปกติ" : "Minerals come in 5 groups and each skill needs a different mix. Friendly countries send some every month; buy the rest here. Prices rise when you buy a lot or a producer bans exports, then drift back."}</p>
+    <div class="mkt">{P.MAT_IDS.map(g => {
+      const G = P.MAT[g], pr = P.mktPrice(g), idx = S.mkt[g], u = users(g);
+      return <div class="mktrow" key={g} style={{"--rc":G.col}}>
+        <span class="mic"><Icon n={G.icon} size={22} style={{color:G.col}}/></span>
+        <div class="grow"><b>{L(G.name)}</b><small class="muted">{L(G.sub)}</small>{u.length ? <small class="muted">{th ? "ใช้กับ" : "Needed for"}: {u.join(", ")}</small> : null}</div>
+        <div class="mstock"><small class="muted">{th ? "มีอยู่" : "Stock"}</small><b class="mono">{Math.floor(S.mat[g])}</b><small class="muted">+{gain[g].toFixed(1)}{t("perMo")}</small></div>
+        <div class="mprice"><small class="muted">{th ? "ราคา/หน่วย" : "Price/unit"}</small><b class="mono"><Rich t={`${P.IC.ep} ${pr}`}/></b><small class={idx > 1.15 ? "bad" : idx < .9 ? "good" : "muted"}>{idx > 1.15 ? (th ? "แพง" : "high") : idx < .9 ? (th ? "ถูก" : "low") : (th ? "ปกติ" : "normal")}</small></div>
+        <div class="row gap">
+          <Btn kind="primary" disabled={S.ep < pr * lot} sound={null} onClick={() => { if (P.mktBuy(g)) Audio.play("coin"); }}>{`${th ? "ซื้อ" : "Buy"} ${lot} · ${P.IC.ep} ${pr * lot}`}</Btn>
+          <Btn kind="ghost" disabled={S.mat[g] < lot} sound={null} onClick={() => { if (P.mktSell(g)) Audio.play("coin"); }}>{`${th ? "ขาย" : "Sell"} ${lot}`}</Btn>
+        </div>
+      </div>;
+    })}</div>
+    <div class="mfoot"><span class="muted small"><Rich t={`${P.IC.ep} ${Math.floor(S.ep)}`}/></span><Btn onClick={close}>{th ? "กลับเข้าเกม" : "Back to the game"}</Btn></div>
   </Modal>;
 }

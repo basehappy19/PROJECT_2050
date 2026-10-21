@@ -13,6 +13,8 @@ export const SND_TINT = {heat:"#f07a3c", fire:"#ff5a4a", explosion:"#ff5a4a", st
   market:"#f2c14e", lab:"#4fd1c5", office:"#c3a6ff", harbor:"#8fd0ff", air:"#8fd0ff", train:"#4fd1c5", construction:"#f2b441"};
 const CE_SND = {CE_BATTERY:"factory", CE_COAL:"factory", CE_DAM:"flood", CE_FOREST:"forest", CE_CBAM:"market", CE_REFUGEE:"crowd", CE_SEABED:"underwater", CE_NUKE:"lab",
   CE_ARCTIC:"arctic", CE_LOSS:"office", CE_SOLARWAR:"market", CE_GEOENG:"lab", CE_MARINE:"ocean", CE_PALM:"farm", CE_DATA:"city", CE_RAIL:"train"};
+/* painted picture for each event (assets/img/events/<id>.webp) */
+export const eventImg = id => `assets/img/events/${id}.webp`;
 export const eventSnd = e => (e.country ? CE_SND[e.id] : e.snd) || "office";
 
 /* CSS background for a crop of the map centred on map point [x, y]; aspect = container height / width */

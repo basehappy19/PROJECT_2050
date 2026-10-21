@@ -4,7 +4,7 @@ import {G} from "../game.js";
 import {Icon, Rich} from "./icon.jsx";
 import {Btn, Tabs, Meter} from "./widgets.jsx";
 import {Modal, endImg} from "./modals.jsx";
-import {SND_ICON, SND_TINT} from "./hero.js";
+import {SND_ICON, SND_TINT, eventImg} from "./hero.js";
 import {HZ_COL} from "../core.js";
 
 const END_KEYS = ["winS", "winA", "winB", "l3", "l2", "l1"];
@@ -39,10 +39,22 @@ export function Learn(){
     body = <>
       <p class="muted small">{t("lCardsHelp")} · {got.length}/{FACT_EVENTS.length}</p>
       <div class="grid2">{list.map(e => { const on = d.seen.includes(e.id); return <div class={"fact card " + (on ? "" : "locked")} key={e.id}>
-        {on ? <div class="fimg" style={{"--tint":SND_TINT[e.snd] || "#4fd1c5"}}><Icon n={SND_ICON[e.snd] || "lightbulb"} size={44}/></div> : null}
+        {on ? <div class="fimg" style={{"--tint":SND_TINT[e.snd] || "#4fd1c5", backgroundImage:`url(${eventImg(e.id)})`}}/> : null}
         <b><Rich t={on ? `[[lightbulb]] ${L(e.title)}` : `[[lock]] ${t("lLocked")}`} iconColor={on ? "warn" : "muted"}/></b>
         <span class="muted small">{on ? L(e.fact) : t("lLockedHelp")}</span>
+        {on && e.news ? <a class="small src" href={e.news.url} target="_blank" rel="noopener noreferrer"><Icon n="link" size={12}/> {e.news.src} · {e.news.y}</a> : null}
       </div>; })}</div>
+    </>;
+  } else if (tab === "res"){
+    const who = k => Object.entries(P.CRES).filter(([, v]) => v.r.includes(k)).map(([id]) => P.cname(id));
+    body = <>
+      <p class="muted small">{t("lResHelp")}</p>
+      <div class="grid2">{Object.entries(P.RES).map(([k, R]) => <div class="rescard card" key={k} style={{"--rc":R.col}}>
+        <div class="rtop"><span class="ric"><Icon n={R.icon} size={24}/></span><div><b>{L(R.name)}</b><small class="muted">{L(R.use)}</small></div></div>
+        <span class="small">{L(R.fact)}</span>
+        {who(k).length ? <small class="muted"><Icon n="map-pin" size={12}/> {who(k).slice(0, 6).join(", ")}</small> : null}
+        <a class="small src" href={R.src} target="_blank" rel="noopener noreferrer"><Icon n="link" size={12}/> {t("source")}</a>
+      </div>)}</div>
     </>;
   } else if (tab === "haz"){
     body = <>
@@ -65,6 +77,7 @@ export function Learn(){
     <h2><Icon n="book-open" size={24} color="accent"/> {up(t("mLearn"))}</h2>
     <Tabs items={[
       {id:"cards", label:`[[lightbulb]] ${t("lCards")}`, on:tab === "cards", fn:set("cards")},
+      {id:"res", label:`[[$ore]] ${t("lRes")}`, on:tab === "res", fn:set("res")},
       {id:"haz", label:`[[cloud-lightning]] ${t("lHazards")}`, on:tab === "haz", fn:set("haz")},
       {id:"end", label:`[[image]] ${t("lEndings")}`, on:tab === "end", fn:set("end")},
       {id:"ach", label:`[[trophy]] ${t("mAch")}`, on:tab === "ach", fn:set("ach")},

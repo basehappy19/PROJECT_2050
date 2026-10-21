@@ -2,6 +2,7 @@
 import {P, S, t, L, up, COL, relCol} from "../core.js";
 import {Audio} from "../audio.js";
 import {Icon, Rich} from "./icon.jsx";
+import {Gfx} from "../gfx.js";
 
 const snd = (fn, s = "click") => e => { if (s) Audio.play(s); fn && fn(e); };
 const hov = () => Audio.hover();
@@ -67,3 +68,8 @@ export const LangSeg = () => <Seg cls="lang" items={[
   {id:"en", label:"EN", on:S.lang === "en", fn:() => { P.setLang("en"); document.documentElement.lang = "en"; }},
 ]}/>;
 export const Msg = ({UIM}) => UIM.msg ? <p class={"msg " + (UIM.err ? "bad" : "good")} role="status">{UIM.msg}</p> : null;
+/* graphics quality: auto · low · medium · high */
+export function GfxSeg(){
+  const items = [["auto", "gfxAuto"], ["low", "gfxLow"], ["medium", "gfxMed"], ["high", "gfxHigh"]].map(([id, k]) => ({id, label:t(k), on:Gfx.pref === id, fn:() => { Gfx.choose(id); P._bump(); }}));
+  return <div class="gfxrow"><Icon n="monitor" size={18}/><span class="lbl">{t("gfxLbl")}</span><Seg cls="gfx" items={items}/>{Gfx.pref === "auto" ? <small class="muted">{t("gfx_" + Gfx.level)}</small> : null}</div>;
+}
