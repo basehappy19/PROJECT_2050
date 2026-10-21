@@ -123,6 +123,8 @@ async function build(){
   let html = fs.readFileSync(path.join(HERE, "index.html"), "utf8");
   const api = process.env.P2050_API ? `<script>window.P2050_API=${JSON.stringify(process.env.P2050_API)}</script>\n` : "";
   html = html.replace("<!--CSS-->", `<link rel="stylesheet" href="assets/${cssName}">`).replace("<!--JS-->", `${api}<script type="module" src="assets/${jsName}"></script>`).replace(/__VERSION__/g, VERSION);
+  // share links (og:url, og:image, canonical) point at the real site when PUBLIC_URL is set in .env
+  if (process.env.PUBLIC_URL) html = html.split("https://basehappy19.github.io/PROJECT_2050/").join(process.env.PUBLIC_URL.replace(/\/?$/, "/"));
   fs.writeFileSync(path.join(OUT, "index.html"), html);
   // service worker: precache the shell; big media is cached when first used
   const core = ["./", "index.html", "site.webmanifest", `assets/${jsName}`, `assets/${cssName}`, "assets/data/world.json",
