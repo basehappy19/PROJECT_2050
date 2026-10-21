@@ -165,6 +165,19 @@ function GoogleBtn(){
 function SubAccount(){
   const n = N();
   if (!n.online) return <Offline/>;
+  if (!n.user && n.pendingGoogle){
+    /* signed in with Google but no username yet: show only this step, so the normal sign-in forms don't confuse anyone */
+    return <>
+      <div class="card gdone"><b><Rich t={`[[circle-check]] ${t("gSignedIn")}`} iconColor="good"/></b><span class="muted">{t("googlePickName")}</span></div>
+      <form class="form" onSubmit={e => { e.preventDefault(); const f = form(e); if (!UIM.consent){ UIM.msg = t("needConsent"); UIM.err = true; bump(); return; } n.googleComplete((f.user || "").trim()); }}>
+        <Field label={t("fUsername")} name="user" ph="a–z 0–9 _ (3–16)" autocomplete="username"/>
+        <Check on={!!UIM.consent} onClick={() => { UIM.consent = !UIM.consent; bump(); }}>{t("pdpaConsent")}</Check>
+        <Btn type="submit" block size="lg" disabled={n.busy}>{`[[check]] ${t("gConfirm")}`}</Btn>
+      </form>
+      <Msg UIM={UIM}/>
+      <div class="row gap backrow"><Btn kind="ghost" sound="close" onClick={() => { n.pendingGoogle = null; UIM.msg = ""; bump(); }}>{`[[x]] ${t("gCancel")}`}</Btn></div>
+    </>;
+  }
   if (!n.user){
     const tab = UIM.accTab || "login";
     return <>
@@ -184,12 +197,6 @@ function SubAccount(){
         <p class="muted small">{t("noReset")}</p>
       </form>}
       {n.cfg && n.cfg.googleClientId ? <><div class="or"><span>{t("or")}</span></div><GoogleBtn/></> : null}
-      {n.pendingGoogle ? <form class="form" onSubmit={e => { e.preventDefault(); const f = form(e); if (!UIM.consent){ UIM.msg = t("needConsent"); UIM.err = true; bump(); return; } n.googleComplete((f.user || "").trim()); }}>
-        <p class="acc">{t("googlePickName")}</p>
-        <Field label={t("fUsername")} name="user" ph="a–z 0–9 _ (3–16)"/>
-        <Check on={!!UIM.consent} onClick={() => { UIM.consent = !UIM.consent; bump(); }}>{t("pdpaConsent")}</Check>
-        <Btn type="submit" disabled={n.busy}>{t("signUp")}</Btn>
-      </form> : null}
       <Msg UIM={UIM}/>
       <Back/>
     </>;
@@ -209,10 +216,10 @@ function SubAccount(){
       <Btn type="submit" disabled={n.busy || (!free && u.terra < P.PRICE.rename)}>{`${t("rename")} · ${free ? t("free") : P.PRICE.rename + " " + t("gemsWord")}`}</Btn>
     </form>
     <H3>{t("appearance")}</H3>
-    <div class="row gap wrap">{[["", t("themeDefault")], ["night", t("themeNight")], ["paint", t("themePaint")]].map(([id, lab]) => { const own = !id || n.owns("theme_" + id); return <Btn key={id || "def"} size="sm" kind={curT === id ? "primary" : "ghost"} disabled={!own} onClick={() => { try { localStorage.setItem("p2050-theme", id); } catch(e){} bump(); }}>{`${own ? "" : "[[lock]] "}${lab}`}</Btn>; })}</div>
-    <div class="row gap wrap">{[["base", t("outfitBase"), true], ["alt", t("outfitAlt"), n.owns("outfit")], ["gold", t("outfitGold"), n.maxLevel() >= 10]].map(([id, lab, own]) => <Btn key={id} size="sm" kind={curO === id ? "primary" : "ghost"} disabled={!own} onClick={() => { try { localStorage.setItem("p2050-outfit", id); } catch(e){} bump(); }}>{`${own ? "" : "[[lock]] "}${lab}`}</Btn>)}</div>
+    <div class="optrows"><div class="row gap wrap">{[["", t("themeDefault")], ["night", t("themeNight")], ["paint", t("themePaint")]].map(([id, lab]) => { const own = !id || n.owns("theme_" + id); return <Btn key={id || "def"} size="sm" kind={curT === id ? "primary" : "ghost"} disabled={!own} onClick={() => { try { localStorage.setItem("p2050-theme", id); } catch(e){} bump(); }}>{`${own ? "" : "[[lock]] "}${lab}`}</Btn>; })}</div>
+    <div class="row gap wrap">{[["base", t("outfitBase"), true], ["alt", t("outfitAlt"), n.owns("outfit")], ["gold", t("outfitGold"), n.maxLevel() >= 10]].map(([id, lab, own]) => <Btn key={id} size="sm" kind={curO === id ? "primary" : "ghost"} disabled={!own} onClick={() => { try { localStorage.setItem("p2050-outfit", id); } catch(e){} bump(); }}>{`${own ? "" : "[[lock]] "}${lab}`}</Btn>)}</div></div>
     <Msg UIM={UIM}/>
-    <div class="row gap"><Back/><span class="grow"/><Btn kind="ghost" onClick={() => n.logout()}>{`[[log-out]] ${t("signOut")}`}</Btn></div>
+    <div class="row gap acctfoot"><Back/><span class="grow"/><Btn kind="ghost" onClick={() => n.logout()}>{`[[log-out]] ${t("signOut")}`}</Btn></div>
   </>;
 }
 

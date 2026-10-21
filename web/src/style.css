@@ -586,3 +586,15 @@ canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
 .drawer .greencard,.drawer .basecard{margin:0 0 12px;gap:8px;padding:13px 14px}
 .drawer .reslist{margin:6px 0 10px}
 .drawer h3.title{margin-bottom:2px} .drawer p.sub{margin:0 0 12px}
+/* ---- account page: Google button without the white box, room between rows ---- */
+.gbtn iframe{color-scheme:normal;border-radius:999px}
+.gbtn{justify-content:center;margin:2px 0 4px}
+.gdone{flex-direction:column;gap:6px;margin:4px 0 14px;border-color:rgba(95,211,154,.45);background:rgba(95,211,154,.06)}
+.optrows{display:flex;flex-direction:column;gap:12px;margin-bottom:6px}
+.menu-panel .msg{margin:12px 0}
+.menu-panel .form{gap:14px}
+.menu-panel .h3{margin:22px 0 10px}
+.profile{padding:14px 16px}
+.lvls{gap:10px}
+.acctfoot{margin-top:18px}
+.menu-panel form.row{margin-bottom:4px}

@@ -29,4 +29,5 @@ Object.assign(P.UI, {
   /* update log */
   mUpd:T("บันทึกการอัปเดต", "Update log"), updNew:T("มีอะไรใหม่ในเวอร์ชัน", "What's new in version"), updSee:T("ดูทั้งหมด", "See all"),
   updVer:T("เวอร์ชัน", "Version"),
+  gSignedIn:T("เข้าสู่ระบบด้วย Google แล้ว", "Signed in with Google"), gCancel:T("ยกเลิก ใช้บัญชีอื่น", "Cancel, use another account"), gConfirm:T("ใช้ชื่อนี้และเริ่มเล่น", "Use this name and start"),
 });
