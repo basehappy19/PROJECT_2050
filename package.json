@@ -1,0 +1,17 @@
+{
+  "name": "project-zero",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Project Zero: the web game, its API server and the admin page, run with one command",
+  "type": "module",
+  "engines": { "node": ">=22" },
+  "scripts": {
+    "setup": "npm ci --prefix web && npm ci --omit=dev --prefix server/api",
+    "build": "node scripts/build.mjs",
+    "start": "node scripts/start.mjs",
+    "migrate": "node scripts/run.mjs api prisma migrate deploy",
+    "db:status": "node scripts/run.mjs api prisma migrate status",
+    "studio": "node scripts/run.mjs studio",
+    "make-admin": "node scripts/run.mjs api node scripts/make-admin.js"
+  }
+}

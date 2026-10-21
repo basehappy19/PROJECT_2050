@@ -8,7 +8,7 @@ Server ของเกม ทำหน้าที่เก็บบัญชี
 | `api` | Node.js + Fastify (โค้ดอยู่ใน `api/`) สร้าง/อัปเดตตารางด้วย Prisma Migrate ให้เองตอนเริ่มทำงาน |
 | `web` | Nginx เสิร์ฟเกมเวอร์ชันเว็บ (`../index.html` + `../assets/`) และส่งต่อ `/api` กับ `/verify` ไปที่ api |
 
-ไม่อยากใช้ Docker: ดู [DEPLOY-VPS.md](DEPLOY-VPS.md) (ติดตั้ง Node.js + PostgreSQL + Nginx + systemd ตรง ๆ บน VPS)
+ไม่อยากใช้ Docker: ที่โฟลเดอร์บนสุดใช้ `npm run setup` → `npm run build` → `npm start` (ตั้งพอร์ตใน `.env`) ดู [DEPLOY-VPS.md](DEPLOY-VPS.md)
 
 ฐานข้อมูลจัดการด้วย Prisma: schema อยู่ที่ `api/prisma/schema.prisma`, migration อยู่ที่ `api/prisma/migrations/` (API รันให้เองตอนเริ่ม) และดูข้อมูลผ่านหน้าเว็บได้ด้วย `npm run db:studio`
 

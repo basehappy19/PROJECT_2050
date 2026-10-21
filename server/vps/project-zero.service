@@ -1,0 +1,22 @@
+# systemd service: runs every Project Zero service (`npm start` → game, admin, API) and restarts it if it stops.
+# Copy to /etc/systemd/system/project-zero.service, check the paths, then:
+#   sudo systemctl daemon-reload && sudo systemctl enable --now project-zero
+# Logs: journalctl -u project-zero -f      Settings and ports: /opt/project2050/.env
+[Unit]
+Description=Project Zero (game, admin page and API)
+After=network.target postgresql.service
+Wants=postgresql.service
+
+[Service]
+Type=simple
+User=p2050
+WorkingDirectory=/opt/project2050
+ExecStart=/usr/bin/node scripts/start.mjs
+Restart=always
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=full
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
