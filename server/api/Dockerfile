@@ -1,10 +1,12 @@
 FROM node:22-alpine
+RUN apk add --no-cache openssl
 WORKDIR /app
 ENV NODE_ENV=production
 COPY package.json package-lock.json ./
 RUN npm ci --omit=dev && npm cache clean --force
 COPY src ./src
-COPY migrations ./migrations
+COPY prisma ./prisma
+COPY prisma.config.mjs ./
 COPY scripts ./scripts
 COPY assets ./assets
 USER node

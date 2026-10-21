@@ -5,8 +5,12 @@ Server ของเกม ทำหน้าที่เก็บบัญชี
 | container | หน้าที่ |
 |---|---|
 | `db` | PostgreSQL 16 เก็บข้อมูลไว้ใน volume `pgdata` (ลบ container แล้วข้อมูลยังอยู่) |
-| `api` | Node.js + Fastify (โค้ดอยู่ใน `api/`) สร้างตารางฐานข้อมูลให้เองตอนเริ่มทำงาน |
+| `api` | Node.js + Fastify (โค้ดอยู่ใน `api/`) สร้าง/อัปเดตตารางด้วย Prisma Migrate ให้เองตอนเริ่มทำงาน |
 | `web` | Nginx เสิร์ฟเกมเวอร์ชันเว็บ (`../index.html` + `../assets/`) และส่งต่อ `/api` กับ `/verify` ไปที่ api |
+
+ไม่อยากใช้ Docker: ดู [DEPLOY-VPS.md](DEPLOY-VPS.md) (ติดตั้ง Node.js + PostgreSQL + Nginx + systemd ตรง ๆ บน VPS)
+
+ฐานข้อมูลจัดการด้วย Prisma: schema อยู่ที่ `api/prisma/schema.prisma`, migration อยู่ที่ `api/prisma/migrations/` (API รันให้เองตอนเริ่ม) และดูข้อมูลผ่านหน้าเว็บได้ด้วย `npm run db:studio`
 
 ## เริ่มใช้งาน (เครื่องที่ลง Docker Desktop แล้ว)
 

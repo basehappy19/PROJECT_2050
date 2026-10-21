@@ -21,3 +21,4 @@ server/api/node_modules/
 web/node_modules/
 web/tools/.cache/
 web/src/gen/
+server/api/src/generated/

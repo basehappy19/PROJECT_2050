@@ -1,0 +1,201 @@
+// Project : 2050 · database schema, managed with Prisma (migrations in prisma/migrations).
+// Change the database:  edit this file → `npx prisma migrate dev --name what-changed` (on a dev database)
+//                       → commit the new folder in prisma/migrations → on the server `npx prisma migrate deploy`.
+// Look at / edit data:  `npx prisma studio` (opens a web page; on a server use an SSH tunnel, see DEPLOY.md).
+// The API itself still talks to PostgreSQL with plain SQL (src/app.js, src/admin.js); this file is the map of the tables.
+
+generator client {
+  provider        = "prisma-client"
+  output          = "../src/generated/prisma"
+  previewFeatures = ["partialIndexes"]
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model achievements {
+  user_id    BigInt
+  ach        String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, ach])
+}
+
+/// everything an admin changed, who and when
+model admin_log {
+  id                               BigInt   @id @default(autoincrement())
+  admin_id                         BigInt?
+  target_id                        BigInt?
+  action                           String
+  detail                           Json     @default("{}")
+  created_at                       DateTime @default(now()) @db.Timestamptz(6)
+  admin                            users?   @relation("admin_log_admin_idTousers", fields: [admin_id], references: [id], onUpdate: NoAction)
+  target                           users?   @relation("admin_log_target_idTousers", fields: [target_id], references: [id], onUpdate: NoAction)
+
+  @@index([created_at(sort: Desc)], map: "admin_log_time")
+}
+
+model certificates {
+  code      String   @id
+  user_id   BigInt
+  full_name String
+  grade     String?
+  issued_at DateTime @default(now()) @db.Timestamptz(6)
+  users     users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "certificates_user")
+}
+
+model character_progress {
+  user_id BigInt
+  char    String
+  xp      Int    @default(0)
+  users   users  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, char])
+}
+
+model cloud_saves {
+  user_id    BigInt
+  slot       String
+  meta       Json
+  state      Json
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, slot])
+}
+
+/// game settings changed online from /admin: balance (A/B), announcement, disabledEvents, prices, certMinCards
+model game_config {
+  key        String   @id
+  value      Json
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_by BigInt?
+  users      users?   @relation(fields: [updated_by], references: [id], onUpdate: NoAction)
+}
+
+model game_results {
+  id          String    @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id     BigInt
+  mode        String
+  char        String
+  seed        BigInt?
+  day         DateTime  @db.Date
+  daily_date  DateTime? @db.Date
+  started_at  DateTime  @default(now()) @db.Timestamptz(6)
+  finished_at DateTime? @db.Timestamptz(6)
+  ending      String?
+  tick        Int?
+  temp        Float?    @db.Real
+  net         Float?    @db.Real
+  appr        Float?    @db.Real
+  rel         Float?    @db.Real
+  skills      Int?
+  real_sec    Int?
+  score       Int?
+  terra       Int?
+  xp          Int?
+  flagged     Boolean   @default(false)
+  note        String?
+  ab          String?
+  world       Boolean   @default(false)
+  last_tick   Int?
+  users       users     @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([mode, finished_at, score(sort: Desc)], map: "results_board", where: raw("((finished_at IS NOT NULL) AND (NOT flagged))"))
+  @@index([user_id, day], map: "results_user_day")
+}
+
+model owned_items {
+  user_id    BigInt
+  item       String
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([user_id, item])
+}
+
+/// one row per game started (guests too), for the A/B balance test
+model play_stats {
+  id         String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  user_id    BigInt?
+  ab         String   @default("A")
+  mode       String   @default("normal")
+  world      Boolean  @default(false)
+  started_at DateTime @default(now()) @db.Timestamptz(6)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  last_tick  Int      @default(0)
+  ending     String?
+  temp       Float?   @db.Real
+  net        Float?   @db.Real
+  appr       Float?   @db.Real
+  real_sec   Int?
+  skills     Int?
+  ore_used   Int?
+  users      users?   @relation(fields: [user_id], references: [id], onUpdate: NoAction)
+
+  @@index([ab, started_at], map: "play_stats_ab")
+}
+
+model progress {
+  user_id    BigInt   @id
+  cards      Int      @default(0)
+  updated_at DateTime @default(now()) @db.Timestamptz(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+}
+
+model refresh_tokens {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
+  token_hash String   @unique
+  expires_at DateTime @db.Timestamptz(6)
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "refresh_tokens_user")
+}
+
+/// players: role = player · tester · admin, flags = {certOverride, abGroup, note}
+model users {
+  id                                   BigInt               @id @default(autoincrement())
+  username                             String               @unique
+  email                                String?              @unique
+  password_hash                        String?
+  google_sub                           String?              @unique
+  display_name                         String
+  renamed                              Boolean              @default(false)
+  created_at                           DateTime             @default(now()) @db.Timestamptz(6)
+  last_login                           DateTime?            @db.Timestamptz(6)
+  role                                 String               @default("player")
+  flags                                Json                 @default("{}")
+  banned                               Boolean              @default(false)
+  achievements                         achievements[]
+  admin_actions                        admin_log[]          @relation("admin_log_admin_idTousers")
+  admin_changes                        admin_log[]          @relation("admin_log_target_idTousers")
+  certificates                         certificates[]
+  character_progress                   character_progress[]
+  cloud_saves                          cloud_saves[]
+  game_config                          game_config[]
+  game_results                         game_results[]
+  owned_items                          owned_items[]
+  play_stats                           play_stats[]
+  progress                             progress?
+  refresh_tokens                       refresh_tokens[]
+  wallet_ledger                        wallet_ledger[]
+}
+
+/// every gem (Terra) earned or spent; a player's balance is the sum of this table
+model wallet_ledger {
+  id         BigInt   @id @default(autoincrement())
+  user_id    BigInt
+  amount     Int
+  reason     String
+  ref        String?
+  created_at DateTime @default(now()) @db.Timestamptz(6)
+  users      users    @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction)
+
+  @@index([user_id], map: "wallet_user")
+}
