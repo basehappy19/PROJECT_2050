@@ -235,7 +235,7 @@ const Net = {
         const d = this._gDiv = document.createElement("div");
         Object.assign(d.style, {position:"fixed", zIndex:50, display:"none"});
         document.body.appendChild(d);
-        google.accounts.id.renderButton(d, {theme:"filled_black", size:"large", shape:"pill", text:"continue_with", width:300});
+        google.accounts.id.renderButton(d, {theme:"filled_black", size:"large", shape:"rectangular", text:"continue_with", width:400});   // invisible, on top of our own button (menu.jsx GoogleBtn)
         this._gReady = true; dirty();
       } catch(e) { console.warn("Google sign-in", e); }
     };

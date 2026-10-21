@@ -206,7 +206,6 @@ const failed = e => { $("#main").innerHTML = `<div class="card"><div class="empt
 /* ---------- sign in ---------- */
 function loginView(note){
   $("#root").innerHTML = `<div class="login"><div class="card"><div class="brand"><img src="/assets/img/ui/logo.png" alt=""><div><b>PROJECT <i>ZERO</i></b><small>หน้าผู้ดูแล</small></div></div>
-    <p class="muted small" style="text-align:center;margin:0 0 20px">ใช้บัญชีเดียวกับในเกม บัญชีต้องเป็นผู้ดูแลก่อน (คำสั่ง <span class="mono">npm run make-admin</span>)</p>
     <form class="col" id="lf"><label class="field"><span>ชื่อผู้ใช้หรืออีเมล</span><input class="inp" id="u" autocomplete="username" required></label>
     <label class="field"><span>รหัสผ่าน</span><input class="inp" id="p" type="password" autocomplete="current-password" required></label>
     ${note ? `<div class="note">${esc(note)}</div>` : ""}<button class="btn pri" style="height:46px;margin-top:6px">เข้าสู่ระบบ</button></form></div></div>`;

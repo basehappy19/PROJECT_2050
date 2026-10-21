@@ -46,3 +46,4 @@ Object.assign(P.UI, {
   cact_tariff:T("CO₂ ประเทศนี้ −20% × ทำตามแผน (ได้ผลน้อยลงทุกครั้ง) แต่มิตรภาพ −22 ความนิยม −1% และอาจถูกตอบโต้ด้วยการคว่ำบาตร", "This country's CO₂ −20% × on-plan (less each time), but friendship −22, approval −1%, and it may hit back with sanctions"),
 });
 { const a = P.ACTIONS.find(x => x.id === "tariff"); if (a) a.desc = T("CO₂ ทวีป −0.8 Gt × ทำตามแผน (ได้ผลน้อยลงทุกครั้ง) แต่ทำตามแผน −8% มิตรภาพทุกประเทศในทวีป −10 ความนิยม −2% และบางประเทศอาจคว่ำบาตร", "Continent CO₂ −0.8 Gt × on-plan (less each time), but on-plan −8%, every country here friendship −10, approval −2%, and some may sanction us"); }
+Object.assign(P.UI, { googleContinue:T("ดำเนินการต่อด้วย Google", "Continue with Google") });

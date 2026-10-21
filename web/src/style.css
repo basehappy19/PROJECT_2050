@@ -101,7 +101,15 @@ kbd{font:500 10px var(--mono);color:var(--muted);border:1px solid var(--line);bo
 textarea.code{height:76px;padding:8px 10px;font:500 11px/1.45 var(--mono);resize:none;color:var(--muted)}
 .form{display:flex;flex-direction:column;gap:11px;margin-bottom:6px}
 .or{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:12px;margin:12px 0}.or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
-.gbtn{min-height:44px;display:flex;align-items:center}
+/* Google sign-in: our button underneath, Google's real button on top at almost zero opacity (it still takes the click) */
+.gbtn{position:relative;height:48px;border-radius:12px;overflow:hidden;border:1px solid var(--line);background:rgba(14,29,36,.85);transition:border-color .15s,background .15s}
+.gbtn .gface{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;gap:12px;font:600 15px var(--disp);color:var(--fg);pointer-events:none}
+.gbtn .gface svg{background:#fff;border-radius:50%;padding:3px;width:28px;height:28px;flex-shrink:0}
+.gbtn.ready:hover{border-color:var(--accent);background:rgba(79,209,197,.1)}
+.gbtn:not(.ready) .gface{color:var(--muted)}
+.gbtn .ghit{position:absolute;inset:0;opacity:.011;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.gbtn .ghit > div{transform:scale(1.3);transform-origin:center}
+.gbtn .ghit iframe{margin:0 !important}
 
 /* ---------- loading ---------- */
 .loading{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:24px;text-align:center;background:radial-gradient(ellipse at 50% 40%,#0b2a30 0%,#061015 60%)}

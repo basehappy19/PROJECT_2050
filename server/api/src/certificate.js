@@ -166,22 +166,57 @@ function watermarkOver(doc, W, H, cert){
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"}[c]));
 /* public verification page */
+/* fonts and logo come from the game itself (same site: /assets/...) */
+const FACES = [["Kanit", "kanit", [600, 700]], ["IBM Plex Sans Thai", "ibm-plex-sans-thai", [400, 600]], ["IBM Plex Mono", "ibm-plex-mono", [500]]]
+  .flatMap(([fam, f, ws]) => ws.flatMap(w => ["thai", "latin"].map(sub => f === "ibm-plex-mono" && sub === "thai" ? "" :
+    `@font-face{font-family:"${fam}";font-style:normal;font-weight:${w};font-display:swap;src:url(/assets/fonts/${f}-${sub}-${w}.woff2) format("woff2");${sub === "thai" ? "unicode-range:U+0E01-0E5B,U+200C-200D,U+25CC;" : ""}}`))).join("");
+/* public verification page */
 export function verifyHtml(cert, code){
   const ok = !!cert;
   const body = ok
-    ? `<div class="ok">✓ ประกาศนียบัตรนี้ออกโดยเกม Project Zero จริง</div>
+    ? `<div class="badge ok"><span>✓</span>ประกาศนียบัตรนี้ออกโดยเกม Project Zero จริง</div>
+       <p class="lbl">ผู้ได้รับ</p>
        <h1>${esc(cert.full_name)}</h1>
-       <p>ผ่านภารกิจในเกม Project Zero นำโลกสู่ Net Zero${cert.grade ? ` · ${esc(GRADE[cert.grade] || cert.grade)}` : ""}</p>
-       <p class="m">ผลการเรียนรู้</p><ol class="m">${OUTCOMES.map(o => `<li>${esc(o)}</li>`).join("")}</ol>
-       <p class="m">ออกเมื่อ ${esc(thaiDate(new Date(cert.issued_at)))} · รหัส ${esc(cert.code)}</p>
-       <p class="m">วิธีตรวจของจริง: ชื่อ วันที่ และรหัสในเอกสารต้องตรงกับหน้านี้ทุกตัวอักษร · พื้นหลังมีลายน้ำ “PROJECT ZERO · ${esc(cert.code)}” เป็นแนวเฉียงทั้งแผ่น และขอบด้านในเป็นตัวอักษรขนาดเล็กมากที่มีรหัสเดียวกัน · ถ้ารหัสในลายน้ำไม่ตรงกับรหัสของเอกสาร หรือมีรอยแก้ทับ ถือว่าไม่ใช่ของจริง หรือดาวน์โหลด PDF ต้นฉบับจากลิงก์ด้านล่างมาเทียบ</p>
-       <p><a href="/api/certificates/${encodeURIComponent(cert.code)}/pdf">ดาวน์โหลด PDF</a></p>`
-    : `<div class="bad">✕ ไม่พบประกาศนียบัตรรหัส ${esc(code)}</div><p>ตรวจสอบว่าพิมพ์รหัสถูกต้อง (รูปแบบ P2050-XXXX-XXXX)</p>`;
+       <p class="lead">ผ่านภารกิจในเกม Project Zero ภารกิจกู้วิกฤตโลก${cert.grade ? ` · ระดับผลงาน ${esc(GRADE[cert.grade] || cert.grade)}` : ""}</p>
+       <div class="grid"><div><small>ออกเมื่อ</small><b>${esc(thaiDate(new Date(cert.issued_at)))}</b></div><div><small>รหัสประกาศนียบัตร</small><b class="mono">${esc(cert.code)}</b></div></div>
+       <h2>ผลการเรียนรู้</h2>
+       <ol>${OUTCOMES.map(o => `<li>${esc(o)}</li>`).join("")}</ol>
+       <a class="btn" href="/api/certificates/${encodeURIComponent(cert.code)}/pdf">ดาวน์โหลด PDF</a>`
+    : `<div class="badge bad"><span>✕</span>ไม่พบประกาศนียบัตรรหัสนี้</div>
+       <h1 class="mono small">${esc(code)}</h1>
+       <p class="lead">ตรวจสอบว่าพิมพ์รหัสถูกต้อง (รูปแบบ P2050-XXXX-XXXX)</p>`;
   return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ตรวจสอบประกาศนียบัตร · PROJECT ZERO</title>
-<style>body{margin:0;background:#061015;color:#e6f0ee;font-family:"IBM Plex Sans Thai",system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;padding:16px;box-sizing:border-box}
-main{max-width:560px;width:100%;background:#0e1d24;border:1px solid #24414b;border-radius:16px;padding:28px}
-h1{font-size:28px;margin:12px 0 6px}ol{padding-left:20px;line-height:1.6}.ok{color:#5fd39a;font-weight:600}.bad{color:#ff5a4a;font-weight:600}.m{color:#8fa9a6;font-size:14px}a{color:#4fd1c5}
-.brand{font-family:monospace;color:#4fd1c5;font-size:12px;letter-spacing:.1em}</style></head>
-<body><main><div class="brand">PROJECT ZERO · CERTIFICATE CHECK</div>${body}</main></body></html>`;
+<title>ตรวจสอบประกาศนียบัตร · PROJECT ZERO</title><link rel="icon" href="/assets/img/ui/logo.png">
+<style>${FACES}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;display:grid;place-items:center;padding:24px 16px;color:#e6f0ee;font:400 16px/1.6 "IBM Plex Sans Thai",system-ui,sans-serif;
+  background:radial-gradient(1200px 600px at 15% -10%,rgba(79,209,197,.14),transparent 60%),radial-gradient(900px 500px at 110% 110%,rgba(47,158,111,.16),transparent 60%),#061015}
+main{width:100%;max-width:620px;background:rgba(14,29,36,.92);border:1px solid #24414b;border-radius:20px;padding:30px 32px;box-shadow:0 30px 80px rgba(0,0,0,.45)}
+header{display:flex;align-items:center;gap:14px;margin-bottom:22px}
+header img{width:52px;height:52px}
+header b{display:block;font:700 22px/1.1 Kanit,sans-serif;letter-spacing:.04em} header b i{font-style:normal;color:#4fd1c5}
+header small{font:500 12px "IBM Plex Mono",monospace;letter-spacing:.12em;color:#8fa9a6}
+.badge{display:inline-flex;align-items:center;gap:10px;padding:8px 14px 8px 8px;border-radius:999px;font-weight:600;font-size:15px}
+.badge span{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;font-size:15px}
+.badge.ok{background:rgba(95,211,154,.12);color:#5fd39a} .badge.ok span{background:#5fd39a;color:#06261a}
+.badge.bad{background:rgba(255,90,74,.12);color:#ff7466} .badge.bad span{background:#ff5a4a;color:#2b0603}
+.lbl{margin:22px 0 0;color:#8fa9a6;font-size:14px}
+h1{font:700 34px/1.25 Kanit,sans-serif;margin:2px 0 6px;color:#fff} h1.small{font-size:22px}
+.lead{margin:0;color:#c9dcd8}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}
+.grid div{background:rgba(255,255,255,.04);border:1px solid #1d353d;border-radius:12px;padding:10px 14px}
+.grid small{display:block;color:#8fa9a6;font-size:13px} .grid b{font-weight:600}
+.mono{font-family:"IBM Plex Mono",monospace;font-weight:500;letter-spacing:.03em}
+h2{font:600 18px Kanit,sans-serif;margin:20px 0 8px;color:#4fd1c5}
+ol{margin:0;padding-left:22px;color:#c9dcd8;font-size:15px} ol li{margin:4px 0;padding-left:4px}
+.btn{display:inline-block;margin-top:24px;padding:12px 22px;border-radius:12px;background:linear-gradient(180deg,#5fe0d3,#2fa99d);color:#04201d;font:600 16px Kanit,sans-serif;text-decoration:none}
+.btn:hover{filter:brightness(1.08)}
+footer{margin-top:26px;padding-top:16px;border-top:1px solid #1d353d;color:#6f8c88;font-size:13px}
+@media (max-width:520px){ main{padding:22px 18px} h1{font-size:28px} .grid{grid-template-columns:1fr} }
+</style></head>
+<body><main>
+<header><img src="/assets/img/ui/logo.png" alt=""><div><b>PROJECT <i>ZERO</i></b><small>ตรวจสอบประกาศนียบัตร</small></div></header>
+${body}
+<footer>Project Zero · Garena Academy Game Maker</footer>
+</main></body></html>`;
 }
