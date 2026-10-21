@@ -1,4 +1,4 @@
-Project : 2050 — sound and music credits (web version)
+Project Zero — sound and music credits (web version)
 All files were trimmed, loudness-matched and re-encoded for the game. They are used inside the game only;
 please do not redistribute them as a standalone sound pack.
 

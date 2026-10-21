@@ -45,7 +45,7 @@ export function Menu(){
       <div class="scroll">
         <div class="logo">
           <img src="assets/img/ui/logo.png" alt="" width="54" height="54"/>
-          <div><small class="mono acc">GLOBAL CLIMATE TASKFORCE · 2026 – 2050</small><h1>PROJECT <b>:</b> 2050</h1></div>
+          <div><small class="mono acc">GLOBAL CLIMATE TASKFORCE · 2026 – 2050</small><h1>PROJECT <b>ZERO</b></h1></div>
         </div>
         <p class={sub ? "subtitle" : "lead"}>{sub ? t(TITLES[sub]) : t("mDesc")}</p>
         {!sub && N().cfg && N().cfg.announcement && L(N().cfg.announcement) ? <div class="announce card"><Icon n="megaphone" size={18} color="warn"/><span>{L(N().cfg.announcement)}</span></div> : null}

@@ -1,4 +1,4 @@
-/* Project : 2050 — web version entry */
+/* Project Zero — web version entry */
 import "./style.css";
 import {render} from "preact";
 import {P, S} from "./core.js";

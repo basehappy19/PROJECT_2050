@@ -5,6 +5,7 @@ if (P.mods && P.mods.changelog) return;
 const V = (v, date, name, th, en) => ({v, date, name, items:{th, en}});
 P.CHANGELOG = [
   V("1.0", "2026-10-21", {th:"โลกที่มีชีวิต", en:"A Living World"}, [
+    "เกมเปลี่ยนชื่อเป็น Project Zero พร้อมโลโก้และภาพตัวอย่างเวลาแชร์ลิงก์แบบใหม่",
     "โหมดใหม่ “โลกต่อเนื่อง” เล่นได้ไม่มีวันจบ มีฤดูกาล เป้าหมายรายฤดู และการประชุม COP ทุกปี ปลดล็อกเมื่อชนะภารกิจ 2050 ครั้งแรก และกด “เล่นโลกนี้ต่อ” ตอนชนะได้ทันที",
     "แร่: พลังงานสะอาดต้องใช้แร่ เช่น ลิเทียมและแร่หายาก ได้จากประเทศที่เป็นมิตร ฟองสีส้ม และการสั่งซื้อ ถ้าประเทศผู้ผลิตห้ามส่งออกก็ต้องหาทางอื่น",
     "สิ่งที่สร้างขึ้นบนแผนที่จริง: กังหันลม โซลาร์ฟาร์ม โรงไฟฟ้า ป่าปลูกใหม่ และอีกหลายอย่าง ปักลงในประเทศที่เหมาะ",
@@ -24,6 +25,7 @@ P.CHANGELOG = [
     "ฤดูกาลมีผลกับภัยพิบัติ: มรสุม ฤดูพายุ หน้าร้อน และฤดูไฟป่า",
     "เอารหัสเซฟออก ถ้าจะเล่นต่อบนเครื่องอื่นให้ใช้เซฟบนคลาวด์",
   ], [
+    "The game is now called Project Zero, with a new logo and a new preview picture for shared links.",
     "New “Continuous World” mode with no end year: seasons, season goals and a yearly COP summit. Unlocks after your first Mission 2050 win; you can also press “Keep playing this world” when you win.",
     "Minerals: clean energy needs minerals such as lithium and rare earths. Get them from friendly countries, orange bubbles and purchase orders — and find another way when a producer bans exports.",
     "What you build appears on the real map: wind turbines, solar farms, power plants, new forests and more, placed in suitable countries.",

@@ -1,7 +1,7 @@
 {
   "name": "p2050-api",
   "version": "1.0.0",
-  "description": "Project : 2050 game server: accounts, Terra, shop, leaderboard, cloud saves, certificates",
+  "description": "Project Zero game server: accounts, Terra, shop, leaderboard, cloud saves, certificates",
   "main": "src/index.js",
   "scripts": {
     "start": "node src/index.js",

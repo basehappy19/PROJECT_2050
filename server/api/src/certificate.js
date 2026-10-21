@@ -10,7 +10,7 @@ const FONT = {body:path.join(ASSETS, "PlexThai-Regular.ttf"), bodyB:path.join(AS
 /* certificate/certificate.json — partner organisation and signatures, filled in later (no code change needed)
    { "issuer": "...", "partner": {"name": "...", "logo": "partner.png"} | null, "signatures": [{"name":"...","title":"...","image":"sign1.png"}] } */
 export function loadCertConfig(){
-  const def = {issuer:"ทีม PROJECT : 2050 · Garena Academy Game Maker", partner:null, signatures:[]};
+  const def = {issuer:"ทีม Project Zero · Garena Academy Game Maker", partner:null, signatures:[]};
   try {
     const j = JSON.parse(fs.readFileSync(config.certConfigPath, "utf8"));
     return {...def, ...j, dir:path.dirname(config.certConfigPath)};
@@ -27,7 +27,7 @@ export function verifyUrl(code, req){
 /* A4 landscape certificate → Buffer */
 export function certificatePdf(cert, req){
   const cfg = loadCertConfig();
-  const doc = new PDFDocument({size:"A4", layout:"landscape", margin:0, info:{Title:`Certificate ${cert.code}`, Author:"PROJECT : 2050"}});
+  const doc = new PDFDocument({size:"A4", layout:"landscape", margin:0, info:{Title:`Certificate ${cert.code}`, Author:"PROJECT ZERO"}});
   const chunks = []; doc.on("data", c => chunks.push(c));
   const done = new Promise(res => doc.on("end", () => res(Buffer.concat(chunks))));
   for (const [k, f] of Object.entries(FONT)) doc.registerFont(k, f);
@@ -49,7 +49,7 @@ export function certificatePdf(cert, req){
   center("ฉบับนี้ให้ไว้เพื่อแสดงว่า", 222, "body", 16, "#33484c");
   center(cert.full_name, 250, "head", 34, "#0b1a20");
   doc.moveTo(W / 2 - 200, 302).lineTo(W / 2 + 200, 302).lineWidth(1).stroke("#9fb8b4");
-  center("ได้ปฏิบัติภารกิจในเกม PROJECT : 2050 ภารกิจกู้วิกฤตโลก สำเร็จ", 316, "bodyB", 16, "#0b1a20");
+  center("ได้ปฏิบัติภารกิจในเกม Project Zero ภารกิจกู้วิกฤตโลก สำเร็จ", 316, "bodyB", 16, "#0b1a20");
   center("นำโลกสู่การปล่อยคาร์บอนสุทธิเป็นศูนย์ (Net Zero) ได้ก่อนสิ้นปี 2050 ตามเป้าหมายการพัฒนาที่ยั่งยืน ข้อ 13", 342, "body", 13.5, "#33484c");
   if (cert.grade) center(`ระดับผลงาน: ${GRADE[cert.grade] || cert.grade}`, 372, "bodyB", 14, "#b07800");
   center(`ให้ไว้ ณ วันที่ ${thaiDate(new Date(cert.issued_at))}`, 398, "body", 13.5, "#33484c");
@@ -78,17 +78,17 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;", "<":"&lt;", "
 export function verifyHtml(cert, code){
   const ok = !!cert;
   const body = ok
-    ? `<div class="ok">✓ เกียรติบัตรนี้ออกโดยเกม PROJECT : 2050 จริง</div>
+    ? `<div class="ok">✓ เกียรติบัตรนี้ออกโดยเกม Project Zero จริง</div>
        <h1>${esc(cert.full_name)}</h1>
        <p>ปฏิบัติภารกิจนำโลกสู่ Net Zero สำเร็จ${cert.grade ? ` · ${esc(GRADE[cert.grade] || cert.grade)}` : ""}</p>
        <p class="m">ออกเมื่อ ${esc(thaiDate(new Date(cert.issued_at)))} · รหัส ${esc(cert.code)}</p>
        <p><a href="/api/certificates/${encodeURIComponent(cert.code)}/pdf">ดาวน์โหลด PDF</a></p>`
     : `<div class="bad">✕ ไม่พบเกียรติบัตรรหัส ${esc(code)}</div><p>ตรวจสอบว่าพิมพ์รหัสถูกต้อง (รูปแบบ P2050-XXXX-XXXX)</p>`;
   return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ตรวจสอบเกียรติบัตร · PROJECT : 2050</title>
+<title>ตรวจสอบเกียรติบัตร · PROJECT ZERO</title>
 <style>body{margin:0;background:#061015;color:#e6f0ee;font-family:"IBM Plex Sans Thai",system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;padding:16px;box-sizing:border-box}
 main{max-width:560px;width:100%;background:#0e1d24;border:1px solid #24414b;border-radius:16px;padding:28px}
 h1{font-size:28px;margin:12px 0 6px}.ok{color:#5fd39a;font-weight:600}.bad{color:#ff5a4a;font-weight:600}.m{color:#8fa9a6;font-size:14px}a{color:#4fd1c5}
 .brand{font-family:monospace;color:#4fd1c5;font-size:12px;letter-spacing:.1em}</style></head>
-<body><main><div class="brand">PROJECT : 2050 · CERTIFICATE CHECK</div>${body}</main></body></html>`;
+<body><main><div class="brand">PROJECT ZERO · CERTIFICATE CHECK</div>${body}</main></body></html>`;
 }

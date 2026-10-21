@@ -32,7 +32,7 @@ function Loading(){
   return <div class="loading" onClick={ready ? enter : undefined}>
     <img src="assets/img/ui/logo.png" alt="" class="llogo"/>
     <small class="mono acc">GLOBAL CLIMATE TASKFORCE · 2026 – 2050</small>
-    <h1>PROJECT <b>:</b> 2050</h1>
+    <h1>PROJECT <b>ZERO</b></h1>
     <div class="lbar"><i style={{width:`${p * 100}%`}}/></div>
     <div class="lrow"><span class="muted">{ready ? t("ldReady") : `${t("loading")} · ${p < .5 ? t("ldGlobe") : t("ldImg")}`}</span><span class="mono muted">{Math.round(p * 100)}%</span></div>
     {ready ? <Btn size="lg" sound={null} onClick={enter} cls="enter">{t("enter")}</Btn> : null}

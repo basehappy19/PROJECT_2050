@@ -1,4 +1,4 @@
-/* Build the web version of Project : 2050 into the repository root:
+/* Build the web version of Project Zero into the repository root:
      index.html · sw.js · assets/app-[hash].js · assets/app-[hash].css · assets/{img,audio,data,fonts}/…
    The game rules, data and server client are shared with the GDevelop version (gdevelop/_source/src/1x-, 20-, 21-*.js).
    Usage: node build.mjs            (production build)

@@ -1,4 +1,4 @@
-# PROJECT : 2050 · Game server
+# PROJECT ZERO · Game server
 
 Server ของเกม ทำหน้าที่เก็บบัญชีผู้เล่น, Terra, ร้านค้า, ตารางอันดับ, เซฟบนคลาวด์ และเกียรติบัตร รันด้วย Docker Compose มี 3 container
 

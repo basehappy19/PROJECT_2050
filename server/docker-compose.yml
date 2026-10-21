@@ -1,4 +1,4 @@
-# PROJECT : 2050 · game server
+# PROJECT ZERO · game server
 #   db  = PostgreSQL 16 (data kept in the "pgdata" volume)
 #   api = Node.js API (accounts, Terra, shop, leaderboard, cloud saves, certificates)
 #   web = Nginx: serves the web game (../index.html + ../assets/) and forwards /api and /verify to the API

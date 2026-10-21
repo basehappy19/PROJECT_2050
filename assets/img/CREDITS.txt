@@ -1,4 +1,4 @@
-Project : 2050 — image credits (web version)
+Project Zero — image credits (web version)
 - Earth: NASA Visible Earth — Blue Marble: Next Generation (Reto Stöckli, NASA Earth Observatory), Black Marble 2016,
   and the cloud composite (public domain). Reprojected and colour-graded for the game.
 - Country shapes: Natural Earth 1:50m via world-atlas (public domain).

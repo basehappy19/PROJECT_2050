@@ -1,4 +1,4 @@
-// Project : 2050 · database schema, managed with Prisma (migrations in prisma/migrations).
+// Project Zero · database schema, managed with Prisma (migrations in prisma/migrations).
 // Change the database:  edit this file → `npx prisma migrate dev --name what-changed` (on a dev database)
 //                       → commit the new folder in prisma/migrations → on the server `npx prisma migrate deploy`.
 // Look at / edit data:  `npx prisma studio` (opens a web page; on a server use an SSH tunnel, see DEPLOY.md).

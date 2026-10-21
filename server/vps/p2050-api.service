@@ -1,8 +1,8 @@
-# systemd service for the Project : 2050 API (Node.js). Copy to /etc/systemd/system/p2050-api.service, then:
+# systemd service for the Project Zero API (Node.js). Copy to /etc/systemd/system/p2050-api.service, then:
 #   sudo systemctl daemon-reload && sudo systemctl enable --now p2050-api
 # Logs: journalctl -u p2050-api -f
 [Unit]
-Description=Project 2050 game API
+Description=Project Zero game API
 After=network.target postgresql.service
 Wants=postgresql.service
 

@@ -26,7 +26,7 @@ export function TopBar(){
   if (has3) sp.push({id:"sp3", label:"3×", on:S.speed === 3, fn:() => G.setSpeed(3), sound:null});
   const fs = !!document.fullscreenElement, running = P.running();
   return <header class="topbar">
-    <div class="brand glass" onClick={() => G.pause()} title={t("pTitle")}><span>PROJECT</span><b>:</b><span>2050</span></div>
+    <div class="brand glass" onClick={() => G.pause()} title={t("pTitle")}><span>PROJECT</span><b>ZERO</b></div>
     <div class="kpis">
       <Kpi stat="money" label={t("ep")} value={Math.floor(S.ep)} sub={`+${P.epGain()}${t("perMo")}`}/>
       <Kpi stat="policy" label={t("pc")} value={Math.floor(S.pc)} sub={`+${P.pcGain()}${t("perMo")}`}/>

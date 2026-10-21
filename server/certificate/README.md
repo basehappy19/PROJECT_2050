@@ -6,7 +6,7 @@
 
 ```json
 {
-  "issuer": "ทีม PROJECT : 2050 · Garena Academy Game Maker",
+  "issuer": "ทีม Project Zero · Garena Academy Game Maker",
   "partner": { "name": "ชื่อหน่วยงาน", "logo": "partner-logo.png" },
   "signatures": [
     { "name": "ชื่อผู้ลงนาม", "title": "ตำแหน่ง", "image": "sign1.png" },

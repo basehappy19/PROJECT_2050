@@ -1,4 +1,4 @@
-# Project : 2050 — เวอร์ชันเว็บ
+# Project Zero — เวอร์ชันเว็บ
 
 เวอร์ชัน 1.0 · เว็บแอป Preact + canvas + three.js (build ด้วย esbuild)
 กฎเกมและข้อมูลอยู่ใน `src/engine/` (แยกออกมาจากเวอร์ชัน GDevelop ตั้งแต่ 1.0 · เวอร์ชัน GDevelop ไม่อัปเดตแล้ว)
