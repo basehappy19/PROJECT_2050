@@ -119,7 +119,7 @@ export async function certificatePdf(cert, req, over = {}){
 
 /* ---------- anti-forgery watermark ----------
    under the content: a guilloche pattern whose waves are derived from the certificate code (every certificate looks different
-   and the pattern can't be copied onto another code), a large faint emblem, and microtext along the inner frame.
+   and the pattern can't be copied onto another code), the game logo large and faint, and microtext along the inner frame.
    over the content: a faint diagonal "PROJECT ZERO · <code>" repeated across the page, so any text pasted over the
    name or date breaks the pattern visibly. */
 function seedOf(code){ const h = crypto.createHash("sha256").update("p0-wm:" + code).digest(); return i => h[i % h.length] / 255; }
@@ -141,21 +141,10 @@ function watermarkUnder(doc, W, H, code){
       doc.lineWidth(.35).strokeOpacity(.16).stroke(k % 2 ? "#4fd1c5" : "#2f9e6f");
     }
   }
-  // rosette behind the centre
-  const cx = W / 2, cy = H / 2 + 20, n = 11 + Math.floor(r(5) * 6);
-  for (let k = 0; k < 36; k++){
-    const rot = k * Math.PI / 18;
-    for (let a = 0; a <= Math.PI * 2 + .01; a += Math.PI / 90){
-      const rr = 120 + 55 * Math.sin(n * a + rot) * Math.cos(a * 3 + rot * 2);
-      const x = cx + rr * Math.cos(a), y = cy + rr * .62 * Math.sin(a);
-      a === 0 ? doc.moveTo(x, y) : doc.lineTo(x, y);
-    }
-    doc.lineWidth(.3).strokeOpacity(.09).stroke("#0e6e66");
-  }
   doc.restore();
-  // big faint emblem
+  // the game logo, large and faint, in the middle of the page
   const logo = path.join(ASSETS, "logo.png");
-  if (fs.existsSync(logo)){ doc.save(); doc.opacity(.045); doc.image(logo, W / 2 - 150, H / 2 - 130, {width:300}); doc.restore(); }
+  if (fs.existsSync(logo)){ const sz = 330; doc.save(); doc.opacity(.07); doc.image(logo, W / 2 - sz / 2, H / 2 - sz / 2 + 10, {width:sz}); doc.restore(); }
   // microtext on the inner frame (looks like a thin line; a photocopy turns it into a smudge)
   const micro = (`PROJECT ZERO ${code} · `).repeat(60);
   doc.save().font("body").fontSize(2.6).fillColor("#0e6e66").fillOpacity(.85);
