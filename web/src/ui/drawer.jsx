@@ -22,7 +22,7 @@ function Resources({c}){
       {cr ? <div class="reslist">{cr.r.map(k => { const R = P.RES[k]; return <span class="res" key={k} title={L(R.fact)} style={{"--rc":R.col}}><Icon n={R.icon} size={15}/>{L(R.name)}</span>; })}</div> : null}
       {imp ? <p class="muted small"><Rich t={`[[ship]] ${t("resImporter")}`} iconColor="inherit"/></p> : null}
       {ban ? <p class="bad small"><Rich t={`[[ban]] ${t("oreBanned")} ${ban} ${t("months")}`} iconColor="inherit"/></p>
-        : src ? <p class="small"><Rich t={`${IC().ore} ${t("oreSends")} +${src.amt.toFixed(1)}${t("perMo")}`}/></p>
+        : src ? <p class="small"><Rich t={`${IC().ore} ${t("oreSends")} +${src.amt < .1 ? src.amt.toFixed(2) : src.amt.toFixed(1)}${t("perMo")}`}/></p>
         : S.oreOn && cr && cr.w ? <p class="warn small">{t("oreNeedFriend")}</p> : null}
     </> : null}
   </>;

@@ -206,6 +206,7 @@ function spawn(M, kind){
 }
 export function drawTraffic(M, c, dt, now, vis){
   if (!S.regions || !M.shapes.length || !P.trafficLevels) return;
+  if (!P.running()) dt = 0;   // paused, an event open, a menu open: planes and ships stop where they are
   const tl = P.trafficLevels(), q = QTY[Gfx.level] || QTY.medium;
   const want = {air:Math.round(q.air * tl.air), box:Math.round(q.box * tl.sea), oil:Math.round(q.oil * tl.oil), ore:Math.round(q.ore * tl.ore)};
   const list = M.traffic = M.traffic || [];

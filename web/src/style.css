@@ -576,3 +576,13 @@ canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
 .plegend{display:flex;align-items:center;gap:5px;font-size:11.5px;color:var(--muted)} .plegend i{width:12px;height:12px;border-radius:3px;background:rgba(255,80,90,.6)} .plegend i.m{background:rgba(255,211,90,.6)} .plegend i.g{background:rgba(110,211,90,.65)}
 .tiny{font-size:10.5px;line-height:1.35}
 @media (max-width:700px), (max-height:520px){ .placebar .tiny{display:none} .wside:has(.placebar.on) .wgoals{display:none} .placebar{padding:8px 10px;gap:5px} .ptok{padding:4px 8px} }
+/* ---- drawer spacing: every block gets room to breathe ---- */
+.drawer .card{margin:0 0 12px}
+.drawer .cards .card{margin:0}
+.drawer .statgrid{gap:10px;margin:0 0 12px}
+.drawer .stat{padding:9px 12px;gap:4px}
+.drawer .relcard{gap:8px;padding:13px 14px}
+.drawer .relcard small{margin-top:2px}
+.drawer .greencard,.drawer .basecard{margin:0 0 12px;gap:8px;padding:13px 14px}
+.drawer .reslist{margin:6px 0 10px}
+.drawer h3.title{margin-bottom:2px} .drawer p.sub{margin:0 0 12px}
