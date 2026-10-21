@@ -31,9 +31,9 @@ Object.assign(P.UI, {
   updVer:T("เวอร์ชัน", "Version"),
   hardLocked:T("ปลดล็อกเมื่อชนะโหมดปกติ", "Unlocks after a Normal win"), hardLockedMsg:T("ชนะภารกิจ 2050 โหมดปกติก่อน แล้วโหมด Hard Core จะเปิดให้เล่น", "Win Mission 2050 in Normal mode first to open Hard Core"),
   certCondNormal:T("ชนะภารกิจ 2050 โหมดปกติ", "Win Mission 2050 in Normal mode"), certCondHard:T("ชนะภารกิจ 2050 โหมด Hard Core", "Win Mission 2050 in Hard Core"),
-  certIssued:T("คุณได้รับเกียรติบัตรแล้ว ขอได้คนละ 1 ใบ", "You already have your certificate (one per player)"),
-  certIssuedBtn:T("ขอเกียรติบัตรแล้ว", "Certificate already issued"), certNotYet:T("ยังไม่ผ่านเงื่อนไข", "Not eligible yet"),
-  certSpecial:T("ผู้ดูแลให้สิทธิ์คุณขอเกียรติบัตรได้ 1 ครั้ง", "An admin has given you one certificate request"),
-  err_already_issued:T("คุณได้รับเกียรติบัตรแล้ว", "You already have a certificate"),
+  certIssued:T("คุณได้รับประกาศนียบัตรแล้ว ขอได้คนละ 1 ใบ", "You already have your certificate (one per player)"),
+  certIssuedBtn:T("ขอประกาศนียบัตรแล้ว", "Certificate already issued"), certNotYet:T("ยังไม่ผ่านเงื่อนไข", "Not eligible yet"),
+  certSpecial:T("ผู้ดูแลให้สิทธิ์คุณขอประกาศนียบัตรได้ 1 ครั้ง", "An admin has given you one certificate request"),
+  err_already_issued:T("คุณได้รับประกาศนียบัตรแล้ว", "You already have a certificate"),
   gSignedIn:T("เข้าสู่ระบบด้วย Google แล้ว", "Signed in with Google"), gCancel:T("ยกเลิก ใช้บัญชีอื่น", "Cancel, use another account"), gConfirm:T("ใช้ชื่อนี้และเริ่มเล่น", "Use this name and start"),
 });

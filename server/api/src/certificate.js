@@ -40,7 +40,7 @@ export async function certificatePdf(cert, req, over = {}){
   if (over.partner) cfg.partner = {...(cfg.partner || {}), name:over.partner};
   const url = verifyUrl(cert.code, req);
   const qr = await QRCode.toBuffer(url, {margin:1, width:300, color:{dark:"#0b1a20", light:"#ffffff"}});
-  const doc = new PDFDocument({size:"A4", layout:"landscape", margin:0, info:{Title:`เกียรติบัตร ${cert.code}`, Author:"Project Zero", Subject:"Project Zero certificate"}});
+  const doc = new PDFDocument({size:"A4", layout:"landscape", margin:0, info:{Title:`ประกาศนียบัตร ${cert.code}`, Author:"Project Zero", Subject:"Project Zero certificate"}});
   const chunks = []; doc.on("data", c => chunks.push(c));
   const done = new Promise(res => doc.on("end", () => res(Buffer.concat(chunks))));
   for (const [k, f] of Object.entries(FONT)) doc.registerFont(k, f);
@@ -56,12 +56,12 @@ export async function certificatePdf(cert, req, over = {}){
   if (fs.existsSync(logo)) doc.image(logo, W / 2 - 32, 42, {width:64});
   if (cfg.partner && cfg.partner.logo && cfg.dir){ const pl = path.join(cfg.dir, cfg.partner.logo); if (fs.existsSync(pl)) doc.image(pl, W - 160, 46, {fit:[100, 60], align:"right"}); }
   const center = (txt, y, font, size, color = "#0b1a20", opts = {}) => { doc.font(font).fontSize(size).fillColor(color).text(txt, 70, y, {width:W - 140, align:"center", ...opts}); };
-  center("เกียรติบัตร", 106, "head", 36, "#0e6e66");
+  center("ประกาศนียบัตร", 106, "head", 36, "#0e6e66");
   center("CERTIFICATE OF ACHIEVEMENT", 152, "headS", 10.5, "#5b7a77", {characterSpacing:3});
   center("ฉบับนี้ให้ไว้เพื่อแสดงว่า", 172, "body", 13.5, "#33484c");
   center(cert.full_name, 192, "head", 28, "#0b1a20");
   doc.moveTo(W / 2 - 190, 234).lineTo(W / 2 + 190, 234).lineWidth(1).stroke("#9fb8b4");
-  center("ได้ผ่านภารกิจในเกม Project Zero ภารกิจกู้วิกฤตโลก ครบทั้งโหมดปกติและโหมด Hard Core", 244, "bodyB", 13.5, "#0b1a20");
+  center("ได้ผ่านภารกิจในเกม Project Zero ภารกิจกู้วิกฤตโลก", 244, "bodyB", 13.5, "#0b1a20");
   center(`โดยนำโลกสู่การปล่อยคาร์บอนสุทธิเป็นศูนย์ (Net Zero) ได้ก่อนสิ้นปี ค.ศ. 2050 ตามเป้าหมายการพัฒนาที่ยั่งยืน ข้อ 13${cert.grade ? `  ·  ระดับผลงาน ${GRADE[cert.grade] || cert.grade}` : ""}`, 264, "body", 11.5, "#33484c");
   // learning outcomes (two columns; each row as tall as its longer item)
   const boxX = 76, boxY = 286, boxW = W - 152, colW = (boxW - 54) / 2;
@@ -73,8 +73,12 @@ export async function certificatePdf(cert, req, over = {}){
   doc.font("bodyB").fontSize(11.5).fillColor("#0e6e66").text("ผลการเรียนรู้ที่ได้รับจากการผ่านภารกิจ", boxX + 18, boxY + 9);
   OUTCOMES.forEach((t, i) => {
     const cx = boxX + 18 + (i % 2) * (colW + 18), cy = boxY + 32 + (i < 2 ? 0 : rows[0]);
-    doc.circle(cx + 6, cy + 7, 6).fill("#2f9e6f");
-    doc.font("bodyB").fontSize(8).fillColor("#ffffff").text(String(i + 1), cx + 2.6, cy + 2.3, {width:7, align:"center"});
+    // number centred in its circle: put the digits' middle (half the cap height above the baseline) on the circle's centre
+    const ccx = cx + 6, ccy = cy + 7, fs = 8.5;
+    doc.circle(ccx, ccy, 6.5).fill("#2f9e6f");
+    doc.font("headS").fontSize(fs);
+    const f = doc._font, asc = f.ascender / 1000 * fs, cap = (f.capHeight || f.ascender * .7) / 1000 * fs, n = String(i + 1), tw = doc.widthOfString(n);
+    doc.fillColor("#ffffff").text(n, ccx - tw / 2, ccy + cap / 2 - asc, {lineBreak:false});
     doc.font("body").fontSize(9.4).fillColor("#22383c").text(t, cx + 18, cy, {width:colW - 18, lineGap:.5});
   });
   const y0 = boxY + boxH + 10;
@@ -91,9 +95,10 @@ export async function certificatePdf(cert, req, over = {}){
       doc.font("body").fontSize(9.5).fillColor("#5b7a77").text(s.title || "", cx - 110, sy + 58, {width:220, align:"center"});
     });
   } else {
-    doc.font("body").fontSize(10.5).fillColor("#5b7a77").text("ออกโดย", 70, sy + 4, {width:W - 340, align:"center"});
-    doc.font("bodyB").fontSize(12.5).fillColor("#0e6e66").text(cfg.issuer || TEAM, 70, sy + 20, {width:W - 340, align:"center"});
-    doc.font("body").fontSize(10.5).fillColor("#33484c").text(cfg.partner && cfg.partner.name ? `ร่วมกับ ${cfg.partner.name} · Garena Academy Game Maker` : "Garena Academy Game Maker", 70, sy + 40, {width:W - 340, align:"center"});
+    // centred on the page, like the lines above it
+    center("ออกโดย", sy + 4, "body", 10.5, "#5b7a77");
+    center(cfg.issuer || TEAM, sy + 20, "bodyB", 12.5, "#0e6e66");
+    center(cfg.partner && cfg.partner.name ? `ร่วมกับ ${cfg.partner.name} · Garena Academy Game Maker` : "Garena Academy Game Maker", sy + 40, "body", 10.5, "#33484c");
   }
   // QR code for checking the certificate online
   const qx = W - 168, qy = Math.min(H - 158, y0);
@@ -101,7 +106,7 @@ export async function certificatePdf(cert, req, over = {}){
   doc.image(qr, qx, qy, {width:88});
   doc.font("body").fontSize(8.5).fillColor("#5b7a77").text("สแกนเพื่อตรวจสอบ", qx - 20, qy + 100, {width:128, align:"center"});
   // footer: code + verification link
-  doc.font("body").fontSize(9).fillColor("#5b7a77").text(`รหัสเกียรติบัตร ${cert.code}  ·  ตรวจสอบได้ที่ ${url}`, 60, H - 56, {width:W - 120, align:"center"});
+  doc.font("body").fontSize(9).fillColor("#5b7a77").text(`รหัสประกาศนียบัตร ${cert.code}  ·  ตรวจสอบได้ที่ ${url}`, 60, H - 56, {width:W - 120, align:"center"});
   doc.end();
   return done;
 }
@@ -111,15 +116,15 @@ const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;", "<":"&lt;", "
 export function verifyHtml(cert, code){
   const ok = !!cert;
   const body = ok
-    ? `<div class="ok">✓ เกียรติบัตรนี้ออกโดยเกม Project Zero จริง</div>
+    ? `<div class="ok">✓ ประกาศนียบัตรนี้ออกโดยเกม Project Zero จริง</div>
        <h1>${esc(cert.full_name)}</h1>
-       <p>ผ่านภารกิจนำโลกสู่ Net Zero ครบทั้งโหมดปกติและโหมด Hard Core${cert.grade ? ` · ${esc(GRADE[cert.grade] || cert.grade)}` : ""}</p>
+       <p>ผ่านภารกิจในเกม Project Zero นำโลกสู่ Net Zero${cert.grade ? ` · ${esc(GRADE[cert.grade] || cert.grade)}` : ""}</p>
        <p class="m">ผลการเรียนรู้</p><ol class="m">${OUTCOMES.map(o => `<li>${esc(o)}</li>`).join("")}</ol>
        <p class="m">ออกเมื่อ ${esc(thaiDate(new Date(cert.issued_at)))} · รหัส ${esc(cert.code)}</p>
        <p><a href="/api/certificates/${encodeURIComponent(cert.code)}/pdf">ดาวน์โหลด PDF</a></p>`
-    : `<div class="bad">✕ ไม่พบเกียรติบัตรรหัส ${esc(code)}</div><p>ตรวจสอบว่าพิมพ์รหัสถูกต้อง (รูปแบบ P2050-XXXX-XXXX)</p>`;
+    : `<div class="bad">✕ ไม่พบประกาศนียบัตรรหัส ${esc(code)}</div><p>ตรวจสอบว่าพิมพ์รหัสถูกต้อง (รูปแบบ P2050-XXXX-XXXX)</p>`;
   return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ตรวจสอบเกียรติบัตร · PROJECT ZERO</title>
+<title>ตรวจสอบประกาศนียบัตร · PROJECT ZERO</title>
 <style>body{margin:0;background:#061015;color:#e6f0ee;font-family:"IBM Plex Sans Thai",system-ui,sans-serif;display:grid;place-items:center;min-height:100vh;padding:16px;box-sizing:border-box}
 main{max-width:560px;width:100%;background:#0e1d24;border:1px solid #24414b;border-radius:16px;padding:28px}
 h1{font-size:28px;margin:12px 0 6px}ol{padding-left:20px;line-height:1.6}.ok{color:#5fd39a;font-weight:600}.bad{color:#ff5a4a;font-weight:600}.m{color:#8fa9a6;font-size:14px}a{color:#4fd1c5}

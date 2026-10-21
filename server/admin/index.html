@@ -174,7 +174,7 @@ const itemName = id => item(id).name.replace(/^ตัวละคร:\s*/, "ต�
 const charName = id => (DATA.chars.find(c => c.id === id) || {name:id}).name;
 const evName = id => (DATA.events.find(e => e.id === id) || {title:id}).title;
 const KIND_DESC = {char:"ปลดล็อกตัวละครนี้ให้เลือกเล่นได้"};
-const SET_NAME = {announcement:"ประกาศหน้าเมนู", disabledEvents:"เหตุการณ์ในเกม", prices:"ราคาในร้านค้า", certMinCards:"การ์ดขั้นต่ำสำหรับเกียรติบัตร", certIssuer:"ชื่อผู้ออกเกียรติบัตร",
+const SET_NAME = {announcement:"ประกาศหน้าเมนู", disabledEvents:"เหตุการณ์ในเกม", prices:"ราคาในร้านค้า", certMinCards:"การ์ดขั้นต่ำสำหรับประกาศนียบัตร", certIssuer:"ชื่อผู้ออกประกาศนียบัตร",
   certPartner:"หน่วยงานร่วม", minGameSeconds:"เวลาเล่นขั้นต่ำที่ได้เพชร", googleClientId:"เข้าสู่ระบบด้วย Google", extraOrigins:"เว็บไซต์อื่นที่ใช้ API ได้", balance:"ค่าความยาก (เลิกใช้แล้ว)"};
 
 /* ---------- shell ---------- */
@@ -240,7 +240,7 @@ async function viewHome(){
       ${card("trophy", "ชนะ", winp + "%", `${fmt(o.games.wins)} จาก ${fmt(o.games.finished)} เกมที่เล่นจบ`)}
       ${card("timer", "เวลาเล่นเฉลี่ย", (o.games.minutes ?? "—") + " นาที", "ต่อเกมที่เล่นจบ")}
       ${card("gem", "เพชรที่ได้ / ใช้", fmt(o.gems.earned) + " / " + fmt(o.gems.spent), "รวมทุกผู้เล่น")}
-      ${card("award", "เกียรติบัตร", fmt(o.certs.total), `เดือนนี้ ${fmt(o.certs.month)} ใบ`)}
+      ${card("award", "ประกาศนียบัตร", fmt(o.certs.total), `เดือนนี้ ${fmt(o.certs.month)} ใบ`)}
       ${card("ban", "บัญชีที่ถูกระงับ", fmt(o.players.banned), `ผู้ดูแล ${fmt(o.players.admins)} คน`)}
     </div>
     <div class="grid2">
@@ -288,7 +288,7 @@ async function viewPlayer(name){
         <div class="stat"><span>${ic("gem")} เพชร</span><b>${fmt(u.gems)}</b></div>
         <div class="stat"><span>${ic("trophy")} ชนะ / เกมล่าสุด</span><b>${wins} / ${j.runs.length}</b></div>
         <div class="stat"><span>${ic("book-open")} การ์ดความรู้</span><b>${u.cards}</b></div>
-        <div class="stat"><span>${ic("award")} เกียรติบัตร</span><b>${j.certs.length}</b></div>
+        <div class="stat"><span>${ic("award")} ประกาศนียบัตร</span><b>${j.certs.length}</b></div>
         <div class="stat"><span>${ic("star")} ความสำเร็จ</span><b>${j.ach.length}<small class="muted" style="font-size:14px"> / ${DATA.ach.length}</small></b></div>
       </div></div>
 
@@ -301,7 +301,7 @@ async function viewPlayer(name){
       </div>
       <div class="card"><h2>${ic("shield")} สิทธิ์และสถานะ</h2><p class="lead">กดเลือกแล้วบันทึกทันที</p>
         <div class="col">
-          <div class="field"><span>สิทธิ์ขอเกียรติบัตร</span><div class="seg" id="cert">${Object.entries(CERT).map(([k, l]) => `<button data-k="${k}" class="${certNow === k ? "on" : ""} ${k === "false" ? "bad" : k === "true" ? "good" : ""}">${l}</button>`).join("")}</div>
+          <div class="field"><span>สิทธิ์ขอประกาศนียบัตร</span><div class="seg" id="cert">${Object.entries(CERT).map(([k, l]) => `<button data-k="${k}" class="${certNow === k ? "on" : ""} ${k === "false" ? "bad" : k === "true" ? "good" : ""}">${l}</button>`).join("")}</div>
             <span class="help">กติกาปกติ: ชนะทั้งโหมดปกติและโหมด Hard Core และมีการ์ดความรู้ครบตามที่ตั้งไว้ (มีอยู่ ${u.cards} ใบ) · ขอได้คนละ 1 ใบ · “ให้สิทธิ์ขอได้ 1 ครั้ง” ใช้ได้แม้ไม่ผ่านกติกาหรือเคยขอแล้ว และหมดเมื่อผู้เล่นกดขอ</span></div>
           <div class="field"><span>บทบาท</span><div class="seg" id="role">${Object.entries(ROLE).map(([k, l]) => `<button data-k="${k}" class="${u.role === k ? "on" : ""}" ${isMe && k !== "admin" ? "disabled title='ลดสิทธิ์ตัวเองไม่ได้'" : ""}>${l}</button>`).join("")}</div>
             <span class="help">ผู้ดูแลเข้าหน้านี้ได้ · ผู้ทดสอบเหมือนผู้เล่น แต่ใช้แยกบัญชีทดสอบให้เห็นชัด</span></div>
@@ -320,7 +320,7 @@ async function viewPlayer(name){
         <div class="grow"><b>${esc(itemName(x.id))}</b><p>${esc(x.desc || KIND_DESC[x.kind] || "")}</p></div><span class="sw"><input type="checkbox" data-own="${x.id}" ${owned.has(x.id) ? "checked" : ""}><i></i></span></div></label>`).join("")}</div></div>
 
     <div class="grid2">
-      <div class="card"><h2>${ic("book-open")} การ์ดความรู้</h2><p class="lead">จำนวนการ์ดที่ปลดล็อกแล้ว (ใช้เป็นเงื่อนไขเกียรติบัตร)</p>
+      <div class="card"><h2>${ic("book-open")} การ์ดความรู้</h2><p class="lead">จำนวนการ์ดที่ปลดล็อกแล้ว (ใช้เป็นเงื่อนไขประกาศนียบัตร)</p>
         <div class="row"><input class="inp" id="cd" type="number" min="0" max="500" value="${u.cards}" style="width:130px"><button class="btn pri" id="cdb">บันทึก</button></div></div>
       <div class="card danger-zone"><h2>${ic("rotate-ccw")} รีเซ็ตข้อมูล</h2><p class="lead">เลือกสิ่งที่จะลบ ย้อนกลับไม่ได้</p>
         <div class="chips" id="rs">${Object.entries(RESET).map(([k, l]) => `<label class="chip"><input type="checkbox" value="${k}" hidden>${l}</label>`).join("")}</div>
@@ -335,7 +335,7 @@ async function viewPlayer(name){
         <td class="mono">${r.temp != null ? "+" + Number(r.temp).toFixed(2) + "°C" : "—"}</td><td class="mono">${r.score != null ? fmt(r.score) : "—"}</td><td class="mono">${r.terra ? "+" + r.terra : "—"}</td></tr>`).join("")}</table>` : `<div class="empty">ยังไม่เคยเล่นจบ</div>`}</div>
 
     <div class="grid2">
-      <div class="card"><h2>${ic("award")} เกียรติบัตร</h2>${j.certs.length ? j.certs.map(c => `<div class="row sp" style="padding:8px 0;border-bottom:1px solid var(--line2)"><div><b>${esc(c.full_name)}</b><div class="small muted mono">${esc(c.code)} · ${day(c.issued_at)}</div></div><a class="btn sm" href="/verify/${encodeURIComponent(c.code)}" target="_blank">${ic("link")} ตรวจสอบ</a></div>`).join("") : `<div class="empty">ยังไม่มี</div>`}</div>
+      <div class="card"><h2>${ic("award")} ประกาศนียบัตร</h2>${j.certs.length ? j.certs.map(c => `<div class="row sp" style="padding:8px 0;border-bottom:1px solid var(--line2)"><div><b>${esc(c.full_name)}</b><div class="small muted mono">${esc(c.code)} · ${day(c.issued_at)}</div></div><a class="btn sm" href="/verify/${encodeURIComponent(c.code)}" target="_blank">${ic("link")} ตรวจสอบ</a></div>`).join("") : `<div class="empty">ยังไม่มี</div>`}</div>
       <div class="card"><h2>${ic("history")} ประวัติการแก้ไขผู้เล่นนี้</h2><div class="log">${j.history.map(h => logItem({...h, target:u.username, target_name:u.display_name}, true)).join("") || `<div class="empty">ยังไม่มี</div>`}</div></div>
     </div>`;
   const reload = () => viewPlayer(u.username);
@@ -343,7 +343,7 @@ async function viewPlayer(name){
   $("#bk").onclick = () => go("users");
   $$("[data-g]").forEach(b => b.onclick = () => run(() => api("POST", `/admin/users/${id}/gems`, {amount:Number(b.dataset.g), note:$("#gn").value.trim()}), `${Number(b.dataset.g) > 0 ? "ให้" : "หัก"}เพชร ${Math.abs(b.dataset.g)} แล้ว`));
   $("#gb").onclick = () => { const n = Number($("#gm").value); if (!n) return toast("ใส่จำนวนเพชรก่อน", true); run(() => api("POST", `/admin/users/${id}/gems`, {amount:n, note:$("#gn").value.trim()}), "บันทึกเพชรแล้ว"); };
-  $("#cert").onclick = e => { const b = e.target.closest("button"); if (!b) return; const v = b.dataset.k === "null" ? null : b.dataset.k === "true"; run(() => api("POST", `/admin/users/${id}/flags`, {certOverride:v}), "สิทธิ์เกียรติบัตร: " + CERT[b.dataset.k]); };
+  $("#cert").onclick = e => { const b = e.target.closest("button"); if (!b) return; const v = b.dataset.k === "null" ? null : b.dataset.k === "true"; run(() => api("POST", `/admin/users/${id}/flags`, {certOverride:v}), "สิทธิ์ประกาศนียบัตร: " + CERT[b.dataset.k]); };
   $("#role").onclick = async e => { const b = e.target.closest("button"); if (!b || b.disabled || b.dataset.k === u.role) return; if (b.dataset.k === "admin" && !(await ask("ตั้งเป็นผู้ดูแล?", `@${esc(u.username)} จะเข้าหน้านี้และแก้ทุกอย่างได้`, "ตั้งเป็นผู้ดูแล"))) return; run(() => api("POST", `/admin/users/${id}/flags`, {role:b.dataset.k}), "บทบาท: " + ROLE[b.dataset.k]); };
   $("#ntb").onclick = () => run(() => api("POST", `/admin/users/${id}/flags`, {note:$("#nt").value.trim()}), "บันทึกหมายเหตุแล้ว");
   $("#bn").onclick = async () => { if (!u.banned && !(await ask("ระงับบัญชีนี้?", `@${esc(u.username)} จะถูกออกจากระบบทุกเครื่อง และเข้าสู่ระบบไม่ได้จนกว่าจะยกเลิก`, "ระงับบัญชี", true))) return; run(() => api("POST", `/admin/users/${id}/flags`, {banned:!u.banned}), u.banned ? "ยกเลิกการระงับแล้ว" : "ระงับบัญชีแล้ว"); };
@@ -435,13 +435,13 @@ async function viewSettings(){
       <label class="field"><span>OAuth Client ID</span><input class="inp mono" id="gid" value="${esc(st.googleClientId)}" placeholder="123456789-xxxx.apps.googleusercontent.com"><span class="help">ลบให้ว่างแล้วบันทึก = ปิดปุ่ม Google</span></label>
       <div class="infobox" style="margin-top:12px">วิธีได้ Client ID<ol><li>เข้า Google Cloud Console → APIs &amp; Services → Credentials</li><li>Create credentials → OAuth client ID → ประเภท Web application</li><li>Authorized JavaScript origins ใส่ <span class="mono">${esc(location.origin)}</span></li><li>คัดลอก Client ID มาวางที่นี่</li></ol></div>`) +
     `<div class="grid2">` +
-    sect("certMinCards", "award", "เงื่อนไขเกียรติบัตร", "ผู้เล่นต้องชนะทั้งโหมดปกติและโหมด Hard Core และมีการ์ดความรู้ครบตามจำนวนนี้ (ขอได้คนละ 1 ใบ)", `
+    sect("certMinCards", "award", "เงื่อนไขประกาศนียบัตร", "ผู้เล่นต้องชนะทั้งโหมดปกติและโหมด Hard Core และมีการ์ดความรู้ครบตามจำนวนนี้ (ขอได้คนละ 1 ใบ)", `
       <label class="field"><span>จำนวนการ์ดความรู้ที่ต้องมี</span><input class="inp" id="cmc" type="number" min="0" max="500" value="${st.certMinCards}" style="width:140px"></label>`) +
     sect("minGameSeconds", "timer", "กันการเล่นเร็วเพื่อปั่นเพชร", "เกมที่จบเร็วกว่านี้ไม่ได้เพชร (ยังได้ XP)", `
       <label class="field"><span>เวลาเล่นขั้นต่ำ (นาที)</span><input class="inp" id="mgs" type="number" min="0" max="120" step="1" value="${Math.round(st.minGameSeconds / 60)}" style="width:140px"></label>`) +
     `</div>` +
-    sect("certIssuer", "award", "ชื่อบนเกียรติบัตร", "ชื่อผู้ออกเกียรติบัตร และหน่วยงานที่ร่วมจัด (ถ้ามี) เว้นว่าง = ใช้ค่าเดิม", `<div class="grid2">
-      <label class="field"><span>ผู้ออกเกียรติบัตร</span><input class="inp" id="ci" maxlength="120" value="${esc(st.certIssuer)}" placeholder="ทีม ส่งงานวินาทีสุดท้ายเพราะไส้กรอกหมดแล้วหมดกำลังใจปั่นงาน"></label>
+    sect("certIssuer", "award", "ชื่อบนประกาศนียบัตร", "ชื่อผู้ออกประกาศนียบัตร และหน่วยงานที่ร่วมจัด (ถ้ามี) เว้นว่าง = ใช้ค่าเดิม", `<div class="grid2">
+      <label class="field"><span>ผู้ออกประกาศนียบัตร</span><input class="inp" id="ci" maxlength="120" value="${esc(st.certIssuer)}" placeholder="ทีม ส่งงานวินาทีสุดท้ายเพราะไส้กรอกหมดแล้วหมดกำลังใจปั่นงาน"></label>
       <label class="field"><span>หน่วยงานร่วม</span><input class="inp" id="cp" maxlength="120" value="${esc(st.certPartner)}" placeholder="เช่น โรงเรียนภูเขียว"></label></div>`) +
     `<details class="card"><summary style="cursor:pointer;font:600 16px var(--disp)">${ic("link")} ขั้นสูง: เว็บไซต์อื่นที่เรียกใช้ API ได้</summary><div style="margin-top:14px">
       <p class="lead">ปกติไม่ต้องตั้ง (เว็บของเกมเองใช้ได้อยู่แล้ว) ใส่เฉพาะเมื่อเปิดเกมจากโดเมนอื่น เช่น GitHub Pages · บรรทัดละ 1 ที่อยู่</p>
@@ -466,7 +466,7 @@ async function viewSettings(){
 
 /* ---------- log ---------- */
 const LOG_TYPE = {gems:["gem", "sky-c", "เพชร"], items:["shopping-bag", "acc-c", "ของในร้าน"], xp:["star", "gold-c", "เลเวลตัวละคร"], cards:["book-open", "acc-c", "การ์ดความรู้"],
-  flags:["shield", "pur-c", "สิทธิ์และสถานะ"], reset:["rotate-ccw", "bad-c", "รีเซ็ต"], setting:["settings", "acc-c", "ตั้งค่าเกม"], cert_used:["award", "gold-c", "เกียรติบัตร"], config:["settings", "acc-c", "ตั้งค่าเกม (รุ่นเก่า)"]};
+  flags:["shield", "pur-c", "สิทธิ์และสถานะ"], reset:["rotate-ccw", "bad-c", "รีเซ็ต"], setting:["settings", "acc-c", "ตั้งค่าเกม"], cert_used:["award", "gold-c", "ประกาศนียบัตร"], config:["settings", "acc-c", "ตั้งค่าเกม (รุ่นเก่า)"]};
 const who = (u, n) => u ? `<b>${esc(n || u)}</b> <span class="mono small muted">@${esc(u)}</span>` : "";
 function settingText(key, before, after){
   const name = SET_NAME[key] || key, lines = [];
@@ -485,7 +485,7 @@ function settingText(key, before, after){
   if (key === "announcement"){ const t = (after && (after.th || after.en)) || ""; return {title:t ? "แก้ประกาศหน้าเมนู" : "ลบประกาศหน้าเมนู", lines:t ? [`“${esc(t)}”`] : []}; }
   if (key === "googleClientId") return {title:after ? "เปิดเข้าสู่ระบบด้วย Google" : "ปิดเข้าสู่ระบบด้วย Google", lines:after ? [`Client ID ${esc(String(after).slice(0, 18))}…`] : []};
   if (key === "minGameSeconds") return {title:"เปลี่ยนเวลาเล่นขั้นต่ำที่ได้เพชร", lines:[`${Math.round((before || 0) / 60)} → <b>${Math.round((after || 0) / 60)}</b> นาที`]};
-  if (key === "certMinCards") return {title:"เปลี่ยนเงื่อนไขเกียรติบัตร", lines:[`การ์ดความรู้ที่ต้องมี ${before} → <b>${after}</b> ใบ`]};
+  if (key === "certMinCards") return {title:"เปลี่ยนเงื่อนไขประกาศนียบัตร", lines:[`การ์ดความรู้ที่ต้องมี ${before} → <b>${after}</b> ใบ`]};
   if (key === "balance") return {title:"แก้ค่าความยาก A/B (ระบบนี้เลิกใช้แล้ว)", lines:[]};
   if (typeof after === "string" || typeof before === "string") return {title:"เปลี่ยน" + name, lines:[`“${esc(before || "—")}” → “<b>${esc(after || "—")}</b>”`]};
   if (Array.isArray(after)) return {title:"เปลี่ยน" + name, lines:after.map(esc)};
@@ -499,7 +499,7 @@ function logItem(r, compact){
   else if (r.action === "items"){ title = "แก้ของในร้าน"; if ((d.add || []).length) lines.push("ให้: " + d.add.map(itemName).map(esc).join(", ")); if ((d.remove || []).length) lines.push("เอาออก: " + d.remove.map(itemName).map(esc).join(", ")); }
   else if (r.action === "xp"){ title = `ตั้งเลเวล ${esc(charName(d.char))} ${d.from ? `จาก Lv ${d.from} ` : ""}เป็น <b>Lv ${d.level}</b>`; }
   else if (r.action === "cards"){ title = `ตั้งการ์ดความรู้ ${d.from != null ? d.from + " → " : "เป็น "}<b>${d.cards}</b> ใบ`; }
-  else if (r.action === "cert_used"){ title = `ใช้สิทธิ์ขอเกียรติบัตรแล้ว <span class="mono small">${esc(d.code || "")}</span>`; }
+  else if (r.action === "cert_used"){ title = `ใช้สิทธิ์ขอประกาศนียบัตรแล้ว <span class="mono small">${esc(d.code || "")}</span>`; }
   else if (r.action === "reset"){ title = "รีเซ็ตข้อมูล"; lines.push((d.what || []).map(w => RESET[w] || w).join(", ")); }
   else if (r.action === "flags"){
     const c = d.changes;
@@ -507,10 +507,10 @@ function logItem(r, compact){
       title = "แก้สิทธิ์และสถานะ";
       if (c.role) lines.push(`บทบาท: ${ROLE[c.role[0]] || c.role[0]} → <b>${ROLE[c.role[1]] || c.role[1]}</b>`);
       if (c.banned) lines.push(c.banned[1] ? `<span class="bad-c">ระงับบัญชี</span>` : `<span class="ok-c">ยกเลิกการระงับบัญชี</span>`);
-      if (c.certOverride) lines.push(`สิทธิ์เกียรติบัตร: ${CERT[String(c.certOverride[0])]} → <b>${CERT[String(c.certOverride[1])]}</b>`);
+      if (c.certOverride) lines.push(`สิทธิ์ประกาศนียบัตร: ${CERT[String(c.certOverride[0])]} → <b>${CERT[String(c.certOverride[1])]}</b>`);
       if (c.note) lines.push(`หมายเหตุ: “${esc(c.note[1] || "—")}”`);
       if (c.banned && Object.keys(c).length === 1) { title = c.banned[1] ? "ระงับบัญชี" : "ยกเลิกการระงับบัญชี"; lines = []; }
-    } else { title = "แก้สิทธิ์และสถานะ"; lines.push(`บทบาท ${ROLE[d.role] || d.role || "—"} · ${d.banned ? "ระงับอยู่" : "ใช้งานได้"}${d.flags && "certOverride" in d.flags ? " · สิทธิ์เกียรติบัตร: " + CERT[String(d.flags.certOverride)] : ""}`); }
+    } else { title = "แก้สิทธิ์และสถานะ"; lines.push(`บทบาท ${ROLE[d.role] || d.role || "—"} · ${d.banned ? "ระงับอยู่" : "ใช้งานได้"}${d.flags && "certOverride" in d.flags ? " · สิทธิ์ประกาศนียบัตร: " + CERT[String(d.flags.certOverride)] : ""}`); }
   }
   else if (r.action === "setting" || r.action === "config"){ const x = settingText(d.key, d.before, d.after !== undefined ? d.after : d.value); title = x.title; lines = x.lines; }
   else { title = esc(r.action); }
