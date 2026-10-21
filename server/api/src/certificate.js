@@ -3,6 +3,7 @@ import QRCode from "qrcode";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import crypto from "node:crypto";
 import { config } from "./config.js";
 
 const ASSETS = path.join(path.dirname(fileURLToPath(import.meta.url)), "..", "assets");
@@ -40,7 +41,10 @@ export async function certificatePdf(cert, req, over = {}){
   if (over.partner) cfg.partner = {...(cfg.partner || {}), name:over.partner};
   const url = verifyUrl(cert.code, req);
   const qr = await QRCode.toBuffer(url, {margin:1, width:300, color:{dark:"#0b1a20", light:"#ffffff"}});
-  const doc = new PDFDocument({size:"A4", layout:"landscape", margin:0, info:{Title:`ประกาศนียบัตร ${cert.code}`, Author:"Project Zero", Subject:"Project Zero certificate"}});
+  // locked against editing (owner password is random and thrown away); printing and copying text still allowed
+  const doc = new PDFDocument({size:"A4", layout:"landscape", margin:0, pdfVersion:"1.7",
+    ownerPassword:crypto.randomBytes(24).toString("hex"), permissions:{printing:"highResolution", copying:true, modifying:false, annotating:false, fillingForms:false, contentAccessibility:true, documentAssembly:false},
+    info:{Title:`ประกาศนียบัตร ${cert.code}`, Author:"Project Zero", Subject:"Project Zero certificate"}});
   const chunks = []; doc.on("data", c => chunks.push(c));
   const done = new Promise(res => doc.on("end", () => res(Buffer.concat(chunks))));
   for (const [k, f] of Object.entries(FONT)) doc.registerFont(k, f);
@@ -51,6 +55,7 @@ export async function certificatePdf(cert, req, over = {}){
   doc.rect(30, 30, W - 60, H - 60).lineWidth(1.2).stroke("#4fd1c5");
   doc.save().polygon([0, 0], [130, 0], [0, 130]).fill("#4fd1c5").restore();
   doc.save().polygon([W, H], [W - 130, H], [W, H - 130]).fill("#2f9e6f").restore();
+  watermarkUnder(doc, W, H, cert.code);
   // logos
   const logo = path.join(ASSETS, "logo.png");
   if (fs.existsSync(logo)) doc.image(logo, W / 2 - 32, 42, {width:64});
@@ -107,8 +112,67 @@ export async function certificatePdf(cert, req, over = {}){
   doc.font("body").fontSize(8.5).fillColor("#5b7a77").text("สแกนเพื่อตรวจสอบ", qx - 20, qy + 100, {width:128, align:"center"});
   // footer: code + verification link
   doc.font("body").fontSize(9).fillColor("#5b7a77").text(`รหัสประกาศนียบัตร ${cert.code}  ·  ตรวจสอบได้ที่ ${url}`, 60, H - 56, {width:W - 120, align:"center"});
+  watermarkOver(doc, W, H, cert);
   doc.end();
   return done;
+}
+
+/* ---------- anti-forgery watermark ----------
+   under the content: a guilloche pattern whose waves are derived from the certificate code (every certificate looks different
+   and the pattern can't be copied onto another code), a large faint emblem, and microtext along the inner frame.
+   over the content: a faint diagonal "PROJECT ZERO · <code>" repeated across the page, so any text pasted over the
+   name or date breaks the pattern visibly. */
+function seedOf(code){ const h = crypto.createHash("sha256").update("p0-wm:" + code).digest(); return i => h[i % h.length] / 255; }
+function watermarkUnder(doc, W, H, code){
+  const r = seedOf(code);
+  doc.save();
+  // guilloche: interlaced sine bands across the page, phase/frequency from the code
+  doc.rect(36, 36, W - 72, H - 72).clip();
+  const bands = 7, f1 = 2 + r(0) * 3, f2 = 5 + r(1) * 4, a1 = 9 + r(2) * 8, a2 = 4 + r(3) * 4, ph = r(4) * Math.PI * 2;
+  for (let b = 0; b < bands; b++){
+    const yc = 60 + b * (H - 120) / (bands - 1);
+    for (let k = 0; k < 6; k++){
+      const off = k * Math.PI / 3 + b * .7;
+      doc.moveTo(30, yc);
+      for (let x = 30; x <= W - 30; x += 3){
+        const t = x / W * Math.PI * 2;
+        doc.lineTo(x, yc + a1 * Math.sin(f1 * t + off + ph) + a2 * Math.sin(f2 * t - off * 1.7));
+      }
+      doc.lineWidth(.35).strokeOpacity(.16).stroke(k % 2 ? "#4fd1c5" : "#2f9e6f");
+    }
+  }
+  // rosette behind the centre
+  const cx = W / 2, cy = H / 2 + 20, n = 11 + Math.floor(r(5) * 6);
+  for (let k = 0; k < 36; k++){
+    const rot = k * Math.PI / 18;
+    for (let a = 0; a <= Math.PI * 2 + .01; a += Math.PI / 90){
+      const rr = 120 + 55 * Math.sin(n * a + rot) * Math.cos(a * 3 + rot * 2);
+      const x = cx + rr * Math.cos(a), y = cy + rr * .62 * Math.sin(a);
+      a === 0 ? doc.moveTo(x, y) : doc.lineTo(x, y);
+    }
+    doc.lineWidth(.3).strokeOpacity(.09).stroke("#0e6e66");
+  }
+  doc.restore();
+  // big faint emblem
+  const logo = path.join(ASSETS, "logo.png");
+  if (fs.existsSync(logo)){ doc.save(); doc.opacity(.045); doc.image(logo, W / 2 - 150, H / 2 - 130, {width:300}); doc.restore(); }
+  // microtext on the inner frame (looks like a thin line; a photocopy turns it into a smudge)
+  const micro = (`PROJECT ZERO ${code} · `).repeat(60);
+  doc.save().font("body").fontSize(2.6).fillColor("#0e6e66").fillOpacity(.85);
+  doc.text(micro, 34, 25.6, {width:W - 68, height:4, lineBreak:false, ellipsis:false});
+  doc.text(micro, 34, H - 28.4, {width:W - 68, height:4, lineBreak:false, ellipsis:false});
+  doc.restore();
+}
+function watermarkOver(doc, W, H, cert){
+  const label = `PROJECT ZERO · ${cert.code}`;
+  doc.save();
+  doc.rotate(-24, {origin:[W / 2, H / 2]});
+  doc.font("headS").fontSize(15).fillColor("#0e6e66").fillOpacity(.045);
+  const step = doc.widthOfString(label, {characterSpacing:2}) + 110;
+  for (let y = -H * .55, row = 0; y < H * 1.55; y += 78, row++)
+    for (let x = -W * .6 + (row % 2) * step / 2; x < W * 1.5; x += step)
+      doc.text(label, x, y, {lineBreak:false, characterSpacing:2});
+  doc.restore();
 }
 
 const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;", "'":"&#39;"}[c]));
@@ -121,6 +185,7 @@ export function verifyHtml(cert, code){
        <p>ผ่านภารกิจในเกม Project Zero นำโลกสู่ Net Zero${cert.grade ? ` · ${esc(GRADE[cert.grade] || cert.grade)}` : ""}</p>
        <p class="m">ผลการเรียนรู้</p><ol class="m">${OUTCOMES.map(o => `<li>${esc(o)}</li>`).join("")}</ol>
        <p class="m">ออกเมื่อ ${esc(thaiDate(new Date(cert.issued_at)))} · รหัส ${esc(cert.code)}</p>
+       <p class="m">วิธีตรวจของจริง: ชื่อ วันที่ และรหัสในเอกสารต้องตรงกับหน้านี้ทุกตัวอักษร · พื้นหลังมีลายน้ำ “PROJECT ZERO · ${esc(cert.code)}” เป็นแนวเฉียงทั้งแผ่น และขอบด้านในเป็นตัวอักษรขนาดเล็กมากที่มีรหัสเดียวกัน · ถ้ารหัสในลายน้ำไม่ตรงกับรหัสของเอกสาร หรือมีรอยแก้ทับ ถือว่าไม่ใช่ของจริง หรือดาวน์โหลด PDF ต้นฉบับจากลิงก์ด้านล่างมาเทียบ</p>
        <p><a href="/api/certificates/${encodeURIComponent(cert.code)}/pdf">ดาวน์โหลด PDF</a></p>`
     : `<div class="bad">✕ ไม่พบประกาศนียบัตรรหัส ${esc(code)}</div><p>ตรวจสอบว่าพิมพ์รหัสถูกต้อง (รูปแบบ P2050-XXXX-XXXX)</p>`;
   return `<!doctype html><html lang="th"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
