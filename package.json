@@ -4,7 +4,9 @@
   "private": true,
   "description": "Project Zero: the web game, its API server and the admin page, run with one command",
   "type": "module",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "setup": "npm ci --prefix web && npm ci --omit=dev --prefix server/api",
     "build": "node scripts/build.mjs",
@@ -12,6 +14,7 @@
     "migrate": "node scripts/run.mjs api prisma migrate deploy",
     "db:status": "node scripts/run.mjs api prisma migrate status",
     "studio": "node scripts/run.mjs studio",
-    "make-admin": "node scripts/run.mjs api node scripts/make-admin.js"
+    "make-admin": "node scripts/run.mjs api node scripts/make-admin.js",
+    "pm2": "pm2 start ecosystem.config.cjs"
   }
 }
