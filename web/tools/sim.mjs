@@ -17,7 +17,7 @@ function makeEngine(seed){
   ctx.window = ctx; vm.createContext(ctx);
   // deterministic Math.random per game so runs can be repeated
   let s = seed >>> 0; ctx.Math = Object.create(Math); ctx.Math.random = () => { s = (s + 0x6D2B79F5) | 0; let x = Math.imul(s ^ (s >>> 15), 1 | s); x ^= x + Math.imul(x ^ (x >>> 7), 61 | x); return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
-  for (const f of fs.readdirSync(ENG).filter(f => /^(1\d|2\d)-.*\.js$/.test(f)).sort()) vm.runInContext(`(function(){${fs.readFileSync(path.join(ENG, f), "utf8")}})();`, ctx, {filename:f});
+  for (const f of fs.readdirSync(ENG).filter(f => /^(1\d|2\d|3\d)-.*\.js$/.test(f)).sort()) vm.runInContext(`(function(){${fs.readFileSync(path.join(ENG, f), "utf8")}})();`, ctx, {filename:f});
   return ctx.P2050;
 }
 
@@ -32,37 +32,45 @@ function play(bot, seed){
     // resolve an open event
     if (S.event){
       const e = P.currentEvent(); let best = -1;
-      if (bot === "good"){
+      if (bot !== "casual" && bot !== "idle"){
         let bs = -1e9;
         e.options.forEach((o, k) => { if (!P.affordable(o.fx)) return; const fx = o.fx; const sc = -(fx.co2 || 0) * 10 - (fx.temp || 0) * 300 - (fx.tip || 0) * 1.2 + (fx.appr || 0) * (S.appr < 40 ? 1.5 : .6) + (fx.ep || 0) * .04 + (fx.pc || 0) * .1 + (fx.relA || 0) * .05 + (fx.relB || 0) * .05 - (fx.cA || 0) * 20 - (fx.cB || 0) * 20; if (sc > bs){ bs = sc; best = k; } });
       } else { const ok = e.options.map((o, k) => k).filter(k => P.affordable(e.options[k].fx)); best = ok.length ? ok[Math.floor(R() * ok.length)] : -1; }
       P.chooseOption(best);
       continue;
     }
+    if (bot === "idle"){ if (process.env.KEEPAPPR) S.appr = 60; P.tick(); continue; }   // does nothing but answer events at random: shows what a neglected world does
     // bubbles
-    for (const b of S.bubbles.slice()){ if (bot === "casual" && R() < .5) continue; if (b.type === "green" || S.ep > P.aidCost() + 30) P.popBubble(b.id, 0, 0); }
+    for (const b of S.bubbles.slice()){ if (bot === "casual" && R() < .5) continue; if (bot === "good" && R() < .2) continue; if (b.type === "green" || S.ep > P.aidCost() + 30) P.popBubble(b.id, 0, 0); }
     // hazards
-    for (const h of S.haz){ if (!h.evac && S.ep > P.evacCost() + (bot === "good" ? 40 : 80) && (bot === "good" || R() < .4)) P.evacuate(h.id); }
+    for (const h of S.haz){ if (!h.evac && S.ep > P.evacCost() + (bot !== "casual" ? 40 : 80) && (bot !== "casual" || R() < .4)) P.evacuate(h.id); }
     // skills
     const ready = P.SKILLS.filter(n => P.nodeState(n) === "ready").map(n => ({n, c:P.nodeCost(n)})).filter(x => (P.canAfford ? P.canAfford(x.n) : S.ep >= x.c.ep && S.pc >= x.c.pc && !P.atCapacity(x.n)));
-    // minerals: when the best next skill needs more minerals than we have, buy some from the friendliest producer
-    if (P.oreCost && S.oreOn && (bot === "good" || R() < .3)){
-      const want = P.SKILLS.filter(n => P.nodeState(n) === "ready" && P.oreCost(n) > (S.ore || 0)).sort((a, b) => co2Value(P, b) - co2Value(P, a))[0];
-      if (want && S.ep > P.ORE_BUY.ep + 40){
-        const src = S.countries.filter(c => P.oreBuyOk(c) && !(c.cd.ore > 0)).sort((a, b) => b.rel - a.rel)[0];
-        if (src){ S.selC = src.id; S.sel = src.reg; P.countryAction("ore"); S.selC = null; }
+    // minerals (1.1: five groups in every mode): when the best next skill is short of a group, buy it from a producer or on the market
+    if (S.oreOn && P.matCost && (bot !== "casual" || R() < .3)){
+      const want = P.SKILLS.filter(n => P.nodeState(n) === "ready" && !P.matOk(n)).sort((a, b) => co2Value(P, b) - co2Value(P, a))[0];
+      if (want){
+        const k = P.matCost(want), miss = P.MAT_IDS.filter(g => (S.mat[g] || 0) < (k[g] || 0));
+        for (const g of miss){
+          const src = S.countries.filter(c => P.oreBuyOk(c) && !(c.cd.ore > 0) && P.CRES[c.id].r.some(r => P.groupOf(r) === g)).sort((a, b) => b.rel - a.rel)[0];
+          if (src && S.ep > P.ORE_BUY.ep + 30){ S.selC = src.id; S.sel = src.reg; P.countryAction("ore"); S.selC = null; }
+          else if (S.ep > P.mktPrice(g) * P.MKT_LOT + 50) P.mktBuy(g);
+        }
       }
     }
+    if (bot !== "casual" || R() < .3){ if (P.readNews) P.readNews(); if (P.readReport) P.readReport(); }
+    // the "carbon tariff" bot: hammers the biggest continent with tariffs whenever it can
+    if (bot === "cbam"){ const big = S.regions.slice().sort((a, b) => b.co2 - a.co2)[0]; S.sel = big.id; S.selC = null; const tf = P.ACTIONS.find(a => a.id === "tariff"); if (!(big.cd.tariff > 0)) P.doAction("tariff"); }
     if (ready.length){
       let pick;
-      if (bot === "good") pick = ready.sort((a, b) => co2Value(P, b.n) / (b.c.ep + b.c.pc * 3) - co2Value(P, a.n) / (a.c.ep + a.c.pc * 3))[0];
+      if (bot !== "casual") pick = ready.sort((a, b) => co2Value(P, b.n) / (b.c.ep + b.c.pc * 3) - co2Value(P, a.n) / (a.c.ep + a.c.pc * 3))[0];
       else if (R() < .5) pick = ready[Math.floor(R() * ready.length)];
       if (pick && (bot !== "good" || P.recentBuys() < 3 || S.ep > 250)) P.buyNode(pick.n.id);
     }
     // active skills and abilities
-    for (const a of P.abilityList()) if (P.abilityReady(a) && (bot === "good" || R() < .3)){ if (a.target === "country"){ const c = S.countries.filter(x => !x.rest).sort((x, y) => y.co2 - x.co2)[0]; S.selC = c.id; S.sel = c.reg; } P.useAbility(a.id); }
+    for (const a of P.abilityList()) if (P.abilityReady(a) && (bot !== "casual" || R() < .3)){ if (a.target === "country"){ const c = S.countries.filter(x => !x.rest).sort((x, y) => y.co2 - x.co2)[0]; S.selC = c.id; S.sel = c.reg; } P.useAbility(a.id); }
     // regional orders: fund the biggest emitter, diplomacy where on-plan is low
-    if (bot === "good" || R() < .3){
+    if (bot !== "casual" || R() < .3){
       const big = S.regions.slice().sort((a, b) => b.co2 - a.co2)[0]; S.sel = big.id; S.selC = null;
       const fund = P.ACTIONS.find(a => a.id === "fund"), k = P.actionCost(fund, big, false);
       if (!(big.cd.fund > 0) && S.ep > k.ep + 60) P.doAction("fund");
@@ -71,7 +79,7 @@ function play(bot, seed){
       if (!(low.cd.diplo > 0) && S.pc > k2.pc + 20 && low.comp < 80) P.doAction("diplo");
     }
     // country orders on the biggest emitters (funding, technology) and bilateral deals
-    if (bot === "good"){
+    if (bot !== "casual"){
       const top = S.countries.filter(c => !c.rest).sort((x, y) => y.co2 - x.co2).slice(0, 6);
       for (const c of top){
         S.selC = c.id; S.sel = c.reg;
@@ -81,14 +89,14 @@ function play(bot, seed){
       for (const r of S.regions) if (P.canAlly(r.id)) P.formAlliance(r.id);
       S.selC = null;
     }
-    if (process.env.TRACE2 && S.tick % 48 === 0 && !S.event) console.log(S.tick, "ep", Math.round(S.ep), "pc", Math.round(S.pc), "ore", Math.round(S.ore || 0), "rush", P.recentBuys(), P.SKILLS.filter(n => P.nodeState(n) === "ready").map(n => { const c = P.nodeCost(n); return `${n.id}:${c.ep}/${c.pc}/${P.oreCost(n)}${P.atCapacity(n) ? "CAP" : ""}`; }).join(" "));
+    if (process.env.TRACE2 && S.tick % 48 === 0 && !S.event) console.log(S.tick, "ep", Math.round(S.ep), "pc", Math.round(S.pc), "mat", JSON.stringify(Object.fromEntries(Object.entries(S.mat || {}).map(([k, v]) => [k, Math.round(v)]))), "rush", P.recentBuys(), P.SKILLS.filter(n => P.nodeState(n) === "ready").map(n => { const c = P.nodeCost(n); return `${n.id}:${c.ep}/${c.pc}/${JSON.stringify(P.matCost(n) || {}).replace(/"/g, "")}${P.atCapacity(n) ? "CAP" : ""}${P.canAfford(n) ? "*" : ""}`; }).join(" "));
     P.tick();
-    if (process.env.TRACE && S.tick % 24 === 0 && !S.event) console.log(S.tick, P.netCO2().toFixed(1), S.regions.map(r => r.co2.toFixed(1) + '/' + r.comp.toFixed(0)).join(' '), 'ep', Math.round(S.ep), 'skills', Object.keys(S.owned).length, 'bil', S.bilats.length, 'cr', S.crolls.length);
+    if (process.env.TRACE && S.tick % 24 === 0 && !S.event) console.log(S.tick, P.netCO2().toFixed(1), S.regions.map(r => r.co2.toFixed(1) + '/' + r.comp.toFixed(0)).join(' '), 'appr', S.appr.toFixed(1), 'T', S.temp.toFixed(2), 'rel', P.relAll().toFixed(0), 'ep', Math.round(S.ep), 'haz', S.stats.dmg.length, 'skills', Object.keys(S.owned).length, 'bil', S.bilats.length, 'cr', S.crolls.length);
   }
   return {over:S.over, grade:S.grade || "-", tick:S.tick, temp:S.temp, net:P.netCO2(), appr:S.appr, skills:Object.keys(S.owned).length};
 }
 
-for (const bot of ["good", "casual"]){
+for (const bot of (process.env.BOTS || "good,casual").split(",")){
   const res = []; for (let g = 0; g < N; g++) res.push(play(bot, 1000 + g * 7919));
   const cnt = k => res.filter(r => r.over === k).length, wins = res.filter(r => r.over === "win");
   const avg = (a, f) => a.length ? (a.reduce((s, r) => s + f(r), 0) / a.length) : 0;

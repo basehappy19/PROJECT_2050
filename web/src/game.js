@@ -34,26 +34,31 @@ export const G = P.Game = {
       Audio.setMood("calm");
     });
   },
-  loadSave(obj){
+  loadSave(obj, slot){
     if (!P.validSave(obj)) return false;
-    this.enterGame(() => { P.loadState(obj); UIM.modal = null; Audio.setMood(Audio.gameMood()); GameMap.refresh(); });
+    const go = () => { P.loadState(obj, slot); UIM.modal = null; UIM.hzAlert = []; Audio.setMood(Audio.gameMood()); GameMap.refresh(); GameMap.resetView(); bump(); };
+    if (UIM.screen === "game"){ P.autosave(); Audio.stopAmb(300); UIM.reward = null; go(); return true; }
+    this.enterGame(go);
     return true;
   },
+  loadSlot(slot){ const all = P.readSaves(), s = all && all[slot]; if (!s || !this.loadSave(s.S, slot)){ UIM.msg = t("oldSave"); UIM.err = true; bump(); return false; } return true; },
   /* ---------- in-game navigation ---------- */
   selectRegion(id, zoom = false){
     Audio.play("select");
     if (S.sel !== id) S.selC = null;
-    S.sel = id; S.tab = "region"; GameMap.focus(id, zoom); this.scrollDrawer(); P.changed();
+    S.sel = id; S.noSel = false; S.tab = "region"; GameMap.focus(id, zoom); this.scrollDrawer(); P.changed();
   },
   selectCountry(id){
     const c = P.C(id); if (!c) return;
     Audio.play("select");
-    S.sel = c.reg; S.selC = id; S.tab = "region"; GameMap.focusCountry(id); this.scrollDrawer(); P.changed();
+    S.sel = c.reg; S.selC = id; S.noSel = false; S.tab = "region"; GameMap.focusCountry(id); this.scrollDrawer(); P.changed();
   },
   setTab(tab){
     if (tab === "tech"){ this.openSkills(); return; }
     Audio.play(S.tab === tab ? "close" : "open");
     S.tab = S.tab === tab ? null : tab; this.scrollDrawer();
+    if (S.tab === "region") S.noSel = false;
+    if (S.tab === "news" && P.readNews && P.readNews()) Audio.play("coin");
     if (S.tab === "region") GameMap.focus(S.sel, false); else if (!S.tab) GameMap.recenter();
     P.changed();
   },
@@ -88,8 +93,14 @@ export const G = P.Game = {
   startGame(char, mode){
     if (!P.Net.owns("char_" + char)) return;
     if (mode === "hard" && !UIM.worldNext && !P.hardUnlocked()){ UIM.msg = t("hardLockedMsg"); UIM.err = true; bump(); return; }
-    UIM.msg = ""; UIM.modal = null;
-    P.startGame(S.lang, {mode:UIM.worldNext ? "normal" : mode, char, charLv:P.levelOf(P.Net.charXp(char)), seed:mode === "daily" && !UIM.worldNext ? P.dailySeed() : undefined, world:UIM.worldNext});
+    const o = {mode:UIM.worldNext ? "normal" : mode, char, charLv:P.levelOf(P.Net.charXp(char)), seed:mode === "daily" && !UIM.worldNext ? P.dailySeed() : undefined, world:UIM.worldNext};
+    // every game autosaves into its own slot: when all 3 are taken by other games, the player chooses which one to use
+    if (o.slot === undefined && P.readSaves() !== null && !P.pickSlot(o)){ UIM.pendingStart = o; UIM.modal = "slotpick"; UIM.msg = ""; Audio.play("open"); bump(); return; }
+    this.beginGame(o);
+  },
+  beginGame(o){
+    UIM.msg = ""; UIM.modal = null; UIM.pendingStart = null; UIM.hzAlert = [];
+    P.startGame(S.lang, o);
     GameMap.refresh(); GameMap.resetView(); Audio.setMood("calm", true);
   },
   /* after a win: keep playing the same world with no end year */
@@ -164,7 +175,8 @@ function clock(now){
       if (acc >= step){ acc -= step; if (acc > step) acc = 0; P.tick(); afterTick(); }
     }
   }
-  if (S.event && UIM.evAt && UIM.eventLockFrac() < 1) bump();
+  // keep redrawing while the event's choices unlock, and once more when they do (otherwise the buttons stay greyed out)
+  if (S.event && UIM.evAt){ if (UIM.eventLockFrac() < 1) bump(); else if (UIM.evOpenAt !== UIM.evAt){ UIM.evOpenAt = UIM.evAt; bump(); } }
   requestAnimationFrame(clock);
 }
 requestAnimationFrame(clock);
@@ -199,6 +211,17 @@ H.showEnd = () => {
   bump();
 };
 H.closeModal = () => { if (UIM.modal === "charsel") UIM.modal = null; bump(); };
+/* 1.1: a disaster forecast stops the clock (can be switched off in the pause menu) so there is time to evacuate */
+export const hzPauseOn = () => ls.get("p2050-hzpause") !== "0";
+const hw0 = H.hazardWarn;
+H.hazardWarn = h => {
+  if (hw0) hw0(h);
+  if (!hzPauseOn() || UIM.screen !== "game") return;
+  (UIM.hzAlert = UIM.hzAlert || []).push(h.id);
+  if (S.speed){ UIM.hzPrev = S.speed; S.speed = 0; }
+  bump();
+};
+G.hzResume = () => { UIM.hzAlert = []; if (!S.speed) P.setSpeed(UIM.hzPrev || 1); UIM.hzPrev = 0; bump(); };
 H.toast = a => { UIM.toastQ.push(a); bump(); };
 H.story = act => { if (UIM.modal === "skills") UIM.modal = null; G.showStory(act); };
 H.gameStart = () => { G.showStory(1); if (P.Net){ P.Net.startRun(); P.Net.statStart(); } };

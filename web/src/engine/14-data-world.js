@@ -18,6 +18,8 @@ const COUNTRIES = [
   C_("DOM","Dominican Rep.","สาธารณรัฐโดมินิกัน","Dominican Republic","NA",30,60,.3,["hurricane","flood"],["vul","coast"]),
   C_("HTI","Haiti","เฮติ","Haiti","NA",3,80,.3,["hurricane","flood"],["vul","coast"]),
   C_("PAN","Panama","ปานามา","Panama","NA",10,40,.5,["flood","drought"],["coast","for"]),
+  C_("CRI","Costa Rica","คอสตาริกา","Costa Rica","NA",8,45,.9,["flood","drought"],["for","coast"]),
+  C_("JAM","Jamaica","จาเมกา","Jamaica","NA",7,65,.5,["hurricane","flood"],["vul","coast"]),
   // Europe (and Russia, Turkey)
   C_("RUS","Russia","รัสเซีย","Russia","EU",1800,35,-.6,["wildfire","heat","flood"],["ind","fos","arc","for"]),
   C_("DEU","Germany","เยอรมนี","Germany","EU",600,25,.8,["flood","heat"],["ind","rich","tech"]),
@@ -36,6 +38,13 @@ const COUNTRIES = [
   C_("BEL","Belgium","เบลเยียม","Belgium","EU",90,30,.7,["flood"],["rich","ind"]),
   C_("CZE","Czechia","เช็กเกีย","Czechia","EU",90,20,.3,["flood","drought"],["ind"]),
   C_("ROU","Romania","โรมาเนีย","Romania","EU",70,35,.3,["flood","drought","heat"],["farm"]),
+  C_("CHE","Switzerland","สวิตเซอร์แลนด์","Switzerland","EU",35,20,.8,["flood","heat"],["rich","tech"]),
+  C_("AUT","Austria","ออสเตรีย","Austria","EU",60,25,.7,["flood","heat"],["rich","ind"]),
+  C_("IRL","Ireland","ไอร์แลนด์","Ireland","EU",35,20,.7,["flood"],["rich","tech","coast"]),
+  C_("FIN","Finland","ฟินแลนด์","Finland","EU",40,15,.9,["wildfire"],["rich","for","arc","tech"]),
+  C_("DNK","Denmark","เดนมาร์ก","Denmark","EU",28,20,.9,["flood"],["rich","coast","tech"]),
+  C_("HUN","Hungary","ฮังการี","Hungary","EU",45,30,.2,["drought","heat"],["farm","ind"]),
+  C_("ISL","Iceland","ไอซ์แลนด์","Iceland","EU",3,15,.9,["flood"],["rich","arc"]),
   // East Asia
   C_("CHN","China","จีน","China","EA",11900,50,.2,["typhoon","flood","heat","drought"],["ind","tech","coast","farm"]),
   C_("JPN","Japan","ญี่ปุ่น","Japan","EA",1000,55,.5,["typhoon","flood","heat"],["ind","rich","tech","coast"]),
@@ -53,6 +62,8 @@ const COUNTRIES = [
   C_("PER","Peru","เปรู","Peru","SA",60,55,.3,["flood","drought"],["for","vul","coast"]),
   C_("VEN","Venezuela","เวเนซุเอลา","Venezuela","SA",90,45,-.3,["flood","drought"],["fos","for"]),
   C_("ECU","Ecuador","เอกวาดอร์","Ecuador","SA",40,50,.3,["flood"],["for","vul","fos"]),
+  C_("BOL","Bolivia","โบลิเวีย","Bolivia","SA",22,50,.2,["drought","flood","wildfire"],["for","fos","vul"]),
+  C_("URY","Uruguay","อุรุกวัย","Uruguay","SA",7,30,.7,["drought","flood"],["farm"]),
   // Middle East & Africa
   C_("SAU","Saudi Arabia","ซาอุดีอาระเบีย","Saudi Arabia","MEAF",700,55,-.7,["heat","drought"],["fos","rich"]),
   C_("IRN","Iran","อิหร่าน","Iran","MEAF",800,55,-.5,["heat","drought"],["fos","ind"]),
@@ -69,6 +80,13 @@ const COUNTRIES = [
   C_("QAT","Qatar","กาตาร์","Qatar","MEAF",100,50,-.4,["heat"],["fos","rich"]),
   C_("KWT","Kuwait","คูเวต","Kuwait","MEAF",100,50,-.5,["heat"],["fos","rich"]),
   C_("COD","Dem. Rep. Congo","ดีอาร์คองโก","DR Congo","MEAF",5,70,.3,["flood","heat"],["for","vul"]),
+  C_("OMN","Oman","โอมาน","Oman","MEAF",90,50,-.4,["heat","drought"],["fos","rich","coast"]),
+  C_("JOR","Jordan","จอร์แดน","Jordan","MEAF",25,60,.3,["heat","drought"],["vul"]),
+  C_("GHA","Ghana","กานา","Ghana","MEAF",20,60,.4,["flood","drought","heat"],["vul","farm","coast"]),
+  C_("TZA","Tanzania","แทนซาเนีย","Tanzania","MEAF",13,65,.4,["drought","flood"],["vul","farm"]),
+  C_("AGO","Angola","แองโกลา","Angola","MEAF",25,60,-.2,["drought","flood"],["fos","vul"]),
+  C_("MOZ","Mozambique","โมซัมบิก","Mozambique","MEAF",9,80,.4,["flood","drought"],["vul","coast"]),
+  C_("MDG","Madagascar","มาดากัสการ์","Madagascar","MEAF",4,75,.4,["drought","flood"],["vul","for","coast"]),
   // South & Southeast Asia, Oceania
   C_("IND","India","อินเดีย","India","SEA",3100,70,.1,["heat","flood","typhoon","drought"],["ind","farm","tech","coast"]),
   C_("IDN","Indonesia","อินโดนีเซีย","Indonesia","SEA",730,65,0,["flood","wildfire","saltwater"],["fos","for","coast","vul"]),
@@ -83,9 +101,15 @@ const COUNTRIES = [
   C_("MMR","Myanmar","เมียนมา","Myanmar","SEA",40,70,0,["typhoon","flood"],["vul","for"]),
   C_("LKA","Sri Lanka","ศรีลังกา","Sri Lanka","SEA",20,60,.3,["flood","drought"],["vul","coast"]),
   C_("KHM","Cambodia","กัมพูชา","Cambodia","SEA",20,65,.2,["flood","drought"],["vul","farm"]),
+  C_("SGP","Singapore","สิงคโปร์","Singapore","SEA",45,30,.5,["heat","flood"],["rich","tech","coast"]),
+  C_("LAO","Laos","ลาว","Laos","SEA",20,55,.2,["flood","drought"],["vul","for"]),
+  C_("NPL","Nepal","เนปาล","Nepal","SEA",15,70,.4,["flood","drought"],["vul","farm"]),
+  C_("BRN","Brunei","บรูไน","Brunei","SEA",9,30,-.2,["flood"],["fos","rich","for"]),
+  C_("PNG","Papua New Guinea","ปาปัวนิวกินี","Papua New Guinea","SEA",7,60,.3,["flood","drought"],["vul","for","coast"]),
+  C_("FJI","Fiji","ฟิจิ","Fiji","SEA",2,75,.8,["typhoon","flood"],["vul","coast"]),
 ];
 /* the rest of each region (small countries) is one pooled entry, shown as "other countries in the region" */
-const REST_W = {NA:40, EU:350, EA:100, SA:60, MEAF:650, SEA:120};
+const REST_W = {NA:25, EU:104, EA:100, SA:31, MEAF:464, SEA:22};   // 1.1: 24 more countries came out of these pools
 const COUNTRY = Object.fromEntries(COUNTRIES.map(c => [c.id, c]));
 const COUNTRY_BY_GEO = Object.fromEntries(COUNTRIES.map(c => [c.geo, c.id]));
 /* short names for map labels */
@@ -210,8 +234,8 @@ const CHARS = [
   {id:"dip", price:249, icon:"handshake", color:"#8fd0ff",
    name:{th:"นักการทูต",en:"The Diplomat"}, person:{th:"ทูตวารี",en:"Ambassador Waree"},
    pas:{th:"มิตรภาพกับทุกประเทศขึ้นเร็วขึ้น 15% (เลเวล 3: 25%)",en:"Friendship rise 15% faster (level 3: 25%)"},
-   acts:[{id:"dip1", cd:24, icon:"users", name:{th:"ประชุมสุดยอด",en:"Summit"}, desc:{th:"ทุกประเทศในภูมิภาคที่เลือกได้มิตรภาพ +15",en:"Every country in the selected region gets friendship +15"}},
-         {id:"dip2", cd:30, lv:5, icon:"heart-handshake", name:{th:"ทูตสันถวไมตรี",en:"Goodwill Tour"}, desc:{th:"ทำตามแผนทุกภูมิภาค +8%",en:"Every region's on-plan +8%"}}]},
+   acts:[{id:"dip1", cd:24, icon:"users", name:{th:"ประชุมสุดยอด",en:"Summit"}, desc:{th:"ทุกประเทศในทวีปที่เลือกได้มิตรภาพ +15",en:"Every country in the selected region gets friendship +15"}},
+         {id:"dip2", cd:30, lv:5, icon:"heart-handshake", name:{th:"ทูตสันถวไมตรี",en:"Goodwill Tour"}, desc:{th:"ทำตามแผนทุกทวีป +8%",en:"Every region's on-plan +8%"}}]},
   {id:"eco", price:249, icon:"chart-candlestick", color:"#f2b441",
    name:{th:"นักเศรษฐศาสตร์",en:"The Economist"}, person:{th:"คุณธารา",en:"Tara"},
    pas:{th:"รายได้ [[$money]] ต่อเดือน +10% (เลเวล 3: 15%)",en:"[[$money]] monthly income +10% (level 3: 15%)"},
@@ -221,7 +245,7 @@ const CHARS = [
    name:{th:"นักเคลื่อนไหว",en:"The Activist"}, person:{th:"น้องเมฆ",en:"Mek"},
    pas:{th:"ความนิยมลดช้าลง 25% (เลเวล 3: 35%)",en:"Approval falls 25% slower (level 3: 35%)"},
    acts:[{id:"act1", cd:24, icon:"megaphone", name:{th:"รณรงค์ใหญ่",en:"Mass Campaign"}, desc:{th:"ความนิยม +12% ทันที",en:"Approval +12% now"}},
-         {id:"act2", cd:36, lv:5, icon:"sprout", name:{th:"พลังเยาวชน",en:"Youth Power"}, desc:{th:"ทำตามแผนทุกภูมิภาค +6% และมิตรภาพทุกประเทศ +5",en:"Every region's on-plan +6% and every friendship +5"}}]},
+         {id:"act2", cd:36, lv:5, icon:"sprout", name:{th:"พลังเยาวชน",en:"Youth Power"}, desc:{th:"ทำตามแผนทุกทวีป +6% และมิตรภาพทุกประเทศ +5",en:"Every region's on-plan +6% and every friendship +5"}}]},
 ];
 const CHAR = Object.fromEntries(CHARS.map(c => [c.id, c]));
 /* XP needed for each level (level 1 at 0 XP … level 10) */

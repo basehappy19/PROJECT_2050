@@ -11,7 +11,7 @@ const TXT = {
   ambHelp:T("ทูตทำให้มิตรภาพขึ้นเองทุกเดือน และพาเทคโนโลยีสีเขียวเข้ามาเร็วขึ้น (ส่งได้พร้อมกัน 3 ประเทศ)", "An ambassador raises friendship every month and brings green technology in faster (3 at a time)"),
   ambHere:T("มีทูตของเราอยู่ที่นี่", "Our ambassador is here"), ambFull:T("ทูตครบ 3 คนแล้ว เรียกกลับก่อน 1 คน", "All 3 ambassadors are out; recall one first"),
   hqSet:T("ย้ายฐานบัญชาการมาที่นี่", "Move the home base here"), hqHere:T("ฐานบัญชาการของเรา", "Our home base"),
-  hqHelp:T("ฐานบัญชาการ: มิตรภาพไม่ต่ำกว่า 50 ภูมิภาคนี้ทำตามแผนดีขึ้น และได้แต้มนโยบายเพิ่ม", "Home base: friendship never below 50, this region follows the plan better, and you get extra policy points"),
+  hqHelp:T("ฐานบัญชาการ: มิตรภาพไม่ต่ำกว่า 50 ทวีปนี้ทำตามแผนดีขึ้น และได้แต้มนโยบายเพิ่ม", "Home base: friendship never below 50, this region follows the plan better, and you get extra policy points"),
   hqWait:T("ย้ายฐานได้อีกครั้งใน", "Can move again in"),
   prest:T("ดาวเกียรติยศ", "Prestige stars"), prestHelp:T("ได้เมื่อพาโลกต่อเนื่องเข้ายุคใหม่ หรือทำเป้าหมายครบ 10 ข้อ · โลกใหม่ได้เงินเพิ่ม 3% ต่อดาว", "Earned when a Continuous World enters a new era or completes 10 goals · new worlds get 3% more money per star"),
   gotStar:T("ได้ดาวเกียรติยศ", "Prestige star earned"),

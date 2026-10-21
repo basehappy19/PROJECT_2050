@@ -22,7 +22,7 @@ function Resources({c}){
       {cr ? <div class="reslist">{cr.r.map(k => { const R = P.RES[k]; return <span class="res" key={k} title={L(R.fact)} style={{"--rc":R.col}}><Icon n={R.icon} size={15}/>{L(R.name)}</span>; })}</div> : null}
       {imp ? <p class="muted small"><Rich t={`[[ship]] ${t("resImporter")}`} iconColor="inherit"/></p> : null}
       {ban ? <p class="bad small"><Rich t={`[[ban]] ${t("oreBanned")} ${ban} ${t("months")}`} iconColor="inherit"/></p>
-        : src ? <p class="small"><Rich t={`${IC().ore} ${t("oreSends")} +${src.amt < .1 ? src.amt.toFixed(2) : src.amt.toFixed(1)}${t("perMo")}`}/></p>
+        : src ? <p class="small"><Rich t={`${IC().ore} ${t("oreSends")}: ${P.matSources().filter(x => x.id === c.id).map(x => `[[${P.MAT[x.g].icon}]] ${L(P.MAT[x.g].name)} +${x.amt < .1 ? x.amt.toFixed(2) : x.amt.toFixed(1)}`).join("  ") || "+" + src.amt.toFixed(2)}${t("perMo")}`}/></p>
         : S.oreOn && cr && cr.w ? <p class="warn small">{t("oreNeedFriend")}</p> : null}
     </> : null}
   </>;
@@ -109,6 +109,27 @@ function BaseCard({c}){
   </div>;
 }
 
+/* 1.1: bilateral agreement as one clear card: what it does, whether it can be made now, and the deals already signed */
+function Bilateral({c, afford}){
+  const ps = c.rel >= 40 ? P.bilatPartners().sort((a, b) => b.rel - a.rel).slice(0, 12) : [], ready = ps.length > 0;
+  const deals = (S.bilats || []).filter(k => k.split("|").includes(c.id)).map(k => k.split("|").find(x => x !== c.id));
+  return <div class={"card bilat " + (ready ? "ready" : "")}>
+    <div class="row"><b><Rich t={`[[handshake]] ${t("bilatTitle")}`} iconColor={ready ? "good" : "accent"}/></b><span class="grow"/>{ready ? <span class="sitag world">{t("bilatReady")}</span> : null}</div>
+    <div class="bfx">
+      <span class="fxchip good"><Icon n="$co2" size={16}/>{t("bilatFxCo2")}</span>
+      <span class="fxchip good"><Icon n="$money" size={16}/>{t("bilatFxMoney")}</span>
+      <span class="fxchip good"><Icon n="$heart" size={16}/>{t("bilatFxRel")}</span>
+    </div>
+    {c.rel < 40 ? <p class="warn small"><Rich t={t("bilatNeedRel2").replace("{R}", Math.round(c.rel))} iconColor="inherit"/></p>
+      : !ready ? <p class="muted small">{t("bilatNone")}</p>
+      : <><p class="small">{t("bilatPick")} · <Rich t={`${IC().ep} ${P.BILAT_COST.ep}  ${IC().pc} ${P.BILAT_COST.pc}`}/></p>
+        <div class="chips">{ps.map(p => <button type="button" key={p.id} class="chip big" disabled={!afford} onClick={() => { P.bilateral(p.id); Audio.play("bell", {vol:.7}); }}>
+          <i style={{background:COL[relCol(p.rel)]}}/>{L(P.COUNTRY[p.id].name)}<small class={"mono relnum " + relCol(p.rel)}><Icon n="$heart" size={13}/>{Math.round(p.rel)}</small></button>)}</div>
+        {!afford ? <p class="bad small">{t("cantAfford")}</p> : null}</>}
+    {deals.length ? <p class="good small"><Rich t={`[[circle-check]] ${t("bilatHave")} ${P.joinNames(deals)}`} iconColor="inherit"/></p> : null}
+  </div>;
+}
+
 function PaneCountry(){
   const c = P.C(S.selC); if (!c){ S.selC = null; return null; }
   const r = P.R(c.reg), meta = c.rest ? null : P.COUNTRY[c.id], hz = S.haz.find(h => h.c === c.id);
@@ -121,6 +142,8 @@ function PaneCountry(){
       <div class="row"><span class="muted">{t("relation")}</span><b class={"mono big " + relCol(c.rel)}>{c.rel >= 0 ? "+" : ""}{Math.round(c.rel)}</b></div>
       <RelBar rel={c.rel}/>
       <small class="muted">{t(c.rel >= 50 ? "relHigh" : c.rel >= 0 ? "relMid" : "relLow")}</small>
+      {c.rel <= P.HOSTILE ? <small class="bad"><Rich t={`[[angry]] ${t("relHostile")}`} iconColor="inherit"/></small> : null}
+      {(S.sanct || {})[c.id] > 0 ? <small class="bad"><Rich t={`[[ban]] ${t("relSanct")} ${S.sanct[c.id]} ${t("months")} · ${IC().ep} −${P.sanctCost(c)}${t("perMo")}`} iconColor="inherit"/></small> : null}
     </div> : null}
     <StatGrid stats={[[t("co2Now"), `${c.co2.toFixed(2)} Gt`, "hot"], [t("shareOfRegion"), `${Math.round(share * 100)}%`], [t("risk"), c.rest ? "—" : `${meta.risk}%`, meta && meta.risk >= 65 ? "bad" : ""], [t("adapt"), `${Math.round(c.adapt)}`]]}/>
     {S.world && !c.rest ? <BaseCard c={c}/> : null}
@@ -139,14 +162,7 @@ function PaneCountry(){
           <Btn kind={ok ? "primary" : "ghost"} disabled={!ok} sound={null} onClick={() => { const before = c.rel; P.countryAction(a.id); if (c.rel > before) Audio.play("relUp", {delay:.1}); }}>{cd ? `${t("cooldown")} ${cd}` : costLabel(k)}</Btn>
         </div>;
       })}</div>
-      <H3>{t("bilatTitle")}</H3>
-      <p class="muted small"><Rich t={`${t("bilatDesc")} · ${IC().ep} ${P.BILAT_COST.ep} ${IC().pc} ${P.BILAT_COST.pc}`}/></p>
-      {c.rel < 40 ? <p class="warn small">{t("bilatNeedRel")}</p> : (() => {
-        const ps = P.bilatPartners().sort((a, b) => b.rel - a.rel).slice(0, 12);
-        if (!ps.length) return <p class="muted small">{t("bilatNone")}</p>;
-        return <div class="chips">{ps.map(p => <button type="button" key={p.id} class="chip" disabled={!afford} onClick={() => { P.bilateral(p.id); Audio.play("bell", {vol:.7}); }}>
-          <i style={{background:COL[relCol(p.rel)]}}/>{L(P.COUNTRY[p.id].name)}</button>)}</div>;
-      })()}
+      <Bilateral c={c} afford={afford}/>
     </> : null}
     <H3>{`${t("ordersRegion")} · ${c.rest ? L(P.RMETA[c.reg].name) : t("thisCountryOnly")}`}</H3>
     <OrderCards scope={c.rest ? "region" : "country"}/>
@@ -188,6 +204,7 @@ function Impact(){
 function PaneStats(){
   const g = P.grossCO2() || 1;
   return <>
+    <Report/>
     <Impact/>
     <H3>{t("chartCo2")}</H3>
     <p class="muted small legend"><i class="lg solid"/>{S.lang === "th" ? "โลกของคุณ" : "Your world"} <i class="lg dash"/>{S.lang === "th" ? "ถ้าไม่ทำอะไรเลย" : "If nothing was done"}</p>
@@ -203,7 +220,37 @@ function PaneStats(){
     <p class="mono muted small">{t("timePlayed")}: {P.fmtTime(S.realSec)}</p>
   </>;
 }
+/* 1.1: news with filters; season forecasts (purple) are real and worth policy points the first time you open the panel */
+const NEWS_F = [["all", "list", "nfAll"], ["in", "radar", "nfIntel"], ["al", "siren", "nfDanger"], ["gd", "circle-check", "nfGood"], ["ev", "lightbulb", "nfDecide"], ["nw", "newspaper", "nfWorld"]];
 function PaneNews(){
-  const C = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg"};
-  return <ul class="news">{S.log.slice(0, 100).map((lg, i) => <li key={S.log.length - i}><span class="mono muted">{P.dateStr(lg.tk)}</span><Rich t={lg.txt} cls={C[lg.cls] || "fg"} iconColor="inherit"/></li>)}</ul>;
+  const C = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg", in:"purple"}, f = S.newsF || "all";
+  const list = S.log.filter(lg => f === "all" || lg.cls === f || (f === "gd" && lg.cls === "tc")).slice(0, 120);
+  const intel = S.intel && S.tick <= S.intel.until ? S.intel : null;
+  return <>
+    {intel ? <div class="card intelcard"><b><Rich t={`[[radar]] ${t("nfIntelNow")}: ${L(P.RMETA[intel.reg].name)}`} iconColor="purple"/></b><small class="muted">{t("nfIntelHelp")} · {intel.until - S.tick} {t("months")}</small></div> : null}
+    <div class="chips nfilter">{NEWS_F.map(([id, ic, k]) => <button type="button" key={id} class={"chip " + (f === id ? "on" : "")} onClick={() => { S.newsF = id; Audio.play("click"); P.changed(); }}><Icon n={ic} size={14}/>{t(k)}</button>)}</div>
+    {list.length ? <ul class="news">{list.map((lg, i) => <li key={S.log.length - i} class={lg.cls === "in" ? "intel" : ""}><span class="mono muted">{P.dateStr(lg.tk)}</span><Rich t={lg.txt} cls={C[lg.cls] || "fg"} iconColor="inherit"/></li>)}</ul> : <p class="muted small">{t("nfEmpty")}</p>}
+  </>;
+}
+/* 1.1: the yearly report, waiting in the statistics panel every January */
+function Report(){
+  const r = S.report; if (!r) return null;
+  const th = S.lang === "th", arrow = v => (v <= 0 ? "▼" : "▲");
+  const tips = [];
+  if (r.nAngry) tips.push(`[[angry]] ${t("rpAngry").replace("{N}", r.nAngry)} ${P.joinNames(r.angry)}`);
+  if (r.sanct.length) tips.push(`[[ban]] ${t("rpSanct")} ${P.joinNames(r.sanct)}`);
+  tips.push(`[[map]] ${t("rpLag")} ${L(P.RMETA[r.lag].name)}`);
+  if (r.appr < 35) tips.push(`[[$appr]] ${t("rpAppr")}`);
+  if (r.friends < 10) tips.push(`[[handshake]] ${t("rpFriends").replace("{N}", r.friends)}`);
+  return <div class={"card report " + (r.read ? "" : "fresh")}>
+    <div class="row"><b><Rich t={`[[file-chart-column]] ${t("rpTitle")} ${r.y}`} iconColor="accent"/></b><span class="grow"/>{!r.read ? <i class="newdot">NEW</i> : null}</div>
+    <div class="rpgrid">
+      <span><Rich t={t("co2")} iconColor="inherit"/><b class={r.dNet <= 0 ? "good" : "bad"}>{r.net.toFixed(1)} Gt <small>{arrow(r.dNet)} {Math.abs(r.dNet).toFixed(1)}</small></b></span>
+      <span><Rich t={t("temp")} iconColor="inherit"/><b class={r.temp >= 2 ? "bad" : r.temp >= 1.5 ? "warn" : "good"}>+{r.temp.toFixed(2)}°C <small>{arrow(-r.dTemp)}</small></b></span>
+      <span><Rich t={t("appr")} iconColor="inherit"/><b class={r.appr < 35 ? "bad" : "good"}>{r.appr.toFixed(0)}%</b></span>
+      <span>{th ? "ประเทศที่เป็นมิตร (40+)" : "Friendly (40+)"}<b>{r.friends}</b></span>
+    </div>
+    <ul class="rptips">{tips.map((x, i) => <li key={i}><Rich t={x} iconColor="inherit"/></li>)}</ul>
+    {!r.read ? <Btn onClick={() => { P.readReport(); Audio.play("coin"); }}>{`[[check]] ${t("rpRead")} · ${IC().pc} +${r.reward}`}</Btn> : <small class="muted">{t("rpDone")}</small>}
+  </div>;
 }

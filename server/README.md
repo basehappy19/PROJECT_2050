@@ -109,11 +109,11 @@ TEST_DATABASE_URL=postgres://p2050:p2050@localhost:5432/p2050_test npm test
 | method | path | หมายเหตุ |
 |---|---|---|
 | GET | `/api/config` | สถานะ server, Google Client ID, ราคา |
-| POST | `/api/auth/register` `/auth/login` `/auth/google` `/auth/google/complete` `/auth/refresh` `/auth/logout` | access token อายุ 15 นาที, refresh token อายุ 60 วัน (ใช้ได้ครั้งเดียว) |
+| POST | `/api/auth/register` `/auth/login` `/auth/google` `/auth/google/complete` `/auth/refresh` `/auth/logout` | access token อายุ 15 นาที, refresh token อายุ 1 ปี (ใช้ได้ครั้งเดียว ต่ออายุทุกครั้งที่ใช้) |
 | GET | `/api/me` · POST `/api/me/display-name` | เปลี่ยน displayName ครั้งแรกฟรี ครั้งต่อไป 49 Terra |
 | POST | `/api/shop/buy` | `{item}` |
 | POST | `/api/runs` · `/api/runs/:id/finish` | เริ่มเกม / ส่งผลเพื่อรับ Terra และ XP |
 | GET | `/api/leaderboard?mode=normal\|hard\|daily&period=week\|all` | คะแนนสูงสุดของแต่ละคน 50 อันดับ |
-| POST | `/api/achievements` · PUT `/api/progress` | |
-| GET/PUT | `/api/saves/:slot` | เซฟบนคลาวด์ s1–s3 |
+| POST | `/api/achievements` · GET/PUT `/api/progress` | ความคืบหน้าตามบัญชี (ความสำเร็จ การปลดล็อก การ์ดความรู้): แต่ละเครื่องส่งของตัวเองมา server รวมกันแล้วส่งกลับ ไม่มีการเขียนทับ |
+| GET/PUT/DELETE | `/api/saves/:slot` | ช่องบันทึก s1–s3 ซิงก์อัตโนมัติ ช่องที่ใหม่กว่าชนะ (ช่องที่ลบเก็บเป็นเครื่องหมาย `meta.del`) |
 | GET/POST | `/api/certificates` · GET `/api/certificates/:code/pdf` · GET `/verify/:code` | |

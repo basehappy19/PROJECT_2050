@@ -23,6 +23,12 @@ function candidates(){
   out.push("http://localhost:8080/api");
   return [...new Set(out)];
 }
+/* same merge as server/api/src/progress.js: lists joined, counters keep the larger value, achievements keep the first time */
+function mergeInto(d, o){
+  for (const k of ["seen", "haz", "charsDone"]) if (Array.isArray(o[k])){ const cur = d[k] = d[k] || []; for (const x of o[k]) if (!cur.includes(x)) cur.push(x); }
+  for (const k of ["greens", "aids", "evac", "cev", "daily"]) if (o[k] !== undefined) d[k] = Math.max(d[k] || 0, o[k] || 0);
+  for (const k of ["got", "ends"]) if (o[k]){ const m = d[k] = d[k] || {}; for (const [id, v] of Object.entries(o[k])) m[id] = m[id] ? (k === "got" ? Math.min(m[id], v) : Math.max(m[id], v)) : v; }
+}
 const Net = {
   base:null, online:false, checking:false, cfg:null, user:null, owned:new Set(), chars:{}, busy:false, cloud:null,
   board:null, boardMode:"normal", boardPeriod:"week", certs:null, pendingGoogle:null,
@@ -162,15 +168,47 @@ const Net = {
     }, 800);
   },
   toastTerra(n){ if (n > 0 && P.UIM) P.UIM.toastQ.push({icon:"terra", title:t("terraGot"), msg:`+${n} Gems`}); },
-  async syncProgress(){ if (!this.user) return; try { await this.req("PUT", "/progress", {cards:P.cardCount()}); } catch(e) {} },
-  /* ---- cloud saves ---- */
-  async loadCloud(){ if (!this.user) return; try { this.cloud = await this.req("GET", "/saves"); dirty(); } catch(e) {} },
-  async cloudSave(slot){
-    if (!this.user) return false;
-    const all = P.readSaves(); const s = all && all[slot]; if (!s) return false;
-    try { await this.req("PUT", `/saves/${slot}`, {meta:s.meta, state:s.S}); (this.cloud = this.cloud || {})[slot] = {meta:s.meta}; return true; } catch(e) { return false; }
+  /* progress follows the account: send this device's progress, get back the merge of every device + the server's own records
+     (achievements, wins). Called on sign-in, on refresh and a few seconds after anything changes. */
+  async syncProgress(){
+    if (!this.user) return;
+    const d = P.AchStore.data, mine = {seen:d.seen, haz:d.haz, charsDone:d.charsDone, greens:d.greens, aids:d.aids, evac:d.evac, cev:d.cev, daily:d.daily, got:d.got, ends:d.ends, tut:ls.get("p2050-tut") === "1" ? 1 : 0};
+    try {
+      const j = await this.req("PUT", "/progress", {cards:P.cardCount(), data:mine});
+      if (j && j.data){ mergeInto(P.AchStore.data, j.data); P.AchStore.save(true); if (j.data.tut) ls.set("p2050-tut", "1"); dirty(); }
+    } catch(e) {}
   },
-  async cloudLoad(slot){ try { const j = await this.req("GET", `/saves/${slot}`); return j.state; } catch(e) { return null; } },
+  progressChanged(){ if (!this.user) return; clearTimeout(this._progT); this._progT = setTimeout(() => this.syncProgress(), 4000); },
+  /* ---- cloud saves: the 3 slots follow the account. Each write here is sent up a few seconds later;
+     on sign-in / back at the menu the newer copy of each slot wins (a deleted slot is kept as a "deleted at" marker). ---- */
+  cloudQueue(slot){
+    if (!this.user) return;
+    (this._sq = this._sq || {})[slot] = 1; clearTimeout(this._sqT);
+    this._sqT = setTimeout(() => { const q = Object.keys(this._sq); this._sq = {}; q.forEach(k => this.cloudPush(k)); }, 6000);
+  },
+  async cloudPush(slot){
+    if (!this.user) return false;
+    const all = P.rawSaves(), s = all && all[slot]; if (!s || !s.meta) return false;
+    try { await this.req("PUT", `/saves/${slot}`, {meta:s.meta, state:s.S || {}}); return true; } catch(e) { return false; }
+  },
+  async loadCloud(){
+    if (!this.user || this._syncing) return; this._syncing = true;
+    try {
+      const cloud = await this.req("GET", "/saves"), all = P.rawSaves() || {};
+      let changed = false;
+      for (const slot of P.SLOTS){
+        const c = cloud[slot] && cloud[slot].meta, l = all[slot] && all[slot].meta;
+        if (c && (!l || (c.at || 0) > (l.at || 0))){
+          if (S.started && !S.over && S.saveSlot === slot && P.Game && P.UIM && P.UIM.screen === "game") continue;   // never swap the game being played
+          if (c.del){ all[slot] = {meta:c, S:null}; changed = true; continue; }
+          try { const j = await this.req("GET", `/saves/${slot}`); if (j && j.state && P.validSave(j.state)){ all[slot] = {meta:j.meta, S:j.state}; changed = true; } } catch(e) {}
+        } else if (l && (!c || (l.at || 0) > (c.at || 0))) this.cloudPush(slot);
+      }
+      if (changed) P.putSaves(all);
+      this.cloud = cloud;
+    } catch(e) {}
+    finally { this._syncing = false; dirty(); }
+  },
   /* ---- leaderboard ---- */
   async loadBoard(){
     await this.init(); const m = this.boardMode, p = this.boardMode === "daily" ? "day" : this.boardPeriod;
@@ -220,4 +258,5 @@ P.outfitPref = () => ls.get("p2050-outfit") || "base";
 P.outfitOf = id => { const p = P.outfitPref(); if (p === "alt" && Net.owns("outfit")) return "alt"; if (p === "gold" && P.levelOf(Net.charXp(id)) >= 10) return "gold"; return "base"; };
 H.achUnlocked = () => Net.syncAch();
 H.autosaved = () => {};
+H.slotWritten = slot => Net.cloudQueue(slot);
 Net.init();

@@ -17,20 +17,21 @@ const S = P.S, T = (th, en) => ({th, en}), L = o => P.L(o);
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 const GROUPS = {
-  bat:{icon:"battery-full", col:"#8fd0ff", res:["li", "co", "ni", "gr"], base:6, name:T("แร่แบตเตอรี่", "Battery minerals"), sub:T("ลิเทียม โคบอลต์ นิกเกิล กราไฟต์", "lithium, cobalt, nickel, graphite")},
-  ree:{icon:"magnet", col:"#c3a6ff", res:["ree", "ga"], base:8, name:T("แร่หายาก", "Rare earths"), sub:T("แม่เหล็กกังหันลมและมอเตอร์", "magnets for turbines and motors")},
-  cu:{icon:"cable", col:"#f0a060", res:["cu"], base:5, name:T("ทองแดง", "Copper"), sub:T("สายไฟ สายส่ง มอเตอร์", "wires, power lines, motors")},
-  si:{icon:"sun", col:"#ffe08a", res:["si", "sand"], base:4, name:T("ซิลิคอนและทราย", "Silicon & sand"), sub:T("แผงโซลาร์ กระจก คอนกรีต", "solar panels, glass, concrete")},
-  u:{icon:"radiation", col:"#c8f05a", res:["u"], base:7, name:T("ยูเรเนียม", "Uranium"), sub:T("เชื้อเพลิงนิวเคลียร์", "nuclear fuel")},
+  bat:{icon:"battery-full", col:"#8fd0ff", res:["li", "co", "ni", "gr"], base:3.5, name:T("แร่แบตเตอรี่", "Battery minerals"), sub:T("ลิเทียม โคบอลต์ นิกเกิล กราไฟต์", "lithium, cobalt, nickel, graphite")},
+  ree:{icon:"magnet", col:"#c3a6ff", res:["ree", "ga"], base:4.5, name:T("แร่หายาก", "Rare earths"), sub:T("แม่เหล็กกังหันลมและมอเตอร์", "magnets for turbines and motors")},
+  cu:{icon:"cable", col:"#f0a060", res:["cu"], base:3, name:T("ทองแดง", "Copper"), sub:T("สายไฟ สายส่ง มอเตอร์", "wires, power lines, motors")},
+  si:{icon:"sun", col:"#ffe08a", res:["si", "sand"], base:2.5, name:T("ซิลิคอนและทราย", "Silicon & sand"), sub:T("แผงโซลาร์ กระจก คอนกรีต", "solar panels, glass, concrete")},
+  u:{icon:"radiation", col:"#c8f05a", res:["u"], base:4, name:T("ยูเรเนียม", "Uranium"), sub:T("เชื้อเพลิงนิวเคลียร์", "nuclear fuel")},
 };
 const GIDS = Object.keys(GROUPS);
 /* recipe shares by skill (the rest of a skill's mineral cost is copper, the metal every electric thing needs) */
 const RECIPE = {
-  E2:{ree:.3, si:.4, cu:.3}, E3:{bat:.7, cu:.3}, E7:{si:.6, cu:.4}, E4:{u:.7, cu:.3}, E5:{ree:.5, cu:.5},
-  P4:{bat:.6, cu:.25, ree:.15}, E6:{bat:.35, cu:.65}, C7:{si:.5, cu:.5}, P5:{si:.5, cu:.5},
+  E1:{cu:1}, E2:{ree:.3, si:.4, cu:.3}, E8:{cu:.6, si:.4}, E3:{bat:.75, cu:.25}, E7:{si:.6, cu:.4}, E4:{u:.75, cu:.25}, E9:{bat:.5, cu:.5},
+  E5:{ree:.4, bat:.3, cu:.3}, I1:{si:.5, cu:.5}, I2:{cu:.6, si:.4}, I4:{cu:1}, P4:{bat:.6, cu:.25, ree:.15}, E6:{bat:.4, cu:.6}, I3:{cu:1},
+  N4:{cu:.5, si:.5}, N6:{si:1}, C2:{si:1}, C4:{si:.8, cu:.2}, C5:{si:1}, C7:{si:.5, cu:.5}, P5:{si:.5, cu:.5},
 };
 const groupOf = r => GIDS.find(g => GROUPS[g].res.includes(r));
-const full = () => !!(S && S.world);
+const full = () => true;   // 1.1: every mode uses the five mineral groups (was Continuous World only)
 
 function marketInit(){
   if (!full()) return;
@@ -57,13 +58,13 @@ function matSources(){
   for (const c of S.countries){
     const cr = P.CRES[c.id]; if (!cr || !cr.w || c.rest || (S.oreBan || {})[c.id] > 0) continue;
     const gs = [...new Set(cr.r.map(groupOf).filter(Boolean))]; if (!gs.length) continue;
-    const amt = cr.w * P.relFactor(c.rel) * .035; if (amt <= 0) continue;
-    gs.forEach(g => out.push({id:c.id, g, amt:amt / gs.length * 1.4}));
+    const amt = cr.w * P.relFactor(c.rel) * (P.ORE_SRC ?? .035); if (amt <= 0) continue;
+    gs.forEach(g => out.push({id:c.id, g, amt:amt / gs.length}));
   }
   return out;
 }
 function matGain(){
-  const by = {bat:0, ree:0, cu:0, si:0, u:0}, base = (.6 + (S.oreInc || 0)) / GIDS.length;
+  const by = {bat:0, ree:0, cu:0, si:0, u:0}, base = ((P.ORE_HOME ?? .6) + (S.oreInc || 0)) / GIDS.length;
   GIDS.forEach(g => by[g] += base);
   matSources().forEach(x => by[x.g] += x.amt * ((S.orePrice || 0) > 0 ? .7 : 1));
   return by;
@@ -95,11 +96,11 @@ const _tick = P.oreTick; P.oreTick = () => { if (!S.oreOn) return _tick(); if (m
 const _pop = P.popOre; P.popOre = b => {
   if (!full()) return _pop(b);
   marketInit(); const cr = P.CRES[b.cid], gs = cr ? [...new Set(cr.r.map(groupOf).filter(Boolean))] : []; const g = gs.length ? gs[Math.floor(P.rand() * gs.length)] : "cu";
-  const gain = 6 + Math.round(P.rand() * 4); S.mat[g] += gain; return gain;
+  const gain = 5 + Math.round(P.rand() * 3); S.mat[g] += gain; return gain;
 };
 const _buy = P.oreBuy; P.oreBuy = c => {
   if (!full()) return _buy(c);
-  marketInit(); const gs = [...new Set((P.CRES[c.id] || {r:[]}).r.map(groupOf).filter(Boolean))]; const gain = Math.round(10 + 6 * P.relFactor(c.rel));
+  marketInit(); const gs = [...new Set((P.CRES[c.id] || {r:[]}).r.map(groupOf).filter(Boolean))]; const gain = Math.round(8 + 6 * P.relFactor(c.rel));
   if (!gs.length) { S.mat.cu += gain; return gain; } gs.forEach(g => S.mat[g] += Math.round(gain / gs.length)); return gain;
 };
 const _gain = P.oreGain; P.oreGain = () => (full() && S.oreOn ? Object.values(matGain()).reduce((a, b) => a + b, 0) : _gain());

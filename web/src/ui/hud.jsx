@@ -10,7 +10,7 @@ import {IconBtn, Seg, LangSeg, Portrait, Key, Meter} from "./widgets.jsx";
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
 function Kpi({label, value, sub, meter, cls = "", danger, stat}){
-  return <div class={`kpi glass ${cls} ${danger ? "danger" : ""} ${stat ? "has3d" : ""}`}>
+  return <div class={`kpi glass ${cls} ${danger ? "danger" : ""} ${stat ? "has3d" : ""}`} title={sub ? `${plain(label)} ${sub}` : undefined}>
     {stat ? <Icon n={"$" + stat} size={30} cls="k3d"/> : null}
     <span class="k">{stat ? plain(label) : <Rich t={label}/>}</span>
     <span class="v" key={value}>{value}</span>
@@ -28,7 +28,7 @@ export function TopBar(){
   return <header class="topbar">
     <div class="brand glass" onClick={() => G.pause()} title={t("pTitle")}><span>PROJECT</span><b>ZERO</b></div>
     <div class="kpis">
-      <Kpi stat="money" label={t("ep")} value={Math.floor(S.ep)} sub={`+${P.epGain()}${t("perMo")}`}/>
+      <Kpi stat="money" label={t("ep")} value={Math.floor(S.ep)} sub={P.sanctionsCost() ? `+${P.epGain()} −${P.sanctionsCost()}` : `+${P.epGain()}${t("perMo")}`} cls={P.sanctionsCost() ? "sanct" : ""}/>
       <Kpi stat="policy" label={t("pc")} value={Math.floor(S.pc)} sub={`+${P.pcGain()}${t("perMo")}`}/>
       {S.oreOn ? (P.isFullRes() ? <button type="button" class="kpibtn" title={S.lang === "th" ? "ตลาดแร่โลก" : "World minerals market"} onClick={() => { Audio.play("open"); UIM.modal = "market"; bump(); }}><Kpi stat="ore" label={t("oreLbl")} value={P.matTotal()} sub={`+${Math.round(P.oreGain())}${t("perMo")}`} cls="ore mkton"/></button>
         : <Kpi stat="ore" label={t("oreLbl")} value={Math.floor(S.ore || 0)} sub={`+${Math.round(P.oreGain())}${t("perMo")}`} cls="ore"/>) : null}
@@ -49,6 +49,24 @@ export function TopBar(){
       </div>
     </div>
   </header>;
+}
+
+/* 1.1: disaster forecasts stop the clock: evacuate from here, then carry on */
+export function HazAlert(){
+  const list = (UIM.hzAlert || []).map(id => S.haz.find(h => h.id === id)).filter(Boolean);
+  if (!list.length || S.event || UIM.modal || S.over) return null;
+  const cost = P.evacCost();
+  return <div class="hzalert glass-strong" role="alert">
+    <div class="hzh"><Icon n="siren" size={20} color="bad"/><b>{t("hzAlertTitle")}</b><span class="grow"/><small class="muted">{t("hzAlertPaused")}</small></div>
+    {list.map(h => { const Z = P.HAZARDS[h.type], left = Math.max(0, h.at - S.tick); return <div class="hzrow" key={h.id}>
+      <Icon n={Z.icon} size={22} color="warn"/>
+      <span class="grow"><b>{L(Z.name)}</b> · {P.cname(h.c)}<small class="muted"> · {left} {t("months")}{h.wide ? ` · ${t("hzWide")}` : ""}</small></span>
+      <button type="button" class="ibtn" title={t("hzShow")} onClick={() => { Audio.play("click"); GameMap.focusCountry(h.c); }}><Icon n="locate" size={17}/></button>
+      {h.evac ? <span class="good small"><Icon n="check" size={15}/> {t("evacuated")}</span>
+        : <button type="button" class="btn btn-danger btn-sm" disabled={S.ep < cost} onClick={() => { if (P.evacuate(h.id)) Audio.play("shield"); bump(); }}><Rich t={`${t("evacuate")} · ${P.IC.ep} ${cost}`} iconColor="inherit"/></button>}
+    </div>; })}
+    <div class="hzf"><button type="button" class="btn btn-primary" onClick={() => { Audio.play("click"); G.hzResume(); }}><Rich t={`[[play]] ${t("hzGo")}`} iconColor="inherit"/></button></div>
+  </div>;
 }
 
 /* character portrait + ability buttons */
@@ -153,7 +171,8 @@ function MeterT(){
 export function Bottom(){
   const tabs = [["tech", "network", "nbTech", "T"], ["region", "map", "nbRegion", "R"], ["stats", "chart-line", "nbStats", "S"], ["news", "newspaper", "nbNews", "N"]];
   const ready = P.SKILLS.filter(n => P.nodeState(n) === "ready" && P.canAfford(n)).length;
-  const lg = S.log[0], LCOL = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg"};
+  const lg = S.log[0], LCOL = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg", in:"purple"};
+  const badge = {tech:ready, news:S.unread || 0, stats:S.report && !S.report.read ? "!" : 0};
   return <footer class="bottom">
     <div class="meters glass"><MeterNZ/><MeterT/></div>
     <div class="row2">
@@ -162,8 +181,8 @@ export function Bottom(){
       </button>
       <nav class="tabbar">{tabs.map(([id, ic, key, kk]) => {
         const on = id === "tech" ? UIM.modal === "skills" : S.tab === id;
-        return <button type="button" key={id} class={`tabbtn glass ${on ? "on" : ""} ${id === "tech" && ready ? "pulse" : ""}`} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>
-          <Icon n={ic} size={17}/><span>{up(t(key))}</span>{id === "tech" && ready ? <b class="badge">{ready}</b> : <Key k={kk}/>}
+        return <button type="button" key={id} class={`tabbtn glass ${on ? "on" : ""} ${badge[id] ? "pulse" : ""}`} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>
+          <Icon n={ic} size={17}/><span>{up(t(key))}</span>{badge[id] ? <b class={"badge " + (id === "tech" ? "" : "b2")}>{badge[id]}</b> : <Key k={kk}/>}
         </button>;
       })}</nav>
     </div>

@@ -66,13 +66,16 @@ const CRES = {
   POL:{r:["cu", "coal"], w:1}, IND:{r:["coal", "ree"], w:1}, MYS:{r:["palm", "rubber"], w:0}, QAT:{r:["he", "oil"], w:0}, SAU:{r:["oil", "ph"], w:0},
   DZA:{r:["he", "oil"], w:0}, KHM:{r:["sand", "rubber"], w:0}, EGY:{r:["ph", "oil"], w:0}, LKA:{r:["gr"], w:1}, UZB:{r:["u"], w:1}, MNG:{r:["cu", "coal"], w:1},
   ZAF:{r:["coal"], w:1}, IRN:{r:["oil"], w:0}, IRQ:{r:["oil"], w:0}, ARE:{r:["oil"], w:0}, KWT:{r:["oil"], w:0}, NGA:{r:["oil"], w:0}, NOR:{r:["oil"], w:0},
+  BOL:{r:["li"], w:2}, MOZ:{r:["gr"], w:1}, MDG:{r:["gr", "ni"], w:1}, TZA:{r:["gr"], w:1}, PNG:{r:["cu", "ni"], w:1}, FIN:{r:["ni", "co"], w:1}, JOR:{r:["ph"], w:1},
+  AGO:{r:["oil"], w:0}, OMN:{r:["oil"], w:0}, BRN:{r:["oil"], w:0},
   VEN:{r:["oil"], w:0}, COL:{r:["coal", "oil"], w:0}, ECU:{r:["oil"], w:0}, TUR:{r:["co"], w:0}, ISR:{r:["ph"], w:0},
 };
 /* countries that depend on imported minerals (shown on their panel) */
 const IMPORTERS = ["JPN", "KOR", "TWN", "DEU", "FRA", "ITA", "GBR", "ESP", "NLD", "BEL"];
 
 /* ---------------- skills: minerals needed (IEA intensities) and what gets built on the map ---------------- */
-const ORE = {E1:10, E2:35, E3:45, E7:20, E4:15, E5:30, E8:10, E9:5, I2:15, P4:50, E6:25, N4:15, P5:10, C7:15};
+/* 1.1: minerals are scarcer and more skills need them (each split into mineral groups, see 28-market.js RECIPE) */
+const ORE = {E1:15, E2:45, E8:15, E3:60, E7:30, E4:35, E9:10, E5:50, I1:20, I2:25, I4:10, P4:70, E6:40, I3:10, N4:30, N6:20, C2:10, C4:20, C5:10, C7:25, P5:15};
 /* build kinds are drawn by the map (wind turbines, solar farms, …); where = preferred countries (real potential) */
 const BUILD = {
   E1:{k:"grid", where:["USA", "CHN", "IND", "DEU", "BRA", "JPN"], n:2},
@@ -108,7 +111,7 @@ const NEW_SKILLS = [
   S_("R1", "industry", "battery-charging", [3, 0], 80, 15, ["I5"], 12, T("รีไซเคิลแบตเตอรี่และแร่", "Battery & Mineral Recycling"),
     T("ได้แร่ +1 ทุกเดือนจากของเก่า และสกิลที่ใช้แร่ใช้น้อยลง 20%", "Minerals +1 every month from old products; skills need 20% fewer minerals"), {oreInc:1, oreDisc:.2}),
   S_("R2", "energy", "pickaxe", [3, 1], 90, 20, ["E2"], 12, T("เหมืองและโรงแยกแร่ในประเทศ", "Home Mines & Refineries"),
-    T("ได้แร่ +2 ทุกเดือนโดยไม่พึ่งประเทศอื่น แต่ความนิยม −4% และความเสี่ยงภัยพิบัติทุกภูมิภาค +3% จากมลพิษเหมือง", "Minerals +2 a month without relying on others, but approval −4% and every region's disaster risk +3% from mine pollution"),
+    T("ได้แร่ +2 ทุกเดือนโดยไม่พึ่งประเทศอื่น แต่ความนิยม −4% และความเสี่ยงภัยพิบัติทุกทวีป +3% จากมลพิษเหมือง", "Minerals +2 a month without relying on others, but approval −4% and every region's disaster risk +3% from mine pollution"),
     {oreInc:2, appr:-4, vulnAll:3}, {trade:1}),
 ];
 NEW_SKILLS.forEach(n => { if (!SKILL[n.id]){ SKILLS.push(n); SKILL[n.id] = n; } });
@@ -117,20 +120,21 @@ if (P.NODE_ICON) NEW_SKILLS.forEach(n => { P.NODE_ICON[n.id] = n.icon; });
 
 /* ---------------- minerals: income, costs, bubbles ---------------- */
 const relFactor = rel => rel >= 50 ? 1 : rel >= 20 ? .6 : rel >= 0 ? .3 : 0;
+const ORE_HOME = .25, ORE_SRC = .016;   // 1.1: much less free income (was .6 and .035)
 /* what each country sends us this month: [{id, amt}] */
 function oreSources(){
   const out = [];
   for (const c of S.countries){
     const cr = CRES[c.id]; if (!cr || !cr.w || c.rest) continue;
     if ((S.oreBan || {})[c.id] > 0) continue;
-    const amt = cr.w * relFactor(c.rel) * .035;
+    const amt = cr.w * relFactor(c.rel) * ORE_SRC;
     if (amt > 0) out.push({id:c.id, amt});
   }
   return out;
 }
 function oreGain(){
   if (!S.oreOn) return 0;
-  let g = .6 + oreSources().reduce((s, x) => s + x.amt, 0) + (S.oreInc || 0);
+  let g = ORE_HOME + oreSources().reduce((s, x) => s + x.amt, 0) + (S.oreInc || 0);
   if ((S.orePrice || 0) > 0) g *= .7;                // price spike: the market sends less for the same money
   return Math.max(0, Math.round(g * 10) / 10);
 }
@@ -141,7 +145,7 @@ function oreCost(n){
 }
 function oreTick(){
   if (!S.oreOn) return;
-  const src = oreSources(), base = .6 + (S.oreInc || 0), tot = oreGain();
+  const src = oreSources(), base = ORE_HOME + (S.oreInc || 0), tot = oreGain();
   S.ore = (S.ore || 0) + tot;
   const from = S.oreFrom = S.oreFrom || {};
   src.forEach(x => { from[x.id] = (from[x.id] || 0) + x.amt; });
@@ -149,7 +153,7 @@ function oreTick(){
   Object.keys(S.oreBan || {}).forEach(k => { if (S.oreBan[k] > 0 && --S.oreBan[k] === 0){ P.addLog(`[[${"package-open"}]] ${P.cname(k)} ${L(T("กลับมาส่งออกแร่แล้ว", "is exporting minerals again"))}`, "gd"); } });
   if (S.orePrice > 0) S.orePrice--;
   // orange bubbles over mining countries
-  if (!S.bubbles.some(b => b.type === "ore") && P.rand() < .09){
+  if (!S.bubbles.some(b => b.type === "ore") && P.rand() < .14){
     const list = S.countries.filter(c => CRES[c.id] && CRES[c.id].w && !(S.oreBan || {})[c.id]);
     if (list.length){ const c = list[Math.floor(P.rand() * list.length)]; S.bubbles.push({id:++S.bubId, type:"ore", reg:c.reg, cid:c.id, ttl:4}); hook("sfx", "spawnGreen"); }
   }
@@ -157,8 +161,8 @@ function oreTick(){
 /* first skill bought → minerals switch on (one step at a time, as planned) */
 function unlockOre(){
   if (S.oreOn) return;
-  S.oreOn = true; S.ore = (S.ore || 0) + 25;
-  P.addLog(L(T("[[$ore]] ปลดล็อกแร่: พลังงานสะอาดต้องใช้แร่ หาได้จากประเทศที่เป็นมิตร ฟองสีส้ม และการสั่งซื้อ", "[[$ore]] Minerals unlocked: clean energy needs minerals — get them from friendly countries, orange bubbles and purchase orders")), "gd");
+  S.oreOn = true; S.ore = (S.ore || 0) + 15;
+  P.addLog(L(T("[[$ore]] ปลดล็อกแร่: พลังงานสะอาดต้องใช้แร่ 5 กลุ่ม (แร่แบตเตอรี่ แร่หายาก ทองแดง ซิลิคอนและทราย ยูเรเนียม) หาได้จากประเทศที่เป็นมิตร ฟองสีส้ม การสั่งซื้อจากประเทศ และตลาดแร่โลก (กดที่ช่องแร่ด้านบน)", "[[$ore]] Minerals unlocked: clean energy needs 5 mineral groups (battery minerals, rare earths, copper, silicon & sand, uranium). Get them from friendly countries, orange bubbles, purchase orders and the world market (tap the minerals box at the top)")), "gd");
   hook("toast", {id:"ore", icon:"$ore", title:L(T("ปลดล็อกใหม่", "New")), msg:L(T("แร่: ใช้สร้างพลังงานสะอาด", "Minerals: needed for clean energy"))});
 }
 function spendOre(n){
@@ -166,15 +170,15 @@ function spendOre(n){
   S.ore -= k; S.oreUsed = (S.oreUsed || 0) + k;
 }
 function popOre(b){
-  const gain = 6 + Math.round(P.rand() * 4);
+  const gain = 5 + Math.round(P.rand() * 3);
   S.ore = (S.ore || 0) + gain; (S.oreFrom = S.oreFrom || {})[b.cid] = (S.oreFrom[b.cid] || 0) + gain;
   return gain;
 }
 /* country order: buy minerals from a country that has them */
-const ORE_BUY = {id:"ore", icon:"package", ep:35, pc:0, cd:6, name:T("ซื้อแร่จากประเทศนี้", "Buy minerals here"), desc:T("แร่ +12 (มากขึ้นถ้าเป็นมิตร) และมิตรภาพ +2", "Minerals +12 (more if friendly), friendship +2")};
+const ORE_BUY = {id:"ore", icon:"package", ep:30, pc:0, cd:6, name:T("ซื้อแร่จากประเทศนี้", "Buy minerals here"), desc:T("แร่ที่ประเทศนี้มี +8 ถึง +14 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2", "This country's minerals +8 to +14 (more if friendly), friendship +2")};
 function oreBuyOk(c){ return !!(S.oreOn && c && !c.rest && CRES[c.id] && CRES[c.id].w && !((S.oreBan || {})[c.id] > 0)); }
 function oreBuy(c){
-  const gain = Math.round(10 + 6 * relFactor(c.rel));
+  const gain = Math.round(8 + 6 * relFactor(c.rel));
   S.ore = (S.ore || 0) + gain; (S.oreFrom = S.oreFrom || {})[c.id] = (S.oreFrom[c.id] || 0) + gain;
   return gain;
 }
@@ -186,4 +190,4 @@ function oreSummary(){
 }
 
 { const i = (P.CACTS || []).findIndex(a => a.id === "ore"); if (i >= 0) P.CACTS[i] = ORE_BUY; }
-Object.assign(P, {RES, CRES, IMPORTERS, ORE_BUY, oreSources, oreGain, oreCost, oreTick, unlockOre, spendOre, popOre, oreBuyOk, oreBuy, oreSummary, relFactor});
+Object.assign(P, {ORE_HOME, ORE_SRC, RES, CRES, IMPORTERS, ORE_BUY, oreSources, oreGain, oreCost, oreTick, unlockOre, spendOre, popOre, oreBuyOk, oreBuy, oreSummary, relFactor});

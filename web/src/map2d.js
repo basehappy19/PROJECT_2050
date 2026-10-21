@@ -42,7 +42,7 @@ export const GameMap = {
     for (const s of j.shapes){
       const rings = s.p.map(r => { const a = new Float32Array(r.length); let x = 0, y = 0; for (let i = 0; i < r.length; i += 2){ if (i === 0){ x = r[0]; y = r[1]; } else { x += r[i]; y += r[i + 1]; } a[i] = x / 10; a[i + 1] = y / 10; } return a; });
       const path = new Path2D(); for (const r of rings){ path.moveTo(r[0], r[1]); for (let i = 2; i < r.length; i += 2) path.lineTo(r[i], r[i + 1]); path.closePath(); }
-      const sh = {name:s.n, c:s.c, r:s.r, b:s.b, l:s.l, rings, path};
+      const sh = {name:s.n, c:s.c || (P.COUNTRY_BY_GEO && P.COUNTRY_BY_GEO[s.n]) || null, r:s.r, b:s.b, l:s.l, rings, path};   // 1.1: countries added after the map data was built
       this.shapes.push(sh); if (s.c && !this.byCountry[s.c]) this.byCountry[s.c] = sh;
     }
     const regPaths = {};
@@ -205,7 +205,9 @@ export const GameMap = {
       else G.selectRegion(sh.r, true);
       return;
     }
+    // tap on empty sea: close the panel and clear the selection (no outline left behind)
     if (S.tab) G.closeTab();
+    if (S.selC || !S.noSel){ S.selC = null; S.noSel = true; P.changed(); }
   },
   /* ---------- drawing ---------- */
   frame(){
@@ -241,11 +243,32 @@ export const GameMap = {
   buildCache(){
     const k = Gfx.cfg.cache, W = Math.round(MAP.W * k), Hh = Math.round(MAP.H * k);
     if (!this.cache || this.cache.width !== W || this.cache.height !== Hh){ this.cache = document.createElement("canvas"); this.cache.width = W; this.cache.height = Hh; }
-    const c = this.cache.getContext("2d", {alpha:false});
-    c.setTransform(1, 0, 0, 1, 0, 0); c.fillStyle = COL.bg; c.fillRect(0, 0, W, Hh);
+    const c = this.cache.getContext("2d");
+    c.setTransform(1, 0, 0, 1, 0, 0); c.clearRect(0, 0, W, Hh);   // transparent outside the map outline: space shows through
     c.setTransform(k, 0, 0, k, 0, 0);
     this.paintWorld(c, 1 / k, .75);
     this.cacheKey = this.tintKey();
+  },
+  /* 1.1: outside the world map is deep space (stars, a faint nebula and the glow of the planet's edge), not a flat dark fill.
+     Built once per screen size; drifts very slightly with the camera so it feels far away. */
+  drawSpace(c){
+    const w = this.w, h = this.h;
+    if (!this.space || this.space.width !== Math.round(w * 1.2) || this.space.height !== Math.round(h * 1.2)){
+      const cv = this.space = document.createElement("canvas"); cv.width = Math.round(w * 1.2); cv.height = Math.round(h * 1.2);
+      const g = cv.getContext("2d", {alpha:false}), W = cv.width, H = cv.height;
+      const bg = g.createLinearGradient(0, 0, W, H); bg.addColorStop(0, "#040b14"); bg.addColorStop(.5, "#061019"); bg.addColorStop(1, "#050a12"); g.fillStyle = bg; g.fillRect(0, 0, W, H);
+      let seed = 7; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+      for (const [x, y, r, col] of [[.15, .25, .45, "rgba(60,110,170,.10)"], [.85, .7, .5, "rgba(79,209,197,.07)"], [.6, .1, .35, "rgba(150,110,220,.06)"]]){
+        const gr = g.createRadialGradient(x * W, y * H, 0, x * W, y * H, r * Math.max(W, H)); gr.addColorStop(0, col); gr.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+      }
+      const n = Math.round(W * H / 2600);
+      for (let i = 0; i < n; i++){
+        const x = rnd() * W, y = rnd() * H, b = rnd(), r = b > .985 ? 1.4 : b > .9 ? 1 : .6;
+        g.fillStyle = `rgba(${200 + Math.round(rnd() * 55)},${215 + Math.round(rnd() * 40)},255,${.25 + b * .6})`; g.beginPath(); g.arc(x, y, r, 0, Math.PI * 2); g.fill();
+      }
+    }
+    const ox = clamp(-(this.cam.x / MAP.W - .5) * w * .1, -w * .1, 0) - w * .05, oy = clamp(-(this.cam.y / MAP.H - .5) * h * .1, -h * .1, 0) - h * .05;
+    c.drawImage(this.space, ox, oy);
   },
   /* how many cached pixels fall on one screen pixel at this zoom (below 1 = the cache looks soft) */
   cacheDensity(){ return Gfx.cfg.cache / (this.scale() * this.dpr); },
@@ -270,7 +293,7 @@ export const GameMap = {
     const c = this.bctx, d = this.dpr, s = this.scale();
     if (this.shapes.length && this.cacheKey !== this.tintKey()) this.buildCache();
     c.setTransform(d, 0, 0, d, 0, 0);
-    c.fillStyle = COL.bg; c.fillRect(0, 0, this.w, this.h);
+    this.drawSpace(c);
     const fast = !!this.cache && (moving || !this.needSharp());
     this.baseFast = fast;
     if (fast){
@@ -287,7 +310,7 @@ export const GameMap = {
     const px = 1 / s;   // one CSS pixel in map units
     if (!fast) this.paintWorld(c, px, clamp((this.cam.z - .95) / .7, .25, 1));
     if (!S.regions) return;
-    const zc = this.cam.z >= ZCOUNTRY, sel = S.sel, selC = S.selC;
+    const zc = this.cam.z >= ZCOUNTRY, sel = S.noSel ? null : S.sel, selC = S.noSel ? null : S.selC;
     // selected region: a little brighter, with an outline
     if (sel && this.regPaths[sel]){
       const r = S.regions.find(q => q.id === sel), col = r ? heatRGB(regionHeatValue(r)) : [79, 209, 197];
@@ -365,7 +388,7 @@ export const GameMap = {
     if (!zc){
       for (const r of S.regions){
         const [wx, wy] = this.regionPoint(r.id), [x, y] = this.toScreen(wx, wy); if (!vis(x, y)) continue;
-        const sel = S.sel === r.id, txt = `${r.id}  ${r.co2.toFixed(1)} Gt`;
+        const sel = !S.noSel && S.sel === r.id, txt = `${r.id}  ${r.co2.toFixed(1)} Gt`;
         const hov = this.hover && this.hover.hit === "lab-" + r.id;
         const b = this.pill(x, y, txt, {font:"600 12px 'IBM Plex Mono', monospace", h:24, stroke:sel || hov ? COL.accent : "rgba(79,209,197,.25)", sw:sel ? 1.5 : 1, icon:S.alli[r.id] ? "handshake" : null, iconColor:COL.good, bg:sel ? "rgba(8,40,40,.9)" : undefined});
         this.hits.push({id:"lab-" + r.id, ...b, fn:() => G.selectRegion(r.id, true)});

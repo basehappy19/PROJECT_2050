@@ -21,11 +21,11 @@ const TOTAL_TICKS = 300;
 const TIP_TO_TEMP = 0.004;          // 1 'tipping %' ≈ +0.004 °C
 const SPEEDS = [0, 9, 4.5, 3];      // seconds per month: 1× ≈ 45 min for the whole game, 2× ≈ 22 min, 3× ≈ 15 min
 const MAX_PROJECTS = 3;
-const MODES = {normal:{ep:25, pc:20, haz:1, dmg:1}, hard:{ep:10, pc:12, haz:1.6, dmg:1.25}, daily:{ep:25, pc:20, haz:1.15, dmg:1}};
+const MODES = {normal:{ep:25, pc:20, haz:1, dmg:1}, hard:{ep:10, pc:12, haz:1.3, dmg:1.2}, daily:{ep:25, pc:20, haz:1.1, dmg:1}};
 /* Balance presets: inc = monthly income · cost = prices of skills and orders · haz = how often disasters come · growth = how fast emissions grow.
    Bot test (tools/sim.mjs): A = a sensible player wins ~60%, usually in 2049–2050; B = harder, ~30%. Players get A; B is for testing during development. */
-const BALANCE = {A:{inc:1.22, cost:.88, haz:1, growth:1}, B:{inc:1.2, cost:.9, haz:1, growth:1}};
-const HARD = {inc:.98, cost:1.02, haz:1.25, growth:1};   // Hard Core on top of the preset
+const BALANCE = {A:{inc:1, cost:.94, haz:1, growth:1}, B:{inc:.9, cost:1, haz:1.15, growth:1.05}};
+const HARD = {inc:1, cost:.99, haz:1.1, growth:1};   // Hard Core on top of the preset
 const bal = () => { const b = BALANCE[S.ab] || BALANCE.A; return S.mode === "hard" ? {inc:b.inc * HARD.inc, cost:b.cost * HARD.cost, haz:b.haz * HARD.haz, growth:b.growth * HARD.growth} : b; };
 function setBalance(id, values){ if (values) BALANCE[id] = Object.assign({inc:1, cost:1, haz:1, growth:1}, values); if (S) S.ab = BALANCE[id] ? id : "A"; }
 /* Every game uses preset A. Developers can try another preset with ?ab=B in the address or localStorage "p2050-ab" (bot tests: web/tools/sim.mjs). */
@@ -100,6 +100,7 @@ function applyRegionCO2(r, delta){ const d = delta < 0 ? delta * (r.comp / 100) 
 function changeComp(id, v, permanent){ (id === "ALL" ? S.regions : [R(id)]).forEach(r => { r.comp = clamp(r.comp + v, 0, 100); if (permanent) r.compBase = clamp(r.compBase + v, 0, 100); }); }
 function changeVuln(id, v){ (id === "ALL" ? S.regions : [R(id)]).forEach(r => { r.vuln = clamp(r.vuln + v, 0, 100); }); }
 const charLvBonus = () => S.charLv >= 3;
+const REL_COMP = .3;   // 1.1: how much a continent's friendship pulls its on-plan % (was .08)
 function relMult(){ let m = 1; if (S.owned.D1) m += .2; if (S.char === "dip") m += charLvBonus() ? .25 : .15; return m; }
 function changeRel(id, v){
   const c = C(id); if (!c) return 0;
@@ -110,14 +111,17 @@ function changeRel(id, v){
 }
 const avgRel = reg => { const l = regCountries(reg, false); return l.length ? l.reduce((s, c) => s + c.rel, 0) / l.length : 0; };
 const relAll = () => { const l = S.countries.filter(c => !c.rest); return l.reduce((s, c) => s + c.rel, 0) / l.length; };
+/* 1.1: approval is easy to lose and slow to win back */
+const APPR_UP = .7, APPR_DOWN = 1.2;
+function addAppr(v){ S.appr = clamp(S.appr + (v > 0 ? v * APPR_UP : v * APPR_DOWN), 0, 100); }
 
 /* ---------------------------- Economy ---------------------------- */
 function epGain(){
-  let base = 2 + avg(r => r.comp) * 0.07 + S.appr / 30;
+  let base = 1 + avg(r => r.comp) * 0.05 + S.appr / 40 + (S.bilats || []).length * (P.BILAT_INC || 0);
   if (S.char === "eco") base *= charLvBonus() ? 1.15 : 1.1;
   return Math.floor((Math.floor(base) + S.epInc) * bal().inc * (1 + (S.prest || 0) * .03));   // prest: Prestige stars (Continuous World only)
 }
-const pcGain = () => Math.max(1, Math.floor((1 + avg(r => r.comp) * 0.03 + (S.pcInc || 0)) * bal().inc));   // pcInc: home base (Continuous World)
+const pcGain = () => Math.max(1, Math.floor((1.3 + avg(r => r.comp) * 0.035 + (S.pcInc || 0)) * bal().inc));   // pcInc: home base (Continuous World)
 const recentBuys = () => (S.buys || []).filter(tk => S.tick - tk < 12).length;
 const rushMult = () => 1 + 0.2 * recentBuys();
 function nodeCost(n){
@@ -146,7 +150,7 @@ function buyNode(id){
   const fx = n.fx;
   const boost = (n.cat === "energy" && id !== "E1" && S.owned.E1) ? 1.1 : 1;
   const dacEff = (id === "N4" && !S.owned.E2) ? 0.6 : 1;
-  if (fx.appr) S.appr = clamp(S.appr + fx.appr, 0, 100);
+  if (fx.appr) addAppr(fx.appr);
   if (fx.compAll) changeComp("ALL", fx.compAll, true);
   if (fx.comp) Object.entries(fx.comp).forEach(([k,v]) => changeComp(k, v, true));
   if (fx.vuln) Object.entries(fx.vuln).forEach(([k,v]) => changeVuln(k, v));
@@ -187,14 +191,14 @@ function useAbility(id){
   switch (id){
     case "I4": addCountryCO2(c, -0.15 * c.co2); changeRel(c.id, -5); S.stats.help[c.id] = (S.stats.help[c.id] || 0) + 1; break;
     case "C6": S.evacFree[c.id] = 1; break;
-    case "D4": S.ep += 80; S.appr = clamp(S.appr - 4, 0, 100); break;
+    case "D4": S.ep += 80; addAppr(-4); break;
     case "sci1": S.buff.instant = 1; break;
     case "sci2": S.buff.disc = 1; break;
     case "dip1": regCountries(S.sel, false).forEach(x => changeRel(x.id, 15)); break;
     case "dip2": changeComp("ALL", 8, false); break;
     case "eco1": S.ep += 120; S.bond = 12; break;
     case "eco2": if (S.pc < 20) return false; S.pc -= 20; S.ep += 70; break;
-    case "act1": S.appr = clamp(S.appr + 12, 0, 100); break;
+    case "act1": addAppr(12); break;
     case "act2": changeComp("ALL", 6, false); S.countries.forEach(x => { if (!x.rest) changeRel(x.id, 5); }); break;
     default: return false;
   }
@@ -215,13 +219,13 @@ function doAction(aid, scope){
   if (!cc){
     if (aid === "fund")   setRegionCO2(r, r.co2 - 0.35 * r.comp / 100);
     if (aid === "diplo")  r.comp = clamp(r.comp + 8, 0, 100);
-    if (aid === "adapt"){ r.vuln = clamp(r.vuln - 10, 0, 100); S.appr = clamp(S.appr + 1, 0, 100); }
-    if (aid === "tariff"){ setRegionCO2(r, r.co2 - 0.8 * r.comp / 100); r.comp = clamp(r.comp - 6, 0, 100); regCountries(r.id, false).forEach(x => changeRel(x.id, -4)); }
+    if (aid === "adapt"){ r.vuln = clamp(r.vuln - 10, 0, 100); addAppr(1); }
+    if (aid === "tariff"){ const k = Math.pow(.72, r.uses[aid] - 1); setRegionCO2(r, r.co2 - 0.8 * k * r.comp / 100); r.comp = clamp(r.comp - 8, 0, 100); regCountries(r.id, false).forEach(x => changeRel(x.id, -10)); addAppr(-2); if (P.retaliate) regCountries(r.id, false).forEach(x => P.retaliate(x, .35)); }
   } else {
     if (aid === "fund"){ addCountryCO2(cc, -cc.co2 * 0.12 * r.comp / 100); changeRel(cc.id, 3); }
     if (aid === "diplo") changeRel(cc.id, 12);
     if (aid === "adapt"){ cc.adapt = clamp(cc.adapt + 20, 0, 100); changeRel(cc.id, 4); }
-    if (aid === "tariff"){ addCountryCO2(cc, -cc.co2 * 0.25 * r.comp / 100); changeRel(cc.id, -12); }
+    if (aid === "tariff"){ cc.tar = (cc.tar || 0) + 1; addCountryCO2(cc, -cc.co2 * 0.2 * Math.pow(.7, cc.tar - 1) * r.comp / 100); changeRel(cc.id, -22); addAppr(-1); if (P.retaliate) P.retaliate(cc, .6); }
     S.stats.help[cc.id] = (S.stats.help[cc.id] || 0) + 1;
   }
   addLog(`${t("logAct")}: ${L(a.name)} → ${cc ? cname(cc.id) : L(RMETA[r.id].name)}`, "tc"); Ach.unlock("action1"); hook("sfx", "action");
@@ -256,7 +260,7 @@ function countryAction(aid){
   changed();
 }
 /* bilateral agreement between the selected country and a partner (both relation ≥ 40) */
-const BILAT_COST = {ep:30, pc:15};
+const BILAT_COST = {ep:30, pc:15}, BILAT_CUT = .12, BILAT_MONTHS = 24, BILAT_INC = 1;
 const bilatKey = (a, b) => [a, b].sort().join("|");
 function bilatPartners(){
   const c = S.selC && C(S.selC); if (!c || c.rest || c.rel < 40) return [];
@@ -266,8 +270,9 @@ function bilateral(pid){
   const c = S.selC && C(S.selC), p = C(pid);
   if (!c || !p || c.rel < 40 || p.rel < 40 || S.bilats.includes(bilatKey(c.id, p.id)) || S.ep < BILAT_COST.ep || S.pc < BILAT_COST.pc) return;
   S.ep -= BILAT_COST.ep; S.pc -= BILAT_COST.pc; S.bilats.push(bilatKey(c.id, p.id));
-  [c, p].forEach(x => { S.crolls.push({c:x.id, left:24, months:24, frac:-0.10}); changeRel(x.id, 5); });
-  addLog(`${t("logBilat")}: ${cname(c.id)} + ${cname(p.id)}`, "gd"); hook("sfx", "buy"); Ach.unlock("bilateral");
+  [c, p].forEach(x => { S.crolls.push({c:x.id, left:BILAT_MONTHS, months:BILAT_MONTHS, frac:-BILAT_CUT, bil:1}); changeRel(x.id, 8); if (P.addGreen) P.addGreen(x.id, 10); });
+  addLog(`[[handshake]] ${t("logBilat")}: ${cname(c.id)} + ${cname(p.id)} · ${IC.co2} −${Math.round(BILAT_CUT * 100)}% ${t("bilatBoth")} ${BILAT_MONTHS} ${t("months")} · ${IC.ep} +${BILAT_INC}${t("perMo")}`, "gd"); hook("sfx", "buy"); Ach.unlock("bilateral");
+  hook("toast", {id:"bil" + S.bilats.length, icon:"handshake", title:t("logBilat"), msg:`${cname(c.id)} + ${cname(p.id)}`});
   changed();
 }
 /* alliance: 3+ countries in one region with relation ≥ 50 (needs skill D3) */
@@ -299,7 +304,7 @@ function applyFx(fx, target, cev){
   if (fx.rco2) Object.entries(fx.rco2).forEach(([k,v]) => applyRegionCO2(R(k), v));
   if (fx.temp) S.temp += fx.temp;
   if (fx.tip)  S.temp += fx.tip * TIP_TO_TEMP;
-  if (fx.appr) S.appr = clamp(S.appr + fx.appr, 0, 100);
+  if (fx.appr) addAppr(fx.appr);
   if (fx.ep)   S.ep = Math.max(0, S.ep + fx.ep);
   if (fx.pc)   S.pc = Math.max(0, S.pc + fx.pc);
   if (fx.comp) Object.entries(fx.comp).forEach(([k,v]) => changeComp(k === "T" ? (target || "ALL") : k, v, false));
@@ -330,10 +335,13 @@ function applyFx(fx, target, cev){
 
 /* ---------------------------- Bubbles (green = free Eco-Points; red = disaster aid after a hazard) ---------------------------- */
 const RED_COST = 20;
+/* 1.1: green bubbles are the main money source: up to 2 at a time, often */
+const GREEN_MAX = 2, GREEN_P = .55;
+const greenGain = () => 8 + Math.round(avg(r => r.comp) / 10);
 const aidCost = () => Math.round(RED_COST * (S.owned.D1 ? .75 : 1));
 function spawnGreens(){
   const greens = S.bubbles.filter(b => b.type === "green").length;
-  if (greens < 1 && rand() < 0.10){
+  if (greens < GREEN_MAX && rand() < GREEN_P){
     const reg = pick(S.regions, r => 0.3 + r.comp / 100);
     const city = pick(CITIES[reg.id], c => c[2]);
     S.bubbles.push({id:++S.bubId, type:"green", reg:reg.id, lat:city[0], lon:city[1], ttl:4}); hook("sfx", "spawnGreen");
@@ -343,9 +351,9 @@ function ageBubbles(){
   S.bubbles.forEach(b => {
     b.ttl--;
     if (b.ttl <= 0 && b.type === "red"){
-      const r = R(b.reg); S.appr = clamp(S.appr - 1.5, 0, 100); r.vuln = clamp(r.vuln + 2, 0, 100); r.comp = clamp(r.comp - 2, 0, 100);
-      if (b.cid) changeRel(b.cid, -6);
-      hook("sfx", "miss"); addLog(`${t("redMiss")} ${b.cid ? cname(b.cid) : L(RMETA[b.reg].name)} · ${t("appr")} −1.5% · ${t("vuln")} +2%`, "al");
+      const r = R(b.reg); addAppr(-2); r.vuln = clamp(r.vuln + 2, 0, 100); r.comp = clamp(r.comp - 2, 0, 100);
+      if (b.cid) changeRel(b.cid, -8);
+      hook("sfx", "miss"); addLog(`${t("redMiss")} ${b.cid ? cname(b.cid) : L(RMETA[b.reg].name)} · ${t("appr")} −${(2 * APPR_DOWN).toFixed(1)}% · ${t("vuln")} +2% · ${t("relation")} −8`, "al");
     }
   });
   S.bubbles = S.bubbles.filter(b => b.ttl > 0);
@@ -356,12 +364,12 @@ function popBubble(id, x, y){
   if (b.type === "ore"){
     const gain = P.popOre(b); hook("sfx", "pop"); hook("floatText", x, y, `+${gain} ${IC.ore}`, "accent");
   } else if (b.type === "green"){
-    const gain = 2 + Math.round(avg(r => r.comp) / 40);
+    const gain = greenGain();
     S.ep += gain; hook("sfx", "pop"); Ach.green(); hook("floatText", x, y, `+${gain} ${IC.ep}`, "good");
   } else {
     const cost = aidCost();
     if (S.ep < cost) { hook("sfx", "error"); hook("floatText", x, y, t("cantAfford"), "bad"); return true; }
-    const r = R(b.reg); S.ep -= cost; r.comp = clamp(r.comp + 3, 0, 100); r.vuln = clamp(r.vuln - 1, 0, 100); S.appr = clamp(S.appr + 1, 0, 100);
+    const r = R(b.reg); S.ep -= cost; r.comp = clamp(r.comp + 3, 0, 100); r.vuln = clamp(r.vuln - 1, 0, 100); addAppr(1);
     if (b.cid){ changeRel(b.cid, 10); S.stats.help[b.cid] = (S.stats.help[b.cid] || 0) + 1; }
     S.stats.aid++;
     hook("sfx", "aid"); Ach.aid(); hook("floatText", x, y, `+1% ${IC.appr}`, "accent");
@@ -373,23 +381,35 @@ function popBubble(id, x, y){
 
 /* ---------------------------- Local weather ---------------------------- */
 const FORECAST = 3;   // months of warning before a hazard strikes
+const HAZ_APPR = .5;
 function hazardTick(){
   const M = MODES[S.mode] || MODES.normal;
   for (const h of S.haz.filter(h => S.tick >= h.at)) strike(h);
   S.haz = S.haz.filter(h => S.tick < h.at);
-  const maxN = S.mode === "hard" ? 3 : 2;
-  const p = (0.03 + Math.max(0, S.temp - 1.2) * 0.06) * M.haz * bal().haz * (S.crisis ? 2 : 1);
-  if (S.haz.length < maxN && rand() < p){
+  // 1.1: more disasters, and several can be on their way at the same time
+  const maxN = S.mode === "hard" ? 7 : 5;
+  const p = (0.045 + Math.max(0, S.temp - 1.2) * 0.08) * M.haz * bal().haz * (S.crisis ? 2 : 1);
+  for (let k = 0; k < 2; k++){
+    if (S.haz.length >= maxN || rand() >= (k ? p * .4 : p)) break;
     const busy = new Set(S.haz.map(h => h.c));
     const list = S.countries.filter(c => !c.rest && !busy.has(c.id));
-    const c = pick(list, x => COUNTRY[x.id].risk * (R(x.reg).vuln / 50) / (1 + x.adapt / 40));
+    const intel = S.intel && S.tick <= S.intel.until ? S.intel.reg : null;   // the season forecast in the news is real
+    const c = pick(list, x => COUNTRY[x.id].risk * (R(x.reg).vuln / 50) / (1 + x.adapt / 40) * (x.reg === intel ? 2.5 : 1));
     const type = P.seasonWeight ? pick(COUNTRY[c.id].hz, z => P.seasonWeight(z, c.id)) : COUNTRY[c.id].hz[Math.floor(rand() * COUNTRY[c.id].hz.length)];
-    const h = {id:++S.hazId, type, c:c.id, at:S.tick + FORECAST, sev:0.7 + rand() * 0.6, evac:!!S.evacFree[c.id]};
-    if (h.evac){ delete S.evacFree[c.id]; S.stats.evac++; }
-    S.haz.push(h);
-    addLog(`[[${HAZARDS[type].icon}]] ${t("forecast")}: ${L(HAZARDS[type].name)} · ${cname(c.id)} · ${FORECAST} ${t("months")}`, "al");
-    hook("sfx", "warn"); hook("hazardWarn", h);
+    addHazard(c, type);
+    // a wide weather system: neighbours in the same continent get the same warning
+    if (rand() < .15 + Math.max(0, S.temp - 1.5) * .2){
+      const near = S.countries.filter(x => !x.rest && x.reg === c.reg && x.id !== c.id && !S.haz.some(h => h.c === x.id) && COUNTRY[x.id].hz.includes(type));
+      for (let n = 0; n < 2 && near.length && S.haz.length < maxN + 2; n++){ const o = near.splice(Math.floor(rand() * near.length), 1)[0]; addHazard(o, type, true); }
+    }
   }
+}
+function addHazard(c, type, wide){
+  const h = {id:++S.hazId, type, c:c.id, at:S.tick + FORECAST, sev:0.7 + rand() * 0.6, evac:!!S.evacFree[c.id], wide:!!wide};
+  if (h.evac){ delete S.evacFree[c.id]; S.stats.evac++; }
+  S.haz.push(h);
+  addLog(`[[${HAZARDS[type].icon}]] ${t("forecast")}: ${L(HAZARDS[type].name)} · ${cname(c.id)} · ${FORECAST} ${t("months")}`, "al");
+  hook("sfx", "warn"); hook("hazardWarn", h);
 }
 const evacCost = () => 12;
 function evacuate(hid){
@@ -401,9 +421,9 @@ function evacuate(hid){
 function strike(h){
   const M = MODES[S.mode] || MODES.normal, Z = HAZARDS[h.type], c = C(h.c), r = R(c.reg);
   const d = h.sev * (1 + Math.max(0, S.temp - 1.2) * 0.6) * (1 - respOf(h.type)) * (h.evac ? 0.35 : 1) * M.dmg * (1 - c.adapt / 200);
-  const epLoss = Math.round(Z.ep * d), apLoss = Z.appr * d * (S.owned.C3 ? 0.5 : 1);
+  const epLoss = Math.round(Z.ep * d), apLoss = Z.appr * d * HAZ_APPR * (S.owned.C3 ? 0.5 : 1);   // 1.1: more disasters, each a bit softer on approval
   S.ep = Math.max(0, S.ep - epLoss + (S.owned.C3 ? 15 : 0));
-  S.appr = clamp(S.appr - apLoss, 0, 100);
+  S.appr = clamp(S.appr - apLoss * APPR_DOWN, 0, 100);
   r.vuln = clamp(r.vuln + Z.vuln * d, 0, 100);
   changeRel(c.id, -2 * d);
   if (Z.co2) applyRegionCO2(r, Z.co2 * d);
@@ -411,7 +431,7 @@ function strike(h){
   S.stats.dmg.push({type:h.type, c:c.id, tick:S.tick, d:+d.toFixed(2)});
   const ac = AchStore.data; ac.haz = ac.haz || []; if (!ac.haz.includes(h.type)){ ac.haz.push(h.type); AchStore.save(); }
   if (d < 0.25) Ach.unlock("stormSafe");
-  addLog(`[[${Z.icon}]] ${L(Z.name)} ${t("hits")} ${cname(c.id)} · ${IC.ep} −${epLoss} · ${t("appr")} −${apLoss.toFixed(1)}%${h.evac ? " · " + t("evacuated") : ""}`, d > 0.6 ? "al" : "ev");
+  addLog(`[[${Z.icon}]] ${L(Z.name)} ${t("hits")} ${cname(c.id)} · ${IC.ep} −${epLoss} · ${t("appr")} −${(apLoss * APPR_DOWN).toFixed(1)}%${h.evac ? " · " + t("evacuated") : ""}`, d > 0.6 ? "al" : "ev");
   // aid bubble at the country
   S.bubbles.push({id:++S.bubId, type:"red", reg:c.reg, cid:c.id, hz:h.type, ttl:5});
   hook("sfx", "spawnRed"); hook("hazardStrike", h, d);
@@ -447,7 +467,7 @@ function tick(){
     if (damp > 0 && P.impactAdd) P.impactAdd("skills", r.co2 * 0.0022 * fossil * damp * bal().growth);   // growth that skills held back
     if (S.p3 && r.comp < 70) v -= 0.3 / 12;
     setRegionCO2(r, v);
-    const target = clamp(r.compBase + (S.appr - 75) * 0.25 + avgRel(r.id) * 0.08, 0, 100);
+    const target = clamp(r.compBase + (S.appr - 75) * 0.25 + avgRel(r.id) * REL_COMP, 0, 100);
     r.comp = clamp(r.comp + (target - r.comp) * 0.02, 0, 100);
     Object.keys(r.cd).forEach(k => { if (r.cd[k] > 0) r.cd[k]--; });
   });
@@ -458,18 +478,19 @@ function tick(){
   allianceTick();
   mark("orders");
   const net = netCO2();
-  S.temp += (net / 36.0) * 0.0035 + (S.tip / 100) * 0.0015;
+  // 1.1: high emissions heat the planet faster than in proportion, low emissions slower (good play stays cooler, neglect reaches +3.0°C)
+  S.temp += Math.sign(net) * Math.pow(Math.abs(net) / 36.0, 1.5) * 0.0039 + (S.tip / 100) * 0.0042;
   S.ep += epGain(); S.pc += pcGain();
   if (P.v1Tick) P.v1Tick();
   mark("green");
   if (P.impactTick) P.impactTick(net);
-  if (S.temp >= 2.5) S.tip += 1.2; else if (S.temp >= 2.0) S.tip += 0.6; else if (S.temp >= 1.5) S.tip += 0.2;
+  if (S.temp >= 2.5) S.tip += 4.5; else if (S.temp >= 2.0) S.tip += 2.2; else if (S.temp >= 1.5) S.tip += 0.2;   // 1.1: past +2.0°C the planet starts heating itself
   S.tip = clamp(S.tip, 0, 100);
   if (prevTemp < 1.5 && S.temp >= 1.5) { addLog(t("logTipping"), "al"); hook("sfx", "warn"); }
   if (prevTemp < 2.0 && S.temp >= 2.0) { addLog(t("logTipping2"), "al"); hook("sfx", "warn"); }
   const calm = S.char === "act" ? (charLvBonus() ? .65 : .75) : 1;
-  const stress = avg(r => r.vuln) / 100 * Math.max(0, S.temp - 1.3) * 0.6 * calm;
-  S.appr = clamp(S.appr - stress + (60 - S.appr) * 0.004, 0, 100);
+  const stress = avg(r => r.vuln) / 100 * Math.max(0, S.temp - 1.35) * 0.65 * calm;
+  S.appr = clamp(S.appr - stress + (55 - S.appr) * 0.008, 0, 100);
   ageBubbles(); spawnGreens(); hazardTick();
   S.hist.push({net, temp:S.temp}); Ach.check();
   if (checkEnd()) return;
@@ -585,7 +606,8 @@ function checkEnd(){
   if (S.mode === "daily") AchStore.data.daily = (AchStore.data.daily || 0) + 1;
   AchStore.save();
   Ach.check(); changed(); hook("showEnd"); hook("gameOver");
-  const sv = readSaves(); if (sv && sv.auto){ delete sv.auto; try { localStorage.setItem(SAVE_KEY, JSON.stringify(sv)); } catch(e) {} }
+  // a finished game is no longer "continued": remove its autosave (a slot the player saved by hand stays)
+  const sv = readSaves(); if (sv && S.saveSlot && sv[S.saveSlot] && sv[S.saveSlot].meta.id === S.saveId && (sv[S.saveSlot].meta.auto || S.mode === "hard")) deleteSlot(S.saveSlot);
   return true;
 }
 function score(){
@@ -657,40 +679,94 @@ function startGame(lang, o = {}){
   if (P.v1Init) P.v1Init();
   addLog(t("logStart"), "tc"); hook("sfx", "start"); Ach.unlock("start");
   S.story[1] = 1;
+  S.saveId = newSaveId(); S.saveSlot = opts.slot === undefined ? pickSlot(S) : opts.slot;
   hook("closeModal"); changed(); autosave(); hook("gameStart");
 }
 /* Daily Challenge seed: the same for everyone on the same (UTC) date */
 P.dailySeed = (d = new Date()) => { const s = d.toISOString().slice(0, 10); let h = 2166136261; for (const ch of s){ h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619); } return h | 0; };
 
 /* ---------------------------- Save / Load ----------------------------
-   localStorage key p2050-saves = {auto, s1, s2, s3}; each {meta, S}. (Save codes were removed in 1.0; cloud saves move a game between devices.)
-   Hard Core games only keep the autosave. */
-const SAVE_KEY = "p2050-saves", SLOTS = ["auto","s1","s2","s3"];
-function readSaves(){ try { return JSON.parse(localStorage.getItem(SAVE_KEY) || "{}") || {}; } catch(e) { return null; } }
-function snapshot(){ const c = JSON.parse(JSON.stringify(S)); c.tab = null; return c; }
-function slotMeta(){ return {tick:S.tick, temp:S.temp, net:netCO2(), appr:S.appr, at:Date.now(), mode:S.mode, char:S.char}; }
-function writeSlot(slot){
-  if (S.mode === "hard" && slot !== "auto") return false;
-  const all = readSaves(); if (all === null) return false;
-  all[slot] = {meta:slotMeta(), S:snapshot()};
-  try { localStorage.setItem(SAVE_KEY, JSON.stringify(all)); return true; } catch(e) { return false; }
+   localStorage key p2050-saves = {s1, s2, s3}; each {meta, S}. 3 slots, each holding one game.
+   A game gets its own slot when it starts (the first empty one) and autosaves there: meta.auto marks "(automatic)".
+   Each slot belongs to one mode (normal · Hard Core · daily · Continuous World): a game can only save over a slot
+   of its own mode or its own slot, never over a game of another mode. Signed-in players get the slots on every device (21-net.js). */
+const SAVE_KEY = "p2050-saves", SLOTS = ["s1","s2","s3"];
+const modeKey = o => o ? (o.world ? "world" : (o.mode || "normal")) : null;
+function readSaves(){
+  let all; try { all = JSON.parse(localStorage.getItem(SAVE_KEY) || "{}") || {}; } catch(e) { return null; }
+  // older versions kept a separate "auto" slot: move it into a free slot
+  if (all.auto){
+    const free = SLOTS.find(k => !all[k] || (all[k].meta && all[k].meta.del));
+    if (free && all.auto.meta){ all[free] = all.auto; all[free].meta.auto = true; }
+    delete all.auto; try { localStorage.setItem(SAVE_KEY, JSON.stringify(all)); } catch(e) {}
+  }
+  for (const k of Object.keys(all)){
+    const sv = all[k]; if (!sv || !sv.meta) continue;
+    if (sv.meta.del){ all[k] = null; continue; }   // deleted (kept as a marker for cloud sync)
+    if (sv.meta.world === undefined && sv.S) sv.meta.world = !!sv.S.world;   // saves from 1.0 did not record the mode of a Continuous World
+  }
+  return all;
 }
-function autosave(){ if (S.started && !S.over){ writeSlot("auto"); hook("autosaved"); } }
+function rawSaves(){ try { return JSON.parse(localStorage.getItem(SAVE_KEY) || "{}") || {}; } catch(e) { return null; } }
+function putSaves(all){ try { localStorage.setItem(SAVE_KEY, JSON.stringify(all)); return true; } catch(e) { return false; } }
+function snapshot(){ const c = JSON.parse(JSON.stringify(S)); c.tab = null; return c; }
+function slotMeta(auto){ return {tick:S.tick, temp:S.temp, net:netCO2(), appr:S.appr, at:Date.now(), mode:S.mode, world:!!S.world, char:S.char, auto:!!auto, id:S.saveId}; }
+/* may this game write into that slot? */
+function slotFree(slot, all = readSaves()){
+  const s = all && all[slot]; if (!s || !s.meta) return true;
+  return s.meta.id && s.meta.id === S.saveId || modeKey(s.meta) === modeKey(S);
+}
+/* the slot a new game starts in: an empty one, else the oldest autosave of the same mode; null = all full → the player picks */
+function pickSlot(o = S){
+  const all = readSaves(); if (all === null) return null;
+  const empty = SLOTS.find(k => !all[k]); if (empty) return empty;
+  const same = SLOTS.filter(k => all[k].meta && all[k].meta.auto && modeKey(all[k].meta) === modeKey(o)).sort((a, b) => all[a].meta.at - all[b].meta.at);
+  return same[0] || null;
+}
+function writeSlot(slot, auto = false){
+  if (!SLOTS.includes(slot) || !S.started) return false;
+  if (S.mode === "hard" && !auto && slot !== S.saveSlot) return false;
+  const all = rawSaves(); if (all === null) return false;
+  if (!slotFree(slot, readSaves())) return false;
+  all[slot] = {meta:slotMeta(auto), S:null};
+  S.saveSlot = slot; all[slot].S = snapshot();
+  if (!putSaves(all)) return false;
+  hook("slotWritten", slot);
+  return true;
+}
+function deleteSlot(slot){
+  const all = rawSaves(); if (!all || !SLOTS.includes(slot)) return false;
+  all[slot] = {meta:{del:1, at:Date.now()}, S:null};
+  if (S.saveSlot === slot && S.started) S.saveSlot = null;
+  putSaves(all); hook("slotWritten", slot); return true;
+}
+function autosave(){
+  if (!S.started || S.over || !S.saveSlot) return;
+  // the slot was taken meanwhile (e.g. by a game of another mode synced from another device): move to a free one
+  if (!writeSlot(S.saveSlot, true)){ const k = pickSlot(S); if (!k || !writeSlot(k, true)) return; }
+  hook("autosaved");
+}
+/* the most recent game (for "Continue") */
+function latestSlot(){ const all = readSaves(); if (!all) return null; return SLOTS.filter(k => all[k] && all[k].meta && validSave(all[k].S)).sort((a, b) => all[b].meta.at - all[a].meta.at)[0] || null; }
 function validSave(o){ return o && o.v === SAVE_VERSION && Array.isArray(o.regions) && o.regions.length === 6 && Array.isArray(o.countries) && typeof o.tick === "number" && Array.isArray(o.hist); }
-function loadState(obj){
+function loadState(obj, slot){
   if (!validSave(obj)) return false;
   const lang = S.lang;
   resetState(Object.assign(newState(lang, {mode:obj.mode, char:obj.char, charLv:obj.charLv, seed:obj.seed}), obj, {lang, started:true, speed:0, tab:null}));
+  if (!S.saveId) S.saveId = newSaveId();
+  if (slot) S.saveSlot = slot;
   if (S.speed === 3 && !(P.Net && P.Net.owns("speed3"))) S.speed = 1;
   if (P.v1Init) P.v1Init();
   return true;
 }
-function slotName(k){ return k === "auto" ? t("slotAuto") : `${t("slot")} ${k.slice(1)}`; }
+const newSaveId = () => Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+const MODE_TAG = {normal:{th:"ภารกิจ 2050",en:"Mission 2050"}, hard:{th:"Hard Core",en:"Hard Core"}, daily:{th:"ภารกิจรายวัน",en:"Daily"}, world:{th:"โลกต่อเนื่อง",en:"Continuous World"}};
+function modeName(o){ return L(MODE_TAG[modeKey(o)] || MODE_TAG.normal); }
+function slotName(k, meta){ return `${t("slot")} ${k.slice(1)}${meta && meta.auto ? ` (${t("autoTag")})` : ""}`; }
 function slotMetaLines(m){
   if (!m) return [t("empty")];
   const when = new Date(m.at).toLocaleString(S.lang === "th" ? "th-TH" : "en-GB", {dateStyle:"short", timeStyle:"short"});
-  const tag = m.mode === "hard" ? " · HARD CORE" : m.mode === "daily" ? " · DAILY" : "";
-  return [`${dateStr(m.tick)} · ΔT +${m.temp.toFixed(2)}°C · CO₂ ${m.net.toFixed(1)} Gt · ${String(t("appr")).replace(/\[\[\$?[a-z0-9-]+\]\]\s?/g, "")} ${m.appr.toFixed(0)}%`, when + tag];
+  return [`${dateStr(m.tick)} · ΔT +${m.temp.toFixed(2)}°C · CO₂ ${m.net.toFixed(1)} Gt · ${String(t("appr")).replace(/\[\[\$?[a-z0-9-]+\]\]\s?/g, "")} ${m.appr.toFixed(0)}%`, when + " · " + modeName(m)];
 }
 const fmtTime = sec => { sec = Math.max(0, Math.round(sec)); const h = Math.floor(sec / 3600), m = Math.floor(sec / 60) % 60, s = sec % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(s).padStart(2, "0"); };
 
@@ -699,7 +775,8 @@ const AchStore = (() => {
   const KEY = "p2050-ach";
   let data = {got:{}, greens:0, aids:0, seen:[], haz:[], ends:{}, evac:0, cev:0, charsDone:[], daily:0};
   try { data = Object.assign(data, JSON.parse(localStorage.getItem(KEY) || "{}")); } catch(e) {}
-  const save = () => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {} };
+  // quiet = saving what just came from the server (don't send it straight back)
+  const save = quiet => { try { localStorage.setItem(KEY, JSON.stringify(data)); } catch(e) {} if (!quiet && P.Net && P.Net.progressChanged) P.Net.progressChanged(); };
   return { get data(){ return data; }, save };
 })();
 const Ach = (() => {
@@ -763,7 +840,8 @@ Object.assign(P, {
   buyNode, abilityList, abilityReady, useAbility, doAction, countryAction, cactCost, cactOk, bilatPartners, bilateral, canAlly, allyCandidates, formAlliance, avgRel, relAll, changeRel,
   applyFx, popBubble, evacuate, tick, eligible, triggerEvent, currentEvent, affordable, chooseOption, checkEnd, score, summary, xpFor, endStory, fxChips, changed,
   setSpeed, setLang, running, newGame, startGame,
-  SAVE_KEY, SLOTS, readSaves, writeSlot, autosave, validSave, loadState, slotName, slotMetaLines,
+  addAppr, addHazard, greenGain, APPR_UP, APPR_DOWN, BILAT_CUT, BILAT_MONTHS, BILAT_INC, REL_COMP, GREEN_MAX,
+  SAVE_KEY, SLOTS, readSaves, rawSaves, putSaves, writeSlot, deleteSlot, slotFree, pickSlot, latestSlot, modeKey, modeName, autosave, validSave, loadState, slotName, slotMetaLines,
   AchStore, Ach,
 });
 if (!S.regions){ let lang = "th"; try { lang = localStorage.getItem("p2050-lang") || "th"; } catch(e) {} resetState(newState(lang)); buildCountries(); }

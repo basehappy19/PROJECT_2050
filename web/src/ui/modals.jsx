@@ -1,10 +1,10 @@
 /* Pop-up windows: dilemma event, end of game, character select, story, pause, tutorial */
 import {useEffect, useState, useRef} from "preact/hooks";
-import {P, S, UIM, t, L, up, COL, relCol, bump} from "../core.js";
+import {P, S, UIM, t, L, up, COL, relCol, bump, ls} from "../core.js";
 import {Audio} from "../audio.js";
-import {G} from "../game.js";
+import {G, hzPauseOn} from "../game.js";
 import {Icon, Rich, plain} from "./icon.jsx";
-import {Btn, IconBtn, Seg, Meter, Portrait, portraitSrc, H3, Terra, Volume, GfxSeg, LangSeg, Msg, Key, SlotInfo} from "./widgets.jsx";
+import {Btn, IconBtn, Seg, Meter, Portrait, portraitSrc, H3, Terra, Volume, GfxSeg, LangSeg, Msg, Key, SlotInfo, Check} from "./widgets.jsx";
 
 import {mapCrop, eventPoint, eventSnd, eventImg, SND_ICON, SND_TINT} from "./hero.js";
 const mapCropBg = pt => mapCrop(pt, pt ? 3.4 : 1.15, .3).backgroundImage;
@@ -26,14 +26,15 @@ export function EventModal(){
   const opts = e.options.map((o, i) => ({o, i, ok:P.affordable(o.fx)}));
   if (opts.every(q => !q.ok)) opts.push({o:{label:{th:P.UI.postpone.th, en:P.UI.postpone.en}, fx:P.POSTPONE}, i:-1, ok:true});
   const where = e.country ? t("evCountryTag") : e.target ? `${t("eventTag")} · ${L(P.RMETA[e.target].name)}` : `${t("eventTag")} · ${t("global")}`;
-  const side = (lab, ids, col) => <div class="side"><b class={col}>{lab}</b><div class="chips">{ids.map(id => { const c = P.C(id); return <span class="chip static" key={id} style={{borderColor:COL[col]}}><i style={{background:COL[relCol(c.rel)]}}/>{L(P.COUNTRY[id].name)}<small class={"mono " + relCol(c.rel)}>{Math.round(c.rel)}</small></span>; })}</div></div>;
+  const side = (lab, ids, col) => <div class="side"><b class={col}>{lab}</b><div class="chips">{ids.map(id => { const c = P.C(id); return <span class="chip static" key={id} style={{borderColor:COL[col]}}><i style={{background:COL[relCol(c.rel)]}}/>{L(P.COUNTRY[id].name)}<small class={"mono relnum " + relCol(c.rel)} title={t("relation")}><Icon n="$heart" size={14}/>{Math.round(c.rel)}</small></span>; })}</div></div>;
   return <Modal kind="event">
     <div class="hero photo" style={{backgroundImage:`url(${eventImg(e.id)}), ${mapCropBg(eventPoint(e))}`, "--tint":SND_TINT[eventSnd(e)] || COL.accent}}>
       <div class="tags"><Tag color={e.country ? "accent" : "warn"}>{`[[${e.country ? "globe" : "siren"}]] ${where}`}</Tag>{e.news ? <Tag color="good">{`[[newspaper]] ${t("realNews")} ${e.news.y}`}</Tag> : null}</div>
       <h2>{L(e.title)}</h2>
     </div>
     <div class="mbody">
-      {e.country ? <div class="sides">{side(t("sideA"), e.A, "good")}{side(t("sideB"), e.B, "bad")}</div> : null}
+      {e.country ? <><div class="sides">{side(t("sideA"), e.A, "good")}{side(t("sideB"), e.B, "bad")}</div>
+        <p class="muted small rellegend"><Rich t={t("relLegend")} iconColor="inherit"/></p></> : null}
       <p class="desc"><Rich t={L(e.desc)}/></p>
       {e.news ? <p class="newsrc muted small"><Icon n="link" size={13}/> {t("source")}: <a href={e.news.url} target="_blank" rel="noopener noreferrer">{e.news.src}</a></p> : null}
       <div class="ask"><Rich t={`[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`} iconColor="accent"/>{P.hasKeyboard() ? <small class="mono muted">{t("evKeys")}</small> : null}</div>
@@ -176,6 +177,48 @@ export function Story(){
   </div>;
 }
 
+/* ---------------- save slots (pause window, home screen "Load", slot picker) ----------------
+   each slot shows its mode; a game can save over its own slot or one of the same mode, never a game of another mode */
+export function SlotRow({slot, saves, inGame, pick}){
+  const s = saves && saves[slot], m = s && s.meta, ok = s && P.validSave(s.S), cur = inGame && S.started && S.saveSlot === slot && m && m.id === S.saveId;
+  const canSave = inGame && P.slotFree(slot, saves) && !(S.mode === "hard" && slot !== S.saveSlot);
+  const [ask, setAsk] = useState(false);
+  const save = () => {
+    P.Ach.unlock("saver"); const k = P.slotName(slot), done = P.writeSlot(slot, false);
+    UIM.msg = done ? `${t("saved")} · ${k}${P.Net.user ? " · " + t("cloudOk") : ""}` : t("noStore"); UIM.err = !done; bump();
+  };
+  return <div class={"card slotrow " + (cur ? "cur" : "")}>
+    <SlotInfo name={P.slotName(slot, m)} meta={ok ? m : null} bad={s && !ok ? t("oldSave") : null} cur={cur}/>
+    <div class="slotbtns">
+      {pick ? (m && !P.slotFree(slot, saves) ? null : <Btn kind="primary" onClick={() => pick(slot)}>{m ? `[[save]] ${t("slotUseOver")}` : `[[save]] ${t("slotUse")}`}</Btn>) : null}
+      {inGame && !pick ? <Btn kind="ghost" sound="save" disabled={!canSave} title={!canSave && m ? t("slotOtherMode") : ""} onClick={save}>{`[[save]] ${t("save")}`}</Btn> : null}
+      {!pick && ok && !cur ? <Btn kind={inGame ? "ghost" : "primary"} sound="start" onClick={() => G.loadSlot(slot)}>{`[[folder-open]] ${t("load")}`}</Btn> : null}
+      {!inGame && m ? (ask ? <Btn kind="danger" onClick={() => { P.deleteSlot(slot); setAsk(false); UIM.msg = `${t("slotDeleted")} · ${P.slotName(slot)}`; UIM.err = false; bump(); }}>{t("slotDelSure")}</Btn>
+        : <IconBtn n="trash-2" title={t("slotDel")} onClick={() => setAsk(true)}/>) : null}
+    </div>
+    {inGame && m && !canSave && !cur ? <small class="muted slotnote">{S.mode === "hard" ? t("hardNoManual") : t("slotOtherMode")}</small> : null}
+  </div>;
+}
+/* all 3 slots are taken when a new game starts: choose one of the same mode to replace, or delete one, or play without autosave */
+export function SlotPick(){
+  const saves = P.readSaves() || {}, o = UIM.pendingStart || {};
+  const [, set] = useState(0);
+  return <Modal kind="slotpick" onClose={() => { UIM.modal = "charsel"; bump(); }}>
+    <Tag>{`[[save]] ${t("slotFullTag")}`}</Tag>
+    <h2>{t("slotFullTitle")}</h2>
+    <p class="muted">{t("slotFullMsg").replace("{M}", P.modeName(o))}</p>
+    <div class="slots">{P.SLOTS.map(slot => {
+      const m = saves[slot] && saves[slot].meta, same = !m || P.modeKey(m) === P.modeKey(o);
+      return <div class="card slotrow" key={slot}>
+        <SlotInfo name={P.slotName(slot, m)} meta={m}/>
+        <div class="slotbtns">{same ? <Btn kind="primary" onClick={() => G.beginGame({...o, slot})}>{m ? `[[save]] ${t("slotUseOver")}` : `[[save]] ${t("slotUse")}`}</Btn>
+          : <Btn kind="ghost" onClick={() => { P.deleteSlot(slot); set(x => x + 1); bump(); }}>{`[[trash-2]] ${t("slotDel")}`}</Btn>}</div>
+      </div>;
+    })}</div>
+    <div class="mfoot"><Btn kind="ghost" onClick={() => G.beginGame({...o, slot:null})}>{t("slotNoSave")}</Btn></div>
+  </Modal>;
+}
+
 /* ---------------- pause ---------------- */
 export function Pause(){
   const saves = P.readSaves();
@@ -183,25 +226,20 @@ export function Pause(){
     <Tag>{`${P.dateStr()} · ${t("mode_" + S.mode)}`}</Tag>
     <h2>{t("pTitle")}</h2>
     <p class="mono muted small"><Icon n="timer" size={14}/> {t("timePlayed")} {P.fmtTime(S.realSec)}</p>
-    <div class="row gap"><Btn size="lg" onClick={() => G.resume()}>{`[[play]] ${t("pResume")}`}</Btn><span class="grow"/><LangSeg/></div>
-    <Volume/>
-    <GfxSeg/>
-    {S.mode === "hard" ? <p class="warn small"><Rich t={`[[skull]] ${t("hardSaves")}`} iconColor="inherit"/></p>
-      : saves === null ? <p class="bad small">{t("noStore")}</p>
-      : <div class="slots">{["s1", "s2", "s3"].map(slot => {
-        const m = saves[slot] && saves[slot].meta;
-        return <div class="card slotrow" key={slot}>
-          <SlotInfo name={P.slotName(slot)} meta={m}/>
-          <Btn kind="ghost" sound="save" onClick={() => {
-            P.Ach.unlock("saver"); const ok = P.writeSlot(slot);
-            UIM.msg = ok ? `${t("saved")} · ${P.slotName(slot)}` : t("noStore"); UIM.err = !ok;
-            if (ok && P.Net.user) P.Net.cloudSave(slot).then(r => { if (r){ UIM.msg = `${t("saved")} · ${P.slotName(slot)} · ${t("cloudOk")}`; bump(); } });
-            bump();
-          }}>{`[[save]] ${t("save")}`}</Btn>
-        </div>;
-      })}</div>}
+    <div class="row gap"><Btn size="lg" onClick={() => G.resume()}>{`[[play]] ${t("pResume")}`}</Btn></div>
+    <div class="card pzset">
+      <div class="row gap"><b class="pzh"><Icon n="settings" size={16}/> {S.lang === "th" ? "ตั้งค่า" : "Settings"}</b><span class="grow"/><LangSeg/></div>
+      <Volume/>
+      <GfxSeg/>
+      <Check on={hzPauseOn()} onClick={() => { ls.set("p2050-hzpause", hzPauseOn() ? "0" : "1"); bump(); }}>{t("hzPauseOpt")}</Check>
+    </div>
+    <b class="pzh"><Icon n="save" size={16}/> {S.lang === "th" ? "ช่องบันทึก" : "Save slots"}</b>
+    {saves === null ? <p class="bad small">{t("noStore")}</p> : <>
+      <p class="muted small slothelp"><Rich t={`[[info]] ${S.mode === "hard" ? t("hardSaves") : t("slotHelp")}`} iconColor="inherit"/></p>
+      <div class="slots">{P.SLOTS.map(slot => <SlotRow key={slot} slot={slot} saves={saves} inGame/>)}</div>
+    </>}
     <Msg UIM={UIM}/>
-    <div class="row gap wrap">
+    <div class="row gap wrap pzfoot">
       <Btn kind="ghost" onClick={() => G.openTutorial(0, false)}>{`[[graduation-cap]] ${t("tutMenu")}`}</Btn>
       <Btn kind="ghost" onClick={() => G.openLearn()}>{`[[book-open]] ${t("mLearn")}`}</Btn>
       {document.fullscreenEnabled ? <Btn kind="ghost" onClick={() => G.fullscreen()}>{`[[${document.fullscreenElement ? "minimize" : "maximize"}]] ${S.lang === "th" ? "เต็มจอ" : "Fullscreen"}`}</Btn> : null}
@@ -239,7 +277,7 @@ export function Market(){
   const th = S.lang === "th", gain = P.matGain(), lot = P.MKT_LOT;
   const users = g => P.SKILLS.filter(n => !S.owned[n.id] && P.matCost(n) && P.matCost(n)[g]).slice(0, 3).map(n => L(n.name));
   return <Modal kind="market" wide onClose={close}>
-    <Tag color="warn">{th ? "โลกต่อเนื่อง" : "Continuous World"}</Tag>
+    <Tag color="warn">{th ? "[[$ore]] แร่ 5 กลุ่ม" : "[[$ore]] 5 mineral groups"}</Tag>
     <h2>{th ? "ตลาดแร่โลก" : "World minerals market"}</h2>
     <p class="muted">{th ? "แร่แยกเป็น 5 กลุ่ม แต่ละสกิลใช้ไม่เหมือนกัน ประเทศที่เป็นมิตรส่งมาให้ทุกเดือน ขาดเมื่อไรซื้อจากตลาดได้ ราคาขึ้นเมื่อเราซื้อมากหรือมีประเทศห้ามส่งออก แล้วค่อย ๆ กลับสู่ปกติ" : "Minerals come in 5 groups and each skill needs a different mix. Friendly countries send some every month; buy the rest here. Prices rise when you buy a lot or a producer bans exports, then drift back."}</p>
     <div class="mkt">{P.MAT_IDS.map(g => {

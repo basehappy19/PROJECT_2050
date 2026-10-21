@@ -7,6 +7,7 @@ import {G} from "../game.js";
 import {Globe} from "../globe.js";
 import {Icon, Rich} from "./icon.jsx";
 import {Btn, IconBtn, Tabs, Seg, Check, Terra, Portrait, Volume, GfxSeg, LangSeg, Msg, H3, SlotInfo} from "./widgets.jsx";
+import {SlotRow} from "./modals.jsx";
 import {AchList} from "./learn.jsx";
 
 const N = () => P.Net;
@@ -50,7 +51,7 @@ export function Menu(){
         <p class={sub ? "subtitle" : "lead"}>{sub ? t(TITLES[sub]) : t("mDesc")}</p>
         {!sub && N().cfg && N().cfg.announcement && L(N().cfg.announcement) ? <div class="announce card"><Icon n="megaphone" size={18} color="warn"/><span>{L(N().cfg.announcement)}</span></div> : null}
         {sub === "load" ? <SubLoad/> : sub === "ach" ? <><AchList/><Back/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : <Main/>}
-        <footer class="mfooter">
+        {sub ? null : <footer class="mfooter">
           <small class="mono muted">{up(t("teamK"))}</small>
           <p class="team">{t("team")}</p>
           <p class="muted small">{t("disclaimer")}</p>
@@ -59,14 +60,14 @@ export function Menu(){
           <div class="row"><button type="button" class="linkbtn mono" onClick={() => { Audio.play("click"); goSub("updates")(); }}>{`${t("updVer")} ${P.VERSION_NAME}`}</button></div>
           <div class="row"><small class="muted grow">{t("mTag")}</small><LangSeg/></div>
           <small class="muted credits">Earth imagery: NASA Visible Earth (Blue Marble, Black Marble) · Sounds &amp; music: CC0 / CC-BY, see assets/audio/CREDITS.txt</small>
-        </footer>
+        </footer>}
       </div>
     </section>
   </div>;
 }
 
 function Main(){
-  const saves = P.readSaves(), auto = saves && saves.auto, n = P.Ach.count();
+  const saves = P.readSaves(), lk = P.latestSlot(), auto = lk && saves[lk], n = P.Ach.count();
   const tiles = [
     {id:"loadmenu", ic:"save", t1:t("mLoad"), fn:goSub("load")},
     {id:"learn", ic:"book-open", t1:t("mLearn"), t2:`${P.cardCount()}/${P.cardTotal()}`, fn:() => G.openLearn("cards")},
@@ -82,8 +83,8 @@ function Main(){
       <button type="button" class={"bigbtn " + (!auto ? "primary" : "")} onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("start"); G.newGame(); }}>
         <Icon n="globe" size={26}/><span><b>{t("mNew")}</b><small>{t("mNewS")}</small></span><Icon n="chevron-right" size={20} cls="chev"/>
       </button>
-      <button type="button" class={"bigbtn " + (auto ? "primary" : "")} disabled={!auto} onPointerEnter={() => auto && Audio.hover()} onClick={() => { Audio.play("start"); const s2 = P.readSaves(); if (s2 && s2.auto && !G.loadSave(s2.auto.S)){ UIM.msg = t("oldSave"); UIM.err = true; bump(); } }}>
-        <Icon n="play" size={26}/><span><b>{t("mCont")}</b><small class="mono">{auto ? `${P.dateStr(auto.meta.tick)} · ΔT +${auto.meta.temp.toFixed(2)}°C · ${auto.meta.net.toFixed(1)} Gt` : t("mNoSave")}</small></span><Icon n="chevron-right" size={20} cls="chev"/>
+      <button type="button" class={"bigbtn " + (auto ? "primary" : "")} disabled={!auto} onPointerEnter={() => auto && Audio.hover()} onClick={() => { Audio.play("start"); G.loadSlot(lk); }}>
+        <Icon n="play" size={26}/><span><b>{t("mCont")}</b><small class="mono">{auto ? `${P.slotName(lk, auto.meta)} · ${P.modeName(auto.meta)} · ${P.dateStr(auto.meta.tick)}` : t("mNoSave")}</small></span><Icon n="chevron-right" size={20} cls="chev"/>
       </button>
       {(() => { const on = P.worldUnlocked(); return <button type="button" class={"bigbtn world " + (on ? "" : "locked")} disabled={!on} onPointerEnter={() => on && Audio.hover()} onClick={() => { Audio.play("start"); G.newGame(true); }}>
         <Icon n={on ? "infinity" : "lock"} size={26}/><span><b>{t("mWorld")}{on && P.prestige() ? <i class="stars" title={L(P.W2.prestHelp)}>{"★".repeat(P.prestige())}</i> : null}</b><small>{on ? t("mWorldS") : t("mWorldLock")}</small></span><Icon n="chevron-right" size={20} cls="chev"/>
@@ -132,16 +133,8 @@ function AccountChip(){
 function SubLoad(){
   const saves = P.readSaves();
   return <>
-    {saves === null ? <p class="bad">{t("noStore")}</p> : P.SLOTS.map(slot => {
-      const ok = saves[slot] && P.validSave(saves[slot].S);
-      return <div class="card slotrow" key={slot}><SlotInfo name={P.slotName(slot)} meta={ok ? saves[slot].meta : null} bad={saves[slot] && !ok ? t("oldSave") : null}/>
-        <Btn disabled={!ok} sound="start" onClick={() => { const s2 = P.readSaves(); if (s2 && s2[slot]) G.loadSave(s2[slot].S); }}>{t("load")}</Btn></div>;
-    })}
-    {N().user ? <><H3>{t("cloudSaves")}</H3>{["s1", "s2", "s3"].map(slot => {
-      const c = (N().cloud || {})[slot];
-      return <div class="card slotrow" key={slot}><SlotInfo name={`☁ ${P.slotName(slot)}`} meta={c ? c.meta : null}/>
-        <Btn kind="ghost" disabled={!c} onClick={() => N().cloudLoad(slot).then(st => { if (!st || !G.loadSave(st)){ UIM.msg = t("codeBad"); UIM.err = true; bump(); } })}>{t("load")}</Btn></div>;
-    })}</> : null}
+    <p class="muted small slothelp"><Rich t={`[[info]] ${t("slotHelp")}${N().user ? " " + t("slotCloud") : ""}`} iconColor="inherit"/></p>
+    {saves === null ? <p class="bad">{t("noStore")}</p> : <div class="slots">{P.SLOTS.map(slot => <SlotRow key={slot} slot={slot} saves={saves}/>)}</div>}
     <Msg UIM={UIM}/>
     <Back/>
   </>;

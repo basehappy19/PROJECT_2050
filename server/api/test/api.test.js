@@ -108,6 +108,20 @@ test("shop, rename, achievements", async () => {
   r = await call("POST", "/api/achievements", {ids:["start", "win", "fake", "start"]}, tok); assert.equal(r.body.awarded, 15);
   r = await call("POST", "/api/achievements", {ids:["start", "win"]}, tok); assert.equal(r.body.awarded, 0);
 });
+test("progress follows the account: devices are merged, never overwritten", async () => {
+  // device A
+  let r = await call("PUT", "/api/progress", {cards:4, data:{seen:["EVT_1", "EVT_2"], haz:["flood"], got:{start:2000, tutorial:3000}, ends:{l3:100}, daily:1, tut:1, junk:{x:1}}}, tok);
+  assert.equal(r.status, 200, JSON.stringify(r.body)); assert.deepEqual(r.body.data.seen, ["EVT_1", "EVT_2"]); assert.equal(r.body.data.junk, undefined);
+  // device B, with less in some places and more in others
+  r = await call("PUT", "/api/progress", {cards:2, data:{seen:["EVT_2", "EVT_3"], haz:["heat"], got:{start:1000}, daily:0, greens:7}}, tok);
+  const d = r.body.data;
+  assert.deepEqual(d.seen.sort(), ["EVT_1", "EVT_2", "EVT_3"]); assert.deepEqual(d.haz.sort(), ["flood", "heat"]);
+  assert.equal(d.got.start, 1000); assert.ok(d.got.tutorial); assert.equal(d.daily, 1); assert.equal(d.greens, 7); assert.equal(d.tut, 1);
+  assert.ok(d.got.win, "achievements stored on the server are included"); assert.ok(Object.keys(d.ends).some(k => k.startsWith("win")), "a win recorded on the server unlocks the modes");
+  assert.equal(r.body.cards, 4);
+  r = await call("GET", "/api/progress", null, tok); assert.deepEqual(r.body.data.seen.sort(), ["EVT_1", "EVT_2", "EVT_3"]);
+  r = await call("GET", "/api/progress"); assert.equal(r.status, 401);
+});
 test("leaderboard shows the best run per player", async () => {
   let r = await call("GET", "/api/leaderboard?mode=normal&period=week", null, tok);
   assert.equal(r.status, 200); assert.equal(r.body.rows.length, 1); assert.equal(r.body.rows[0].username, "phukhieo"); assert.equal(r.body.me.rank, 1);
@@ -119,6 +133,11 @@ test("cloud saves", async () => {
   r = await call("GET", "/api/saves", null, tok); assert.equal(r.body.s1.meta.tick, 12);
   r = await call("GET", "/api/saves/s1", null, tok); assert.equal(r.body.state.tick, 12);
   r = await call("PUT", "/api/saves/s9", {meta:{}, state:{}}, tok); assert.equal(r.body.error, "bad_slot");
+  // a slot deleted on one device is kept as a marker so other devices remove it too
+  r = await call("PUT", "/api/saves/s1", {meta:{del:1, at:Date.now()}, state:{}}, tok); assert.equal(r.status, 200);
+  r = await call("GET", "/api/saves", null, tok); assert.equal(r.body.s1.meta.del, 1);
+  r = await call("DELETE", "/api/saves/s1", null, tok); assert.equal(r.status, 200);
+  r = await call("GET", "/api/saves", null, tok); assert.equal(r.body.s1, undefined);
 });
 test("certificate: eligibility, PDF and verify page", async () => {
   let r = await call("GET", "/api/certificates", null, tok); assert.equal(r.body.eligibility.wins, 1); assert.equal(r.body.eligibility.eligible, false);

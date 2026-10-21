@@ -31,7 +31,7 @@ export const UIM = P.UIM = {
     return this.modal;     // "skills" | "charsel"
   },
   get paused(){ return this.modal === "pause"; },
-  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market"].includes(this.modal) || !!this.transition; },
+  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market", "slotpick"].includes(this.modal) || !!this.transition; },
   eventLocked(){ return (performance.now() - this.evAt) / 1000 < EVENT_LOCK; },
   eventLockFrac(){ return Math.min(1, (performance.now() - this.evAt) / 1000 / EVENT_LOCK); },
 };

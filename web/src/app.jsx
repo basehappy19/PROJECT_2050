@@ -6,10 +6,10 @@ import {G} from "./game.js";
 import {GameMap} from "./map2d.js";
 import {Icon, Rich} from "./ui/icon.jsx";
 import {Btn} from "./ui/widgets.jsx";
-import {TopBar, AbilityBar, ZoomBtns, Bottom, WorldGoals} from "./ui/hud.jsx";
+import {TopBar, AbilityBar, ZoomBtns, Bottom, WorldGoals, HazAlert} from "./ui/hud.jsx";
 import {Drawer} from "./ui/drawer.jsx";
 import {Skills} from "./ui/skills.jsx";
-import {EventModal, EndModal, CharSel, Story, Pause, Tutorial, Market} from "./ui/modals.jsx";
+import {EventModal, EndModal, CharSel, Story, Pause, Tutorial, Market, SlotPick} from "./ui/modals.jsx";
 import {Learn} from "./ui/learn.jsx";
 import {Menu} from "./ui/menu.jsx";
 
@@ -76,6 +76,7 @@ function GameScreen(){
       <WorldGoals/>
       <ZoomBtns/>
       <Drawer/>
+      <HazAlert/>
       <Bottom/>
     </div>
   </div>;
@@ -93,6 +94,7 @@ function Windows(){
   if (k === "tutorial") return <Tutorial/>;
   if (k === "learn") return <Learn/>;
   if (k === "market") return <Market/>;
+  if (k === "slotpick") return <SlotPick/>;
   return null;
 }
 

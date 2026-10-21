@@ -26,11 +26,11 @@ const STAT = {
 };
 const T = (th, en) => ({th, en});
 const LBL = {
-  co2World:T("CO₂ ทั้งโลก", "World CO₂"), co2Each:T("CO₂ ทุกภูมิภาค (แห่งละ)", "CO₂, every region (each)"), co2In:T("CO₂", "CO₂"),
-  sink:T("ดูดซับ CO₂", "CO₂ capture"), appr:T("ความนิยม", "Approval"), planAll:T("ทำตามแผน ทุกภูมิภาค", "On-plan, every region"), planIn:T("ทำตามแผน", "On-plan"),
-  riskAll:T("ความเสี่ยงภัยพิบัติ ทุกภูมิภาค", "Disaster risk, every region"), riskIn:T("ความเสี่ยงภัยพิบัติ", "Disaster risk"),
+  co2World:T("CO₂ ทั้งโลก", "World CO₂"), co2Each:T("CO₂ ทุกทวีป (แห่งละ)", "CO₂, every region (each)"), co2In:T("CO₂", "CO₂"),
+  sink:T("ดูดซับ CO₂", "CO₂ capture"), appr:T("ความนิยม", "Approval"), planAll:T("ทำตามแผน ทุกทวีป", "On-plan, every region"), planIn:T("ทำตามแผน", "On-plan"),
+  riskAll:T("ความเสี่ยงภัยพิบัติ ทุกทวีป", "Disaster risk, every region"), riskIn:T("ความเสี่ยงภัยพิบัติ", "Disaster risk"),
   income:T("รายได้เงิน", "Money income"), growth:T("การปล่อย CO₂ โตช้าลง", "CO₂ growth slows"), temp:T("อุณหภูมิโลก", "Global temperature"),
-  p3:T("บังคับภูมิภาคที่ทำตามแผนต่ำกว่า 70% ลด CO₂", "Regions under 70% on-plan must cut CO₂"), hzDmg:T("เสียหาย", "damage"),
+  p3:T("บังคับทวีปที่ทำตามแผนต่ำกว่า 70% ลด CO₂", "Regions under 70% on-plan must cut CO₂"), hzDmg:T("เสียหาย", "damage"),
   perMo:T("/เดือน", "/mo"), perYr:T("/ปี", "/yr"), ore:T("แร่", "Minerals"), oreInc:T("รายได้แร่", "Mineral income"), oreDisc:T("สกิลใช้แร่น้อยลง", "Skills need fewer minerals"),
 };
 const fmtN = (v, d = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d).replace(/\.0+$/, "");

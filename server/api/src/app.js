@@ -7,6 +7,7 @@ import { hashPassword, checkPassword, accessToken, readAccess, issueRefresh, use
 import { SHOP, RENAME_PRICE, CHARS, MODES, levelOf, ACH_TERRA, terraFor, scoreFor, xpFor, dailyFactor, dailySeed, gradeOf, checkSummary } from "./game-rules.js";
 import { badWord } from "./words.js";
 import { certificatePdf, verifyHtml } from "./certificate.js";
+import { mergeProgress } from "./progress.js";
 import { registerAdmin, registerStats, priceOf } from "./admin.js";
 import { getSettings, originAllowed } from "./settings.js";
 
@@ -235,10 +236,30 @@ export function buildApp(pool, opts = {}){
       return {awarded, user:await publicUser(db, req.uid)};
     });
   });
+  /* progress that follows the account (see progress.js): the device sends what it has, the server merges it with what other
+     devices sent and returns the combined result, which the device then keeps. Achievements and wins recorded on the server are added too. */
+  async function serverProgress(db, uid){
+    const got = Object.fromEntries((await db.query("SELECT ach, EXTRACT(EPOCH FROM created_at) * 1000 AS at FROM achievements WHERE user_id = $1", [uid])).rows.map(r => [r.ach, Math.round(Number(r.at)) || 1]));
+    const ends = {};
+    for (const r of (await db.query("SELECT ending, temp, EXTRACT(EPOCH FROM finished_at) * 1000 AS at FROM game_results WHERE user_id = $1 AND ending IS NOT NULL AND NOT flagged ORDER BY finished_at DESC LIMIT 300", [uid])).rows){
+      const k = r.ending === "win" ? "win" + gradeOf(r.temp) : r.ending;
+      ends[k] = Math.max(ends[k] || 0, Math.round(Number(r.at)) || 1);
+    }
+    return {got, ends};
+  }
+  app.get("/api/progress", AUTH, async req => {
+    const row = (await pool.query("SELECT cards, data FROM progress WHERE user_id = $1", [req.uid])).rows[0] || {cards:0, data:{}};
+    return {cards:row.cards, data:mergeProgress(row.data, await serverProgress(pool, req.uid))};
+  });
   app.put("/api/progress", AUTH, async req => {
-    const cards = Math.max(0, Math.min(500, Math.round(Number((req.body || {}).cards) || 0)));
-    await pool.query("INSERT INTO progress(user_id, cards) VALUES ($1, $2) ON CONFLICT (user_id) DO UPDATE SET cards = GREATEST(progress.cards, EXCLUDED.cards), updated_at = now()", [req.uid, cards]);
-    return {ok:true};
+    const b = req.body || {}, cards = Math.max(0, Math.min(500, Math.round(Number(b.cards) || 0)));
+    return tx(pool, async db => {
+      await db.query("INSERT INTO progress(user_id, cards) VALUES ($1, 0) ON CONFLICT (user_id) DO NOTHING", [req.uid]);
+      const row = (await db.query("SELECT cards, data FROM progress WHERE user_id = $1 FOR UPDATE", [req.uid])).rows[0];
+      const data = mergeProgress(row.data, b.data);
+      await db.query("UPDATE progress SET cards = GREATEST(cards, $2), data = $3, updated_at = now() WHERE user_id = $1", [req.uid, cards, data]);
+      return {ok:true, cards:Math.max(row.cards, cards), data:mergeProgress(data, await serverProgress(db, req.uid))};
+    });
   });
 
   /* ---------- cloud saves (3 slots) ---------- */
@@ -253,6 +274,11 @@ export function buildApp(pool, opts = {}){
     const slot = SLOT(req.params.slot), b = req.body || {}; if (!slot) return fail(reply, 400, "bad_slot");
     if (!b.state || typeof b.state !== "object" || !b.meta || typeof b.meta !== "object") return fail(reply, 400, "bad_save");
     await pool.query("INSERT INTO cloud_saves(user_id, slot, meta, state) VALUES ($1, $2, $3, $4) ON CONFLICT (user_id, slot) DO UPDATE SET meta = EXCLUDED.meta, state = EXCLUDED.state, updated_at = now()", [req.uid, slot, b.meta, b.state]);
+    return {ok:true};
+  });
+  app.delete("/api/saves/:slot", AUTH, async (req, reply) => {
+    const slot = SLOT(req.params.slot); if (!slot) return fail(reply, 400, "bad_slot");
+    await pool.query("DELETE FROM cloud_saves WHERE user_id = $1 AND slot = $2", [req.uid, slot]);
     return {ok:true};
   });
 

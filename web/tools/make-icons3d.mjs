@@ -45,13 +45,17 @@ const MODELS = {
     for (let i = 0; i < 4; i++){ const ln = mesh(new THREE.BoxGeometry(.8 - (i % 2) * .25, .05, .02), mat(0x9a8f78, {roughness:.8})); ln.position.set(-.05 - (i % 2) * .12, .36 - i * .2, .04); g.add(ln); }
     const seal = mesh(new THREE.CylinderGeometry(.2, .2, .07, 32), mat(0xe0443a)); seal.rotation.x = Math.PI / 2; seal.position.set(.35, -.42, .07); g.add(seal);
     g.rotation.set(-.25, .4, .12); return g; },
+  /* minerals: a dark rock with violet crystal prisms and a copper nugget (1.1: reads as "minerals" even at 30 px, unlike the Gems diamond) */
   ore(){ const g = new THREE.Group();
-    let rg = new THREE.IcosahedronGeometry(.95, 2); rg.deleteAttribute("normal"); rg.deleteAttribute("uv"); rg = mergeVertices(rg); const p = rg.attributes.position;
-    for (let i = 0; i < p.count; i++){ const v = new THREE.Vector3().fromBufferAttribute(p, i); const k = 1 + (Math.sin(v.x * 5.1) + Math.sin(v.y * 4.3 + 1) + Math.sin(v.z * 6.2 + 2)) * .06; v.multiplyScalar(k); v.y *= .78; p.setXYZ(i, v.x, v.y, v.z); }
-    rg.computeVertexNormals(); g.add(mesh(rg, mat(0x6b5a4c, {roughness:.85, clearcoat:0, flatShading:true})));
-    const cr = mat(0xff8a1c, {emissive:0xff5a00, emissiveIntensity:.6, roughness:.15, clearcoat:1});
-    [[.2, .7, .15, .55], [-.35, .6, .2, .42], [.05, .78, -.25, .34], [.55, .42, .25, .32]].forEach(([x, y, z, s]) => { const c = mesh(new THREE.OctahedronGeometry(s, 0), cr); c.scale.set(.55, 1.4, .55); c.position.set(x, y, z); c.rotation.set(Math.random() * .6, Math.random() * 3, (x > 0 ? -1 : 1) * .35); g.add(c); });
-    g.rotation.set(.15, .5, 0); return g; },
+    let rg = new THREE.IcosahedronGeometry(.78, 1); rg.deleteAttribute("normal"); rg.deleteAttribute("uv"); rg = mergeVertices(rg); const p = rg.attributes.position;
+    for (let i = 0; i < p.count; i++){ const v = new THREE.Vector3().fromBufferAttribute(p, i); const k = 1 + (Math.sin(v.x * 4.1) + Math.sin(v.y * 3.3 + 1) + Math.sin(v.z * 5.2 + 2)) * .07; v.multiplyScalar(k); v.y = v.y * .55 - .35; p.setXYZ(i, v.x, v.y, v.z); }
+    rg.computeVertexNormals(); g.add(mesh(rg, mat(0x4a4f5c, {roughness:.9, clearcoat:0, flatShading:true})));
+    const cr = mat(0xa77bff, {roughness:.08, metalness:.1, clearcoat:1, flatShading:true, emissive:0x3a1a8a, emissiveIntensity:.35});
+    const cr2 = mat(0x5fe3ff, {roughness:.08, metalness:.1, clearcoat:1, flatShading:true, emissive:0x0a4a6a, emissiveIntensity:.3});
+    const prism = (r, h, m) => { const gg = new THREE.Group(); const body = mesh(new THREE.CylinderGeometry(r, r, h, 6, 1), m); gg.add(body); const tip = mesh(new THREE.ConeGeometry(r, r * 1.5, 6, 1), m); tip.position.y = h / 2 + r * .75; gg.add(tip); return gg; };
+    [[-.05, .3, .1, .34, 1.2, 0, cr], [-.5, .1, .0, .25, .8, .5, cr], [.45, .12, .15, .27, .9, -.45, cr2], [.15, .0, .45, .18, .5, -.2, cr2]].forEach(([x, y, z, r, h, rz, m]) => { const c = prism(r, h, m); c.position.set(x, y, z); c.rotation.set(.15, .3, rz); g.add(c); });
+    const nug = mesh(new THREE.DodecahedronGeometry(.22, 0), mat(0xd9823b, {metalness:.85, roughness:.3, flatShading:true})); nug.position.set(-.35, -.2, .5); nug.scale.set(1.3, .9, 1.1); g.add(nug);
+    g.rotation.set(.12, .35, 0); return g; },
   appr(){ const g = new THREE.Group(), y = mat(0xffc400, {roughness:.3, clearcoat:.8}), dark = mat(0x3b2a12, {roughness:.4});
     g.add(mesh(new THREE.SphereGeometry(1, 64, 48), y));
     for (const x of [-.33, .33]){ const e = mesh(new THREE.CapsuleGeometry(.09, .18, 8, 16), dark); e.position.set(x, .25, .9); g.add(e); }
@@ -63,7 +67,12 @@ const MODELS = {
     const ring = mesh(new THREE.TorusGeometry(.98, .07, 16, 64), mat(0x4fe39a, {roughness:.25})); ring.position.z = .15; g.add(ring);
     const ck = mesh(ext(checkShape(), .12, .05), mat(0xffffff, {roughness:.2})); ck.position.z = .2; ck.scale.setScalar(1.15); g.add(ck);
     g.rotation.set(-.3, .45, 0); return g; },
-  heart(){ const g = new THREE.Group(); const h = mesh(ext(heartShape(), .45, .2), mat(0xff2d63, {roughness:.25, clearcoat:.8})); g.add(h); g.rotation.set(-.15, .45, 0); return g; },
+  /* 1.1: a plumper, front-facing heart so it still reads as a heart at 30 px */
+  heart(){ const g = new THREE.Group(), sh = new THREE.Shape(), pts = [];
+    for (let i = 0; i <= 96; i++){ const t = i / 96 * Math.PI * 2; pts.push(new THREE.Vector2(16 * Math.sin(t) ** 3 / 16, (13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)) / 16)); }
+    sh.setFromPoints(pts);
+    const h = mesh(ext(sh, .42, .26, {curveSegments:64, bevelSegments:10}), mat(0xff2a55, {roughness:.22, clearcoat:1, clearcoatRoughness:.15, sheen:.3}));
+    g.add(h); g.rotation.set(-.12, .2, 0); return g; },
   risk(){ const g = new THREE.Group(); g.add(mesh(ext(roundTri(1.1), .3, .1), mat(0xff7a00, {roughness:.3, clearcoat:.8})));
     const w = mat(0xfff7ee, {roughness:.3}); const bar = mesh(new THREE.CapsuleGeometry(.09, .38, 8, 16), w); bar.position.set(0, .05, .27); g.add(bar);
     const dot = mesh(new THREE.SphereGeometry(.1, 20, 16), w); dot.position.set(0, -.4, .27); g.add(dot); g.position.y = .1; g.rotation.set(-.15, .45, 0); return g; },
@@ -91,6 +100,7 @@ const MODELS = {
 window.renderAll = () => {
   const out = {};
   for (const [id, fn] of Object.entries(MODELS)){
+    if (window.ONLY && window.ONLY.length && !window.ONLY.includes(id)) continue;
     const scene = new THREE.Scene(); scene.environment = env; scene.environmentIntensity = .5;
     const key = new THREE.DirectionalLight(0xfff6e8, 2.4); key.position.set(-2, 3, 4); scene.add(key);
     const rim = new THREE.DirectionalLight(0x9fe8ff, .9); rim.position.set(3, 1, -2); scene.add(rim);
@@ -122,7 +132,7 @@ page.on("console", m => { if (m.type() === "error") console.log("console", m.tex
 page.on("pageerror", e => console.log("pageerror", e.message));
 await page.goto(`http://localhost:${srv.address().port}/`);
 await page.waitForFunction(() => window.ready, null, {timeout:60000});
-const imgs = await page.evaluate(() => window.renderAll());
+const imgs = await page.evaluate(only => { window.ONLY = only; return window.renderAll(); }, process.argv.slice(2));   // node tools/make-icons3d.mjs heart ore → only those
 for (const [id, url] of Object.entries(imgs)) fs.writeFileSync(path.join(OUT, id + ".webp"), Buffer.from(url.split(",")[1], "base64"));
 console.log("icons:", Object.keys(imgs).join(" "));
 await browser.close(); srv.close();

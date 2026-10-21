@@ -75,7 +75,8 @@ export function GfxSeg(){
 }
 
 /* A save slot at a glance: when in the game, how far to 2050, how close to Net Zero, temperature and approval */
-export function SlotInfo({name, meta, icon, bad}){
+const MODE_CLS = {hard:"hard", daily:"daily", world:"world", normal:"normal"};
+export function SlotInfo({name, meta, icon, bad, cur}){
   if (!meta) return <div class="slotinfo empty"><b>{name}</b><small class="muted">{bad || t("empty")}</small></div>;
   const m = meta, th = S.lang === "th";
   const yearP = Math.max(0, Math.min(1, m.tick / (P.TOTAL_TICKS || 300))), nzP = Math.max(0, Math.min(1, (36 - m.net) / 36));
@@ -85,7 +86,8 @@ export function SlotInfo({name, meta, icon, bad}){
     <div class="sitop">
       {m.char ? <Portrait id={m.char} size={34}/> : icon ? <Icon n={icon} size={20} color="accent"/> : null}
       <b>{name}</b>
-      {m.mode === "hard" ? <span class="sitag hard">HARD CORE</span> : m.mode === "daily" ? <span class="sitag">DAILY</span> : null}
+      <span class={"sitag " + MODE_CLS[P.modeKey(m)]}>{P.modeName(m)}</span>
+      {cur ? <span class="sitag cur">{t("slotThisGame")}</span> : null}
       <span class="grow"/><span class="mono sidate">{P.dateStr(m.tick)}</span>
     </div>
     <div class="sibars">

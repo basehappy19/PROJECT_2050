@@ -615,3 +615,54 @@ canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
 @media (max-width:700px), (max-height:520px){ .sibars{grid-template-columns:1fr} .sichips small{width:100%} }
 .card.slotrow{flex-direction:row;align-items:center;text-align:left}
 .sibar .meter{width:100%}
+/* ---- 1.1 save slots: mode tags, buttons, current game ---- */
+.slotrow{flex-wrap:wrap}
+.slotbtns{display:flex;gap:8px;align-items:center;flex-shrink:0}
+.slotnote{flex-basis:100%;font-size:12px}
+.slothelp{margin:2px 0 6px;line-height:1.5}
+.sitag.normal{background:rgba(79,209,197,.14);color:var(--accent)}
+.sitag.daily{background:rgba(242,193,78,.15);color:var(--warn)}
+.sitag.world{background:rgba(120,200,120,.16);color:var(--good)}
+.sitag.cur{background:rgba(255,255,255,.1);color:var(--fg)}
+.card.slotrow.cur{border-color:rgba(79,209,197,.55)}
+@media (max-width:700px){ .slotbtns{flex-basis:100%;justify-content:flex-end} }
+/* pause window: more room between the groups */
+.modal.pause{display:flex;flex-direction:column;gap:14px;padding:22px 24px}
+.modal.pause h2{margin:0}
+.modal.pause .slots{gap:10px;margin:0}
+.modal.pause .slothelp{margin:-6px 0 0}
+.pzset{display:flex;flex-direction:column;gap:10px;padding:14px 16px;text-align:left;align-items:stretch}
+.pzset .vol, .pzset .gfxrow{margin:0}
+.pzh{display:inline-flex;align-items:center;gap:8px;font:600 15px var(--disp);color:var(--fg)}
+.pzfoot{gap:10px !important;padding-top:4px;border-top:1px solid var(--line);margin-top:2px;padding-top:14px}
+.modal.pause .keys{margin-top:0}
+/* top bar numbers: the "+12/month" note never wraps, so the big number stays on its line */
+.kpi{grid-template-rows:15px 1fr;align-items:end}
+.kpi .s{white-space:nowrap;line-height:1}
+.kpi .v{white-space:nowrap;align-self:center;line-height:1.1}
+.sk-detail > *{flex-shrink:0} .sk-detail .btn-lg{min-height:48px}
+.relnum{display:inline-flex;align-items:center;gap:3px;margin-left:4px} .rellegend{margin:-2px 0 8px;line-height:1.45}
+/* ---- 1.1: disaster alert, news filters, yearly report, bilateral card ---- */
+.hzalert{position:absolute;left:50%;top:84px;transform:translateX(-50%);width:min(460px,calc(100vw - 24px));z-index:30;padding:14px 16px;display:flex;flex-direction:column;gap:10px;border:1px solid rgba(255,90,74,.55);border-radius:14px;animation:pop2 .25s cubic-bezier(.2,.9,.3,1.2);pointer-events:auto}
+.hzh{display:flex;align-items:center;gap:8px} .hzh b{font:600 16px var(--disp)}
+.hzrow{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;background:rgba(255,255,255,.04)} .hzrow b{font-weight:600}
+.hzf{display:flex;justify-content:flex-end}
+.badge.b2{background:var(--purple);color:#1a1030}
+.kpi.sanct .s{color:var(--bad)}
+.nfilter{margin:2px 0 10px;flex-wrap:wrap;gap:6px} .nfilter .chip{cursor:pointer;display:inline-flex;align-items:center;gap:5px} .nfilter .chip.on{border-color:var(--accent);color:var(--accent);background:rgba(79,209,197,.12)}
+.news li.intel{background:rgba(195,166,255,.08);border-radius:8px}
+.intelcard{display:flex;flex-direction:column;gap:4px;padding:10px 12px;margin-bottom:10px;border-color:rgba(195,166,255,.5);text-align:left;align-items:stretch}
+.card.report{display:flex;flex-direction:column;gap:10px;padding:12px 14px;margin-bottom:12px;text-align:left;align-items:stretch} .card.report.fresh{border-color:rgba(79,209,197,.6);box-shadow:0 0 0 1px rgba(79,209,197,.25) inset}
+.rpgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 14px;font-size:12.5px;color:var(--muted)} .rpgrid span{display:flex;flex-direction:column;gap:2px} .rpgrid b{font:600 15px var(--mono);color:var(--fg)} .rpgrid b small{font-size:11px}
+.rptips{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:5px;font-size:12.5px;line-height:1.45}
+.card.bilat{display:flex;flex-direction:column;gap:9px;padding:12px 14px;text-align:left;align-items:stretch;margin:6px 0 4px}
+.card.bilat.ready{border-color:rgba(95,211,154,.6);animation:bglow 2.4s ease-in-out infinite}
+@keyframes bglow{50%{box-shadow:0 0 0 1px rgba(95,211,154,.35) inset,0 0 18px rgba(95,211,154,.15)}}
+.bfx{display:flex;flex-wrap:wrap;gap:6px} .bfx .fxchip{display:inline-flex;align-items:center;gap:5px;padding:3px 9px;border-radius:99px;font-size:12px;background:rgba(95,211,154,.1);color:var(--good)}
+.chip.big{padding:6px 10px;font-size:13px}
+/* top bar on mid-size screens (4 values + controls): no "+n/month" notes, they are in the tooltip; the logo gives way first */
+@media (max-width:1240px){ .kpi .s{display:none} .kpi .kmeter{left:96px} }
+@media (max-width:1100px){ .brand{display:none} }
+.kpi{overflow:hidden}
+@media (max-width:700px){ .hzalert{top:auto;bottom:calc(var(--bottom-h, 160px) + 70px)} }
+.sitag{white-space:nowrap} @media (max-width:700px){ .sitop{flex-wrap:wrap;row-gap:6px} .sitop .sidate{margin-left:auto} }

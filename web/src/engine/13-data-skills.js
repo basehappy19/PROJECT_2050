@@ -21,7 +21,7 @@ const SKILLS = [
   S_("E1","energy","zap",[0,1],50,10,[],6,{th:"โครงข่ายไฟฟ้าอัจฉริยะ",en:"Smart Grid"},
     {th:"CO₂ โลก −0.8 Gt และสกิลพลังงานสะอาดอื่นได้ผลเพิ่ม 10%",en:"Global CO₂ −0.8 Gt; other clean-energy skills work 10% better"},{co2:-0.8}),
   S_("E2","energy","sun",[1,0],80,15,["E1"],18,{th:"ฟาร์มแสงอาทิตย์และกังหันลม",en:"Solar & Wind Farms"},
-    {th:"CO₂ ทุกภูมิภาค −0.4 Gt (รวม −2.4 Gt)",en:"Every region −0.4 Gt (−2.4 Gt total)"},{all:-0.4}),
+    {th:"CO₂ ทุกทวีป −0.4 Gt (รวม −2.4 Gt)",en:"Every region −0.4 Gt (−2.4 Gt total)"},{all:-0.4}),
   S_("E8","energy","flame-kindling",[1,2],70,15,["E1"],12,{th:"พลังงานความร้อนใต้พิภพ",en:"Geothermal Power"},
     {th:"CO₂ ใน NA, SEA และ EA แห่งละ −0.3 Gt",en:"NA, SEA and EA each −0.3 Gt"},{rco2:{NA:-0.3,SEA:-0.3,EA:-0.3}}),
   S_("E3","energy","battery-charging",[2,0],110,20,["E2"],12,{th:"แบตเตอรี่กักเก็บพลังงาน",en:"Battery Storage"},
@@ -59,7 +59,7 @@ const SKILLS = [
   S_("N2","nature","waves",[1,0],70,15,["N1"],18,{th:"ป่าชายเลนและบลูคาร์บอน",en:"Mangroves & Blue Carbon"},
     {th:"ดักจับ 1.2 Gt/ปี, ความเสี่ยงภัย SEA −15% และไต้ฝุ่นกับน้ำเค็มรุกเสียหายน้อยลง 30%",en:"Captures 1.2 Gt/yr, SEA risk −15%; typhoons and saltwater do 30% less damage"},{sink:1.2,vuln:{SEA:-15}},{resp:{typhoon:.3,saltwater:.3}}),
   S_("N3","nature","wheat",[1,2],85,20,["N1"],18,{th:"เกษตรฟื้นฟูบำรุงดิน",en:"Regenerative Farming"},
-    {th:"ดักจับ 1.5 Gt/ปี, ความนิยม +3% และความเสี่ยงภัยทุกภูมิภาค −3%",en:"Captures 1.5 Gt/yr, approval +3%, every region's risk −3%"},{sink:1.5,appr:3,vulnAll:-3}),
+    {th:"ดักจับ 1.5 Gt/ปี, ความนิยม +3% และความเสี่ยงภัยทุกทวีป −3%",en:"Captures 1.5 Gt/yr, approval +3%, every region's risk −3%"},{sink:1.5,appr:3,vulnAll:-3}),
   S_("N6","nature","fish",[2,0],210,50,["N2"],12,{th:"เติมแร่ธาตุในมหาสมุทร",en:"Ocean Mineralisation"},
     {th:"ดักจับ 4.0 Gt/ปี แต่รบกวนระบบนิเวศทะเล: อุณหภูมิ +0.03°C",en:"Captures 4.0 Gt/yr but disrupts sea life: +0.03°C"},{sink:4.0,tip:8},{trade:1}),
   S_("A1","nature","sprout",[2,1],60,10,["N3"],12,{th:"ข้าวปล่อยมีเทนต่ำ",en:"Low-Methane Rice"},
@@ -69,11 +69,11 @@ const SKILLS = [
   S_("A2","nature","beef",[3,1],110,25,["A1"],18,{th:"เนื้อสัตว์ทางเลือก",en:"Alternative Protein"},
     {th:"CO₂ โลก −1.0 Gt, รายได้ [[$money]] +2/เดือน แต่ความนิยม −3%",en:"Global CO₂ −1.0 Gt, [[$money]] +2/mo, but approval −3%"},{co2:-1.0,epInc:2,appr:-3},{trade:1}),
   S_("A3","nature","droplets",[3,2],70,15,["N5"],0,{th:"พืชทนแล้ง",en:"Drought-Proof Crops"},
-    {th:"ภัยแล้งและไฟป่าเสียหายน้อยลง 50%, ความเสี่ยงภัยทุกภูมิภาค −4%",en:"Droughts and wildfires do 50% less damage; every region's risk −4%"},{vulnAll:-4},{resp:{drought:.5,wildfire:.5}}),
+    {th:"ภัยแล้งและไฟป่าเสียหายน้อยลง 50%, ความเสี่ยงภัยทุกทวีป −4%",en:"Droughts and wildfires do 50% less damage; every region's risk −4%"},{vulnAll:-4},{resp:{drought:.5,wildfire:.5}}),
 
   /* ---------------- Cities & adaptation ---------------- */
   S_("C1","city","radio-tower",[0,0],60,10,[],0,{th:"ระบบเตือนภัยล่วงหน้า",en:"Early Warning System"},
-    {th:"เฮอริเคน ไต้ฝุ่น และน้ำท่วมเสียหายน้อยลง 40%, ความเสี่ยงภัยทุกภูมิภาค −5%",en:"Hurricanes, typhoons and floods do 40% less damage; every region's risk −5%"},{vulnAll:-5},{resp:{hurricane:.4,typhoon:.4,flood:.4}}),
+    {th:"เฮอริเคน ไต้ฝุ่น และน้ำท่วมเสียหายน้อยลง 40%, ความเสี่ยงภัยทุกทวีป −5%",en:"Hurricanes, typhoons and floods do 40% less damage; every region's risk −5%"},{vulnAll:-5},{resp:{hurricane:.4,typhoon:.4,flood:.4}}),
   S_("P5","city","building-2",[0,2],100,25,[],18,{th:"มาตรฐานอาคาร Net-Zero",en:"Net-Zero Building Code"},
     {th:"CO₂ โลก −1.8 Gt และประหยัดพลังงานในเมือง",en:"Global CO₂ −1.8 Gt, urban energy savings"},{co2:-1.8,damp:.15}),
   S_("C2","city","droplet",[1,0],90,20,["C1"],12,{th:"เมืองฟองน้ำ",en:"Sponge Cities"},
@@ -87,11 +87,11 @@ const SKILLS = [
   S_("C4","city","brick-wall",[2,1],75,15,["C2"],12,{th:"ประตูกั้นน้ำเค็ม",en:"Saltwater Barriers"},
     {th:"น้ำเค็มรุกเสียหายน้อยลง 60% และความเสี่ยงภัย SEA −8%",en:"Saltwater intrusion does 60% less damage; SEA risk −8%"},{vuln:{SEA:-8}},{resp:{saltwater:.6}}),
   S_("C7","city","shield-check",[3,1],160,40,["C2","C3"],24,{th:"เมกะโปรเจกต์เมืองทนภัย",en:"Resilient Megacities"},
-    {th:"ความเสี่ยงภัยทุกภูมิภาค −10% และทำตามแผนทุกภูมิภาค +3%",en:"Every region's risk −10% and on-plan +3%"},{vulnAll:-10,compAll:3}),
+    {th:"ความเสี่ยงภัยทุกทวีป −10% และทำตามแผนทุกทวีป +3%",en:"Every region's risk −10% and on-plan +3%"},{vulnAll:-10,compAll:3}),
 
   /* ---------------- Diplomacy & policy ---------------- */
   S_("P1","policy","megaphone",[0,1],30,5,[],0,{th:"แคมเปญความรู้ด้านภูมิอากาศ",en:"Climate Literacy Campaign"},
-    {th:"ความนิยม +10% และทำตามแผนทุกภูมิภาค +5% (ถาวร)",en:"Approval +10%, every region's on-plan +5% (permanent)"},{appr:10,compAll:5}),
+    {th:"ความนิยม +10% และทำตามแผนทุกทวีป +5% (ถาวร)",en:"Approval +10%, every region's on-plan +5% (permanent)"},{appr:10,compAll:5}),
   S_("P2","policy","receipt",[1,0],60,25,["P1"],6,{th:"ภาษีคาร์บอน",en:"Carbon Tax"},
     {th:"CO₂ โลก −2.5 Gt, รายได้ [[$money]] +6/เดือน แต่ความนิยม −8%",en:"Global CO₂ −2.5 Gt, [[$money]] +6/mo, but approval −8%"},{co2:-2.5,appr:-8,epInc:6},{trade:1}),
   S_("D1","policy","hand-coins",[1,1],80,20,["P1"],0,{th:"กองทุนภูมิอากาศโลก",en:"Global Climate Fund"},
@@ -99,13 +99,13 @@ const SKILLS = [
   S_("D4","policy","piggy-bank",[1,2],40,10,["P1"],0,{th:"ระดมทุนฉุกเฉิน",en:"Emergency Fundraising"},
     {th:"สกิลกดใช้: ได้ [[$money]] +80 ทันที แต่ความนิยม −4% · พัก 18 เดือน",en:"Active: [[$money]] +80 now, approval −4% · 18-month cooldown"},{},{type:"active",cd:18}),
   S_("P3","policy","scale",[2,0],90,40,["P2"],0,{th:"ภาษีคาร์บอนข้ามพรมแดน",en:"Carbon Border Tax"},
-    {th:"ภูมิภาคที่ทำตามแผนต่ำกว่า 70% ถูกบังคับลด CO₂ ปีละ −0.3 Gt ต่อเนื่อง",en:"Regions under 70% on-plan must cut −0.3 Gt/yr, ongoing"},{p3:1}),
+    {th:"ทวีปที่ทำตามแผนต่ำกว่า 70% ถูกบังคับลด CO₂ ปีละ −0.3 Gt ต่อเนื่อง",en:"Regions under 70% on-plan must cut −0.3 Gt/yr, ongoing"},{p3:1}),
   S_("D2","policy","arrow-left-right",[2,1],70,20,["D1"],0,{th:"แลกเปลี่ยนเทคโนโลยี",en:"Technology Exchange"},
     {th:"ปลดล็อกคำสั่ง \"แลกเปลี่ยนเทคโนโลยี\" กับแต่ละประเทศ",en:"Unlocks the \"Share technology\" order for each country"},{}),
   S_("P6","policy","ban",[3,0],150,60,["P3"],12,{th:"เลิกอุดหนุนฟอสซิลทั่วโลก",en:"End Fossil Subsidies"},
     {th:"CO₂ โลก −4.5 Gt แต่ทำตามแผนใน MEAF และ NA −15% ทันที",en:"Global CO₂ −4.5 Gt, but MEAF and NA on-plan −15% at once"},{co2:-4.5,comp:{MEAF:-15,NA:-15},damp:.25},{trade:1}),
-  S_("D3","policy","handshake",[3,1],120,40,["D2"],0,{th:"สนธิสัญญาระดับภูมิภาค",en:"Regional Treaties"},
-    {th:"ปลดล็อกการตั้งกลุ่มพันธมิตร (ประเทศที่มิตรภาพ 50+ ตั้งแต่ 3 ประเทศในภูมิภาคเดียวกัน)",en:"Unlocks alliances (3+ countries in one region with friendship 50+)"},{}),
+  S_("D3","policy","handshake",[3,1],120,40,["D2"],0,{th:"สนธิสัญญาระดับทวีป",en:"Regional Treaties"},
+    {th:"ปลดล็อกการตั้งกลุ่มพันธมิตร (ประเทศที่มิตรภาพ 50+ ตั้งแต่ 3 ประเทศในทวีปเดียวกัน)",en:"Unlocks alliances (3+ countries in one region with friendship 50+)"},{}),
 ];
 const SKILL = Object.fromEntries(SKILLS.map(n => [n.id, n]));
 const SKILL_TYPE = {passive:{th:"ติดตัวถาวร",en:"Passive"}, active:{th:"กดใช้",en:"Active"}, trade:{th:"ได้อย่างเสียอย่าง",en:"Trade-off"}, resp:{th:"รับมือภัย",en:"Disaster response"}, country:{th:"เลือกประเทศ",en:"Targets a country"}};

@@ -114,7 +114,7 @@ function seasonWeight(type, cid){
 }
 
 /* ---------------- Continuous World ---------------- */
-const worldUnlocked = () => { const e = (P.AchStore.data.ends || {}); return Object.keys(e).some(k => k.startsWith("win")); };
+const worldUnlocked = () => { const e = (P.AchStore.data.ends || {}); const c = P.Net && P.Net.user && P.Net.user.cleared; return Object.keys(e).some(k => k.startsWith("win")) || !!(c && (c.normal || c.hard)); };
 const GOALS = [
   {id:"cut", icon:"$co2", t:T("ลด CO₂ ของ {R} ลง 2% ในฤดูนี้", "Cut {R}'s CO₂ by 2% this season"), make:() => { const r = S.regions.slice().sort((a, b) => b.co2 - a.co2)[Math.floor(P.rand() * 3)]; return {r:r.id, v0:r.co2}; }, done:g => (P.R(g.r).co2 <= g.v0 * .98), reward:{ep:40}},
   {id:"aid", icon:"heart-handshake", t:T("ช่วยเหลือผู้ประสบภัย (ฟองสีแดง) 1 ครั้ง", "Answer one disaster-aid bubble"), make:() => ({v0:S.stats.aid}), done:g => S.stats.aid >= g.v0 + 1, reward:{pc:10}},
@@ -149,7 +149,7 @@ function goalsTick(){
 const ERAS = {
   shift:{icon:"zap", name:T("ยุคเปลี่ยนผ่าน", "The Transition"), goal:T("ไปให้ถึง Net Zero", "Reach Net Zero")},
   heal:{icon:"sprout", name:T("ยุคฟื้นฟู", "The Healing"), goal:T("ดึง CO₂ ออกจนอุณหภูมิลดต่ำกว่า +1.5°C", "Pull CO₂ out until warming falls below +1.5°C")},
-  thrive:{icon:"sparkles", name:T("ยุครุ่งเรือง", "The Thriving Age"), goal:T("รักษาโลกให้สมดุล ทุกภูมิภาคทำตามแผน 80% ขึ้นไป", "Keep the world in balance, every region 80%+ on-plan")},
+  thrive:{icon:"sparkles", name:T("ยุครุ่งเรือง", "The Thriving Age"), goal:T("รักษาโลกให้สมดุล ทุกทวีปทำตามแผน 80% ขึ้นไป", "Keep the world in balance, every region 80%+ on-plan")},
 };
 /* the world mode replaces game over with setbacks you can recover from */
 function worldCheck(){

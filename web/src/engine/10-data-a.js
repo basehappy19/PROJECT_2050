@@ -13,8 +13,8 @@ const UI = {
   compliance:{th:"[[$plan]] ทำตามแผน",en:"[[$plan]] On-plan"}, vuln:{th:"[[$risk]] ความเสี่ยงภัยพิบัติ",en:"[[$risk]] Disaster risk"},
   treeHint:{th:"เส้นลูกศรแสดงลำดับการปลดล็อก: ต้องมีโหนดต้นทางก่อน · สีเขียว = มีแล้ว · สีฟ้า = ปลดล็อกได้ · เส้นประ = ยังล็อก",en:"Arrows show unlock order: own the source first · green = owned · blue = available · dashed = locked"},
   alsoNeeds:{th:"ต้องมี",en:"needs"},
-  nbTech:{th:"เทคโนโลยี",en:"Tech"}, nbRegion:{th:"ภูมิภาค",en:"Regions"}, nbStats:{th:"สถิติ",en:"Stats"}, nbNews:{th:"ข่าว",en:"News"},
-  dTech:{th:"เทคโนโลยี & นโยบาย",en:"Tech & Policy Tree"}, dRegion:{th:"ควบคุมภูมิภาค",en:"Regional control"}, dStats:{th:"สถิติโลก",en:"Global metrics"}, dNews:{th:"รายงานข่าวคณะทำงาน",en:"Taskforce dispatch"},
+  nbTech:{th:"เทคโนโลยี",en:"Tech"}, nbRegion:{th:"ทวีป",en:"Regions"}, nbStats:{th:"สถิติ",en:"Stats"}, nbNews:{th:"ข่าว",en:"News"},
+  dTech:{th:"เทคโนโลยี & นโยบาย",en:"Tech & Policy Tree"}, dRegion:{th:"ควบคุมทวีป",en:"Regional control"}, dStats:{th:"สถิติโลก",en:"Global metrics"}, dNews:{th:"รายงานข่าวคณะทำงาน",en:"Taskforce dispatch"},
   rush:{th:"เงินเฟ้อสีเขียว",en:"Greenflation"},
   rushTip:{th:"เงินเฟ้อสีเขียว (Greenflation): อนุมัติหลายโครงการในรอบ 12 เดือน ความต้องการเทคโนโลยีสะอาดพุ่งพร้อมกัน ราคาจึงขึ้น 20% ต่อโครงการ",en:"Greenflation: approving many projects within 12 months drives clean-tech demand up, adding 20% per project"},
   nzTitle:{th:"Net Zero",en:"Net Zero"}, tTitle:{th:"อุณหภูมิโลก",en:"Global warming"},
@@ -25,7 +25,7 @@ const UI = {
   rising:{th:"กำลังเพิ่มขึ้น ยังไม่ลด",en:"Still rising"},
   toLose:{th:"ห่างจุดแพ้",en:"from losing"},
   barNZ:{th:"ความคืบหน้าสู่ Net Zero",en:"Progress to Net Zero"}, barT:{th:"ภาวะโลกร้อน (ขีดแพ้ +3.0°C)",en:"Warming (lose at +3.0°C)"},
-  ghint:{th:"ลากเพื่อเลื่อนแผนที่ · ล้อเมาส์เพื่อซูม · แตะภูมิภาคเพื่อสั่งการ · แตะฟองเพื่อเก็บแต้ม",en:"Drag to pan · scroll to zoom · tap a region to act · tap bubbles to collect"},
+  ghint:{th:"ลากเพื่อเลื่อนแผนที่ · ล้อเมาส์เพื่อซูม · แตะทวีปเพื่อสั่งการ · แตะฟองเพื่อเก็บแต้ม",en:"Drag to pan · scroll to zoom · tap a region to act · tap bubbles to collect"},
   cat1:{th:"พลังงานและอุตสาหกรรม",en:"Energy & Industrial Transition"},
   cat2:{th:"นโยบายภูมิอากาศและเศรษฐกิจสังคม",en:"Climate Policy & Socio-Economy"},
   cat3:{th:"แหล่งดูดซับคาร์บอนและวิศวกรรมธรรมชาติ",en:"Carbon Sink & Nature Engineering"},
@@ -33,12 +33,12 @@ const UI = {
   needs:{th:"ต้องมีก่อน",en:"Requires"}, none:{th:"ไม่มี",en:"None"}, rollout:{th:"ทยอยผล",en:"Roll-out"},
   months:{th:"เดือน",en:"mo"}, inProgress:{th:"โครงการที่กำลังทยอยผล",en:"Projects rolling out"},
   paused:{th:"หยุดชะงัก",en:"stalled"},
-  rollNote:{th:"การลด CO₂ ทยอยเกิดขึ้นทุกเดือน คูณด้วยอัตราทำตามแผนของภูมิภาค ณ เดือนนั้น และยิ่งลดได้มากแล้ว ตันสุดท้ายยิ่งลดยาก",en:"CO₂ cuts arrive monthly, scale with each region's on-plan at that time, and the last tonnes are the hardest to cut."},
+  rollNote:{th:"การลด CO₂ ทยอยเกิดขึ้นทุกเดือน คูณด้วยอัตราทำตามแผนของทวีป ณ เดือนนั้น และยิ่งลดได้มากแล้ว ตันสุดท้ายยิ่งลดยาก",en:"CO₂ cuts arrive monthly, scale with each region's on-plan at that time, and the last tonnes are the hardest to cut."},
   capFull:{th:"ทีมงาน GCT ดูแลโครงการได้พร้อมกันสูงสุด 3 โครงการ รอให้โครงการเดิมทยอยผลครบก่อน",en:"GCT can run at most 3 roll-outs at once. Wait for one to finish."},
   co2Now:{th:"CO₂ ปัจจุบัน",en:"CO₂ now"}, co2Start:{th:"ปี 2026",en:"In 2026"}, fossil:{th:"สัดส่วนฟอสซิล",en:"Fossil share"}, reserve:{th:"ทุนสำรอง",en:"Reserves"},
   cooldown:{th:"พักอีก",en:"Ready in"},
   chartCo2:{th:"CO₂ สุทธิของโลก (Gt/ปี)",en:"Global net CO₂ (Gt/yr)"}, chartTemp:{th:"อุณหภูมิเพิ่มจากยุคก่อนอุตสาหกรรม (°C)",en:"Warming vs pre-industrial (°C)"},
-  shares:{th:"การปล่อยรายภูมิภาค (Gt/ปี)",en:"Emissions by region (Gt/yr)"},
+  shares:{th:"การปล่อยรายทวีป (Gt/ปี)",en:"Emissions by region (Gt/yr)"},
   eventTag:{th:"เหตุการณ์ฉุกเฉิน · ต้องตัดสินใจ",en:"Dilemma event · decision required"},
   cantAfford:{th:"ทรัพยากรไม่พอ",en:"Not enough resources"},
   postpone:{th:"เลื่อนการตัดสินใจ (ถูกวิจารณ์หนัก)",en:"Postpone the decision (heavy criticism)"},
@@ -47,7 +47,7 @@ const UI = {
   introTitle:{th:"ท่านคือผู้อำนวยการสูงสุดแห่ง GCT",en:"You are Supreme Director of the GCT"},
   introBody:{th:"นานาชาติมอบอำนาจให้ท่านจัดสรรงบประมาณ ผลักดันสนธิสัญญา และเร่งเทคโนโลยีข้ามพรมแดน เป้าหมายคือทำให้การปล่อยคาร์บอนสุทธิของโลกเหลือศูนย์ก่อนสิ้นปี 2050",
              en:"The world has given you authority over budgets, treaties and cross-border technology. Your goal: bring global net carbon emissions to zero before the end of 2050."},
-  introRules:{th:["1 เดือนในเกม = 1 tick · [[$money]] เงิน และ [[$policy]] แต้มนโยบาย เพิ่มทุกเดือน","แตะ [[sprout]] บนแผนที่เพื่อเก็บเงิน · แตะ [[siren]] เพื่อส่งความช่วยเหลือก่อนหมดเวลา","ซื้อเทคโนโลยีตามผัง (พร้อมกันได้ 3 โครงการ) · แตะภูมิภาคบนแผนที่เพื่อสั่งการ","แพ้เมื่อ [[$temp]] ถึง +3.0°C, [[$appr]] เหลือ 0% หรือถึงปี 2051 · Space = หยุด/เล่น"],
+  introRules:{th:["1 เดือนในเกม = 1 tick · [[$money]] เงิน และ [[$policy]] แต้มนโยบาย เพิ่มทุกเดือน","แตะ [[sprout]] บนแผนที่เพื่อเก็บเงิน · แตะ [[siren]] เพื่อส่งความช่วยเหลือก่อนหมดเวลา","ซื้อเทคโนโลยีตามผัง (พร้อมกันได้ 3 โครงการ) · แตะทวีปบนแผนที่เพื่อสั่งการ","แพ้เมื่อ [[$temp]] ถึง +3.0°C, [[$appr]] เหลือ 0% หรือถึงปี 2051 · Space = หยุด/เล่น"],
               en:["1 in-game month = 1 tick · [[$money]] Money and [[$policy]] Policy points come in monthly","Tap [[sprout]] on the map to collect Money · tap [[siren]] to send aid before time runs out","Buy tech along the tree (3 projects at once) · tap a region on the map to act","Lose at [[$temp]] +3.0°C, [[$appr]] 0%, or 2051 · Space = pause/play"]},
   winTitle:{th:"Net Zero สำเร็จ",en:"Net Zero achieved"},
   winBody:{th:"การปล่อยคาร์บอนสุทธิของโลกแตะศูนย์ โลกหลังยุคคาร์บอนเริ่มต้นขึ้นแล้ว",en:"Global net emissions hit zero. The post-carbon era begins."},
@@ -92,7 +92,7 @@ const UI = {
   teamK:{th:"พัฒนาโดยทีม",en:"Developed by team"},
   team:{th:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์",en:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์"},
   disclaimer:{th:"เกมนี้จัดทำขึ้นเพื่อใช้ในกิจกรรม Garena Academy Game Maker เท่านั้น",en:"This game was made for the Garena Academy Game Maker activity only."},
-  noGL:{th:"เบราว์เซอร์นี้แสดงลูกโลก 3 มิติไม่ได้ ยังเล่นได้ผ่านแผง “ภูมิภาค” ด้านล่าง",en:"This browser can't show the 3D globe. You can still play through the Regions panel below."},
+  noGL:{th:"เบราว์เซอร์นี้แสดงลูกโลก 3 มิติไม่ได้ ยังเล่นได้ผ่านแผง “ทวีป” ด้านล่าง",en:"This browser can't show the 3D globe. You can still play through the Regions panel below."},
 };
 const MONTHS = {th:["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."],en:["JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC"]};
 const RESERVE = { vh:{m:.8,th:"สูงมาก",en:"Very high"}, h:{m:.9,th:"สูง",en:"High"}, m:{m:1,th:"ปานกลาง",en:"Medium"}, l:{m:1.2,th:"ต่ำ",en:"Low"} };
@@ -118,10 +118,10 @@ const CITIES = {
 
 /* Regional actions: cost ×1.25 per use in that region, 4-month cooldown. */
 const ACTIONS = [
-  {id:"fund",  ep:40, pc:0,  cd:4, name:{th:"กองทุนพลังงานสะอาด",en:"Clean energy fund"}, desc:{th:"CO₂ ภูมิภาค −0.35 Gt × ทำตามแผน",en:"Regional CO₂ −0.35 Gt × on-plan"}},
+  {id:"fund",  ep:40, pc:0,  cd:4, name:{th:"กองทุนพลังงานสะอาด",en:"Clean energy fund"}, desc:{th:"CO₂ ทวีป −0.35 Gt × ทำตามแผน",en:"Regional CO₂ −0.35 Gt × on-plan"}},
   {id:"diplo", ep:0,  pc:12, cd:4, name:{th:"การทูตภูมิอากาศ",en:"Climate diplomacy"}, desc:{th:"ทำตามแผน +8% (ค่อยๆ ลดลงสู่ค่าฐาน)",en:"On-plan +8% (drifts back to baseline)"}},
   {id:"adapt", ep:35, pc:0,  cd:4, name:{th:"กองทุนปรับตัว",en:"Adaptation fund"}, desc:{th:"ความเปราะบาง −10%, ความนิยม +1%",en:"Vulnerability −10%, approval +1%"}},
-  {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ภูมิภาค −0.8 Gt × ทำตามแผน, ทำตามแผน −6%",en:"Regional CO₂ −0.8 Gt × on-plan, on-plan −6%"}},
+  {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ทวีป −0.8 Gt × ทำตามแผน, ทำตามแผน −6%",en:"Regional CO₂ −0.8 Gt × on-plan, on-plan −6%"}},
 ];
 
 const IC = {ep:"[[$money]]", pc:"[[$policy]]", appr:"[[$appr]]", temp:"[[$temp]]", co2:"[[$co2]]", comp:"[[$plan]]", vuln:"[[$risk]]", rel:"[[$heart]]", ore:"[[$ore]]", gem:"[[$gem]]", sink:"[[$sink]]"};
