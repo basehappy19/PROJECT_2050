@@ -36,7 +36,7 @@ export const G = P.Game = {
   },
   loadSave(obj, slot){
     if (!P.validSave(obj)) return false;
-    const go = () => { P.loadState(obj, slot); UIM.modal = null; UIM.hzAlert = []; Audio.setMood(Audio.gameMood()); GameMap.refresh(); GameMap.resetView(); bump(); };
+    const go = () => { P.loadState(obj, slot); UIM.modal = null; Audio.setMood(Audio.gameMood()); GameMap.refresh(); GameMap.resetView(); bump(); };
     if (UIM.screen === "game"){ P.autosave(); Audio.stopAmb(300); UIM.reward = null; go(); return true; }
     this.enterGame(go);
     return true;
@@ -99,7 +99,7 @@ export const G = P.Game = {
     this.beginGame(o);
   },
   beginGame(o){
-    UIM.msg = ""; UIM.modal = null; UIM.pendingStart = null; UIM.hzAlert = [];
+    UIM.msg = ""; UIM.modal = null; UIM.pendingStart = null;
     P.startGame(S.lang, o);
     GameMap.refresh(); GameMap.resetView(); Audio.setMood("calm", true);
   },
@@ -211,17 +211,6 @@ H.showEnd = () => {
   bump();
 };
 H.closeModal = () => { if (UIM.modal === "charsel") UIM.modal = null; bump(); };
-/* 1.1: a disaster forecast stops the clock (can be switched off in the pause menu) so there is time to evacuate */
-export const hzPauseOn = () => ls.get("p2050-hzpause") !== "0";
-const hw0 = H.hazardWarn;
-H.hazardWarn = h => {
-  if (hw0) hw0(h);
-  if (!hzPauseOn() || UIM.screen !== "game") return;
-  (UIM.hzAlert = UIM.hzAlert || []).push(h.id);
-  if (S.speed){ UIM.hzPrev = S.speed; S.speed = 0; }
-  bump();
-};
-G.hzResume = () => { UIM.hzAlert = []; if (!S.speed) P.setSpeed(UIM.hzPrev || 1); UIM.hzPrev = 0; bump(); };
 H.toast = a => { UIM.toastQ.push(a); bump(); };
 H.story = act => { if (UIM.modal === "skills") UIM.modal = null; G.showStory(act); };
 H.gameStart = () => { G.showStory(1); if (P.Net){ P.Net.startRun(); P.Net.statStart(); } };

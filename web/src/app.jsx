@@ -6,7 +6,7 @@ import {G} from "./game.js";
 import {GameMap} from "./map2d.js";
 import {Icon, Rich} from "./ui/icon.jsx";
 import {Btn} from "./ui/widgets.jsx";
-import {TopBar, AbilityBar, ZoomBtns, Bottom, WorldGoals, HazAlert} from "./ui/hud.jsx";
+import {TopBar, AbilityBar, ZoomBtns, Bottom, WorldGoals} from "./ui/hud.jsx";
 import {Drawer} from "./ui/drawer.jsx";
 import {Skills} from "./ui/skills.jsx";
 import {EventModal, EndModal, CharSel, Story, Pause, Tutorial, Market, SlotPick} from "./ui/modals.jsx";
@@ -76,7 +76,6 @@ function GameScreen(){
       <WorldGoals/>
       <ZoomBtns/>
       <Drawer/>
-      <HazAlert/>
       <Bottom/>
     </div>
   </div>;

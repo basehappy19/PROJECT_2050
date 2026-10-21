@@ -2,7 +2,7 @@
 import {useEffect, useState, useRef} from "preact/hooks";
 import {P, S, UIM, t, L, up, COL, relCol, bump, ls} from "../core.js";
 import {Audio} from "../audio.js";
-import {G, hzPauseOn} from "../game.js";
+import {G} from "../game.js";
 import {Icon, Rich, plain} from "./icon.jsx";
 import {Btn, IconBtn, Seg, Meter, Portrait, portraitSrc, H3, Terra, Volume, GfxSeg, LangSeg, Msg, Key, SlotInfo, Check} from "./widgets.jsx";
 
@@ -231,7 +231,6 @@ export function Pause(){
       <div class="row gap"><b class="pzh"><Icon n="settings" size={16}/> {S.lang === "th" ? "ตั้งค่า" : "Settings"}</b><span class="grow"/><LangSeg/></div>
       <Volume/>
       <GfxSeg/>
-      <Check on={hzPauseOn()} onClick={() => { ls.set("p2050-hzpause", hzPauseOn() ? "0" : "1"); bump(); }}>{t("hzPauseOpt")}</Check>
     </div>
     <b class="pzh"><Icon n="save" size={16}/> {S.lang === "th" ? "ช่องบันทึก" : "Save slots"}</b>
     {saves === null ? <p class="bad small">{t("noStore")}</p> : <>

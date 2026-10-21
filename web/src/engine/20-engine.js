@@ -407,7 +407,7 @@ function hazardTick(){
 function addHazard(c, type, wide){
   const h = {id:++S.hazId, type, c:c.id, at:S.tick + FORECAST, sev:0.7 + rand() * 0.6, evac:!!S.evacFree[c.id], wide:!!wide};
   if (h.evac){ delete S.evacFree[c.id]; S.stats.evac++; }
-  S.haz.push(h);
+  S.haz.push(h); newHaz = true;
   addLog(`[[${HAZARDS[type].icon}]] ${t("forecast")}: ${L(HAZARDS[type].name)} · ${cname(c.id)} · ${FORECAST} ${t("months")}`, "al");
   hook("sfx", "warn"); hook("hazardWarn", h);
 }
@@ -438,9 +438,10 @@ function strike(h){
 }
 
 /* ---------------------------- Tick engine ---------------------------- */
+let newHaz = false;   // a disaster forecast appeared this month
 function tick(){
   if (!S.started || S.over || S.event) return;
-  S.tick++;
+  S.tick++; newHaz = false;
   const prevTemp = S.temp;
   const IM = P.impactMark || (() => () => {}), mark = IM();   // impact dashboard: how much each kind of work lowered CO₂
   if (S.stall > 0) S.stall--;
@@ -496,6 +497,9 @@ function tick(){
   if (checkEnd()) return;
   maybeNews();
   if (S.tick % 6 === 0) autosave();
+  // 1.1 fix: a new disaster forecast never appears together with a window that stops the game (story, event, COP);
+  // the window waits a month, so the evacuate prompt shows while the clock is running
+  if (newHaz){ changed(); return; }
   const act = STORY.find(a => a.at > 0 && S.tick >= a.at && !S.story[a.act]);
   if (act){ S.story[act.act] = 1; hook("story", act.act); changed(); return; }
   if (S.world && S.tick % 12 === 11){ S.lastEv = S.tick; S.event = "COP"; S.cev = null; hook("sfx", "event"); hook("amb", "crowd"); hook("showEvent"); changed(); return; }

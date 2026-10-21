@@ -51,24 +51,6 @@ export function TopBar(){
   </header>;
 }
 
-/* 1.1: disaster forecasts stop the clock: evacuate from here, then carry on */
-export function HazAlert(){
-  const list = (UIM.hzAlert || []).map(id => S.haz.find(h => h.id === id)).filter(Boolean);
-  if (!list.length || S.event || UIM.modal || S.over) return null;
-  const cost = P.evacCost();
-  return <div class="hzalert glass-strong" role="alert">
-    <div class="hzh"><Icon n="siren" size={20} color="bad"/><b>{t("hzAlertTitle")}</b><span class="grow"/><small class="muted">{t("hzAlertPaused")}</small></div>
-    {list.map(h => { const Z = P.HAZARDS[h.type], left = Math.max(0, h.at - S.tick); return <div class="hzrow" key={h.id}>
-      <Icon n={Z.icon} size={22} color="warn"/>
-      <span class="grow"><b>{L(Z.name)}</b> · {P.cname(h.c)}<small class="muted"> · {left} {t("months")}{h.wide ? ` · ${t("hzWide")}` : ""}</small></span>
-      <button type="button" class="ibtn" title={t("hzShow")} onClick={() => { Audio.play("click"); GameMap.focusCountry(h.c); }}><Icon n="locate" size={17}/></button>
-      {h.evac ? <span class="good small"><Icon n="check" size={15}/> {t("evacuated")}</span>
-        : <button type="button" class="btn btn-danger btn-sm" disabled={S.ep < cost} onClick={() => { if (P.evacuate(h.id)) Audio.play("shield"); bump(); }}><Rich t={`${t("evacuate")} · ${P.IC.ep} ${cost}`} iconColor="inherit"/></button>}
-    </div>; })}
-    <div class="hzf"><button type="button" class="btn btn-primary" onClick={() => { Audio.play("click"); G.hzResume(); }}><Rich t={`[[play]] ${t("hzGo")}`} iconColor="inherit"/></button></div>
-  </div>;
-}
-
 /* character portrait + ability buttons */
 export function AbilityBar(){
   const [tip, setTip] = useState(null);

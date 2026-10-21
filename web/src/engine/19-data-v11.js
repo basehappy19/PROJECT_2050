@@ -21,10 +21,6 @@ Object.assign(P.UI, {
   relLegend:T("[[$heart]] ตัวเลขหลังชื่อประเทศคือ “มิตรภาพ” ของประเทศนั้นกับเรา (−100 ถึง 100) ฝ่ายที่เราเลือกข้างจะชอบเรามากขึ้น อีกฝ่ายจะไม่พอใจ", "[[$heart]] The number after each country is its “friendship” with us (−100 to 100). The side you back will like you more; the other side less."),
 });
 Object.assign(P.UI, {
-  /* disaster forecasts stop the clock */
-  hzAlertTitle:T("พยากรณ์ภัยพิบัติ", "Disaster forecast"), hzAlertPaused:T("หยุดเวลาไว้ให้ก่อน", "Time is paused"),
-  hzShow:T("ดูบนแผนที่", "Show on map"), hzGo:T("เล่นต่อ", "Carry on"), hzWide:T("ระบบอากาศกว้าง หลายประเทศ", "wide weather system"),
-  hzPauseOpt:T("หยุดเวลาเมื่อมีพยากรณ์ภัยพิบัติ", "Pause when a disaster is forecast"),
   /* news panel */
   nfAll:T("ทั้งหมด", "All"), nfIntel:T("ข่าวกรอง", "Forecasts"), nfDanger:T("ภัย/เตือน", "Warnings"), nfGood:T("ผลงาน", "Progress"), nfDecide:T("การตัดสินใจ", "Decisions"), nfWorld:T("ข่าวโลก", "World news"),
   nfEmpty:T("ยังไม่มีข่าวประเภทนี้", "Nothing here yet"),
