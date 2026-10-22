@@ -222,6 +222,21 @@ P.CHANGELOG.find(x => x.v === "1.1").subs = [
 ];
 /* the newest version number, counting minor updates */
 P.CHANGELOG.find(x => x.v === "1.5").subs = [
+  SUB("1.5.4", "2026-10-22", [
+    "หน้าแรกใหม่ ปุ่มน้อยลง ดูง่ายขึ้น และมีเมนูตั้งค่าแยก",
+    "ปุ่มปิดและปุ่มย้อนกลับอยู่ด้านบนทุกหน้า ไม่ต้องเลื่อนหา",
+    "หน้าหยุดเกมแบบกว้าง ไม่ต้องเลื่อนลง",
+    "ตลาดทรัพยากร ความนิยม และหน้าประเทศ ใช้ภาพและไอคอนแทนข้อความยาว ๆ",
+    "ไอคอน 3 มิติของทรัพยากรครบทุกชนิดในหน้าเรียนรู้และหน้าประเทศ",
+    "กราฟราคาทรัพยากรขึ้นลงตามจริงตั้งแต่เริ่มเกม",
+  ], [
+    "A new home screen with fewer buttons, and a separate Settings menu.",
+    "Close and back buttons sit at the top of every page.",
+    "A wide pause window that needs no scrolling.",
+    "The resources market, approval and country pages use pictures and icons instead of long text.",
+    "3D icons for every resource on the learning page and country pages.",
+    "Resource price charts move up and down from the very start.",
+  ]),
   SUB("1.5.3", "2026-10-22", [
     "เกมยากขึ้น: ชนะยากขึ้นในทุกโหมด ต้องวางแผนมากขึ้น",
     "ปรับสมดุลตัวละคร: นักเศรษฐศาสตร์ นักการทูต และนักกิจกรรมแรงน้อยลง",
@@ -233,13 +248,13 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
   ]),
   SUB("1.5.2", "2026-10-22", [
     "แผนที่ในเกมวาดด้วยการ์ดจอ (GPU) เลื่อนและซูมลื่นขึ้น ประหยัดแบตเตอรี่ โดยเฉพาะบน iPad และเครื่องสเปกต่ำ",
-    "เครื่องที่ใช้ GPU ไม่ได้ เกมกลับไปวาดแบบเดิมให้เอง และปิดได้ในหน้าตั้งค่า",
+    "เครื่องที่ใช้ GPU ไม่ได้ เกมกลับไปวาดแบบเดิมให้เอง",
     "ปรับสมดุลความยากใหม่หลังเพิ่มระบบการเมืองและห่วงโซ่แร่",
     "เปลี่ยนชื่อ “แร่” เป็น “ทรัพยากร” เช่น ช่องทรัพยากรด้านบน และตลาดทรัพยากรโลก",
     "แก้บัคและปรับปรุงประสิทธิภาพ",
   ], [
     "The in-game map is drawn on the graphics card (GPU): smoother panning and zooming and longer battery life, above all on iPads and slower computers.",
-    "Devices without a usable GPU go back to the old renderer by themselves; it can also be turned off in the settings.",
+    "Devices without a usable GPU go back to the old renderer by themselves.",
     "Difficulty retuned after the new politics and mineral supply chain.",
     "“Minerals” is now called “Resources”, e.g. the Resources counter at the top and the World resources market.",
     "Bug fixes and performance improvements.",

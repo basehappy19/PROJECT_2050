@@ -135,6 +135,78 @@ const MODELS = {
     const c0 = mesh(new THREE.CylinderGeometry(.07, .07, .05, 20), dark); c0.rotation.x = Math.PI / 2; sym.add(c0);
     sym.position.set(.42, .15, .3); sym.rotation.y = .6; sym.scale.setScalar(.9); g.add(sym);
     g.rotation.set(.18, -.4, -.12); return g; },
+  /* ---------- 1.5.4: one icon per resource (learning page, country panel) ---------- */
+  "res-li"(){ const g = new THREE.Group(), m = mat(0xdfe6f2, {metalness:.85, roughness:.22, clearcoat:.6}), tint = mat(0xb9a7ff, {metalness:.6, roughness:.25});
+    const ing = mesh(new THREE.BoxGeometry(1.6, .5, .8, 1, 1, 1), m); g.add(ing);
+    const top = mesh(new THREE.BoxGeometry(1.3, .12, .55), tint); top.position.y = .3; g.add(top);
+    const b = mesh(new THREE.CylinderGeometry(.22, .22, .7, 32), mat(0x2f8cff, {clearcoat:1})); b.position.set(.55, .75, .1); g.add(b);
+    const c = mesh(new THREE.CylinderGeometry(.1, .1, .1, 20), m); c.position.set(.55, 1.15, .1); g.add(c);
+    g.rotation.set(.35, -.5, 0); return g; },
+  "res-co"(){ const g = new THREE.Group(), blue = mat(0x1f4fff, {roughness:.12, clearcoat:1, metalness:.2, emissive:0x0a1a66, emissiveIntensity:.3});
+    [[0, 0, 0, .55, 1.3], [-.45, -.15, .1, .38, .9], [.45, -.2, .05, .35, .8], [.15, -.3, .4, .28, .6]].forEach(([x, y, z, r, h]) => { const c = mesh(new THREE.CylinderGeometry(r * .3, r, h, 6), blue); c.position.set(x, y + h / 2 - .5, z); c.rotation.z = x * -.5; g.add(c); });
+    const base = mesh(new THREE.DodecahedronGeometry(.6, 0), mat(0x5a5f6a, {roughness:.9, clearcoat:0, flatShading:true})); base.scale.set(1.4, .45, 1); base.position.y = -.65; g.add(base);
+    g.rotation.set(.1, -.4, 0); return g; },
+  "res-ni"(){ const g = new THREE.Group(), m = mat(0xc9d3c9, {metalness:.9, roughness:.2, clearcoat:.5});
+    const hx = new THREE.Shape(); for (let i = 0; i <= 6; i++){ const a = Math.PI / 6 + i * Math.PI / 3; i ? hx.lineTo(Math.cos(a), Math.sin(a)) : hx.moveTo(Math.cos(a), Math.sin(a)); }
+    const hole = new THREE.Path(); hole.absarc(0, 0, .45, 0, Math.PI * 2, true); hx.holes.push(hole);
+    g.add(mesh(ext(hx, .4, .08), m)); g.rotation.set(-.5, .4, 0); return g; },
+  "res-gr"(){ const g = new THREE.Group(), m = mat(0x3b4048, {metalness:.55, roughness:.35, clearcoat:.3});
+    const hx = new THREE.Shape(); for (let i = 0; i <= 6; i++){ const a = i * Math.PI / 3; i ? hx.lineTo(Math.cos(a), Math.sin(a)) : hx.moveTo(Math.cos(a), Math.sin(a)); }
+    for (let i = 0; i < 4; i++){ const l = mesh(ext(hx, .1, .03), m); l.rotation.x = -Math.PI / 2; l.position.set(i * .05, i * .2 - .3, -i * .04); l.rotation.z = i * .25; g.add(l); }
+    const pen = mesh(new THREE.CylinderGeometry(.09, .09, 1.6, 6), mat(0xffc24a, {roughness:.4})); pen.rotation.z = -.9; pen.position.set(.2, .55, .5); g.add(pen);
+    const tip = mesh(new THREE.ConeGeometry(.09, .25, 6), m); tip.rotation.z = -.9 + Math.PI; tip.position.set(-.53, .02, .5); g.add(tip);
+    g.rotation.set(.35, -.3, 0); return g; },
+  "res-ga"(){ const g = new THREE.Group(), m = mat(0xd6dee6, {metalness:1, roughness:.08, clearcoat:1});
+    const pts = []; for (let i = 0; i <= 24; i++){ const t = i / 24, y = -1 + 2 * t, r = Math.sin(Math.PI * t) * (1 - t * .55) * .85 + (t > .9 ? 0 : 0); pts.push(new THREE.Vector2(Math.max(.001, r), y)); }
+    const d = mesh(new THREE.LatheGeometry(pts, 48), m); g.add(d);
+    const pool = mesh(new THREE.CylinderGeometry(.9, .95, .08, 48), m); pool.position.y = -1; pool.scale.z = .6; g.add(pool);
+    g.rotation.set(.2, 0, 0); return g; },
+  "res-si"(){ const g = new THREE.Group(), wafer = mat(0x5a6aa0, {metalness:.85, roughness:.12, clearcoat:1, iridescence:1, iridescenceIOR:1.4}), line = mat(0xd7dde3, {metalness:.9, roughness:.2});
+    const w = mesh(new THREE.CylinderGeometry(1, 1, .08, 64), wafer); g.add(w);
+    for (let i = -3; i <= 3; i++){ const a = mesh(new THREE.BoxGeometry(.02, .02, 1.7 * Math.sqrt(1 - (i / 3.6) ** 2)), line); a.position.set(i * .24, .05, 0); g.add(a); const b2 = mesh(new THREE.BoxGeometry(1.7 * Math.sqrt(1 - (i / 3.6) ** 2), .02, .02), line); b2.position.set(0, .05, i * .24); g.add(b2); }
+    g.rotation.set(.75, 0, .15); return g; },
+  "res-ph"(){ const g = new THREE.Group(), rock = mat(0xd9c27a, {roughness:.85, clearcoat:0, flatShading:true}), leaf = mat(0x37b34a, {roughness:.4, clearcoat:.6});
+    const r = mesh(new THREE.DodecahedronGeometry(.85, 0), rock); r.scale.set(1.2, .8, 1); g.add(r);
+    const st = mesh(new THREE.CylinderGeometry(.05, .06, .6, 12), leaf); st.position.set(0, .85, .1); g.add(st);
+    for (const s of [-1, 1]){ const l = mesh(ext(leafShape(.32), .04, .02), leaf); l.position.set(s * .25, 1.1, .1); l.rotation.z = s * -1.0; g.add(l); }
+    g.rotation.set(.2, -.4, 0); return g; },
+  "res-he"(){ const g = new THREE.Group(), b = mat(0x7fd8ff, {roughness:.15, clearcoat:1, transmission:.25, thickness:.5});
+    const pts = []; for (let i = 0; i <= 30; i++){ const t = i / 30, y = -1.1 + 2.1 * t; const r = Math.sin(Math.PI * Math.pow(t, .8)) * .85; pts.push(new THREE.Vector2(Math.max(.02, r), y)); }
+    g.add(mesh(new THREE.LatheGeometry(pts, 48), b));
+    const k = mesh(new THREE.ConeGeometry(.1, .15, 16), b); k.position.y = -1.15; k.rotation.x = Math.PI; g.add(k);
+    g.add(mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(0, -1.2, 0), new THREE.Vector3(.15, -1.5, .05), new THREE.Vector3(-.1, -1.8, 0), new THREE.Vector3(.05, -2.1, 0)]), 20, .015, 6), mat(0xffffff)));
+    g.rotation.set(0, 0, -.12); return g; },
+  "res-sand"(){ const g = new THREE.Group(), sand = mat(0xe8cf95, {roughness:.95, clearcoat:0}), glass = mat(0xd8f3ff, {transmission:.85, roughness:.05, thickness:.3}), wood = mat(0x9a6a3a, {roughness:.6});
+    const heap = mesh(new THREE.ConeGeometry(1.1, .7, 48), sand); heap.position.y = -.7; g.add(heap);
+    for (const y of [-.25, .95]){ const c = mesh(new THREE.CylinderGeometry(.42, .42, .08, 32), wood); c.position.y = y; g.add(c); }
+    const pts = []; for (let i = 0; i <= 20; i++){ const t = i / 20, y = -.2 + 1.1 * t, r = .08 + .3 * Math.abs(Math.cos(Math.PI * t)); pts.push(new THREE.Vector2(r, y)); }
+    g.add(mesh(new THREE.LatheGeometry(pts, 32), glass));
+    const s2 = mesh(new THREE.ConeGeometry(.3, .25, 32), sand); s2.position.y = -.08; g.add(s2);
+    g.rotation.set(.15, -.3, 0); return g; },
+  "res-plastic"(){ const g = new THREE.Group(), p = mat(0x7fd8d0, {transmission:.6, roughness:.1, thickness:.6, clearcoat:1}), cap = mat(0x2f8cff, {roughness:.3});
+    const pts = [[.0, -1], [.42, -1], [.48, -.9], [.48, .2], [.3, .55], [.16, .7], [.16, .85]].map(([x, y]) => new THREE.Vector2(x, y));
+    g.add(mesh(new THREE.LatheGeometry(pts, 40), p));
+    const c = mesh(new THREE.CylinderGeometry(.19, .19, .2, 24), cap); c.position.y = .95; g.add(c);
+    const lab = mesh(new THREE.CylinderGeometry(.485, .485, .4, 40, 1, true), mat(0xffffff, {roughness:.5})); lab.position.y = -.35; g.add(lab);
+    g.rotation.set(.1, 0, -.2); return g; },
+  "res-rubber"(){ const g = new THREE.Group(), r = mat(0x24282c, {roughness:.75, clearcoat:.1}), hub = mat(0xc8d0d8, {metalness:.85, roughness:.25}), leaf = mat(0x37b34a, {roughness:.4, clearcoat:.6});
+    g.add(mesh(new THREE.TorusGeometry(.7, .32, 24, 64), r)); g.add(mesh(new THREE.CylinderGeometry(.42, .42, .25, 32).rotateX(Math.PI / 2), hub));
+    const l = mesh(ext(leafShape(.4), .05, .02), leaf); l.position.set(.75, .75, .35); l.rotation.z = -.7; g.add(l);
+    g.rotation.set(-.2, .45, 0); return g; },
+  "res-palm"(){ const g = new THREE.Group(), oil = mat(0xffb300, {transmission:.35, roughness:.08, clearcoat:1, thickness:.6}), fruit = mat(0xe8452a, {roughness:.3, clearcoat:.8});
+    const pts = []; for (let i = 0; i <= 24; i++){ const t = i / 24, a = Math.PI * t; pts.push(new THREE.Vector2(Math.max(.001, Math.sin(a) * (1 - t) * .9 + (t > .97 ? 0 : 0)), -Math.cos(a) * .9 + t * .9)); }
+    const d = mesh(new THREE.LatheGeometry(pts, 48), oil); d.position.x = -.25; g.add(d);
+    [[.65, -.55, .3], [.95, -.45, 0], [.8, -.75, -.15], [.5, -.8, .1]].forEach(([x, y, z]) => { const f = mesh(new THREE.SphereGeometry(.22, 24, 16), fruit); f.position.set(x, y, z); g.add(f); });
+    g.rotation.set(.1, -.2, 0); return g; },
+  "res-oil"(){ const g = new THREE.Group(), drum = mat(0x2a3138, {metalness:.6, roughness:.35}), ring = mat(0xe84a2a, {metalness:.4, roughness:.35}), blk = mat(0x111111, {roughness:.05, clearcoat:1, metalness:.3});
+    g.add(mesh(new THREE.CylinderGeometry(.6, .6, 1.4, 40), drum));
+    for (const y of [-.35, .35]){ const r = mesh(new THREE.TorusGeometry(.6, .04, 10, 48), ring); r.rotation.x = Math.PI / 2; r.position.y = y; g.add(r); }
+    const pts = []; for (let i = 0; i <= 24; i++){ const t = i / 24, a = Math.PI * t; pts.push(new THREE.Vector2(Math.max(.001, Math.sin(a) * (1 - t) * .55), -Math.cos(a) * .55 + t * .55)); }
+    const d = mesh(new THREE.LatheGeometry(pts, 40), blk); d.position.set(.75, .6, .45); g.add(d);
+    g.rotation.set(.2, -.4, 0); return g; },
+  "res-coal"(){ const g = new THREE.Group(), c = mat(0x2b2b2e, {roughness:.55, metalness:.2, clearcoat:.5, flatShading:true});
+    [[0, 0, 0, .7], [-.65, -.3, .2, .45], [.6, -.35, .15, .42], [.1, -.45, .55, .35]].forEach(([x, y, z, r], i) => { const m = mesh(new THREE.DodecahedronGeometry(r, 0), c); m.position.set(x, y, z); m.rotation.set(i, i * 2, i * .5); g.add(m); });
+    g.rotation.set(.2, -.3, 0); return g; },
   gem(){ const g = new THREE.Group(), m = mat(0x18c8ff, {roughness:.08, metalness:.2, clearcoat:1, flatShading:true});
     const crown = mesh(new THREE.CylinderGeometry(.62, 1, .38, 8, 1), m); crown.position.y = .19; g.add(crown);
     const pav = mesh(new THREE.CylinderGeometry(1, 0, .95, 8, 1), m); pav.position.y = -.47; g.add(pav);

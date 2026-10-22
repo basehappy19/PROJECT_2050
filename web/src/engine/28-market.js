@@ -40,6 +40,14 @@ function marketInit(){
   // a world continued from Mission 2050 turns its single mineral stock into groups once
   // single-value minerals (a world continued from Mission 2050, or the unlock bonus) are shared out between the groups
   if ((S.ore || 0) >= 1){ const k = S.ore / GIDS.length; GIDS.forEach(g => S.mat[g] += k); S.ore = 0; }
+  // 1.5.4: the chart starts with two years of (made-up but realistic) ups and downs instead of a flat line
+  const hist = S.mktHist = S.mktHist || {};
+  GIDS.forEach(g => {
+    if (hist[g] && hist[g].length >= 6) return;
+    let v = S.mkt[g], d = 0; const back = [];
+    for (let i = 0; i < 24; i++){ d = d * .7 + (Math.random() - .5) * .12; if (Math.random() < .1) d += (Math.random() < .5 ? -1 : 1) * .2; v = clamp(v - d, .6, 1.8); back.push(Math.max(1, Math.round(GROUPS[g].base * v * (P.bal ? P.bal().cost : 1) * 10) / 10)); }
+    const old = hist[g] || [], need = 23 - old.length; hist[g] = back.reverse().slice(-need).concat(old.length ? old : [price(g)]);
+  });
 }
 function matCost(n){
   if (!full() || !n.ore) return null;
@@ -94,10 +102,10 @@ function marketTick(){
     P.addLog(`[[${up ? "trending-up" : "trending-down"}]] ${L(SHOCK[g][up ? 0 : 1])}`, "in");
   }
   GIDS.forEach(g => {
-    dr[g] = clamp(dr[g] * .93 + (R() - .5) * .05, -.4, .7);   // demand cycle that slowly fades
+    dr[g] = clamp(dr[g] * .93 + (R() - .5) * .09, -.4, .7);   // demand cycle that slowly fades
     let target = 1 + dr[g] + ((S.orePrice || 0) > 0 ? .35 : 0);
     banned.forEach(id => { const cr = P.CRES[id]; if (cr && cr.r.some(r => groupOf(r) === g)) target += .12 * cr.w / 2; });
-    S.mkt[g] = clamp(S.mkt[g] + (target - S.mkt[g]) * .18 + (R() - .5) * .025, .5, 3);
+    S.mkt[g] = clamp(S.mkt[g] + (target - S.mkt[g]) * .18 + (R() - .5) * .07, .5, 3);   // 1.5.4: livelier month-to-month moves
     (hist[g] = hist[g] || []).push(price(g)); if (hist[g].length > 24) hist[g].shift();
   });
   return true;

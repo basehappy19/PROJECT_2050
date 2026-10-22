@@ -73,10 +73,7 @@ export const Msg = ({UIM}) => UIM.msg ? <p class={"msg " + (UIM.err ? "bad" : "g
 /* graphics quality: auto · low · medium · high */
 export function GfxSeg(){
   const items = [["auto", "gfxAuto"], ["low", "gfxLow"], ["medium", "gfxMed"], ["high", "gfxHigh"]].map(([id, k]) => ({id, label:t(k), on:Gfx.pref === id, fn:() => { Gfx.choose(id); P._bump(); }}));
-  const th = S.lang === "th", M = P.Map, glOn = (() => { try { return localStorage.getItem("p2050-mapgl") !== "0"; } catch (e){ return true; } })();
-  const glNote = M && M.base && glOn && !M.usingGL() ? (th ? "เครื่องนี้ใช้ WebGL 2 ไม่ได้ จึงวาดแบบเดิม" : "WebGL 2 isn't available here, so the map uses the old renderer") : null;
-  return <><div class="gfxrow"><Icon n="monitor" size={18}/><span class="lbl">{t("gfxLbl")}</span><Seg cls="gfx" items={items}/>{Gfx.pref === "auto" ? <small class="muted">{t("gfx_" + Gfx.level)}</small> : null}</div>
-    <div class="gfxrow"><Icon n="cpu" size={18}/><Check on={glOn} onClick={() => { if (M && M.setGL) M.setGL(!glOn); else { try { localStorage.setItem("p2050-mapgl", glOn ? "0" : "1"); } catch (e){} } P._bump(); }}>{th ? "วาดแผนที่ด้วยการ์ดจอ (GPU)" : "Draw the map on the GPU"}</Check>{glNote ? <small class="muted">{glNote}</small> : null}</div></>;
+  return <div class="gfxrow"><Icon n="monitor" size={18}/><span class="lbl">{t("gfxLbl")}</span><Seg cls="gfx" items={items}/>{Gfx.pref === "auto" ? <small class="muted">{t("gfx_" + Gfx.level)}</small> : null}</div>;
 }
 
 /* 1.9: reads `text` aloud when it appears (if narration is on); with `btn`, also shows a listen / stop button */
@@ -152,10 +149,8 @@ export function GroupList({full, onPick, extra}){
     return <div class={"grow1 " + st} key={G.id} style={{"--gc":G.color}} onClick={onPick}>
       <div class="ghead"><Icon n={G.icon} size={full ? 22 : 16} cls="gic"/><b>{L(G.name)}</b><small class="muted mono">{Math.round(G.w * 100)}%</small><span class="grow"/><span class={"gst " + c}>{lab}</span><b class="mono gv">{v.toFixed(0)}%</b></div>
       <div class="gbar"><i style={{width:`${v}%`}}/><s style={{left:`${P.GROUP_ANGRY}%`}}/><s class="b" style={{left:`${P.GROUP_BACK}%`}}/></div>
-      {full ? <div class="gtxt">
-        <span><Icon n="thumbs-up" size={13}/> {L(G.likes)}</span>
-        <span><Icon n="thumbs-down" size={13}/> {L(G.hates)}</span>
-        <span class={st === "back" ? "good" : st === "angry" ? "bad" : "muted"}><Icon n={st === "angry" ? "megaphone" : "sparkles"} size={13}/> {L(st === "angry" ? G.bad : G.good)}</span>
+      {full ? <div class="gtxt" title={`👍 ${L(G.likes)}\n👎 ${L(G.hates)}`}>
+        <span class={st === "back" ? "good" : st === "angry" ? "bad" : "muted"}><Icon n={st === "angry" ? "megaphone" : "sparkles"} size={13}/> {L(st === "angry" ? G.bad : G.good).replace(/^[^:]*:\s*/, "")}</span>
       </div> : null}
       {extra ? extra(G.id) : null}
     </div>;

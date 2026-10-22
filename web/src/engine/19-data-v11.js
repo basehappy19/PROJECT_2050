@@ -70,4 +70,9 @@ Object.assign(P.UI, {
   err_not_reached:T("ยังไม่ถึงขั้นนี้", "You haven't reached this tier yet"), err_already_claimed:T("รับรางวัลนี้ไปแล้ว", "Already claimed"), err_not_done:T("ภารกิจยังไม่สำเร็จ", "Mission not finished yet"),
   err_bad_mission:T("ภารกิจนี้ไม่ใช่ของสัปดาห์นี้", "That mission isn't this week's"), err_bad_tier:T("ไม่มีขั้นนี้", "No such tier"),
 });
-
+/* 1.5.4: shorter menu labels, settings page */
+Object.assign(P.UI, {
+  mLoadS:T("โหลด", "Load"), mLearnS:T("เรียนรู้", "Learn"), mHowS:T("วิธีเล่น", "How to"), mAchS:T("ความสำเร็จ", "Awards"),
+  mSeasonS:T("ซีซั่น", "Season"), mBoardS:T("อันดับ", "Ranks"), mShopS:T("ร้านค้า", "Shop"), mSettingsS:T("ตั้งค่า", "Settings"),
+  mSettings:T("ตั้งค่า", "Settings"), mWorldS2:T("โลกต่อเนื่อง", "Endless World"),
+});

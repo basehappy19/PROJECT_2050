@@ -37,7 +37,7 @@ export function Learn(){
     const got = FACT_EVENTS.filter(e => d.seen.includes(e.id));
     const list = [...got, ...FACT_EVENTS.filter(e => !d.seen.includes(e.id)).slice(0, Math.max(0, 6 - got.length))];
     body = <>
-      <p class="muted small">{t("lCardsHelp")} · {got.length}/{FACT_EVENTS.length}</p>
+      <p class="mono muted small">{got.length}/{FACT_EVENTS.length}</p>
       <div class="grid2">{list.map(e => { const on = d.seen.includes(e.id); return <div class={"fact card " + (on ? "" : "locked")} key={e.id}>
         {on ? <div class="fimg" style={{"--tint":SND_TINT[e.snd] || "#4fd1c5", backgroundImage:`url(${eventImg(e.id)})`}}/> : null}
         <b><Rich t={on ? `[[lightbulb]] ${L(e.title)}` : `[[lock]] ${t("lLocked")}`} iconColor={on ? "warn" : "muted"}/></b>
@@ -48,9 +48,8 @@ export function Learn(){
   } else if (tab === "res"){
     const who = k => Object.entries(P.CRES).filter(([, v]) => v.r.includes(k)).map(([id]) => P.cname(id));
     body = <>
-      <p class="muted small">{t("lResHelp")}</p>
       <div class="grid2">{Object.entries(P.RES).map(([k, R]) => <div class="rescard card" key={k} style={{"--rc":R.col}}>
-        <div class="rtop"><span class="ric"><Icon n={R.icon} size={24}/></span><div><b>{L(R.name)}</b><small class="muted">{L(R.use)}</small></div></div>
+        <div class="rtop"><Icon n={"$res-" + k} size={56}/><div><b>{L(R.name)}</b><small class="muted">{L(R.use)}</small></div></div>
         <span class="small">{L(R.fact)}</span>
         {who(k).length ? <small class="muted"><Icon n="map-pin" size={12}/> {who(k).slice(0, 6).join(", ")}</small> : null}
         <a class="small src" href={R.src} target="_blank" rel="noopener noreferrer"><Icon n="link" size={12}/> {t("source")}</a>
@@ -58,7 +57,6 @@ export function Learn(){
     </>;
   } else if (tab === "haz"){
     body = <>
-      <p class="muted small">{t("lHazHelp")}</p>
       <div class="hzlist">{HZ_IDS.map(id => { const Z = P.HAZARDS[id], on = (d.haz || []).includes(id); return <div class={"hz card " + (on ? "" : "locked")} key={id}>
         <div class="hzimg" style={on ? {"--tint":HZ_COL[id]} : null}><Icon n={on ? Z.icon : "lock"} size={30}/></div>
         <div class="grow"><b>{L(Z.name)}</b><span class="muted small">{on ? L(Z.fact) : t("lHazLocked")}</span></div>
@@ -66,7 +64,6 @@ export function Learn(){
     </>;
   } else if (tab === "end"){
     body = <>
-      <p class="muted small">{t("lEndHelp")}</p>
       <div class="grid3">{END_KEYS.map(key => { const on = !!(d.ends || {})[key], win = key.startsWith("win"); return <figure class={"endcard " + (on ? "" : "locked")} key={key}>
         <div class="eimg" style={on ? {backgroundImage:`url(${endImg(win ? "win" : key, win ? key.slice(3) : null)})`} : null}>{on ? null : <Icon n="lock" size={26}/>}</div>
         <figcaption>{on ? (win ? L(P.ENDINGS.win.grades[key.slice(3)]) : t(key + "Title")) : "???"}</figcaption>
@@ -83,6 +80,5 @@ export function Learn(){
       {id:"ach", label:`[[trophy]] ${t("mAch")}`, on:tab === "ach", fn:set("ach")},
     ]}/>
     {body}
-    <div class="mfoot"><Btn kind="ghost" onClick={() => G.closeLearn()}>{t("mBack")}</Btn></div>
   </Modal>;
 }

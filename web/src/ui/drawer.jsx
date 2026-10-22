@@ -13,19 +13,24 @@ function Resources({c}){
   const refs = P.refinesList ? P.refinesList(c.id) : [];
   const cr = P.CRES[c.id], imp = P.IMPORTERS.includes(c.id), src = S.oreOn && P.oreSources().find(x => x.id === c.id), ban = (S.oreBan || {})[c.id];
   return <>
-    <div class="card greencard">
+    <div class="card greencard" title={t("greenHelp")}>
       <div class="row"><span class="muted"><Rich t={`[[leaf]] ${t("greenTech")}`} iconColor="good"/></span><b class="mono good">{Math.round(c.green || 0)}%</b></div>
       <Meter v={(c.green || 0) / 100} color="good" h={6}/>
-      <small class="muted">{t("greenHelp")}</small>
     </div>
     {cr || imp || refs.length ? <>
       <H3>{t("resTitle")}</H3>
-      {cr ? <div class="reslist">{cr.r.map(k => { const R = P.RES[k]; return <span class="res" key={k} title={L(R.fact)} style={{"--rc":R.col}}><Icon n={R.icon} size={15}/>{L(R.name)}</span>; })}</div> : null}
-      {imp ? <p class="muted small"><Rich t={`[[ship]] ${t("resImporter")}`} iconColor="inherit"/></p> : null}
-      {refs.length ? <p class="small refline"><Rich t={`[[factory]] ${t("refHas")}: ${refs.map(g => `[[${P.MAT[g].icon}]] ${L(P.MAT[g].name)}`).join("  ")} · ${t("refReady")}${S.oreOn ? " · " + (c.rel >= P.REF_TOLL_REL && !c.hostile && !ban ? `${t("refTollOn")} +${P.REF_TOLL_CAP}${t("perMo")}` : t("refTollOff").replace("{N}", P.REF_TOLL_REL)) : ""}`} iconColor="inherit"/></p> : null}
-      {ban ? <p class="bad small"><Rich t={`[[ban]] ${t("oreBanned")} ${ban} ${t("months")}`} iconColor="inherit"/></p>
-        : src ? <p class="small"><Rich t={`${IC().ore} ${t("oreSends")}: ${P.matSources().filter(x => x.id === c.id).map(x => `[[${P.MAT[x.g].icon}]] ${L(P.MAT[x.g].name)} +${x.amt < .1 ? x.amt.toFixed(2) : x.amt.toFixed(1)}`).join("  ") || "+" + src.amt.toFixed(2)}${t("perMo")}`}/></p>
-        : S.oreOn && cr && cr.w ? <p class="warn small">{t("oreNeedFriend")}</p> : null}
+      {cr ? <div class="restiles">{cr.r.map(k => { const R = P.RES[k], g = P.groupOf && P.groupOf(k), ready = g && refs.includes(g); return <div class="rt" key={k} title={L(R.fact)} style={{"--rc":R.col}}>
+        <Icon n={"$res-" + k} size={38}/><span>{L(R.name).replace(/\s*\(.*\)$/, "")}</span>{ready ? <i class="rtok" title={t("refReady")}><Icon n="factory" size={11}/></i> : null}
+      </div>; })}</div> : null}
+      <div class="respills">
+        {imp ? <span class="rp" title={t("resImporter")}><Icon n="ship" size={14}/>{S.lang === "th" ? "นำเข้า" : "Imports"}</span> : null}
+        {refs.length ? <span class="rp good" title={t("refReady")}><Icon n="factory" size={14}/>{refs.map(g => <Icon key={g} n={P.MAT[g].icon} size={16}/>)}</span> : null}
+        {refs.length && S.oreOn ? (c.rel >= P.REF_TOLL_REL && !c.hostile && !ban ? <span class="rp good" title={t("refTollOn")}><Icon n="handshake" size={14}/>+{P.REF_TOLL_CAP}{t("perMo")}</span>
+          : <span class="rp muted" title={t("refTollOff").replace("{N}", P.REF_TOLL_REL)}><Icon n="handshake" size={14}/><Icon n="$heart" size={14}/>{P.REF_TOLL_REL}+</span>) : null}
+        {ban ? <span class="rp bad" title={t("oreBanned")}><Icon n="ban" size={14}/>{ban} {t("months")}</span>
+          : src ? <span class="rp good" title={t("oreSends")}><Icon n="truck" size={14}/>{P.matSources().filter(x => x.id === c.id).map(x => <span key={x.g} class="rpi"><Icon n={P.MAT[x.g].icon} size={16}/>+{x.amt < .1 ? x.amt.toFixed(2) : x.amt.toFixed(1)}</span>)}{t("perMo")}</span>
+          : S.oreOn && cr && cr.w ? <span class="rp warn" title={t("oreNeedFriend")}><Icon n="truck" size={14}/><Icon n="$heart" size={14}/>0+</span> : null}
+      </div>
     </> : null}
   </>;
 }
@@ -150,7 +155,7 @@ function PaneCountry(){
     <StatGrid stats={[[t("co2Now"), `${c.co2.toFixed(2)} Gt`, "hot"], [t("shareOfRegion"), `${Math.round(share * 100)}%`], [t("risk"), c.rest ? "—" : `${meta.risk}%`, meta && meta.risk >= 65 ? "bad" : ""], [t("adapt"), `${Math.round(c.adapt)}`]]}/>
     {S.world && !c.rest ? <BaseCard c={c}/> : null}
     {!c.rest ? <Resources c={c}/> : null}
-    {meta ? <p class="muted small"><Rich t={`${t("hazardsHere")}: ${meta.hz.map(h => `[[${P.HAZARDS[h].icon}]] ${L(P.HAZARDS[h].name)}`).join("   ")}`} iconColor="warn"/></p> : null}
+    {meta ? <div class="hzchips" title={t("hazardsHere")}>{meta.hz.map(h => <span key={h}><Icon n={P.HAZARDS[h].icon} size={14}/>{L(P.HAZARDS[h].name)}</span>)}</div> : null}
     {hz ? <div class="card row bad-b">
       <div class="grow"><b class="bad"><Rich t={`[[${P.HAZARDS[hz.type].icon}]] ${t("forecast")}: ${L(P.HAZARDS[hz.type].name)} · ${Math.max(0, hz.at - S.tick)} ${t("months")}`} iconColor="inherit"/></b></div>
       <Btn kind={hz.evac ? "ghost" : "danger"} disabled={hz.evac || S.ep < P.evacCost()} onClick={() => { if (P.evacuate(hz.id)) Audio.play("shield"); }}>{hz.evac ? `[[check]] ${t("evacuated")}` : `${t("evacuate")} · ${IC().ep} ${P.evacCost()}`}</Btn>

@@ -274,7 +274,8 @@ canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
 @keyframes pop2{from{transform:translateY(12px) scale(.98);opacity:0}}
 .modal.wide{width:min(1100px,100%)}
 .modal h2{font-size:24px;line-height:1.25;margin:4px 0 6px}
-.modal .mclose{position:absolute;top:12px;right:12px;z-index:2;background:rgba(6,16,21,.6)}
+/* 1.5.4: the close button of every window stays at the top while you scroll (all screen sizes) */
+.modal .mclose{position:sticky;top:0;float:right;margin:-6px -8px 6px 10px;z-index:6;background:rgba(6,16,21,.92);box-shadow:0 4px 14px rgba(0,0,0,.45)}
 .tag{font:600 11px var(--mono);letter-spacing:.05em;display:flex;align-items:center;gap:4px}
 .tag.warn{color:var(--warn)} .tag.accent{color:var(--accent)} .tag.good{color:var(--good)} .tag.bad{color:var(--bad)}
 .mfoot{display:flex;align-items:center;gap:8px;margin-top:16px;flex-wrap:wrap}
@@ -774,3 +775,56 @@ html.cb .bar.temp .z:nth-child(1){background:#4ea8ff} html.cb .bar.temp .z:nth-c
 .speakbtn{flex:none}
 .ask .speakbtn{margin-left:auto}
 .gfxrow.narr{flex-wrap:wrap}
+/* ===== 1.5.4 menu: fewer words, bigger targets ===== */
+.subhead{position:sticky;top:-26px;z-index:5;display:flex;align-items:center;gap:12px;margin:-26px -26px 14px;padding:18px 26px 12px;background:linear-gradient(180deg,rgba(9,21,27,.98) 75%,rgba(9,21,27,0))}
+.subhead h2{font:600 21px var(--disp);margin:0}
+@media (max-width:700px){ .subhead{top:-18px;margin:-18px -16px 12px;padding:14px 16px 10px} }
+.whatsnew{display:inline-flex;align-items:center;gap:8px;width:auto;max-width:100%;margin:14px 0 12px;padding:6px 12px 6px 10px;border-radius:99px;font-size:13px}
+.whatsnew b{font-size:12px;color:var(--accent)} .whatsnew span{display:block;flex:initial;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font:600 13px var(--disp)}
+.whatsnew .newdot{font-size:9.5px;padding:2px 6px}
+.bigbtns{gap:8px}
+.bigbtn.primary{padding:16px 18px} .bigbtn.primary b{font-size:21px}
+.bigrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));gap:8px}
+.bigbtn.half{padding:11px 14px;gap:10px} .bigbtn.half b{font-size:15.5px} .bigbtn.half .chev{display:none}
+.dock{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:16px}
+.dk{display:flex;flex-direction:column;align-items:center;gap:7px;padding:12px 4px 10px;border-radius:14px;border:1px solid var(--line);background:rgba(14,29,36,.7);transition:all .15s}
+.dk:hover{border-color:var(--accent);background:rgba(79,209,197,.09);transform:translateY(-2px)}
+.dki{position:relative;display:grid;place-items:center;width:44px;height:44px;border-radius:12px;background:rgba(79,209,197,.1)}
+.dkdot{position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:var(--warn);box-shadow:0 0 0 2px rgba(9,21,27,1)}
+.dkl{font:600 12.5px var(--disp);white-space:nowrap}
+.mfooter{gap:4px} .mfooter .credits{font-size:11px;line-height:1.5}
+.setlist{display:flex;flex-direction:column;gap:14px}
+.setlist .setrow{display:flex;align-items:center;gap:10px} .setlist .setrow .lbl{flex:1}
+.setlist .linkbtn{align-self:flex-start}
+/* 1.5.4 pause window: wide, two columns, no long scroll */
+.modal.pause{width:min(980px,100%);display:block;padding:22px 24px}
+.pzgrid{display:grid;grid-template-columns:250px 1fr;gap:22px;align-items:start}
+.pzside{display:flex;flex-direction:column;gap:10px}
+.pzside h2{margin:0}
+.pzacts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:4px}
+.pzact{display:flex;flex-direction:column;align-items:center;gap:6px;padding:12px 4px;border-radius:12px;border:1px solid var(--line);background:rgba(14,29,36,.7);font:600 12.5px var(--disp);color:var(--fg);transition:all .15s}
+.pzact:hover{border-color:var(--accent)} .pzact.on{border-color:var(--accent);background:rgba(79,209,197,.12);color:var(--accent)}
+.pzmain{min-width:0;padding-top:30px}
+.pzmain .slots{margin:0;gap:10px}
+@media (max-width:760px){ .pzgrid{grid-template-columns:1fr} .pzacts{grid-template-columns:repeat(3,1fr)} .pzmain{padding-top:0} }
+/* 1.5.4 market: compact cards */
+.market .mkhead{display:flex;align-items:center;gap:14px;margin-bottom:12px;padding-right:46px} .market .mkhead h2{margin:0;flex:1}
+.mkref{flex-direction:row;align-items:center;gap:10px;flex-wrap:wrap;padding:7px 10px}
+.mkref .rflow{display:inline-flex;align-items:center;gap:5px;font-size:12.5px} .mkref .rflow b{font-size:14px}
+.mkref .pips{display:inline-flex;align-items:center;gap:3px} .mkref .pips i{width:8px;height:8px;border-radius:2px;background:rgba(255,255,255,.14)}
+.mkref .pips i.on{background:var(--accent)} .mkref .pips i.bld{background:var(--warn);animation:kbp 1.2s infinite}
+.mkref .pips small{display:inline-flex;align-items:center;gap:2px;margin-left:6px}
+.mkref .btn{height:30px;padding:0 9px;font-size:12px}
+/* 1.5.4 country resources: pictures instead of sentences */
+.restiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px}
+.rt{position:relative;display:flex;flex-direction:column;align-items:center;gap:3px;padding:8px 4px 7px;border-radius:11px;border:1px solid var(--line);background:linear-gradient(180deg,color-mix(in srgb,var(--rc) 12%,transparent),rgba(14,29,36,.6));text-align:center}
+.rt span{font-size:11.5px;line-height:1.25}
+.rt .rtok{position:absolute;top:5px;right:5px;display:grid;place-items:center;width:18px;height:18px;border-radius:50%;background:var(--good);color:#06221f;font-style:normal}
+.respills{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.rp{display:inline-flex;align-items:center;gap:4px;height:28px;padding:0 10px;border-radius:99px;border:1px solid var(--line);background:rgba(255,255,255,.04);font:600 12px var(--mono)}
+.rp.good{color:var(--good);border-color:rgba(95,211,154,.35)} .rp.bad{color:var(--bad);border-color:rgba(255,90,74,.4)} .rp.warn{color:var(--warn);border-color:rgba(255,194,74,.4)} .rp.muted{color:var(--muted)}
+.hzchips{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.hzchips span{display:inline-flex;align-items:center;gap:4px;height:26px;padding:0 9px;border-radius:99px;background:rgba(255,194,74,.08);color:var(--warn);font-size:12px}
+.rpi{display:inline-flex;align-items:center;gap:2px}
+@media (min-width:1000px){ .glist.full{grid-template-columns:repeat(4,1fr)} }
+.glist.full .grow1 .spark{height:44px}

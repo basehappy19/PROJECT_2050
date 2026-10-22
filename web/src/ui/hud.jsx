@@ -55,7 +55,7 @@ export function TopBar(){
       <Kpi stat="policy" label={t("pc")} value={S.pc} sub={`+${P.pcGain()}${t("perMo")}`} tip={t("tipPc")}/>
       {S.oreOn ? <Kpi stat="ore" label={t("oreLbl")} value={P.matTotal()} sub={`+${Math.round(P.oreGain())}${t("perMo")}`} cls="ore mkton" tip={t("tipOre")} onClick={() => { Audio.play("open"); UIM.modal = "market"; bump(); }}/> : null}
       <Kpi stat="appr" label={t("appr")} value={S.appr} fmt={x => `${x.toFixed(0)}%`} meter={{v:S.appr / 100, c:acls}} cls={"appr mkton " + acls} danger={S.appr < 25} badge={P.angryCount && P.angryCount() ? "!" : null}
-        tip={S.groups ? `${t("tipAppr")} ${P.GROUPS.map(G => `[[${G.icon}]] ${Math.round(S.groups[G.id])}%`).join("  ")} · ${t("tipGroups")}` : t("tipAppr")} onClick={() => { Audio.play("open"); UIM.modal = "politics"; bump(); }}/>
+        tip={S.groups ? P.GROUPS.map(G => `[[${G.icon}]] ${Math.round(S.groups[G.id])}%`).join("  ") : t("tipAppr")} onClick={() => { Audio.play("open"); UIM.modal = "politics"; bump(); }}/>
     </div>
     <div class="ctrls glass">
       <div class="date">

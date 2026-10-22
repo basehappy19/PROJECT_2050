@@ -17,7 +17,11 @@ const goSub = sub => () => {
   if (sub === "board") N().loadBoard(); if (sub === "cert") N().loadCerts(); if (sub === "season") N().loadSeason(); if (sub === "shop" || sub === "account") N().refresh();
   bump();
 };
-const Back = () => <div class="backrow"><Btn kind="ghost" sound="close" onClick={() => { UIM.sub = null; UIM.msg = ""; bump(); }}>{t("mBack")}</Btn></div>;
+const goBack = () => { UIM.sub = null; UIM.msg = ""; bump(); };
+const Back = () => null;   // 1.5.4: every sub-page has its back button at the top (SubHead)
+function SubHead({title}){
+  return <div class="subhead"><IconBtn n="arrow-left" title={t("mBack")} sound="close" onClick={goBack}/><h2>{title}</h2></div>;
+}
 const Offline = () => <><p class="muted">{t("netOfflineLong")}</p><Back/></>;
 
 /* the globe lives outside Preact so it survives re-renders */
@@ -37,31 +41,23 @@ function GlobeView(){
 
 export function Menu(){
   const sub = UIM.sub;
-  const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason"};
+  const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason", settings:"mSettings"};
   return <div class={"home " + (UIM.transition ? "leaving" : "")}>
     <GlobeView/>
     <div class="home-vignette"/>
     <AccountChip/>
     <section class={"menu-panel glass-strong " + (sub ? "sub" : "")}>
       <div class="scroll">
-        <div class="logo">
+        {sub ? <SubHead title={t(TITLES[sub])}/> : <div class="logo">
           <img src="assets/img/ui/logo.png" alt="" width="54" height="54"/>
           <div><small class="mono acc">GLOBAL CLIMATE TASKFORCE · 2026 – 2050</small><h1>PROJECT <b>ZERO</b></h1></div>
-        </div>
-        <p class={sub ? "subtitle" : "lead"}>{sub ? t(TITLES[sub]) : t("mDesc")}</p>
+        </div>}
         {!sub && N().cfg && N().cfg.announcement && L(N().cfg.announcement) ? <div class="announce card"><Icon n="megaphone" size={18} color="warn"/><span>{L(N().cfg.announcement)}</span></div> : null}
-        {sub === "load" ? <SubLoad/> : sub === "ach" ? <><AchList/><Back/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : sub === "season" ? <SubSeason/> : <Main/>}
+        {sub === "load" ? <SubLoad/> : sub === "ach" ? <><Btn kind="ghost" block onClick={goSub("cert")}>{`[[award]] ${t("mCert")}`}</Btn><AchList/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : sub === "season" ? <SubSeason/> : sub === "settings" ? <SubSettings/> : <Main/>}
         {sub ? null : <footer class="mfooter">
           <small class="mono muted">{up(t("teamK"))}</small>
           <p class="team">{t("team")}</p>
-          <p class="muted small">{t("disclaimer")}</p>
-          <Volume/>
-          <GfxSeg/>
-      <A11ySeg/>
-      <NarrRow/>
-          <div class="row"><button type="button" class="linkbtn mono" onClick={() => { Audio.play("click"); goSub("updates")(); }}>{`${t("updVer")} ${P.VERSION_NAME}`}</button></div>
-          <div class="row"><small class="muted grow">{t("mTag")}</small><LangSeg/></div>
-          <small class="muted credits">Earth imagery: NASA Visible Earth (Blue Marble, Black Marble) · Sounds &amp; music: CC0 / CC-BY, see assets/audio/CREDITS.txt</small>
+          <small class="muted credits">{t("disclaimer")} · Earth imagery: NASA Visible Earth · Sounds &amp; music: CC0 / CC-BY</small>
         </footer>}
       </div>
     </section>
@@ -69,36 +65,46 @@ export function Menu(){
 }
 
 function Main(){
-  const saves = P.readSaves(), lk = P.latestSlot(), auto = lk && saves[lk], n = P.Ach.count();
-  const tiles = [
-    {id:"loadmenu", ic:"save", t1:t("mLoad"), fn:goSub("load")},
-    {id:"learn", ic:"book-open", t1:t("mLearn"), t2:`${P.cardCount()}/${P.cardTotal()}`, fn:() => G.openLearn("cards")},
-    {id:"ach", ic:"trophy", t1:t("mAch"), t2:`${n}/${P.ACH.length}`, fn:goSub("ach")},
-    {id:"tutorial", ic:"graduation-cap", t1:t("mHow"), fn:() => G.openTutorial(0, false)},
-    {id:"shop", ic:"shopping-bag", t1:t("mShop"), fn:goSub("shop")},
-    {id:"season", ic:"calendar-check", t1:t("mSeason"), t2:N().seasonReady && N().seasonReady() ? "●" : "", fn:goSub("season")},
-    {id:"board", ic:"medal", t1:t("mBoard"), fn:goSub("board")},
-    {id:"cert", ic:"award", t1:t("mCert"), fn:goSub("cert")},
-    {id:"account", ic:"user-round", t1:N().user ? t("mAccount") : t("signIn"), fn:goSub("account")},
+  const saves = P.readSaves(), lk = P.latestSlot(), auto = lk && saves[lk], n = P.Ach.count(), world = P.worldUnlocked();
+  const dock = [
+    {id:"load", ic:"save", t1:t("mLoadS"), fn:goSub("load")},
+    {id:"learn", ic:"book-open", t1:t("mLearnS"), fn:() => G.openLearn("cards")},
+    {id:"how", ic:"graduation-cap", t1:t("mHowS"), fn:() => G.openTutorial(0, false)},
+    {id:"ach", ic:"trophy", t1:t("mAchS"), badge:`${n}/${P.ACH.length}`, fn:goSub("ach")},
+    {id:"season", ic:"calendar-check", t1:t("mSeasonS"), dot:N().seasonReady && N().seasonReady(), fn:goSub("season")},
+    {id:"board", ic:"medal", t1:t("mBoardS"), fn:goSub("board")},
+    {id:"shop", ic:"shopping-bag", t1:t("mShopS"), fn:goSub("shop")},
+    {id:"settings", ic:"settings", t1:t("mSettingsS"), fn:goSub("settings")},
   ];
+  const big = (cls, ic, title, sub, fn, dis) => <button type="button" class={"bigbtn " + cls} disabled={dis} onPointerEnter={() => !dis && Audio.hover()} onClick={() => { Audio.play("start"); fn(); }}>
+    <Icon n={ic} size={26}/><span><b>{title}</b>{sub ? <small class="mono">{sub}</small> : null}</span><Icon n="chevron-right" size={20} cls="chev"/>
+  </button>;
   return <>
+    <WhatsNew/>
     <div class="bigbtns">
-      <button type="button" class={"bigbtn " + (!auto ? "primary" : "")} onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("start"); G.newGame(); }}>
-        <Icon n="globe" size={26}/><span><b>{t("mNew")}</b><small>{t("mNewS")}</small></span><Icon n="chevron-right" size={20} cls="chev"/>
-      </button>
-      <button type="button" class={"bigbtn " + (auto ? "primary" : "")} disabled={!auto} onPointerEnter={() => auto && Audio.hover()} onClick={() => { Audio.play("start"); G.loadSlot(lk); }}>
-        <Icon n="play" size={26}/><span><b>{t("mCont")}</b><small class="mono">{auto ? `${P.slotName(lk, auto.meta)} · ${P.modeName(auto.meta)} · ${P.dateStr(auto.meta.tick)}` : t("mNoSave")}</small></span><Icon n="chevron-right" size={20} cls="chev"/>
-      </button>
-      {(() => { const on = P.worldUnlocked(); return <button type="button" class={"bigbtn world " + (on ? "" : "locked")} disabled={!on} onPointerEnter={() => on && Audio.hover()} onClick={() => { Audio.play("start"); G.newGame(true); }}>
-        <Icon n={on ? "infinity" : "lock"} size={26}/><span><b>{t("mWorld")}{on && P.prestige() ? <i class="stars" title={L(P.W2.prestHelp)}>{"★".repeat(P.prestige())}</i> : null}</b><small>{on ? t("mWorldS") : t("mWorldLock")}</small></span><Icon n="chevron-right" size={20} cls="chev"/>
-      </button>; })()}
+      {auto ? big("primary", "play", t("mCont"), `${P.modeName(auto.meta)} · ${P.dateStr(auto.meta.tick)}`, () => G.loadSlot(lk)) : big("primary", "globe", t("mNew"), null, () => G.newGame())}
+      <div class="bigrow">
+        {auto ? big("half", "globe", t("mNew"), null, () => G.newGame()) : null}
+        {big("half world " + (world ? "" : "locked"), world ? "infinity" : "lock", t("mWorldS2"), null, () => G.newGame(true), !world)}
+      </div>
     </div>
     <Msg UIM={UIM}/>
-    <WhatsNew/>
-    <div class="tiles">{tiles.map(it => <button type="button" key={it.id} class="tile" onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("click"); it.fn(); }}>
-      <Icon n={it.ic} size={20} color="accent"/><span>{it.t1}</span>{it.t2 ? <small class="mono muted">{it.t2}</small> : null}
+    <div class="dock">{dock.map(it => <button type="button" key={it.id} class="dk" onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("click"); it.fn(); }}>
+      <span class="dki"><Icon n={it.ic} size={24} color="accent"/>{it.dot ? <i class="dkdot"/> : null}</span><span class="dkl">{it.t1}</span>
     </button>)}</div>
   </>;
+}
+
+/* 1.5.4: everything adjustable in one place */
+function SubSettings(){
+  return <div class="setlist">
+    <div class="setrow"><Icon n="languages" size={18}/><span class="lbl">{S.lang === "th" ? "ภาษา" : "Language"}</span><LangSeg/></div>
+    <Volume/>
+    <GfxSeg/>
+    <A11ySeg/>
+    <NarrRow/>
+    <button type="button" class="linkbtn mono" onClick={() => { Audio.play("click"); goSub("updates")(); }}>{`${t("updVer")} ${P.VERSION_NAME}`}</button>
+  </div>;
 }
 
 /* ---------------- update log ---------------- */
@@ -107,9 +113,7 @@ const seenVer = () => { try { return localStorage.getItem(SEEN_KEY); } catch (e)
 function WhatsNew(){
   const c = P.CHANGELOG[0], fresh = seenVer() !== P.VERSION_NAME;
   return <button type="button" class={"whatsnew " + (fresh ? "fresh" : "")} onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("click"); goSub("updates")(); }}>
-    <Icon n="sparkles" size={20} color="accent"/>
-    <span><small class="muted">{t("updNew")} {P.VERSION_NAME}</small><b>{L(c.name)}</b></span>
-    {fresh ? <i class="newdot">NEW</i> : null}<Icon n="chevron-right" size={18} cls="chev"/>
+    <Icon n="sparkles" size={16} color="accent"/><b class="mono">v{P.VERSION_NAME}</b><span>{L(c.name)}</span>{fresh ? <i class="newdot">NEW</i> : null}
   </button>;
 }
 function SubUpdates(){
