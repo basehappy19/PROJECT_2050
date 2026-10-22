@@ -2,11 +2,11 @@
    (web/src/engine/14-data-world.js: SHOP, PRICE, TERRA, LEVELS). */
 
 export const SHOP = {
-  speed3:{price:199}, char_dip:{price:249}, char_eco:{price:249}, char_act:{price:249},
+  speed3:{price:199}, char_dip:{price:249}, char_eco:{price:249}, char_act:{price:249}, char_oce:{price:249}, char_eng:{price:249},
   theme_night:{price:99}, theme_paint:{price:99}, outfit:{price:149}, frame:{price:79},
 };
 export const RENAME_PRICE = 49;
-export const CHARS = ["sci", "dip", "eco", "act"];
+export const CHARS = ["sci", "dip", "eco", "act", "oce", "eng"];
 export const MODES = ["normal", "hard", "daily"];
 export const LEVELS = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
 export const levelOf = xp => { let l = 1; LEVELS.forEach((v, i) => { if (xp >= v) l = i + 1; }); return l; };
@@ -16,7 +16,7 @@ const EASY = ["start", "tutorial", "tech1", "action1", "event1", "saver", "abili
 const HARD = ["allTech", "win15", "winEarly", "hardWin", "readAll", "lvl10", "charAll", "friends20", "unity", "read100", "fusion", "thrive", "green10"];
 const ALL = ["start","tutorial","tech1","action1","event1","saver","greens","aids","rush","rich","branchE","branchP","branchN","allTech","fusion","unity","safe","peak","half","decade",
   "win","winEarly","win15","winLoved","loseTime","loseHeat","loseVote","chaoPhraya","read25","read100","readAll",
-  "ability1","skill20","branchI","branchC","rel100","friends20","bilateral","alliance","cev10","stormSafe","evac5","hardWin","daily","charAll","lvl10","cards30",
+  "ability1","skill20","branchI","branchC","branchW","rel100","friends20","bilateral","alliance","cev10","stormSafe","evac5","hardWin","daily","charAll","lvl10","cards30",
   /* 1.0 */ "ore1","ore5c","pins30","green10","news10","world1","thrive"];
 export const ACH_TERRA = Object.fromEntries(ALL.map(id => [id, EASY.includes(id) ? 5 : HARD.includes(id) ? 20 : 10]));
 

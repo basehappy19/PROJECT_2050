@@ -69,7 +69,7 @@ const Net = {
         } catch(e) {}
       }
       this.checking = false;
-      if (this.online && this.access){ await this.me(); if (this.user){ this.syncAch(); this.syncProgress(); this.loadCloud(); } }   // 1.1: opening the game already signed in syncs progress and save slots right away
+      if (this.online && this.access){ await this.me(); if (this.user){ this.syncAch(); this.syncProgress(); this.loadCloud(); this.loadSeason(); } }   // 1.1: opening the game already signed in syncs progress and save slots right away
       if (this.online && this.cfg.googleClientId) this.loadGoogle();
       dirty();
     })();
@@ -134,7 +134,7 @@ const Net = {
   /* ---- play statistics for the A/B balance test (guests too; no personal data) ---- */
   async statStart(){
     S.statId = null; await this.init(); if (!this.online) return;
-    try { const j = await this.req("POST", "/stats/start", {ab:S.ab || "A", mode:S.mode, world:!!S.world}, !!this.user); if (S.started) S.statId = j.id; } catch(e) {}
+    try { const j = await this.req("POST", "/stats/start", {ab:S.ab || "A", mode:S.mode, world:!!S.world, ver:P.VERSION_NAME}, !!this.user); if (S.started) S.statId = j.id; } catch(e) {}
   },
   statUpdate(final){
     if (!this.online || !S.statId) return;
@@ -156,7 +156,7 @@ const Net = {
       UIM.reward = {terra:j.terra, xp:j.xp, level:j.level, levelUp:j.levelUp, note:j.note ? (P.UI["note_" + j.note] ? t("note_" + j.note) : j.note) : ""};
       if (j.user) this.user = j.user; if (j.chars) this.chars = j.chars;
     } catch(e){ UIM.reward = {error:true, xp:0}; }
-    this.syncProgress(); P.Ach.check(); dirty();
+    this.syncProgress(); P.Ach.check(); if (this.user) this.loadSeason(); dirty();
   },
   /* ---- achievements & learning progress (server pays Terra once per achievement) ---- */
   syncAch(){
@@ -224,6 +224,20 @@ const Net = {
     try { const j = await this.req("POST", "/certificates", {fullName}); this.certs = j; msg(t("certDone")); P.Audio.play("win"); }
     catch(e){ msg(errText(e), true); } finally { this.busy = false; dirty(); }
   },
+  /* ---- 1.8: weekly missions and the season pass ---- */
+  async loadSeason(){ await this.init(); if (!this.user) return; try { this.season = await this.req("GET", "/season"); } catch(e){ this.season = {error:true}; } dirty(); },
+  async claimTier(tier){
+    this.busy = true;
+    try { const j = await this.req("POST", "/season/claim", {tier}); this.season = j; this.applyMe(j); msg(t("seasonGot")); P.Audio.play("buy"); }
+    catch(e){ msg(errText(e), true); P.Audio.play("error"); } finally { this.busy = false; dirty(); }
+  },
+  async claimMission(mission){
+    this.busy = true;
+    try { const j = await this.req("POST", "/weekly/claim", {mission}); this.season = j; this.applyMe(j); msg(t("seasonGot")); P.Audio.play("coin"); }
+    catch(e){ msg(errText(e), true); P.Audio.play("error"); } finally { this.busy = false; dirty(); }
+  },
+  /* how many rewards are waiting (dot on the menu tile) */
+  seasonReady(){ const s = this.season; if (!s || !s.season) return 0; return s.season.tiers.filter(x => x.reached && !x.claimed).length + s.weekly.missions.filter(m => m.done && !m.claimed).length; },
   certUrl(code){ return `${this.base}/certificates/${encodeURIComponent(code)}/pdf`; },
   /* ---- Google sign-in button (an HTML element placed over the game canvas) ---- */
   loadGoogle(){

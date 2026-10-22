@@ -9,7 +9,8 @@ import {Btn} from "./ui/widgets.jsx";
 import {TopBar, AbilityBar, ZoomBtns, Bottom, WorldGoals} from "./ui/hud.jsx";
 import {Drawer} from "./ui/drawer.jsx";
 import {Skills} from "./ui/skills.jsx";
-import {EventModal, EndModal, CharSel, Story, Pause, Tutorial, Market, SlotPick} from "./ui/modals.jsx";
+import {Narr} from "./narrator.js";
+import {EventModal, EndModal, CharSel, Story, Pause, Tutorial, Market, Politics, SlotPick} from "./ui/modals.jsx";
 import {Learn} from "./ui/learn.jsx";
 import {Menu} from "./ui/menu.jsx";
 
@@ -56,6 +57,13 @@ function Toast(){
   </div>;
 }
 
+/* ---------- 1.1.5: a new version arrived while a game is running ---------- */
+function UpdateBar(){
+  if (!UIM.updateReady) return null;
+  return <div class="updbar glass-strong" role="status"><Icon n="sparkles" size={18} color="accent"/><span>{t("updReady")}</span>
+    <Btn size="sm" onClick={() => P.updateNow()}>{t("updNow")}</Btn><Btn size="sm" kind="ghost" onClick={() => { UIM.updateReady = false; bump(); }}>{t("updLater")}</Btn></div>;
+}
+
 /* ---------- game screen ---------- */
 function GameScreen(){
   const mapRef = useRef(), hudRef = useRef();
@@ -93,6 +101,7 @@ function Windows(){
   if (k === "tutorial") return <Tutorial/>;
   if (k === "learn") return <Learn/>;
   if (k === "market") return <Market/>;
+  if (k === "politics") return <Politics/>;
   if (k === "slotpick") return <SlotPick/>;
   return null;
 }
@@ -104,6 +113,8 @@ export function App(){
     {sc === "loading" ? <Loading/> : sc === "menu" ? <Menu/> : <GameScreen/>}
     {sc !== "loading" ? <Windows/> : null}
     <Toast/>
+    <UpdateBar/>
+    {Narr.subs && Narr.line ? <div class="subline" aria-live="polite"><span>{Narr.line}</span></div> : null}
     {UIM.transition === "in" ? <div class="flash in"/> : UIM.transition === "reveal" ? <div class="flash out"/> : null}
     {UIM.fade ? <div class="flash fade"/> : null}
   </>;

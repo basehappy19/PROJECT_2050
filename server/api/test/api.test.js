@@ -159,6 +159,45 @@ test("certificate: eligibility, PDF and verify page", async () => {
   r = await call("GET", `/verify/${c.code}`); assert.equal(r.status, 200); assert.match(r.raw.body, /เด็กชายภูเขียว ใจดี/);
   r = await call("GET", "/verify/P2050-XXXX-XXXX"); assert.equal(r.status, 404);
 });
+test("weekly missions and the season pass are worked out from finished games", async () => {
+  const { forgetSettings } = await import("../src/settings.js");
+  let r = await call("POST", "/api/auth/register", {username:"season1", email:"s1@school.ac.th", password:"secret123"}); const t = r.body.access;
+  // only three missions on: finish 3 games, win a game, win 2 games
+  await pool.query("INSERT INTO game_config(key, value) VALUES ('weekly', $1) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+    [JSON.stringify({terra:[20, 30, 50], xp:40, off:["win1x", "playHard", "daily2", "finish5", "charWin", "appr60", "skills25", "gradeA", "cool18", "winHard", "score7500"].filter(x => x !== "win1x")})]);
+  forgetSettings();
+  r = await call("GET", "/api/season", null, t); assert.equal(r.status, 200, JSON.stringify(r.body));
+  assert.equal(r.body.xp, 0); assert.equal(r.body.weekly.missions.length, 3); assert.equal(r.body.season.tiers.length, 10); assert.equal(r.body.season.auto, true);
+  assert.deepEqual(r.body.weekly.missions.map(m => m.id).sort(), ["finish3", "win1", "win2"]);
+  r = await call("POST", "/api/weekly/claim", {mission:"win1"}, t); assert.equal(r.body.error, "not_done");
+  r = await call("POST", "/api/season/claim", {tier:1}, t); assert.equal(r.body.error, "not_reached");
+  for (let i = 0; i < 3; i++){
+    const id = (await call("POST", "/api/runs", {mode:"normal", char:"sci"}, t)).body.runId;
+    await pool.query("UPDATE game_results SET started_at = now() - interval '15 minutes' WHERE id = $1", [id]);
+    r = await call("POST", `/api/runs/${id}/finish`, {ending:"win", tick:290, temp:1.7, net:-0.2, appr:70, rel:30, skills:30, realSec:900}, t); assert.equal(r.body.flagged, false);
+  }
+  const before = (await call("GET", "/api/me", null, t)).body.user.terra;
+  r = await call("GET", "/api/season", null, t);
+  assert.ok(r.body.xp >= 3 * 50, "xp " + r.body.xp); assert.ok(r.body.weekly.missions.every(m => m.done)); assert.equal(r.body.games, 3);
+  for (const m of r.body.weekly.missions){ const c = await call("POST", "/api/weekly/claim", {mission:m.id}, t); assert.equal(c.status, 200, JSON.stringify(c.body)); }
+  r = await call("POST", "/api/weekly/claim", {mission:"win1"}, t); assert.equal(r.body.error, "already_claimed");
+  r = await call("POST", "/api/weekly/claim", {mission:"cool18"}, t); assert.equal(r.body.error, "bad_mission");
+  r = await call("GET", "/api/season", null, t); assert.ok(r.body.xp >= 3 * 50 + 3 * 40);   // claimed missions add season XP
+  const reached = r.body.reached; assert.ok(reached >= 2);
+  r = await call("POST", "/api/season/claim", {tier:1}, t); assert.equal(r.status, 200); assert.equal(r.body.season.tiers[0].claimed, true);
+  r = await call("POST", "/api/season/claim", {tier:1}, t); assert.equal(r.body.error, "already_claimed");
+  r = await call("POST", "/api/season/claim", {tier:10}, t); assert.equal(r.body.error, "not_reached");
+  const after = (await call("GET", "/api/me", null, t)).body.user.terra;
+  assert.equal(after - before, 20 + 30 + 50 + 10);
+  // a season set on the admin page with an item reward
+  await pool.query("INSERT INTO game_config(key, value) VALUES ('season', $1) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
+    [JSON.stringify({id:"test-s", name:{th:"ทดสอบ", en:"Test"}, start:"2000-01-01", end:"2999-01-01", step:50, tiers:[{terra:5, item:"frame"}, {terra:7}]})]);
+  forgetSettings();
+  r = await call("GET", "/api/season", null, t); assert.equal(r.body.season.id, "test-s"); assert.equal(r.body.season.tiers[0].item, "frame");
+  r = await call("POST", "/api/season/claim", {tier:1}, t); assert.equal(r.status, 200);
+  r = await call("GET", "/api/me", null, t); assert.ok(r.body.owned.includes("frame"), JSON.stringify(r.body.owned));
+  await pool.query("DELETE FROM game_config WHERE key IN ('season', 'weekly')"); forgetSettings();
+});
 test("logout revokes the refresh token", async () => {
   let r = await call("POST", "/api/auth/logout", {refresh}); assert.equal(r.status, 200);
   r = await call("POST", "/api/auth/refresh", {refresh}); assert.equal(r.status, 401);

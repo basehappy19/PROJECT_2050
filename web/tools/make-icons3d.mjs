@@ -90,6 +90,51 @@ const MODELS = {
     const tr = mesh(new THREE.CylinderGeometry(.13, .18, .8, 16), mat(0x8a5a35, {roughness:.8})); tr.position.y = -.55; g.add(tr);
     [[0, .25, 0, .62, leaf], [-.45, -.05, .05, .45, leaf2], [.45, -.02, .05, .46, leaf2], [0, .65, -.05, .42, leaf]].forEach(([x, y, z, s, m]) => { const b = mesh(new THREE.SphereGeometry(s, 32, 24), m); b.position.set(x, y, z); g.add(b); });
     g.rotation.set(-.05, .3, 0); return g; },
+  /* ---- 1.1: the five mineral groups ---- */
+  /* battery minerals: a battery cell with a lightning bolt */
+  "mat-bat"(){ const g = new THREE.Group(), body = mat(0x2f8cff, {roughness:.25, clearcoat:1}), steel = mat(0xd7dde3, {metalness:.9, roughness:.25}), band = mat(0x0f2f66, {roughness:.4});
+    const c = mesh(new THREE.CylinderGeometry(.5, .5, 1.5, 48), body); g.add(c);
+    const top = mesh(new THREE.CylinderGeometry(.5, .5, .16, 48), steel); top.position.y = .83; g.add(top);
+    const nub = mesh(new THREE.CylinderGeometry(.18, .18, .14, 32), steel); nub.position.y = .98; g.add(nub);
+    const bot = mesh(new THREE.CylinderGeometry(.5, .5, .1, 48), steel); bot.position.y = -.8; g.add(bot);
+    const bd = mesh(new THREE.CylinderGeometry(.505, .505, .22, 48), band); bd.position.y = -.45; g.add(bd);
+    const bolt = new THREE.Shape(); bolt.moveTo(.08, .42); bolt.lineTo(-.2, -.02); bolt.lineTo(-.01, -.02); bolt.lineTo(-.1, -.38); bolt.lineTo(.2, .06); bolt.lineTo(.01, .06); bolt.closePath();
+    const bm = mesh(ext(bolt, .06, .02), mat(0xffd84a, {emissive:0x806000, emissiveIntensity:.4, roughness:.3})); bm.position.set(0, .2, .5); g.add(bm);
+    g.rotation.set(.12, -.35, -.18); return g; },
+  /* rare earths: a horseshoe magnet */
+  "mat-ree"(){ const g = new THREE.Group(), red = mat(0xe8324a, {roughness:.25, clearcoat:1}), steel = mat(0xe3e8ee, {metalness:.9, roughness:.2});
+    const arc = mesh(new THREE.TorusGeometry(.55, .24, 24, 64, Math.PI), red); arc.rotation.z = 0; arc.position.y = .1; g.add(arc);
+    for (const x of [-.55, .55]){ const leg = mesh(new THREE.CylinderGeometry(.24, .24, .55, 32), red); leg.position.set(x, -.17, 0); g.add(leg);
+      const tip = mesh(new THREE.CylinderGeometry(.24, .24, .3, 32), steel); tip.position.set(x, -.59, 0); g.add(tip); }
+    const spark = mat(0xc3a6ff, {emissive:0x7a4ff0, emissiveIntensity:.8, roughness:.2});
+    [[-.3, -.95, .2, .07], [.2, -1.0, .1, .06], [0, -1.12, .25, .05]].forEach(([x, y, z, r]) => { const sp = mesh(new THREE.OctahedronGeometry(r, 0), spark); sp.position.set(x, y, z); g.add(sp); });
+    g.rotation.set(.15, -.35, .25); return g; },
+  /* copper: a spool of copper wire */
+  "mat-cu"(){ const g = new THREE.Group(), cu = mat(0xd9773a, {metalness:.85, roughness:.28, clearcoat:.4}), wood = mat(0x3a4552, {roughness:.6});
+    g.add(mesh(new THREE.CylinderGeometry(.3, .3, 1.1, 32), wood));
+    for (const y of [-.6, .6]) { const f = mesh(new THREE.CylinderGeometry(.8, .8, .1, 48), wood); f.position.y = y; g.add(f); }
+    for (let i = 0; i < 9; i++){ const t = mesh(new THREE.TorusGeometry(.6, .07, 12, 48), cu); t.rotation.x = Math.PI / 2; t.position.y = -.48 + i * .12; g.add(t); }
+    const tail = mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3([new THREE.Vector3(.55, .3, .25), new THREE.Vector3(.9, .05, .45), new THREE.Vector3(1.0, -.5, .35)]), 20, .06, 10), cu); g.add(tail);
+    g.rotation.set(.32, -.4, 0); return g; },
+  /* silicon & sand: a solar cell on a little heap of sand */
+  "mat-si"(){ const g = new THREE.Group(), sand = mat(0xe8cf95, {roughness:.95, clearcoat:0}), cell = mat(0x1d3f8f, {roughness:.2, metalness:.3, clearcoat:1}), line = mat(0xcfd8e3, {metalness:.8, roughness:.3});
+    const heap = mesh(new THREE.ConeGeometry(.95, .55, 48), sand); heap.position.y = -.55; g.add(heap);
+    const pn = new THREE.Group();
+    pn.add(mesh(new THREE.BoxGeometry(1.25, 1.25, .08), cell));
+    const fr = mesh(new THREE.BoxGeometry(1.33, 1.33, .05), line); fr.position.z = -.03; pn.add(fr);
+    for (const k of [-.31, 0, .31]){ const a = mesh(new THREE.BoxGeometry(.025, 1.22, .02), line); a.position.set(k, 0, .05); pn.add(a); const b2 = mesh(new THREE.BoxGeometry(1.22, .025, .02), line); b2.position.set(0, k, .05); pn.add(b2); }
+    pn.position.set(0, .25, 0); pn.rotation.set(-.35, 0, 0); g.add(pn);
+    g.rotation.set(.1, -.45, 0); return g; },
+  /* uranium: a glowing green fuel pellet stack in a rod */
+  "mat-u"(){ const g = new THREE.Group(), glow = mat(0x7dff5a, {emissive:0x2fbf1a, emissiveIntensity:.9, roughness:.3, clearcoat:.6}), steel = mat(0xc8d0d8, {metalness:.9, roughness:.25}), dark = mat(0x23302a, {roughness:.5});
+    for (let i = 0; i < 3; i++){ const pl = mesh(new THREE.CylinderGeometry(.36, .36, .38, 40), glow); pl.position.y = -.45 + i * .42; g.add(pl); }
+    for (let i = 0; i < 4; i++){ const r = mesh(new THREE.CylinderGeometry(.38, .38, .04, 40), dark); r.position.y = -.66 + i * .42; g.add(r); }
+    const cap = mesh(new THREE.CylinderGeometry(.4, .4, .12, 40), steel); cap.position.y = .66; g.add(cap);
+    const sym = new THREE.Group(), y = mat(0xffd400, {roughness:.3});
+    for (let k = 0; k < 3; k++){ const sec = mesh(new THREE.CylinderGeometry(.3, .3, .04, 32, 1, false, k * 2 * Math.PI / 3 - .5, 1), y); sec.rotation.x = Math.PI / 2; sym.add(sec); }
+    const c0 = mesh(new THREE.CylinderGeometry(.07, .07, .05, 20), dark); c0.rotation.x = Math.PI / 2; sym.add(c0);
+    sym.position.set(.42, .15, .3); sym.rotation.y = .6; sym.scale.setScalar(.9); g.add(sym);
+    g.rotation.set(.18, -.4, -.12); return g; },
   gem(){ const g = new THREE.Group(), m = mat(0x18c8ff, {roughness:.08, metalness:.2, clearcoat:1, flatShading:true});
     const crown = mesh(new THREE.CylinderGeometry(.62, 1, .38, 8, 1), m); crown.position.y = .19; g.add(crown);
     const pav = mesh(new THREE.CylinderGeometry(1, 0, .95, 8, 1), m); pav.position.y = -.47; g.add(pav);

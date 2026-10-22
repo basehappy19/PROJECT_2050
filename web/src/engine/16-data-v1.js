@@ -13,11 +13,11 @@ Object.assign(P.UI, {
 Object.assign(P.UI, {
   gemsWord:T("เพชร", "Gems"),
   /* minerals and resources */
-  oreLbl:T("[[$ore]] แร่", "[[$ore]] Minerals"), resTitle:T("ทรัพยากรของประเทศนี้", "This country's resources"),
-  resImporter:T("ประเทศนี้ต้องนำเข้าแร่เกือบทั้งหมดทางเรือ", "This country imports almost all its minerals by ship"),
-  oreBanned:T("ระงับส่งออกแร่อยู่อีก", "Mineral exports stopped for another"), oreSends:T("ส่งแร่ให้เรา", "Sends us minerals"),
-  oreNeedFriend:T("ยังไม่ส่งแร่ให้เรา: ต้องมีมิตรภาพตั้งแต่ 0 ขึ้นไป (ยิ่งสูงยิ่งได้มาก)", "Not sending us minerals yet: needs friendship 0+ (more when higher)"),
-  oreUsed:T("ใช้แร่ไป", "Minerals used"), oreMostFrom:T("ได้จาก", "most from"),
+  oreLbl:T("[[$ore]] ทรัพยากร", "[[$ore]] Resources"), resTitle:T("ทรัพยากรของประเทศนี้", "This country's resources"),
+  resImporter:T("ประเทศนี้ต้องนำเข้าทรัพยากรเกือบทั้งหมดทางเรือ", "This country imports almost all its minerals by ship"),
+  oreBanned:T("ระงับส่งออกทรัพยากรอยู่อีก", "Mineral exports stopped for another"), oreSends:T("ส่งทรัพยากรให้เรา", "Sends us minerals"),
+  oreNeedFriend:T("ยังไม่ส่งทรัพยากรให้เรา: ต้องมีมิตรภาพตั้งแต่ 0 ขึ้นไป (ยิ่งสูงยิ่งได้มาก)", "Not sending us minerals yet: needs friendship 0+ (more when higher)"),
+  oreUsed:T("ใช้ทรัพยากรไป", "Resources used"), oreMostFrom:T("ได้จาก", "most from"),
   greenTech:T("เทคโนโลยีสีเขียว", "Green technology"), greenHelp:T("ยิ่งสูง CO₂ ยิ่งลดเองทุกเดือน แพร่ต่อไปยังประเทศที่มีเที่ยวบินและเรือเชื่อมกัน", "The higher it is, the more CO₂ falls by itself each month; it spreads to countries linked by flights and ships"),
   /* Continuous World */
   mWorld:T("โลกต่อเนื่อง", "Continuous World"), mWorldS:T("เล่นได้ไม่จบ มีฤดูกาล เป้าหมาย และการประชุม COP ทุกปี", "No end year: seasons, goals and a COP summit every year"),

@@ -31,7 +31,7 @@ export const UIM = P.UIM = {
     return this.modal;     // "skills" | "charsel"
   },
   get paused(){ return this.modal === "pause"; },
-  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market", "slotpick"].includes(this.modal) || !!this.transition; },
+  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market", "politics", "slotpick"].includes(this.modal) || !!this.transition; },
   eventLocked(){ return (performance.now() - this.evAt) / 1000 < EVENT_LOCK; },
   eventLockFrac(){ return Math.min(1, (performance.now() - this.evAt) / 1000 / EVENT_LOCK); },
 };
@@ -67,7 +67,22 @@ export const COL = {
   accent:"#4fd1c5", ink:"#04201d", good:"#5fd39a", warn:"#f2b441", hot:"#f07a3c", bad:"#ff5a4a",
   purple:"#c3a6ff", cloud:"#b7c7cf", vuln:"#ff8a7a", gold:"#f2c14e", sky:"#8fd0ff",
 };
+/* 1.1.4: accessibility — text size (normal · large · extra large) and a colour-blind palette (blue/orange instead of green/red) */
+const COL0 = {good:COL.good, bad:COL.bad, hot:COL.hot, warn:COL.warn};
+const CB = {good:"#4ea8ff", bad:"#ff9f1c", hot:"#ffbf47", warn:"#f5d547"};
+export const A11y = {
+  get fs(){ return ls.get("p2050-fs", "n"); }, get cb(){ return ls.get("p2050-cb") === "1"; },
+  apply(){
+    const h = document.documentElement; h.classList.toggle("fs-l", this.fs === "l"); h.classList.toggle("fs-xl", this.fs === "xl"); h.classList.toggle("cb", this.cb);
+    Object.assign(COL, this.cb ? CB : COL0); if (P.Map && P.Map.colorsChanged) P.Map.colorsChanged();
+  },
+  setFs(v){ ls.set("p2050-fs", v); this.apply(); bump(); },
+  setCb(on){ ls.set("p2050-cb", on ? "1" : "0"); this.apply(); bump(); },
+};
+P.A11y = A11y;
 export const relCol = rel => (rel >= 50 ? "good" : rel >= 0 ? "accent" : rel > -40 ? "warn" : "bad");
 export const HZ_COL = {hurricane:"#c3a6ff", typhoon:"#c3a6ff", flood:"#8fd0ff", heat:"#ff8a3c", drought:"#f2c14e", wildfire:"#ff5a4a", saltwater:"#4fd1c5"};
 export const asset = p => `assets/${p}`;
 export const small = () => Math.min(window.innerWidth, window.innerHeight) < 600 || (navigator.deviceMemory && navigator.deviceMemory <= 3);
+
+A11y.apply();

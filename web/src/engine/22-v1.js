@@ -13,7 +13,7 @@ const L = o => P.L(o);
 const STAT = {
   money:{th:"เงิน", en:"Money", icon:"coins"},
   policy:{th:"แต้มนโยบาย", en:"Policy points", icon:"scroll-text"},
-  ore:{th:"แร่", en:"Minerals", icon:"gem"},
+  ore:{th:"ทรัพยากร", en:"Resources", icon:"gem"},
   appr:{th:"ความนิยม", en:"Approval", icon:"smile"},
   plan:{th:"ทำตามแผน", en:"On-plan", icon:"circle-check"},
   heart:{th:"มิตรภาพ", en:"Friendship", icon:"heart"},
@@ -31,7 +31,7 @@ const LBL = {
   riskAll:T("ความเสี่ยงภัยพิบัติ ทุกทวีป", "Disaster risk, every region"), riskIn:T("ความเสี่ยงภัยพิบัติ", "Disaster risk"),
   income:T("รายได้เงิน", "Money income"), growth:T("การปล่อย CO₂ โตช้าลง", "CO₂ growth slows"), temp:T("อุณหภูมิโลก", "Global temperature"),
   p3:T("บังคับทวีปที่ทำตามแผนต่ำกว่า 70% ลด CO₂", "Regions under 70% on-plan must cut CO₂"), hzDmg:T("เสียหาย", "damage"),
-  perMo:T("/เดือน", "/mo"), perYr:T("/ปี", "/yr"), ore:T("แร่", "Minerals"), oreInc:T("รายได้แร่", "Mineral income"), oreDisc:T("สกิลใช้แร่น้อยลง", "Skills need fewer minerals"),
+  perMo:T("/เดือน", "/mo"), perYr:T("/ปี", "/yr"), ore:T("ทรัพยากร", "Resources"), oreInc:T("รายได้ทรัพยากร", "Resource income"), oreDisc:T("สกิลใช้ทรัพยากรน้อยลง", "Skills need fewer resources"),
 };
 const fmtN = (v, d = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d).replace(/\.0+$/, "");
 const regName = k => (RMETA[k] ? L(RMETA[k].short || RMETA[k].name) : k);

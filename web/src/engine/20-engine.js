@@ -24,8 +24,8 @@ const MAX_PROJECTS = 3;
 const MODES = {normal:{ep:25, pc:20, haz:1, dmg:1}, hard:{ep:10, pc:12, haz:1.3, dmg:1.2}, daily:{ep:25, pc:20, haz:1.1, dmg:1}};
 /* Balance presets: inc = monthly income · cost = prices of skills and orders · haz = how often disasters come · growth = how fast emissions grow.
    Bot test (tools/sim.mjs): A = a sensible player wins ~60%, usually in 2049–2050; B = harder, ~30%. Players get A; B is for testing during development. */
-const BALANCE = {A:{inc:1, cost:.94, haz:1, growth:1}, B:{inc:.9, cost:1, haz:1.15, growth:1.05}};
-const HARD = {inc:1, cost:.99, haz:1.1, growth:1};   // Hard Core on top of the preset
+const BALANCE = {A:{inc:1, cost:1.085, haz:1, growth:1}, B:{inc:.9, cost:1, haz:1.15, growth:1.05}};
+const HARD = {inc:1, cost:.975, haz:1.1, growth:1};   // Hard Core on top of the preset
 const bal = () => { const b = BALANCE[S.ab] || BALANCE.A; return S.mode === "hard" ? {inc:b.inc * HARD.inc, cost:b.cost * HARD.cost, haz:b.haz * HARD.haz, growth:b.growth * HARD.growth} : b; };
 function setBalance(id, values){ if (values) BALANCE[id] = Object.assign({inc:1, cost:1, haz:1, growth:1}, values); if (S) S.ab = BALANCE[id] ? id : "A"; }
 /* Every game uses preset A. Developers can try another preset with ?ab=B in the address or localStorage "p2050-ab" (bot tests: web/tools/sim.mjs). */
@@ -101,7 +101,7 @@ function changeComp(id, v, permanent){ (id === "ALL" ? S.regions : [R(id)]).forE
 function changeVuln(id, v){ (id === "ALL" ? S.regions : [R(id)]).forEach(r => { r.vuln = clamp(r.vuln + v, 0, 100); }); }
 const charLvBonus = () => S.charLv >= 3;
 const REL_COMP = .3;   // 1.1: how much a continent's friendship pulls its on-plan % (was .08)
-function relMult(){ let m = 1; if (S.owned.D1) m += .2; if (S.char === "dip") m += charLvBonus() ? .25 : .15; return m; }
+function relMult(){ let m = 1; if (S.owned.D1) m += .2; if (S.char === "dip") m += charLvBonus() ? .06 : .04; return m; }
 function changeRel(id, v){
   const c = C(id); if (!c) return 0;
   const d = v > 0 ? v * relMult() : v, before = c.rel;
@@ -118,16 +118,16 @@ function addAppr(v){ S.appr = clamp(S.appr + (v > 0 ? v * APPR_UP : v * APPR_DOW
 /* ---------------------------- Economy ---------------------------- */
 function epGain(){
   let base = 1 + avg(r => r.comp) * 0.05 + S.appr / 40 + (S.bilats || []).length * (P.BILAT_INC || 0);
-  if (S.char === "eco") base *= charLvBonus() ? 1.15 : 1.1;
-  return Math.floor((Math.floor(base) + S.epInc) * bal().inc * (1 + (S.prest || 0) * .03));   // prest: Prestige stars (Continuous World only)
+  if (S.char === "eco") base *= charLvBonus() ? 1.06 : 1.05;
+  return Math.floor((Math.floor(base) + S.epInc) * bal().inc * (1 + (S.prest || 0) * .03) * (P.incMult ? P.incMult() : 1));   // 1.6: industry's mood   // prest: Prestige stars (Continuous World only)
 }
-const pcGain = () => Math.max(1, Math.floor((1.3 + avg(r => r.comp) * 0.035 + (S.pcInc || 0)) * bal().inc));   // pcInc: home base (Continuous World)
+const pcGain = () => Math.max(1, Math.floor((1.3 + avg(r => r.comp) * 0.035 + (S.pcInc || 0)) * bal().inc * (P.pcMult ? P.pcMult() : 1)));   // 1.6: the young's mood   // pcInc: home base (Continuous World)
 const recentBuys = () => (S.buys || []).filter(tk => S.tick - tk < 12).length;
 const rushMult = () => 1 + 0.2 * recentBuys();
 function nodeCost(n){
   let m = (S.disc[n.id] ?? 1) * S.discAll * rushMult() * bal().cost;
-  if (S.char === "sci" && n.cat === "energy") m *= charLvBonus() ? .85 : .9;
-  if (S.buff.disc) m *= .6;
+  if (S.char === "sci" && n.cat === "energy") m *= charLvBonus() ? .9 : .92;
+  if (S.buff.disc) m *= .9;
   return {ep: Math.round(n.ep * m), pc: Math.round(n.pc * m)};
 }
 const busyIds = () => [...new Set(S.rollouts.map(r => r.id))];
@@ -160,6 +160,7 @@ function buyNode(id){
   if (fx.tip) S.temp += fx.tip * TIP_TO_TEMP;
   if (fx.p3) S.p3 = true;
   if (fx.oreInc) S.oreInc = (S.oreInc || 0) + fx.oreInc;
+  if (fx.relAll) S.countries.forEach(c => { if (!c.rest) changeRel(c.id, fx.relAll); });
   if (fx.oreDisc) S.oreDisc = (S.oreDisc || 0) + fx.oreDisc;
   if (P.placeBuilds) P.placeBuilds(n);
   if (P.unlockOre) P.unlockOre();
@@ -167,7 +168,7 @@ function buyNode(id){
   if (fx.co2){ const g = grossCO2() || 1; S.regions.forEach(r => per[r.id] = (per[r.id]||0) + fx.co2 * boost * r.co2 / g); }
   if (fx.all) RIDS.forEach(k => per[k] = (per[k]||0) + fx.all * boost);
   if (fx.rco2) Object.entries(fx.rco2).forEach(([k,v]) => per[k] = (per[k]||0) + v * boost);
-  const months = instant ? 1 : Math.max(1, n.months);
+  const months = instant ? 1 : Math.max(1, Math.round(n.months * (P.rollMult ? P.rollMult(n) : 1)));
   if (Object.keys(per).length){
     if (instant) S.regions.forEach(r => { if (per[r.id]) setRegionCO2(r, r.co2 + per[r.id] * (r.comp / 100) * lastMile(r)); });
     else S.rollouts.push({id, kind:"co2", left:months, months, per});
@@ -180,7 +181,7 @@ function buyNode(id){
 function abilityList(){
   const out = [];
   const ch = CHAR[S.char];
-  if (ch) ch.acts.forEach(a => out.push({id:a.id, kind:"char", icon:a.icon, name:a.name, desc:a.desc, cd:a.cd, lock:a.lv && S.charLv < a.lv ? a.lv : 0}));
+  if (ch) ch.acts.forEach(a => out.push({id:a.id, kind:"char", icon:a.icon, name:a.name, desc:a.desc, cd:a.cd, target:a.target, lock:a.lv && S.charLv < a.lv ? a.lv : 0}));
   SKILLS.filter(n => n.type === "active" && S.owned[n.id]).forEach(n => out.push({id:n.id, kind:"skill", icon:n.icon, name:n.name, desc:n.desc, cd:n.cd, target:n.target}));
   return out;
 }
@@ -193,14 +194,14 @@ function useAbility(id){
     case "C6": S.evacFree[c.id] = 1; break;
     case "D4": S.ep += 80; addAppr(-4); break;
     case "sci1": S.buff.instant = 1; break;
-    case "sci2": S.buff.disc = 1; break;
-    case "dip1": regCountries(S.sel, false).forEach(x => changeRel(x.id, 15)); break;
-    case "dip2": changeComp("ALL", 8, false); break;
-    case "eco1": S.ep += 120; S.bond = 12; break;
-    case "eco2": if (S.pc < 20) return false; S.pc -= 20; S.ep += 70; break;
-    case "act1": addAppr(12); break;
-    case "act2": changeComp("ALL", 6, false); S.countries.forEach(x => { if (!x.rest) changeRel(x.id, 5); }); break;
-    default: return false;
+    case "sci2": S.buff.disc = 1; break;   // next skill −10% (nodeCost)
+    case "dip1": regCountries(S.sel, false).forEach(x => changeRel(x.id, 3)); break;
+    case "dip2": changeComp("ALL", 1, false); break;
+    case "eco1": S.ep += 100; S.bond = 12; break;
+    case "eco2": if (S.pc < 15) return false; S.pc -= 15; S.ep += 40; break;
+    case "act1": addAppr(2); break;
+    case "act2": changeComp("ALL", 1, false); break;
+    default: if (!(P.extraAbility && P.extraAbility(id, c))) return false;   // abilities added later (31-v15.js)
   }
   S.actCd[id] = a.cd;
   addLog(`${t("logAbility")}: ${L(a.name)}${a.target === "country" && c ? " → " + cname(c.id) : ""}`, "tc");
@@ -233,7 +234,7 @@ function doAction(aid, scope){
 }
 /* orders for one country (relations) */
 const CACTS = [
-  P.ORE_BUY || {id:"ore", icon:"package", ep:35, pc:0, cd:6, name:{th:"ซื้อแร่", en:"Buy minerals"}, desc:{th:"", en:""}},
+  P.ORE_BUY || {id:"ore", icon:"package", ep:35, pc:0, cd:6, name:{th:"ซื้อทรัพยากร", en:"Buy resources"}, desc:{th:"", en:""}},
   {id:"talk",  icon:"message-circle", ep:0,  pc:6,  cd:6,  name:{th:"เจรจา",en:"Negotiate"}, desc:{th:"มิตรภาพ +10",en:"Friendship +10"}},
   {id:"fund",  icon:"hand-coins",     ep:50, pc:0,  cd:12, name:{th:"ส่งทุนสนับสนุน",en:"Send funding"}, desc:{th:"มิตรภาพ +20 และ CO₂ ประเทศนี้ −8% ภายใน 12 เดือน",en:"Friendship +20; this country's CO₂ −8% over 12 months"}},
   {id:"tech",  icon:"arrow-left-right", ep:0, pc:10, cd:12, req:"D2", name:{th:"แลกเปลี่ยนเทคโนโลยี",en:"Share technology"}, desc:{th:"มิตรภาพ +8 และ CO₂ ประเทศนี้ −5% ทันที (ต้องมีสกิลอย่างน้อย 3 สกิล)",en:"Friendship +8; this country's CO₂ −5% now (needs 3+ skills)"}},
@@ -420,7 +421,7 @@ function evacuate(hid){
 }
 function strike(h){
   const M = MODES[S.mode] || MODES.normal, Z = HAZARDS[h.type], c = C(h.c), r = R(c.reg);
-  const d = h.sev * (1 + Math.max(0, S.temp - 1.2) * 0.6) * (1 - respOf(h.type)) * (h.evac ? 0.35 : 1) * M.dmg * (1 - c.adapt / 200);
+  const d = h.sev * (1 + Math.max(0, S.temp - 1.2) * 0.6) * (1 - respOf(h.type)) * (h.evac ? 0.35 : 1) * M.dmg * (1 - c.adapt / 200) * (P.hzCharMult ? P.hzCharMult(h.type) : 1);
   const epLoss = Math.round(Z.ep * d), apLoss = Z.appr * d * HAZ_APPR * (S.owned.C3 ? 0.5 : 1);   // 1.1: more disasters, each a bit softer on approval
   S.ep = Math.max(0, S.ep - epLoss + (S.owned.C3 ? 15 : 0));
   S.appr = clamp(S.appr - apLoss * APPR_DOWN, 0, 100);
@@ -474,7 +475,7 @@ function tick(){
   });
   S.countries.forEach(c => { Object.keys(c.cd).forEach(k => { if (c.cd[k] > 0) c.cd[k]--; }); c.rel += (Math.min(c.rel, 20) - c.rel) * 0.004; });
   Object.keys(S.actCd).forEach(k => { if (S.actCd[k] > 0) S.actCd[k]--; });
-  if (S.bond > 0){ S.ep = Math.max(0, S.ep - 12); S.bond--; }
+  if (S.bond > 0){ S.ep = Math.max(0, S.ep - 8); S.bond--; }
   mark(null);
   allianceTick();
   mark("orders");
@@ -489,7 +490,7 @@ function tick(){
   S.tip = clamp(S.tip, 0, 100);
   if (prevTemp < 1.5 && S.temp >= 1.5) { addLog(t("logTipping"), "al"); hook("sfx", "warn"); }
   if (prevTemp < 2.0 && S.temp >= 2.0) { addLog(t("logTipping2"), "al"); hook("sfx", "warn"); }
-  const calm = S.char === "act" ? (charLvBonus() ? .65 : .75) : 1;
+  const calm = S.char === "act" ? (charLvBonus() ? .93 : .95) : 1;
   const stress = avg(r => r.vuln) / 100 * Math.max(0, S.temp - 1.35) * 0.65 * calm;
   S.appr = clamp(S.appr - stress + (55 - S.appr) * 0.008, 0, 100);
   ageBubbles(); spawnGreens(); hazardTick();
@@ -652,8 +653,8 @@ function fxChips(fx, target){
   if (fx.cA) push(`${IC.co2} ${t("sideA")} ${fmt(fx.cA * 100,0)}%`, fx.cA < 0, "$co2", Math.abs(fx.cA) / .02, fx.cA > 0);
   if (fx.cB) push(`${IC.co2} ${t("sideB")} ${fmt(fx.cB * 100,0)}%`, fx.cB < 0, "$co2", Math.abs(fx.cB) / .02, fx.cB > 0);
   if (fx.ore) push(`${IC.ore} ${fmt(fx.ore,0)}`, fx.ore > 0, "$ore", Math.abs(fx.ore) / 12, fx.ore > 0);
-  if (fx.oreBan) push(`${IC.ore} ${S.lang === "th" ? "แร่ถูกระงับส่งออก" : "export ban"}`, false, "$ore", 1.5, false);
-  if (fx.orePrice) push(`${IC.ore} ${S.lang === "th" ? "แร่แพงขึ้น" : "pricier minerals"} ${fx.orePrice} ${t("months")}`, false, "$ore", 1, true);
+  if (fx.oreBan) push(`${IC.ore} ${S.lang === "th" ? "ทรัพยากรถูกระงับส่งออก" : "export ban"}`, false, "$ore", 1.5, false);
+  if (fx.orePrice) push(`${IC.ore} ${S.lang === "th" ? "ทรัพยากรแพงขึ้น" : "pricier resources"} ${fx.orePrice} ${t("months")}`, false, "$ore", 1, true);
   if (fx.closed) push(`[[ship]] ${S.lang === "th" ? "เส้นทางเรือปิด" : "sea route closed"}`, false, "ship", 1, false);
   if (fx.airCut) push(`[[plane]] ${S.lang === "th" ? "เที่ยวบินหยุด" : "flights grounded"} ${fx.airCut} ${t("months")}`, false, "plane", 1.5, false);
   if (fx.relAll) push(`${IC.rel} ${S.lang === "th" ? "ทุกประเทศ" : "all countries"} ${fmt(fx.relAll,0)}`, fx.relAll > 0, "$heart", Math.abs(fx.relAll) / 5, fx.relAll > 0);
@@ -808,7 +809,7 @@ const Ach = (() => {
     if (recentBuys() >= 3) unlock("rush");
     if (S.ep >= 300) unlock("rich");
     if (byCat("energy")) unlock("branchE"); if (byCat("policy")) unlock("branchP"); if (byCat("nature")) unlock("branchN");
-    if (byCat("industry")) unlock("branchI"); if (byCat("city")) unlock("branchC");
+    if (byCat("industry")) unlock("branchI"); if (byCat("city")) unlock("branchC"); if (SKILLS.some(n => n.cat === "water") && byCat("water")) unlock("branchW");
     if (SKILLS.every(n => S.owned[n.id])) unlock("allTech");
     if (S.owned.E5 && rollProgress("E5") === null) unlock("fusion");
     if (S.regions.every(r => r.comp >= 85)) unlock("unity");

@@ -6,7 +6,7 @@ import {P, S, UIM, t, L, up, COL, bump} from "../core.js";
 import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {Icon, Rich} from "./icon.jsx";
-import {Btn, IconBtn, Pill, Meter, Key} from "./widgets.jsx";
+import {Btn, IconBtn, Pill, Meter, Key, GroupTilt} from "./widgets.jsx";
 
 const R = 50, COLW = 168, ROWH = 128;
 const hexPts = (cx, cy, r) => Array.from({length:6}, (_, i) => { const a = Math.PI / 180 * (60 * i - 30); return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`; }).join(" ");
@@ -116,6 +116,7 @@ function Detail({cat}){
     </div>
     <Effects chips={P.skillChips(n)}/>
     <p class="desc muted"><Rich t={L(n.desc)}/></p>
+    {P.tiltOfSkill && P.tiltOfSkill(n.id).length ? <div class="skgrp"><small class="muted">{t("grpWho")}</small><GroupTilt list={P.tiltOfSkill(n.id)}/></div> : null}
     <div class="pills">
       {!own ? <><Pill t={`${P.IC.ep} ${c.ep}`} kind={S.ep >= c.ep ? "acc" : "bad"}/><Pill t={`${P.IC.pc} ${c.pc}`} kind={S.pc >= c.pc ? "acc" : "bad"}/>{P.isFullRes() ? Object.entries(P.matCost(n) || {}).map(([g, v]) => <Pill key={g} t={`[[${P.MAT[g].icon}]] ${v}`} kind={(S.mat[g] || 0) >= v ? "acc" : "bad"}/>) : oc ? <Pill t={`${P.IC.ore} ${oc}`} kind={(S.ore || 0) >= oc ? "acc" : "bad"}/> : null}</> : null}
       <Pill t={`${t("needs")}: ${n.req.length ? n.req.map(q => L(P.SKILL[q].name)).join(" + ") : t("none")}`}/>
@@ -124,7 +125,11 @@ function Detail({cat}){
     </div>
     {!own ? <>
       <Btn block size="lg" disabled={!can} sound={null} onClick={() => { if (P.buyNode(n.id)) bump(); }}>{`[[lock-open]] ${t("unlock")}`}</Btn>
-      {full ? <p class="bad small">{t("capFull")}</p> : st === "locked" ? <p class="warn small">{t("needReq")}</p> : !can ? <p class="bad small">{t("cantAfford")}</p> : null}
+      {full ? <p class="bad small">{t("capFull")}</p> : st === "locked" ? <p class="warn small">{t("needReq")}</p>
+        : !can && S.oreOn && P.matCost(n) && !P.matOk(n) ? <div class="skmat"><span class="bad small"><Rich t={`${t("matShortSk")} ${Object.entries(P.matCost(n)).filter(([g, v]) => (S.mat[g] || 0) < v).map(([g, v]) => `[[${P.MAT[g].icon}]] ${Math.ceil(v - (S.mat[g] || 0))}`).join("  ")}`} iconColor="inherit"/></span>
+          {P.rawFor ? Object.entries(P.matCost(n)).filter(([g, v]) => (S.mat[g] || 0) < v && P.rawFor(g) > 0).map(([g]) => <small class="muted" key={g}><Rich t={`[[${P.MAT[g].icon}]] ${t("refWaiting").replace("{N}", P.rawFor(g)).replace("{M}", P.monthsToRefine(g))}`} iconColor="inherit"/></small>) : null}
+          <Btn kind="gold" sound="open" onClick={() => { G.closeSkills(); UIM.modal = "market"; bump(); }}>{`[[store]] ${t("toMarket")}`}</Btn></div>
+        : !can ? <p class="bad small">{t("cantAfford")}</p> : null}
     </> : n.type === "active" ? <>
       <Btn block size="lg" kind="gold" disabled={!(a && P.abilityReady(a))} onClick={() => { if (P.useAbility(n.id)){ Audio.play("powerup", {vol:.6}); bump(); } }}>{cd ? `${t("cooldown")} ${cd} ${t("months")}` : `[[zap]] ${t("useNow")}`}</Btn>
       {!cd && n.target === "country" && !(S.selC && !S.selC.startsWith("R_")) ? <p class="warn small">{t("needCountry")}</p> : n.target === "country" && S.selC ? <p class="muted small">{t("target")}: {P.cname(S.selC)}</p> : null}

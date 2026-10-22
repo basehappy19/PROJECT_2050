@@ -4,6 +4,7 @@ import rateLimit from "@fastify/rate-limit";
 import { config } from "./config.js";
 import { tx } from "./db.js";
 import { hashPassword, checkPassword, accessToken, readAccess, issueRefresh, useRefresh, revokeRefresh, verifyGoogle, googleTicket, readGoogleTicket, newCode } from "./auth.js";
+import { seasonState, claimTier, claimMission } from "./season.js";
 import { SHOP, RENAME_PRICE, CHARS, MODES, levelOf, ACH_TERRA, terraFor, scoreFor, xpFor, dailyFactor, dailySeed, gradeOf, checkSummary } from "./game-rules.js";
 import { badWord } from "./words.js";
 import { certificatePdf, verifyHtml } from "./certificate.js";
@@ -222,6 +223,26 @@ export function buildApp(pool, opts = {}){
     const h = req.headers.authorization || "";
     if (h){ try { const uid = await readAccess(h.replace(/^Bearer\s+/i, "")); const m = (await pool.query(`SELECT * FROM (${ranked}) x WHERE user_id = $${args.length + 1}`, [...args, uid])).rows[0]; if (m) me = {rank:Number(m.rank), score:m.score}; } catch {} }
     return {mode, period, rows:rows.map(r => ({rank:Number(r.rank), username:r.username, displayName:r.display_name, score:r.score, ending:r.ending, char:r.char, frame:r.frame})), me};
+  });
+
+  /* ---------- 1.8: weekly missions and the season pass (season.js) ---------- */
+  app.get("/api/season", AUTH, async req => seasonState(pool, req.uid, await getSettings(pool)));
+  app.post("/api/season/claim", AUTH, async (req, reply) => {
+    const tier = Number((req.body || {}).tier);
+    if (!Number.isInteger(tier) || tier < 1 || tier > 30) return fail(reply, 400, "bad_tier");
+    return tx(pool, async db => {
+      await db.query("SELECT id FROM users WHERE id = $1 FOR UPDATE", [req.uid]);
+      const e = await claimTier(db, req.uid, await getSettings(db), tier); if (e) return fail(reply, 400, e);
+      return {...(await seasonState(db, req.uid, await getSettings(db))), ...(await meBody(db, req.uid))};
+    });
+  });
+  app.post("/api/weekly/claim", AUTH, async (req, reply) => {
+    const mission = String((req.body || {}).mission || "");
+    return tx(pool, async db => {
+      await db.query("SELECT id FROM users WHERE id = $1 FOR UPDATE", [req.uid]);
+      const e = await claimMission(db, req.uid, await getSettings(db), mission); if (e) return fail(reply, 400, e);
+      return {...(await seasonState(db, req.uid, await getSettings(db))), ...(await meBody(db, req.uid))};
+    });
   });
 
   /* ---------- achievements (Terra once per achievement) + learning progress ---------- */

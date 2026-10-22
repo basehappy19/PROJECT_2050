@@ -109,9 +109,9 @@ const BUILD = {
 const S_ = (id, cat, icon, pos, ep, pc, req, months, name, desc, fx, extra = {}) => ({id, cat, icon, pos, ep, pc, req, months, name, desc, fx, type:"passive", ...extra});
 const NEW_SKILLS = [
   S_("R1", "industry", "battery-charging", [3, 0], 80, 15, ["I5"], 12, T("รีไซเคิลแบตเตอรี่และแร่", "Battery & Mineral Recycling"),
-    T("ได้แร่ +1 ทุกเดือนจากของเก่า และสกิลที่ใช้แร่ใช้น้อยลง 20%", "Minerals +1 every month from old products; skills need 20% fewer minerals"), {oreInc:1, oreDisc:.2}),
+    T("ได้ทรัพยากร +1 ทุกเดือนจากของเก่า และสกิลที่ใช้ทรัพยากรใช้น้อยลง 20%", "Minerals +1 every month from old products; skills need 20% fewer minerals"), {oreInc:1, oreDisc:.2}),
   S_("R2", "energy", "pickaxe", [3, 1], 90, 20, ["E2"], 12, T("เหมืองและโรงแยกแร่ในประเทศ", "Home Mines & Refineries"),
-    T("ได้แร่ +2 ทุกเดือนโดยไม่พึ่งประเทศอื่น แต่ความนิยม −4% และความเสี่ยงภัยพิบัติทุกทวีป +3% จากมลพิษเหมือง", "Minerals +2 a month without relying on others, but approval −4% and every region's disaster risk +3% from mine pollution"),
+    T("ได้ทรัพยากร +2 ทุกเดือนโดยไม่พึ่งประเทศอื่น แต่ความนิยม −4% และความเสี่ยงภัยพิบัติทุกทวีป +3% จากมลพิษเหมือง", "Minerals +2 a month without relying on others, but approval −4% and every region's disaster risk +3% from mine pollution"),
     {oreInc:2, appr:-4, vulnAll:3}, {trade:1}),
 ];
 NEW_SKILLS.forEach(n => { if (!SKILL[n.id]){ SKILLS.push(n); SKILL[n.id] = n; } });
@@ -150,7 +150,7 @@ function oreTick(){
   const from = S.oreFrom = S.oreFrom || {};
   src.forEach(x => { from[x.id] = (from[x.id] || 0) + x.amt; });
   from.home = (from.home || 0) + base;
-  Object.keys(S.oreBan || {}).forEach(k => { if (S.oreBan[k] > 0 && --S.oreBan[k] === 0){ P.addLog(`[[${"package-open"}]] ${P.cname(k)} ${L(T("กลับมาส่งออกแร่แล้ว", "is exporting minerals again"))}`, "gd"); } });
+  Object.keys(S.oreBan || {}).forEach(k => { if (S.oreBan[k] > 0 && --S.oreBan[k] === 0){ P.addLog(`[[${"package-open"}]] ${P.cname(k)} ${L(T("กลับมาส่งออกทรัพยากรแล้ว", "is exporting minerals again"))}`, "gd"); } });
   if (S.orePrice > 0) S.orePrice--;
   // orange bubbles over mining countries
   if (!S.bubbles.some(b => b.type === "ore") && P.rand() < .14){
@@ -162,8 +162,8 @@ function oreTick(){
 function unlockOre(){
   if (S.oreOn) return;
   S.oreOn = true; S.ore = (S.ore || 0) + 15;
-  P.addLog(L(T("[[$ore]] ปลดล็อกแร่: พลังงานสะอาดต้องใช้แร่ 5 กลุ่ม (แร่แบตเตอรี่ แร่หายาก ทองแดง ซิลิคอนและทราย ยูเรเนียม) หาได้จากประเทศที่เป็นมิตร ฟองสีส้ม การสั่งซื้อจากประเทศ และตลาดแร่โลก (กดที่ช่องแร่ด้านบน)", "[[$ore]] Minerals unlocked: clean energy needs 5 mineral groups (battery minerals, rare earths, copper, silicon & sand, uranium). Get them from friendly countries, orange bubbles, purchase orders and the world market (tap the minerals box at the top)")), "gd");
-  hook("toast", {id:"ore", icon:"$ore", title:L(T("ปลดล็อกใหม่", "New")), msg:L(T("แร่: ใช้สร้างพลังงานสะอาด", "Minerals: needed for clean energy"))});
+  P.addLog(L(T("[[$ore]] ปลดล็อกทรัพยากร: พลังงานสะอาดต้องใช้ทรัพยากร 5 กลุ่ม (แร่แบตเตอรี่ แร่หายาก ทองแดง ซิลิคอนและทราย ยูเรเนียม) หาได้จากประเทศที่เป็นมิตร ฟองสีส้ม การสั่งซื้อจากประเทศ และตลาดทรัพยากรโลก (กดที่ช่องทรัพยากรด้านบน)", "[[$ore]] Minerals unlocked: clean energy needs 5 mineral groups (battery minerals, rare earths, copper, silicon & sand, uranium). Get them from friendly countries, orange bubbles, purchase orders and the world market (tap the minerals box at the top)")), "gd");
+  hook("toast", {id:"ore", icon:"$ore", title:L(T("ปลดล็อกใหม่", "New")), msg:L(T("ทรัพยากร: ใช้สร้างพลังงานสะอาด", "Minerals: needed for clean energy"))});
 }
 function spendOre(n){
   const k = oreCost(n); if (!k) return;
@@ -175,7 +175,7 @@ function popOre(b){
   return gain;
 }
 /* country order: buy minerals from a country that has them */
-const ORE_BUY = {id:"ore", icon:"package", ep:30, pc:0, cd:6, name:T("ซื้อแร่จากประเทศนี้", "Buy minerals here"), desc:T("แร่ที่ประเทศนี้มี +8 ถึง +14 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2", "This country's minerals +8 to +14 (more if friendly), friendship +2")};
+const ORE_BUY = {id:"ore", icon:"package", ep:30, pc:0, cd:6, name:T("ซื้อทรัพยากรจากประเทศนี้", "Buy resources here"), desc:T("ทรัพยากรที่ประเทศนี้มี +8 ถึง +14 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2", "This country's minerals +8 to +14 (more if friendly), friendship +2")};
 function oreBuyOk(c){ return !!(S.oreOn && c && !c.rest && CRES[c.id] && CRES[c.id].w && !((S.oreBan || {})[c.id] > 0)); }
 function oreBuy(c){
   const gain = Math.round(8 + 6 * relFactor(c.rel));

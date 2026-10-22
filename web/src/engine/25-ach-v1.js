@@ -6,8 +6,8 @@ if (P.mods && P.mods.achV1) return;
 const S = P.S, T = (th, en) => ({th, en});
 const NEWS_IDS = () => P.EVENTS.filter(e => /^NW_/.test(e.id)).map(e => e.id);
 P.ACH.push(
-  {id:"ore1",     icon:"gem",           t:T("แร่ก้อนแรก", "First Minerals"),            d:T("เริ่มใช้แร่ครั้งแรก (ซื้อสกิลแรก)", "Start using minerals (buy your first skill)")},
-  {id:"ore5c",    icon:"ship",          t:T("ไม่พึ่งใครคนเดียว", "Many Suppliers"),     d:T("ได้แร่จาก 5 ประเทศขึ้นไปพร้อมกัน", "Get minerals from 5+ countries at once")},
+  {id:"ore1",     icon:"gem",           t:T("ทรัพยากรชิ้นแรก", "First Resources"),            d:T("เริ่มใช้ทรัพยากรครั้งแรก (ซื้อสกิลแรก)", "Start using minerals (buy your first skill)")},
+  {id:"ore5c",    icon:"ship",          t:T("ไม่พึ่งใครคนเดียว", "Many Suppliers"),     d:T("ได้ทรัพยากรจาก 5 ประเทศขึ้นไปพร้อมกัน", "Get minerals from 5+ countries at once")},
   {id:"pins30",   icon:"map-pin",       t:T("เปลี่ยนโฉมแผนที่", "A New Map"),            d:T("มีสิ่งที่สร้างบนแผนที่ 30 แห่งในเกมเดียว", "Have 30 builds on the map in one game")},
   {id:"green10",  icon:"leaf",          t:T("เทคโนโลยีไร้พรมแดน", "Tech Without Borders"), d:T("10 ประเทศมีเทคโนโลยีสีเขียว 60% ขึ้นไปพร้อมกัน", "10 countries at 60%+ green technology at once")},
   {id:"news10",   icon:"newspaper",     t:T("ทันข่าวโลก", "On the News"),                d:T("พบเหตุการณ์จากข่าวจริง 10 เรื่อง (นับทุกเกม)", "See 10 real-news events (all games)"), prog:d => [d.seen.filter(id => /^NW_/.test(id)).length, 10]},

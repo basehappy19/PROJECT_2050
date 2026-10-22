@@ -4,6 +4,7 @@
 import { tx } from "./db.js";
 import { SHOP, CHARS, levelOf, LEVELS } from "./game-rules.js";
 import { SETTINGS, SETTING_KEYS, getSettings, forgetSettings } from "./settings.js";
+import { MISSIONS, DEFAULT_TIERS, SEASON_STEP, currentSeason, weekKey, weekMissions } from "./season.js";
 
 const fail = (reply, code, error, extra = {}) => reply.code(code).send({error, ...extra});
 const ROLES = ["player", "tester", "admin"];
@@ -142,7 +143,10 @@ export function registerAdmin(app, pool, {balance, meBody}){
   app.get("/api/admin/settings", ADMIN, async () => {
     const st = await getSettings(pool, true);
     const rows = (await pool.query("SELECT c.key, c.updated_at, u.username FROM game_config c LEFT JOIN users u ON u.id = c.updated_by")).rows;
-    return {settings:st, updated:Object.fromEntries(rows.map(r => [r.key, {at:r.updated_at, by:r.username}])), shop:SHOP, chars:CHARS, levels:LEVELS};
+    const missions = Object.fromEntries(Object.entries(MISSIONS).map(([k, v]) => [k, {t:v.t, goal:v.goal, tier:v.tier}]));
+    const claims = (await pool.query(`SELECT (SELECT COUNT(*)::int FROM weekly_claims WHERE week = $1) AS weekly, (SELECT COUNT(*)::int FROM season_claims WHERE season = $2) AS season`, [weekKey(), currentSeason(st.season).id])).rows[0];
+    return {settings:st, updated:Object.fromEntries(rows.map(r => [r.key, {at:r.updated_at, by:r.username}])), shop:SHOP, chars:CHARS, levels:LEVELS,
+      missions, seasonNow:currentSeason(st.season), defaultTiers:DEFAULT_TIERS, defaultStep:SEASON_STEP, week:weekKey(), weekMissions:weekMissions(weekKey(), st.weekly), claims};
   });
   app.put("/api/admin/settings/:key", ADMIN, async (req, reply) => {
     const key = String(req.params.key), def = SETTINGS[key]; if (!def) return fail(reply, 400, "bad_key");
@@ -170,11 +174,33 @@ export function registerAdmin(app, pool, {balance, meBody}){
       COUNT(*) FILTER (WHERE world)::int AS world FROM play_stats WHERE started_at > now() - interval '30 days'`);
     const gems = await one(`SELECT COALESCE(SUM(amount) FILTER (WHERE amount > 0), 0)::int AS earned, COALESCE(-SUM(amount) FILTER (WHERE amount < 0), 0)::int AS spent FROM wallet_ledger WHERE created_at > now() - interval '30 days'`);
     const certs = await one(`SELECT COUNT(*)::int AS total, COUNT(*) FILTER (WHERE issued_at > now() - interval '30 days')::int AS month FROM certificates`);
-    const days = (await pool.query(`SELECT to_char(d, 'YYYY-MM-DD') AS day, (SELECT COUNT(*) FROM play_stats p WHERE p.started_at >= d AND p.started_at < d + interval '1 day')::int AS games
+    const days = (await pool.query(`SELECT to_char(d, 'YYYY-MM-DD') AS day, (SELECT COUNT(*) FROM play_stats p WHERE (p.started_at AT TIME ZONE 'Asia/Bangkok') >= d AND (p.started_at AT TIME ZONE 'Asia/Bangkok') < d + interval '1 day')::int AS games
       FROM generate_series(date_trunc('day', now() AT TIME ZONE 'Asia/Bangkok') - interval '13 days', date_trunc('day', now() AT TIME ZONE 'Asia/Bangkok'), interval '1 day') d ORDER BY d`)).rows;
     const top = (await pool.query(`SELECT u.username, u.display_name, MAX(g.score)::int AS score FROM game_results g JOIN users u ON u.id = g.user_id
       WHERE g.ending = 'win' AND NOT g.flagged AND g.finished_at > now() - interval '30 days' GROUP BY u.id ORDER BY score DESC LIMIT 5`)).rows;
     return {players, games, gems, certs, days, top};
+  });
+
+  /* ---------- 1.1.6 difficulty from real games (guests included): how games end, in which year players lose, the numbers at the end ---------- */
+  app.get("/api/admin/difficulty", ADMIN, async req => {
+    const q = req.query || {}, args = [], where = [];
+    const mode = String(q.mode || "all"), days = String(q.days || "30"), ver = String(q.ver || "");
+    if (mode === "world") where.push("world"); else if (["normal", "hard", "daily"].includes(mode)){ args.push(mode); where.push(`mode = $${args.length} AND NOT world`); }
+    if (/^\d+$/.test(days)){ args.push(+days); where.push(`started_at > now() - ($${args.length} || ' days')::interval`); }
+    if (/^\d+\.\d+(\.\d+)?$/.test(ver)){ args.push(ver); where.push(`ver = $${args.length}`); }
+    const W = where.length ? "WHERE " + where.join(" AND ") : "";
+    const one = async sql => (await pool.query(sql, args)).rows[0];
+    const sum = await one(`SELECT COUNT(*)::int AS started, COUNT(*) FILTER (WHERE ending IS NOT NULL)::int AS finished,
+      COUNT(*) FILTER (WHERE ending IS NULL AND updated_at < now() - interval '6 hours')::int AS abandoned,
+      COUNT(*) FILTER (WHERE ending = 'win')::int AS win, COUNT(*) FILTER (WHERE ending = 'l1')::int AS l1, COUNT(*) FILTER (WHERE ending = 'l2')::int AS l2, COUNT(*) FILTER (WHERE ending = 'l3')::int AS l3,
+      ROUND(AVG(real_sec) FILTER (WHERE ending IS NOT NULL)::numeric / 60, 1)::float AS minutes FROM play_stats ${W}`);
+    const years = (await pool.query(`SELECT 2026 + LEAST(24, last_tick / 12) AS y, COALESCE(ending, 'quit') AS e, COUNT(*)::int AS n FROM play_stats ${W ? W + " AND" : "WHERE"}
+      (ending IS NOT NULL OR updated_at < now() - interval '6 hours') GROUP BY 1, 2 ORDER BY 1`, args)).rows;
+    const ends = (await pool.query(`SELECT ending AS e, COUNT(*)::int AS n, ROUND(AVG(temp)::numeric, 2)::float AS temp, ROUND(AVG(appr)::numeric, 1)::float AS appr, ROUND(AVG(net)::numeric, 1)::float AS net,
+      ROUND(AVG(skills)::numeric, 1)::float AS skills, ROUND(AVG(ore_used)::numeric)::int AS ore, ROUND(AVG(last_tick)::numeric)::int AS tick, ROUND(AVG(real_sec)::numeric / 60, 1)::float AS minutes
+      FROM play_stats ${W ? W + " AND" : "WHERE"} ending IS NOT NULL GROUP BY ending`, args)).rows;
+    const vers = (await pool.query(`SELECT COALESCE(ver, '1.0') AS ver, COUNT(*)::int AS n FROM play_stats GROUP BY 1 ORDER BY 1 DESC LIMIT 12`)).rows;
+    return {sum, years, ends, vers};
   });
 
   app.get("/api/admin/log", ADMIN, async req => {
@@ -194,7 +220,8 @@ export function registerStats(app, pool, readUid){
   app.post("/api/stats/start", lim, async req => {
     const b = req.body || {}, uid = await readUid(req);
     const ab = /^[A-Z]{1,4}$/.test(String(b.ab || "")) ? String(b.ab) : "A", mode = ["normal", "hard", "daily"].includes(b.mode) ? b.mode : "normal";
-    const r = await pool.query("INSERT INTO play_stats(user_id, ab, mode, world) VALUES ($1, $2, $3, $4) RETURNING id", [uid, ab, mode, !!b.world]);
+    const ver = /^\d+\.\d+(\.\d+)?$/.test(String(b.ver || "")) ? String(b.ver) : null;
+    const r = await pool.query("INSERT INTO play_stats(user_id, ab, mode, world, ver) VALUES ($1, $2, $3, $4, $5) RETURNING id", [uid, ab, mode, !!b.world, ver]);
     return {id:r.rows[0].id};
   });
   app.post("/api/stats/:id", lim, async (req, reply) => {

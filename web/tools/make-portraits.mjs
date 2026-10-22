@@ -218,6 +218,55 @@ function act(outfit){
       ${strands(["M236,148 C266,132 330,130 370,146", "M300,118 C292,140 288,160 290,182"])}`,
   });
 }
+/* 1.1 → 1.5: ocean scientist (Dr. Nawa) — wetsuit jacket, dive mask pushed up on the head */
+function oce(outfit){
+  const id = "oce-" + outfit, gold = outfit === "gold";
+  const suit = outfit === "alt" ? ["#ff9a4a", "#e0702a", "#9c4410"] : ["#1fb3a8", "#13807a", "#08433f"];
+  return portrait({id, male:false, skin:"tan", hair:"#1a1210", hairHi:"#5a3f30", smile:1, age:.3,
+    bg:gold ? ["#5a4a1a", "#2a2410", "#0d0b06"] : ["#1f6fa8", "#0d3a60", "#051a2c"], rim:gold ? "#f2c14e" : "#8fd0ff",
+    cloth:suit, inner:["#14232b", "#0b151a"],
+    backHair:`<path d="M168,290 C152,180 222,104 302,102 C384,102 450,180 432,290 L420,250 L180,250 Z" fill="url(#${id}-hair)"/>
+      <path d="M408,250 C450,270 470,330 452,392 C444,420 428,436 414,430 C430,390 432,330 404,290 Z" fill="url(#${id}-hair)"/>`,
+    body:shoulders(`url(#${id}-cloth)`, `
+      <path d="M262,500 C276,512 290,516 300,516 C310,516 324,512 338,500 L342,560 L258,560 Z" fill="url(#${id}-inner)"/>
+      <path d="M300,516 L300,640" stroke="#0b1418" stroke-width="7"/><path d="M300,516 L300,640" stroke="#c9d6dc" stroke-width="2" stroke-dasharray="6 5"/>
+      <rect x="292" y="520" width="16" height="22" rx="4" fill="#c9d6dc"/>
+      <path d="M215,520 C240,560 250,600 252,640 M385,520 C360,560 350,600 348,640" stroke="${suit[2]}" stroke-width="10" fill="none" opacity=".7"/>
+      <path d="M200,560 C230,548 260,560 270,600" stroke="#0b151a" stroke-width="12" fill="none" opacity=".55"/>
+      ${gold ? `<circle cx="384" cy="590" r="12" fill="#f2c14e" stroke="#a0761a" stroke-width="3"/>` : `<path d="M372,584 q12,-14 24,0 q-12,10 -24,0z M396,584 l8,-6 0,12z" fill="#e8fbff"/>`}`),
+    frontHair:`<path d="M180,270 C168,176 226,122 302,120 C380,120 436,176 420,270 C414,232 400,206 380,192 C340,214 280,214 240,196 C214,210 192,236 180,270 Z" fill="url(#${id}-hair)"/>
+      ${strands(["M226,170 C262,150 330,148 376,168", "M300,124 C312,146 318,168 320,190"])}`,
+    extra:`<g transform="translate(0 -6)">
+      <path d="M186,196 C220,170 380,170 414,196" stroke="#0b151a" stroke-width="12" fill="none"/>
+      <rect x="214" y="150" width="172" height="58" rx="26" fill="#0b151a"/>
+      <rect x="226" y="158" width="70" height="42" rx="18" fill="#8fe6ff" opacity=".85"/><rect x="304" y="158" width="70" height="42" rx="18" fill="#8fe6ff" opacity=".85"/>
+      <path d="M236,166 l22,0 l-26,28z M314,166 l22,0 l-26,28z" fill="#fff" opacity=".5"/>
+      <rect x="214" y="150" width="172" height="58" rx="26" fill="none" stroke="${gold ? "#f2c14e" : suit[0]}" stroke-width="4"/></g>`,
+  });
+}
+/* 1.5: city engineer (Kla) — yellow hard hat, high-visibility vest over a blue shirt */
+function eng(outfit){
+  const id = "eng-" + outfit, gold = outfit === "gold";
+  const shirt = outfit === "alt" ? ["#6b7177", "#4b5157", "#2c3135"] : ["#3a6fb8", "#28508a", "#16305a"];
+  const vest = outfit === "alt" ? "#c6f04a" : "#ff8a1c";
+  return portrait({id, male:true, skin:"light", hair:"#1a1210", hairHi:"#40322c", smile:.9, age:.45, beard:false,
+    bg:gold ? ["#5a4a1a", "#2a2410", "#0d0b06"] : ["#5a6b7a", "#2e3a45", "#10161c"], rim:gold ? "#f2c14e" : "#ffc24a",
+    cloth:shirt, inner:shirt,
+    backHair:`<path d="M176,280 C164,200 220,150 300,148 C380,148 436,200 424,280 L410,250 L190,250 Z" fill="url(#${id}-hair)"/>`,
+    body:shoulders(`url(#${id}-cloth)`, `
+      <path d="M262,504 L300,560 L338,504 C326,512 314,516 300,518 C286,516 274,512 262,504 Z" fill="${shirt[2]}"/>
+      <path d="M200,528 C214,520 236,516 252,516 L282,640 L214,640 C206,600 200,560 200,528 Z" fill="${vest}"/>
+      <path d="M400,528 C386,520 364,516 348,516 L318,640 L386,640 C394,600 400,560 400,528 Z" fill="${vest}"/>
+      <path d="M212,580 L268,580 L270,596 L214,596 Z M388,580 L332,580 L330,596 L386,596 Z" fill="#e8eef0" opacity=".95"/>
+      <path d="M212,612 L274,612 L276,628 L214,628 Z M388,612 L326,612 L324,628 L386,628 Z" fill="#e8eef0" opacity=".95"/>
+      ${gold ? `<circle cx="372" cy="548" r="11" fill="#f2c14e" stroke="#a0761a" stroke-width="3"/>` : `<rect x="356" y="540" width="26" height="18" rx="3" fill="#ffffff"/><rect x="360" y="545" width="18" height="4" fill="#3a6fb8"/>`}`),
+    frontHair:`<path d="M186,262 C182,226 196,200 214,190 L386,190 C404,200 418,226 414,262 C408,240 396,226 380,220 L220,220 C204,226 192,240 186,262 Z" fill="url(#${id}-hair)"/>`,
+    extra:`<path d="M168,212 C164,140 226,92 300,90 C374,92 436,140 432,212 Z" fill="${gold ? "#f2c14e" : outfit === "alt" ? "#f4f4f2" : "#ffcc1f"}"/>
+      <path d="M150,212 C200,200 400,200 450,212 C452,226 446,232 432,232 L168,232 C154,232 148,226 150,212 Z" fill="${gold ? "#d9a520" : outfit === "alt" ? "#d6d6d2" : "#e8b000"}"/>
+      <path d="M288,92 L312,92 L316,206 L284,206 Z" fill="#000" opacity=".1"/>
+      <path d="M206,150 C226,118 262,100 300,98" stroke="#fff" stroke-width="7" opacity=".35" fill="none" stroke-linecap="round"/>`,
+  });
+}
 function adv(){
   const id = "adv";
   return portrait({id, male:false, skin:"light", hair:"#120d0c", hairHi:"#3b2c29", smile:.9, noEars:true, age:.3,
@@ -235,9 +284,11 @@ function adv(){
   });
 }
 
-const LIST = [];
-for (const o of ["base", "alt", "gold"]){ LIST.push([`sci-${o}`, sci(o)], [`dip-${o}`, dip(o)], [`eco-${o}`, eco(o)], [`act-${o}`, act(o)]); }
+let LIST = [];
+for (const o of ["base", "alt", "gold"]){ LIST.push([`sci-${o}`, sci(o)], [`dip-${o}`, dip(o)], [`eco-${o}`, eco(o)], [`act-${o}`, act(o)], [`oce-${o}`, oce(o)], [`eng-${o}`, eng(o)]); }
 LIST.push(["adv", adv()]);
+// --only oce,eng → render just those characters (the others stay byte-for-byte as they are)
+const oi = process.argv.indexOf("--only"); if (oi > 0){ const only = process.argv[oi + 1].split(","); LIST = LIST.filter(([n]) => only.includes(n.split("-")[0])); }
 fs.mkdirSync(OUT, {recursive:true});
 const browser = await chromium.launch({executablePath:process.env.CHROME || "/opt/pw-browsers/chromium"});
 const page = await browser.newPage({viewport:{width:W, height:H}, deviceScaleFactor:1});
@@ -248,7 +299,7 @@ for (const [name, svg] of LIST){
 const si = process.argv.indexOf("--sheet");
 if (si > 0){
   const imgs = LIST.map(([n]) => `<img src="data:image/jpeg;base64,${fs.readFileSync(path.join(OUT, n + ".jpg")).toString("base64")}" style="width:240px;height:256px;margin:2px">`).join("");
-  await page.setViewportSize({width:5 * 244, height:3 * 260});
+  await page.setViewportSize({width:6 * 244, height:Math.ceil(LIST.length / 6) * 260});
   await page.setContent(`<html><body style="margin:0;background:#222;display:flex;flex-wrap:wrap">${imgs}</body></html>`);
   await page.screenshot({path:process.argv[si + 1]});
 }

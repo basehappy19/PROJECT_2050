@@ -4,7 +4,7 @@ import {P, S, UIM, t, L, up, COL, relCol, bump, ls} from "../core.js";
 import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {Icon, Rich, plain} from "./icon.jsx";
-import {Btn, IconBtn, Seg, Meter, Portrait, portraitSrc, H3, Terra, Volume, GfxSeg, LangSeg, Msg, Key, SlotInfo, Check} from "./widgets.jsx";
+import {Btn, IconBtn, Seg, Meter, Portrait, portraitSrc, H3, Terra, Volume, GfxSeg, A11ySeg, NarrRow, LangSeg, Msg, Key, SlotInfo, Check, GroupList, GroupTilt, Speak} from "./widgets.jsx";
 
 import {mapCrop, eventPoint, eventSnd, eventImg, SND_ICON, SND_TINT} from "./hero.js";
 const mapCropBg = pt => mapCrop(pt, pt ? 3.4 : 1.15, .3).backgroundImage;
@@ -37,7 +37,7 @@ export function EventModal(){
         <p class="muted small rellegend"><Rich t={t("relLegend")} iconColor="inherit"/></p></> : null}
       <p class="desc"><Rich t={L(e.desc)}/></p>
       {e.news ? <p class="newsrc muted small"><Icon n="link" size={13}/> {t("source")}: <a href={e.news.url} target="_blank" rel="noopener noreferrer">{e.news.src}</a></p> : null}
-      <div class="ask"><Rich t={`[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`} iconColor="accent"/>{P.hasKeyboard() ? <small class="mono muted">{t("evKeys")}</small> : null}</div>
+      <div class="ask"><Rich t={`[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`} iconColor="accent"/><Speak text={`${L(e.title)}. ${L(e.desc)} ${opts.map(({o, i}) => (i === -1 ? "" : "ABC"[i] + ". ") + L(o.label)).join(". ")}`} btn/>{P.hasKeyboard() ? <small class="mono muted">{t("evKeys")}</small> : null}</div>
       <Meter v={f} color={locked ? "warn" : "accent"} h={4} cls="lockbar"/>
       <div class="opts">{opts.map(({o, i, ok}) => {
         const usable = ok && !locked;
@@ -49,6 +49,7 @@ export function EventModal(){
               const lab = (c.txt.includes(t("sideA")) ? t("sideA") : c.txt.includes(t("sideB")) ? t("sideB") : "") + (c.txt.includes(t("delayed")) ? " " + t("later") : "");
               return <span class={"fxchip " + (c.good ? "good" : "bad")} key={k} title={plain(c.txt)}><Icon n={c.icon || "circle"} size={15}/>{lab ? <small>{lab}</small> : null}<b>{arrows(c.up, c.mag || 1)}</b></span>;
             })}</span> : <span class="muted small"><Rich t={`[[eye-off]] ${t("hardHidden")}`} iconColor="inherit"/></span>}
+            {!hard && i >= 0 && P.tiltOfOption ? <GroupTilt list={P.tiltOfOption(o, e)}/> : null}
             {!ok ? <span class="bad small">{t("cantAfford")}</span> : null}
           </span>
         </button>;
@@ -170,6 +171,7 @@ export function Story(){
       })}</div>
       <div class="mfoot">
         <Btn kind="ghost" onClick={() => G.storySkip()}>{t("tutSkip")}</Btn>
+        <Speak text={L(st.panels[Math.min(UIM.storyI, st.panels.length - 1)].say)} btn/>
         {P.hasKeyboard() ? <small class="mono muted grow">{t("storyKeys")}</small> : <span class="grow"/>}
         <Btn onClick={() => G.storyNext()} sound={null}>{last ? `${t("storyGo")} [[play]]` : `${t("tutNext")} [[chevron-right]]`}</Btn>
       </div>
@@ -231,6 +233,8 @@ export function Pause(){
       <div class="row gap"><b class="pzh"><Icon n="settings" size={16}/> {S.lang === "th" ? "ตั้งค่า" : "Settings"}</b><span class="grow"/><LangSeg/></div>
       <Volume/>
       <GfxSeg/>
+      <A11ySeg/>
+      <NarrRow/>
     </div>
     <b class="pzh"><Icon n="save" size={16}/> {S.lang === "th" ? "ช่องบันทึก" : "Save slots"}</b>
     {saves === null ? <p class="bad small">{t("noStore")}</p> : <>
@@ -261,6 +265,7 @@ export function Tutorial(){
       <div class="dots">{P.TUT.map((_, d) => <i key={d} class={d === i ? "on" : ""}/>)}</div>
       <div class="mfoot">
         <Btn kind="ghost" onClick={() => G.tutAct("skip")}>{t("tutSkip")}</Btn>
+        <Speak text={`${L(st.title)}. ${st.body[S.lang].join(" ")}`} btn/>
         <span class="grow"/>
         {i ? <Btn kind="ghost" sound={null} onClick={() => G.tutAct("back")}>{`[[chevron-left]] ${t("tutBack")}`}</Btn> : null}
         <Btn sound={null} onClick={() => G.tutAct(last ? "done" : "next")}>{last ? t("tutDone") : `${t("tutNext")} [[chevron-right]]`}</Btn>
@@ -270,28 +275,82 @@ export function Tutorial(){
 }
 
 /* ---------------- Continuous World: the world minerals market ---------------- */
+/* small price chart for the last 24 months */
+function Spark({data, color, min, max}){
+  if (!data || data.length < 2) return <svg class="spark" viewBox="0 0 120 36"/>;
+  const lo = min ?? Math.min(...data), hi = max ?? Math.max(...data), span = hi - lo || 1;
+  const pts = data.map((v, i) => `${(i / (data.length - 1) * 116 + 2).toFixed(1)},${(32 - (v - lo) / span * 28).toFixed(1)}`).join(" ");
+  const last = pts.split(" ").pop().split(",");
+  return <svg class="spark" viewBox="0 0 120 36" preserveAspectRatio="none"><polyline points={pts} fill="none" stroke={color} stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx={last[0]} cy={last[1]} r="2.6" fill={color}/></svg>;
+}
+/* 1.6: politics at home — the four groups behind the approval number */
+export function Politics(){
+  const close = () => { UIM.modal = null; bump(); };
+  const th = S.lang === "th", w = P.GROUPS.map(G => `${L(G.name)} ${Math.round(G.w * 100)}%`).join(" · ");
+  return <Modal kind="politics" wide onClose={close}>
+    <Tag color="accent">{th ? "[[landmark]] การเมืองในประเทศ" : "[[landmark]] Politics at home"}</Tag>
+    <h2>{th ? "ความนิยม" : "Approval"} <span class="mono">{S.appr.toFixed(0)}%</span></h2>
+    <p class="muted small">{th ? `ความนิยมรวมคือค่าเฉลี่ยของ 4 กลุ่ม (${w}) ทุกการตัดสินใจมีคนได้และคนเสีย ดูสัญลักษณ์ ▲ ▼ ใต้ตัวเลือกในเหตุการณ์และในสกิล ว่ากลุ่มไหนจะพอใจหรือไม่พอใจ` : `Approval is the average of four groups (${w}). Every decision has winners and losers: the ▲ ▼ marks under event choices and skills show who will be pleased or upset.`}</p>
+    <GroupList full extra={g => <Spark data={(S.grpHist || {})[g]} color={P.GROUP[g].color} min={0} max={100}/>}/>
+    <p class="muted small"><Rich t={th ? "[[info]] กลุ่มที่ 'สนับสนุน' ต้องพอใจ 70% ขึ้นไปและมากกว่าค่าเฉลี่ย ความต่างระหว่างกลุ่มจะค่อยๆ จางลงเอง ถ้าทำให้กลุ่มไหนโกรธ ยังเอาใจกลับมาได้" : "[[info]] A group backs you at 70%+ and above the average. Differences between groups fade slowly on their own, so an angry group can be won back."} iconColor="inherit"/></p>
+  </Modal>;
+}
+/* 1.7: raw minerals waiting, refining speed, our refinery and friendly refiners */
+function Refinery({g}){
+  const th = S.lang === "th", lv = P.refLevel(g), b = (S.refBuild || {})[g], tl = P.tollers(g), k = P.refCost(g), max = lv >= P.REF_MAX_LV;
+  return <div class="mkref">
+    <div class="mkrefrow">
+      <span title={t("refRawHelp")}><Icon n="pickaxe" size={15}/>{t("refRaw")} <b class="mono">{P.rawFor(g)}</b></span>
+      <Icon n="arrow-right" size={14} cls="muted"/>
+      <span><Icon n="factory" size={15}/>{t("refSpeed")} <b class="mono">{P.refCap(g).toFixed(1)}</b><small class="muted">{t("perMo")}</small></span>
+    </div>
+    <small class="muted">{`${t("refOurs")} ${(S.refLv || {})[g] || 0}/${P.REF_MAX_LV}`}{b ? ` · ${t("refBuilding")} ${b} ${t("months")}` : ""}{tl.length ? ` · ${t("refFriends")}: ${P.joinNames(tl.map(c => c.id))}` : ""}</small>
+    <div class="mkrefb">
+      <Btn kind="ghost" size="sm" disabled={!P.canBuild(g)} sound={null} onClick={() => { if (P.buildRefinery(g)) Audio.play("buy"); }}><Rich t={max ? `[[factory]] ${t("refMax")}` : b ? `[[hammer]] ${t("refBuilding")} ${b} ${t("months")}` : `[[factory]] ${t("refBuild")} · ${P.IC.ep} ${k.ep}  ${P.IC.pc} ${k.pc}`} iconColor="inherit"/></Btn>
+      {!max && !b && P.refTilt ? <GroupTilt list={P.refTilt()}/> : null}
+    </div>
+  </div>;
+}
+/* 1.1: world minerals market — one card per group: stock, price trend, what it's for, buy/sell */
 export function Market(){
   const close = () => { UIM.modal = null; bump(); };
   P.marketInit();
-  const th = S.lang === "th", gain = P.matGain(), lot = P.MKT_LOT;
-  const users = g => P.SKILLS.filter(n => !S.owned[n.id] && P.matCost(n) && P.matCost(n)[g]).slice(0, 3).map(n => L(n.name));
+  const th = S.lang === "th", gain = P.matGain(), lot = P.MKT_LOT, ep = P.IC.ep;
   return <Modal kind="market" wide onClose={close}>
-    <Tag color="warn">{th ? "[[$ore]] แร่ 5 กลุ่ม" : "[[$ore]] 5 mineral groups"}</Tag>
-    <h2>{th ? "ตลาดแร่โลก" : "World minerals market"}</h2>
-    <p class="muted">{th ? "แร่แยกเป็น 5 กลุ่ม แต่ละสกิลใช้ไม่เหมือนกัน ประเทศที่เป็นมิตรส่งมาให้ทุกเดือน ขาดเมื่อไรซื้อจากตลาดได้ ราคาขึ้นเมื่อเราซื้อมากหรือมีประเทศห้ามส่งออก แล้วค่อย ๆ กลับสู่ปกติ" : "Minerals come in 5 groups and each skill needs a different mix. Friendly countries send some every month; buy the rest here. Prices rise when you buy a lot or a producer bans exports, then drift back."}</p>
-    <div class="mkt">{P.MAT_IDS.map(g => {
-      const G = P.MAT[g], pr = P.mktPrice(g), idx = S.mkt[g], u = users(g);
-      return <div class="mktrow" key={g} style={{"--rc":G.col}}>
-        <span class="mic"><Icon n={G.icon} size={22} style={{color:G.col}}/></span>
-        <div class="grow"><b>{L(G.name)}</b><small class="muted">{L(G.sub)}</small>{u.length ? <small class="muted">{th ? "ใช้กับ" : "Needed for"}: {u.join(", ")}</small> : null}</div>
-        <div class="mstock"><small class="muted">{th ? "มีอยู่" : "Stock"}</small><b class="mono">{Math.floor(S.mat[g])}</b><small class="muted">+{gain[g].toFixed(1)}{t("perMo")}</small></div>
-        <div class="mprice"><small class="muted">{th ? "ราคา/หน่วย" : "Price/unit"}</small><b class="mono"><Rich t={`${P.IC.ep} ${pr}`}/></b><small class={idx > 1.15 ? "bad" : idx < .9 ? "good" : "muted"}>{idx > 1.15 ? (th ? "แพง" : "high") : idx < .9 ? (th ? "ถูก" : "low") : (th ? "ปกติ" : "normal")}</small></div>
-        <div class="row gap">
-          <Btn kind="primary" disabled={S.ep < pr * lot} sound={null} onClick={() => { if (P.mktBuy(g)) Audio.play("coin"); }}>{`${th ? "ซื้อ" : "Buy"} ${lot} · ${P.IC.ep} ${pr * lot}`}</Btn>
-          <Btn kind="ghost" disabled={S.mat[g] < lot} sound={null} onClick={() => { if (P.mktSell(g)) Audio.play("coin"); }}>{`${th ? "ขาย" : "Sell"} ${lot}`}</Btn>
+    <Tag color="warn">{th ? "[[$ore]] ทรัพยากร 5 กลุ่ม" : "[[$ore]] 5 resource groups"}</Tag>
+    <h2>{th ? "ตลาดทรัพยากรโลก" : "World resources market"}</h2>
+    <div class="mkhead">
+      <span class="mkcash"><Rich t={`${ep} ${Math.floor(S.ep)}`}/></span>
+      <small class="muted">{th ? "ราคาเปลี่ยนทุกเดือน ตามความต้องการของโลก ข่าวตลาด การห้ามส่งออก และการซื้อขายของเรา ซื้อตอนถูก ขายตอนแพง" : "Prices change every month with world demand, market news, export bans and our own trading. Buy low, sell high."} <Rich t={t("refIntro")} iconColor="inherit"/></small>
+    </div>
+    <div class="mkgrid">{P.MAT_IDS.map(g => {
+      const G = P.MAT[g], pr = P.mktPrice(g), hist = (S.mktHist || {})[g] || [], prev = hist.length > 1 ? hist[hist.length - 2] : pr;
+      const chg = prev ? (pr - prev) / prev * 100 : 0, lvl = S.mkt[g] / 1, short = P.matShort(g), users = P.matUsers(g).slice(0, 3);
+      const k10 = P.mktLotCost(g, lot), kN = short ? P.mktLotCost(g, short.need) : 0;
+      return <div class="mkcard" key={g} style={{"--rc":G.col}}>
+        <div class="mktop">
+          <Icon n={G.icon} size={52}/>
+          <div class="grow"><b>{L(G.name)}</b><small class="muted">{L(G.sub)}</small></div>
+          <div class="mkstock"><b class="mono">{Math.floor(S.mat[g])}</b><small class="muted">{P.refCap ? t("refStock") : th ? "มีอยู่" : "in stock"} · +{gain[g].toFixed(1)}{t("perMo")}</small></div>
+        </div>
+        <div class="mkprice">
+          <div><small class="muted">{th ? "ราคาต่อหน่วย" : "Price per unit"}</small>
+            <b class="mono"><Rich t={`${ep} ${pr.toFixed(1)}`}/></b>
+            <span class={"chg " + (chg > .5 ? "up" : chg < -.5 ? "down" : "")}>{chg > .5 ? "▲" : chg < -.5 ? "▼" : "•"} {Math.abs(chg).toFixed(0)}%</span>
+            <span class={"lvl " + (lvl > 1.15 ? "hi" : lvl < .9 ? "lo" : "")}>{lvl > 1.15 ? (th ? "แพง" : "high") : lvl < .9 ? (th ? "ถูก" : "cheap") : (th ? "ปกติ" : "normal")}</span>
+          </div>
+          <Spark data={hist} color={G.col}/>
+        </div>
+        {P.refCap ? <Refinery g={g}/> : null}
+        {short ? <div class="mkneed"><Icon n="triangle-alert" size={15}/>{th ? `ขาดอีก ${short.need} สำหรับ` : `${short.need} short for`} <b>{L(short.n.name)}</b></div>
+          : users.length ? <div class="mkuse muted">{th ? "ใช้ทำ" : "Used for"}: {users.map(n => L(n.name)).join(", ")}</div> : <div class="mkuse muted">{th ? "ตอนนี้ยังไม่มีสกิลที่ต้องใช้" : "No skill needs it right now"}</div>}
+        <div class="mkbtns">
+          <Btn kind="primary" disabled={S.ep < k10} sound={null} onClick={() => { if (P.mktBuy(g, lot)) Audio.play("coin"); }}><Rich t={`${th ? "ซื้อ" : "Buy"} ${lot} · ${ep} ${k10}`} iconColor="inherit"/></Btn>
+          {short ? <Btn kind="gold" disabled={S.ep < kN} sound={null} onClick={() => { if (P.mktBuy(g, short.need)) Audio.play("coin"); }}><Rich t={`${th ? "ซื้อที่ขาด" : "Buy missing"} ${short.need} · ${ep} ${kN}`} iconColor="inherit"/></Btn> : null}
+          <Btn kind="ghost" disabled={S.mat[g] < lot} sound={null} onClick={() => { if (P.mktSell(g, lot)) Audio.play("coin"); }}><Rich t={`${th ? "ขาย" : "Sell"} ${lot} · +${P.mktSellGain(g, lot)}`} iconColor="inherit"/></Btn>
         </div>
       </div>;
     })}</div>
-    <div class="mfoot"><span class="muted small"><Rich t={`${P.IC.ep} ${Math.floor(S.ep)}`}/></span><Btn onClick={close}>{th ? "กลับเข้าเกม" : "Back to the game"}</Btn></div>
+    <div class="mfoot"><span class="grow"/><Btn onClick={close}>{th ? "กลับเข้าเกม" : "Back to the game"}</Btn></div>
   </Modal>;
 }

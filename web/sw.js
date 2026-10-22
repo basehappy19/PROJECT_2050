@@ -31,6 +31,19 @@ self.addEventListener("fetch", e => {
     return;
   }
   const media = /\/assets\/(img|audio)\//.test(url.pathname);
+  // 1.1.5: small files that keep their name between versions (UI icons, map data, fonts) are served from the cache
+  // but refreshed in the background, so a changed icon shows on the next visit instead of never
+  const fresh = /\/assets\/(img\/ui\/|data\/|fonts\/)/.test(url.pathname) && !req.headers.has("range");
+  if (fresh){
+    e.respondWith((async () => {
+      const key = new Request(url.href.split("#")[0].split("?")[0]), cacheName = media ? "p2050-media" : CACHE;
+      const hit = await caches.match(key, {ignoreSearch:true});
+      const net = fetch(key, {cache:"no-cache"}).then(async r => { if (r.ok && r.status === 200) (await caches.open(cacheName)).put(key, r.clone()); return r; }).catch(() => null);
+      if (hit){ e.waitUntil(net); return hit; }
+      return (await net) || Response.error();
+    })());
+    return;
+  }
   e.respondWith((async () => {
     const key = new Request(url.href.split("#")[0].split("?")[0]);
     const hit = await caches.match(key, {ignoreSearch:true});

@@ -1,6 +1,6 @@
 /* In-game HUD: top bar (KPIs, date, speed, buttons) · character + abilities · zoom · meters · ticker + tabs */
-import {useState} from "preact/hooks";
-import {P, S, UIM, t, L, up, COL, bump} from "../core.js";
+import {useState, useEffect, useRef} from "preact/hooks";
+import {P, S, UIM, t, L, up, COL, bump, isTouch} from "../core.js";
 import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {GameMap} from "../map2d.js";
@@ -9,13 +9,36 @@ import {IconBtn, Seg, LangSeg, Portrait, Key, Meter} from "./widgets.jsx";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
-function Kpi({label, value, sub, meter, cls = "", danger, stat}){
-  return <div class={`kpi glass ${cls} ${danger ? "danger" : ""} ${stat ? "has3d" : ""}`} title={sub ? `${plain(label)} ${sub}` : undefined}>
+/* 1.1.3: numbers slide to their new value, with a short +/− flash so you see what you gained or lost */
+function AnimNum({v, fmt = x => Math.floor(x)}){
+  const [shown, setShown] = useState(v), [delta, setDelta] = useState(null), r = useRef({from:v, to:v, t0:0, raf:0, shown:v});
+  r.current.shown = shown;
+  useEffect(() => {
+    const q = r.current; if (v === q.to) return;
+    const d = v - q.to; q.from = q.shown; q.to = v; q.t0 = performance.now();
+    if (Math.abs(d) >= 1) setDelta({d, k:q.t0});
+    cancelAnimationFrame(q.raf);
+    const step = now => { const p = Math.min(1, (now - q.t0) / 450), e = 1 - Math.pow(1 - p, 3); setShown(q.from + (q.to - q.from) * e); if (p < 1) q.raf = requestAnimationFrame(step); };
+    q.raf = requestAnimationFrame(step);
+  }, [v]);
+  useEffect(() => () => cancelAnimationFrame(r.current.raf), []);
+  return <>{fmt(shown)}{delta ? <i class={"kdelta " + (delta.d > 0 ? "up" : "down")} key={delta.k}>{delta.d > 0 ? "+" : "−"}{Math.abs(Math.round(delta.d))}</i> : null}</>;
+}
+/* a value in the top bar: hover (or tap) shows what it is and how to get more */
+function Kpi({label, value, fmt, sub, meter, cls = "", danger, stat, tip, onClick, badge}){
+  const [open, setOpen] = useState(false), touch = isTouch();
+  const box = <div class={`kpi glass ${cls} ${danger ? "danger" : ""} ${stat ? "has3d" : ""}`}>
     {stat ? <Icon n={"$" + stat} size={30} cls="k3d"/> : null}
     <span class="k">{stat ? plain(label) : <Rich t={label}/>}</span>
-    <span class="v" key={value}>{value}</span>
+    <span class="v">{typeof value === "number" ? <AnimNum v={value} fmt={fmt}/> : value}</span>
     {sub ? <span class="s">{sub}</span> : null}
     {meter !== undefined ? <Meter v={meter.v} color={meter.c} h={4} cls="kmeter"/> : null}
+    {badge ? <i class="kbadge">{badge}</i> : null}
+  </div>;
+  return <div class="kpiw" onPointerEnter={e => { if (e.pointerType === "mouse") setOpen(true); }} onPointerLeave={() => setOpen(false)}
+    onClick={() => { if (onClick) onClick(); else if (touch) setOpen(o => !o); }}>
+    {onClick ? <button type="button" class="kpibtn">{box}</button> : box}
+    {open && tip ? <div class="ktip glass-strong" role="tooltip"><b><Rich t={label}/></b>{sub ? <span class="mono acc">{sub}</span> : null}<span><Rich t={tip}/></span></div> : null}
   </div>;
 }
 
@@ -28,11 +51,11 @@ export function TopBar(){
   return <header class="topbar">
     <div class="brand glass" onClick={() => G.pause()} title={t("pTitle")}><span>PROJECT</span><b>ZERO</b></div>
     <div class="kpis">
-      <Kpi stat="money" label={t("ep")} value={Math.floor(S.ep)} sub={P.sanctionsCost() ? `+${P.epGain()} −${P.sanctionsCost()}` : `+${P.epGain()}${t("perMo")}`} cls={P.sanctionsCost() ? "sanct" : ""}/>
-      <Kpi stat="policy" label={t("pc")} value={Math.floor(S.pc)} sub={`+${P.pcGain()}${t("perMo")}`}/>
-      {S.oreOn ? (P.isFullRes() ? <button type="button" class="kpibtn" title={S.lang === "th" ? "ตลาดแร่โลก" : "World minerals market"} onClick={() => { Audio.play("open"); UIM.modal = "market"; bump(); }}><Kpi stat="ore" label={t("oreLbl")} value={P.matTotal()} sub={`+${Math.round(P.oreGain())}${t("perMo")}`} cls="ore mkton"/></button>
-        : <Kpi stat="ore" label={t("oreLbl")} value={Math.floor(S.ore || 0)} sub={`+${Math.round(P.oreGain())}${t("perMo")}`} cls="ore"/>) : null}
-      <Kpi stat="appr" label={t("appr")} value={`${S.appr.toFixed(0)}%`} meter={{v:S.appr / 100, c:acls}} cls={"appr " + acls} danger={S.appr < 25}/>
+      <Kpi stat="money" label={t("ep")} value={S.ep} sub={P.sanctionsCost() ? `+${P.epGain()} −${P.sanctionsCost()}` : `+${P.epGain()}${t("perMo")}`} cls={P.sanctionsCost() ? "sanct" : ""} tip={t("tipEp")}/>
+      <Kpi stat="policy" label={t("pc")} value={S.pc} sub={`+${P.pcGain()}${t("perMo")}`} tip={t("tipPc")}/>
+      {S.oreOn ? <Kpi stat="ore" label={t("oreLbl")} value={P.matTotal()} sub={`+${Math.round(P.oreGain())}${t("perMo")}`} cls="ore mkton" tip={t("tipOre")} onClick={() => { Audio.play("open"); UIM.modal = "market"; bump(); }}/> : null}
+      <Kpi stat="appr" label={t("appr")} value={S.appr} fmt={x => `${x.toFixed(0)}%`} meter={{v:S.appr / 100, c:acls}} cls={"appr mkton " + acls} danger={S.appr < 25} badge={P.angryCount && P.angryCount() ? "!" : null}
+        tip={S.groups ? `${t("tipAppr")} ${P.GROUPS.map(G => `[[${G.icon}]] ${Math.round(S.groups[G.id])}%`).join("  ")} · ${t("tipGroups")}` : t("tipAppr")} onClick={() => { Audio.play("open"); UIM.modal = "politics"; bump(); }}/>
     </div>
     <div class="ctrls glass">
       <div class="date">
@@ -125,7 +148,7 @@ function MeterNZ(){
   if (trend < -0.05){ const yr = 2026 + S.tick / 12 + net / -trend; proj = yr <= 2051 ? `${t("onTrack")} ${Math.floor(yr)}` : t("offTrack"); pcls = yr <= 2051 ? "good" : "bad"; }
   else { proj = t("rising"); pcls = "bad"; }
   const pos = v => clamp(v / NZ_MAX, 0, 1), cls = net <= 8 ? "good" : net <= 20 ? "warn" : "bad";
-  return <div class="mtr">
+  return <div class="mtr" title={plain(t("tipNZ"))}>
     <div class="mtr-h"><Rich t={`[[flag]] ${up(t("nzTitle"))}`} cls="ttl"/><span class={"big " + cls}>{net.toFixed(1)}<small> Gt</small></span></div>
     <div class="bar nz">
       <i class="fill" style={{width:`${(1 - pos(net)) * 100}%`}}/>
@@ -138,7 +161,7 @@ function MeterNZ(){
 }
 function MeterT(){
   const monthsLeft = Math.max(0, P.TOTAL_TICKS - S.tick), era = S.world && P.ERAS[S.era || "shift"], cls = S.temp >= 2.5 ? "bad" : S.temp >= 2.0 ? "hot" : S.temp >= 1.5 ? "warn" : "good";
-  return <div class="mtr">
+  return <div class="mtr" title={plain(t("tipTemp"))}>
     <div class="mtr-h"><Rich t={`[[$temp]] ${up(t("tTitle"))}`} cls="ttl"/><span class={"big " + cls}>+{S.temp.toFixed(2)}<small>°C</small></span></div>
     <div class="bar temp">
       <i class="z"/><i class="z"/><i class="z"/><i class="z"/>

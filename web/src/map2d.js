@@ -11,10 +11,12 @@ import ICONS from "./gen/icons.js";
 import {Gfx} from "./gfx.js";
 import {drawPins, drawTraffic, drawInfo, img3d} from "./mapfx.js";
 import {drawHex, hexCells} from "./hexgrid.js";
+import {createMapGL} from "./mapgl.js";
 
 const ZMIN = .9, ZMAX = 5, ZCOUNTRY = 1.55;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const HEAT = [[31,158,120],[217,166,43],[208,97,47],[224,48,42]];
+const HEAT_N = [[31,158,120],[217,166,43],[208,97,47],[224,48,42]], HEAT_CB = [[46,120,200],[140,170,205],[240,170,70],[225,110,25]];   // 1.1.4 colour-blind: blue → orange
+let HEAT = P.A11y && P.A11y.cb ? HEAT_CB : HEAT_N;
 const regionHeatValue = r => clamp(0.55 * (r.co2 / r.co2_0) + 0.35 * (r.vuln / 100) + (S.temp - 1.2) * 0.35 - 0.2, 0, 1);
 const heatRGB = (v, pal = HEAT) => { const x = clamp(v, 0, .999) * (pal.length - 1), i = Math.floor(x), f = x - i, a = pal[i], b = pal[i + 1]; return [0, 1, 2].map(k => Math.round(a[k] + (b[k] - a[k]) * f)); };
 P.heatRGB = heatRGB; P.regionHeatValue = regionHeatValue;
@@ -51,8 +53,10 @@ export const GameMap = {
     // outline of the whole map (Robinson edge) from the edge of the texture area
     const edge = new Path2D(), N = 90;
     const {projection} = await import("./geo.js"); const pr = projection();
-    for (let i = 0; i <= N; i++){ const p = pr([MAP.lon0 + 179.99, MAP.latTop - (MAP.latTop - MAP.latBot) * i / N]); i ? edge.lineTo(p[0], p[1]) : edge.moveTo(p[0], p[1]); }
-    for (let i = 0; i <= N; i++){ const p = pr([MAP.lon0 - 179.99, MAP.latBot + (MAP.latTop - MAP.latBot) * i / N]); edge.lineTo(p[0], p[1]); }
+    const ep = [];
+    for (let i = 0; i <= N; i++){ const p = pr([MAP.lon0 + 179.99, MAP.latTop - (MAP.latTop - MAP.latBot) * i / N]); i ? edge.lineTo(p[0], p[1]) : edge.moveTo(p[0], p[1]); ep.push(p[0], p[1]); }
+    for (let i = 0; i <= N; i++){ const p = pr([MAP.lon0 - 179.99, MAP.latBot + (MAP.latTop - MAP.latBot) * i / N]); edge.lineTo(p[0], p[1]); ep.push(p[0], p[1]); }
+    this.edgePts = new Float32Array(ep);
     edge.closePath(); this.edge = edge;
     // CO₂ plume points
     this.plumes = [];
@@ -74,9 +78,9 @@ export const GameMap = {
   mount(el){
     this.el = el;
     if (!this.base){
-      this.base = document.createElement("canvas"); this.base.className = "map-base";
       this.fx = document.createElement("canvas"); this.fx.className = "map-fx";
-      this.bctx = this.base.getContext("2d", {alpha:false}); this.fctx = this.fx.getContext("2d");
+      this.fctx = this.fx.getContext("2d");
+      this.makeBase(this.glWanted());
       this.bindInput();
     }
     el.append(this.base, this.fx);
@@ -87,13 +91,29 @@ export const GameMap = {
     const loop = () => { if (!this.active) return; this.frame(); this.raf = requestAnimationFrame(loop); };
     this.raf = requestAnimationFrame(loop);
   },
+  /* 1.2: the bottom layer is drawn with WebGL when the device can (and the player hasn't turned it off), else Canvas 2D */
+  glWanted(){ return ls.get("p2050-mapgl", "1") !== "0"; },   // "0" = off, "force" = even on a software GPU (tests)
+  makeBase(wantGL){
+    const old = this.base;
+    this.base = document.createElement("canvas"); this.base.className = "map-base";
+    if (this.gl){ this.gl.dispose(); this.gl = null; }
+    this.gl = wantGL ? createMapGL(this.base, ls.get("p2050-mapgl") === "force") : null; this.glBuilt = false;
+    if (wantGL && !this.gl){ this.base = document.createElement("canvas"); this.base.className = "map-base"; }   // a canvas that once had a WebGL context can't give a 2D one
+    if (this.gl){ this.bctx = document.createElement("canvas").getContext("2d"); this.gl.onLost = () => setTimeout(() => this.makeBase(false), 0); }   // 2D context only for "which country is here?"
+    else this.bctx = this.base.getContext("2d", {alpha:false});
+    if (old && old.parentNode) old.replaceWith(this.base);
+    if (old){ this.resize(); this.dirtyBase = true; }
+  },
+  setGL(on){ ls.set("p2050-mapgl", on ? "1" : "0"); if (!!this.gl !== !!on && this.base) this.makeBase(on); bump(); return !!this.gl === !!on; },
+  usingGL(){ return !!this.gl; },
   unmount(){ this.active = false; cancelAnimationFrame(this.raf); if (this._ro) this._ro.disconnect(); this.base && this.base.remove(); this.fx && this.fx.remove(); },
   resize(){
     if (!this.el) return;
     const w = this.el.clientWidth, h = this.el.clientHeight, dpr = Gfx.dpr();
     if (!w || !h) return;
     this.w = w; this.h = h; this.dpr = dpr;
-    for (const c of [this.base, this.fx]){ c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); c.style.width = w + "px"; c.style.height = h + "px"; }
+    for (const c of [this.base, this.fx]){ if (!(c === this.base && this.gl)){ c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); } c.style.width = w + "px"; c.style.height = h + "px"; }
+    if (this.gl) this.gl.setSize(w, h, dpr);
     this.s0 = Math.max(w / MAP.W, (h * .55) / MAP.H);
     this.clampCam(); this.dirtyBase = true; this.fxDirty = true;
   },
@@ -238,7 +258,7 @@ export const GameMap = {
   /* cached picture of the whole map: photo + region colours + borders (rebuilt only when the colours change) */
   tintKey(){
     if (!S.regions) return "-";
-    return S.regions.map(r => heatRGB(regionHeatValue(r)).map(v => v >> 3).join(".")).join("|") + "|" + this.theme() + "|" + (this.img ? this.img.width : 0) + "|" + Gfx.level;
+    return S.regions.map(r => heatRGB(regionHeatValue(r)).map(v => v >> 3).join(".")).join("|") + "|" + (HEAT === HEAT_CB ? "cb" : "") + "|" + this.theme() + "|" + (this.img ? this.img.width : 0) + "|" + Gfx.level;
   },
   buildCache(){
     const k = Gfx.cfg.cache, W = Math.round(MAP.W * k), Hh = Math.round(MAP.H * k);
@@ -252,6 +272,11 @@ export const GameMap = {
   /* 1.1: outside the world map is deep space (stars, a faint nebula and the glow of the planet's edge), not a flat dark fill.
      Built once per screen size; drifts very slightly with the camera so it feels far away. */
   drawSpace(c){
+    const [ox, oy] = this.spaceCanvas();
+    c.drawImage(this.space, ox, oy);
+  },
+  /* builds the starfield picture once per screen size; returns where to put it */
+  spaceCanvas(){
     const w = this.w, h = this.h;
     if (!this.space || this.space.width !== Math.round(w * 1.2) || this.space.height !== Math.round(h * 1.2)){
       const cv = this.space = document.createElement("canvas"); cv.width = Math.round(w * 1.2); cv.height = Math.round(h * 1.2);
@@ -268,8 +293,9 @@ export const GameMap = {
       }
     }
     const ox = clamp(-(this.cam.x / MAP.W - .5) * w * .1, -w * .1, 0) - w * .05, oy = clamp(-(this.cam.y / MAP.H - .5) * h * .1, -h * .1, 0) - h * .05;
-    c.drawImage(this.space, ox, oy);
+    return [ox, oy];
   },
+  colorsChanged(){ HEAT = P.A11y && P.A11y.cb ? HEAT_CB : HEAT_N; this.dirtyBase = true; this.fxDirty = true; },
   /* how many cached pixels fall on one screen pixel at this zoom (below 1 = the cache looks soft) */
   cacheDensity(){ return Gfx.cfg.cache / (this.scale() * this.dpr); },
   needSharp(){ return this.cacheDensity() < .95; },
@@ -289,7 +315,22 @@ export const GameMap = {
     c.strokeStyle = `rgba(230,255,250,${.16 * bAlpha})`; c.lineWidth = .6 * px;
     for (const sh of this.shapes) c.stroke(sh.path);
   },
+  /* 1.2: the same picture on the GPU (mapgl.js) */
+  drawBaseGL(){
+    const G = this.gl, s = this.scale();
+    if (!this.glBuilt){ if (!this.shapes.length) return; G.build(this.shapes, this.edgePts, Object.keys(this.regPaths)); G.setSize(this.w, this.h, this.dpr); this.glBuilt = true; }
+    if (this.img) G.setImage(this.img);
+    const off = this.spaceCanvas(); G.setSpace(this.space);
+    const th = this.theme(), aBase = th === "night" ? .18 : th === "paint" ? .26 : .2;
+    const cols = {}; if (S.regions) for (const r of S.regions) cols[r.id] = heatRGB(regionHeatValue(r));
+    G.setTints(cols, aBase);
+    const zc = this.cam.z >= ZCOUNTRY, sel = S.regions && !S.noSel ? S.sel : null, selC = S.regions && !S.noSel ? S.selC : null;
+    const cShapes = !selC ? [] : selC.startsWith("R_") ? this.shapes.filter(x => !x.c && x.r === selC.slice(2)) : this.shapes.filter(x => x.c === selC);
+    G.setSelection(sel && this.regPaths[sel] ? sel : null, sel && cols[sel] ? cols[sel] : [79, 209, 197], zc, cShapes, selC || null);
+    G.render(this.cam.x, this.cam.y, s, off, clamp((this.cam.z - .95) / .7, .25, 1), S.regions ? clamp((S.temp - 1.4) / 1.4, 0, 1) : 0);
+  },
   drawBase(moving){
+    if (this.gl){ this.baseFast = false; return this.drawBaseGL(); }
     const c = this.bctx, d = this.dpr, s = this.scale();
     if (this.shapes.length && this.cacheKey !== this.tintKey()) this.buildCache();
     c.setTransform(d, 0, 0, d, 0, 0);
@@ -406,9 +447,13 @@ export const GameMap = {
       }
     }
     // hazard forecasts: pulsing ring + icon + months left (tap = evacuate)
+    // 1.1.2: markers of countries close together are stacked upwards instead of drawn on top of each other
+    const hzPlaced = [];
     for (const h of S.haz || []){
       const pt = this.countryPoint(h.c); if (!pt) continue;
-      const [x, y0] = this.toScreen(pt[0], pt[1]), y = y0 - 30; if (!vis(x, y)) continue;
+      const [x, y0] = this.toScreen(pt[0], pt[1]); let y = y0 - 30;
+      for (let k = 0; k < 6 && hzPlaced.some(q => Math.abs(q[0] - x) < 74 && Math.abs(q[1] - y) < 58); k++) y -= 58;
+      hzPlaced.push([x, y]); if (!vis(x, y)) continue;
       const Z = P.HAZARDS[h.type], col = HZ_COL[h.type] || COL.bad, left = Math.max(0, h.at - S.tick), ph = (now * 1.4) % 1;
       c.strokeStyle = col; c.globalAlpha = (1 - ph) * .7; c.lineWidth = 2; c.beginPath(); c.arc(x, y, 18 + ph * 22, 0, Math.PI * 2); c.stroke(); c.globalAlpha = 1;
       c.fillStyle = "rgba(6,16,21,.9)"; c.beginPath(); c.arc(x, y, 18, 0, Math.PI * 2); c.fill(); c.lineWidth = 2; c.strokeStyle = col; c.stroke();

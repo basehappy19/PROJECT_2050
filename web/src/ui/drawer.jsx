@@ -1,15 +1,16 @@
 /* Right-hand drawer (bottom sheet on phones): Region / Country, Stats, News */
-import {P, S, t, L, up, COL, relCol} from "../core.js";
+import {P, S, t, L, up, COL, relCol, UIM, bump} from "../core.js";
 import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {GameMap} from "../map2d.js";
 import {Icon, Rich} from "./icon.jsx";
-import {Btn, IconBtn, RelBar, Meter, H3, Key} from "./widgets.jsx";
+import {Btn, IconBtn, RelBar, Meter, H3, Key, GroupList, GroupTilt} from "./widgets.jsx";
 
 const IC = () => P.IC;
 const costLabel = c => [c.ep ? `${IC().ep} ${c.ep}` : "", c.pc ? `${IC().pc} ${c.pc}` : "", c.ore ? `${IC().ore} ${c.ore}` : ""].filter(Boolean).join("  ");
 /* what a country has (real resources), what it sends us, and how far it has gone with green technology */
 function Resources({c}){
+  const refs = P.refinesList ? P.refinesList(c.id) : [];
   const cr = P.CRES[c.id], imp = P.IMPORTERS.includes(c.id), src = S.oreOn && P.oreSources().find(x => x.id === c.id), ban = (S.oreBan || {})[c.id];
   return <>
     <div class="card greencard">
@@ -17,10 +18,11 @@ function Resources({c}){
       <Meter v={(c.green || 0) / 100} color="good" h={6}/>
       <small class="muted">{t("greenHelp")}</small>
     </div>
-    {cr || imp ? <>
+    {cr || imp || refs.length ? <>
       <H3>{t("resTitle")}</H3>
       {cr ? <div class="reslist">{cr.r.map(k => { const R = P.RES[k]; return <span class="res" key={k} title={L(R.fact)} style={{"--rc":R.col}}><Icon n={R.icon} size={15}/>{L(R.name)}</span>; })}</div> : null}
       {imp ? <p class="muted small"><Rich t={`[[ship]] ${t("resImporter")}`} iconColor="inherit"/></p> : null}
+      {refs.length ? <p class="small refline"><Rich t={`[[factory]] ${t("refHas")}: ${refs.map(g => `[[${P.MAT[g].icon}]] ${L(P.MAT[g].name)}`).join("  ")} · ${t("refReady")}${S.oreOn ? " · " + (c.rel >= P.REF_TOLL_REL && !c.hostile && !ban ? `${t("refTollOn")} +${P.REF_TOLL_CAP}${t("perMo")}` : t("refTollOff").replace("{N}", P.REF_TOLL_REL)) : ""}`} iconColor="inherit"/></p> : null}
       {ban ? <p class="bad small"><Rich t={`[[ban]] ${t("oreBanned")} ${ban} ${t("months")}`} iconColor="inherit"/></p>
         : src ? <p class="small"><Rich t={`${IC().ore} ${t("oreSends")}: ${P.matSources().filter(x => x.id === c.id).map(x => `[[${P.MAT[x.g].icon}]] ${L(P.MAT[x.g].name)} +${x.amt < .1 ? x.amt.toFixed(2) : x.amt.toFixed(1)}`).join("  ") || "+" + src.amt.toFixed(2)}${t("perMo")}`}/></p>
         : S.oreOn && cr && cr.w ? <p class="warn small">{t("oreNeedFriend")}</p> : null}
@@ -59,7 +61,7 @@ function OrderCards({scope}){
   return <div class="cards">{P.ACTIONS.map(a => {
     const cc = scope === "country", c = P.actionCost(a, r, cc), cd = r.cd[a.id] || 0, ok = !cd && S.ep >= c.ep && S.pc >= c.pc;
     return <div class="card row" key={a.id}>
-      <div class="grow"><b>{L(a.name)}</b><span class="muted"><Rich t={cc ? L(P.UI["cact_" + a.id]) : L(a.desc)}/></span></div>
+      <div class="grow"><b>{L(a.name)}</b><span class="muted"><Rich t={cc ? L(P.UI["cact_" + a.id]) : L(a.desc)}/></span>{P.tiltOfAction ? <GroupTilt list={P.tiltOfAction(a.id)}/> : null}</div>
       <Btn kind={ok ? "primary" : "ghost"} disabled={!ok} sound={null} onClick={() => P.doAction(a.id, scope)}>{cd ? `${t("cooldown")} ${cd}` : costLabel(c)}</Btn>
     </div>;
   })}</div>;
@@ -205,6 +207,7 @@ function PaneStats(){
   const g = P.grossCO2() || 1;
   return <>
     <Report/>
+    {S.groups ? <><H3>{t("grpTitle")}</H3><div class="glist mini" onClick={() => { Audio.play("open"); UIM.modal = "politics"; bump(); }}><GroupList/></div></> : null}
     <Impact/>
     <H3>{t("chartCo2")}</H3>
     <p class="muted small legend"><i class="lg solid"/>{S.lang === "th" ? "โลกของคุณ" : "Your world"} <i class="lg dash"/>{S.lang === "th" ? "ถ้าไม่ทำอะไรเลย" : "If nothing was done"}</p>

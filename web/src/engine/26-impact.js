@@ -75,6 +75,7 @@ function timelineText(e){
   if (e.kind === "ms") return {icon:"flag", col:"good", txt:`${L(T("CO₂ สุทธิต่ำกว่า", "Net CO₂ below"))} ${e.v} Gt`};
   if (e.kind === "hot") return {icon:"thermometer", col:"bad", txt:`${L(T("โลกร้อนถึง", "Warming reached"))} +${e.v.toFixed(1)}°C`};
   if (e.kind === "sanct") return {icon:"ban", col:"bad", txt:`${P.cname(e.c)} ${L(T("คว่ำบาตรการค้ากับเรา", "put sanctions on us"))}`};
+  if (e.kind === "protest" && P.GROUP) return {icon:"megaphone", col:"bad", txt:`${L(P.GROUP[e.g].name)} ${L(T("ประท้วง", "protested"))}`};
   return {icon:"dot", col:"muted", txt:""};
 }
 Object.assign(P, {IMPACT_KINDS:KINDS, impactInit, impactAdd, impactMark, impactTick, impactSummary, timeline, timelineText});

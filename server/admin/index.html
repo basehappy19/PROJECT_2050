@@ -43,7 +43,7 @@ main{padding:28px 32px 60px;max-width:1240px;width:100%}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px} .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
 .stats{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px;margin-bottom:18px}
 .stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px 18px} .stat span{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:13px} .stat b{display:block;font:600 28px/1.25 var(--mono);margin-top:6px} .stat small{color:var(--muted)}
-.stat .ic{color:var(--accent)}
+.stat .ic{color:var(--accent)} .stat b.txt{font:600 19px/1.35 var(--disp);margin-top:10px}
 /* controls */
 .row{display:flex;align-items:center;gap:10px;flex-wrap:wrap} .col{display:flex;flex-direction:column;gap:12px} .sp{justify-content:space-between}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:40px;padding:0 16px;border-radius:11px;border:1px solid var(--line);background:var(--panel2);font:500 14px var(--disp);cursor:pointer;white-space:nowrap;transition:all .12s}
@@ -59,6 +59,7 @@ main{padding:28px 32px 60px;max-width:1240px;width:100%}
 .sw i{position:absolute;inset:0;border-radius:99px;background:#2a3d44;transition:.15s} .sw i::after{content:"";position:absolute;left:3px;top:3px;width:20px;height:20px;border-radius:50%;background:#cfdad8;transition:.15s}
 .sw input:checked+i{background:var(--accent)} .sw input:checked+i::after{transform:translateX(20px);background:#fff} .sw input:focus-visible+i{outline:2px solid var(--accent);outline-offset:2px}
 .chips{display:flex;gap:8px;flex-wrap:wrap} .chip{display:inline-flex;align-items:center;gap:6px;height:32px;padding:0 12px;border-radius:99px;border:1px solid var(--line);background:var(--panel2);cursor:pointer;font-size:13px}
+.wlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:8px 18px}
 .chip.on{border-color:var(--accent);background:rgba(79,209,197,.14);color:var(--accent)} .chip i{font-style:normal;font:600 11px var(--mono);color:var(--muted)}
 .badge{display:inline-flex;align-items:center;gap:4px;font:600 11.5px var(--disp);padding:2px 9px;border-radius:99px;background:var(--panel2);border:1px solid var(--line);color:var(--muted);white-space:nowrap}
 .badge.admin{color:var(--gold);border-color:rgba(242,193,78,.5)} .badge.tester{color:var(--sky);border-color:rgba(143,208,255,.5)} .badge.ban{color:#ffb3a9;border-color:rgba(255,90,74,.55);background:rgba(255,90,74,.1)} .badge.ok{color:var(--good);border-color:rgba(95,211,154,.5)}
@@ -87,6 +88,13 @@ tr.click{cursor:pointer} tr.click:hover td{background:rgba(79,209,197,.05)}
 .ev .bd{padding:12px 14px 14px;display:flex;flex-direction:column;gap:6px;flex:1} .ev b{font:600 14.5px/1.4 var(--disp)} .ev p{margin:0;color:var(--muted);font-size:12.5px;line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .ev .ft{display:flex;align-items:center;gap:10px;margin-top:auto;padding-top:6px} .ev.off{opacity:.5} .ev.off .im{filter:grayscale(1)} .ev.changed{border-color:var(--warn)}
 .savebar{position:sticky;bottom:16px;z-index:5;display:flex;align-items:center;gap:12px;background:#0b1d23;border:1px solid var(--warn);border-radius:14px;padding:12px 16px;box-shadow:0 12px 40px rgba(0,0,0,.45);margin-top:18px}
+.stack{display:flex;height:22px;border-radius:8px;overflow:hidden;background:var(--panel2)} .stack i{display:block;height:100%}
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;margin-top:12px;font-size:13.5px} .legend span{display:inline-flex;align-items:center;gap:7px} .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+.ybars{display:flex;align-items:flex-end;gap:4px;height:170px;padding-top:12px} .ybars > div{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;height:100%;justify-content:flex-end;min-width:0}
+.ybars span{display:flex;flex-direction:column-reverse;width:100%;max-width:26px;border-radius:5px 5px 2px 2px;overflow:hidden;min-height:0} .ybars span i{display:block;min-height:2px}
+.ybars small{font-size:10.5px;color:var(--dim)} .ybars em{font:600 10.5px var(--mono);font-style:normal;color:var(--muted)}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px}
+.tip{display:flex;align-items:center;gap:10px;margin:8px 0 0;font-size:14.5px} .tip .ic{width:18px;height:18px;flex-shrink:0} .tip.bad .ic{color:var(--bad)} .tip.warn .ic{color:var(--warn)} .tip.good .ic{color:var(--good)}
 .bars{display:flex;align-items:flex-end;gap:6px;height:140px;padding-top:10px} .bars div{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
 .bars i{display:block;width:100%;max-width:34px;border-radius:7px 7px 3px 3px;background:linear-gradient(180deg,var(--accent),#2a8c84);min-height:3px} .bars small{font-size:11px;color:var(--dim)} .bars em{font:600 11px var(--mono);font-style:normal;color:var(--muted)}
 /* player page */
@@ -166,7 +174,7 @@ const ROLE = {player:"ผู้เล่น", tester:"ผู้ทดสอบ",
 const MODE = {normal:"ภารกิจ 2050", hard:"Hard Core", daily:"Daily Challenge"};
 const ENDING = {win:"ชนะ", l1:"แพ้: โลกร้อนเกิน 3°C", l2:"แพ้: ถูกถอดถอน", l3:"แพ้: หมดเวลา"};
 const NOTE = {too_short:"เล่นสั้นเกินไป ไม่ได้เพชร", reduced:"เกินวันละ 3 เกม ได้เพชรครึ่งเดียว", daily_cap:"เกินวันละ 6 เกม ได้เพชร 10%", too_fast:"ผลผิดปกติ: เร็วเกินจริง", bad_win:"ผลผิดปกติ: ชนะทั้งที่ CO₂ ยังไม่ถึง 0", bad_values:"ผลผิดปกติ", bad_tick:"ผลผิดปกติ", bad_ending:"ผลผิดปกติ"};
-const LEDGER = {game:"จากการเล่น", achievement:"ความสำเร็จ", shop:"ซื้อของ", rename:"เปลี่ยนชื่อ", admin:"ผู้ดูแลปรับ"};
+const LEDGER = {game:"จากการเล่น", achievement:"ความสำเร็จ", shop:"ซื้อของ", rename:"เปลี่ยนชื่อ", admin:"ผู้ดูแลปรับ", season:"รางวัลซีซั่น", weekly:"ภารกิจรายสัปดาห์"};
 const CERT = {null:"ตามกติกาปกติ", true:"ให้สิทธิ์ขอได้ 1 ครั้ง", false:"ไม่ให้สิทธิ์"};
 const RESET = {results:"ผลการเล่นและคะแนน", achievements:"ความสำเร็จ", chars:"เลเวลตัวละคร", cards:"การ์ดความรู้", saves:"เซฟบนคลาวด์", items:"ของที่ซื้อจากร้าน"};
 const item = id => DATA.shop.find(x => x.id === id) || {id, name:id, icon:"gem"};
@@ -175,11 +183,11 @@ const charName = id => (DATA.chars.find(c => c.id === id) || {name:id}).name;
 const evName = id => (DATA.events.find(e => e.id === id) || {title:id}).title;
 const KIND_DESC = {char:"ปลดล็อกตัวละครนี้ให้เลือกเล่นได้"};
 const SET_NAME = {announcement:"ประกาศหน้าเมนู", disabledEvents:"เหตุการณ์ในเกม", prices:"ราคาในร้านค้า", certMinCards:"การ์ดขั้นต่ำสำหรับประกาศนียบัตร", certIssuer:"ชื่อผู้ออกประกาศนียบัตร",
-  certPartner:"หน่วยงานร่วม", minGameSeconds:"เวลาเล่นขั้นต่ำที่ได้เพชร", googleClientId:"เข้าสู่ระบบด้วย Google", extraOrigins:"เว็บไซต์อื่นที่ใช้ API ได้", balance:"ค่าความยาก (เลิกใช้แล้ว)"};
+  certPartner:"หน่วยงานร่วม", minGameSeconds:"เวลาเล่นขั้นต่ำที่ได้เพชร", googleClientId:"เข้าสู่ระบบด้วย Google", extraOrigins:"เว็บไซต์อื่นที่ใช้ API ได้", balance:"ค่าความยาก (เลิกใช้แล้ว)", season:"ซีซั่น", weekly:"ภารกิจรายสัปดาห์"};
 
 /* ---------- shell ---------- */
 let ME = null, VIEW = "home";
-const NAV = [["home", "layout-dashboard", "ภาพรวม"], ["users", "users", "ผู้เล่น"], ["shop", "shopping-bag", "ร้านค้า"], ["events", "newspaper", "เหตุการณ์"], ["settings", "settings", "ตั้งค่า"], ["log", "history", "ประวัติการแก้ไข"]];
+const NAV = [["home", "layout-dashboard", "ภาพรวม"], ["diff", "gauge", "ความยาก"], ["users", "users", "ผู้เล่น"], ["shop", "shopping-bag", "ร้านค้า"], ["events", "newspaper", "เหตุการณ์"], ["settings", "settings", "ตั้งค่า"], ["log", "history", "ประวัติการแก้ไข"]];
 function shell(){
   $("#root").innerHTML = `<div class="app"><aside>
       <div class="brand"><img src="/assets/img/ui/logo.png" alt=""><div><b>PROJECT <i>ZERO</i></b><small>หน้าผู้ดูแล</small></div></div>
@@ -197,7 +205,7 @@ function go(v, arg, fromHash){
   if (!fromHash && location.hash.slice(1) !== h){ ignoreHash = true; location.hash = h; }
   $$(".navb").forEach(b => b.classList.toggle("on", b.dataset.v === v || (v === "player" && b.dataset.v === "users")));
   window.scrollTo(0, 0);
-  ({home:viewHome, users:viewUsers, player:viewPlayer, shop:viewShop, events:viewEvents, settings:viewSettings, log:viewLog})[v](arg);
+  ({home:viewHome, diff:viewDiff, users:viewUsers, player:viewPlayer, shop:viewShop, events:viewEvents, settings:viewSettings, log:viewLog})[v](arg);
 }
 const page = (title, sub, extra = "") => `<div class="ph"><div class="grow"><h1>${title}</h1>${sub ? `<p>${sub}</p>` : ""}</div>${extra}</div>`;
 const loading = () => { $("#main").innerHTML = `<div class="empty">กำลังโหลด…</div>`; };
@@ -251,6 +259,56 @@ async function viewHome(){
     <div class="card"><div class="row sp"><h2>${ic("history")} แก้ไขล่าสุด</h2><button class="btn sm ghost" id="alllog">ดูทั้งหมด ${ic("chevron-right")}</button></div><div class="log">${lg.rows.slice(0, 6).map(logItem).join("") || `<div class="empty">ยังไม่มีการแก้ไข</div>`}</div></div>`;
   $("#alllog").onclick = () => go("log");
   $("#main").onclick = e => { const tr = e.target.closest("[data-u]"); if (tr) go("player", tr.dataset.u); };
+}
+
+/* ---------- 1.1.6 difficulty: how real games end (guests included) ---------- */
+const END = {win:["ชนะ (Net Zero)", "trophy", "#5fd39a"], l1:["โลกร้อนเกิน +3°C", "thermometer", "#ff7a3c"], l2:["ถูกถอดถอน (ความนิยม 0)", "smile", "#ff5a4a"], l3:["หมดเวลาปี 2050", "clock", "#f2b441"], quit:["เลิกเล่นกลางทาง", "log-out", "#6f8c88"]};
+let DIFF = {mode:"all", days:"30", ver:""};
+async function viewDiff(){
+  loading();
+  let d; try { d = await api("GET", `/admin/difficulty?mode=${DIFF.mode}&days=${DIFF.days}&ver=${encodeURIComponent(DIFF.ver)}`); } catch(e){ return failed(e); }
+  const s = d.sum, fin = s.finished || 0, pct = n => fin ? Math.round(n / fin * 100) : 0, all = fin + s.abandoned;
+  const seg = (key, opts) => `<div class="seg" data-k="${key}">${opts.map(([v, l]) => `<button data-v="${v}" class="${DIFF[key] === v ? "on" : ""}">${l}</button>`).join("")}</div>`;
+  const stat = (icn, label, val, note = "") => `<div class="stat"><span>${ic(icn)} ${label}</span><b>${val}</b><small>${note}</small></div>`;
+  // ending shares as one stacked bar
+  const parts = ["win", "l1", "l2", "l3", "quit"].map(k => [k, k === "quit" ? s.abandoned : s[k]]).filter(([, n]) => n);
+  const stack = all ? `<div class="stack">${parts.map(([k, n]) => `<i style="width:${n / all * 100}%;background:${END[k][2]}" title="${END[k][0]}: ${n}"></i>`).join("")}</div>
+    <div class="legend">${parts.map(([k, n]) => `<span><i style="background:${END[k][2]}"></i>${END[k][0]} <b class="mono">${n}</b> <small class="muted">(${Math.round(n / all * 100)}%)</small></span>`).join("")}</div>` : `<div class="empty">ยังไม่มีเกมในช่วงนี้</div>`;
+  // in which year games end, stacked by ending
+  const years = [...Array(25)].map((_, i) => 2026 + i), byY = {}; d.years.forEach(r => { (byY[r.y] = byY[r.y] || {})[r.e] = r.n; });
+  const ymax = Math.max(1, ...years.map(y => Object.values(byY[y] || {}).reduce((a, b) => a + b, 0)));
+  const ybars = `<div class="ybars">${years.map(y => { const o = byY[y] || {}, tot = Object.values(o).reduce((a, b) => a + b, 0);
+    return `<div title="${y}: ${["win", "l1", "l2", "l3", "quit"].filter(k => o[k]).map(k => END[k][0] + " " + o[k]).join(" · ") || "ไม่มี"}"><em>${tot || ""}</em><span style="height:${tot / ymax * 100}%">${["quit", "l3", "l2", "l1", "win"].filter(k => o[k]).map(k => `<i style="flex:${o[k]};background:${END[k][2]}"></i>`).join("")}</span><small>${String(y).slice(2)}</small></div>`; }).join("")}</div>`;
+  const E = Object.fromEntries(d.ends.map(r => [r.e, r]));
+  const row = k => { const r = E[k]; return r ? `<tr><td><span class="dot" style="background:${END[k][2]}"></span>${END[k][0]}</td><td class="mono">${r.n}</td><td class="mono">${2026 + Math.floor((r.tick || 0) / 12)}</td><td class="mono">+${(r.temp ?? 0).toFixed(2)}°C</td><td class="mono">${(r.appr ?? 0).toFixed(0)}%</td><td class="mono">${(r.net ?? 0).toFixed(1)} Gt</td><td class="mono">${r.skills ?? "—"}</td><td class="mono">${r.minutes ?? "—"} นาที</td></tr>` : ""; };
+  // plain-language hints
+  const tips = [];
+  if (fin >= 10){
+    if (pct(s.win) < 15) tips.push(["triangle-alert", "bad", `ชนะเพียง ${pct(s.win)}% เกมอาจยากเกินไป`]);
+    else if (pct(s.win) > 70) tips.push(["triangle-alert", "warn", `ชนะถึง ${pct(s.win)}% เกมอาจง่ายเกินไป`]);
+    else tips.push(["circle-check", "good", `อัตราชนะ ${pct(s.win)}% อยู่ในช่วงที่ท้าทายพอดี (15–70%)`]);
+    const worst = ["l1", "l2", "l3"].sort((a, b) => s[b] - s[a])[0];
+    if (s[worst] && s[worst] >= s.win) tips.push(["lightbulb", "warn", `แพ้แบบ "${END[worst][0]}" มากที่สุด ${worst === "l2" ? "ลองดูว่าความนิยมลดเร็วเกินไปไหม" : worst === "l1" ? "ลองดูว่าโลกร้อนเร็วเกินไปไหม" : "ผู้เล่นลด CO₂ ไม่ทันปี 2050 ลองดูราคาสกิลและแร่"}`]);
+  }
+  if (all >= 10 && s.abandoned / all > .4) tips.push(["log-out", "warn", `เลิกเล่นกลางทาง ${Math.round(s.abandoned / all * 100)}% อาจเพราะเกมยาวหรือช่วงต้นน่าเบื่อ`]);
+  $("#main").innerHTML = page("ความยากจากเกมจริง", "ดูว่าผู้เล่นจริงชนะหรือแพ้แบบไหน แพ้ปีไหน และค่าต่าง ๆ ตอนจบเกม ใช้ปรับความยากแทนการเดา (นับเกมของผู้เล่นที่ไม่ได้ล็อกอินด้วย)") + `
+    <div class="card row" style="gap:14px">
+      ${seg("mode", [["all", "ทุกโหมด"], ["normal", "ปกติ"], ["hard", "Hard Core"], ["daily", "รายวัน"], ["world", "โลกต่อเนื่อง"]])}
+      ${seg("days", [["7", "7 วัน"], ["30", "30 วัน"], ["90", "90 วัน"], ["all", "ทั้งหมด"]])}
+      ${seg("ver", [["", "ทุกเวอร์ชัน"], ...d.vers.map(v => [v.ver === "1.0" ? "" : v.ver, v.ver + " (" + v.n + ")"]).filter(([v]) => v)])}
+    </div>
+    <div class="stats">
+      ${stat("gamepad-2", "เกมที่เริ่ม", fmt(s.started), `เล่นจบ ${fmt(fin)} · เลิกกลางทาง ${fmt(s.abandoned)}`)}
+      ${stat("trophy", "อัตราชนะ", pct(s.win) + "%", `${fmt(s.win)} จาก ${fmt(fin)} เกมที่จบ`)}
+      ${stat("timer", "เวลาเล่นต่อเกม", (s.minutes ?? "—") + " นาที", "เฉลี่ยเกมที่เล่นจบ")}
+      <div class="stat"><span>${ic("skull")} แพ้มากที่สุด</span><b class="txt">${fin ? END[["l1", "l2", "l3"].sort((a, b) => s[b] - s[a])[0]][0] : "—"}</b></div>
+    </div>
+    ${tips.length ? `<div class="card"><h2>${ic("lightbulb")} ข้อสังเกต</h2>${tips.map(([i, c, txt]) => `<p class="tip ${c}">${ic(i)} ${esc(txt)}</p>`).join("")}</div>` : ""}
+    <div class="card"><h2>${ic("chart-candlestick")} เกมจบแบบไหน</h2><p class="lead">สัดส่วนของทุกเกมที่จบหรือเลิกเล่นแล้ว</p>${stack}</div>
+    <div class="card"><h2>${ic("calendar")} จบเกมปีไหน (ในเกม)</h2><p class="lead">แต่ละแท่งคือปีในเกมที่เกมจบ แยกสีตามแบบการจบ ชี้ที่แท่งเพื่อดูตัวเลข</p>${ybars}</div>
+    <div class="card"><h2>${ic("gauge")} ค่าเฉลี่ยตอนจบเกม</h2><p class="lead">ช่วยดูว่าผู้เล่นแพ้เพราะอะไร เช่น ถูกถอดถอนทั้งที่ CO₂ ลดได้ดี แปลว่าความนิยมยากเกินไป</p>
+      ${d.ends.length ? `<table><tr><th>แบบการจบ</th><th>เกม</th><th>ปีในเกม</th><th>อุณหภูมิ</th><th>ความนิยม</th><th>CO₂ สุทธิ</th><th>สกิล</th><th>เวลาเล่น</th></tr>${["win", "l1", "l2", "l3"].map(row).join("")}</table>` : `<div class="empty">ยังไม่มีเกมที่เล่นจบ</div>`}</div>`;
+  $$("#main .seg").forEach(el => el.onclick = e => { const b = e.target.closest("button"); if (!b) return; DIFF[el.dataset.k] = b.dataset.v; viewDiff(); });
 }
 
 /* ---------- players ---------- */
@@ -420,6 +478,37 @@ async function viewEvents(){
 }
 
 /* ---------- settings ---------- */
+/* 1.8: season pass and weekly missions */
+function seasonSect(s){
+  const st = s.settings, cur = s.seasonNow, set = st.season, tiers = (set ? set.tiers : s.defaultTiers).map(t => t.item ? `${t.terra} ${t.item}` : String(t.terra)).join("\n");
+  const d = new Date(), y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, "0");
+  return `<div class="card" data-sec="season"><h2>${ic("calendar-check")} ซีซั่น (Season Pass แบบเพชร)</h2>
+    <p class="lead">ตอนนี้: <b>${esc(cur.name.th)}</b> ${esc(cur.start)} ถึง ${esc(cur.end)} ${cur.auto ? '<span class="muted">(อัตโนมัติ: ซีซั่นละ 1 เดือน)</span>' : '<span class="ok-c">(ตั้งเอง)</span>'} · รับรางวัลซีซั่นนี้ไปแล้ว ${s.claims.season} ครั้ง<br>
+    ทุกเกมที่เล่นจบได้ XP ซีซั่น (20 + ชนะ 30 + คะแนน/300 สูงสุด 30 + Hard Core 10) ภารกิจรายสัปดาห์ที่รับแล้วได้ XP เพิ่ม · ถ้าวันนี้อยู่นอกช่วงวันที่ที่ตั้งไว้ จะกลับไปใช้ซีซั่นรายเดือนอัตโนมัติ</p>
+    <div class="grid2">
+      <label class="field"><span>รหัสซีซั่น (ห้ามซ้ำกับซีซั่นเก่า)</span><input class="inp mono" id="sid" maxlength="40" value="${esc(set ? set.id : "s-" + y + m)}"></label>
+      <label class="field"><span>XP ต่อ 1 ขั้น</span><input class="inp" id="sstep" type="number" min="20" max="5000" value="${set ? set.step : s.defaultStep}"></label>
+      <label class="field"><span>ชื่อ (ไทย)</span><input class="inp" id="snth" maxlength="80" value="${esc(set ? set.name.th : "")}" placeholder="เช่น ซีซั่นปิดเทอม"></label>
+      <label class="field"><span>ชื่อ (English)</span><input class="inp" id="snen" maxlength="80" value="${esc(set ? set.name.en : "")}" placeholder="e.g. Holiday Season"></label>
+      <label class="field"><span>วันเริ่ม</span><input class="inp" id="sst" type="date" value="${esc(set ? set.start : cur.start)}"></label>
+      <label class="field"><span>วันจบ (ซีซั่นจบก่อนวันนี้)</span><input class="inp" id="sen" type="date" value="${esc(set ? set.end : cur.end)}"></label>
+    </div>
+    <label class="field" style="margin-top:10px"><span>รางวัลแต่ละขั้น บรรทัดละขั้น: จำนวนเพชร และรหัสของในร้าน (ถ้ามี) เช่น <span class="mono">20 frame</span> · ของที่ผู้เล่นมีแล้วจะได้เพชร +40 แทน · รหัสของ: ${Object.keys(s.shop).map(k => `<span class="mono">${esc(k)}</span>`).join(" ")}</span>
+      <textarea class="inp mono" id="stiers" rows="6" style="width:100%">${esc(tiers)}</textarea></label>
+    <div class="row" style="margin-top:16px;border-top:1px solid var(--line2);padding-top:14px">${s.updated.season ? `<span class="updated">แก้ล่าสุด ${dt(s.updated.season.at)} โดย @${esc(s.updated.season.by || "—")}</span>` : `<span class="updated">ใช้ซีซั่นรายเดือนอัตโนมัติ</span>`}<span class="grow"></span>${s.updated.season ? `<button class="btn ghost sm" data-reset="season">${ic("rotate-ccw")} กลับไปใช้รายเดือนอัตโนมัติ</button>` : ""}<button class="btn pri" data-save="season">${ic("save")} บันทึก</button></div></div>`;
+}
+function weeklySect(s){
+  const w = s.settings.weekly, off = new Set(w.off), TIER = ["ง่าย", "กลาง", "ยาก"];
+  return `<div class="card" data-sec="weekly"><h2>${ic("target")} ภารกิจรายสัปดาห์</h2>
+    <p class="lead">สัปดาห์ละ 3 ภารกิจ (ง่าย กลาง ยาก อย่างละ 1) เหมือนกันทุกคน เปลี่ยนทุกวันจันทร์ · สัปดาห์นี้: ${s.weekMissions.map(id => `<b>${esc(s.missions[id].t.th)}</b>`).join(" · ")} · รับรางวัลแล้ว ${s.claims.weekly} ครั้ง</p>
+    <div class="grid2" style="grid-template-columns:repeat(4,1fr)">
+      ${[0, 1, 2].map(i => `<label class="field"><span>เพชร ภารกิจ${TIER[i]}</span><input class="inp" id="wt${i}" type="number" min="0" max="1000" value="${w.terra[i]}"></label>`).join("")}
+      <label class="field"><span>XP ซีซั่นต่อภารกิจ</span><input class="inp" id="wxp" type="number" min="0" max="1000" value="${w.xp}"></label>
+    </div>
+    <p class="lead" style="margin-top:12px">ภารกิจที่เปิดให้สุ่ม (ปิดได้ แต่ต้องเหลืออย่างน้อย 3)</p>
+    <div class="wlist">${Object.entries(s.missions).map(([id, m]) => `<label class="row small" style="gap:8px"><span class="sw"><input type="checkbox" data-wm="${id}" ${off.has(id) ? "" : "checked"}><i></i></span><span class="grow">${esc(m.t.th)}</span><span class="muted">${TIER[m.tier]}</span></label>`).join("")}</div>
+    <div class="row" style="margin-top:16px;border-top:1px solid var(--line2);padding-top:14px">${s.updated.weekly ? `<span class="updated">แก้ล่าสุด ${dt(s.updated.weekly.at)} โดย @${esc(s.updated.weekly.by || "—")}</span>` : `<span class="updated">ใช้ค่าเริ่มต้น</span>`}<span class="grow"></span>${s.updated.weekly ? `<button class="btn ghost sm" data-reset="weekly">${ic("rotate-ccw")} คืนค่าเริ่มต้น</button>` : ""}<button class="btn pri" data-save="weekly">${ic("save")} บันทึก</button></div></div>`;
+}
 async function viewSettings(){
   loading();
   let s; try { s = await api("GET", "/admin/settings"); } catch(e){ return failed(e); }
@@ -442,6 +531,7 @@ async function viewSettings(){
     sect("certIssuer", "award", "ชื่อบนประกาศนียบัตร", "ชื่อผู้ออกประกาศนียบัตร และหน่วยงานที่ร่วมจัด (ถ้ามี) เว้นว่าง = ใช้ค่าเดิม", `<div class="grid2">
       <label class="field"><span>ผู้ออกประกาศนียบัตร</span><input class="inp" id="ci" maxlength="120" value="${esc(st.certIssuer)}" placeholder="ทีม ส่งงานวินาทีสุดท้ายเพราะไส้กรอกหมดแล้วหมดกำลังใจปั่นงาน"></label>
       <label class="field"><span>หน่วยงานร่วม</span><input class="inp" id="cp" maxlength="120" value="${esc(st.certPartner)}" placeholder="เช่น โรงเรียนภูเขียว"></label></div>`) +
+    seasonSect(s) + weeklySect(s) +
     `<details class="card"><summary style="cursor:pointer;font:600 16px var(--disp)">${ic("link")} ขั้นสูง: เว็บไซต์อื่นที่เรียกใช้ API ได้</summary><div style="margin-top:14px">
       <p class="lead">ปกติไม่ต้องตั้ง (เว็บของเกมเองใช้ได้อยู่แล้ว) ใส่เฉพาะเมื่อเปิดเกมจากโดเมนอื่น เช่น GitHub Pages · บรรทัดละ 1 ที่อยู่</p>
       <textarea class="inp mono" id="eo" placeholder="https://example.github.io" style="width:100%">${esc(st.extraOrigins.join("\n"))}</textarea>
@@ -453,6 +543,11 @@ async function viewSettings(){
     minGameSeconds:() => Math.round(Number($("#mgs").value) * 60),
     certIssuer:() => $("#ci").value.trim(),
     extraOrigins:() => $("#eo").value.split(/\s+/).map(x => x.trim().replace(/\/$/, "")).filter(Boolean),
+    season:() => {
+      const tiers = $("#stiers").value.split("\n").map(l => l.trim()).filter(Boolean).map(l => { const [a, b] = l.split(/[\s,]+/); return b ? {terra:Number(a), item:b} : {terra:Number(a)}; });
+      return {id:$("#sid").value.trim(), name:{th:$("#snth").value.trim(), en:$("#snen").value.trim()}, start:$("#sst").value, end:$("#sen").value, step:Number($("#sstep").value), tiers};
+    },
+    weekly:() => ({terra:[Number($("#wt0").value), Number($("#wt1").value), Number($("#wt2").value)], xp:Number($("#wxp").value), off:$$("[data-wm]").filter(x => !x.checked).map(x => x.dataset.wm)}),
   };
   const save = async (k, v, ok = "บันทึกแล้ว") => { try { await api("PUT", "/admin/settings/" + k, {value:v}); toast(ok); viewSettings(); } catch(e){ toast(err(e), true); } };
   $$("[data-save]").forEach(b => b.onclick = async () => {

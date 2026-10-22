@@ -11,5 +11,21 @@ if (!CanvasRenderingContext2D.prototype.roundRect){
 }
 document.documentElement.lang = S.lang || "th";
 render(<App/>, document.getElementById("app"));
-if ("serviceWorker" in navigator && location.protocol === "https:") navigator.serviceWorker.register("sw.js").catch(() => {});
+/* 1.1.5: a new version is picked up while the game is open: the service worker checks for updates when the tab comes back
+   and every 20 minutes; when the new one takes over, the menu reloads at once and a game in progress offers "Update now" (it saves first) */
+if ("serviceWorker" in navigator && location.protocol === "https:"){
+  const had = !!navigator.serviceWorker.controller;
+  navigator.serviceWorker.register("sw.js").then(reg => {
+    const check = () => reg.update().catch(() => {});
+    setInterval(check, 20 * 60 * 1000);
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
+  }).catch(() => {});
+  navigator.serviceWorker.addEventListener("controllerchange", () => { if (had) P.updateReady(); });
+}
+P.updateReady = () => {
+  const UIM = P.UIM;
+  if (UIM.screen !== "game" || !S.started || S.over){ location.reload(); return; }
+  UIM.updateReady = true; P._bump();
+};
+P.updateNow = () => { try { P.autosave(); } catch(e){} setTimeout(() => location.reload(), 150); };
 window.P2050 = P;

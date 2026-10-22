@@ -47,3 +47,27 @@ Object.assign(P.UI, {
 });
 { const a = P.ACTIONS.find(x => x.id === "tariff"); if (a) a.desc = T("CO₂ ทวีป −0.8 Gt × ทำตามแผน (ได้ผลน้อยลงทุกครั้ง) แต่ทำตามแผน −8% มิตรภาพทุกประเทศในทวีป −10 ความนิยม −2% และบางประเทศอาจคว่ำบาตร", "Continent CO₂ −0.8 Gt × on-plan (less each time), but on-plan −8%, every country here friendship −10, approval −2%, and some may sanction us"); }
 Object.assign(P.UI, { googleContinue:T("ดำเนินการต่อด้วย Google", "Continue with Google") });
+Object.assign(P.UI, { matShortSk:T("ทรัพยากรไม่พอ ขาดอีก", "Not enough resources, short by"), toMarket:T("ไปตลาดทรัพยากร", "Go to the market") });
+/* 1.1.3: what each value in the top bar means */
+Object.assign(P.UI, {
+  tipEp:T("ใช้ซื้อสกิล สั่งการ และช่วยเหลือ ได้ทุกเดือนตามความนิยมและการทำตามแผน และได้มากจากการกดฟองสีเขียว", "Pays for skills, orders and aid. Comes every month (more with approval and on-plan) and in bigger amounts from green bubbles."),
+  tipPc:T("ใช้ปลดล็อกสกิลและการทูต ได้ทุกเดือนตามการทำตามแผน และจากการอ่านข่าวกรองกับรายงานประจำปี", "Needed for skills and diplomacy. Comes every month with on-plan, and from reading forecasts and the yearly report."),
+  tipOre:T("ทรัพยากร 5 กลุ่มที่พลังงานสะอาดต้องใช้ ได้จากประเทศที่เป็นมิตร ฟองสีส้ม การสั่งซื้อ และตลาดทรัพยากร (กดเพื่อเปิดตลาด)", "The 5 mineral groups clean energy needs: from friendly countries, orange bubbles, purchase orders and the market (tap to open it)."),
+  tipAppr:T("ถ้าลดถึง 0% จะถูกถอดถอน ลดเมื่อภัยพิบัติ การตัดสินใจที่คนไม่ชอบ และโลกร้อนขึ้น เพิ่มเมื่อช่วยผู้ประสบภัย (ฟองสีแดง)", "At 0% you are voted out. Falls with disasters, unpopular choices and a hotter world; rises when you help disaster victims (red bubbles)."),
+  tipNZ:T("CO₂ สุทธิของโลกต่อปี ลดให้ถึง 0 ก่อนสิ้นปี 2050 เพื่อชนะ", "The world's net CO₂ per year. Bring it to 0 before the end of 2050 to win."),
+  tipTemp:T("โลกร้อนขึ้นกี่องศาจากยุคก่อนอุตสาหกรรม ถึง +3.0°C แพ้ ยิ่งร้อนภัยพิบัติยิ่งบ่อยและแรง", "How much warmer the world is than before industry. At +3.0°C you lose; the hotter, the more and worse the disasters."),
+});
+Object.assign(P.UI, {
+  updReady:T("มีเกมเวอร์ชันใหม่แล้ว", "A new version of the game is ready"), updNow:T("อัปเดตเลย (บันทึกเกมให้ก่อน)", "Update now (saves first)"), updLater:T("ภายหลัง", "Later"),
+});
+/* 1.8: weekly missions and the season pass */
+Object.assign(P.UI, {
+  mSeason:T("ซีซั่นและภารกิจ", "Season & missions"), seasonLogin:T("เข้าสู่ระบบเพื่อรับภารกิจรายสัปดาห์และรางวัลซีซั่น", "Sign in to get weekly missions and season rewards"),
+  seasonWeekly:T("ภารกิจสัปดาห์นี้", "This week's missions"), seasonEnds:T("รีเซ็ต", "resets"), seasonPass:T("รางวัลซีซั่น", "Season rewards"),
+  seasonXp:T("XP ซีซั่น", "Season XP"), seasonHow:T("ทุกเกมที่เล่นจบได้ XP ซีซั่น (ชนะ คะแนนสูง และโหมด Hard Core ได้มากขึ้น) ภารกิจที่รับรางวัลแล้วก็ได้ XP ด้วย", "Every finished game gives season XP (more for wins, high scores and Hard Core); claimed missions give XP too."),
+  seasonClaim:T("รับ", "Claim"), seasonGot:T("ได้รับรางวัลแล้ว", "Reward claimed"), seasonDone:T("รับแล้ว", "Claimed"),
+  seasonTill:T("ถึง", "until"), seasonTier:T("ขั้น", "Tier"), seasonLocked:T("ยังไม่ถึง", "Not yet"),
+  err_not_reached:T("ยังไม่ถึงขั้นนี้", "You haven't reached this tier yet"), err_already_claimed:T("รับรางวัลนี้ไปแล้ว", "Already claimed"), err_not_done:T("ภารกิจยังไม่สำเร็จ", "Mission not finished yet"),
+  err_bad_mission:T("ภารกิจนี้ไม่ใช่ของสัปดาห์นี้", "That mission isn't this week's"), err_bad_tier:T("ไม่มีขั้นนี้", "No such tier"),
+});
+

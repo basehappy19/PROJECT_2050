@@ -17,7 +17,7 @@ function makeEngine(seed){
   ctx.window = ctx; vm.createContext(ctx);
   // deterministic Math.random per game so runs can be repeated
   let s = seed >>> 0; ctx.Math = Object.create(Math); ctx.Math.random = () => { s = (s + 0x6D2B79F5) | 0; let x = Math.imul(s ^ (s >>> 15), 1 | s); x ^= x + Math.imul(x ^ (x >>> 7), 61 | x); return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
-  for (const f of fs.readdirSync(ENG).filter(f => /^(1\d|2\d|3\d)-.*\.js$/.test(f)).sort()) vm.runInContext(`(function(){${fs.readFileSync(path.join(ENG, f), "utf8")}})();`, ctx, {filename:f});
+  for (const f of fs.readdirSync(ENG).filter(f => /^(1\d|2\d|3\d)-.*\.js$/.test(f) && !(process.env.NOPOL && f.startsWith("32-"))).sort()) vm.runInContext(`(function(){${fs.readFileSync(path.join(ENG, f), "utf8")}})();`, ctx, {filename:f});
   return ctx.P2050;
 }
 
@@ -26,7 +26,7 @@ const co2Value = (P, n) => { const fx = n.fx || {}; let v = 0; if (fx.co2) v -= 
 function play(bot, seed){
   const P = makeEngine(seed), S = P.S;
   if (P.setBalance) P.setBalance(PRESET, process.env.BAL ? JSON.parse(process.env.BAL) : undefined);   // BAL='{"inc":1.1,"cost":.9}' tries a custom preset
-  P.startGame("th", {mode:MODE, char:"sci", charLv:1, seed, ab:PRESET});
+  P.startGame("th", {mode:MODE, char:process.env.CHAR || "sci", charLv:+(process.env.LV || 1), seed, ab:PRESET});
   const R = () => P.rand();
   for (let i = 0; i < 1200 && !S.over; i++){
     // resolve an open event
@@ -45,7 +45,7 @@ function play(bot, seed){
     // hazards
     for (const h of S.haz){ if (!h.evac && S.ep > P.evacCost() + (bot !== "casual" ? 40 : 80) && (bot !== "casual" || R() < .4)) P.evacuate(h.id); }
     // skills
-    const ready = P.SKILLS.filter(n => P.nodeState(n) === "ready").map(n => ({n, c:P.nodeCost(n)})).filter(x => (P.canAfford ? P.canAfford(x.n) : S.ep >= x.c.ep && S.pc >= x.c.pc && !P.atCapacity(x.n)));
+    const ready = P.SKILLS.filter(n => P.nodeState(n) === "ready" && !(process.env.NOWATER && n.cat === "water")).map(n => ({n, c:P.nodeCost(n)})).filter(x => (P.canAfford ? P.canAfford(x.n) : S.ep >= x.c.ep && S.pc >= x.c.pc && !P.atCapacity(x.n)));
     // minerals (1.1: five groups in every mode): when the best next skill is short of a group, buy it from a producer or on the market
     if (S.oreOn && P.matCost && (bot !== "casual" || R() < .3)){
       const want = P.SKILLS.filter(n => P.nodeState(n) === "ready" && !P.matOk(n)).sort((a, b) => co2Value(P, b) - co2Value(P, a))[0];
@@ -54,21 +54,25 @@ function play(bot, seed){
         for (const g of miss){
           const src = S.countries.filter(c => P.oreBuyOk(c) && !(c.cd.ore > 0) && P.CRES[c.id].r.some(r => P.groupOf(r) === g)).sort((a, b) => b.rel - a.rel)[0];
           if (src && S.ep > P.ORE_BUY.ep + 30){ S.selC = src.id; S.sel = src.reg; P.countryAction("ore"); S.selC = null; }
-          else if (S.ep > P.mktPrice(g) * P.MKT_LOT + 50) P.mktBuy(g);
+          else if (S.ep > P.mktLotCost(g, P.MKT_LOT) + 50) P.mktBuy(g);
         }
       }
     }
     if (bot !== "casual" || R() < .3){ if (P.readNews) P.readNews(); if (P.readReport) P.readReport(); }
+    // 1.7: build a refinery for a group whose raw stock keeps piling up
+    if (S.oreOn && P.buildRefinery && bot !== "casual" && bot !== "idle" && !process.env.NOREF) for (const g of P.MAT_IDS){ if (P.rawFor(g) > 15 && P.monthsToRefine(g) > 6 && P.canBuild(g) && S.ep > P.refCost(g).ep + 120) P.buildRefinery(g); }
     // the "carbon tariff" bot: hammers the biggest continent with tariffs whenever it can
     if (bot === "cbam"){ const big = S.regions.slice().sort((a, b) => b.co2 - a.co2)[0]; S.sel = big.id; S.selC = null; const tf = P.ACTIONS.find(a => a.id === "tariff"); if (!(big.cd.tariff > 0)) P.doAction("tariff"); }
     if (ready.length){
       let pick;
       if (bot !== "casual") pick = ready.sort((a, b) => co2Value(P, b.n) / (b.c.ep + b.c.pc * 3) - co2Value(P, a.n) / (a.c.ep + a.c.pc * 3))[0];
       else if (R() < .5) pick = ready[Math.floor(R() * ready.length)];
+      // a sensible player doesn't buy low-value skills while saving for the big ones (every purchase makes the next one dearer)
+      if (pick && bot !== "casual" && co2Value(P, pick.n) < .5 && S.ep < 300) pick = null;
       if (pick && (bot !== "good" || P.recentBuys() < 3 || S.ep > 250)) P.buyNode(pick.n.id);
     }
     // active skills and abilities
-    for (const a of P.abilityList()) if (P.abilityReady(a) && (bot !== "casual" || R() < .3)){ if (a.target === "country"){ const c = S.countries.filter(x => !x.rest).sort((x, y) => y.co2 - x.co2)[0]; S.selC = c.id; S.sel = c.reg; } P.useAbility(a.id); }
+    if (!process.env.NOABIL) for (const a of P.abilityList()) if (P.abilityReady(a) && (bot !== "casual" || R() < .3)){ if (a.target === "country"){ const c = S.countries.filter(x => !x.rest).sort((x, y) => y.co2 - x.co2)[0]; S.selC = c.id; S.sel = c.reg; } P.useAbility(a.id); }
     // regional orders: fund the biggest emitter, diplomacy where on-plan is low
     if (bot !== "casual" || R() < .3){
       const big = S.regions.slice().sort((a, b) => b.co2 - a.co2)[0]; S.sel = big.id; S.selC = null;
@@ -93,7 +97,7 @@ function play(bot, seed){
     P.tick();
     if (process.env.TRACE && S.tick % 24 === 0 && !S.event) console.log(S.tick, P.netCO2().toFixed(1), S.regions.map(r => r.co2.toFixed(1) + '/' + r.comp.toFixed(0)).join(' '), 'appr', S.appr.toFixed(1), 'T', S.temp.toFixed(2), 'rel', P.relAll().toFixed(0), 'ep', Math.round(S.ep), 'haz', S.stats.dmg.length, 'skills', Object.keys(S.owned).length, 'bil', S.bilats.length, 'cr', S.crolls.length);
   }
-  return {over:S.over, grade:S.grade || "-", tick:S.tick, temp:S.temp, net:P.netCO2(), appr:S.appr, skills:Object.keys(S.owned).length};
+  return {over:S.over, grade:S.grade || "-", tick:S.tick, temp:S.temp, net:P.netCO2(), appr:S.appr, skills:Object.keys(S.owned).length, prot:(S.stats && S.stats.protests) || 0, grp:S.groups ? {...S.groups} : null};
 }
 
 for (const bot of (process.env.BOTS || "good,casual").split(",")){
@@ -102,4 +106,9 @@ for (const bot of (process.env.BOTS || "good,casual").split(",")){
   const avg = (a, f) => a.length ? (a.reduce((s, r) => s + f(r), 0) / a.length) : 0;
   const grades = ["S", "A", "B"].map(g => `${g}:${wins.filter(r => r.grade === g).length}`).join(" ");
   console.log(`${bot.padEnd(6)} preset ${PRESET} · win ${(cnt("win") / N * 100).toFixed(0)}% (${grades}) · heat ${cnt("l1")} · impeached ${cnt("l2")} · time ${cnt("l3")} · win year ${(2026 + avg(wins, r => r.tick) / 12).toFixed(1)} · win temp ${avg(wins, r => r.temp).toFixed(2)} · end temp ${avg(res, r => r.temp).toFixed(2)} · skills ${avg(res, r => r.skills).toFixed(0)} · end net ${avg(res, r => r.net).toFixed(1)} · appr ${avg(res, r => r.appr).toFixed(0)}`);
+}
+if (process.env.GRP) for (const bot of (process.env.BOTS || "good,casual").split(",")){   // 1.6: how the four groups end up
+  const res = []; for (let g = 0; g < Math.min(N, 60); g++) res.push(play(bot, 1000 + g * 7919));
+  const avg = f => (res.reduce((s, r) => s + f(r), 0) / res.length).toFixed(1);
+  console.log(`${bot.padEnd(6)} groups · protests ${avg(r => r.prot)} · ` + ["city", "ind", "farm", "youth"].map(g => `${g} ${avg(r => r.grp ? r.grp[g] : 0)}`).join(" · "));
 }

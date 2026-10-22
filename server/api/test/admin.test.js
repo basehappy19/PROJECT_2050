@@ -50,6 +50,14 @@ test("settings live in the database and reach the game", async () => {
   r = await call("PUT", "/api/admin/settings/certMinCards", {value:7}, admin);
   r = await call("PUT", "/api/admin/settings/announcement", {value:{th:"ปิดปรับปรุงคืนนี้", en:""}}, admin);
   r = await call("PUT", "/api/admin/settings/nope", {value:1}, admin); assert.equal(r.body.error, "bad_key");
+  // 1.8: season and weekly missions
+  r = await call("PUT", "/api/admin/settings/season", {value:{id:"s1", start:"2026-11-01", end:"2026-10-01", step:100, tiers:[{terra:5}]}}, admin); assert.equal(r.body.error, "bad_value");
+  r = await call("PUT", "/api/admin/settings/season", {value:{id:"s1", start:"2026-11-01", end:"2026-12-01", step:100, tiers:[{terra:5, item:"nope"}]}}, admin); assert.equal(r.body.error, "bad_value");
+  r = await call("PUT", "/api/admin/settings/season", {value:{id:"s1", name:{th:"ซีซั่นปีใหม่", en:"New Year"}, start:"2026-11-01", end:"2026-12-01", step:100, tiers:[{terra:5}, {terra:9, item:"frame"}]}}, admin); assert.equal(r.status, 200);
+  r = await call("PUT", "/api/admin/settings/weekly", {value:{terra:[10, 20], xp:40, off:[]}}, admin); assert.equal(r.body.error, "bad_value");
+  r = await call("PUT", "/api/admin/settings/weekly", {value:{terra:[10, 20, 40], xp:30, off:["daily2"]}}, admin); assert.equal(r.status, 200);
+  r = await call("GET", "/api/admin/settings", null, admin); assert.equal(r.body.settings.season.id, "s1"); assert.equal(r.body.weekMissions.length, 3); assert.ok(!r.body.weekMissions.includes("daily2"));
+  r = await call("PUT", "/api/admin/settings/season", {value:null}, admin); r = await call("PUT", "/api/admin/settings/weekly", {value:null}, admin);
   r = await call("GET", "/api/config");
   assert.deepEqual(r.body.disabledEvents, ["EVT_43", "NW_REDSEA"]); assert.equal(r.body.prices.speed3, 150); assert.equal(r.body.googleClientId, "123456-abc.apps.googleusercontent.com");
   assert.equal(r.body.certMinCards, 7); assert.equal(r.body.announcement.th, "ปิดปรับปรุงคืนนี้"); assert.equal(r.body.balance, undefined);
@@ -64,6 +72,16 @@ test("dashboard overview, guests' games included", async () => {
   r = await call("GET", "/api/admin/overview", null, admin);
   assert.equal(r.body.players.total, 2); assert.equal(r.body.games.started, 2); assert.equal(r.body.games.wins, 1); assert.equal(r.body.games.minutes, 45);
   assert.equal(r.body.days.length, 14); assert.equal(r.body.days[13].games, 2);
+});
+test("difficulty page: endings, year of the ending, averages, versions", async () => {
+  let r = await call("POST", "/api/stats/start", {mode:"normal", ver:"1.1.1"}); const g = r.body.id;
+  await call("POST", `/api/stats/${g}`, {tick:130, ending:"l2", temp:2.1, appr:0, net:20, skills:12, realSec:1500});
+  r = await call("GET", "/api/admin/difficulty?mode=normal&days=30", null, admin);
+  assert.equal(r.status, 200); assert.equal(r.body.sum.win, 1); assert.equal(r.body.sum.l2, 1);
+  assert.ok(r.body.years.some(y => y.y === 2036 && y.e === "l2")); assert.equal(r.body.ends.find(e => e.e === "l2").skills, 12);
+  assert.ok(r.body.vers.some(v => v.ver === "1.1.1"));
+  r = await call("GET", "/api/admin/difficulty?ver=1.1.1&days=all", null, admin); assert.equal(r.body.sum.started, 1);
+  r = await call("GET", "/api/admin/difficulty", null, player); assert.equal(r.status, 403);
 });
 test("sessions last a year and survive two tabs refreshing at once", async () => {
   let r = await call("POST", "/api/auth/login", {login:"teacher", password:"secret123"}); const rt = r.body.refresh;

@@ -2,6 +2,7 @@
    .env only holds what the server needs before it can reach the database (DATABASE_URL, JWT_SECRET, ports).
    Each setting: a default, a check, and (for old installs) the environment variable it used to come from. */
 import { config } from "./config.js";
+import { checkSeason, checkWeekly, WEEKLY_DEFAULT } from "./season.js";
 
 const env = process.env;
 const str = max => v => (typeof v === "string" && v.length <= max ? v.trim() : undefined);
@@ -21,6 +22,8 @@ export const SETTINGS = {
   minGameSeconds:{def:() => Number(env.MIN_GAME_SECONDS ?? 300), check:int(0, 7200)},
   googleClientId:{def:() => (env.GOOGLE_CLIENT_ID || "").trim(), check:v => (v === "" || (typeof v === "string" && /^[\w.-]{10,200}\.apps\.googleusercontent\.com$/.test(v.trim())) ? v.trim() : undefined)},
   extraOrigins:  {def:() => [], check:urlList},
+  season:        {def:() => null, check:checkSeason},                 // 1.8: null = one season per calendar month
+  weekly:        {def:() => ({...WEEKLY_DEFAULT}), check:checkWeekly},
 };
 export const SETTING_KEYS = Object.keys(SETTINGS);
 

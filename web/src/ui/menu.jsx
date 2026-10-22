@@ -6,7 +6,7 @@ import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {Globe} from "../globe.js";
 import {Icon, Rich} from "./icon.jsx";
-import {Btn, IconBtn, Tabs, Seg, Check, Terra, Portrait, Volume, GfxSeg, LangSeg, Msg, H3, SlotInfo} from "./widgets.jsx";
+import {Btn, IconBtn, Tabs, Seg, Check, Terra, Portrait, Volume, GfxSeg, A11ySeg, NarrRow, LangSeg, Msg, H3, SlotInfo} from "./widgets.jsx";
 import {SlotRow} from "./modals.jsx";
 import {AchList} from "./learn.jsx";
 
@@ -14,7 +14,7 @@ const N = () => P.Net;
 const goSub = sub => () => {
   UIM.sub = sub; UIM.msg = ""; UIM.err = false;
   const p = document.querySelector(".menu-panel .scroll"); if (p) p.scrollTop = 0;
-  if (sub === "board") N().loadBoard(); if (sub === "cert") N().loadCerts(); if (sub === "shop" || sub === "account") N().refresh();
+  if (sub === "board") N().loadBoard(); if (sub === "cert") N().loadCerts(); if (sub === "season") N().loadSeason(); if (sub === "shop" || sub === "account") N().refresh();
   bump();
 };
 const Back = () => <div class="backrow"><Btn kind="ghost" sound="close" onClick={() => { UIM.sub = null; UIM.msg = ""; bump(); }}>{t("mBack")}</Btn></div>;
@@ -37,7 +37,7 @@ function GlobeView(){
 
 export function Menu(){
   const sub = UIM.sub;
-  const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd"};
+  const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason"};
   return <div class={"home " + (UIM.transition ? "leaving" : "")}>
     <GlobeView/>
     <div class="home-vignette"/>
@@ -50,13 +50,15 @@ export function Menu(){
         </div>
         <p class={sub ? "subtitle" : "lead"}>{sub ? t(TITLES[sub]) : t("mDesc")}</p>
         {!sub && N().cfg && N().cfg.announcement && L(N().cfg.announcement) ? <div class="announce card"><Icon n="megaphone" size={18} color="warn"/><span>{L(N().cfg.announcement)}</span></div> : null}
-        {sub === "load" ? <SubLoad/> : sub === "ach" ? <><AchList/><Back/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : <Main/>}
+        {sub === "load" ? <SubLoad/> : sub === "ach" ? <><AchList/><Back/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : sub === "season" ? <SubSeason/> : <Main/>}
         {sub ? null : <footer class="mfooter">
           <small class="mono muted">{up(t("teamK"))}</small>
           <p class="team">{t("team")}</p>
           <p class="muted small">{t("disclaimer")}</p>
           <Volume/>
           <GfxSeg/>
+      <A11ySeg/>
+      <NarrRow/>
           <div class="row"><button type="button" class="linkbtn mono" onClick={() => { Audio.play("click"); goSub("updates")(); }}>{`${t("updVer")} ${P.VERSION_NAME}`}</button></div>
           <div class="row"><small class="muted grow">{t("mTag")}</small><LangSeg/></div>
           <small class="muted credits">Earth imagery: NASA Visible Earth (Blue Marble, Black Marble) · Sounds &amp; music: CC0 / CC-BY, see assets/audio/CREDITS.txt</small>
@@ -74,6 +76,7 @@ function Main(){
     {id:"ach", ic:"trophy", t1:t("mAch"), t2:`${n}/${P.ACH.length}`, fn:goSub("ach")},
     {id:"tutorial", ic:"graduation-cap", t1:t("mHow"), fn:() => G.openTutorial(0, false)},
     {id:"shop", ic:"shopping-bag", t1:t("mShop"), fn:goSub("shop")},
+    {id:"season", ic:"calendar-check", t1:t("mSeason"), t2:N().seasonReady && N().seasonReady() ? "●" : "", fn:goSub("season")},
     {id:"board", ic:"medal", t1:t("mBoard"), fn:goSub("board")},
     {id:"cert", ic:"award", t1:t("mCert"), fn:goSub("cert")},
     {id:"account", ic:"user-round", t1:N().user ? t("mAccount") : t("signIn"), fn:goSub("account")},
@@ -102,20 +105,24 @@ function Main(){
 const SEEN_KEY = "p2050.seenVersion";
 const seenVer = () => { try { return localStorage.getItem(SEEN_KEY); } catch (e){ return null; } };
 function WhatsNew(){
-  const c = P.CHANGELOG[0], fresh = seenVer() !== c.v;
+  const c = P.CHANGELOG[0], fresh = seenVer() !== P.VERSION_NAME;
   return <button type="button" class={"whatsnew " + (fresh ? "fresh" : "")} onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("click"); goSub("updates")(); }}>
     <Icon n="sparkles" size={20} color="accent"/>
-    <span><small class="muted">{t("updNew")} {c.v}</small><b>{L(c.name)}</b></span>
+    <span><small class="muted">{t("updNew")} {P.VERSION_NAME}</small><b>{L(c.name)}</b></span>
     {fresh ? <i class="newdot">NEW</i> : null}<Icon n="chevron-right" size={18} cls="chev"/>
   </button>;
 }
 function SubUpdates(){
-  useEffect(() => { try { localStorage.setItem(SEEN_KEY, P.CHANGELOG[0].v); } catch (e){} }, []);
+  useEffect(() => { try { localStorage.setItem(SEEN_KEY, P.VERSION_NAME); } catch (e){} }, []);
   const lang = S.lang === "en" ? "en" : "th";
   const fmt = d => { const [y, m, dd] = d.split("-").map(Number); return new Date(y, m - 1, dd).toLocaleDateString(lang === "th" ? "th-TH" : "en-GB", {day:"numeric", month:"short", year:"numeric"}); };
   return <>
     <div class="updlog">{P.CHANGELOG.map((c, i) => <article key={c.v} class={"upd " + (i === 0 ? "latest" : "")}>
       <header><b class="mono">{c.v}</b><h4>{L(c.name)}</h4><small class="muted">{fmt(c.date)}</small></header>
+      {(c.subs || []).map(u => <section class="updsub" key={u.v}>
+        <header><b class="mono">{u.v}</b><small class="muted">{fmt(u.date)}</small></header>
+        <ul>{u.items[lang].map((x, j) => <li key={j}>{x}</li>)}</ul>
+      </section>)}
       <ul>{c.items[lang].map((x, j) => <li key={j}>{x}</li>)}</ul>
     </article>)}</div>
     <Back/>
@@ -238,6 +245,41 @@ function SubShop(){
         <Btn kind={own ? "ghost" : "gold"} disabled={own || !afford || n.busy} sound={null} onClick={() => { n.buy(it.id); Audio.play("coin"); }}>{own ? `[[check]] ${t("owned2")}` : `[[terra]] ${P.shopPrice(it)}`}</Btn>
       </div>;
     })}</div>
+    <Msg UIM={UIM}/>
+    <Back/>
+  </>;
+}
+
+/* ---------------- 1.8: weekly missions and the season pass ---------------- */
+function SubSeason(){
+  const n = N(), D = n.season;
+  if (!n.online) return <Offline/>;
+  if (!n.user) return <><p class="muted">{t("seasonLogin")}</p><Btn onClick={goSub("account")}>{`[[log-in]] ${t("signIn")}`}</Btn><Back/></>;
+  if (!D || D.error || !D.season) return <><p class="muted">{D && D.error ? t("boardFail") : t("netChecking")}</p><Back/></>;
+  const Z = D.season, th = S.lang === "th", fmt = d => new Date(d + "T00:00:00+07:00").toLocaleDateString(th ? "th-TH" : "en-GB", {day:"numeric", month:"short"});
+  const next = Z.tiers.find(x => !x.reached), prevXp = next ? next.xp - Z.step : Z.tiers.length * Z.step, into = next ? Math.max(0, D.xp - prevXp) : Z.step;
+  const ITEM = id => { const it = P.SHOP.find(x => x.id === id); return it ? L(it.name) : id; };
+  return <>
+    <div class="card seasonhead">
+      <div class="row"><Icon n="calendar-check" size={22} color="accent"/><b class="grow">{L(Z.name)}</b><small class="muted mono">{fmt(Z.start)} – {fmt(Z.end)}</small></div>
+      <div class="row"><span class="muted">{t("seasonXp")}</span><span class="grow"/><b class="mono acc">{D.xp}</b></div>
+      <div class="sbar"><i style={{width:`${Math.min(100, into / Z.step * 100)}%`}}/></div>
+      <small class="muted">{next ? `${t("seasonTier")} ${next.tier}: ${into}/${Z.step} XP` : "★"} · {t("seasonHow")}</small>
+    </div>
+    <H3>{`${t("seasonWeekly")} · ${t("seasonEnds")} ${fmt(D.weekly.ends)}`}</H3>
+    <div class="missions">{D.weekly.missions.map(m => <div class={"card row mission " + (m.claimed ? "own" : m.done ? "ready" : "")} key={m.id}>
+      <Icon n={m.claimed ? "circle-check" : m.done ? "gift" : "target"} size={22} color={m.claimed ? "good" : m.done ? "gold" : "accent"}/>
+      <div class="grow"><b>{L(m.name)}</b><div class="mbar"><i style={{width:`${m.progress / m.goal * 100}%`}}/></div><small class="muted mono">{m.progress}/{m.goal} · +{m.xp} XP</small></div>
+      <Btn kind={m.done && !m.claimed ? "gold" : "ghost"} disabled={!m.done || m.claimed || n.busy} sound={null} onClick={() => n.claimMission(m.id)}>{m.claimed ? `[[check]] ${t("seasonDone")}` : `[[terra]] ${m.terra}`}</Btn>
+    </div>)}</div>
+    <H3>{t("seasonPass")}</H3>
+    <div class="tiers">{Z.tiers.map(x => <div class={"tier " + (x.claimed ? "own" : x.reached ? "ready" : "")} key={x.tier}>
+      <small class="mono muted">{t("seasonTier")} {x.tier}</small>
+      <Terra n={x.terra} cls={x.reached ? "good" : ""}/>
+      {x.item ? <small class="titem"><Icon n="sparkles" size={12}/> {ITEM(x.item)}</small> : null}
+      <small class="mono muted">{x.xp} XP</small>
+      <Btn size="sm" kind={x.reached && !x.claimed ? "gold" : "ghost"} disabled={!x.reached || x.claimed || n.busy} sound={null} onClick={() => n.claimTier(x.tier)}>{x.claimed ? "[[check]]" : x.reached ? t("seasonClaim") : "[[lock]]"}</Btn>
+    </div>)}</div>
     <Msg UIM={UIM}/>
     <Back/>
   </>;

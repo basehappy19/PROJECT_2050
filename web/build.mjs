@@ -119,7 +119,7 @@ const require_vm = () => _vm;
 const ADMIN_ICONS = ["layout-dashboard", "users", "shopping-bag", "newspaper", "settings", "history", "log-out", "search", "gem", "plus", "minus", "check", "x", "shield", "ban",
   "award", "trophy", "user-round", "refresh-cw", "chevron-left", "chevron-right", "eye", "eye-off", "megaphone", "key-round", "clock", "sparkles", "lock", "lock-open", "triangle-alert",
   "filter", "rotate-ccw", "save", "gamepad-2", "calendar", "fast-forward", "handshake", "chart-candlestick", "moon", "palette", "shirt", "square-dashed", "book-open", "star", "trash-2",
-  "circle-check", "circle-x", "info", "globe", "pencil", "user-cog", "mail", "timer", "link", "flag"];
+  "circle-check", "circle-x", "info", "globe", "pencil", "user-cog", "mail", "timer", "link", "flag", "gauge", "thermometer", "skull", "smile", "lightbulb", "log-in", "waves", "hard-hat", "fast-forward", "calendar-check", "target"];
 
 /* ---------- protection: make the shipped code hard to read and re-use ---------- */
 async function obfuscate(code){

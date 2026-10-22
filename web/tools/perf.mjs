@@ -1,5 +1,5 @@
 /* Map performance check: pans and zooms the in-game map and reports the time spent drawing.
-   Usage (after node build.mjs): node tools/perf.mjs [w] [h] [dpr] [quality] */
+   Usage (after node build.mjs): node tools/perf.mjs [w] [h] [dpr] [quality]   ·   GL=0 uses the Canvas 2D map instead of WebGL, GL=force uses WebGL even without a GPU */
 import {chromium} from "playwright";
 import http from "node:http";
 import fs from "node:fs";
@@ -19,7 +19,7 @@ const browser = await chromium.launch({executablePath:process.env.CHROME || "/op
 const page = await browser.newPage({viewport:{width:W, height:H}, deviceScaleFactor:DPR});
 page.on("pageerror", e => console.log("pageerror", e.message));
 await page.goto(`http://localhost:${srv.address().port}/index.html`);
-await page.evaluate(q => { localStorage.setItem("p2050-tut", "1"); if (q) localStorage.setItem("p2050-gfx", q); }, Q);
+await page.evaluate(([q, gl]) => { localStorage.setItem("p2050-tut", "1"); if (q) localStorage.setItem("p2050-gfx", q); localStorage.setItem("p2050-mapgl", gl); }, [Q, process.env.GL === "0" ? "0" : process.env.GL || "1"]);   // GL=0: compare with the Canvas 2D map
 await page.reload();
 await page.waitForSelector(".loading .enter", {timeout:90000});
 await page.click(".loading .enter"); await page.waitForTimeout(1500);
@@ -56,7 +56,7 @@ const res = await page.evaluate(async () => {
   const avg = a => a.length ? +(a.reduce((s, x) => s + x, 0) / a.length).toFixed(2) : 0;
   const p95 = a => { if (!a.length) return 0; const b = a.slice().sort((x, y) => x - y); return +b[Math.floor(b.length * .95)].toFixed(2); };
   return {moving:{frames:frames.length, fps:+(frames.length / 6).toFixed(1), frameAvg:avg(frames.slice(2)), frameP95:p95(frames.slice(2)), base:avg(base.slice(0, idleBase)), baseP95:p95(base.slice(0, idleBase)), fx:avg(fx.slice(0, idleFx))},
-    idle:{baseCalls:base.length - idleBase, fxCalls:fx.length - idleFx, fx:avg(fx.slice(idleFx))}, dpr:M.dpr, canvas:[M.base.width, M.base.height], quality:P.gfx ? P.gfx.level : "-"};
+    idle:{baseCalls:base.length - idleBase, fxCalls:fx.length - idleFx, fx:avg(fx.slice(idleFx))}, dpr:M.dpr, canvas:[M.base.width, M.base.height], quality:P.gfx ? P.gfx.level : "-", renderer:M.usingGL && M.usingGL() ? "webgl" : "canvas2d"};
 });
 const m1 = await met(); const d = k => +((m1[k] - m0[k]) * 1000 / 9).toFixed(1);
 res.mainThreadMsPerSec = {task:d("TaskDuration"), script:d("ScriptDuration"), layout:d("LayoutDuration"), style:d("RecalcStyleDuration")};

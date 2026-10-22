@@ -3,7 +3,57 @@ if (P.mods && P.mods.changelog) return;
 (P.mods = P.mods || {}).changelog = 1;
 /* ===== Data · Update log (shown on the main menu). Written for players, not programmers. Newest first. ===== */
 const V = (v, date, name, th, en) => ({v, date, name, items:{th, en}});
+/* minor updates (1.1.1, 1.1.2, …) sit inside their main version as subs, newest first */
+const SUB = (v, date, th, en) => ({v, date, items:{th, en}});
 P.CHANGELOG = [
+  V("1.5", "2026-10-22", {th:"ซีซั่นแรก", en:"Season One"}, [
+    "ภารกิจรายสัปดาห์: ทุกสัปดาห์มี 3 ภารกิจ (ง่าย กลาง ยาก) ทำสำเร็จแล้วกดรับเพชร",
+    "รางวัลซีซั่น: ทุกเกมที่เล่นจบได้ XP ซีซั่น สะสมครบแต่ละขั้นรับเพชรและของพิเศษ เช่น กรอบโปรไฟล์ และธีมแผนที่",
+    "ดูได้ที่เมนู “ซีซั่นและภารกิจ” (ต้องเข้าสู่ระบบ)",
+    "แก้บัคและปรับปรุงประสิทธิภาพ",
+  ], [
+    "Weekly missions: three each week (easy, medium, hard); finish one and claim gems.",
+    "Season rewards: every finished game gives season XP; each tier pays gems and special items such as a profile frame and a map theme.",
+    "Find them under “Season & missions” on the menu (sign-in needed).",
+    "Bug fixes and performance improvements.",
+  ]),
+  V("1.4", "2026-10-22", {th:"จากเหมืองสู่โรงงาน", en:"From Mine to Factory"}, [
+    "ห่วงโซ่อุปทานแร่: แร่ที่ขุดได้เป็นแร่ดิบ ต้องผ่านโรงแยกแร่ก่อนจึงใช้สร้างสกิลได้",
+    "ประเทศที่มีโรงแยกแร่ เช่น จีน อินโดนีเซีย ชิลี ส่งแร่แบบพร้อมใช้ ประเทศอื่นส่งแร่ดิบ",
+    "สร้างโรงแยกแร่ของเราเองได้ในตลาดทรัพยากร (แยกได้เร็วขึ้น แต่มีค่าดูแลรายเดือน) และประเทศที่มีโรงแยกแร่ซึ่งเป็นมิตรจะช่วยแยกแร่ให้",
+    "แก้บัคและปรับปรุงประสิทธิภาพ",
+  ], [
+    "The mineral supply chain: dug-up minerals are raw and must go through a refinery before skills can use them.",
+    "Countries with refineries, such as China, Indonesia and Chile, send minerals ready to use; others send them raw.",
+    "Build our own refineries in the minerals market (faster refining, but a monthly upkeep), and friendly refining countries lend a hand.",
+    "Bug fixes and performance improvements.",
+  ]),
+  V("1.3", "2026-10-22", {th:"เสียงของประชาชน", en:"Voices at Home"}, [
+    "การเมืองในประเทศ: ความนิยมแบ่งเป็น 4 กลุ่ม คนเมือง ภาคอุตสาหกรรม เกษตรกร และคนรุ่นใหม่ แต่ละกลุ่มพอใจไม่เท่ากัน",
+    "ทุกสกิล ตัวเลือกในเหตุการณ์ และคำสั่ง มีคนได้และคนเสีย ดูสัญลักษณ์ ▲ ▼ ว่ากลุ่มไหนจะพอใจหรือไม่พอใจ",
+    "กลุ่มที่สนับสนุนให้โบนัส เช่น อุตสาหกรรมเพิ่มรายได้ คนรุ่นใหม่เพิ่มแต้มนโยบาย กลุ่มที่โกรธมากอาจออกมาประท้วง",
+    "กดที่ความนิยมด้านบนเพื่อดูทั้ง 4 กลุ่ม และดูได้ในแท็บสถิติ",
+    "แก้บัคและปรับปรุงประสิทธิภาพ",
+  ], [
+    "Politics at home: approval is now made of four groups (city people, industry, farmers and young people), each with its own mood.",
+    "Every skill, event choice and order has winners and losers: the ▲ ▼ marks show which group will be pleased or upset.",
+    "Groups that back you give bonuses (industry adds income, young people add policy points); very angry groups may protest.",
+    "Tap approval at the top to see all four groups; they are in the statistics tab too.",
+    "Bug fixes and performance improvements.",
+  ]),
+  V("1.2", "2026-10-22", {th:"คนใหม่ ทางเลือกใหม่", en:"New Faces, New Paths"}, [
+    "ตัวละครใหม่ 2 คน: ดร.นาวา นักสมุทรศาสตร์ (รับมือพายุ น้ำท่วม และน้ำเค็มรุกได้ดี) และคุณกล้า วิศวกรเมือง (สร้างโครงการได้เร็ว)",
+    "หมวดสกิลใหม่ “อาหารและน้ำ” 8 สกิล เช่น ชลประทานน้ำหยด ลดขยะอาหาร โรงกลั่นน้ำทะเลพลังแสงอาทิตย์ และข้อตกลงความมั่นคงทางอาหารโลก",
+    "ความสำเร็จใหม่สำหรับหมวดอาหารและน้ำ",
+    "ปรับสมดุลตัวละครทุกคนให้ใกล้เคียงกันขึ้น และปรับความยากโดยรวม",
+    "แก้บัคและปรับปรุงประสิทธิภาพ",
+  ], [
+    "Two new characters: Dr. Nawa the Ocean Scientist (handles storms, floods and saltwater well) and Kla the City Engineer (builds projects fast).",
+    "A new skill branch, “Food & Water”, with 8 skills such as drip irrigation, cutting food waste, solar desalination and a world food security pact.",
+    "A new achievement for the Food & Water branch.",
+    "All characters rebalanced to be closer to each other, and the overall difficulty retuned.",
+    "Bug fixes and performance improvements.",
+  ]),
   V("1.1", "2026-10-22", {th:"โลกที่ต้องคิดหนักขึ้น", en:"A Tougher World"}, [
     "เกมยากขึ้น ต้องวางแผนมากขึ้น: เงินรายเดือนน้อยลงแต่ฟองสีเขียวให้มากขึ้น ความนิยมลดง่ายขึ้น ภัยพิบัติมาบ่อยขึ้นและเกิดหลายที่พร้อมกันได้ และโลกร้อนได้ถึง +3.0°C ถ้าไม่ลดจริงจัง",
     "มิตรภาพมีผลมากขึ้น ประเทศที่ไม่พอใจเราอาจไม่ร่วมมือหรือคว่ำบาตร และภาษีคาร์บอนข้ามแดนใช้พร่ำเพรื่อไม่ได้แล้ว",
@@ -143,4 +193,65 @@ P.CHANGELOG = [
     "App icons and a preview picture for shared links.",
   ]),
 ];
-P.VERSION_NAME = P.CHANGELOG[0].v;
+P.CHANGELOG.find(x => x.v === "1.1").subs = [
+  SUB("1.1.6", "2026-10-22", ["หน้าผู้ดูแลมีหน้า “ความยาก” ดูจากเกมจริงว่าผู้เล่นชนะหรือแพ้แบบไหนและแพ้ปีไหน", "แก้บัคเล็กน้อย"],
+    ["The admin page has a new “Difficulty” view built from real games: how players win or lose, and in which year.", "Small bug fixes."]),
+  SUB("1.1.5", "2026-10-22", ["เกมเวอร์ชันใหม่โหลดเองโดยไม่ต้องรีเฟรช ถ้ากำลังเล่นอยู่จะมีปุ่ม “อัปเดตเลย” (บันทึกเกมให้ก่อน)", "ไอคอนที่เปลี่ยนใหม่แสดงทันทีในครั้งถัดไปที่เปิดเกม"],
+    ["New versions load by themselves; during a game an “Update now” button appears (it saves first).", "Changed icons show up the next time you open the game."]),
+  SUB("1.1.4", "2026-10-22", ["ตั้งขนาดตัวอักษรได้ 3 ระดับ", "โหมดสีสำหรับคนตาบอดสี (ฟ้า-ส้มแทนเขียว-แดง)"],
+    ["Text size setting with 3 levels.", "Colour-blind mode (blue/orange instead of green/red)."]),
+  SUB("1.1.3", "2026-10-22", ["ตัวเลขด้านบนเลื่อนขึ้นลงพร้อมบอกว่าได้หรือเสียเท่าไร", "ชี้หรือแตะค่าต่าง ๆ เพื่อดูคำอธิบาย"],
+    ["Numbers in the top bar slide to their new value and show what you gained or lost.", "Hover or tap any value to see what it means."]),
+  SUB("1.1.2", "2026-10-22", ["ป้ายพยากรณ์ภัยของประเทศที่อยู่ใกล้กันไม่ทับกันแล้ว", "ปุ่มซูมไม่บังชื่อประเทศเวลาเปิดแผงด้านขวา"],
+    ["Disaster forecasts of nearby countries no longer cover each other.", "Zoom buttons no longer cover country names when a side panel is open."]),
+  SUB("1.1.1", "2026-10-22", [
+    "ตลาดแร่แบบใหม่ ราคาขึ้นลงทุกเดือน มีกราฟราคา บอกว่าขาดแร่เท่าไร และกดซื้อเฉพาะที่ขาดได้",
+    "ไอคอนแร่แบบ 3 มิติทุกกลุ่ม ดูออกง่าย",
+    "ปุ่มเข้าสู่ระบบด้วย Google แบบใหม่",
+    "หน้าตรวจสอบประกาศนียบัตรสวยและอ่านง่ายขึ้น",
+    "บนมือถือ ปุ่มปิดของหน้าต่างยาว ๆ อยู่ด้านบนเสมอ",
+    "แก้บัคและปรับปรุงประสิทธิภาพ",
+  ], [
+    "A new minerals market: prices move every month, with price charts, how much you're short of, and a button to buy just what's missing.",
+    "3D icons for every mineral group, easy to tell apart.",
+    "A new “Continue with Google” button.",
+    "A cleaner, easier-to-read certificate check page.",
+    "On phones, the close button of long windows stays at the top.",
+    "Bug fixes and performance improvements.",
+  ]),
+];
+/* the newest version number, counting minor updates */
+P.CHANGELOG.find(x => x.v === "1.5").subs = [
+  SUB("1.5.3", "2026-10-22", [
+    "เกมยากขึ้น: ชนะยากขึ้นในทุกโหมด ต้องวางแผนมากขึ้น",
+    "ปรับสมดุลตัวละคร: นักเศรษฐศาสตร์ นักการทูต และนักกิจกรรมแรงน้อยลง",
+    "สกิลที่ 2 ของตัวละคร (เลเวล 5) และโบนัสเลเวล 3 อ่อนลงและใช้ได้ห่างขึ้น",
+  ], [
+    "The game is harder: winning takes more planning in every mode.",
+    "Characters rebalanced: the Economist, the Diplomat and the Activist are less strong.",
+    "Characters' second abilities (level 5) and level 3 bonuses are weaker and recharge more slowly.",
+  ]),
+  SUB("1.5.2", "2026-10-22", [
+    "แผนที่ในเกมวาดด้วยการ์ดจอ (GPU) เลื่อนและซูมลื่นขึ้น ประหยัดแบตเตอรี่ โดยเฉพาะบน iPad และเครื่องสเปกต่ำ",
+    "เครื่องที่ใช้ GPU ไม่ได้ เกมกลับไปวาดแบบเดิมให้เอง และปิดได้ในหน้าตั้งค่า",
+    "ปรับสมดุลความยากใหม่หลังเพิ่มระบบการเมืองและห่วงโซ่แร่",
+    "เปลี่ยนชื่อ “แร่” เป็น “ทรัพยากร” เช่น ช่องทรัพยากรด้านบน และตลาดทรัพยากรโลก",
+    "แก้บัคและปรับปรุงประสิทธิภาพ",
+  ], [
+    "The in-game map is drawn on the graphics card (GPU): smoother panning and zooming and longer battery life, above all on iPads and slower computers.",
+    "Devices without a usable GPU go back to the old renderer by themselves; it can also be turned off in the settings.",
+    "Difficulty retuned after the new politics and mineral supply chain.",
+    "“Minerals” is now called “Resources”, e.g. the Resources counter at the top and the World resources market.",
+    "Bug fixes and performance improvements.",
+  ]),
+  SUB("1.5.1", "2026-10-22", [
+    "เสียงพากย์ภาษาไทย อ่านเนื้อเรื่อง หน้าวิธีเล่น และเหตุการณ์ให้ฟัง ด้วยเสียงไทยของเครื่อง (ถ้าเครื่องมี)",
+    "คำบรรยายบนจอตามเสียงที่อ่าน",
+    "เปิด/ปิดเสียงพากย์ คำบรรยาย และเลือกความเร็วได้ในหน้าตั้งค่า หรือกดปุ่มลำโพงฟังเฉพาะหน้านั้น",
+  ], [
+    "Thai narration: the story, the how-to-play pages and events can be read aloud with the device's own voice.",
+    "On-screen subtitles follow the voice.",
+    "Turn narration and subtitles on or off and pick a speed in the settings, or tap the speaker button to hear just that page.",
+  ]),
+];
+P.VERSION_NAME = P.CHANGELOG[0].subs && P.CHANGELOG[0].subs.length ? P.CHANGELOG[0].subs[0].v : P.CHANGELOG[0].v;
