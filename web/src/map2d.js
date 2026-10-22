@@ -9,7 +9,7 @@ import {MAP, ll} from "./geo.js";
 import {Audio} from "./audio.js";
 import ICONS from "./gen/icons.js";
 import {Gfx} from "./gfx.js";
-import {drawPins, drawTraffic, drawInfo, img3d} from "./mapfx.js";
+import {drawPins, drawTraffic, drawInfo, img3d, drawDetail, drawStatus} from "./mapfx.js";
 import {drawHex, hexCells} from "./hexgrid.js";
 import {createMapGL} from "./mapgl.js";
 
@@ -421,6 +421,7 @@ export const GameMap = {
       c.setTransform(d, 0, 0, d, 0, 0);
     }
     // builds on the map and the traffic between countries
+    drawDetail(this, c, now, vis, iconImg);   // 1.7: capitals, smokestacks, sea chokepoints
     drawPins(this, c, now, vis);
     drawTraffic(this, c, dt, now, vis);
     const hexHit = drawHex(this, c, vis);
@@ -446,6 +447,7 @@ export const GameMap = {
         this.hits.push({id:"cl-" + cc.id, ...b, fn:() => G.selectCountry(cc.id)});
       }
     }
+    drawStatus(this, c, vis, iconImg);   // 1.7: sanctions and other country states
     // hazard forecasts: pulsing ring + icon + months left (tap = evacuate)
     // 1.1.2: markers of countries close together are stacked upwards instead of drawn on top of each other
     const hzPlaced = [];
@@ -466,7 +468,7 @@ export const GameMap = {
     // bubbles (green = free Eco-Points · red = disaster aid)
     for (const bb of S.bubbles){
       const pt = bb.cid ? this.countryPoint(bb.cid) : ll(bb.lat, bb.lon); if (!pt) continue;
-      const bob = Math.sin(now * 2.4 + bb.id) * 3;
+      const bob = S.speed ? Math.sin(now * 2.4 + bb.id) * 3 : 0; c.globalAlpha = S.speed ? 1 : .45;   // 1.7: paused → dimmed, can't be collected
       const [x, y0] = this.toScreen(pt[0], pt[1]), y = y0 - 22 + bob; if (!vis(x, y)) continue;
       const red = bb.type === "red", ore = bb.type === "ore", col = red ? COL.bad : ore ? "#ff9a3c" : COL.good, R = 17;
       const g = c.createRadialGradient(x, y, 2, x, y, R + 12); g.addColorStop(0, red ? "rgba(255,90,74,.5)" : ore ? "rgba(255,154,60,.5)" : "rgba(95,211,154,.5)"); g.addColorStop(1, "rgba(0,0,0,0)");
@@ -477,8 +479,9 @@ export const GameMap = {
       const maxT = red ? 5 : 4; c.strokeStyle = "rgba(255,255,255,.75)"; c.lineWidth = 2; c.beginPath(); c.arc(x, y, R + 4, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * clamp(bb.ttl / maxT, 0, 1)); c.stroke();
       const im3 = img3d(red ? "heart" : ore ? "ore" : "money"), im = im3 || iconImg(red ? "heart-handshake" : "leaf", col);
       if (im) c.drawImage(im, x - (im3 ? 13 : 10), y - (im3 ? 13 : 10), im3 ? 26 : 20, im3 ? 26 : 20);
-      if (red) this.pill(x, y + R + 14, `${P.aidCost()} · ${bb.ttl}`, {font:"600 10px 'IBM Plex Mono', monospace", h:17, icon:"leaf", iconColor:COL.good, bg:"rgba(6,16,21,.88)"});
+      if (red) this.pill(x, y + R + 14, `${P.aidCost()} · ${bb.ttl}`, {font:"600 10px 'IBM Plex Mono', monospace", h:17, icon:"coins", iconColor:COL.gold, bg:"rgba(6,16,21,.88)"});
       this.hits.push({id:"bb-" + bb.id, x:x - R - 6, y:y - R - 6, w:2 * R + 12, h:2 * R + 12, fn:() => { if (P.popBubble(bb.id, x, y - 26)){ this.burst(x, y, col); if (!red) Audio.play("coin", {vol:.6}); } }});
+      c.globalAlpha = 1;
     }
     // hazard strike effects
     for (const f of this.fx_){

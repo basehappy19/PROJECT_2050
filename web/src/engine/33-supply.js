@@ -68,7 +68,7 @@ function refineTick(){
 }
 Object.assign(P.UI, {
   resReady:T("พร้อมใช้", "ready"), resRaw:T("ต้องแปรรูป", "needs refining"), resSends:T("ส่งให้เรา", "Sends us"), resBanned:T("ระงับ", "Stopped"),
-  resNeed:T("ต้องถึง", "needs"), resToll:T("ช่วยแปรรูปให้เรา", "Refines for us"), resImports:T("ประเทศนี้ต้องนำเข้าแร่", "Imports its minerals"),
+  resNeed:T("ต้องถึง", "needs"), resToll:T("ช่วยแปรรูปให้เรา", "Refines for us"), resImports:T("ประเทศนี้ต้องนำเข้าทรัพยากร", "Imports its resources"),
   invReady:T("พร้อมใช้", "Ready"), invRaw:T("รอแปรรูป", "Waiting"), invSpeed:T("แปรรูปได้", "Refines"),
   refHas:T("มีโรงแยกแร่", "Refines"), refReady:T("ส่งทรัพยากรเหล่านี้แบบพร้อมใช้", "sends these ready to use"),
   refTollOn:T("ช่วยแยกแร่ดิบให้เรา", "refines our raw minerals"), refTollOff:T("มิตรภาพ {N}+ จะช่วยแยกแร่ดิบให้เรา", "at friendship {N}+ it refines our raw minerals"),

@@ -15,12 +15,12 @@ const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 /* ---------------- characters ---------------- */
 const SEA_HZ = ["hurricane", "typhoon", "flood", "saltwater"];
 P.CHARS.push(
-  {id:"oce", price:249, icon:"waves", color:"#4fb8e8",
+  {id:"oce", price:299, icon:"waves", color:"#4fb8e8",
    name:T("นักสมุทรศาสตร์", "The Ocean Scientist"), person:T("ดร.นาวา", "Dr. Nawa"),
    pas:T("พายุ น้ำท่วม และน้ำเค็มรุกเสียหายน้อยลง 15% (เลเวล 3: 25%)", "Storms, floods and saltwater do 15% less damage (level 3: 25%)"),
    acts:[{id:"oce1", cd:24, icon:"shell", target:"country", name:T("ฟื้นฟูชายฝั่ง", "Restore the Coast"), desc:T("ประเทศที่เลือก: CO₂ −8% (ป่าชายเลนและหญ้าทะเลดูดซับ) การปรับตัว +25 และมิตรภาพ +5", "Selected country: CO₂ −8% (mangroves and seagrass), adaptation +25, friendship +5")},
          {id:"oce2", cd:30, lv:5, icon:"radio", name:T("เตือนภัยทะเล", "Sea-Storm Warning"), desc:T("ทุกพยากรณ์พายุ น้ำท่วม และน้ำเค็มรุกตอนนี้ อพยพให้ฟรี", "Every storm, flood and saltwater forecast right now is evacuated for free")}]},
-  {id:"eng", price:249, icon:"hard-hat", color:"#ffc24a",
+  {id:"eng", price:349, icon:"hard-hat", color:"#ffc24a",
    name:T("วิศวกรเมือง", "The City Engineer"), person:T("คุณกล้า", "Kla"),
    pas:T("สกิลหมวดเมือง อุตสาหกรรม และอาหารกับน้ำ ทยอยผลเร็วขึ้น 25% (เลเวล 3: 30%)", "City, industry and food & water skills roll out 25% faster (level 3: 30%)"),
    acts:[{id:"eng1", cd:30, icon:"construction", name:T("เร่งก่อสร้าง", "Rush the Build"), desc:T("ทุกโครงการที่กำลังทยอยผล เดินหน้าเร็วขึ้นทันที 4 เดือน", "Every project rolling out jumps 4 months ahead now")},
@@ -28,8 +28,8 @@ P.CHARS.push(
 );
 P.CHARS.slice(-2).forEach(c => { P.CHAR[c.id] = c; });
 P.SHOP.splice(4, 0,
-  {id:"char_oce", price:249, icon:"waves", kind:"char", name:T("ตัวละคร: นักสมุทรศาสตร์", "Character: The Ocean Scientist")},
-  {id:"char_eng", price:249, icon:"hard-hat", kind:"char", name:T("ตัวละคร: วิศวกรเมือง", "Character: The City Engineer")});
+  {id:"char_oce", price:299, icon:"waves", kind:"char", name:T("ตัวละคร: นักสมุทรศาสตร์", "Character: The Ocean Scientist")},
+  {id:"char_eng", price:349, icon:"hard-hat", kind:"char", name:T("ตัวละคร: วิศวกรเมือง", "Character: The City Engineer")});
 
 const lv3 = () => S.charLv >= 3;
 P.hzCharMult = type => (S.char === "oce" && SEA_HZ.includes(type) ? (lv3() ? .75 : .85) : 1);

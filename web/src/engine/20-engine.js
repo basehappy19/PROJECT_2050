@@ -200,7 +200,7 @@ function useAbility(id){
     case "eco1": S.ep += 100; S.bond = 12; break;
     case "eco2": if (S.pc < 15) return false; S.pc -= 15; S.ep += 40; break;
     case "act1": addAppr(2); break;
-    case "act2": if (P.groupTilt) P.groupTilt({youth:10}); break;   // 1.6: young people rally behind you
+    case "act2": if (P.groupTilt) P.groupTilt({youth:10}, true); break;   // 1.6: young people rally behind you
     default: if (!(P.extraAbility && P.extraAbility(id, c))) return false;   // abilities added later (31-v15.js)
   }
   S.actCd[id] = a.cd;
@@ -362,6 +362,7 @@ function ageBubbles(){
 /* x, y = screen position (design units) for the floating text */
 function popBubble(id, x, y){
   const b = S.bubbles.find(q => q.id === id); if (!b || S.over || S.event) return false;
+  if (!S.speed){ hook("sfx", "error"); hook("floatText", x, y, t("bubPaused"), "bad"); return false; }   // 1.7: bubbles only while the clock runs (no free money while paused)
   if (b.type === "ore"){
     const gain = P.popOre(b); hook("sfx", "pop"); hook("floatText", x, y, `+${gain} ${IC.ore}`, "accent");
   } else if (b.type === "green"){

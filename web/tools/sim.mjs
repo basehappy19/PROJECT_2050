@@ -97,7 +97,7 @@ function play(bot, seed){
     P.tick();
     if (process.env.TRACE && S.tick % 24 === 0 && !S.event) console.log(S.tick, P.netCO2().toFixed(1), S.regions.map(r => r.co2.toFixed(1) + '/' + r.comp.toFixed(0)).join(' '), 'appr', S.appr.toFixed(1), 'T', S.temp.toFixed(2), 'rel', P.relAll().toFixed(0), 'ep', Math.round(S.ep), 'haz', S.stats.dmg.length, 'skills', Object.keys(S.owned).length, 'bil', S.bilats.length, 'cr', S.crolls.length);
   }
-  return {over:S.over, grade:S.grade || "-", tick:S.tick, temp:S.temp, net:P.netCO2(), appr:S.appr, skills:Object.keys(S.owned).length, prot:(S.stats && S.stats.protests) || 0, grp:S.groups ? {...S.groups} : null};
+  return {over:S.over, grade:S.grade || "-", tick:S.tick, temp:S.temp, net:P.netCO2(), appr:S.appr, skills:Object.keys(S.owned).length, prot:(S.stats && S.stats.protests) || 0, grp:S.groups ? {...S.groups} : null, ms:[60, 120, 180, 240].map(t => (S.hist[t] ? S.hist[t].net : null)), msHit:S.ms17 ? {...S.ms17} : null};
 }
 
 for (const bot of (process.env.BOTS || "good,casual").split(",")){
@@ -106,6 +106,11 @@ for (const bot of (process.env.BOTS || "good,casual").split(",")){
   const avg = (a, f) => a.length ? (a.reduce((s, r) => s + f(r), 0) / a.length) : 0;
   const grades = ["S", "A", "B"].map(g => `${g}:${wins.filter(r => r.grade === g).length}`).join(" ");
   console.log(`${bot.padEnd(6)} preset ${PRESET} · win ${(cnt("win") / N * 100).toFixed(0)}% (${grades}) · heat ${cnt("l1")} · impeached ${cnt("l2")} · time ${cnt("l3")} · win year ${(2026 + avg(wins, r => r.tick) / 12).toFixed(1)} · win temp ${avg(wins, r => r.temp).toFixed(2)} · end temp ${avg(res, r => r.temp).toFixed(2)} · skills ${avg(res, r => r.skills).toFixed(0)} · end net ${avg(res, r => r.net).toFixed(1)} · appr ${avg(res, r => r.appr).toFixed(0)}`);
+}
+if (process.env.MS) for (const bot of (process.env.BOTS || "good,casual").split(",")){   // 1.7: net CO₂ at the milestone years (2030 … 2045), median and quartiles
+  const res = []; for (let g = 0; g < N; g++) res.push(play(bot, 1000 + g * 7919));
+  const q = (a, p) => { a = a.filter(x => x !== null).sort((x, y) => x - y); return a.length ? a[Math.floor(p * (a.length - 1))].toFixed(1) : "-"; };
+  console.log(`${bot.padEnd(6)} net at 2030/35/40/45 (25%·50%·75%) · ` + [0, 1, 2, 3].map(i => [.25, .5, .75].map(p => q(res.map(r => r.ms[i]), p)).join("·")).join("  ") + " · hit " + [0, 1, 2, 3].map(i => res.filter(r => r.msHit && r.msHit[i] === 1).length).join("/"));
 }
 if (process.env.GRP) for (const bot of (process.env.BOTS || "good,casual").split(",")){   // 1.6: how the four groups end up
   const res = []; for (let g = 0; g < Math.min(N, 60); g++) res.push(play(bot, 1000 + g * 7919));

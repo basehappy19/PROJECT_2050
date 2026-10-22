@@ -19,7 +19,7 @@ const srv = http.createServer((req, res) => {
 }).listen(0);
 const port = srv.address().port;
 const browser = await chromium.launch({executablePath:process.env.CHROME || "/opt/pw-browsers/chromium", args:["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--autoplay-policy=no-user-gesture-required"]});
-const page = await browser.newPage({viewport:{width:W, height:H}, deviceScaleFactor:1, hasTouch:W < 800, isMobile:W < 800});
+const page = await browser.newPage({viewport:{width:W, height:H}, deviceScaleFactor:+(process.env.DSF || 1), hasTouch:W < 800, isMobile:W < 800});
 const errs = [];
 page.on("console", m => { if (m.type() === "error") errs.push(m.text()); });
 page.on("pageerror", e => errs.push("pageerror: " + e.message));

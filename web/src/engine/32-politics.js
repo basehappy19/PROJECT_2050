@@ -157,7 +157,7 @@ function protest(g){
   if (g === "farm"){ const m = Math.min(S.ep, 6), q = Math.min(S.pc, 3); S.ep -= m; S.pc -= q; fx = `${IC.ep} −${m} · ${IC.pc} −${q}`; }
   if (g === "youth"){ const q = Math.min(S.pc, 6); S.pc -= q; fx = `${IC.pc} −${q}`; }
   if (P.ledgerTag) P.ledgerTag("protest", S.ep - e0, S.pc - p0);
-  S.stats.protests = (S.stats.protests || 0) + 1;
+  S.stats.protests = (S.stats.protests || 0) + 1; S.lastProtest = g;
   P.addLog(`[[megaphone]] ${tx} · ${fx}`, "al");
   hook("sfx", "warn"); hook("toast", {id:"prot" + g + S.tick, icon:"megaphone", title:L(T("ประท้วง", "Protest")), msg:L(GROUP[g].name)});
   if (P.timeline) P.timeline("protest", {g});
@@ -223,5 +223,11 @@ const isBacking = (g, v, m) => (v >= BACK && v >= m + BACK_GAP) || ((S.grpFlag |
 const groupState = g => { if (!S.groups) return "ok"; const v = S.groups[g], m = mean(); return v < ANGRY ? "angry" : isBacking(g, v, m) ? "back" : v < 40 ? "low" : "ok"; };
 const angryCount = () => (S.groups ? GID.filter(g => S.groups[g] < ANGRY).length : 0);
 
-P.groupTilt = t => { if (!S.groups) return; sync(); applyTilt(t); settle(); };
+/* exact: the named groups move by exactly that much and the other groups make up the difference, so the average stays (1.7) */
+function applyExact(t){
+  const named = GID.filter(g => t[g]), rest = GID.filter(g => !t[g]), d = named.reduce((s, g) => s + GW[g] * t[g], 0), rw = rest.reduce((s, g) => s + GW[g], 0) || 1;
+  named.forEach(g => { S.groups[g] = clamp(S.groups[g] + t[g], 0, 100); });
+  rest.forEach(g => { S.groups[g] = clamp(S.groups[g] - d / rw, 0, 100); });
+}
+P.groupTilt = (t, exact) => { if (!S.groups) return; sync(); if (exact) applyExact(t); else applyTilt(t); settle(); };
 Object.assign(P, {withGroupTilt:withTilt, groupPreview:preview, GROUPS, GROUP, GID, GROUP_BACK:BACK, GROUP_ANGRY:ANGRY, tiltOfSkill, tiltOfOption, tiltOfAction, groupState, angryCount, eventTilt, groupsTick});

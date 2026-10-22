@@ -2,8 +2,8 @@
    (web/src/engine/14-data-world.js: SHOP, PRICE, TERRA, LEVELS). */
 
 export const SHOP = {
-  speed3:{price:199}, char_dip:{price:249}, char_eco:{price:249}, char_act:{price:249}, char_oce:{price:249}, char_eng:{price:249},
-  theme_night:{price:99}, theme_paint:{price:99}, outfit:{price:149}, frame:{price:79},
+  speed3:{price:299}, char_dip:{price:449}, char_eco:{price:399}, char_act:{price:399}, char_oce:{price:299}, char_eng:{price:349},   // 1.7: dearer the more often a character wins
+  theme_night:{price:149}, theme_paint:{price:149}, outfit:{price:199}, frame:{price:99},
 };
 export const RENAME_PRICE = 49;
 export const CHARS = ["sci", "dip", "eco", "act", "oce", "eng"];
@@ -18,13 +18,13 @@ const ALL = ["start","tutorial","tech1","action1","event1","saver","greens","aid
   "win","winEarly","win15","winLoved","loseTime","loseHeat","loseVote","chaoPhraya","read25","read100","readAll",
   "ability1","skill20","branchI","branchC","branchW","rel100","friends20","bilateral","alliance","cev10","stormSafe","evac5","hardWin","daily","charAll","lvl10","cards30",
   /* 1.0 */ "ore1","ore5c","pins30","green10","news10","world1","thrive"];
-export const ACH_TERRA = Object.fromEntries(ALL.map(id => [id, EASY.includes(id) ? 5 : HARD.includes(id) ? 20 : 10]));
+export const ACH_TERRA = Object.fromEntries(ALL.map(id => [id, EASY.includes(id) ? 3 : HARD.includes(id) ? 10 : 5]));   // 1.7: halved
 
 /* Terra for one finished game (before the daily limit) */
-export const TERRA = {win:30, l3:12, l2:6, l1:4, bonusMax:15, capGame:45, capHard:67, hardMult:1.5};
+export const TERRA = {win:15, l3:6, l2:3, l1:2, bonusMax:8, capGame:23, capHard:34, hardMult:1.5};   // 1.7: gems are rarer (was win 30, cap 45)
 export function terraFor(s){
   const base = TERRA[s.ending] || 0;
-  const bonus = Math.max(0, Math.min(6, (2.0 - s.temp) / 0.6 * 6)) + Math.max(0, Math.min(5, s.appr / 100 * 5)) + Math.max(0, Math.min(4, s.rel / 100 * 4));
+  const bonus = (Math.max(0, Math.min(6, (2.0 - s.temp) / 0.6 * 6)) + Math.max(0, Math.min(5, s.appr / 100 * 5)) + Math.max(0, Math.min(4, s.rel / 100 * 4))) / 2;
   let t = base + Math.min(TERRA.bonusMax, bonus);
   if (s.mode === "hard") t *= TERRA.hardMult;
   return Math.round(Math.min(t, s.mode === "hard" ? TERRA.capHard : TERRA.capGame));

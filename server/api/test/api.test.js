@@ -33,7 +33,7 @@ let tok, refresh;
 
 test("config", async () => {
   const r = await call("GET", "/api/config");
-  assert.equal(r.status, 200); assert.equal(r.body.game, "p2050"); assert.equal(r.body.googleClientId, null); assert.equal(r.body.prices.speed3, 199);
+  assert.equal(r.status, 200); assert.equal(r.body.game, "p2050"); assert.equal(r.body.googleClientId, null); assert.equal(r.body.prices.speed3, 299);
 });
 test("register, duplicate, bad input, login", async () => {
   let r = await call("POST", "/api/auth/register", {username:"phukhieo", email:"Teacher@School.ac.th", password:"secret123", displayName:"ภูเขียว"});
@@ -63,7 +63,7 @@ test("a run pays Terra and XP; impossible results pay nothing", async () => {
   await pool.query("UPDATE game_results SET started_at = now() - interval '15 minutes' WHERE id = $1", [id]);
   r = await call("POST", `/api/runs/${id}/finish`, {ending:"win", tick:290, temp:1.7, net:-0.2, appr:70, rel:30, skills:30, realSec:900}, tok);
   assert.equal(r.status, 200, JSON.stringify(r.body)); assert.equal(r.body.flagged, false);
-  assert.ok(r.body.terra >= 30 && r.body.terra <= 45, "terra " + r.body.terra); assert.ok(r.body.xp > 60);
+  assert.ok(r.body.terra >= 15 && r.body.terra <= 23, "terra " + r.body.terra); assert.ok(r.body.xp > 60);
   assert.equal(r.body.user.terra, r.body.terra);
   r = await call("POST", `/api/runs/${id}/finish`, {ending:"win", tick:290, temp:1.7, net:-0.2, appr:70, rel:30, skills:30}, tok); assert.equal(r.body.error, "already_finished");
   // too fast for 300 months → flagged
@@ -99,13 +99,13 @@ test("daily challenge seed must match the date", async () => {
 test("shop, rename, achievements", async () => {
   await pool.query("INSERT INTO wallet_ledger(user_id, amount, reason) SELECT id, 500, 'admin' FROM users WHERE username = 'phukhieo'");
   let r = await call("GET", "/api/me", null, tok); const bal = r.body.user.terra;
-  r = await call("POST", "/api/shop/buy", {item:"speed3"}, tok); assert.equal(r.status, 200); assert.equal(r.body.user.terra, bal - 199); assert.ok(r.body.owned.includes("speed3"));
+  r = await call("POST", "/api/shop/buy", {item:"speed3"}, tok); assert.equal(r.status, 200); assert.equal(r.body.user.terra, bal - 299); assert.ok(r.body.owned.includes("speed3"));
   r = await call("POST", "/api/shop/buy", {item:"speed3"}, tok); assert.equal(r.body.error, "already_owned");
   r = await call("POST", "/api/shop/buy", {item:"gold_bars"}, tok); assert.equal(r.body.error, "unknown_item");
   r = await call("POST", "/api/me/display-name", {displayName:"ครูภูเขียว"}, tok); assert.equal(r.body.user.displayName, "ครูภูเขียว"); const b2 = r.body.user.terra;
   r = await call("POST", "/api/me/display-name", {displayName:"ภูเขียว 2"}, tok); assert.equal(r.body.user.terra, b2 - 49);
   r = await call("POST", "/api/me/display-name", {displayName:"ไอ้สัตว์"}, tok); assert.equal(r.body.error, "bad_word");
-  r = await call("POST", "/api/achievements", {ids:["start", "win", "fake", "start"]}, tok); assert.equal(r.body.awarded, 15);
+  r = await call("POST", "/api/achievements", {ids:["start", "win", "fake", "start"]}, tok); assert.equal(r.body.awarded, 8);   // 1.7: start 3 + win 5
   r = await call("POST", "/api/achievements", {ids:["start", "win"]}, tok); assert.equal(r.body.awarded, 0);
 });
 test("progress follows the account: devices are merged, never overwritten", async () => {
@@ -188,7 +188,7 @@ test("weekly missions and the season pass are worked out from finished games", a
   r = await call("POST", "/api/season/claim", {tier:1}, t); assert.equal(r.body.error, "already_claimed");
   r = await call("POST", "/api/season/claim", {tier:10}, t); assert.equal(r.body.error, "not_reached");
   const after = (await call("GET", "/api/me", null, t)).body.user.terra;
-  assert.equal(after - before, 20 + 30 + 50 + 10);
+  assert.equal(after - before, 20 + 30 + 50 + 5);
   // a season set on the admin page with an item reward
   await pool.query("INSERT INTO game_config(key, value) VALUES ('season', $1) ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value",
     [JSON.stringify({id:"test-s", name:{th:"ทดสอบ", en:"Test"}, start:"2000-01-01", end:"2999-01-01", step:50, tiers:[{terra:5, item:"frame"}, {terra:7}]})]);

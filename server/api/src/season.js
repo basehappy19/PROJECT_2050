@@ -27,7 +27,7 @@ export const MISSIONS = {
   winHard: {goal:1, tier:2, t:T("ชนะโหมด Hard Core", "Win in Hard Core"), test:r => r.ending === "win" && r.mode === "hard"},
   score7500:{goal:1, tier:2, t:T("ทำคะแนน 7,500 ขึ้นไปในเกมเดียว", "Score 7,500 or more in one game"), test:r => Number(r.score) >= 7500},
 };
-export const WEEKLY_DEFAULT = {terra:[20, 30, 50], xp:40, off:[]};
+export const WEEKLY_DEFAULT = {terra:[10, 15, 25], xp:40, off:[]};   // 1.7: halved
 /* Monday (Bangkok) of the week that contains `now`, as YYYY-MM-DD */
 export function weekKey(now = new Date()){
   const day = bkkDate(now), d = new Date(day + "T00:00:00Z"), dow = (d.getUTCDay() + 6) % 7;
@@ -48,7 +48,7 @@ export function weekMissions(week, cfg = WEEKLY_DEFAULT){
 }
 
 /* ---------------- season ---------------- */
-export const DEFAULT_TIERS = [{terra:10}, {terra:15}, {terra:15}, {terra:20}, {terra:20, item:"frame"}, {terra:20}, {terra:25}, {terra:25}, {terra:30}, {terra:50, item:"theme_night"}];
+export const DEFAULT_TIERS = [{terra:5}, {terra:8}, {terra:8}, {terra:10}, {terra:10, item:"frame"}, {terra:10}, {terra:12}, {terra:12}, {terra:15}, {terra:25, item:"theme_night"}];   // 1.7: halved
 export const SEASON_STEP = 120;
 const TH_MONTH = ["ม.ค.", "ก.พ.", "มี.ค.", "เม.ย.", "พ.ค.", "มิ.ย.", "ก.ค.", "ส.ค.", "ก.ย.", "ต.ค.", "พ.ย.", "ธ.ค."];
 const EN_MONTH = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
@@ -93,7 +93,7 @@ export async function seasonState(db, uid, settings, now = new Date()){
   };
 }
 /* a season item the player already owns is paid in gems instead */
-export const ITEM_SWAP = 40;
+export const ITEM_SWAP = 20;
 
 /* claim one season tier (inside a transaction) */
 export async function claimTier(db, uid, settings, tier, now = new Date()){

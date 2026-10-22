@@ -37,7 +37,7 @@ export function EventModal(){
         <p class="muted small rellegend"><Rich t={t("relLegend")} iconColor="inherit"/></p></> : null}
       <p class="desc"><Rich t={L(e.desc)}/></p>
       {e.news ? <p class="newsrc muted small"><Icon n="link" size={13}/> {t("source")}: <a href={e.news.url} target="_blank" rel="noopener noreferrer">{e.news.src}</a></p> : null}
-      <div class="ask"><Rich t={`[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`} iconColor="accent"/><Speak text={`${L(e.title)}. ${L(e.desc)} ${opts.map(({o, i}) => (i === -1 ? "" : "ABC"[i] + ". ") + L(o.label)).join(". ")}`} btn/>{P.hasKeyboard() ? <small class="mono muted">{t("evKeys")}</small> : null}</div>
+      <div class="ask"><Rich t={`[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`} iconColor="accent"/><Speak text={`${L(e.title)}. ${L(e.desc)}`} btn/>{P.hasKeyboard() ? <small class="mono muted">{t("evKeys")}</small> : null}</div>
       <Meter v={f} color={locked ? "warn" : "accent"} h={4} cls="lockbar"/>
       <div class="opts">{opts.map(({o, i, ok}) => {
         const usable = ok && !locked;
@@ -83,10 +83,17 @@ export function EndModal(){
       <h2 class="endtitle">{t(win ? "winTitle" : o + "Title")}</h2>
       {win ? <p class="gold grade">{L(P.ENDINGS.win.grades[S.grade || "A"])}</p> : null}
       <p>{t(win ? "winBody" + (S.grade || "A") : o + "Body")}</p>
-      <div class="quote"><Portrait id={S.char} size={56}/><div><b style={{color:P.CHAR[S.char].color}}>{L(P.CHAR[S.char].person)}</b><p>“{L(QUOTES[o])}”</p></div></div>
+      <div class="quote"><Portrait id={S.char} size={56}/><div><b style={{color:P.CHAR[S.char].color}}>{L(P.CHAR[S.char].person)}</b><p>“{L(P.endQuote ? P.endQuote() : QUOTES[o])}”</p></div></div>
       <div class="statgrid three">{stats.map(([a, b], i) => <div class="stat" key={i}><span><Rich t={up(a)}/></span><b>{b}</b></div>)}</div>
+      {P.endPaper ? (() => { const np = P.endPaper(); return <div class="paper">
+        <div class="pmast"><b>THE WORLD TIMES</b><small class="mono">{np.date}</small></div>
+        <h3>{L(np.head)}</h3>
+        <ul>{np.people.map(x => <li key={x.who}><Portrait id={x.who} size={34} ring={P.NPC[x.who].color}/><span>{L(x.t)}</span></li>)}</ul>
+      </div>; })() : null}
       <H3>{t("yourStory")}</H3>
       <ul class="story-lines">{lines.map((s, i) => <li key={i}><Rich t={s} iconColor="accent"/></li>)}</ul>
+      {P.realActions ? <><H3>{S.lang === "th" ? "สิ่งที่คุณทำได้จริงวันนี้" : "What you can do in real life today"}</H3>
+        <ul class="reallife">{P.realActions().map((a, i) => <li key={i}><Icon n={a.icon} size={20}/><span>{L(a.t)}</span></li>)}</ul></> : null}
       <div class={"reward " + (rw && !rw.guest && !rw.error ? "ok" : "")}>
         {!rw ? <span class="muted"><Icon n="loader" size={16} cls="spin"/> {t("rewardWait")}</span>
           : rw.guest ? <span class="muted">{t("rewardGuest")} · XP +{rw.xp}</span>
@@ -117,6 +124,7 @@ export function CharSel(){
         <div class="info">
           <b class="nm">{L(c.name)}</b>
           <span class="person mono" style={{color:c.color}}>{L(c.person)}</span>
+          {c.bio ? <span class="bio">{L(c.bio)}</span> : null}
           <Meter v={nx ? (xp - pv) / (nx - pv) : 1} color={c.color} h={4}/>
           <span class="pas"><Rich t={L(c.pas)}/></span>
           <ul class="acts">{c.acts.map(ab => <li key={ab.id}><Icon n={ab.icon} size={14} color={c.color}/>{L(ab.name)}{ab.lv ? <small class="muted"> (Lv{ab.lv})</small> : null}</li>)}</ul>
@@ -158,19 +166,20 @@ export function Story(){
       <h2>{L(st.title)}</h2>
       <div class="panels">{st.panels.map((p, i) => {
         if (i > UIM.storyI) return null;
-        const me = p.who === "me", who = me ? S.char : "adv", cur = i === UIM.storyI;
-        return <div class={`panel ${me ? "me" : "adv"} ${cur ? "cur" : "old"}`} key={i} style={{"--bg":p.bg}}>
-          <Portrait id={who} size={cur ? 92 : 56} ring={me ? P.CHAR[S.char].color : COL.purple}/>
+        const w = P.panelWho ? P.panelWho(p) : p.who, me = w === "me", who = me ? S.char : w, npc = P.NPC && P.NPC[w], cur = i === UIM.storyI;
+        const col = me ? P.CHAR[S.char].color : npc ? npc.color : COL.purple, say = L(P.panelSay ? P.panelSay(p) : p.say);
+        return <div class={`panel ${me ? "me" : "adv"} ${npc ? "npc" : ""} ${cur ? "cur" : "old"}`} key={i} style={{"--bg":p.bg}}>
+          <Portrait id={who} size={cur ? 92 : 56} ring={col}/>
           <div class="speech">
-            <b style={{color:me ? P.CHAR[S.char].color : COL.purple}}>{me ? L(P.CHAR[S.char].person) : L(P.ADVISOR.name)}</b>
-            <p>{cur ? <Typewriter text={L(p.say)}/> : L(p.say)}</p>
+            <b style={{color:col}}>{me ? L(P.CHAR[S.char].person) : npc ? L(npc.name) : L(P.ADVISOR.name)}</b>
+            <p>{cur ? <Typewriter text={say}/> : say}</p>
           </div>
           <Icon n={p.icon} size={64} cls="panel-ic"/>
         </div>;
       })}</div>
       <div class="mfoot">
         <Btn kind="ghost" onClick={() => G.storySkip()}>{t("tutSkip")}</Btn>
-        <Speak text={L(st.panels[Math.min(UIM.storyI, st.panels.length - 1)].say)} btn/>
+        <Speak text={L(P.panelSay ? P.panelSay(st.panels[Math.min(UIM.storyI, st.panels.length - 1)]) : st.panels[Math.min(UIM.storyI, st.panels.length - 1)].say)} btn/>
         {P.hasKeyboard() ? <small class="mono muted grow">{t("storyKeys")}</small> : <span class="grow"/>}
         <Btn onClick={() => G.storyNext()} sound={null}>{last ? `${t("storyGo")} [[play]]` : `${t("tutNext")} [[chevron-right]]`}</Btn>
       </div>

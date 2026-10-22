@@ -6,13 +6,40 @@ const V = (v, date, name, th, en) => ({v, date, name, items:{th, en}});
 /* minor updates (1.1.1, 1.1.2, …) sit inside their main version as subs, newest first */
 const SUB = (v, date, th, en) => ({v, date, items:{th, en}});
 P.CHANGELOG = [
+  V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
+    "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",
+    "ตัวละครใหม่ในเรื่อง: ฝน อาสาปลูกป่าชายเลนที่สมุทรปราการ ลุงทองดี ชาวนาที่ฉะเชิงเทรา และไกรวิทย์ ฝ่ายต้านจากธุรกิจพลังงานเก่า",
+    "ฉากเนื้อเรื่องสั้น ๆ ที่เกิดตามสิ่งที่คุณทำ เช่น ถูกคว่ำบาตรครั้งแรก มีกลุ่มประท้วง โลกร้อนเกิน 1.5°C หรือลด CO₂ ได้ครึ่งทาง",
+    "เป้าหมายรายทางปี 2030 2035 2040 และ 2045 อยู่บนหลอด Net Zero ผ่านแล้วได้เงินและแต้มนโยบาย",
+    "ตอนจบ: หนังสือพิมพ์บอกว่าชีวิตของผู้คนเป็นอย่างไร คำพูดของตัวละครแต่ละตัว และ 3 สิ่งที่คุณทำได้จริงในชีวิต",
+    "ไอคอน SDG จริงบนหมวดสกิลและหน้าแรก",
+    "ผังสกิลจัดใหม่ ลูกศรไม่ตัดกัน และทุกสกิลมีไอคอน 3 มิติกับเสียงจริงตอนปลดล็อก",
+    "แผนที่มีชีวิตขึ้น: เมืองหลวง ย่านอุตสาหกรรมที่ควันหยุดเมื่อสะอาด ช่องแคบและคลองเดินเรือ และไอคอนบอกประเทศที่คว่ำบาตรเรา ไม่ร่วมมือ หรือเป็นพันธมิตร",
+    "เสียงพากย์อ่านเร็วขึ้น ต่อประโยคเป็นธรรมชาติขึ้น และอีเวนต์อ่านเฉพาะเรื่อง ไม่อ่านตัวเลือก",
+    "หน้าวิธีเล่นใหม่ทั้งหมด ภาพและข้อความตรงกับเกมตอนนี้",
+    "เพชรหายากขึ้น ราคาตัวละครตั้งตามโอกาสชนะ (ยิ่งชนะง่ายยิ่งแพง)",
+    "แก้บัค: กดเก็บฟองได้ขณะหยุดเวลา และข้อความบางจุดไม่ตรงกับค่าจริง",
+  ], [
+    "Every character has a background and their own lines in all three acts.",
+    "New people in the story: Fon, a mangrove volunteer in Samut Prakan; Uncle Thongdee, a Chachoengsao rice farmer; and Krai, who pushes back for old energy.",
+    "Short story scenes triggered by what you do: your first sanctions, a protest, passing 1.5°C, getting halfway.",
+    "Milestones for 2030, 2035, 2040 and 2045 on the Net Zero meter; reaching one pays money and policy points.",
+    "Endings: a newspaper tells what became of the people, each character has their own last words, and three things you can do in real life.",
+    "Real SDG icons on the skill branches and the home screen.",
+    "A tidier skill tree with no crossing arrows; every skill has a 3D icon and a real sound when unlocked.",
+    "A livelier map: capitals, industrial hubs whose smoke stops when they are clean, sea chokepoints, and icons for countries that sanction us, refuse to cooperate or are our allies.",
+    "Narration reads faster and more naturally, and events are read without their options.",
+    "A new How to Play, with pictures and text that match the game today.",
+    "Gems are rarer, and characters are priced by how often they win.",
+    "Fixes: bubbles could be collected while paused, and some texts did not match the real numbers.",
+  ]),
   V("1.6", "2026-10-22", {th:"โลกกว้างขึ้น ดูง่ายขึ้น", en:"A Bigger, Clearer World"}, [
     "เพิ่มประเทศอีก 80 ประเทศ รวมเป็น 172 ประเทศ เช่น เซอร์เบีย ลิทัวเนีย ซูดาน เซเนกัล ฮอนดูรัส ปารากวัย เติร์กเมนิสถาน ภูฏาน มัลดีฟส์",
     "หน้าประเทศ: ทรัพยากรแต่ละชนิดบอกชัดว่า “พร้อมใช้” หรือ “ต้องแปรรูป” และสถานะการส่งทรัพยากรให้เราอ่านได้ในบรรทัดเดียว",
     "ตลาดทรัพยากร: เห็นชัดว่ามีของพร้อมใช้เท่าไร และรอแปรรูปอีกเท่าไร เหลือแค่ปุ่มซื้อกับขาย",
     "หน้าความนิยม: เห็นว่าแต่ละกลุ่มชอบและไม่ชอบอะไร เปลี่ยนไปเท่าไรใน 1 ปี และได้หรือเสียอะไร",
     "หน้าสถิติแบ่งเป็น 4 แท็บ และมีแท็บการเงิน บอกว่าเงินและแต้มนโยบายได้มาจากไหน ใช้ไปกับอะไร รายปีหรือทั้งเกม",
-    "สกิลใหม่ตอนเลเวล 5: นักการทูต “ทูตสันถวไมตรี” ยกเลิกการคว่ำบาตรทั้งหมด และนักกิจกรรม “พลังเยาวชน” ทำให้คนรุ่นใหม่พอใจขึ้น",
+    "สกิลใหม่ตอนเลเวล 5: นักการทูต “ทูตสันถวไมตรี” ยกเลิกการคว่ำบาตรทั้งหมด และนักเคลื่อนไหว “พลังเยาวชน” ทำให้คนรุ่นใหม่พอใจขึ้น",
     "ปรับความยากใหม่ให้เหมาะกับประเทศที่เพิ่มขึ้น",
   ], [
     "80 more countries, 172 in all, such as Serbia, Lithuania, Sudan, Senegal, Honduras, Paraguay, Turkmenistan, Bhutan and the Maldives.",
@@ -258,7 +285,7 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
   ]),
   SUB("1.5.3", "2026-10-22", [
     "เกมยากขึ้น: ชนะยากขึ้นในทุกโหมด ต้องวางแผนมากขึ้น",
-    "ปรับสมดุลตัวละคร: นักเศรษฐศาสตร์ นักการทูต และนักกิจกรรมแรงน้อยลง",
+    "ปรับสมดุลตัวละคร: นักเศรษฐศาสตร์ นักการทูต และนักเคลื่อนไหวแรงน้อยลง",
     "สกิลที่ 2 ของตัวละคร (เลเวล 5) และโบนัสเลเวล 3 อ่อนลงและใช้ได้ห่างขึ้น",
   ], [
     "The game is harder: winning takes more planning in every mode.",

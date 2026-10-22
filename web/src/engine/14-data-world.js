@@ -320,17 +320,17 @@ const CHARS = [
    pas:{th:"สกิลหมวดพลังงานถูกลง 8%",en:"Energy skills cost 8% less"},
    acts:[{id:"sci1", cd:42, icon:"lightbulb", name:{th:"ค้นพบใหม่",en:"Breakthrough"}, desc:{th:"สกิลถัดไปที่ซื้อจะทยอยผลเสร็จทันที และไม่นับโควตา 3 โครงการ",en:"The next skill you buy rolls out instantly and ignores the 3-project limit"}},
          {id:"sci2", cd:96, lv:5, icon:"flask-round", name:{th:"ทุนวิจัยเร่งด่วน",en:"Research Sprint"}, desc:{th:"สกิลถัดไปที่ซื้อถูกลง 5%",en:"The next skill you buy costs 5% less"}}]},
-  {id:"dip", price:249, icon:"handshake", color:"#8fd0ff",
+  {id:"dip", price:449, icon:"handshake", color:"#8fd0ff",
    name:{th:"นักการทูต",en:"The Diplomat"}, person:{th:"ทูตวารี",en:"Ambassador Waree"},
    pas:{th:"มิตรภาพกับทุกประเทศขึ้นเร็วขึ้น 4%",en:"Friendship rises 4% faster"},
    acts:[{id:"dip1", cd:42, icon:"users", name:{th:"ประชุมสุดยอด",en:"Summit"}, desc:{th:"ทุกประเทศในทวีปที่เลือกได้มิตรภาพ +3",en:"Every country in the selected region gets friendship +3"}},
          {id:"dip2", cd:48, lv:5, icon:"heart-handshake", name:{th:"ทูตสันถวไมตรี",en:"Goodwill Tour"}, desc:{th:"ยกเลิกการคว่ำบาตรทั้งหมด และประเทศที่โกรธเรามิตรภาพ +5",en:"Ends every sanction; angry countries' friendship +5"}}]},
-  {id:"eco", price:249, icon:"chart-candlestick", color:"#f2b441",
+  {id:"eco", price:399, icon:"chart-candlestick", color:"#f2b441",
    name:{th:"นักเศรษฐศาสตร์",en:"The Economist"}, person:{th:"คุณธารา",en:"Tara"},
    pas:{th:"รายได้ [[$money]] ต่อเดือน +5% (เลเวล 3: 6%)",en:"[[$money]] monthly income +5% (level 3: 6%)"},
    acts:[{id:"eco1", cd:30, icon:"banknote", name:{th:"พันธบัตรสีเขียว",en:"Green Bonds"}, desc:{th:"ได้ [[$money]] +100 ทันที แล้วผ่อนคืนเดือนละ 8 เป็นเวลา 12 เดือน",en:"[[$money]] +100 now, repaid at 8 a month for 12 months"}},
          {id:"eco2", cd:72, lv:5, icon:"arrow-left-right", name:{th:"ตลาดคาร์บอน",en:"Carbon Market"}, desc:{th:"แลก [[$policy]] 15 เป็น [[$money]] 40",en:"Trade [[$policy]] 15 for [[$money]] 40"}}]},
-  {id:"act", price:249, icon:"megaphone", color:"#ff8a7a",
+  {id:"act", price:399, icon:"megaphone", color:"#ff8a7a",
    name:{th:"นักเคลื่อนไหว",en:"The Activist"}, person:{th:"น้องเมฆ",en:"Mek"},
    pas:{th:"ความนิยมลดช้าลง 5% (เลเวล 3: 7%)",en:"Approval falls 5% slower (level 3: 7%)"},
    acts:[{id:"act1", cd:48, icon:"megaphone", name:{th:"รณรงค์ใหญ่",en:"Mass Campaign"}, desc:{th:"ความนิยม +2% ทันที (ก่อนหักกฎความนิยมเพิ่มยาก)",en:"Approval +2% now (before the slower-gain rule)"}},
@@ -343,14 +343,14 @@ const levelOf = xp => { let l = 1; LEVELS.forEach((v, i) => { if (xp >= v) l = i
 
 /* ---------------- Shop (prices in Terra) ---------------- */
 const SHOP = [
-  {id:"speed3", price:199, icon:"fast-forward", kind:"unlock", name:{th:"ความเร็ว x3",en:"Speed x3"}, desc:{th:"เพิ่มปุ่มความเร็ว x3 ในเกม (ถาวร)",en:"Adds a x3 speed button (permanent)"}},
-  {id:"char_dip", price:249, icon:"handshake", kind:"char", name:{th:"ตัวละคร: นักการทูต",en:"Character: The Diplomat"}},
-  {id:"char_eco", price:249, icon:"chart-candlestick", kind:"char", name:{th:"ตัวละคร: นักเศรษฐศาสตร์",en:"Character: The Economist"}},
-  {id:"char_act", price:249, icon:"megaphone", kind:"char", name:{th:"ตัวละคร: นักเคลื่อนไหว",en:"Character: The Activist"}},
-  {id:"theme_night", price:99, icon:"moon", kind:"theme", name:{th:"ธีมแผนที่กลางคืน",en:"Night map theme"}, desc:{th:"ทะเลสีเข้มและแสงไฟเมือง",en:"Dark seas and city lights"}},
-  {id:"theme_paint", price:99, icon:"palette", kind:"theme", name:{th:"ธีมแผนที่ภาพวาด",en:"Painted map theme"}, desc:{th:"สีพาสเทลแบบภาพสีน้ำ",en:"Soft watercolour colours"}},
-  {id:"outfit", price:149, icon:"shirt", kind:"outfit", name:{th:"ชุดตัวละครแบบใหม่",en:"New character outfits"}, desc:{th:"ชุดสีใหม่สำหรับตัวละครทุกตัว",en:"A new outfit for every character"}},
-  {id:"frame", price:79, icon:"square-dashed", kind:"frame", name:{th:"กรอบโปรไฟล์ทองบน Leaderboard",en:"Gold Leaderboard frame"}, desc:{th:"ชื่อของคุณมีกรอบสีทองในตารางอันดับ",en:"Your name gets a gold frame on the leaderboard"}},
+  {id:"speed3", price:299, icon:"fast-forward", kind:"unlock", name:{th:"ความเร็ว x3",en:"Speed x3"}, desc:{th:"เพิ่มปุ่มความเร็ว x3 ในเกม (ถาวร)",en:"Adds a x3 speed button (permanent)"}},
+  {id:"char_dip", price:449, icon:"handshake", kind:"char", name:{th:"ตัวละคร: นักการทูต",en:"Character: The Diplomat"}},
+  {id:"char_eco", price:399, icon:"chart-candlestick", kind:"char", name:{th:"ตัวละคร: นักเศรษฐศาสตร์",en:"Character: The Economist"}},
+  {id:"char_act", price:399, icon:"megaphone", kind:"char", name:{th:"ตัวละคร: นักเคลื่อนไหว",en:"Character: The Activist"}},
+  {id:"theme_night", price:149, icon:"moon", kind:"theme", name:{th:"ธีมแผนที่กลางคืน",en:"Night map theme"}, desc:{th:"ทะเลสีเข้มและแสงไฟเมือง",en:"Dark seas and city lights"}},
+  {id:"theme_paint", price:149, icon:"palette", kind:"theme", name:{th:"ธีมแผนที่ภาพวาด",en:"Painted map theme"}, desc:{th:"สีพาสเทลแบบภาพสีน้ำ",en:"Soft watercolour colours"}},
+  {id:"outfit", price:199, icon:"shirt", kind:"outfit", name:{th:"ชุดตัวละครแบบใหม่",en:"New character outfits"}, desc:{th:"ชุดสีใหม่สำหรับตัวละครทุกตัว",en:"A new outfit for every character"}},
+  {id:"frame", price:99, icon:"square-dashed", kind:"frame", name:{th:"กรอบโปรไฟล์ทองบน Leaderboard",en:"Gold Leaderboard frame"}, desc:{th:"ชื่อของคุณมีกรอบสีทองในตารางอันดับ",en:"Your name gets a gold frame on the leaderboard"}},
 ];
 const PRICE = {rename:49};
 
@@ -385,6 +385,6 @@ const ENDINGS = {
 const gradeOf = temp => temp < 1.6 ? "S" : temp < 2.0 ? "A" : "B";
 
 /* ---------------- Terra rewards (shown in the UI; the server decides the real amount) ---------------- */
-const TERRA = {win:30, l3:12, l2:6, l1:4, bonusMax:15, capGame:45, capHard:67, hardMult:1.5};
+const TERRA = {win:15, l3:6, l2:3, l1:2, bonusMax:8, capGame:23, capHard:34, hardMult:1.5};   // 1.7: gems are rarer
 
 Object.assign(P, {COUNTRIES, COUNTRY, COUNTRY_BY_GEO, REST_W, SHORT, HAZARDS, CEVENTS, CE_FIXED, CHARS, CHAR, LEVELS, levelOf, SHOP, PRICE, STORY, ADVISOR, ENDINGS, gradeOf, TERRA});

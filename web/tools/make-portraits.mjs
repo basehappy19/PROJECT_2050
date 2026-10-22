@@ -284,9 +284,56 @@ function adv(){
   });
 }
 
+/* 1.7: story people — the fossil-fuel lobby boss (Mr. Krai), a coastal volunteer from Samut Prakan (Fon), a rice farmer from the Chao Phraya delta (Uncle Thongdee) */
+function opp(){
+  const id = "opp";
+  return portrait({id, male:true, skin:"light", hair:"#8f8a86", hairHi:"#d8d4d0", hairDark:"#4a4643", brow:"#5a5552", smile:.35, age:1,
+    bg:["#4a2a20", "#24130e", "#0b0605"], rim:"#ff7a4a",
+    cloth:["#2a2d33", "#1b1d22", "#0c0d10"], inner:["#f4f1ec", "#d8d2c8"],
+    backHair:`<path d="M176,280 C164,190 226,120 302,118 C380,118 438,190 424,280 L412,250 L188,250 Z" fill="url(#${id}-hair)"/>`,
+    body:shoulders(`url(#${id}-cloth)`, `
+      <path d="M244,524 L300,612 L356,524 C340,532 322,544 300,548 C278,544 260,532 244,524 Z" fill="url(#${id}-inner)"/>
+      <path d="M292,548 L308,548 L318,640 L300,656 L282,640 Z" fill="#a8261c"/><path d="M290,540 L310,540 L306,556 L294,556 Z" fill="#7a1a12"/>
+      <path d="M215,520 L258,528 L300,640 L238,640 L192,560 Z" fill="#202328"/><path d="M385,520 L342,528 L300,640 L362,640 L408,560 Z" fill="#14161a"/>
+      <path d="M362,566 l26,-4 l2,10 l-26,4z" fill="#e8e2d8"/><circle cx="236" cy="590" r="7" fill="#c9a24a"/>`),
+    frontHair:`<path d="M182,262 C176,180 232,132 304,130 C378,130 430,178 420,262 C414,226 400,204 380,192 C330,176 262,178 214,196 C198,214 188,238 182,262 Z" fill="url(#${id}-hair)"/>
+      ${strands(["M220,176 C270,152 340,150 396,172", "M214,196 C260,170 330,166 384,186"], "#ffffff", .12)}`,
+  });
+}
+function fon(){
+  const id = "fon";
+  return portrait({id, male:false, skin:"tan", hair:"#140e0c", hairHi:"#4a3529", smile:1.1, age:.1,
+    bg:["#2a7f9a", "#124658", "#061c24"], rim:"#8fe6ff",
+    cloth:["#3fae6a", "#2b8450", "#165530"], inner:["#3fae6a", "#2b8450"],
+    backHair:`<path d="M170,290 C154,184 222,106 302,104 C384,104 450,182 432,290 L420,250 L180,250 Z" fill="url(#${id}-hair)"/>
+      <path d="M380,150 C440,170 470,240 452,330 C446,360 432,372 420,366 C436,320 432,250 392,196 Z" fill="url(#${id}-hair)"/>`,
+    body:shoulders(`url(#${id}-cloth)`, `
+      <path d="M262,504 C276,516 290,520 300,520 C310,520 324,516 338,504" fill="none" stroke="#165530" stroke-width="8"/>
+      <circle cx="300" cy="590" r="26" fill="#e8fff2" opacity=".9"/><path d="M286,592 q14,-24 28,0 q-14,12 -28,0z" fill="#2b8450"/>`),
+    frontHair:`<path d="M182,272 C168,176 226,124 302,122 C378,122 436,176 420,272 C414,234 400,208 380,194 C350,210 300,214 262,198 C232,206 196,236 182,272 Z" fill="url(#${id}-hair)"/>
+      ${strands(["M226,172 C262,150 330,148 376,168", "M302,126 C292,150 286,170 288,192"])}`,
+    extra:`<path d="M186,226 C230,204 370,204 414,226" stroke="#ffcc33" stroke-width="12" fill="none" stroke-linecap="round"/>`,
+  });
+}
+function lung(){
+  const id = "lung";
+  return portrait({id, male:true, skin:"tan", hair:"#2a2422", hairHi:"#6a625c", smile:.75, age:1, beard:true,
+    bg:["#6f8a2a", "#3a4a14", "#141a06"], rim:"#d9f27a",
+    cloth:["#2c3f6a", "#1d2b4c", "#0f1730"], inner:["#2c3f6a", "#1d2b4c"],
+    backHair:`<path d="M180,280 C170,210 224,170 300,168 C376,168 430,210 420,280 L410,250 L190,250 Z" fill="url(#${id}-hair)"/>`,
+    body:shoulders(`url(#${id}-cloth)`, `
+      <path d="M262,504 L300,556 L338,504" fill="none" stroke="#0f1730" stroke-width="6"/>
+      <path d="M200,560 C240,548 280,552 300,560" stroke="#c8462e" stroke-width="16" fill="none" stroke-linecap="round"/><path d="M200,560 C240,548 280,552 300,560" stroke="#f2c14e" stroke-width="3" stroke-dasharray="6 8" fill="none"/>`),
+    frontHair:`<path d="M190,262 C186,224 200,200 218,192 L382,192 C400,200 414,224 410,262 C404,240 394,226 378,220 L222,220 C206,226 196,240 190,262 Z" fill="url(#${id}-hair)"/>`,
+    extra:`<path d="M300,64 L470,214 C430,228 170,228 130,214 Z" fill="#d9b46a"/><path d="M300,64 L470,214 C430,228 170,228 130,214 Z" fill="none" stroke="#9c7a36" stroke-width="3"/>
+      <path d="M300,64 L360,212 M300,64 L240,212 M300,64 L410,210 M300,64 L190,210" stroke="#b8923e" stroke-width="2" opacity=".7"/>
+      <path d="M168,208 C230,196 370,196 432,208" stroke="#7a1f14" stroke-width="7" fill="none"/>`,
+  });
+}
+
 let LIST = [];
 for (const o of ["base", "alt", "gold"]){ LIST.push([`sci-${o}`, sci(o)], [`dip-${o}`, dip(o)], [`eco-${o}`, eco(o)], [`act-${o}`, act(o)], [`oce-${o}`, oce(o)], [`eng-${o}`, eng(o)]); }
-LIST.push(["adv", adv()]);
+LIST.push(["adv", adv()], ["opp", opp()], ["fon", fon()], ["lung", lung()]);
 // --only oce,eng → render just those characters (the others stay byte-for-byte as they are)
 const oi = process.argv.indexOf("--only"); if (oi > 0){ const only = process.argv[oi + 1].split(","); LIST = LIST.filter(([n]) => only.includes(n.split("-")[0])); }
 fs.mkdirSync(OUT, {recursive:true});

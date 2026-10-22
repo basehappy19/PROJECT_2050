@@ -47,12 +47,13 @@ export const Key = ({k}) => P.hasKeyboard() ? <kbd>{k}</kbd> : null;
 export const H3 = ({children, cls = ""}) => <h3 class={"h3 " + cls}><Rich t={up(children)} iconColor="inherit"/></h3>;
 
 /* character portrait (photo) — round or card */
+const NPC = ["opp", "fon", "lung"];   // 1.7: story people
 export function portraitSrc(id, outfit){
-  if (id === "adv") return "assets/img/portraits/adv.jpg";
+  if (id === "adv" || NPC.includes(id)) return `assets/img/portraits/${id}.jpg`;
   return `assets/img/portraits/${id}-${outfit || (P.outfitOf ? P.outfitOf(id) : "base")}.jpg`;
 }
 export function Portrait({id, size = 48, ring, cls = "", outfit, dim, lv}){
-  const ch = P.CHAR[id], col = ring || (ch ? ch.color : COL.purple), o = outfit || (id !== "adv" && P.outfitOf ? P.outfitOf(id) : "base");
+  const ch = P.CHAR[id], col = ring || (ch ? ch.color : COL.purple), o = outfit || (ch && P.outfitOf ? P.outfitOf(id) : "base");
   return <span class={`portrait ${o === "gold" ? "gold" : ""} ${dim ? "dim" : ""} ${cls}`} style={{width:size, height:size, "--ring":col}}>
     <img src={portraitSrc(id, o)} alt={ch ? L(ch.person) : ""} loading="lazy" draggable="false"/>{lv ? <b class="lv">{lv}</b> : null}</span>;
 }
@@ -87,7 +88,7 @@ export function Speak({text, btn, auto = true}){
 /* 1.9: narration and subtitles settings */
 export function NarrRow(){
   const th = S.lang === "th", ok = Narr.available();
-  const rates = [[.85, th ? "ช้า" : "Slow"], [1, th ? "ปกติ" : "Normal"], [1.15, th ? "เร็ว" : "Fast"]].map(([r, label]) => ({id:"r" + r, label, on:Narr.rate === r, fn:() => Narr.setRate(r)}));
+  const rates = [[1, th ? "ช้า" : "Slow"], [1.25, th ? "ปกติ" : "Normal"], [1.5, th ? "เร็ว" : "Fast"]].map(([r, label]) => ({id:"r" + r, label, on:Narr.rate === r, fn:() => Narr.setRate(r)}));
   return <div class="gfxrow narr"><Icon n="audio-lines" size={18}/><span class="lbl">{th ? "เสียงพากย์" : "Narration"}</span>
     {ok ? <><Check on={Narr.on} onClick={() => { Narr.setOn(!Narr.on); if (Narr.on) Narr.say(th ? "เปิดเสียงพากย์แล้ว" : "Narration is on"); }}>{th ? "อ่านออกเสียง" : "Read aloud"}</Check>
       <Check on={Narr.subs} onClick={() => Narr.setSubs(!Narr.subs)}>{th ? "คำบรรยาย" : "Subtitles"}</Check>

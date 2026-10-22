@@ -9,6 +9,7 @@ import {fileURLToPath} from "node:url";
 const HERE = path.dirname(fileURLToPath(import.meta.url)), WEB = path.resolve(HERE, ".."), OUT = path.resolve(WEB, "../assets/img/ui/3d");
 fs.mkdirSync(OUT, {recursive:true});
 
+const SKILL_MODELS = fs.readFileSync(path.join(HERE, "icons3d-skills.js"), "utf8");   // 1.7
 const PAGE = `<!doctype html><html><body style="margin:0;background:transparent">
 <script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js","three/addons/":"/node_modules/three/examples/jsm/"}}</script>
 <script type="module">
@@ -214,10 +215,11 @@ const MODELS = {
   star(){ const g = new THREE.Group(); g.add(mesh(ext(starShape(), .3, .12), mat(0xffc42e, {metalness:.6, roughness:.3, clearcoat:.6}))); g.rotation.set(-.2, .45, 0); return g; },
 };
 
+${SKILL_MODELS}
 window.renderAll = () => {
   const out = {};
   for (const [id, fn] of Object.entries(MODELS)){
-    if (window.ONLY && window.ONLY.length && !window.ONLY.includes(id)) continue;
+    if (window.ONLY && window.ONLY.length && !window.ONLY.some(o => o === id || (o.endsWith("*") && id.startsWith(o.slice(0, -1))))) continue;
     const scene = new THREE.Scene(); scene.environment = env; scene.environmentIntensity = .5;
     const key = new THREE.DirectionalLight(0xfff6e8, 2.4); key.position.set(-2, 3, 4); scene.add(key);
     const rim = new THREE.DirectionalLight(0x9fe8ff, .9); rim.position.set(3, 1, -2); scene.add(rim);

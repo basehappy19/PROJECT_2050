@@ -8,7 +8,7 @@ import {G} from "../game.js";
 import {Icon, Rich} from "./icon.jsx";
 import {Btn, IconBtn, Pill, Meter, Key, GroupTilt} from "./widgets.jsx";
 
-const R = 50, COLW = 168, ROWH = 128;
+const R = 50, COLW = 168, ROWH = 142;   // 1.7: a little more room for two-line names
 const hexPts = (cx, cy, r) => Array.from({length:6}, (_, i) => { const a = Math.PI / 180 * (60 * i - 30); return `${(cx + r * Math.cos(a)).toFixed(1)},${(cy + r * Math.sin(a)).toFixed(1)}`; }).join(" ");
 const centre = n => [92 + n.pos[0] * COLW, 70 + n.pos[1] * ROWH + (n.pos[0] % 2 ? 26 : 0)];
 const visible = n => S.owned[n.id] || n.req.every(q => S.owned[q]);
@@ -59,7 +59,8 @@ export function Skills(){
                 <polygon class="body" points={hexPts(cx, cy, R)}/>
                 {p !== null ? <polygon class="prog" points={hexPts(cx, cy, R - 5)} style={{opacity:.15 + .35 * p}}/> : null}
                 {sel ? <polygon class="selring" points={hexPts(cx, cy, R + 5)}/> : null}
-                <SvgIcon n={vis ? n.icon : "circle-help"} x={cx - 16} y={cy - 25} s={32} color={own ? "#fff" : vis ? (afford ? COL.accent : COL.fg) : COL.muted} op={vis ? 1 : .35}/>
+                {vis ? <image href={`assets/img/ui/3d/sk-${n.id}.webp`} x={cx - 25} y={cy - 33} width="50" height="50" opacity={own || afford ? 1 : .7}/>
+                  : <SvgIcon n="circle-help" x={cx - 16} y={cy - 25} s={32} color={COL.muted} op={.35}/>}
                 <text x={cx} y={cy + 25} class="lab">{lab}</text>
                 {n.type === "active" ? <SvgIcon n="zap" x={cx + R - 24} y={cy - R + 9} s={13} color={own ? COL.gold : COL.muted}/> : null}
                 {vis && n.trade ? <SvgIcon n="scale" x={cx - R + 11} y={cy - R + 9} s={13} color={COL.warn}/> : null}
@@ -83,6 +84,7 @@ export function Skills(){
           const first = P.SKILLS.find(n => n.cat === c.id && !S.owned[n.id] && visible(n)) || P.SKILLS.find(n => n.cat === c.id); S.node = first.id; bump();
         }}>
           <Icon n={c.icon} size={20}/><span><b>{L(c.name)}</b><small class="mono">{own}/{list.length}</small></span>{ready ? <i class="badge">{ready}</i> : null}
+          {P.SDG_OF && P.SDG_OF[c.id] ? <span class="sdgs">{P.SDG_OF[c.id].map(g => <img key={g} src={`assets/img/sdg/goal-${g}.svg`} alt={`SDG ${g}`} title={`SDG ${g} · ${L(P.SDG_NAME[g])}`} draggable="false"/>)}</span> : null}
         </button>;
       })}</nav>
     </section>
@@ -111,8 +113,9 @@ function Detail({cat}){
   const a = own && n.type === "active" ? P.abilityList().find(q => q.id === n.id) : null, cd = S.actCd[n.id] || 0, p = P.rollProgress(n.id);
   return <div class="sk-detail" key={n.id}>
     <div class="dtop">
-      <span class={"dicon " + (own ? "own" : "")}><Icon n={n.icon} size={36}/></span>
-      <div><h3>{L(n.name)}</h3><div class="pills">{tags.map(tg => <Pill key={tg} t={L(P.SKILL_TYPE[tg])} kind={tg === "trade" ? "warn" : tg === "active" ? "gold" : tg === "resp" ? "acc" : ""}/>)}</div></div>
+      <span class={"dicon d3 " + (own ? "own" : "")}><img src={`assets/img/ui/3d/sk-${n.id}.webp`} alt="" width="56" height="56" draggable="false"/></span>
+      <div class="grow"><h3>{L(n.name)}</h3><div class="pills">{tags.map(tg => <Pill key={tg} t={L(P.SKILL_TYPE[tg])} kind={tg === "trade" ? "warn" : tg === "active" ? "gold" : tg === "resp" ? "acc" : ""}/>)}</div></div>
+      {P.SDG_OF && P.SDG_OF[n.cat] ? <div class="sksdg">{P.SDG_OF[n.cat].map(g => <img key={g} src={`assets/img/sdg/goal-${g}.svg`} alt={`SDG ${g}`} title={`SDG ${g} · ${L(P.SDG_NAME[g])}`} draggable="false"/>)}</div> : null}
     </div>
     <Effects chips={P.skillChips(n)}/>
     <p class="desc muted"><Rich t={L(n.desc)}/></p>
@@ -124,7 +127,7 @@ function Detail({cat}){
       {n.type === "active" ? <Pill t={`${t("cooldownLen")} ${n.cd} ${t("months")}`} kind="gold"/> : null}
     </div>
     {!own ? <>
-      <Btn block size="lg" disabled={!can} sound={null} onClick={() => { if (P.buyNode(n.id)) bump(); }}>{`[[lock-open]] ${t("unlock")}`}</Btn>
+      <Btn block size="lg" disabled={!can} sound={null} onClick={() => { if (P.buyNode(n.id)){ if (P.SKILL_SND && P.SKILL_SND[n.id]) Audio.snippet(P.SKILL_SND[n.id]); bump(); } }}>{`[[lock-open]] ${t("unlock")}`}</Btn>
       {full ? <p class="bad small">{t("capFull")}</p> : st === "locked" ? <p class="warn small">{t("needReq")}</p>
         : !can && S.oreOn && P.matCost(n) && !P.matOk(n) ? <div class="skmat"><span class="bad small"><Rich t={`${t("matShortSk")} ${Object.entries(P.matCost(n)).filter(([g, v]) => (S.mat[g] || 0) < v).map(([g, v]) => `[[${P.MAT[g].icon}]] ${Math.ceil(v - (S.mat[g] || 0))}`).join("  ")}`} iconColor="inherit"/></span>
           {P.rawFor ? Object.entries(P.matCost(n)).filter(([g, v]) => (S.mat[g] || 0) < v && P.rawFor(g) > 0).map(([g]) => <small class="muted" key={g}><Rich t={`[[${P.MAT[g].icon}]] ${t("refWaiting").replace("{N}", P.rawFor(g)).replace("{M}", P.monthsToRefine(g))}`} iconColor="inherit"/></small>) : null}

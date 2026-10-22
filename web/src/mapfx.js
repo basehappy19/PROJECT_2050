@@ -271,3 +271,86 @@ export function drawInfo(M, c){
   const age = (performance.now() - inf.t) / 1000; if (age > 3.2){ M.info = null; return; }
   M.pill(clamp(inf.x, 90, M.w - 90), inf.y - 16, inf.txt, {h:22, bg:"rgba(6,16,21,.94)", stroke:COL.accent, font:"600 11.5px 'IBM Plex Sans Thai', sans-serif"});
 }
+
+/* ---------- 1.7: a more lived-in map ----------
+   · capital cities (gold star; the name when zoomed in)
+   · smokestacks at the big industrial hubs: they smoke as much as their continent still emits, and stop when it is clean
+   · the sea chokepoints ships use (Suez, Bab el-Mandeb, Panama, Hormuz, Malacca), red when an event closes them
+   All cheap: a few dozen small shapes per frame, and nothing at the "low" graphics level except the capitals. */
+const CHOKE_PT = {suez:[30.6, 32.35], redsea:[12.6, 43.4], panama:[9.1, -79.7], hormuz:[26.6, 56.3], malacca:[2.6, 101.2]};
+let capPts = null, hubPts = null, chokePts = null;
+export function drawDetail(M, c, now, vis, iconImg){
+  if (!S.regions) return;
+  const z = M.cam.z, low = Gfx.level === "low", th = S.lang === "th";
+  if (!capPts && P.CAPITALS) capPts = Object.entries(P.CAPITALS).map(([id, v]) => ({id, p:ll(v[0], v[1]), th:v[2], en:v[3]}));
+  if (!hubPts) hubPts = Object.entries(P.CITIES).flatMap(([reg, list]) => list.map(([lat, lon, w, name], i) => ({reg, w, p:ll(lat, lon), ph:i * 1.7})));
+  if (!chokePts) chokePts = Object.entries(CHOKE_PT).map(([k, v]) => ({k, p:ll(v[0], v[1])}));
+  // smokestacks (from continent view)
+  if (!low && z >= 1.25){
+    const regs = {}; for (const r of S.regions) regs[r.id] = r;
+    const s = clamp(10 + 6 * Math.sqrt(z), 18, 32);
+    for (const h of hubPts){
+      const [x, y] = M.toScreen(h.p[0], h.p[1]); if (!vis(x, y, 30)) continue;
+      const r = regs[h.reg], k = clamp(r.co2 / r.co2_0, 0, 1.3), on = k > .22;
+      const sx = x + 12, sy = y + 8;
+      // a small factory: hall + two chimneys (dark outline so it reads on any ground)
+      c.lineWidth = 1.6; c.strokeStyle = on ? "rgba(230,236,240,.85)" : "rgba(200,255,220,.9)"; c.fillStyle = on ? "#3c4349" : "#1f5a3c";
+      c.beginPath(); c.rect(sx - s * .45, sy - s * .32, s * .7, s * .32); c.rect(sx - s * .05, sy - s * .95, s * .16, s * .63); c.rect(sx + s * .2, sy - s * .75, s * .13, s * .43); c.fill(); c.stroke();
+      c.fillStyle = on ? "#c8402e" : "#3fae6a"; c.fillRect(sx - s * .05, sy - s * .95, s * .16, s * .1);
+      if (on){ for (let i = 0; i < 4; i++){ const q = (now * .3 + i / 4 + h.ph) % 1, rr = s * (.12 + q * .38) * (.6 + Math.min(1, k) * .5);
+        c.fillStyle = `rgba(120,116,112,${(1 - q) * .6 * Math.min(1, k + .2)})`; c.beginPath(); c.arc(sx + .03 * s + q * s * .8, sy - s * .98 - q * s * 1.5, rr, 0, TAU); c.fill(); } }
+      else { const im = iconImg("leaf", COL.good); if (im) c.drawImage(im, sx - 2, sy - s * 1.45, 12, 12); }
+      M.hits.push({id:"hub-" + h.reg + h.ph, x:sx - s * .5, y:sy - s, w:s, h:s, fn:() => { M.info = {x:sx, y:sy - s, t:performance.now(), txt:on ? (th ? `ย่านอุตสาหกรรม · ${L(P.RMETA[h.reg].name)} ยังปล่อย ${Math.round(k * 100)}% ของปี 2026` : `Industrial hub · ${L(P.RMETA[h.reg].name)} still emits ${Math.round(k * 100)}% of 2026`) : (th ? "ย่านอุตสาหกรรมสะอาดแล้ว" : "This industrial hub is clean now")}; }});
+    }
+  }
+  // chokepoints
+  if (!low && z >= 1.1){
+    for (const q of chokePts){
+      const [x, y] = M.toScreen(q.p[0], q.p[1]); if (!vis(x, y, 20)) continue;
+      const closed = ((S.closed || {})[q.k] || 0) > 0, col = closed ? COL.bad : "#8fd0ff";
+      c.fillStyle = "rgba(6,16,21,.8)"; c.beginPath(); c.arc(x, y, 8, 0, TAU); c.fill(); c.lineWidth = 1.5; c.strokeStyle = col; c.stroke();
+      const im = iconImg(closed ? "x" : "anchor", col); if (im) c.drawImage(im, x - 6, y - 6, 12, 12);
+      if (closed || z >= 2.2){ const nm = L(P.CHOKE[q.k]); c.font = "600 10px 'IBM Plex Sans Thai', sans-serif"; c.fillStyle = col; c.textAlign = "center"; c.fillText(nm, x, y + 19); c.textAlign = "left"; }
+      M.hits.push({id:"ck-" + q.k, x:x - 10, y:y - 10, w:20, h:20, fn:() => { M.info = {x, y:y - 12, t:performance.now(), txt:`${L(P.CHOKE[q.k])}${closed ? " · " + (th ? "ปิดอยู่" : "closed") : ""}`}; }});
+    }
+  }
+  // capitals (country view)
+  if (capPts && z >= 1.55){
+    const names = z >= 2.5;
+    c.font = "500 10px 'IBM Plex Sans Thai', sans-serif"; c.textBaseline = "middle";
+    for (const q of capPts){
+      const [x, y] = M.toScreen(q.p[0], q.p[1]); if (!vis(x, y, 10)) continue;
+      c.fillStyle = "rgba(6,16,21,.75)"; c.beginPath(); c.arc(x, y, 4.2, 0, TAU); c.fill();
+      c.fillStyle = COL.gold; star(c, x, y, 3.6);
+      if (names){ const nm = th ? q.th : q.en; c.lineWidth = 3; c.strokeStyle = "rgba(6,16,21,.8)"; c.strokeText(nm, x + 7, y); c.fillStyle = "#f3e2b0"; c.fillText(nm, x + 7, y); }
+    }
+    c.textBaseline = "alphabetic";
+  }
+}
+function star(c, x, y, r){ c.beginPath(); for (let i = 0; i < 10; i++){ const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .45 : r; c[i ? "lineTo" : "moveTo"](x + Math.cos(a) * rr, y + Math.sin(a) * rr); } c.closePath(); c.fill(); }
+
+/* ---------- 1.7: status badges over countries (sanctions, not cooperating, export stop, alliance, our base) ---------- */
+export function drawStatus(M, c, vis, iconImg){
+  if (!S.countries) return;
+  const zc = M.cam.z >= 1.55, sanct = S.sanct || {}, ban = S.oreBan || {}, th = S.lang === "th";
+  const allied = new Set(Object.values(S.alli || {}).flatMap(a => a.members));
+  for (const cc of S.countries){
+    if (cc.rest) continue;
+    const list = [];
+    if (sanct[cc.id] > 0) list.push(["ban", COL.bad, th ? `คว่ำบาตรเรา ${sanct[cc.id]} เดือน` : `Sanctioning us · ${sanct[cc.id]} mo`]);
+    else if (ban[cc.id] > 0) list.push(["package-x", COL.warn, th ? `หยุดส่งออกทรัพยากร ${ban[cc.id]} เดือน` : `Exports stopped · ${ban[cc.id]} mo`]);
+    if (cc.hostile && !(sanct[cc.id] > 0)) list.push(["angry", "#ff9a3c", th ? "ไม่ร่วมมือ" : "Not cooperating"]);
+    if (zc && allied.has(cc.id)) list.push(["handshake", COL.good, th ? "พันธมิตร" : "Alliance member"]);
+    if (S.world && S.hq === cc.id) list.push(["landmark", COL.gold, th ? "ฐานบัญชาการ" : "Home base"]);
+    if (S.world && (S.amb || []).includes(cc.id)) list.push(["flag", COL.accent, th ? "ทูตของเรา" : "Our ambassador"]);
+    if (!list.length) continue;
+    const pt = M.countryPoint(cc.id); if (!pt) continue;
+    const [x0, y0] = M.toScreen(pt[0], pt[1]); if (!vis(x0, y0, 30)) continue;
+    list.forEach(([ic, col, tip], i) => {
+      const x = x0 + 16 + i * 21, y = y0 + 12;
+      c.fillStyle = "rgba(6,16,21,.92)"; c.beginPath(); c.arc(x, y, 10, 0, TAU); c.fill(); c.lineWidth = 2; c.strokeStyle = col; c.stroke();
+      const im = iconImg(ic, col); if (im) c.drawImage(im, x - 7, y - 7, 14, 14);
+      M.hits.push({id:"st-" + cc.id + ic, x:x - 11, y:y - 11, w:22, h:22, fn:() => { M.info = {x, y:y - 14, t:performance.now(), txt:`${P.cname(cc.id)} · ${tip}`}; }});
+    });
+  }
+}

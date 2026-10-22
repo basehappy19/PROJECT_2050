@@ -72,6 +72,16 @@ const A = {
     };
     const b = this.buf.get(name); if (b) go(b); else this.load(name).then(go);
   },
+  /* 1.7: a short piece (about 2 s) of a real recording, faded in and out: what a skill sounds like when it is approved */
+  snippet(n, o = {}){
+    if (!this.on || !this.ctx || this.ctx.state !== "running" || !n) return;
+    this.load("amb-" + n).then(b => {
+      if (!b) return;
+      const c = this.ctx, src = c.createBufferSource(), g = c.createGain(), len = Math.min(o.len || 2.2, b.duration), t0 = c.currentTime + (o.delay || .15), v = (o.vol ?? 1.4);
+      src.buffer = b; g.gain.setValueAtTime(0, t0); g.gain.linearRampToValueAtTime(v, t0 + .18); g.gain.setValueAtTime(v, t0 + len - .7); g.gain.linearRampToValueAtTime(0, t0 + len);
+      src.connect(g); g.connect(this.gSfx); src.start(t0, Math.random() * Math.max(0, b.duration - len - .5)); src.stop(t0 + len + .05);
+    });
+  },
   hover(){ const now = performance.now(); if (now - this.lastHover < 70) return; this.lastHover = now; this.play("hover", {vol:.5}); },
   /* looping layer with fades (ambience = event / hazard soundscape · bed = quiet background under the music) */
   loop(slot, n, vol = 1, fade = .8){

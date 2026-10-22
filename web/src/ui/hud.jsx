@@ -153,6 +153,8 @@ function MeterNZ(){
     <div class="bar nz">
       <i class="fill" style={{width:`${(1 - pos(net)) * 100}%`}}/>
       <i class="ghost" style={{left:`${(1 - pos(start)) * 100}%`}}/>
+      {!S.world && P.MILESTONES ? P.MILESTONES.map((m, i) => { const st = (S.ms17 || {})[i], cur = st === undefined && P.MILESTONES.findIndex((q, k) => (S.ms17 || {})[k] === undefined) === i;
+        return <i key={m.y} class={"ms " + (st === 1 ? "hit" : st === 0 ? "miss" : cur ? "next" : "")} style={{left:`${(1 - pos(m.v)) * 100}%`}} title={`${m.y}: CO₂ ≤ ${m.v} Gt`}><b>{st === 1 ? "✓" : st === 0 ? "✕" : ""}{m.y}</b></i>; }) : null}
       <i class={"dot " + cls} style={{left:`${(1 - pos(net)) * 100}%`}}/>
       <Icon n="trophy" size={17} cls="end good"/>
     </div>

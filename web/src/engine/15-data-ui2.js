@@ -51,7 +51,7 @@ Object.assign(P.UI, {
   storyTag:T("เนื้อเรื่อง","Story"), storyGo:T("ไปต่อ","Continue"), storyKeys:T("Space = ต่อไป · Esc = ข้าม","Space = next · Esc = skip"),
   /* skills screen */
   skillsTitle:T("สกิล","Skills"), pausedHere:T("เกมหยุดชั่วคราวขณะเปิดหน้านี้","The game is paused while this screen is open"),
-  buffInstant:T("ค้นพบใหม่: สกิลถัดไปเสร็จทันที","Breakthrough: next skill is instant"), buffDisc:T("ทุนวิจัย: สกิลถัดไปถูกลง 40%","Research sprint: next skill −40%"),
+  buffInstant:T("ค้นพบใหม่: สกิลถัดไปเสร็จทันที","Breakthrough: next skill is instant"), buffDisc:T("ทุนวิจัย: สกิลถัดไปถูกลง 5%","Research sprint: next skill −5%"),
   ready:T("พร้อม","Ready"), hiddenSkill:T("สกิลปริศนา","Unknown skill"), hiddenHint:T("ปลดล็อกสกิลก่อนหน้าเพื่อดูรายละเอียด:","Unlock the earlier skill to reveal it:"),
   noRollouts:T("ยังไม่มีโครงการที่กำลังทยอยผล","No projects rolling out"), needReq:T("ต้องมีสกิลก่อนหน้าก่อน","Needs the earlier skill first"),
   useNow:T("ใช้ตอนนี้","Use now"), target:T("เป้าหมาย","Target"), rollingOut:T("กำลังทยอยผล","Rolling out"),

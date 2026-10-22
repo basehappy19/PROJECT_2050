@@ -80,3 +80,6 @@ Object.assign(P.UI, {
   slotClear:T("ลบเซฟทั้งหมด", "Delete all saves"), slotClearSure:T("ลบเซฟ {N} ช่อง? กู้คืนไม่ได้", "Delete {N} saves? This can't be undone"),
   slotCleared:T("ลบเซฟทั้งหมดแล้ว", "All saves deleted"), cancel:P.UI.cancel || T("ยกเลิก", "Cancel"),
 });
+
+/* 1.7 */
+Object.assign(P.UI, { bubPaused:T("กดเล่นต่อก่อน", "Unpause first") });

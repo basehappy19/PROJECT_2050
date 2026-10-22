@@ -9,3 +9,8 @@ Project Zero — image credits (web version)
   (semi-realistic painted style, landscapes and objects; every picture checked by eye, bad ones redrawn).
   Check the SD-Turbo model licence on huggingface.co/stabilityai/sd-turbo before any commercial use.
 - 3D value icons (img/ui/3d/*.webp): rendered for this game with three.js (web/tools/make-icons3d.mjs).
+
+SDG ICONS (1.7)
+- assets/img/sdg/goal-*.svg — the United Nations Sustainable Development Goals icons, taken from the
+  @haxtheweb/un-sdg package (Apache-2.0). Used for information, non-commercially, as the UN guidelines allow
+  (https://www.un.org/sustainabledevelopment/news/communications-material/). The UN does not endorse this game.

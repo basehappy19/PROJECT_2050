@@ -52,6 +52,7 @@ export function Menu(){
           <img src="assets/img/ui/logo.png" alt="" width="54" height="54"/>
           <div><small class="mono acc">GLOBAL CLIMATE TASKFORCE · 2026 – 2050</small><h1>PROJECT <b>ZERO</b></h1></div>
         </div>}
+        {!sub ? <div class="sdgtag"><img src="assets/img/sdg/goal-13.svg" alt="SDG 13" width="38" height="38"/><span>{t("mTag")}</span></div> : null}
         {!sub && N().cfg && N().cfg.announcement && L(N().cfg.announcement) ? <div class="announce card"><Icon n="megaphone" size={18} color="warn"/><span>{L(N().cfg.announcement)}</span></div> : null}
         {sub === "load" ? <SubLoad/> : sub === "ach" ? <><Btn kind="ghost" block onClick={goSub("cert")}>{`[[award]] ${t("mCert")}`}</Btn><AchList/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : sub === "season" ? <SubSeason/> : sub === "settings" ? <SubSettings/> : <Main/>}
         {sub ? null : <footer class="mfooter">
