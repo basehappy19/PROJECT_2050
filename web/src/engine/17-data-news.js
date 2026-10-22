@@ -198,7 +198,7 @@ const NEWS_EVENTS = [
     O("ใช้โอกาสนี้ผลักดันเป้าหมายที่เข้มขึ้น", "Use it to push for tougher targets", {pc:-20, comp:{ALL:4}, appr:-1}),
     O("เร่งระบบเตือนภัยคลื่นความร้อน", "Speed up heatwave warnings", {ep:-35, vuln:{ALL:-4}, appr:2}),
     O("บอกประชาชนว่าอย่าตื่นตระหนก", "Tell people not to panic", {appr:1})),
-  N("NW_CORAL", "SEA", {}, "underwater", 2024, "NOAA", "https://www.noaa.gov/news-release/noaa-confirms-4th-global-coral-reef-bleaching-event",
+  N("NW_CORAL", "SEA", {}, "underwater", 2024, "NOAA", "https://www.noaa.gov/news-release/noaa-confirms-4th-global-coral-bleaching-event",
     T("ปะการังฟอกขาวทั่วโลกครั้งที่ 4", "The Fourth Global Coral Bleaching"),
     T("น้ำทะเลร้อนจัดต่อเนื่องหลายเดือนทำให้ปะการังฟอกขาวในทุกมหาสมุทร ชาวประมงและการท่องเที่ยวชายฝั่งได้รับผลกระทบ", "Months of hot seawater bleach corals in every ocean. Fishers and coastal tourism are hit."),
     T("เรื่องจริง: เมษายน 2024 NOAA ยืนยันการฟอกขาวของปะการังทั่วโลกครั้งที่ 4 แนวปะการังกว่า 80% ของโลกเจอความร้อนระดับฟอกขาว รวมถึงทะเลไทย", "Real story: in April 2024 NOAA confirmed the 4th global coral bleaching event; over 80% of the world's reefs saw bleaching-level heat, Thai seas included."),
