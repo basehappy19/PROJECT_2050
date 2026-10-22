@@ -294,18 +294,19 @@ function Spark({data, color, min, max}){
 /* 1.6: politics at home — the four groups behind the approval number */
 export function Politics(){
   const close = () => { UIM.modal = null; bump(); };
-  const th = S.lang === "th";
+  const th = S.lang === "th", gs = S.groups || {};
   return <Modal kind="politics" wide onClose={close}>
     <h2><Icon n="$appr" size={30}/> {th ? "ความนิยม" : "Approval"} <span class="mono">{S.appr.toFixed(0)}%</span></h2>
-    <GroupList full extra={g => <Spark data={(S.grpHist || {})[g]} color={P.GROUP[g].color} min={0} max={100}/>}/>
+    <div class="gmix" title={th ? "ความนิยมรวมมาจาก 4 กลุ่มตามน้ำหนัก" : "Approval is the weighted mix of the 4 groups"}>{P.GROUPS.map(G => <i key={G.id} style={{flex:G.w, "--gc":G.color}}><b style={{width:`${gs[G.id] || 0}%`}}/><span><Icon n={G.icon} size={13}/>{Math.round(G.w * 100)}%</span></i>)}</div>
+    <GroupList full/>
   </Modal>;
 }
 /* 1.7: raw minerals waiting, refining speed, our refinery and friendly refiners */
 function Refinery({g}){
-  const th = S.lang === "th", lv = (S.refLv || {})[g] || 0, b = (S.refBuild || {})[g], tl = P.tollers(g), k = P.refCost(g), max = P.refLevel(g) >= P.REF_MAX_LV;
+  const lv = (S.refLv || {})[g] || 0, b = (S.refBuild || {})[g], tl = P.tollers(g), k = P.refCost(g), max = P.refLevel(g) >= P.REF_MAX_LV;
   const tip = `${t("refOurs")} ${lv}/${P.REF_MAX_LV}${tl.length ? " · " + t("refFriends") + ": " + P.joinNames(tl.map(c => c.id)) : ""}`;
   return <div class="mkref" title={tip}>
-    <span class="rflow" title={t("refRawHelp")}><Icon n="pickaxe" size={15}/><b class="mono">{P.rawFor(g)}</b><Icon n="arrow-right" size={13} cls="muted"/><Icon n="factory" size={15}/><b class="mono">{P.refCap(g).toFixed(1)}</b><small class="muted">{t("perMo")}</small></span>
+    <span class="rflow"><Icon n="factory" size={15}/>{t("invSpeed")} <b class="mono">{P.refCap(g).toFixed(1)}</b><small class="muted">{t("perMo")}</small></span>
     <span class="pips">{Array.from({length:P.REF_MAX_LV}, (_, i) => <i key={i} class={i < lv ? "on" : i === lv && b ? "bld" : ""}/>)}{tl.length ? <small class="muted"><Icon n="handshake" size={12}/>{tl.length}</small> : null}</span>
     <span class="grow"/>
     {max ? null : b ? <small class="muted"><Icon n="hammer" size={13}/> {b} {t("months")}</small>
@@ -321,13 +322,17 @@ export function Market(){
     <div class="mkhead"><h2>{th ? "ตลาดทรัพยากรโลก" : "World resources market"}</h2><span class="mkcash"><Rich t={`${ep} ${Math.floor(S.ep)}`}/></span></div>
     <div class="mkgrid">{P.MAT_IDS.map(g => {
       const G = P.MAT[g], pr = P.mktPrice(g), hist = (S.mktHist || {})[g] || [], prev = hist.length > 1 ? hist[hist.length - 2] : pr;
-      const chg = prev ? (pr - prev) / prev * 100 : 0, lvl = S.mkt[g] / 1, short = P.matShort(g);
-      const k10 = P.mktLotCost(g, lot), kN = short ? P.mktLotCost(g, short.need) : 0;
+      const chg = prev ? (pr - prev) / prev * 100 : 0, lvl = S.mkt[g] / 1;
+      const k10 = P.mktLotCost(g, lot);
       return <div class="mkcard" key={g} style={{"--rc":G.col}}>
         <div class="mktop">
           <Icon n={G.icon} size={52}/>
           <div class="grow"><b>{L(G.name)}</b></div>
-          <div class="mkstock"><b class="mono">{Math.floor(S.mat[g])}</b><small class="muted">{P.refCap ? t("refStock") : th ? "มีอยู่" : "in stock"} · +{gain[g].toFixed(1)}{t("perMo")}</small></div>
+        </div>
+        <div class="mkinv">
+          <div class="inv ok"><small>{t("invReady")}</small><b class="mono">{Math.floor(S.mat[g])}</b></div>
+          <Icon n="arrow-left" size={18} cls="muted"/>
+          <div class={"inv raw " + (P.rawFor && P.rawFor(g) ? "" : "zero")}><small>{t("invRaw")}</small><b class="mono">{P.rawFor ? P.rawFor(g) : 0}</b>{P.rawFor && P.rawFor(g) ? <small class="muted">~{P.monthsToRefine(g)} {t("months")}</small> : null}</div>
         </div>
         <div class="mkprice">
           <div>
@@ -340,7 +345,6 @@ export function Market(){
         {P.refCap ? <Refinery g={g}/> : null}
         <div class="mkbtns">
           <Btn kind="primary" disabled={S.ep < k10} sound={null} onClick={() => { if (P.mktBuy(g, lot)) Audio.play("coin"); }}><Rich t={`${th ? "ซื้อ" : "Buy"} ${lot} · ${ep} ${k10}`} iconColor="inherit"/></Btn>
-          {short ? <Btn kind="gold" disabled={S.ep < kN} sound={null} onClick={() => { if (P.mktBuy(g, short.need)) Audio.play("coin"); }}><Rich t={`${th ? "ซื้อที่ขาด" : "Buy missing"} ${short.need} · ${ep} ${kN}`} iconColor="inherit"/></Btn> : null}
           <Btn kind="ghost" disabled={S.mat[g] < lot} sound={null} onClick={() => { if (P.mktSell(g, lot)) Audio.play("coin"); }}><Rich t={`${th ? "ขาย" : "Sell"} ${lot} · +${P.mktSellGain(g, lot)}`} iconColor="inherit"/></Btn>
         </div>
       </div>;

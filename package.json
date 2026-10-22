@@ -1,6 +1,6 @@
 {
   "name": "project-zero",
-  "version": "1.5.4",
+  "version": "1.6.0",
   "private": true,
   "description": "Project Zero: the web game, its API server and the admin page, run with one command",
   "type": "module",

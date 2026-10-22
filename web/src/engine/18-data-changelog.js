@@ -6,6 +6,23 @@ const V = (v, date, name, th, en) => ({v, date, name, items:{th, en}});
 /* minor updates (1.1.1, 1.1.2, …) sit inside their main version as subs, newest first */
 const SUB = (v, date, th, en) => ({v, date, items:{th, en}});
 P.CHANGELOG = [
+  V("1.6", "2026-10-22", {th:"โลกกว้างขึ้น ดูง่ายขึ้น", en:"A Bigger, Clearer World"}, [
+    "เพิ่มประเทศอีก 80 ประเทศ รวมเป็น 172 ประเทศ เช่น เซอร์เบีย ลิทัวเนีย ซูดาน เซเนกัล ฮอนดูรัส ปารากวัย เติร์กเมนิสถาน ภูฏาน มัลดีฟส์",
+    "หน้าประเทศ: ทรัพยากรแต่ละชนิดบอกชัดว่า “พร้อมใช้” หรือ “ต้องแปรรูป” และสถานะการส่งทรัพยากรให้เราอ่านได้ในบรรทัดเดียว",
+    "ตลาดทรัพยากร: เห็นชัดว่ามีของพร้อมใช้เท่าไร และรอแปรรูปอีกเท่าไร เหลือแค่ปุ่มซื้อกับขาย",
+    "หน้าความนิยม: เห็นว่าแต่ละกลุ่มชอบและไม่ชอบอะไร เปลี่ยนไปเท่าไรใน 1 ปี และได้หรือเสียอะไร",
+    "หน้าสถิติแบ่งเป็น 4 แท็บ และมีแท็บการเงิน บอกว่าเงินและแต้มนโยบายได้มาจากไหน ใช้ไปกับอะไร รายปีหรือทั้งเกม",
+    "สกิลใหม่ตอนเลเวล 5: นักการทูต “ทูตสันถวไมตรี” ยกเลิกการคว่ำบาตรทั้งหมด และนักกิจกรรม “พลังเยาวชน” ทำให้คนรุ่นใหม่พอใจขึ้น",
+    "ปรับความยากใหม่ให้เหมาะกับประเทศที่เพิ่มขึ้น",
+  ], [
+    "80 more countries, 172 in all, such as Serbia, Lithuania, Sudan, Senegal, Honduras, Paraguay, Turkmenistan, Bhutan and the Maldives.",
+    "Country pages show each resource as “ready” or “needs refining”, and supply status in one line.",
+    "The resources market shows at a glance what is ready and what is still waiting to be refined; just Buy and Sell remain.",
+    "The approval window shows what each group likes and dislikes, how it changed in a year and what it gives or costs.",
+    "Statistics in four tabs, with a new Money tab: where money and policy points came from and went, per year or for the whole game.",
+    "New level 5 abilities: the Diplomat’s “Goodwill Tour” ends every sanction, and the Activist’s “Youth Power” wins over young people.",
+    "Difficulty retuned for the bigger world.",
+  ]),
   V("1.5", "2026-10-22", {th:"ซีซั่นแรก", en:"Season One"}, [
     "ภารกิจรายสัปดาห์: ทุกสัปดาห์มี 3 ภารกิจ (ง่าย กลาง ยาก) ทำสำเร็จแล้วกดรับเพชร",
     "รางวัลซีซั่น: ทุกเกมที่เล่นจบได้ XP ซีซั่น สะสมครบแต่ละขั้นรับเพชรและของพิเศษ เช่น กรอบโปรไฟล์ และธีมแผนที่",

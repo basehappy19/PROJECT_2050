@@ -21,16 +21,16 @@ const hook = (name, ...a) => (P.H && P.H[name] ? P.H[name](...a) : undefined);
 
 const GROUPS = [
   {id:"city",  w:.35, icon:"building-2",     color:"#5cc8ff", name:T("คนเมือง", "City people"),
-   likes:T("ขนส่งสาธารณะ เมืองร่มรื่น ป้องกันน้ำท่วม", "Transit, cooler cities, flood defences"), hates:T("ค่าไฟและค่าเดินทางแพง ภัยพิบัติในเมือง", "Dearer bills and fares, disasters in cities"),
+   likes:T("ขนส่งสาธารณะ · เมืองร่มรื่น · ป้องกันน้ำท่วม", "Transit, cooler cities, flood defences"), hates:T("ค่าไฟและค่าเดินทางแพง · ภัยพิบัติในเมือง", "Dearer bills and fares, disasters in cities"),
    good:T("สนับสนุน: ความนิยม +0.1%/เดือน", "Backing you: approval +0.1%/mo"), bad:T("ไม่พอใจมาก: อาจเกิดการประท้วงในเมือง (ความนิยมและเงินลด)", "Very angry: city riots may break out (approval and money fall)")},
   {id:"ind",   w:.25, icon:"factory",        color:"#ffb04a", name:T("ภาคอุตสาหกรรม", "Industry"),
-   likes:T("พลังงานราคาถูก เทคโนโลยีใหม่ การปกป้องธุรกิจในประเทศ", "Cheap power, new technology, protection at home"), hates:T("ภาษีคาร์บอน กฎบังคับโรงงาน เลิกอุดหนุนฟอสซิล", "Carbon taxes, factory rules, ending fossil subsidies"),
+   likes:T("พลังงานราคาถูก · เทคโนโลยีใหม่ · ปกป้องธุรกิจในประเทศ", "Cheap power, new technology, protection at home"), hates:T("ภาษีคาร์บอน · กฎบังคับโรงงาน · เลิกอุดหนุนฟอสซิล", "Carbon taxes, factory rules, ending fossil subsidies"),
    good:T("สนับสนุน: รายได้ +2/เดือน", "Backing you: income +2/mo"), bad:T("ไม่พอใจมาก: อาจนัดหยุดงานและล็อบบี้ (เงินลด ทำตามแผนลด)", "Very angry: strikes and lobbying may follow (money and on-plan fall)")},
   {id:"farm",  w:.20, icon:"tractor",        color:"#9ad35a", name:T("เกษตรกร", "Farmers"),
-   likes:T("ชลประทาน พืชทนแล้ง เกษตรฟื้นฟู", "Irrigation, hardy crops, regenerative farming"), hates:T("เสียที่ดินทำกิน ปุ๋ยแพง เนื้อสัตว์ทางเลือก ภัยแล้ง", "Losing farmland, dearer fertiliser, alternative meat, droughts"),
+   likes:T("ชลประทาน · พืชทนแล้ง · เกษตรฟื้นฟู", "Irrigation, hardy crops, regenerative farming"), hates:T("เสียที่ดินทำกิน · ปุ๋ยแพง · เนื้อสัตว์ทางเลือก · ภัยแล้ง", "Losing farmland, dearer fertiliser, alternative meat, droughts"),
    good:T("สนับสนุน: ดินเก็บคาร์บอนเพิ่มทุกเดือน", "Backing you: soils store a little more carbon each month"), bad:T("ไม่พอใจมาก: อาจขับรถไถปิดถนน (เงินและแต้มนโยบายลด)", "Very angry: tractor blockades may follow (money and policy points fall)")},
   {id:"youth", w:.20, icon:"graduation-cap", color:"#c58cff", name:T("คนรุ่นใหม่", "Young people"),
-   likes:T("พลังงานสะอาด ภาษีคาร์บอน ปลูกป่า แคมเปญความรู้", "Clean energy, carbon taxes, forests, climate campaigns"), hates:T("เผาฟอสซิลเพิ่ม ทางเลือกที่ทำให้ CO₂ สูงขึ้น", "Burning more fossil fuel, choices that raise CO₂"),
+   likes:T("พลังงานสะอาด · ภาษีคาร์บอน · ปลูกป่า · แคมเปญความรู้", "Clean energy, carbon taxes, forests, climate campaigns"), hates:T("เผาฟอสซิลเพิ่ม · ทางเลือกที่เพิ่ม CO₂", "Burning more fossil fuel, choices that raise CO₂"),
    good:T("สนับสนุน: แต้มนโยบาย +1/เดือน", "Backing you: policy points +1/mo"), bad:T("ไม่พอใจมาก: อาจหยุดเรียนประท้วง (แต้มนโยบายลด)", "Very angry: school strikes may follow (policy points fall)")},
 ];
 const GID = GROUPS.map(g => g.id), GW = Object.fromEntries(GROUPS.map(g => [g.id, g.w]));
@@ -150,12 +150,13 @@ const TX = {
   angry:T("ไม่พอใจมาก ระวังการประท้วง", "is very angry: protests may follow"),
 };
 function protest(g){
-  const tx = L(TX.protest[g]), IC = P.IC;
+  const tx = L(TX.protest[g]), IC = P.IC, e0 = S.ep, p0 = S.pc;
   let fx = "";
   if (g === "city"){ shiftAll(-2); const m = Math.min(S.ep, 5); S.ep -= m; fx = `${IC.appr} −2% · ${IC.ep} −${m}`; }
   if (g === "ind"){ const m = Math.min(S.ep, 10); S.ep -= m; S.regions.forEach(r => { r.comp = clamp(r.comp - 1, 0, 100); }); fx = `${IC.ep} −${m} · ${IC.comp} −1%`; }
   if (g === "farm"){ const m = Math.min(S.ep, 6), q = Math.min(S.pc, 3); S.ep -= m; S.pc -= q; fx = `${IC.ep} −${m} · ${IC.pc} −${q}`; }
   if (g === "youth"){ const q = Math.min(S.pc, 6); S.pc -= q; fx = `${IC.pc} −${q}`; }
+  if (P.ledgerTag) P.ledgerTag("protest", S.ep - e0, S.pc - p0);
   S.stats.protests = (S.stats.protests || 0) + 1;
   P.addLog(`[[megaphone]] ${tx} · ${fx}`, "al");
   hook("sfx", "warn"); hook("toast", {id:"prot" + g + S.tick, icon:"megaphone", title:L(T("ประท้วง", "Protest")), msg:L(GROUP[g].name)});
@@ -177,8 +178,8 @@ function groupsTick(){
     if (S.grpCd[g] > 0) S.grpCd[g]--;
     if (isBacking(g, v, avg)){
       if (f !== 1){ S.grpFlag[g] = 1; P.addLog(`[[${GROUP[g].icon}]] ${L(GROUP[g].name)} ${L(TX.back)}`, "gd"); }
-      if (g === "ind") S.ep += 2;
-      if (g === "youth") S.pc += 1;
+      if (g === "ind"){ S.ep += 2; if (P.ledgerTag) P.ledgerTag("support", 2, 0); }
+      if (g === "youth"){ S.pc += 1; if (P.ledgerTag) P.ledgerTag("support", 0, 1); }
       if (g === "city") shiftAll(.1);
       if (g === "farm" && S.soilC < .5){ S.soilC += .004; S.sink += .004; }
     } else if (v < ANGRY){
@@ -222,4 +223,5 @@ const isBacking = (g, v, m) => (v >= BACK && v >= m + BACK_GAP) || ((S.grpFlag |
 const groupState = g => { if (!S.groups) return "ok"; const v = S.groups[g], m = mean(); return v < ANGRY ? "angry" : isBacking(g, v, m) ? "back" : v < 40 ? "low" : "ok"; };
 const angryCount = () => (S.groups ? GID.filter(g => S.groups[g] < ANGRY).length : 0);
 
+P.groupTilt = t => { if (!S.groups) return; sync(); applyTilt(t); settle(); };
 Object.assign(P, {withGroupTilt:withTilt, groupPreview:preview, GROUPS, GROUP, GID, GROUP_BACK:BACK, GROUP_ANGRY:ANGRY, tiltOfSkill, tiltOfOption, tiltOfAction, groupState, angryCount, eventTilt, groupsTick});

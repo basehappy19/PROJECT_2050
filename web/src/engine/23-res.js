@@ -68,6 +68,9 @@ const CRES = {
   ZAF:{r:["coal"], w:1}, IRN:{r:["oil"], w:0}, IRQ:{r:["oil"], w:0}, ARE:{r:["oil"], w:0}, KWT:{r:["oil"], w:0}, NGA:{r:["oil"], w:0}, NOR:{r:["oil"], w:0},
   BOL:{r:["li"], w:2}, MOZ:{r:["gr"], w:1}, MDG:{r:["gr", "ni"], w:1}, TZA:{r:["gr"], w:1}, PNG:{r:["cu", "ni"], w:1}, FIN:{r:["ni", "co"], w:1}, JOR:{r:["ph"], w:1},
   AGO:{r:["oil"], w:0}, OMN:{r:["oil"], w:0}, BRN:{r:["oil"], w:0},
+  /* 1.6 */ ZMB:{r:["cu", "co"], w:2}, ZWE:{r:["li", "coal"], w:2}, NAM:{r:["u"], w:2}, NER:{r:["u"], w:1}, SRB:{r:["li"], w:1}, GAB:{r:["oil"], w:0},
+  LBY:{r:["oil"], w:0}, BHR:{r:["oil"], w:0}, TKM:{r:["oil"], w:0}, AZE:{r:["oil"], w:0}, TTO:{r:["oil"], w:0}, GUY:{r:["oil"], w:0},
+  TUN:{r:["ph"], w:0}, SEN:{r:["ph"], w:0}, TGO:{r:["ph"], w:0}, AFG:{r:["li", "cu"], w:0}, BGR:{r:["cu"], w:0}, MRT:{r:["sand"], w:0},
   VEN:{r:["oil"], w:0}, COL:{r:["coal", "oil"], w:0}, ECU:{r:["oil"], w:0}, TUR:{r:["co"], w:0}, ISR:{r:["ph"], w:0},
 };
 /* countries that depend on imported minerals (shown on their panel) */

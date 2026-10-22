@@ -93,7 +93,7 @@ function placeBuilds(n){
 function pinsTick(){ (S.pins || []).forEach(p => { if (!p.done && P.rollProgress(p.sk) === null) p.done = true; }); }
 
 /* ---------------- seasons ---------------- */
-const SOUTH = new Set(["AUS", "NZL", "ARG", "CHL", "ZAF", "BRA", "PER"]);
+const SOUTH = new Set(["AUS", "NZL", "ARG", "CHL", "ZAF", "BRA", "PER", "ZWE", "ZMB", "NAM", "BWA", "MUS", "MWI", "SWZ", "PRY", "SLB", "VUT", "TLS"]);
 const SEASONS = [
   {id:"cool", icon:"snowflake", name:T("หน้าหนาว (ซีกโลกเหนือ)", "Northern winter"), months:[11, 0, 1]},
   {id:"hot", icon:"sun", name:T("หน้าร้อนในเอเชีย", "Hot season in Asia"), months:[2, 3, 4]},

@@ -24,7 +24,7 @@ const MAX_PROJECTS = 3;
 const MODES = {normal:{ep:25, pc:20, haz:1, dmg:1}, hard:{ep:10, pc:12, haz:1.3, dmg:1.2}, daily:{ep:25, pc:20, haz:1.1, dmg:1}};
 /* Balance presets: inc = monthly income · cost = prices of skills and orders · haz = how often disasters come · growth = how fast emissions grow.
    Bot test (tools/sim.mjs): A = a sensible player wins ~60%, usually in 2049–2050; B = harder, ~30%. Players get A; B is for testing during development. */
-const BALANCE = {A:{inc:1, cost:1.085, haz:1, growth:1}, B:{inc:.9, cost:1, haz:1.15, growth:1.05}};
+const BALANCE = {A:{inc:1, cost:1.1, haz:1, growth:1}, B:{inc:.9, cost:1, haz:1.15, growth:1.05}};
 const HARD = {inc:1, cost:.975, haz:1.1, growth:1};   // Hard Core on top of the preset
 const bal = () => { const b = BALANCE[S.ab] || BALANCE.A; return S.mode === "hard" ? {inc:b.inc * HARD.inc, cost:b.cost * HARD.cost, haz:b.haz * HARD.haz, growth:b.growth * HARD.growth} : b; };
 function setBalance(id, values){ if (values) BALANCE[id] = Object.assign({inc:1, cost:1, haz:1, growth:1}, values); if (S) S.ab = BALANCE[id] ? id : "A"; }
@@ -101,7 +101,7 @@ function changeComp(id, v, permanent){ (id === "ALL" ? S.regions : [R(id)]).forE
 function changeVuln(id, v){ (id === "ALL" ? S.regions : [R(id)]).forEach(r => { r.vuln = clamp(r.vuln + v, 0, 100); }); }
 const charLvBonus = () => S.charLv >= 3;
 const REL_COMP = .3;   // 1.1: how much a continent's friendship pulls its on-plan % (was .08)
-function relMult(){ let m = 1; if (S.owned.D1) m += .2; if (S.char === "dip") m += charLvBonus() ? .06 : .04; return m; }
+function relMult(){ let m = 1; if (S.owned.D1) m += .2; if (S.char === "dip") m += .04; return m; }
 function changeRel(id, v){
   const c = C(id); if (!c) return 0;
   const d = v > 0 ? v * relMult() : v, before = c.rel;
@@ -126,8 +126,8 @@ const recentBuys = () => (S.buys || []).filter(tk => S.tick - tk < 12).length;
 const rushMult = () => 1 + 0.2 * recentBuys();
 function nodeCost(n){
   let m = (S.disc[n.id] ?? 1) * S.discAll * rushMult() * bal().cost;
-  if (S.char === "sci" && n.cat === "energy") m *= charLvBonus() ? .9 : .92;
-  if (S.buff.disc) m *= .9;
+  if (S.char === "sci" && n.cat === "energy") m *= .92;
+  if (S.buff.disc) m *= .95;
   return {ep: Math.round(n.ep * m), pc: Math.round(n.pc * m)};
 }
 const busyIds = () => [...new Set(S.rollouts.map(r => r.id))];
@@ -196,11 +196,11 @@ function useAbility(id){
     case "sci1": S.buff.instant = 1; break;
     case "sci2": S.buff.disc = 1; break;   // next skill −10% (nodeCost)
     case "dip1": regCountries(S.sel, false).forEach(x => changeRel(x.id, 3)); break;
-    case "dip2": changeComp("ALL", 1, false); break;
+    case "dip2": Object.keys(S.sanct || {}).forEach(k => { S.sanct[k] = 0; if (S.oreBan) S.oreBan[k] = 0; }); S.countries.forEach(x => { if (!x.rest && x.rel <= -30) changeRel(x.id, 5); }); break;   // 1.6: ends every sanction
     case "eco1": S.ep += 100; S.bond = 12; break;
     case "eco2": if (S.pc < 15) return false; S.pc -= 15; S.ep += 40; break;
     case "act1": addAppr(2); break;
-    case "act2": changeComp("ALL", 1, false); break;
+    case "act2": if (P.groupTilt) P.groupTilt({youth:10}); break;   // 1.6: young people rally behind you
     default: if (!(P.extraAbility && P.extraAbility(id, c))) return false;   // abilities added later (31-v15.js)
   }
   S.actCd[id] = a.cd;
@@ -423,7 +423,7 @@ function strike(h){
   const M = MODES[S.mode] || MODES.normal, Z = HAZARDS[h.type], c = C(h.c), r = R(c.reg);
   const d = h.sev * (1 + Math.max(0, S.temp - 1.2) * 0.6) * (1 - respOf(h.type)) * (h.evac ? 0.35 : 1) * M.dmg * (1 - c.adapt / 200) * (P.hzCharMult ? P.hzCharMult(h.type) : 1);
   const epLoss = Math.round(Z.ep * d), apLoss = Z.appr * d * HAZ_APPR * (S.owned.C3 ? 0.5 : 1);   // 1.1: more disasters, each a bit softer on approval
-  S.ep = Math.max(0, S.ep - epLoss + (S.owned.C3 ? 15 : 0));
+  { const e0 = S.ep; S.ep = Math.max(0, S.ep - epLoss + (S.owned.C3 ? 15 : 0)); if (P.ledgerTag) P.ledgerTag("hazard", S.ep - e0, 0); }
   S.appr = clamp(S.appr - apLoss * APPR_DOWN, 0, 100);
   r.vuln = clamp(r.vuln + Z.vuln * d, 0, 100);
   changeRel(c.id, -2 * d);
@@ -475,14 +475,14 @@ function tick(){
   });
   S.countries.forEach(c => { Object.keys(c.cd).forEach(k => { if (c.cd[k] > 0) c.cd[k]--; }); c.rel += (Math.min(c.rel, 20) - c.rel) * 0.004; });
   Object.keys(S.actCd).forEach(k => { if (S.actCd[k] > 0) S.actCd[k]--; });
-  if (S.bond > 0){ S.ep = Math.max(0, S.ep - 8); S.bond--; }
+  if (S.bond > 0){ const e0 = S.ep; S.ep = Math.max(0, S.ep - 8); S.bond--; if (P.ledgerTag) P.ledgerTag("bond", S.ep - e0, 0); }
   mark(null);
   allianceTick();
   mark("orders");
   const net = netCO2();
   // 1.1: high emissions heat the planet faster than in proportion, low emissions slower (good play stays cooler, neglect reaches +3.0°C)
   S.temp += Math.sign(net) * Math.pow(Math.abs(net) / 36.0, 1.5) * 0.0039 + (S.tip / 100) * 0.0042;
-  S.ep += epGain(); S.pc += pcGain();
+  { const ge = epGain(), gp = pcGain(); S.ep += ge; S.pc += gp; if (P.ledgerTag) P.ledgerTag("income", ge, gp); }
   if (P.v1Tick) P.v1Tick();
   mark("green");
   if (P.impactTick) P.impactTick(net);

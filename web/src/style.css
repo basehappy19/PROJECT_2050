@@ -829,3 +829,49 @@ html.cb .bar.temp .z:nth-child(1){background:#4ea8ff} html.cb .bar.temp .z:nth-c
 @media (min-width:1000px){ .glist.full{grid-template-columns:repeat(4,1fr)} }
 .glist.full .grow1 .spark{height:44px}
 .clearslots{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:10px}
+/* 1.6 country resources: one word per tile, one line per status */
+.rt .rtag{font-style:normal;font:600 10.5px var(--disp);padding:1px 7px;border-radius:99px;margin-top:2px}
+.rt .rtag.ok{background:rgba(95,211,154,.16);color:var(--good)} .rt .rtag.raw{background:rgba(255,194,74,.14);color:var(--warn)}
+.rstat{display:flex;flex-direction:column;gap:4px;margin-top:10px;padding:8px 10px;border-radius:11px;background:rgba(255,255,255,.035)}
+.rs{display:flex;align-items:center;gap:8px;font-size:13px;min-height:26px}
+.rs span{flex:1} .rs b{font:600 13px var(--mono);display:inline-flex;align-items:center;gap:3px}
+.rs b.good{color:var(--good)} .rs b.warn{color:var(--warn)} .rs b.bad{color:var(--bad)}
+.hzchips{align-items:center} .hzchips small{margin-right:2px}
+.hzchips span{background:rgba(255,255,255,.05);color:var(--fg)} .hzchips span .ic{color:var(--warn)}
+/* 1.6 market: what we have, ready vs waiting */
+.mkinv{display:flex;align-items:stretch;gap:8px}
+.mkinv .inv{flex:1;display:flex;flex-direction:column;align-items:center;gap:0;padding:8px 6px;border-radius:12px;border:1px solid}
+.mkinv .inv b{font-size:26px;line-height:1.1} .mkinv .inv small{font-size:11.5px}
+.mkinv .inv.ok{border-color:rgba(95,211,154,.4);background:rgba(95,211,154,.08)} .mkinv .inv.ok small:first-child{color:var(--good)}
+.mkinv .inv.raw{border-color:rgba(255,194,74,.4);background:rgba(255,194,74,.07)} .mkinv .inv.raw small:first-child{color:var(--warn)}
+.mkinv .inv.zero{opacity:.5}
+.mkinv > .ic{align-self:center}
+/* 1.6 approval window */
+.gmix{display:flex;gap:4px;margin:4px 0 14px;height:26px}
+.gmix i{position:relative;border-radius:7px;background:rgba(255,255,255,.06);overflow:hidden;font-style:normal}
+.gmix i b{position:absolute;left:0;top:0;bottom:0;background:var(--gc);opacity:.75}
+.gmix i span{position:relative;display:flex;align-items:center;gap:4px;height:100%;padding:0 8px;font:600 11.5px var(--mono);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.gtxt .gtrend{font:600 13px var(--mono)} .gtxt .gtrend small{font:400 11px var(--disp);color:var(--muted)}
+.gtxt .gtrend.good{color:var(--good)} .gtxt .gtrend.bad{color:var(--bad)}
+.gw{display:flex;flex-wrap:wrap;align-items:center;gap:4px}
+.gw i{font-style:normal;font-size:11.5px;padding:2px 8px;border-radius:99px;background:rgba(255,255,255,.06)}
+.gw .ic.good{color:var(--good)} .gw .ic.bad{color:var(--bad)}
+.geff{display:flex;align-items:center;gap:5px;font-size:12.5px;margin-top:2px}
+.geff.good{color:var(--good)} .geff.bad{color:var(--bad)}
+.glist.full .grow1{gap:8px}
+/* 1.6 statistics tabs and money */
+.stabs{margin:4px 0 10px}
+.money .mnsegs{margin-bottom:10px} .money .chips .chip{height:30px}
+.mnsum{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:6px}
+.mnsum > div{display:flex;flex-direction:column;align-items:center;padding:8px 4px;border-radius:11px;background:rgba(255,255,255,.04)}
+.mnsum small{font-size:11.5px;color:var(--muted)} .mnsum b{font-size:18px;display:inline-flex;align-items:center;gap:3px}
+.mnsum .good b{color:var(--good)} .mnsum .bad b{color:var(--bad)}
+.mrow{display:grid;grid-template-columns:18px minmax(0,1fr) auto;grid-template-rows:auto 6px;align-items:center;column-gap:8px;row-gap:3px;padding:4px 0;font-size:13px}
+.mrow .lb{grid-column:2 / 4}
+.mrow .ln{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mrow .lb{height:6px;border-radius:4px;background:rgba(255,255,255,.06);overflow:hidden} .mrow .lb b{display:block;height:100%;border-radius:4px}
+.mrow.in .lb b{background:var(--good)} .mrow.out .lb b{background:var(--bad)} .mrow.in > .ic{color:var(--good)} .mrow.out > .ic{color:var(--bad)}
+.mrow .lv{font-size:12.5px;min-width:52px;text-align:right}
+
+.stabs,.money .chips{display:flex;flex-wrap:wrap;gap:6px} .stabs .chip,.money .chip{cursor:pointer;display:inline-flex;align-items:center;gap:5px}
+.stabs .chip.on,.money .chip.on{border-color:var(--accent);color:var(--accent);background:rgba(79,209,197,.12)}

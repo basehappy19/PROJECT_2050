@@ -20,17 +20,18 @@ function Resources({c}){
     {cr || imp || refs.length ? <>
       <H3>{t("resTitle")}</H3>
       {cr ? <div class="restiles">{cr.r.map(k => { const R = P.RES[k], g = P.groupOf && P.groupOf(k), ready = g && refs.includes(g); return <div class="rt" key={k} title={L(R.fact)} style={{"--rc":R.col}}>
-        <Icon n={"$res-" + k} size={38}/><span>{L(R.name).replace(/\s*\(.*\)$/, "")}</span>{ready ? <i class="rtok" title={t("refReady")}><Icon n="factory" size={11}/></i> : null}
+        <Icon n={"$res-" + k} size={38}/><span>{L(R.name).replace(/\s*\(.*\)$/, "")}</span>
+        {g ? <em class={"rtag " + (ready ? "ok" : "raw")}>{ready ? t("resReady") : t("resRaw")}</em> : null}
       </div>; })}</div> : null}
-      <div class="respills">
-        {imp ? <span class="rp" title={t("resImporter")}><Icon n="ship" size={14}/>{S.lang === "th" ? "นำเข้า" : "Imports"}</span> : null}
-        {refs.length ? <span class="rp good" title={t("refReady")}><Icon n="factory" size={14}/>{refs.map(g => <Icon key={g} n={P.MAT[g].icon} size={16}/>)}</span> : null}
-        {refs.length && S.oreOn ? (c.rel >= P.REF_TOLL_REL && !c.hostile && !ban ? <span class="rp good" title={t("refTollOn")}><Icon n="handshake" size={14}/>+{P.REF_TOLL_CAP}{t("perMo")}</span>
-          : <span class="rp muted" title={t("refTollOff").replace("{N}", P.REF_TOLL_REL)}><Icon n="handshake" size={14}/><Icon n="$heart" size={14}/>{P.REF_TOLL_REL}+</span>) : null}
-        {ban ? <span class="rp bad" title={t("oreBanned")}><Icon n="ban" size={14}/>{ban} {t("months")}</span>
-          : src ? <span class="rp good" title={t("oreSends")}><Icon n="truck" size={14}/>{P.matSources().filter(x => x.id === c.id).map(x => <span key={x.g} class="rpi"><Icon n={P.MAT[x.g].icon} size={16}/>+{x.amt < .1 ? x.amt.toFixed(2) : x.amt.toFixed(1)}</span>)}{t("perMo")}</span>
-          : S.oreOn && cr && cr.w ? <span class="rp warn" title={t("oreNeedFriend")}><Icon n="truck" size={14}/><Icon n="$heart" size={14}/>0+</span> : null}
-      </div>
+      {S.oreOn ? <div class="rstat">
+        {cr && cr.w ? <div class="rs"><Icon n="truck" size={16}/><span>{t("resSends")}</span>
+          {ban ? <b class="bad">{t("resBanned")} {ban} {t("months")}</b>
+            : src ? <b class="good">+{P.matSources().filter(x => x.id === c.id).reduce((a, x) => a + x.amt, 0).toFixed(2)}{t("perMo")}</b>
+            : <b class="warn"><Icon n="$heart" size={13}/> {t("resNeed")} 0</b>}</div> : null}
+        {refs.length ? <div class="rs"><Icon n="factory" size={16}/><span>{t("resToll")}</span>
+          {c.rel >= P.REF_TOLL_REL && !c.hostile && !ban ? <b class="good">+{P.REF_TOLL_CAP}{t("perMo")}</b> : <b class="warn"><Icon n="$heart" size={13}/> {t("resNeed")} {P.REF_TOLL_REL}</b>}</div> : null}
+        {imp ? <div class="rs"><Icon n="ship" size={16}/><span class="muted">{t("resImports")}</span></div> : null}
+      </div> : null}
     </> : null}
   </>;
 }
@@ -88,7 +89,7 @@ function PaneRegion(){
     <div class="clist">{list.map(c => {
       const hz = !c.rest && S.haz.find(h => h.c === c.id);
       return <button type="button" key={c.id} class="crow" onPointerEnter={() => Audio.hover()} onClick={() => G.selectCountry(c.id)}>
-        <span class="nm"><b>{c.rest ? P.cname(c.id) : L(P.COUNTRY[c.id].name)}</b><small class="mono muted">{c.co2.toFixed(2)} Gt · {Math.round(c.co2 / tot * 100)}%</small></span>
+        <span class="nm"><b>{c.rest ? P.cname(c.id) : L(P.COUNTRY[c.id].name)}</b><small class="mono muted">{P.fmtCO2(c.co2)} · {Math.round(c.co2 / tot * 100)}%</small></span>
         {hz ? <Icon n={P.HAZARDS[hz.type].icon} size={15} color="bad"/> : null}
         {!c.rest ? <><RelBar rel={c.rel}/><b class={"mono rel " + relCol(c.rel)}>{Math.round(c.rel)}</b></> : <Icon n="chevron-right" size={16} color="muted"/>}
       </button>;
@@ -152,10 +153,10 @@ function PaneCountry(){
       {c.rel <= P.HOSTILE ? <small class="bad"><Rich t={`[[angry]] ${t("relHostile")}`} iconColor="inherit"/></small> : null}
       {(S.sanct || {})[c.id] > 0 ? <small class="bad"><Rich t={`[[ban]] ${t("relSanct")} ${S.sanct[c.id]} ${t("months")} · ${IC().ep} −${P.sanctCost(c)}${t("perMo")}`} iconColor="inherit"/></small> : null}
     </div> : null}
-    <StatGrid stats={[[t("co2Now"), `${c.co2.toFixed(2)} Gt`, "hot"], [t("shareOfRegion"), `${Math.round(share * 100)}%`], [t("risk"), c.rest ? "—" : `${meta.risk}%`, meta && meta.risk >= 65 ? "bad" : ""], [t("adapt"), `${Math.round(c.adapt)}`]]}/>
+    <StatGrid stats={[[t("co2Now"), P.fmtCO2(c.co2), "hot"], [t("shareOfRegion"), `${Math.round(share * 100)}%`], [t("risk"), c.rest ? "—" : `${meta.risk}%`, meta && meta.risk >= 65 ? "bad" : ""], [t("adapt"), `${Math.round(c.adapt)}`]]}/>
     {S.world && !c.rest ? <BaseCard c={c}/> : null}
     {!c.rest ? <Resources c={c}/> : null}
-    {meta ? <div class="hzchips" title={t("hazardsHere")}>{meta.hz.map(h => <span key={h}><Icon n={P.HAZARDS[h].icon} size={14}/>{L(P.HAZARDS[h].name)}</span>)}</div> : null}
+    {meta ? <div class="hzchips"><small class="muted">{t("hazardsHere")}</small>{meta.hz.map(h => <span key={h}><Icon n={P.HAZARDS[h].icon} size={14}/>{L(P.HAZARDS[h].name)}</span>)}</div> : null}
     {hz ? <div class="card row bad-b">
       <div class="grow"><b class="bad"><Rich t={`[[${P.HAZARDS[hz.type].icon}]] ${t("forecast")}: ${L(P.HAZARDS[hz.type].name)} · ${Math.max(0, hz.at - S.tick)} ${t("months")}`} iconColor="inherit"/></b></div>
       <Btn kind={hz.evac ? "ghost" : "danger"} disabled={hz.evac || S.ep < P.evacCost()} onClick={() => { if (P.evacuate(hz.id)) Audio.play("shield"); }}>{hz.evac ? `[[check]] ${t("evacuated")}` : `${t("evacuate")} · ${IC().ep} ${P.evacCost()}`}</Btn>
@@ -208,25 +209,57 @@ function Impact(){
       <ul class="tline">{tl.map((e, i) => { const x = P.timelineText(e); return <li key={i}><span class="mono muted">{P.dateStr(e.tk)}</span><Rich t={`[[${x.icon}]] ${x.txt}`} iconColor={x.col}/></li>; })}</ul></> : null}
   </>;
 }
+/* 1.6: statistics in four short tabs instead of one long page */
+const ST_TABS = [["sum", "chart-line", T2("ภาพรวม", "Overview")], ["money", "wallet", T2("การเงิน", "Money")], ["people", "users", T2("ประชาชน", "People")], ["world", "globe", T2("โลก", "World")]];
+function T2(th, en){ return {th, en}; }
 function PaneStats(){
-  const g = P.grossCO2() || 1;
+  const g = P.grossCO2() || 1, tab = S.stTab || "sum", th = S.lang === "th";
   return <>
-    <Report/>
-    {S.groups ? <><H3>{t("grpTitle")}</H3><div class="glist mini" onClick={() => { Audio.play("open"); UIM.modal = "politics"; bump(); }}><GroupList/></div></> : null}
-    <Impact/>
-    <H3>{t("chartCo2")}</H3>
-    <p class="muted small legend"><i class="lg solid"/>{S.lang === "th" ? "โลกของคุณ" : "Your world"} <i class="lg dash"/>{S.lang === "th" ? "ถ้าไม่ทำอะไรเลย" : "If nothing was done"}</p>
-    <LineChart data={S.hist.map(h => h.net)} data2={S.bau ? S.bau.hist : null} min={-5} max={60} ticks={[0, 15, 30, 45, 60]} color="hot" refs={[{v:0, c:"good"}]}/>
-    <H3>{t("chartTemp")}</H3>
-    <LineChart data={S.hist.map(h => h.temp)} min={1} max={3} ticks={[1, 1.5, 2, 2.5, 3]} color="accent" refs={[{v:1.5, c:"warn"}, {v:2, c:"bad"}]}/>
-    <H3>{t("shares")}</H3>
-    {S.regions.map(r => <div class="barrow" key={r.id}><span class="mono">{r.id}</span><Meter v={r.co2 / g} color="hot" h={8}/><span class="mono">{r.co2.toFixed(2)}</span></div>)}
-    <H3>{t("topEmitters")}</H3>
-    {S.countries.filter(x => !x.rest).sort((a, b) => b.co2 - a.co2).slice(0, 8).map(c => <div class="barrow wide" key={c.id}><span>{L(P.COUNTRY[c.id].name)}</span><Meter v={c.co2 / g} color="warn" h={8}/><span class="mono">{c.co2.toFixed(2)}</span></div>)}
-    <H3>{S.lang === "th" ? "แถบอุณหภูมิรายเดือน" : "Warming stripes"}</H3>
-    <div class="stripes">{S.hist.map((h, i) => <i key={i} style={{background:tempColor(h.temp), width:`${100 / (Math.max(P.TOTAL_TICKS, S.hist.length - 1) + 1)}%`}}/>)}</div>
-    <p class="mono muted small">{t("timePlayed")}: {P.fmtTime(S.realSec)}</p>
+    {S.report && !S.report.read ? <Report/> : null}
+    <div class="chips stabs">{ST_TABS.map(([id, ic, name]) => <button type="button" key={id} class={"chip " + (tab === id ? "on" : "")} onClick={() => { S.stTab = id; Audio.play("click"); P.changed(); }}><Icon n={ic} size={14}/>{L(name)}</button>)}</div>
+    {tab === "sum" ? <>
+      <Impact/>
+      <H3>{t("chartCo2")}</H3>
+      <p class="muted small legend"><i class="lg solid"/>{th ? "โลกของคุณ" : "Your world"} <i class="lg dash"/>{th ? "ถ้าไม่ทำอะไรเลย" : "If nothing was done"}</p>
+      <LineChart data={S.hist.map(h => h.net)} data2={S.bau ? S.bau.hist : null} min={-5} max={60} ticks={[0, 15, 30, 45, 60]} color="hot" refs={[{v:0, c:"good"}]}/>
+      <H3>{t("chartTemp")}</H3>
+      <LineChart data={S.hist.map(h => h.temp)} min={1} max={3} ticks={[1, 1.5, 2, 2.5, 3]} color="accent" refs={[{v:1.5, c:"warn"}, {v:2, c:"bad"}]}/>
+      <div class="stripes">{S.hist.map((h, i) => <i key={i} style={{background:tempColor(h.temp), width:`${100 / (Math.max(P.TOTAL_TICKS, S.hist.length - 1) + 1)}%`}}/>)}</div>
+      <p class="mono muted small"><Icon n="timer" size={12}/> {P.fmtTime(S.realSec)}</p>
+    </> : tab === "money" ? <Money/>
+    : tab === "people" ? (S.groups ? <div class="glist mini" onClick={() => { Audio.play("open"); UIM.modal = "politics"; bump(); }}><GroupList/></div> : null)
+    : <>
+      <H3>{t("shares")}</H3>
+      {S.regions.map(r => <div class="barrow" key={r.id}><span class="mono">{r.id}</span><Meter v={r.co2 / g} color="hot" h={8}/><span class="mono">{r.co2.toFixed(2)}</span></div>)}
+      <H3>{t("topEmitters")}</H3>
+      {S.countries.filter(x => !x.rest).sort((a, b) => b.co2 - a.co2).slice(0, 8).map(c => <div class="barrow wide" key={c.id}><span>{L(P.COUNTRY[c.id].name)}</span><Meter v={c.co2 / g} color="warn" h={8}/><span class="mono">{c.co2.toFixed(2)}</span></div>)}
+    </>}
   </>;
+}
+/* 1.6: where money (or policy points) came from and went, for this year, last year or the whole game */
+function Money(){
+  const th = S.lang === "th", per = S.mnPer || "year", cur = S.mnCur || "ep", d = P.ledgerSum ? P.ledgerSum(per, cur) : {inc:[], out:[], tIn:0, tOut:0};
+  const max = Math.max(1, ...d.inc.map(x => x.v), ...d.out.map(x => x.v)), net = d.tIn - d.tOut, ic = cur === "ep" ? "$money" : "$policy";
+  const seg = (k, v, label) => <button type="button" class={"chip " + ((k === "per" ? per : cur) === v ? "on" : "")} onClick={() => { S[k === "per" ? "mnPer" : "mnCur"] = v; Audio.play("click"); P.changed(); }}>{label}</button>;
+  const rows = (list, cls) => list.length ? list.map(x => { const C = P.LEDGER_CATS[x.cat] || P.LEDGER_CATS.other; return <div class={"mrow " + cls} key={x.cat}>
+    <Icon n={C.icon} size={16}/><span class="ln">{L(C.t)}</span><span class="mono lv">{cls === "in" ? "+" : "−"}{x.v.toLocaleString()}</span><i class="lb"><b style={{width:`${x.v / max * 100}%`}}/></i>
+  </div>; }) : <p class="muted small">—</p>;
+  return <div class="money">
+    <div class="row gap wrap mnsegs">
+      <div class="chips">{seg("per", "year", th ? "ปีนี้" : "This year")}{seg("per", "last", th ? "ปีที่แล้ว" : "Last year")}{seg("per", "all", th ? "ทั้งเกม" : "Whole game")}</div>
+      <span class="grow"/>
+      <div class="chips">{seg("cur", "ep", <Icon n="$money" size={18}/>)}{seg("cur", "pc", <Icon n="$policy" size={18}/>)}</div>
+    </div>
+    <div class="mnsum">
+      <div class="good"><small>{th ? "ได้" : "In"}</small><b class="mono">+{d.tIn.toLocaleString()}</b></div>
+      <div class="bad"><small>{th ? "ใช้" : "Out"}</small><b class="mono">−{d.tOut.toLocaleString()}</b></div>
+      <div class={net >= 0 ? "good" : "bad"}><small>{th ? "สุทธิ" : "Net"}</small><b class="mono"><Icon n={ic} size={18}/>{net >= 0 ? "+" : "−"}{Math.abs(net).toLocaleString()}</b></div>
+    </div>
+    <H3>{th ? "ได้มาจาก" : "Came from"}</H3>
+    {rows(d.inc, "in")}
+    <H3>{th ? "ใช้ไปกับ" : "Spent on"}</H3>
+    {rows(d.out, "out")}
+  </div>;
 }
 /* 1.1: news with filters; season forecasts (purple) are real and worth policy points the first time you open the panel */
 const NEWS_F = [["all", "list", "nfAll"], ["in", "radar", "nfIntel"], ["al", "siren", "nfDanger"], ["gd", "circle-check", "nfGood"], ["ev", "lightbulb", "nfDecide"], ["nw", "newspaper", "nfWorld"]];

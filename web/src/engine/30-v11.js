@@ -61,7 +61,7 @@ function hostilityTick(){
   // sanctions cost money every month and slowly wear off
   for (const k of Object.keys(S.sanct || {})){
     if (!(S.sanct[k] > 0)) continue;
-    const c = P.C(k); if (c) S.ep = Math.max(0, S.ep - sanctCost(c));
+    const c = P.C(k); if (c){ const e0 = S.ep; S.ep = Math.max(0, S.ep - sanctCost(c)); if (P.ledgerTag) P.ledgerTag("sanct", S.ep - e0, 0); }
     if (--S.sanct[k] === 0) P.addLog(`[[handshake]] ${P.cname(k)} ${L(TX.sanctEnd)}`, "gd");
   }
   // the border carbon tax (skill P3) annoys continents that are behind the plan

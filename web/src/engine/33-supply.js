@@ -64,9 +64,12 @@ function refineTick(){
     if (n > 0){ S.raw[g] -= n; S.mat[g] += n; }
   }
   const lv = GIDS().reduce((s, g) => s + (S.refLv[g] || 0), 0);
-  if (lv) S.ep = Math.max(0, S.ep - lv * UPKEEP);
+  if (lv){ const e0 = S.ep; S.ep = Math.max(0, S.ep - lv * UPKEEP); if (P.ledgerTag) P.ledgerTag("refinery", S.ep - e0, 0); }
 }
 Object.assign(P.UI, {
+  resReady:T("พร้อมใช้", "ready"), resRaw:T("ต้องแปรรูป", "needs refining"), resSends:T("ส่งให้เรา", "Sends us"), resBanned:T("ระงับ", "Stopped"),
+  resNeed:T("ต้องถึง", "needs"), resToll:T("ช่วยแปรรูปให้เรา", "Refines for us"), resImports:T("ประเทศนี้ต้องนำเข้าแร่", "Imports its minerals"),
+  invReady:T("พร้อมใช้", "Ready"), invRaw:T("รอแปรรูป", "Waiting"), invSpeed:T("แปรรูปได้", "Refines"),
   refHas:T("มีโรงแยกแร่", "Refines"), refReady:T("ส่งทรัพยากรเหล่านี้แบบพร้อมใช้", "sends these ready to use"),
   refTollOn:T("ช่วยแยกแร่ดิบให้เรา", "refines our raw minerals"), refTollOff:T("มิตรภาพ {N}+ จะช่วยแยกแร่ดิบให้เรา", "at friendship {N}+ it refines our raw minerals"),
   refRaw:T("แร่ดิบรอแยก", "Raw, waiting"), refRawHelp:T("แร่ที่ขุดได้ ต้องผ่านโรงแยกแร่ก่อนจึงใช้ได้", "Dug-up minerals must be refined before use"),

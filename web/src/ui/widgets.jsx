@@ -149,9 +149,16 @@ export function GroupList({full, onPick, extra}){
     return <div class={"grow1 " + st} key={G.id} style={{"--gc":G.color}} onClick={onPick}>
       <div class="ghead"><Icon n={G.icon} size={full ? 22 : 16} cls="gic"/><b>{L(G.name)}</b><small class="muted mono">{Math.round(G.w * 100)}%</small><span class="grow"/><span class={"gst " + c}>{lab}</span><b class="mono gv">{v.toFixed(0)}%</b></div>
       <div class="gbar"><i style={{width:`${v}%`}}/><s style={{left:`${P.GROUP_ANGRY}%`}}/><s class="b" style={{left:`${P.GROUP_BACK}%`}}/></div>
-      {full ? <div class="gtxt" title={`👍 ${L(G.likes)}\n👎 ${L(G.hates)}`}>
-        <span class={st === "back" ? "good" : st === "angry" ? "bad" : "muted"}><Icon n={st === "angry" ? "megaphone" : "sparkles"} size={13}/> {L(st === "angry" ? G.bad : G.good).replace(/^[^:]*:\s*/, "")}</span>
-      </div> : null}
+      {full ? (() => {
+        const h = (S.grpHist || {})[G.id] || [], d = h.length > 1 ? v - h[Math.max(0, h.length - 13)] : 0;
+        const words = o => L(o).split(/\s*·\s*|,\s*/).filter(Boolean);
+        return <div class="gtxt">
+          <span class={"gtrend " + (d > 1 ? "good" : d < -1 ? "bad" : "muted")}>{d > 1 ? "▲" : d < -1 ? "▼" : "•"} {Math.abs(d).toFixed(0)} <small>{th ? "ใน 1 ปี" : "in a year"}</small></span>
+          <div class="gw"><Icon n="thumbs-up" size={13} cls="good"/>{words(G.likes).map((w, i) => <i key={i}>{w}</i>)}</div>
+          <div class="gw"><Icon n="thumbs-down" size={13} cls="bad"/>{words(G.hates).map((w, i) => <i key={i}>{w}</i>)}</div>
+          <span class={"geff " + (st === "back" ? "good" : st === "angry" ? "bad" : "muted")}><Icon n={st === "angry" ? "megaphone" : "gift"} size={13}/> {L(st === "angry" ? G.bad : G.good).replace(/^[^:]*:\s*/, "")}</span>
+        </div>;
+      })() : null}
       {extra ? extra(G.id) : null}
     </div>;
   })}</div>;
