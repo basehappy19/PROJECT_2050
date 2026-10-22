@@ -828,3 +828,4 @@ html.cb .bar.temp .z:nth-child(1){background:#4ea8ff} html.cb .bar.temp .z:nth-c
 .rpi{display:inline-flex;align-items:center;gap:2px}
 @media (min-width:1000px){ .glist.full{grid-template-columns:repeat(4,1fr)} }
 .glist.full .grow1 .spark{height:44px}
+.clearslots{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end;margin-top:10px}

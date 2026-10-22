@@ -194,11 +194,20 @@ export function SlotRow({slot, saves, inGame, pick}){
       {pick ? (m && !P.slotFree(slot, saves) ? null : <Btn kind="primary" onClick={() => pick(slot)}>{m ? `[[save]] ${t("slotUseOver")}` : `[[save]] ${t("slotUse")}`}</Btn>) : null}
       {inGame && !pick ? <Btn kind="ghost" sound="save" disabled={!canSave} title={!canSave && m ? t("slotOtherMode") : ""} onClick={save}>{`[[save]] ${t("save")}`}</Btn> : null}
       {!pick && ok && !cur ? <Btn kind={inGame ? "ghost" : "primary"} sound="start" onClick={() => G.loadSlot(slot)}>{`[[folder-open]] ${t("load")}`}</Btn> : null}
-      {!inGame && m ? (ask ? <Btn kind="danger" onClick={() => { P.deleteSlot(slot); setAsk(false); UIM.msg = `${t("slotDeleted")} · ${P.slotName(slot)}`; UIM.err = false; bump(); }}>{t("slotDelSure")}</Btn>
+      {!pick && m ? (ask ? <><Btn kind="danger" onClick={() => { P.deleteSlot(slot); setAsk(false); UIM.msg = `${t("slotDeleted")} · ${P.slotName(slot)}`; UIM.err = false; bump(); }}>{`[[trash-2]] ${t("slotDelSure")}`}</Btn><IconBtn n="x" title={t("cancel")} onClick={() => setAsk(false)}/></>
         : <IconBtn n="trash-2" title={t("slotDel")} onClick={() => setAsk(true)}/>) : null}
     </div>
     {inGame && m && !canSave && !cur ? <small class="muted slotnote">{S.mode === "hard" ? t("hardNoManual") : t("slotOtherMode")}</small> : null}
   </div>;
+}
+/* 1.5.4: delete every save slot at once (asks first) */
+export function ClearSlots({saves}){
+  const [ask, setAsk] = useState(false), n = P.SLOTS.filter(k => saves && saves[k] && saves[k].meta).length;
+  if (!n) return null;
+  return <div class="clearslots">{ask ? <><span class="bad small">{t("slotClearSure").replace("{N}", n)}</span>
+    <Btn kind="danger" onClick={() => { P.SLOTS.forEach(k => { if (saves[k] && saves[k].meta) P.deleteSlot(k); }); setAsk(false); UIM.msg = t("slotCleared"); UIM.err = false; bump(); }}>{`[[trash-2]] ${t("slotDelSure")}`}</Btn>
+    <Btn kind="ghost" onClick={() => setAsk(false)}>{t("cancel")}</Btn></>
+    : <Btn kind="ghost" onClick={() => setAsk(true)}>{`[[trash-2]] ${t("slotClear")}`}</Btn>}</div>;
 }
 /* all 3 slots are taken when a new game starts: choose one of the same mode to replace, or delete one, or play without autosave */
 export function SlotPick(){
@@ -245,7 +254,7 @@ export function Pause(){
         {tab === "settings" ? <div class="setlist">
           <div class="setrow"><Icon n="languages" size={18}/><span class="lbl">{th ? "ภาษา" : "Language"}</span><LangSeg/></div>
           <Volume/><GfxSeg/><A11ySeg/><NarrRow/>
-        </div> : saves === null ? <p class="bad small">{t("noStore")}</p> : <div class="slots">{P.SLOTS.map(slot => <SlotRow key={slot} slot={slot} saves={saves} inGame/>)}</div>}
+        </div> : saves === null ? <p class="bad small">{t("noStore")}</p> : <><div class="slots">{P.SLOTS.map(slot => <SlotRow key={slot} slot={slot} saves={saves} inGame/>)}</div><ClearSlots saves={saves}/></>}
         <Msg UIM={UIM}/>
       </section>
     </div>

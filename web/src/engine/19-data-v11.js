@@ -76,3 +76,7 @@ Object.assign(P.UI, {
   mSeasonS:T("ซีซั่น", "Season"), mBoardS:T("อันดับ", "Ranks"), mShopS:T("ร้านค้า", "Shop"), mSettingsS:T("ตั้งค่า", "Settings"),
   mSettings:T("ตั้งค่า", "Settings"), mWorldS2:T("โลกต่อเนื่อง", "Endless World"),
 });
+Object.assign(P.UI, {
+  slotClear:T("ลบเซฟทั้งหมด", "Delete all saves"), slotClearSure:T("ลบเซฟ {N} ช่อง? กู้คืนไม่ได้", "Delete {N} saves? This can't be undone"),
+  slotCleared:T("ลบเซฟทั้งหมดแล้ว", "All saves deleted"), cancel:P.UI.cancel || T("ยกเลิก", "Cancel"),
+});

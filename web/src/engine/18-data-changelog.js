@@ -229,6 +229,7 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
     "ตลาดทรัพยากร ความนิยม และหน้าประเทศ ใช้ภาพและไอคอนแทนข้อความยาว ๆ",
     "ไอคอน 3 มิติของทรัพยากรครบทุกชนิดในหน้าเรียนรู้และหน้าประเทศ",
     "กราฟราคาทรัพยากรขึ้นลงตามจริงตั้งแต่เริ่มเกม",
+    "ลบช่องบันทึกได้ทั้งจากหน้าโหลดและตอนหยุดเกม และมีปุ่มลบเซฟทั้งหมด",
   ], [
     "A new home screen with fewer buttons, and a separate Settings menu.",
     "Close and back buttons sit at the top of every page.",
@@ -236,6 +237,7 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
     "The resources market, approval and country pages use pictures and icons instead of long text.",
     "3D icons for every resource on the learning page and country pages.",
     "Resource price charts move up and down from the very start.",
+    "Delete a save slot from the Load page or the pause window, or delete all saves at once.",
   ]),
   SUB("1.5.3", "2026-10-22", [
     "เกมยากขึ้น: ชนะยากขึ้นในทุกโหมด ต้องวางแผนมากขึ้น",

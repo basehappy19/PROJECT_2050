@@ -7,7 +7,7 @@ import {G} from "../game.js";
 import {Globe} from "../globe.js";
 import {Icon, Rich} from "./icon.jsx";
 import {Btn, IconBtn, Tabs, Seg, Check, Terra, Portrait, Volume, GfxSeg, A11ySeg, NarrRow, LangSeg, Msg, H3, SlotInfo} from "./widgets.jsx";
-import {SlotRow} from "./modals.jsx";
+import {SlotRow, ClearSlots} from "./modals.jsx";
 import {AchList} from "./learn.jsx";
 
 const N = () => P.Net;
@@ -144,8 +144,7 @@ function AccountChip(){
 function SubLoad(){
   const saves = P.readSaves();
   return <>
-    <p class="muted small slothelp"><Rich t={`[[info]] ${t("slotHelp")}${N().user ? " " + t("slotCloud") : ""}`} iconColor="inherit"/></p>
-    {saves === null ? <p class="bad">{t("noStore")}</p> : <div class="slots">{P.SLOTS.map(slot => <SlotRow key={slot} slot={slot} saves={saves}/>)}</div>}
+    {saves === null ? <p class="bad">{t("noStore")}</p> : <><div class="slots">{P.SLOTS.map(slot => <SlotRow key={slot} slot={slot} saves={saves}/>)}</div><ClearSlots saves={saves}/></>}
     <Msg UIM={UIM}/>
     <Back/>
   </>;
