@@ -6,6 +6,8 @@ import {G} from "../game.js";
 import {Icon, Rich, plain} from "./icon.jsx";
 import {Btn, IconBtn, Seg, Meter, Portrait, portraitSrc, H3, Terra, Volume, GfxSeg, A11ySeg, NarrRow, LangSeg, Msg, Key, SlotInfo, Check, GroupList, GroupTilt, Speak} from "./widgets.jsx";
 
+import {YearStrip} from "./year.jsx";
+import {MpEnd, VoteDots, VoteHead} from "./mp.jsx";
 import {mapCrop, eventPoint, eventSnd, eventImg, SND_ICON, SND_TINT} from "./hero.js";
 const mapCropBg = pt => mapCrop(pt, pt ? 3.4 : 1.15, .3).backgroundImage;
 const Tag = ({children, color = "warn"}) => <div class={"tag " + color}><Rich t={up(children)} iconColor="inherit"/></div>;
@@ -37,7 +39,9 @@ export function EventModal(){
         <p class="muted small rellegend"><Rich t={t("relLegend")} iconColor="inherit"/></p></> : null}
       <p class="desc"><Rich t={L(e.desc)}/></p>
       {e.news ? <p class="newsrc muted small"><Icon n="link" size={13}/> {t("source")}: <a href={e.news.url} target="_blank" rel="noopener noreferrer">{e.news.src}</a></p> : null}
-      <div class="ask"><Rich t={`[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`} iconColor="accent"/><Speak text={`${L(e.title)}. ${L(e.desc)}`} btn/>{P.hasKeyboard() ? <small class="mono muted">{t("evKeys")}</small> : null}</div>
+      <div class="ask"><Rich t={`[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`} iconColor="accent"/><Speak text={`${L(e.title)}. ${L(e.desc)}`} btn/>{P.hasKeyboard() ? <small class="mono muted">{t("evKeys")}</small> : null}
+        <span class="grow"/>{!S.mp ? <Btn kind="ghost" size="sm" onClick={() => { UIM.evMin = true; bump(); }}>{`[[minimize-2]] ${L(P.UI2.evMin)}`}</Btn> : null}</div>
+      {S.mp ? <VoteHead/> : null}
       <Meter v={f} color={locked ? "warn" : "accent"} h={4} cls="lockbar"/>
       <div class="opts">{opts.map(({o, i, ok}) => {
         const usable = ok && !locked;
@@ -52,6 +56,7 @@ export function EventModal(){
             {!hard && i >= 0 && P.tiltOfOption ? <GroupTilt list={P.tiltOfOption(o, e)}/> : null}
             {!ok ? <span class="bad small">{t("cantAfford")}</span> : null}
           </span>
+          {S.mp ? <VoteDots i={i}/> : null}
         </button>;
       })}</div>
     </div>
@@ -67,6 +72,7 @@ const QUOTES = {
 };
 export const endImg = (o, grade) => `assets/img/endings/${o === "win" ? `end-win-${grade || "A"}` : P.ENDINGS[o].img}.jpg`;
 export function EndModal(){
+  if (S.mp) return <MpEnd/>;   // 2.0: the end of a multiplayer game
   const o = S.over, win = o === "win", net = P.netCO2(), st = P.endStory(), rw = UIM.reward;
   const stats = [[t("temp"), `+${S.temp.toFixed(2)}°C`], [t("co2"), `${net.toFixed(1)} Gt`], [t("appr"), `${S.appr.toFixed(0)}%`], ["Net Zero", `${Math.round(Math.max(0, Math.min(1, (36 - net) / 36)) * 100)}%`], [t("skillsTitle"), `${Object.keys(S.owned).length}/${P.SKILLS.length}`], [t("timePlayed"), P.fmtTime(S.realSec)]];
   const lines = [];
@@ -82,7 +88,11 @@ export function EndModal(){
       <Tag color={win ? "good" : "bad"}>{`${P.dateStr()} · ${t("mode_" + S.mode)}`}</Tag>
       <h2 class="endtitle">{t(win ? "winTitle" : o + "Title")}</h2>
       {win ? <p class="gold grade">{L(P.ENDINGS.win.grades[S.grade || "A"])}</p> : null}
-      <p>{t(win ? "winBody" + (S.grade || "A") : o + "Body")}</p>
+      {S.v2 && P.ending2 ? (() => { const e2 = P.ending2(), ng = P.goodYears(); return <>
+        <p class={"end2t " + (win ? "good" : "bad")}>{L(e2.title)}</p>
+        <p>{L(e2.body)}</p>
+        <div class="endyears"><small class="muted">{L(P.UI2.yrGoodYears)} <b class="mono good">{ng}</b> / {(S.years || []).length}</small><YearStrip big/></div>
+      </>; })() : <p>{t(win ? "winBody" + (S.grade || "A") : o + "Body")}</p>}
       <div class="quote"><Portrait id={S.char} size={56}/><div><b style={{color:P.CHAR[S.char].color}}>{L(P.CHAR[S.char].person)}</b><p>“{L(P.endQuote ? P.endQuote() : QUOTES[o])}”</p></div></div>
       <div class="statgrid three">{stats.map(([a, b], i) => <div class="stat" key={i}><span><Rich t={up(a)}/></span><b>{b}</b></div>)}</div>
       {P.endPaper ? (() => { const np = P.endPaper(); return <div class="paper">
@@ -111,7 +121,7 @@ export function EndModal(){
 /* ---------------- character select + mode ---------------- */
 export function CharSel(){
   const sel = UIM.charSel || "sci";
-  const modes = [["normal", "globe"], ["hard", "skull"], ["daily", "calendar-check"]];
+  const modes = [["fast", "zap"], ["normal", "globe"], ["hard", "skull"], ["daily", "calendar-check"]];   // 2.0: Fast mode
   return <Modal kind="charsel" wide onClose={() => G.toMenu()}>
     <Tag color="accent">{t("introTag")}</Tag>
     <h2>{t("charTitle")}</h2>
@@ -251,16 +261,16 @@ export function Pause(){
         <small class="mono muted"><Icon n="timer" size={13}/> {P.fmtTime(S.realSec)}</small>
         <Btn size="lg" block onClick={() => G.resume()}>{`[[play]] ${t("pResume")}`}</Btn>
         <div class="pzacts">
-          {act("save", th ? "บันทึก" : "Saves", go("saves"), tab === "saves")}
+          {!S.mp ? act("save", th ? "บันทึก" : "Saves", go("saves"), tab === "saves") : null}
           {act("settings", th ? "ตั้งค่า" : "Settings", go("settings"), tab === "settings")}
           {act("graduation-cap", th ? "วิธีเล่น" : "How to", () => G.openTutorial(0, false))}
           {act("book-open", th ? "เรียนรู้" : "Learn", () => G.openLearn())}
           {document.fullscreenEnabled ? act(document.fullscreenElement ? "minimize" : "maximize", th ? "เต็มจอ" : "Full", () => G.fullscreen()) : null}
-          {act("log-out", th ? "เมนูหลัก" : "Menu", () => G.toMenu())}
+          {act("log-out", th ? "เมนูหลัก" : "Menu", () => (S.mp && P.Mp ? P.Mp.leaveGame() : G.toMenu()))}
         </div>
       </aside>
       <section class="pzmain">
-        {tab === "settings" ? <div class="setlist">
+        {tab === "settings" || S.mp ? <div class="setlist">
           <div class="setrow"><Icon n="languages" size={18}/><span class="lbl">{th ? "ภาษา" : "Language"}</span><LangSeg/></div>
           <Volume/><GfxSeg/><A11ySeg/><NarrRow/>
         </div> : saves === null ? <p class="bad small">{t("noStore")}</p> : <><div class="slots">{P.SLOTS.map(slot => <SlotRow key={slot} slot={slot} saves={saves} inGame/>)}</div><ClearSlots saves={saves}/></>}

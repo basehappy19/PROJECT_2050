@@ -42,7 +42,7 @@ const randSeed = () => (Math.random() * 2 ** 31) | 0;
 function newState(lang, o = {}){
   const mode = MODES[o.mode] ? o.mode : "normal", M = MODES[mode];
   const st = {
-    v:SAVE_VERSION, lang: lang || "th", mode, char:CHAR[o.char] ? o.char : "sci", charLv:o.charLv || 1, seed:o.seed ?? randSeed(), rng:0,
+    v:SAVE_VERSION, lang: lang || "th", mode, simple:mode === "fast" ? 1 : 0, char:CHAR[o.char] ? o.char : "sci", charLv:o.charLv || 1, seed:o.seed ?? randSeed(), rng:0,
     speed:1, tick:0, realSec:0,
     temp:1.20, tip:10, ep:M.ep, pc:M.pc, appr:75, buys:[],
     epInc:0, damp:0, sink:0, discAll:1, disc:{}, p3:false,
@@ -317,7 +317,7 @@ function applyFx(fx, target, cev){
   S.discAll = Math.max(.5, S.discAll);
   if (fx.damp) S.damp += fx.damp;
   if (fx.stall) S.stall += fx.stall;
-  if (fx.delay) S.delays.push({at:S.tick + fx.delay.m, fx:fx.delay.fx, target});
+  if (fx.delay) S.delays.push({at:S.tick + fx.delay.m, fx:fx.delay.fx, target, title:S.event ? (currentEvent() || {}).title || null : null});
   if (fx.ore) S.ore = Math.max(0, (S.ore || 0) + fx.ore);
   if (fx.oreBan) Object.entries(fx.oreBan).forEach(([k, v]) => { (S.oreBan = S.oreBan || {})[k] = Math.max((S.oreBan[k] || 0), v); });
   if (fx.orePrice) S.orePrice = Math.max(S.orePrice || 0, fx.orePrice);
@@ -354,7 +354,7 @@ function ageBubbles(){
     if (b.ttl <= 0 && b.type === "red"){
       const r = R(b.reg); addAppr(-2); r.vuln = clamp(r.vuln + 2, 0, 100); r.comp = clamp(r.comp - 2, 0, 100);
       if (b.cid) changeRel(b.cid, -8);
-      hook("sfx", "miss"); addLog(`${t("redMiss")} ${b.cid ? cname(b.cid) : L(RMETA[b.reg].name)} · ${t("appr")} −${(2 * APPR_DOWN).toFixed(1)}% · ${t("vuln")} +2% · ${t("relation")} −8`, "al");
+      hook("sfx", "miss"); hook("loss", {k:"miss", c:b.cid || null, reg:b.reg, appr:-2 * APPR_DOWN, rel:b.cid ? -8 : 0}); addLog(`${t("redMiss")} ${b.cid ? cname(b.cid) : L(RMETA[b.reg].name)} · ${t("appr")} −${(2 * APPR_DOWN).toFixed(1)}% · ${t("vuln")} +2% · ${t("relation")} −8`, "al");
     }
   });
   S.bubbles = S.bubbles.filter(b => b.ttl > 0);
@@ -388,6 +388,7 @@ function hazardTick(){
   const M = MODES[S.mode] || MODES.normal;
   for (const h of S.haz.filter(h => S.tick >= h.at)) strike(h);
   S.haz = S.haz.filter(h => S.tick < h.at);
+  if (S.training) return;   // 2.0: training mode places its own disasters
   // 1.1: more disasters, and several can be on their way at the same time
   const maxN = S.mode === "hard" ? 7 : 5;
   const p = (0.045 + Math.max(0, S.temp - 1.2) * 0.08) * M.haz * bal().haz * (S.crisis ? 2 : 1);
@@ -424,8 +425,9 @@ function strike(h){
   const M = MODES[S.mode] || MODES.normal, Z = HAZARDS[h.type], c = C(h.c), r = R(c.reg);
   const d = h.sev * (1 + Math.max(0, S.temp - 1.2) * 0.6) * (1 - respOf(h.type)) * (h.evac ? 0.35 : 1) * M.dmg * (1 - c.adapt / 200) * (P.hzCharMult ? P.hzCharMult(h.type) : 1);
   const epLoss = Math.round(Z.ep * d), apLoss = Z.appr * d * HAZ_APPR * (S.owned.C3 ? 0.5 : 1);   // 1.1: more disasters, each a bit softer on approval
-  { const e0 = S.ep; S.ep = Math.max(0, S.ep - epLoss + (S.owned.C3 ? 15 : 0)); if (P.ledgerTag) P.ledgerTag("hazard", S.ep - e0, 0); }
-  S.appr = clamp(S.appr - apLoss * APPR_DOWN, 0, 100);
+  const e0 = S.ep; S.ep = Math.max(0, S.ep - epLoss + (S.owned.C3 ? 15 : 0)); if (P.ledgerTag) P.ledgerTag("hazard", S.ep - e0, 0);
+  const a0 = S.appr; S.appr = clamp(S.appr - apLoss * APPR_DOWN, 0, 100);
+  hook("loss", {k:"hazard", hz:h.type, c:c.id, ep:S.ep - e0, appr:S.appr - a0, evac:!!h.evac});   // 2.0: every automatic loss is shown with its reason
   r.vuln = clamp(r.vuln + Z.vuln * d, 0, 100);
   changeRel(c.id, -2 * d);
   if (Z.co2) applyRegionCO2(r, Z.co2 * d);
@@ -460,7 +462,13 @@ function tick(){
   S.crolls.forEach(cr => { const c = C(cr.c); if (c) addCountryCO2(c, c.co2_0 * cr.frac / cr.months * (R(c.reg).comp / 100)); cr.left--; });
   S.crolls = S.crolls.filter(cr => cr.left > 0);
   mark("orders");
-  S.delays.filter(d => d.at <= S.tick).forEach(d => applyFx(d.fx, d.target));
+  // 2.0: an earlier decision catching up is logged and shown (it used to change the numbers silently)
+  S.delays.filter(d => d.at <= S.tick).forEach(d => {
+    const e0 = S.ep, p0 = S.pc, a0 = S.appr; applyFx(d.fx, d.target);
+    const ch = fxChips(d.fx, d.target).map(c => c.txt).join(", ");
+    if (ch) addLog(`[[hourglass]] ${t("delayHit")}${d.title ? ": " + L(d.title) : ""} [${ch}]`, fxChips(d.fx, d.target).some(c => !c.good) ? "al" : "gd");
+    hook("loss", {k:"delay", title:d.title || null, ep:S.ep - e0, pc:S.pc - p0, appr:S.appr - a0, good:!fxChips(d.fx, d.target).some(c => !c.good)});
+  });
   S.delays = S.delays.filter(d => d.at > S.tick);
   mark("decisions");
   const damp = Math.min(1.3, S.damp);
@@ -476,7 +484,7 @@ function tick(){
   });
   S.countries.forEach(c => { Object.keys(c.cd).forEach(k => { if (c.cd[k] > 0) c.cd[k]--; }); c.rel += (Math.min(c.rel, 20) - c.rel) * 0.004; });
   Object.keys(S.actCd).forEach(k => { if (S.actCd[k] > 0) S.actCd[k]--; });
-  if (S.bond > 0){ const e0 = S.ep; S.ep = Math.max(0, S.ep - 8); S.bond--; if (P.ledgerTag) P.ledgerTag("bond", S.ep - e0, 0); }
+  if (S.bond > 0){ const e0 = S.ep; S.ep = Math.max(0, S.ep - 8); S.bond--; if (P.ledgerTag) P.ledgerTag("bond", S.ep - e0, 0); hook("loss", {k:"bond", ep:S.ep - e0, left:S.bond}); }
   mark(null);
   allianceTick();
   mark("orders");
@@ -494,7 +502,7 @@ function tick(){
   const calm = S.char === "act" ? (charLvBonus() ? .93 : .95) : 1;
   const stress = avg(r => r.vuln) / 100 * Math.max(0, S.temp - 1.35) * 0.65 * calm;
   S.appr = clamp(S.appr - stress + (55 - S.appr) * 0.008, 0, 100);
-  ageBubbles(); spawnGreens(); hazardTick();
+  ageBubbles(); if (!S.training) spawnGreens(); hazardTick();
   S.hist.push({net, temp:S.temp}); Ach.check();
   if (checkEnd()) return;
   maybeNews();
@@ -502,14 +510,15 @@ function tick(){
   // 1.1 fix: a new disaster forecast never appears together with a window that stops the game (story, event, COP);
   // the window waits a month, so the evacuate prompt shows while the clock is running
   if (newHaz){ changed(); return; }
-  const act = STORY.find(a => a.at > 0 && S.tick >= a.at && !S.story[a.act]);
+  const act = !S.training && STORY.find(a => a.at > 0 && S.tick >= a.at && !S.story[a.act]);
   if (act){ S.story[act.act] = 1; hook("story", act.act); changed(); return; }
   if (S.world && S.tick % 12 === 11){ S.lastEv = S.tick; S.event = "COP"; S.cev = null; hook("sfx", "event"); hook("amb", "crowd"); hook("showEvent"); changed(); return; }
   const p = Math.min(0.25, 0.08 + S.temp * 0.03);
-  if (S.tick - S.lastEv >= 4 && rand() < p) triggerEvent();
+  if (!S.training && S.tick - S.lastEv >= (S.simple ? 6 : 4) && rand() < p) triggerEvent();   // 2.0: fewer events in Fast mode
   changed();
 }
 function maybeNews(){
+  if (S.training) return;
   if (S.tick > 0 && S.tick % 12 === 0){
     const y = 2025 + S.tick / 12, prev = S.hist[Math.max(0, S.hist.length - 13)].net, net = netCO2();
     if (P.Net && P.Net.statUpdate) P.Net.statUpdate(false);
@@ -606,6 +615,7 @@ function checkEnd(){
   if (netCO2() <= 0) o = "win"; else if (S.temp >= 3.0) o = "l1"; else if (S.appr <= 0) o = "l2"; else if (S.tick >= TOTAL_TICKS) o = "l3";
   if (!o) return false;
   S.over = o; S.event = null; S.cev = null; S.grade = o === "win" ? P.gradeOf(S.temp) : null;
+  if (P.onEnd) P.onEnd();   // 2.0: the last year is reviewed too (38-v20.js)
   hook("sfx", o === "win" ? "win" : "lose");
   const ends = AchStore.data.ends = AchStore.data.ends || {}; ends[o === "win" ? "win" + S.grade : o] = Date.now();
   const played = AchStore.data.charsDone = AchStore.data.charsDone || []; if (!played.includes(S.char)) played.push(S.char);
@@ -682,10 +692,12 @@ function startGame(lang, o = {}){
   resetState(newState(lang, opts)); buildCountries(); S.started = true; S.speed = 1;
   S.ab = opts.ab && BALANCE[opts.ab] ? opts.ab : pickBalance();
   if (opts.world) S.world = true;
+  S.v2 = 1;                                   // 2.0: yearly reviews instead of the 5-year milestones
+  if (opts.training) S.training = 1;          // 2.0: the guided training game (no saves, no random disasters or events)
   if (P.v1Init) P.v1Init();
   addLog(t("logStart"), "tc"); hook("sfx", "start"); Ach.unlock("start");
   S.story[1] = 1;
-  S.saveId = newSaveId(); S.saveSlot = opts.slot === undefined ? pickSlot(S) : opts.slot;
+  S.saveId = newSaveId(); S.saveSlot = S.training ? null : opts.slot === undefined ? pickSlot(S) : opts.slot;
   hook("closeModal"); changed(); autosave(); hook("gameStart");
 }
 /* Daily Challenge seed: the same for everyone on the same (UTC) date */
@@ -747,7 +759,7 @@ function deleteSlot(slot){
   putSaves(all); hook("slotWritten", slot); return true;
 }
 function autosave(){
-  if (!S.started || S.over || !S.saveSlot) return;
+  if (!S.started || S.over || !S.saveSlot || S.training || S.mp) return;
   // the slot was taken meanwhile (e.g. by a game of another mode synced from another device): move to a free one
   if (!writeSlot(S.saveSlot, true)){ const k = pickSlot(S); if (!k || !writeSlot(k, true)) return; }
   hook("autosaved");
@@ -788,6 +800,7 @@ const AchStore = (() => {
 const Ach = (() => {
   function unlock(id){
     const d = AchStore.data; if (d.got[id]) return;
+    if (S && (S.training || S.mp) && id !== "tutorial") return;   // 2.0: nothing is earned in the training game or in multiplayer
     const a = ACH.find(x => x.id === id); if (!a) return;
     d.got[id] = Date.now(); AchStore.save(); hook("toast", a); hook("achUnlocked", id);
   }

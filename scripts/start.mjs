@@ -6,6 +6,7 @@
    Put your own Nginx in front for the domain and HTTPS. Stops everything if one service stops,
    so systemd / pm2 can restart the lot. */
 import http from "node:http";
+import net from "node:net";
 import fs from "node:fs";
 import path from "node:path";
 import zlib from "node:zlib";
@@ -75,6 +76,18 @@ function staticServer(name, port, adminOnly){
     res.writeHead(200, headers);
     if (req.method === "HEAD") return res.end();
     const s = fs.createReadStream(hit.file); (gz ? s.pipe(zlib.createGzip()) : s).pipe(res);
+  });
+  /* 2.0: multiplayer WebSocket (/api/ws) goes to the API untouched */
+  srv.on("upgrade", (req, socket, head) => {
+    if (!/^\/api\/ws(\?|$)/.test(req.url)){ socket.destroy(); return; }
+    const up = net.connect(API_PORT, /^(0\.0\.0\.0|::)$/.test(HOST) ? "127.0.0.1" : HOST, () => {
+      const lines = [`${req.method} ${req.url} HTTP/${req.httpVersion}`];
+      for (let i = 0; i < req.rawHeaders.length; i += 2) if (!/^x-forwarded-for$/i.test(req.rawHeaders[i])) lines.push(`${req.rawHeaders[i]}: ${req.rawHeaders[i + 1]}`);
+      lines.push(`X-Forwarded-For: ${[req.headers["x-forwarded-for"], req.socket.remoteAddress].filter(Boolean).join(", ")}`);
+      up.write(lines.join("\r\n") + "\r\n\r\n"); if (head && head.length) up.write(head);
+      socket.pipe(up).pipe(socket);
+    });
+    up.on("error", () => socket.destroy()); socket.on("error", () => up.destroy());
   });
   srv.on("error", err => { log(name, `cannot listen on ${HOST}:${port}: ${err.message}`); shutdown(1); });
   srv.listen(port, HOST, () => log(name, `http://${HOST}:${port}${adminOnly ? "/" : "/  (admin: /admin/)"}`));

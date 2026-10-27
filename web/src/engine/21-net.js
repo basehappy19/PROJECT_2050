@@ -172,10 +172,10 @@ const Net = {
      (achievements, wins). Called on sign-in, on refresh and a few seconds after anything changes. */
   async syncProgress(){
     if (!this.user) return;
-    const d = P.AchStore.data, mine = {seen:d.seen, haz:d.haz, charsDone:d.charsDone, greens:d.greens, aids:d.aids, evac:d.evac, cev:d.cev, daily:d.daily, got:d.got, ends:d.ends, tut:ls.get("p2050-tut") === "1" ? 1 : 0};
+    const d = P.AchStore.data, mine = {seen:d.seen, haz:d.haz, charsDone:d.charsDone, greens:d.greens, aids:d.aids, evac:d.evac, cev:d.cev, daily:d.daily, got:d.got, ends:d.ends, tut:ls.get("p2050-tut") === "1" ? 1 : 0, trained:ls.get("p2050-trained") === "1" ? 1 : 0};   // 2.0: training mode done
     try {
       const j = await this.req("PUT", "/progress", {cards:P.cardCount(), data:mine});
-      if (j && j.data){ mergeInto(P.AchStore.data, j.data); P.AchStore.save(true); if (j.data.tut) ls.set("p2050-tut", "1"); dirty(); }
+      if (j && j.data){ mergeInto(P.AchStore.data, j.data); P.AchStore.save(true); if (j.data.tut) ls.set("p2050-tut", "1"); if (j.data.trained) ls.set("p2050-trained", "1"); dirty(); }
     } catch(e) {}
   },
   progressChanged(){ if (!this.user) return; clearTimeout(this._progT); this._progT = setTimeout(() => this.syncProgress(), 4000); },

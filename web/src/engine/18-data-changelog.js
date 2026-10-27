@@ -6,6 +6,37 @@ const V = (v, date, name, th, en) => ({v, date, name, items:{th, en}});
 /* minor updates (1.1.1, 1.1.2, …) sit inside their main version as subs, newest first */
 const SUB = (v, date, th, en) => ({v, date, items:{th, en}});
 P.CHANGELOG = [
+  V("2.0", "2026-11-10", {th:"เล่นด้วยกัน", en:"Play Together"}, [
+    "เล่นหลายคน: \"คณะทำงานร่วม\" 2–4 คน ช่วยกันกู้โลกใบเดียว แต่ละคนดูแลกระทรวงของตัวเอง (พลังงานและอุตสาหกรรม การทูต ภัยพิบัติและเมือง ประชาชนและธรรมชาติ) และโหวตตัดสินเหตุการณ์ภายใน 15 วินาที",
+    "เล่นหลายคน: \"แข่งภูมิภาค\" 2–4 คน ทุกคนเล่นโลกของตัวเองแต่ใช้อุณหภูมิร่วมกัน ใครถึง Net Zero ก่อนชนะ ส่งเงินช่วยเพื่อน เก็บภาษีคาร์บอนจากคนที่ปล่อยมากกว่า หรือทำข้อตกลงภูมิอากาศร่วมกัน",
+    "ห้องสาธารณะและห้องส่วนตัว (เข้าด้วยรหัส 6 ตัว) เพิ่มเพื่อน ดูว่าเพื่อนออนไลน์ ชวนเพื่อนเข้าห้อง ข้อความด่วนและอีโมต (ไม่มีแชตพิมพ์เอง ปลอดภัยสำหรับโรงเรียน)",
+    "โหมดฝึกซ้อม: พาเล่นทีละขั้นด้วยการกดจริง ราว 8 นาที ผู้เล่นใหม่จะเข้าโหมดนี้ก่อนเล่นครั้งแรก และกลับมาฝึกได้ทุกเมื่อจากเมนู",
+    "โหมดเร็ว: เกมราว 15 นาที ไม่มีระบบทรัพยากรและกลุ่มคน เหตุการณ์น้อยลง เหมาะกับเล่นครั้งแรก",
+    "สรุปผลงานทุกปี: คะแนน 0–100 เทียบกับเป้า CO₂ ของปีนั้น ปีที่ดีได้งบเพิ่ม ปีที่แย่ความเชื่อมั่นลด แต่ละปีมีเรื่องราวของตัวเอง (50 เรื่อง) แทนเป้าหมายราย 5 ปี",
+    "ฉากจบใหม่ 12 แบบ ตามวิธีที่เกมจบและจำนวนปีที่ดี",
+    "ตัวละครวาดใหม่ทั้งหมด เป็นภาพเวกเตอร์ที่สร้างด้วยโค้ดทีละชิ้น ไม่ใช้ AI แต่ละคนหน้าตา อายุ และเสื้อผ้าไม่ซ้ำกัน",
+    "ฉากเปิดเกมใหม่ สั้นและเห็นภาพชัดว่าโลกกำลังเจออะไร",
+    "แก้บัค: ประเทศกว่า 100 ประเทศ (เช่น โซมาเลีย ฟิจิ มัลดีฟส์) ไม่แสดงพยากรณ์ภัยและฟองช่วยเหลือบนแผนที่ ทำให้โดนหักเงินและความนิยมโดยไม่มีอะไรให้กด",
+    "ทุกครั้งที่เสียเงินหรือความนิยมอัตโนมัติ จะมีบอกที่มุมซ้ายล่างว่าเพราะอะไร (ภัยพิบัติ ไม่ได้ช่วยผู้ประสบภัย ประท้วง ถูกคว่ำบาตร ค่าดูแลโรงแยกแร่ ผลจากการตัดสินใจก่อนหน้า)",
+    "พยากรณ์ภัยใหม่ขึ้นเป็นการ์ดด้านบน กดดูหรือสั่งอพยพได้ทันที · ลูกศรที่ขอบจอชี้ไปยังภัยที่มองไม่เห็น · ฟองแดงกะพริบเมื่อใกล้หมดเวลา",
+    "ย่อหน้าต่างเหตุการณ์เพื่อดูแผนที่และทรัพยากรก่อนตัดสินใจได้",
+    "แผนที่ล็อกให้เต็มจอเสมอ (ซูมออกจนหลุดโลกไม่ได้) และ UI จางลงตอนลากแผนที่",
+  ], [
+    "Multiplayer: \"Joint Taskforce\", 2–4 players save one world together. Each runs their own ministries (Energy & Industry, Diplomacy, Disasters & Cities, People & Nature) and events are decided by a 15-second vote.",
+    "Multiplayer: \"Regional Race\", 2–4 players each run their own world but share one temperature. First to Net Zero wins. Send aid, tax a bigger emitter's carbon, or sign a climate pact.",
+    "Public and private rooms (join with a 6-letter code), friends, who's online, invites, quick messages and emotes (no typed chat: safe for school).",
+    "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu any time.",
+    "Fast mode: a 15-minute game without minerals or groups and with fewer events, great for a first game.",
+    "A year in review every January: a score from 0 to 100 against that year's CO₂ target. Good years bring more funding, bad years cost trust, and every year has its own story (50 in all). This replaces the 5-year milestones.",
+    "12 new endings, depending on how the game ended and how many good years you had.",
+    "All characters redrawn as vector illustrations built shape by shape in code, no AI. Everyone has their own face, age and clothes.",
+    "A new opening scene: short, and it shows what the world is facing.",
+    "Bug fix: over 100 countries (such as Somalia, Fiji and the Maldives) showed no disaster warnings or aid bubbles on the map, so money and approval were lost with nothing to tap.",
+    "Every automatic loss of money or approval now says why, at the bottom left (a disaster, missed aid, a protest, sanctions, refinery upkeep, an earlier decision catching up).",
+    "New disaster forecasts pop up as a card at the top: look at it or evacuate straight away · arrows at the screen edge point to disasters you can't see · red bubbles blink when they're about to run out.",
+    "Events can be minimised so you can check the map and your resources before choosing.",
+    "The map always fills the screen (no zooming out into space), and the HUD fades while you drag the map.",
+  ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",
     "ตัวละครใหม่ในเรื่อง: ฝน อาสาปลูกป่าชายเลนที่สมุทรปราการ ลุงทองดี ชาวนาที่ฉะเชิงเทรา และไกรวิทย์ ฝ่ายต้านจากธุรกิจพลังงานเก่า",

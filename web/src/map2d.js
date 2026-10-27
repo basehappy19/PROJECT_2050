@@ -13,7 +13,7 @@ import {drawPins, drawTraffic, drawInfo, img3d, drawDetail, drawStatus} from "./
 import {drawHex, hexCells} from "./hexgrid.js";
 import {createMapGL} from "./mapgl.js";
 
-const ZMIN = .9, ZMAX = 5, ZCOUNTRY = 1.55;
+const ZMIN = 1, ZMAX = 5, ZCOUNTRY = 1.55;   // 2.0: can't zoom out past the whole world (it always fills the screen)
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const HEAT_N = [[31,158,120],[217,166,43],[208,97,47],[224,48,42]], HEAT_CB = [[46,120,200],[140,170,205],[240,170,70],[225,110,25]];   // 1.1.4 colour-blind: blue → orange
 let HEAT = P.A11y && P.A11y.cb ? HEAT_CB : HEAT_N;
@@ -45,7 +45,9 @@ export const GameMap = {
       const rings = s.p.map(r => { const a = new Float32Array(r.length); let x = 0, y = 0; for (let i = 0; i < r.length; i += 2){ if (i === 0){ x = r[0]; y = r[1]; } else { x += r[i]; y += r[i + 1]; } a[i] = x / 10; a[i + 1] = y / 10; } return a; });
       const path = new Path2D(); for (const r of rings){ path.moveTo(r[0], r[1]); for (let i = 2; i < r.length; i += 2) path.lineTo(r[i], r[i + 1]); path.closePath(); }
       const sh = {name:s.n, c:s.c || (P.COUNTRY_BY_GEO && P.COUNTRY_BY_GEO[s.n]) || null, r:s.r, b:s.b, l:s.l, rings, path};   // 1.1: countries added after the map data was built
-      this.shapes.push(sh); if (s.c && !this.byCountry[s.c]) this.byCountry[s.c] = sh;
+      // 2.0 fix: countries added in 1.1 are matched by name (sh.c), not s.c; before this they had no map point,
+      // so their disaster warnings and aid bubbles were never drawn (but still hit you)
+      this.shapes.push(sh); if (sh.c && !this.byCountry[sh.c]) this.byCountry[sh.c] = sh;
     }
     const regPaths = {};
     for (const sh of this.shapes){ (regPaths[sh.r] = regPaths[sh.r] || new Path2D()).addPath(sh.path); }
@@ -123,18 +125,21 @@ export const GameMap = {
   scale(){ return this.s0 * this.cam.z; },
   toScreen(x, y){ const s = this.scale(); return [(x - this.cam.x) * s + this.w / 2, (y - this.cam.y) * s + this.h / 2]; },
   toWorld(sx, sy){ const s = this.scale(); return [(sx - this.w / 2) / s + this.cam.x, (sy - this.h / 2) / s + this.cam.y]; },
-  clampCam(){
-    const s = this.scale(), hw = this.w / 2 / s, hh = this.h / 2 / s, padX = 180 / s, padY = 140 / s;
-    this.cam.x = clamp(this.cam.x, Math.min(MAP.W / 2, hw - padX), Math.max(MAP.W / 2, MAP.W - hw + padX));
-    this.cam.y = clamp(this.cam.y, Math.min(MAP.H / 2, hh - padY), Math.max(MAP.H / 2, MAP.H - hh + padY));
+  /* 2.0: Plague Inc-style camera: the map can't be dragged off into space; its edge stops at the HUD */
+  clampXY(x, y, z){
+    const s = this.s0 * z, hw = this.w / 2 / s, hh = this.h / 2 / s, i = this.insets || {l:0, r:0, t:0, b:0};
+    const x0 = hw - i.l * .6 / s, x1 = MAP.W - hw + i.r * .6 / s, y0 = hh - i.t / s, y1 = MAP.H - hh + i.b / s;
+    return [x0 > x1 ? MAP.W / 2 : clamp(x, x0, x1), y0 > y1 ? MAP.H / 2 : clamp(y, y0, y1)];
   },
+  clampCam(){ const [x, y] = this.clampXY(this.cam.x, this.cam.y, this.cam.z); this.cam.x = x; this.cam.y = y; },
   /* centre of the part of the screen not covered by the HUD / drawer */
   freeCentre(){ const i = this.insets; return [(i.l + this.w - i.r) / 2, (i.t + this.h - i.b) / 2]; },
   lookAt(x, y, z){
     const s = this.s0 * z, [fx, fy] = this.freeCentre();
-    this.target = {x:x - (fx - this.w / 2) / s, y:y - (fy - this.h / 2) / s, z};
+    z = clamp(z, ZMIN, ZMAX); const [cx, cy] = this.clampXY(x - (fx - this.w / 2) / s, y - (fy - this.h / 2) / s, z);
+    this.target = {x:cx, y:cy, z};
   },
-  homeView(){ const [fx, fy] = this.freeCentre(), s = this.s0; return {x:MAP.W / 2 - (fx - this.w / 2) / s * .5, y:MAP.H / 2 - (fy - this.h / 2) / s * .6, z:1}; },
+  homeView(){ const [fx, fy] = this.freeCentre(), s = this.s0, [x, y] = this.clampXY(MAP.W / 2 - (fx - this.w / 2) / s * .5, MAP.H / 2 - (fy - this.h / 2) / s * .6, 1); return {x, y, z:1}; },
   resetView(){ this.target = this.homeView(); },
   recenter(){ if (this.cam.z <= 1.08) this.target = this.homeView(); },
   zoomBy(f){ const b = this.target || this.cam, z = clamp(b.z * f, ZMIN, ZMAX); const [fx, fy] = this.freeCentre(); const [wx, wy] = this.toWorld(fx, fy); this.lookAt(wx, wy, z); Audio.play("tick", {vol:.5}); },
@@ -150,7 +155,7 @@ export const GameMap = {
     const c = this.fx;
     c.style.touchAction = "none";
     c.addEventListener("pointerdown", e => {
-      if (UIM.kind()) return;
+      if (this.locked()) return;
       c.setPointerCapture(e.pointerId);
       this.ptrs.set(e.pointerId, {x:e.offsetX, y:e.offsetY});
       if (this.ptrs.size === 1){ this.drag = {x:e.offsetX, y:e.offsetY, sx:e.offsetX, sy:e.offsetY, moved:0}; }
@@ -166,16 +171,17 @@ export const GameMap = {
       if (this.pinch && this.ptrs.size >= 2){
         const [a, b] = [...this.ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
         const z = clamp(this.pinch.z * d / Math.max(20, this.pinch.d), ZMIN, ZMAX), s = this.s0 * z;
-        this.cam.z = z; this.cam.x = this.pinch.w[0] - (mx - this.w / 2) / s; this.cam.y = this.pinch.w[1] - (my - this.h / 2) / s; this.clampCam(); this.moved();
+        this.setPanning(true); this.cam.z = z; this.cam.x = this.pinch.w[0] - (mx - this.w / 2) / s; this.cam.y = this.pinch.w[1] - (my - this.h / 2) / s; this.clampCam(); this.moved();
       } else if (this.drag){
         const dx = e.offsetX - this.drag.x, dy = e.offsetY - this.drag.y;
         this.drag.moved += Math.abs(dx) + Math.abs(dy);
-        if (this.drag.moved > 6){ const s = this.scale(); this.cam.x -= dx / s; this.cam.y -= dy / s; this.target = null; this.clampCam(); this.moved(); c.style.cursor = "grabbing"; }
+        if (this.drag.moved > 6){ this.setPanning(true); const s = this.scale(); this.cam.x -= dx / s; this.cam.y -= dy / s; this.target = null; this.clampCam(); this.moved(); c.style.cursor = "grabbing"; }
         this.drag.x = e.offsetX; this.drag.y = e.offsetY;
       }
     });
     const end = e => {
       const had = this.ptrs.has(e.pointerId); this.ptrs.delete(e.pointerId);
+      if (!this.ptrs.size) this.setPanning(false);
       if (!had) return;
       if (this.pinch){ if (this.ptrs.size < 2){ this.pinch = null; this.pinchEnd = performance.now(); this.drag = null; } return; }
       const d = this.drag; this.drag = null; c.style.cursor = "";
@@ -184,13 +190,17 @@ export const GameMap = {
     c.addEventListener("pointerup", end); c.addEventListener("pointercancel", end);
     c.addEventListener("pointerleave", () => { if (this.hover){ this.hover = null; } c.style.cursor = ""; });
     c.addEventListener("wheel", e => {
-      if (UIM.kind()) return;
+      if (this.locked()) return;
       e.preventDefault();
       const f = Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0016)), z = clamp(this.cam.z * f, ZMIN, ZMAX);
       const [wx, wy] = this.toWorld(e.offsetX, e.offsetY), s = this.s0 * z;
       this.target = null; this.cam.z = z; this.cam.x = wx - (e.offsetX - this.w / 2) / s; this.cam.y = wy - (e.offsetY - this.h / 2) / s; this.clampCam(); this.moved();
     }, {passive:false});
   },
+  /* the map takes input unless a window covers it (2.0: a minimised event leaves the map free to look around) */
+  locked(){ const k = UIM.kind(); return !!k && !(k === "event" && UIM.evMin); },
+  /* 2.0: the HUD fades while you drag the map */
+  setPanning(on){ if (!!this.panning === on) return; this.panning = on; document.documentElement.classList.toggle("panning", on); },
   shapeAt(sx, sy){
     const [x, y] = this.toWorld(sx, sy), ctx = this.bctx;
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -205,7 +215,7 @@ export const GameMap = {
   },
   hitAt(sx, sy){ for (let i = this.hits.length - 1; i >= 0; i--){ const h = this.hits[i]; if (sx >= h.x && sx <= h.x + h.w && sy >= h.y && sy <= h.y + h.h) return h; } return null; },
   hoverAt(sx, sy){
-    if (UIM.kind() || !this.w){ this.hover = null; return; }
+    if (this.locked() || !this.w){ this.hover = null; return; }
     const h = this.hitAt(sx, sy);
     if (h){ this.fx.style.cursor = "pointer"; if (this.hover && this.hover.hit === h.id) return; this.hover = {hit:h.id}; return; }
     const sh = this.shapeAt(sx, sy);
@@ -475,11 +485,14 @@ export const GameMap = {
       c.fillStyle = g; c.beginPath(); c.arc(x, y, R + 12, 0, Math.PI * 2); c.fill();
       c.fillStyle = red ? "#3a0d0a" : ore ? "#3a220a" : "#0a2e20"; c.beginPath(); c.arc(x, y, R, 0, Math.PI * 2); c.fill();
       c.lineWidth = 2.2; c.strokeStyle = col; c.stroke();
+      // 2.0: an aid bubble about to run out blinks (missing it costs approval and friendship)
+      const urgent = red && bb.ttl <= 2;
+      if (urgent){ const ph = (now * 2.2) % 1; c.strokeStyle = COL.bad; c.globalAlpha = (1 - ph) * .9; c.lineWidth = 3; c.beginPath(); c.arc(x, y, R + 6 + ph * 16, 0, Math.PI * 2); c.stroke(); c.globalAlpha = S.speed ? 1 : .45; }
       // remaining time ring
       const maxT = red ? 5 : 4; c.strokeStyle = "rgba(255,255,255,.75)"; c.lineWidth = 2; c.beginPath(); c.arc(x, y, R + 4, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * clamp(bb.ttl / maxT, 0, 1)); c.stroke();
       const im3 = img3d(red ? "heart" : ore ? "ore" : "money"), im = im3 || iconImg(red ? "heart-handshake" : "leaf", col);
       if (im) c.drawImage(im, x - (im3 ? 13 : 10), y - (im3 ? 13 : 10), im3 ? 26 : 20, im3 ? 26 : 20);
-      if (red) this.pill(x, y + R + 14, `${P.aidCost()} · ${bb.ttl}`, {font:"600 10px 'IBM Plex Mono', monospace", h:17, icon:"coins", iconColor:COL.gold, bg:"rgba(6,16,21,.88)"});
+      if (red) this.pill(x, y + R + 14, `${P.aidCost()} · ${urgent ? "!" : ""}${bb.ttl} ${t("moShort")}`, {font:"600 10px 'IBM Plex Mono', monospace", h:17, icon:"coins", iconColor:COL.gold, bg:urgent && Math.floor(now * 3) % 2 ? "rgba(140,20,14,.95)" : "rgba(6,16,21,.88)"});
       this.hits.push({id:"bb-" + bb.id, x:x - R - 6, y:y - R - 6, w:2 * R + 12, h:2 * R + 12, fn:() => { if (P.popBubble(bb.id, x, y - 26)){ this.burst(x, y, col); if (!red) Audio.play("coin", {vol:.6}); } }});
       c.globalAlpha = 1;
     }
@@ -503,6 +516,7 @@ export const GameMap = {
       c.textAlign = "left"; c.globalAlpha = 1;
     }
     this.floats = this.floats.filter(f => f.t < 1.4);
+    this.drawEdge(c, now);
     if (hexHit) this.hits.push(hexHit);   // placing a build: the grid takes every tap
     drawInfo(this, c);
     // hover tooltip (country name, CO₂, relation)
@@ -515,6 +529,33 @@ export const GameMap = {
       c.fillStyle = "rgba(6,16,21,.92)"; c.strokeStyle = "rgba(79,209,197,.5)"; c.lineWidth = 1; c.beginPath(); c.roundRect(x, y, w, h, 8); c.fill(); c.stroke();
       c.textBaseline = "top"; c.fillStyle = COL.fg; c.font = "600 12.5px 'IBM Plex Sans Thai', sans-serif"; c.fillText(name, x + 10, y + 5);
       c.fillStyle = cc ? COL[relCol(cc.rel)] : COL.muted; c.font = "500 11px 'IBM Plex Mono', 'IBM Plex Sans Thai', monospace"; c.fillText(line2, x + 10, y + 24); c.textBaseline = "alphabetic";
+    }
+  },
+  /* 2.0: arrows at the edge of the screen for disasters and aid bubbles you can't see (zoomed in elsewhere or under the HUD) */
+  drawEdge(c, now){
+    if (UIM.placing) return;
+    const i = this.insets, m = 30, L0 = i.l + m, R0 = this.w - i.r - m, T0 = i.t + m + 6, B0 = this.h - i.b - m;
+    if (R0 - L0 < 80 || B0 - T0 < 80) return;
+    const cx = (L0 + R0) / 2, cy = (T0 + B0) / 2, list = [];
+    for (const h of S.haz || []) if (!h.evac){ const pt = this.countryPoint(h.c); if (pt) list.push({pt, col:HZ_COL[h.type] || COL.bad, icon:P.HAZARDS[h.type].icon, id:"eh-" + h.id, c:h.c, n:Math.max(0, h.at - S.tick)}); }
+    for (const b of S.bubbles || []) if (b.type === "red"){ const pt = b.cid ? this.countryPoint(b.cid) : null; if (pt) list.push({pt, col:COL.bad, icon:"heart-handshake", id:"eb-" + b.id, c:b.cid, n:b.ttl, red:1}); }
+    const placed = [];
+    for (const q of list){
+      const [x, y] = this.toScreen(q.pt[0], q.pt[1]);
+      if (x > L0 - m && x < R0 + m && y > T0 - m && y < B0 + m) continue;   // on screen: drawn as usual
+      const dx = x - cx, dy = y - cy, k = Math.min((R0 - cx) / Math.max(1e-6, Math.abs(dx)), (B0 - cy) / Math.max(1e-6, Math.abs(dy)));
+      let ex = cx + dx * k, ey = cy + dy * k;
+      for (let n = 0; n < 5 && placed.some(p => Math.hypot(p[0] - ex, p[1] - ey) < 34); n++){ if (Math.abs(dx) * (B0 - cy) > Math.abs(dy) * (R0 - cx)) ey += 34; else ex += 34; }
+      ex = clamp(ex, L0, R0); ey = clamp(ey, T0, B0); placed.push([ex, ey]);
+      const a = Math.atan2(dy, dx), pulse = .5 + .5 * Math.sin(now * 5 + ex);
+      c.save(); c.translate(ex, ey);
+      c.fillStyle = q.col; c.globalAlpha = .85; c.beginPath(); c.moveTo(Math.cos(a) * 25, Math.sin(a) * 25); c.lineTo(Math.cos(a + 2.5) * 15, Math.sin(a + 2.5) * 15); c.lineTo(Math.cos(a - 2.5) * 15, Math.sin(a - 2.5) * 15); c.closePath(); c.fill();
+      c.globalAlpha = 1; c.fillStyle = "rgba(6,16,21,.92)"; c.beginPath(); c.arc(0, 0, 15, 0, Math.PI * 2); c.fill(); c.lineWidth = 2 + pulse; c.strokeStyle = q.col; c.stroke();
+      const im = iconImg(q.icon, q.col); if (im) c.drawImage(im, -9, -9, 18, 18);
+      c.font = "700 10px 'IBM Plex Mono', monospace"; c.textAlign = "center"; c.textBaseline = "middle"; c.fillStyle = "#fff"; c.strokeStyle = "rgba(0,0,0,.8)"; c.lineWidth = 3;
+      c.strokeText(String(q.n), 11, 11); c.fillText(String(q.n), 11, 11); c.textAlign = "left";
+      c.restore();
+      this.hits.push({id:q.id, x:ex - 18, y:ey - 18, w:36, h:36, fn:() => { Audio.play("whoosh", {vol:.3}); this.focusCountry(q.c); }});
     }
   },
   burst(x, y, col){ (this.parts = this.parts || []); for (let i = 0; i < 14; i++){ const a = Math.random() * Math.PI * 2, v = 60 + Math.random() * 110; this.parts.push({x, y, vx:Math.cos(a) * v, vy:Math.sin(a) * v - 60, r:1.5 + Math.random() * 2.2, col, t:0}); } },
@@ -570,4 +611,4 @@ H.hazardStrike = (h, d) => {
   Audio.play(one, {vol:.5 + Math.min(.5, d * .5)});
   if (!S.event && !(Audio.amb && !Audio.amb.stopping)){ Audio.ambience(amb, .9); setTimeout(() => { if (Audio.amb && Audio.amb.n === amb && !S.event) Audio.stopAmb(1400); }, 3600); }
 };
-H.hazardWarn = h => { Audio.play("data", {vol:.5, delay:.25}); };
+/* H.hazardWarn: game.js (2.0: also shows a forecast card) */

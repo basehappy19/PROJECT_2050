@@ -7,7 +7,7 @@ export const SHOP = {
 };
 export const RENAME_PRICE = 49;
 export const CHARS = ["sci", "dip", "eco", "act", "oce", "eng"];
-export const MODES = ["normal", "hard", "daily"];
+export const MODES = ["normal", "hard", "daily", "fast"];   // 2.0: Fast mode
 export const LEVELS = [0, 100, 250, 450, 700, 1000, 1350, 1750, 2200, 2700];
 export const levelOf = xp => { let l = 1; LEVELS.forEach((v, i) => { if (xp >= v) l = i + 1; }); return l; };
 
@@ -21,12 +21,13 @@ const ALL = ["start","tutorial","tech1","action1","event1","saver","greens","aid
 export const ACH_TERRA = Object.fromEntries(ALL.map(id => [id, EASY.includes(id) ? 3 : HARD.includes(id) ? 10 : 5]));   // 1.7: halved
 
 /* Terra for one finished game (before the daily limit) */
-export const TERRA = {win:15, l3:6, l2:3, l1:2, bonusMax:8, capGame:23, capHard:34, hardMult:1.5};   // 1.7: gems are rarer (was win 30, cap 45)
+export const TERRA = {win:15, l3:6, l2:3, l1:2, bonusMax:8, capGame:23, capHard:34, hardMult:1.5, fastMult:.6};   // 1.7: gems are rarer (was win 30, cap 45)
 export function terraFor(s){
   const base = TERRA[s.ending] || 0;
   const bonus = (Math.max(0, Math.min(6, (2.0 - s.temp) / 0.6 * 6)) + Math.max(0, Math.min(5, s.appr / 100 * 5)) + Math.max(0, Math.min(4, s.rel / 100 * 4))) / 2;
   let t = base + Math.min(TERRA.bonusMax, bonus);
   if (s.mode === "hard") t *= TERRA.hardMult;
+  if (s.mode === "fast") t *= TERRA.fastMult;   // 2.0: a 15-minute game pays a little less
   return Math.round(Math.min(t, s.mode === "hard" ? TERRA.capHard : TERRA.capGame));
 }
 /* same formula as the game (20-engine.js · score) */

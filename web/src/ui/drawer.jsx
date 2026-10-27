@@ -165,7 +165,7 @@ function PaneCountry(){
       <H3>{t("ordersCountry")}</H3>
       <div class="cards">{P.CACTS.filter(a => !a.req || S.owned[a.req]).map(a => {
         const k = P.cactCost(a), cd = c.cd[a.id] || 0, ok = P.cactOk(a, c);
-        return <div class="card row" key={a.id}>
+        return <div class="card row" key={a.id} data-cact={a.id}>
           <div class="grow"><b><Rich t={`[[${a.icon}]] ${L(a.name)}`} iconColor="accent"/></b><span class="muted"><Rich t={L(a.desc)}/></span></div>
           <Btn kind={ok ? "primary" : "ghost"} disabled={!ok} sound={null} onClick={() => { const before = c.rel; P.countryAction(a.id); if (c.rel > before) Audio.play("relUp", {delay:.1}); }}>{cd ? `${t("cooldown")} ${cd}` : costLabel(k)}</Btn>
         </div>;

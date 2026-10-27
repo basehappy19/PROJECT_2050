@@ -21,7 +21,7 @@ export function IconBtn({n, onClick, title, cls = "", on, disabled, sound = "cli
 /* segmented control: items [{id, label?, icon?, on, fn, dis}] */
 export function Seg({items, cls = ""}){
   return <div class={"seg " + cls}>{items.map(it =>
-    <button type="button" key={it.id} class={it.on ? "on" : ""} disabled={it.dis} onPointerEnter={hov} onClick={snd(it.fn, it.sound ?? "toggle")} title={it.title}>{it.icon ? <Icon n={it.icon} size={15}/> : it.label}</button>)}</div>;
+    <button type="button" key={it.id} data-id={it.id} class={it.on ? "on" : ""} disabled={it.dis} onPointerEnter={hov} onClick={snd(it.fn, it.sound ?? "toggle")} title={it.title}>{it.icon ? <Icon n={it.icon} size={15}/> : it.label}</button>)}</div>;
 }
 /* text tabs: items [{id, label, on, fn, badge}] */
 export function Tabs({items, cls = ""}){

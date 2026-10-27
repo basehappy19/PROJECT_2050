@@ -9,6 +9,7 @@ import {Icon, Rich} from "./icon.jsx";
 import {Btn, IconBtn, Tabs, Seg, Check, Terra, Portrait, Volume, GfxSeg, A11ySeg, NarrRow, LangSeg, Msg, H3, SlotInfo} from "./widgets.jsx";
 import {SlotRow, ClearSlots} from "./modals.jsx";
 import {AchList} from "./learn.jsx";
+import {SubMp, SubRoom, Invites} from "./mp.jsx";
 
 const N = () => P.Net;
 const goSub = sub => () => {
@@ -41,7 +42,7 @@ function GlobeView(){
 
 export function Menu(){
   const sub = UIM.sub;
-  const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason", settings:"mSettings"};
+  const TITLES = {mp:"mpTitle", room:"mpTitle", load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason", settings:"mSettings"};
   return <div class={"home " + (UIM.transition ? "leaving" : "")}>
     <GlobeView/>
     <div class="home-vignette"/>
@@ -54,7 +55,7 @@ export function Menu(){
         </div>}
         {!sub ? <div class="sdgtag"><img src="assets/img/sdg/goal-13.svg" alt="SDG 13" width="38" height="38"/><span>{t("mTag")}</span></div> : null}
         {!sub && N().cfg && N().cfg.announcement && L(N().cfg.announcement) ? <div class="announce card"><Icon n="megaphone" size={18} color="warn"/><span>{L(N().cfg.announcement)}</span></div> : null}
-        {sub === "load" ? <SubLoad/> : sub === "ach" ? <><Btn kind="ghost" block onClick={goSub("cert")}>{`[[award]] ${t("mCert")}`}</Btn><AchList/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : sub === "season" ? <SubSeason/> : sub === "settings" ? <SubSettings/> : <Main/>}
+        {sub === "load" ? <SubLoad/> : sub === "ach" ? <><Btn kind="ghost" block onClick={goSub("cert")}>{`[[award]] ${t("mCert")}`}</Btn><AchList/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : sub === "season" ? <SubSeason/> : sub === "settings" ? <SubSettings/> : sub === "mp" ? <SubMp/> : sub === "room" ? <SubRoom/> : <Main/>}
         {sub ? null : <footer class="mfooter">
           <small class="mono muted">{up(t("teamK"))}</small>
           <p class="team">{t("team")}</p>
@@ -70,7 +71,7 @@ function Main(){
   const dock = [
     {id:"load", ic:"save", t1:t("mLoadS"), fn:goSub("load")},
     {id:"learn", ic:"book-open", t1:t("mLearnS"), fn:() => G.openLearn("cards")},
-    {id:"how", ic:"graduation-cap", t1:t("mHowS"), fn:() => G.openTutorial(0, false)},
+    {id:"train", ic:"graduation-cap", t1:L(P.UI2.trainMenu), dot:!G.trained(), fn:() => G.startTraining(false)},   // 2.0: guided training (the picture guide is in the pause menu)
     {id:"ach", ic:"trophy", t1:t("mAchS"), badge:`${n}/${P.ACH.length}`, fn:goSub("ach")},
     {id:"season", ic:"calendar-check", t1:t("mSeasonS"), dot:N().seasonReady && N().seasonReady(), fn:goSub("season")},
     {id:"board", ic:"medal", t1:t("mBoardS"), fn:goSub("board")},
@@ -88,8 +89,10 @@ function Main(){
         {auto ? big("half", "globe", t("mNew"), null, () => G.newGame()) : null}
         {big("half world " + (world ? "" : "locked"), world ? "infinity" : "lock", t("mWorldS2"), null, () => G.newGame(true), !world)}
       </div>
+      {big("mpbtn", "users", t("mpTitle"), `${L(P.UI.mpCoop)} · ${L(P.UI.mpVersus)}`, goSub(P.Mp && P.Mp.room && P.Mp.room.state !== "ended" ? "room" : "mp"))}
     </div>
     <Msg UIM={UIM}/>
+    <Invites/>
     <div class="dock">{dock.map(it => <button type="button" key={it.id} class="dk" onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("click"); it.fn(); }}>
       <span class="dki"><Icon n={it.ic} size={24} color="accent"/>{it.dot ? <i class="dkdot"/> : null}</span><span class="dkl">{it.t1}</span>
     </button>)}</div>

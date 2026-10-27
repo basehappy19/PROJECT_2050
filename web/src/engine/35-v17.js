@@ -68,6 +68,7 @@ const LINES = {
      oce:T("ป่าชายเลนที่ฝนปลูกเริ่มกันคลื่นได้แล้ว อีกนิดเดียวเท่านั้น", "The mangroves Fon planted are already holding back the waves. Just a little further."),
      eng:T("โครงการสุดท้ายต้องเสร็จทันเวลา ผมจะเฝ้าหน้างานเอง", "The last projects must finish in time. I'll be on site myself.")},
 };
+P.introLine = () => LINES[1][S.char] || LINES[1].sci;   // 2.0: the opening scene
 /* the three acts: the player's lines become their own, Mr. Krai takes over the warning in act 2, Fon closes act 3 */
 const A1 = P.STORY.find(a => a.act === 1), A2 = P.STORY.find(a => a.act === 2), A3 = P.STORY.find(a => a.act === 3);
 if (A1){ A1.panels[2].say = LINES[1]; }
@@ -132,7 +133,7 @@ P.panelWho = p => (typeof p.who === "function" ? p.who() : p.who);
 
 /* one scene at a time, never in the same month as a new disaster forecast, a story act or an event, and at least 4 months apart */
 function sceneTick(){
-  if (S.over || S.event || S.world) return;
+  if (S.over || S.event || S.world || S.training || S.simple) return;
   if ((P.UIM && P.UIM.modal) || S.haz.some(h => h.at === S.tick + P.FORECAST)) return;
   if (S.tick - (S.lastScene ?? -99) < 4) return;
   const sc = SCENES.find(x => !S.story[x.act] && x.when()); if (!sc) return;
@@ -145,7 +146,7 @@ const MS = [{y:2030, tk:60, v:32}, {y:2035, tk:120, v:28}, {y:2040, tk:180, v:22
 const MS_REWARD = {ep:25, pc:6};
 P.MILESTONES = MS; P.MS_REWARD = MS_REWARD;
 function milestoneTick(){
-  if (S.world || S.over) return;
+  if (S.world || S.over || S.v2) return;   // 2.0: games started in 2.0 get a yearly review instead (37-v20.js)
   S.ms17 = S.ms17 || {};
   MS.forEach((m, i) => {
     if (S.ms17[i] !== undefined || S.tick < m.tk) return;
@@ -243,9 +244,9 @@ P.TUT.splice(0, P.TUT.length,
   TU("n01-goal.jpg", "เป้าหมายของเกม", "Your goal",
     ["ท่านนำคณะทำงานภูมิอากาศโลก (GCT) เริ่มเดือนมกราคม 2026", "ทำให้ [[$co2]] CO₂ สุทธิของโลกเหลือ 0 ก่อนสิ้นปี 2050", "CO₂ สุทธิ = ที่ปล่อยทั้งหมด − ที่ป่าและเทคโนโลยีดูดกลับ · 1 เดือนในเกมผ่านไปทุกไม่กี่วินาที"],
     ["You lead the Global Climate Taskforce (GCT), starting January 2026", "Bring the world's [[$co2]] net CO₂ down to 0 before the end of 2050", "Net CO₂ = everything emitted − what forests and technology take back · a game month passes every few seconds"]),
-  TU("n02-meters.jpg", "หลอดชนะ หลอดแพ้ และเป้าหมายรายทาง", "Win and lose meters, milestones",
-    ["[[flag]] หลอด Net Zero: จุดยิ่งเข้าใกล้ถ้วย [[trophy]] ยิ่งใกล้ชนะ", "ขีดบนหลอดคือเป้าหมายปี 2030 2035 2040 2045 ผ่านแล้วได้ [[$money]] และ [[$policy]] เพิ่ม", "[[$temp]] หลอดอุณหภูมิ: ถึง +3.0°C = แพ้ ยิ่งร้อนภัยยิ่งถี่"],
-    ["[[flag]] Net Zero meter: the closer the dot is to the [[trophy]], the closer you are to winning", "The marks are the 2030, 2035, 2040 and 2045 targets; reach one for extra [[$money]] and [[$policy]]", "[[$temp]] Temperature: +3.0°C means game over; the hotter, the more disasters"]),
+  TU("n02-meters.jpg", "หลอดชนะ หลอดแพ้ และสรุปผลงานรายปี", "Win and lose meters, the year in review",
+    ["[[flag]] หลอด Net Zero: จุดยิ่งเข้าใกล้ถ้วย [[trophy]] ยิ่งใกล้ชนะ", "ขีดสีทองคือเป้า CO₂ ของปีนี้ ทุกมกราคมมีสรุปผลงานปี: ถึงเป้า = ปีที่ดี ได้ [[$money]] [[$policy]] เพิ่ม · ไม่ถึง = ความเชื่อมั่นลด · จำนวนปีที่ดีเลือกฉากจบ", "[[$temp]] หลอดอุณหภูมิ: ถึง +3.0°C = แพ้ ยิ่งร้อนภัยยิ่งถี่"],
+    ["[[flag]] Net Zero meter: the closer the dot is to the [[trophy]], the closer you are to winning", "The gold mark is this year's CO₂ target. Every January you get a year in review: on target = a good year with extra [[$money]] [[$policy]] · off target = less trust · your number of good years picks your ending", "[[$temp]] Temperature: +3.0°C means game over; the hotter, the more disasters"]),
   TU("n03-top.jpg", "ค่าด้านบนและตัวละคร", "The top bar and your character",
     ["[[$money]] เงิน และ [[$policy]] แต้มนโยบาย เข้ามาทุกเดือน ใช้ซื้อสกิลและสั่งการ", "[[$ore]] ทรัพยากร: แตะเพื่อเปิดตลาด · [[$appr]] ความนิยม: มาจากคน 4 กลุ่ม แตะเพื่อดู ถ้าเหลือ 0% จะถูกถอดถอน", "ซ้ายบนคือตัวละคร ปุ่มใต้รูปคือสกิลพิเศษ (มีเวลาพัก)"],
     ["[[$money]] Money and [[$policy]] policy points come in every month and pay for skills and orders", "[[$ore]] Resources: tap to open the market · [[$appr]] Approval comes from 4 groups (tap to see); at 0% you're removed", "Top left is your character; the buttons under the portrait are special skills with cooldowns"]),

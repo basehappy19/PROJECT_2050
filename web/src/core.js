@@ -26,12 +26,13 @@ export const UIM = P.UIM = {
     if (this.modal === "tutorial" || this.modal === "pause" || this.modal === "learn") return this.modal;
     if (this.screen !== "game") return this.modal;
     if (this.modal === "story") return "story";
-    if (S.over) return "end";
+    if (this.modal === "year" || this.modal === "intro") return this.modal;   // 2.0: yearly review · opening scene
+    if (S.over || (S.mp && P.Mp && P.Mp.game && P.Mp.game.over)) return "end";   // 2.0: in a race, the losers see the end too
     if (S.event) return "event";
     return this.modal;     // "skills" | "charsel"
   },
   get paused(){ return this.modal === "pause"; },
-  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market", "politics", "slotpick"].includes(this.modal) || !!this.transition; },
+  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market", "politics", "slotpick", "year", "intro"].includes(this.modal) || !!this.transition || !!(this.train && this.train.hold); },
   eventLocked(){ return (performance.now() - this.evAt) / 1000 < EVENT_LOCK; },
   eventLockFrac(){ return Math.min(1, (performance.now() - this.evAt) / 1000 / EVENT_LOCK); },
 };

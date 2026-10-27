@@ -64,7 +64,7 @@ function refineTick(){
     if (n > 0){ S.raw[g] -= n; S.mat[g] += n; }
   }
   const lv = GIDS().reduce((s, g) => s + (S.refLv[g] || 0), 0);
-  if (lv){ const e0 = S.ep; S.ep = Math.max(0, S.ep - lv * UPKEEP); if (P.ledgerTag) P.ledgerTag("refinery", S.ep - e0, 0); }
+  if (lv){ const e0 = S.ep; S.ep = Math.max(0, S.ep - lv * UPKEEP); if (P.ledgerTag) P.ledgerTag("refinery", S.ep - e0, 0); hook("loss", {k:"refinery", ep:S.ep - e0}); }
 }
 Object.assign(P.UI, {
   resReady:T("พร้อมใช้", "ready"), resRaw:T("ต้องแปรรูป", "needs refining"), resSends:T("ส่งให้เรา", "Sends us"), resBanned:T("ระงับ", "Stopped"),

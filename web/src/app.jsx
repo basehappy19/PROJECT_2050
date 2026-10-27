@@ -13,6 +13,10 @@ import {Narr} from "./narrator.js";
 import {EventModal, EndModal, CharSel, Story, Pause, Tutorial, Market, Politics, SlotPick} from "./ui/modals.jsx";
 import {Learn} from "./ui/learn.jsx";
 import {Menu} from "./ui/menu.jsx";
+import {LossFeed, HazardAlerts, EventPill} from "./ui/alerts.jsx";
+import {YearModal, Intro} from "./ui/year.jsx";
+import {Training} from "./ui/training.jsx";
+import {MpHud, MpEnd, Invites} from "./ui/mp.jsx";
 
 /* ---------- loading ---------- */
 const PRELOAD = ["assets/img/globe-day{s}.jpg", "assets/img/globe-night{s}.jpg", "assets/img/globe-clouds{s}.jpg", "assets/img/ui/logo.png", "assets/data/world.json"];
@@ -85,7 +89,11 @@ function GameScreen(){
       <ZoomBtns/>
       <Drawer/>
       <Bottom/>
+      {S.started ? <LossFeed/> : null}
+      {S.started ? <HazardAlerts/> : null}
+      {S.mp ? <MpHud/> : null}
     </div>
+    {S.started && !S.mp ? <div class="mpinv-game"><Invites/></div> : null}
   </div>;
 }
 
@@ -93,7 +101,9 @@ function Windows(){
   const k = UIM.kind();
   if (!k) return null;
   if (k === "skills") return <Skills/>;
-  if (k === "event") return <EventModal/>;
+  if (k === "event") return UIM.evMin ? <EventPill/> : <EventModal/>;
+  if (k === "year") return <YearModal/>;
+  if (k === "intro") return <Intro/>;
   if (k === "end") return <EndModal/>;
   if (k === "charsel") return <CharSel/>;
   if (k === "story") return <Story/>;
@@ -112,6 +122,7 @@ export function App(){
   return <>
     {sc === "loading" ? <Loading/> : sc === "menu" ? <Menu/> : <GameScreen/>}
     {sc !== "loading" ? <Windows/> : null}
+    {sc === "game" && UIM.train ? <Training onFinish={play => G.finishTraining(play)} onQuit={() => G.quitTraining()}/> : null}
     <Toast/>
     <UpdateBar/>
     {Narr.subs && Narr.line ? <div class="subline" aria-live="polite"><span>{Narr.line}</span></div> : null}

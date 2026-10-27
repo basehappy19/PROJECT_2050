@@ -2,7 +2,7 @@
    achievements, endings reached (unlocks Hard Core and the Continuous World), events and hazards seen (knowledge cards),
    characters played and a few counters. Two devices are merged, never overwritten: lists are joined, counters keep the larger value. */
 const ID = /^[A-Za-z0-9_.:-]{1,48}$/;
-const LISTS = ["seen", "haz", "charsDone"], COUNTS = ["greens", "aids", "evac", "cev", "daily"], STAMPS = ["got", "ends"], FLAGS = ["tut"];
+const LISTS = ["seen", "haz", "charsDone"], COUNTS = ["greens", "aids", "evac", "cev", "daily"], STAMPS = ["got", "ends"], FLAGS = ["tut", "trained"];
 const num = v => { const n = Math.round(Number(v)); return Number.isFinite(n) && n >= 0 ? Math.min(n, 1e13) : 0; };
 
 export function cleanProgress(o){

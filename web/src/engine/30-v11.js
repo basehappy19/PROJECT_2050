@@ -61,7 +61,7 @@ function hostilityTick(){
   // sanctions cost money every month and slowly wear off
   for (const k of Object.keys(S.sanct || {})){
     if (!(S.sanct[k] > 0)) continue;
-    const c = P.C(k); if (c){ const e0 = S.ep; S.ep = Math.max(0, S.ep - sanctCost(c)); if (P.ledgerTag) P.ledgerTag("sanct", S.ep - e0, 0); }
+    const c = P.C(k); if (c){ const e0 = S.ep; S.ep = Math.max(0, S.ep - sanctCost(c)); if (P.ledgerTag) P.ledgerTag("sanct", S.ep - e0, 0); hook("loss", {k:"sanct", c:k, ep:S.ep - e0, left:S.sanct[k] - 1}); }
     if (--S.sanct[k] === 0) P.addLog(`[[handshake]] ${P.cname(k)} ${L(TX.sanctEnd)}`, "gd");
   }
   // the border carbon tax (skill P3) annoys continents that are behind the plan
@@ -70,7 +70,7 @@ function hostilityTick(){
 
 /* season forecast every 6 months: one continent is much more likely to be hit (hazardTick reads S.intel) */
 function intelTick(){
-  if (S.tick % 6 !== 1) return;
+  if (S.tick % 6 !== 1 || S.training) return;
   const regs = S.regions.slice(), pick = P.rand();
   let tot = regs.reduce((s, r) => s + r.vuln + 20, 0), acc = 0, reg = regs[0];
   for (const r of regs){ acc += (r.vuln + 20) / tot; if (pick <= acc){ reg = r; break; } }

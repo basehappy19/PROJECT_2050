@@ -34,7 +34,7 @@ export function Skills(){
         </div>
         <span class="muted small paused"><Icon n="pause" size={13}/> {t("pausedHere")}</span>
         <Key k="T"/><Key k="Esc"/>
-        <IconBtn n="x" title="Close" onClick={() => G.closeSkills()} sound={null} cls="big"/>
+        <IconBtn n="x" title="Close" onClick={() => G.closeSkills()} sound={null} cls="big skclose"/>
       </header>
       <div class="sk-body">
         <div class="sk-grid">
@@ -54,7 +54,7 @@ export function Skills(){
               const [cx, cy] = centre(n), vis = visible(n), own = !!S.owned[n.id], c = P.nodeCost(n), p = P.rollProgress(n.id), sel = S.node === n.id;
               const afford = vis && !own && P.canAfford(n);
               const lab = vis ? (p !== null ? `${Math.round(p * 100)}%` : own ? (n.type === "active" ? (S.actCd[n.id] ? `${S.actCd[n.id]} ${t("moShort")}` : t("ready")) : "✓") : `${c.ep}·${c.pc}`) : "???";
-              return <g key={n.id} class={`hex ${own ? "own" : vis ? (afford ? "afford" : "vis") : "hid"} ${n.type} ${sel ? "sel" : ""}`} onClick={() => pick(n.id)} onPointerEnter={() => Audio.hover()} tabIndex={0} role="button" aria-label={vis ? L(n.name) : t("hiddenSkill")} onKeyDown={e => { if (e.key === "Enter") pick(n.id); }}>
+              return <g key={n.id} data-node={n.id} class={`hex ${own ? "own" : vis ? (afford ? "afford" : "vis") : "hid"} ${n.type} ${sel ? "sel" : ""}`} onClick={() => pick(n.id)} onPointerEnter={() => Audio.hover()} tabIndex={0} role="button" aria-label={vis ? L(n.name) : t("hiddenSkill")} onKeyDown={e => { if (e.key === "Enter") pick(n.id); }}>
                 {afford ? <polygon class="halo" points={hexPts(cx, cy, R + 8)}/> : null}
                 <polygon class="body" points={hexPts(cx, cy, R)}/>
                 {p !== null ? <polygon class="prog" points={hexPts(cx, cy, R - 5)} style={{opacity:.15 + .35 * p}}/> : null}
@@ -127,6 +127,7 @@ function Detail({cat}){
       {n.type === "active" ? <Pill t={`${t("cooldownLen")} ${n.cd} ${t("months")}`} kind="gold"/> : null}
     </div>
     {!own ? <>
+      {S.mp && S.mp.kind === "coop" && P.Mp && !P.Mp.myRoles().includes(P.MP.CAT_ROLE[n.cat]) ? <p class="mpskrole"><Icon n={P.MP.ROLE[P.MP.CAT_ROLE[n.cat]].icon} size={16}/> {S.lang === "th" ? "สกิลนี้เป็นงานของกระทรวง" : "This skill belongs to"} <b>{L(P.MP.ROLE[P.MP.CAT_ROLE[n.cat]].name)}</b></p> : null}
       <Btn block size="lg" disabled={!can} sound={null} onClick={() => { if (P.buyNode(n.id)){ if (P.SKILL_SND && P.SKILL_SND[n.id]) Audio.snippet(P.SKILL_SND[n.id]); bump(); } }}>{`[[lock-open]] ${t("unlock")}`}</Btn>
       {full ? <p class="bad small">{t("capFull")}</p> : st === "locked" ? <p class="warn small">{t("needReq")}</p>
         : !can && S.oreOn && P.matCost(n) && !P.matOk(n) ? <div class="skmat"><span class="bad small"><Rich t={`${t("matShortSk")} ${Object.entries(P.matCost(n)).filter(([g, v]) => (S.mat[g] || 0) < v).map(([g, v]) => `[[${P.MAT[g].icon}]] ${Math.ceil(v - (S.mat[g] || 0))}`).join("  ")}`} iconColor="inherit"/></span>

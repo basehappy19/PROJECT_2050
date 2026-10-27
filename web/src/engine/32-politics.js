@@ -119,7 +119,7 @@ function sync(){
 function settle(){ S.appr = clamp(mean(), 0, 100); S.grpSeen = S.appr; }
 function withTilt(fn, tiltOf){
   return (...a) => {
-    if (!S.regions) return fn(...a);
+    if (!S.regions || S.simple) return fn(...a);
     sync();
     const t = tiltOf(...a), before = JSON.stringify(S.owned || {}) + (S.event ? 1 : 0) + S.ep + "/" + S.pc;
     const r = fn(...a);
@@ -157,6 +157,7 @@ function protest(g){
   if (g === "farm"){ const m = Math.min(S.ep, 6), q = Math.min(S.pc, 3); S.ep -= m; S.pc -= q; fx = `${IC.ep} −${m} · ${IC.pc} −${q}`; }
   if (g === "youth"){ const q = Math.min(S.pc, 6); S.pc -= q; fx = `${IC.pc} −${q}`; }
   if (P.ledgerTag) P.ledgerTag("protest", S.ep - e0, S.pc - p0);
+  hook("loss", {k:"protest", g, ep:S.ep - e0, pc:S.pc - p0, appr:g === "city" ? -2 : 0});
   S.stats.protests = (S.stats.protests || 0) + 1; S.lastProtest = g;
   P.addLog(`[[megaphone]] ${tx} · ${fx}`, "al");
   hook("sfx", "warn"); hook("toast", {id:"prot" + g + S.tick, icon:"megaphone", title:L(T("ประท้วง", "Protest")), msg:L(GROUP[g].name)});
@@ -198,14 +199,14 @@ function groupsTick(){
 
 /* ---------------- hooks into the engine ---------------- */
 const _tick = P.tick;
-P.tick = () => { if (S.regions && !S.groups) initGroups(); if (S.regions) sync(), settle(); _tick(); if (S.regions && !S.over) groupsTick(); };
+P.tick = () => { if (S.simple) return _tick(); if (S.regions && !S.groups) initGroups(); if (S.regions) sync(), settle(); _tick(); if (S.regions && !S.over) groupsTick(); };   // 2.0: Fast mode has no groups
 P.buyNode = withTilt(P.buyNode, id => SKILL_TILT[id] || null);
 P.doAction = withTilt(P.doAction, aid => ACT_TILT[aid] || null);
 P.countryAction = withTilt(P.countryAction, aid => CACT_TILT[aid] || null);
 P.useAbility = withTilt(P.useAbility, id => ABIL_TILT[id] || null);
 P.chooseOption = withTilt(P.chooseOption, i => (i >= 0 && P.currentEvent() ? eventTilt(P.currentEvent().options[i], P.currentEvent()) : null));
 const _init = P.v1Init;
-P.v1Init = () => { if (_init) _init(); initGroups(); S.grpSeen = S.appr; settle(); };
+P.v1Init = () => { if (_init) _init(); if (S.simple){ delete S.groups; return; } initGroups(); S.grpSeen = S.appr; settle(); };
 
 /* industry sets income, the young set policy points (±10%) */
 P.incMult = () => (S.groups ? clamp(1 + .5 * (S.groups.ind - mean()) / 100, .9, 1.1) : 1);   // compared with everyone else
@@ -213,6 +214,7 @@ P.pcMult = () => (S.groups ? clamp(1 + .5 * (S.groups.youth - mean()) / 100, .9,
 
 /* for the interface: what a choice / skill / order would do to the groups (after evening out, rounded) */
 function preview(t){
+  if (S.simple) return [];
   const o = evenOut(t); if (!o) return [];
   return GID.map(g => ({g, v:o[g]})).filter(x => Math.abs(x.v) >= 1.2).sort((a, b) => Math.abs(b.v) - Math.abs(a.v));
 }
@@ -229,5 +231,5 @@ function applyExact(t){
   named.forEach(g => { S.groups[g] = clamp(S.groups[g] + t[g], 0, 100); });
   rest.forEach(g => { S.groups[g] = clamp(S.groups[g] - d / rw, 0, 100); });
 }
-P.groupTilt = (t, exact) => { if (!S.groups) return; sync(); if (exact) applyExact(t); else applyTilt(t); settle(); };
+P.groupTilt = (t, exact) => { if (!S.groups || S.simple) return; sync(); if (exact) applyExact(t); else applyTilt(t); settle(); };
 Object.assign(P, {withGroupTilt:withTilt, groupPreview:preview, GROUPS, GROUP, GID, GROUP_BACK:BACK, GROUP_ANGRY:ANGRY, tiltOfSkill, tiltOfOption, tiltOfAction, groupState, angryCount, eventTilt, groupsTick});

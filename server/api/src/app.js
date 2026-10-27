@@ -11,6 +11,8 @@ import { certificatePdf, verifyHtml } from "./certificate.js";
 import { mergeProgress } from "./progress.js";
 import { registerAdmin, registerStats, priceOf } from "./admin.js";
 import { getSettings, originAllowed } from "./settings.js";
+import { createHub } from "./mp/hub.js";
+import { registerFriends } from "./mp/friends.js";
 
 const fail = (reply, code, error, extra = {}) => reply.code(code).send({error, ...extra});
 const USERNAME = /^[a-z0-9_]{3,16}$/;
@@ -348,6 +350,11 @@ export function buildApp(pool, opts = {}){
     const c = (await pool.query("SELECT * FROM certificates WHERE code = $1", [code])).rows[0];
     return reply.type("text/html; charset=utf-8").code(c ? 200 : 404).send(verifyHtml(c, code));
   });
+
+  /* 2.0: friends and multiplayer (WebSocket at /api/ws) */
+  const hub = opts.multiplayer === false ? null : createHub(app, pool, {readAccess, originAllowed});
+  registerFriends(app, pool, hub, {tx, fail});
+  app.decorate("hub", hub);
 
   /* admin tools, online settings and play statistics */
   registerAdmin(app, pool, {balance, meBody});

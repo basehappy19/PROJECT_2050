@@ -121,6 +121,23 @@ sudo ufw allow OpenSSH && sudo ufw allow 'Nginx Full' && sudo ufw --force enable
 cd /opt/project2050 && git pull && npm run setup && npm run build && sudo systemctl restart project-zero
 ```
 
+### อัปเดตเป็น 2.0 (เล่นหลายคน) ครั้งแรก
+
+2.0 ใช้ WebSocket ที่ `/api/ws` ต้องให้ Nginx ส่ง header `Upgrade` ต่อด้วย ไม่อย่างนั้นปุ่ม "เล่นหลายคน" จะต่อไม่ติด:
+
+```bash
+sudo nano /etc/nginx/sites-available/project-zero
+#  1) เพิ่มบรรทัดนี้ไว้บนสุดของไฟล์ (นอก server { … }):
+#       map $http_upgrade $connection_upgrade { default upgrade; '' close; }
+#  2) ใน location / { … } เพิ่ม 3 บรรทัด:
+#       proxy_set_header Upgrade $http_upgrade;
+#       proxy_set_header Connection $connection_upgrade;
+#       proxy_read_timeout 3600s;
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+ดูตัวอย่างเต็มได้ใน `server/vps/nginx-proxy.conf` · ตาราง `friendships` และ `mp_games` ถูกสร้างเองตอน `npm start` (migration 0007) · ถ้าใช้ Cloudflare ให้เปิด WebSockets ในหน้า Network ด้วย (ปกติเปิดอยู่แล้ว)
+
 ## เปลี่ยนโครงสร้างฐานข้อมูล (ฝั่งพัฒนา)
 
 แก้ `server/api/prisma/schema.prisma` → บนเครื่องพัฒนา `cd server/api && npx prisma migrate dev --name <ชื่อ>` → commit โฟลเดอร์ใหม่ใน `prisma/migrations/` → บน VPS อัปเดตเวอร์ชันตามด้านบน

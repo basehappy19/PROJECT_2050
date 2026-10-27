@@ -1,8 +1,11 @@
 /* Game controller: screens, actions, the month tick, keyboard shortcuts, engine hooks */
-import {P, S, H, UIM, bump, ls, t} from "./core.js";
+import {P, S, H, UIM, bump, ls, t, L} from "./core.js";
 import {Audio} from "./audio.js";
 import {GameMap} from "./map2d.js";
 import {Gfx} from "./gfx.js";
+import {addLoss, addAlert} from "./ui/alerts.jsx";
+import {Train} from "./ui/training.jsx";
+import "./mp.js";   // 2.0: multiplayer (sends actions to the server during a multiplayer game)
 Gfx.onAutoDrop = lv => { UIM.toastQ.push({icon:"monitor", title:t("gfxLbl"), msg:t("gfxDropped").replace("{L}", t("gfx_" + lv))}); bump(); };
 
 const tutSeen = () => ls.get("p2050-tut") === "1";
@@ -11,6 +14,7 @@ export const G = P.Game = {
   /* ---------- screens ---------- */
   toMenu(){
     if (UIM.screen === "game") P.autosave();
+    UIM.train = null;
     Audio.stopAmb(300); Audio.setBed("space", .8); Audio.play("whoosh", {vol:.5});
     UIM.modal = null; UIM.sub = null; S.tab = null; UIM.msg = "";
     UIM.fade = true; bump();
@@ -25,6 +29,7 @@ export const G = P.Game = {
     if (this.globe && this.globe.running) this.globe.zoomTo(13, 101, go, 1500); else go();
   },
   newGame(world = false){
+    if (!world && !Train.trained()){ UIM.msg = L(P.UI2.trainForced); UIM.err = false; this.startTraining(true); return; }   // 2.0: a new player trains first
     UIM.placing = null;
     UIM.worldNext = !!world;
     P.newGame(S.lang);
@@ -34,6 +39,23 @@ export const G = P.Game = {
       Audio.setMood("calm");
     });
   },
+  /* 2.0: training mode (ui/training.jsx) */
+  startTraining(forced = false){
+    UIM.placing = null; UIM.worldNext = false; UIM.losses = []; UIM.alerts = [];
+    P.newGame(S.lang);
+    this.enterGame(() => {
+      P.startGame(S.lang, {mode:"normal", char:"sci", charLv:1, training:true, seed:20261, ab:"A"});
+      S.speed = 0; S.ep = 120; S.pc = 40; S.bubbles = []; S.haz = []; S.lastEv = 0;
+      UIM.modal = null; UIM.train = {i:0, forced}; GameMap.refresh(); GameMap.resetView(); Audio.setMood("calm", true); bump();
+    });
+  },
+  trained(){ return Train.trained(); },
+  finishTraining(play){
+    Train.markDone(); UIM.train = null; UIM.losses = []; UIM.alerts = [];
+    if (play){ S.over = null; S.started = false; P.newGame(S.lang); UIM.modal = "charsel"; UIM.modeSel = "fast"; UIM.charSel = "sci"; GameMap.refresh(); Audio.setMood("calm"); bump(); }
+    else this.toMenu();
+  },
+  quitTraining(){ const forced = UIM.train && UIM.train.forced && !Train.trained(); UIM.train = null; UIM.losses = []; UIM.alerts = []; S.started = false; this.toMenu(); if (forced) setTimeout(() => { UIM.msg = L(P.UI2.trainForced); UIM.err = true; bump(); }, 400); },
   loadSave(obj, slot){
     if (!P.validSave(obj)) return false;
     const go = () => { P.loadState(obj, slot); UIM.modal = null; Audio.setMood(Audio.gameMood()); GameMap.refresh(); GameMap.resetView(); bump(); };
@@ -87,9 +109,13 @@ export const G = P.Game = {
   storyNext(){
     const st = P.STORY.find(a => a.act === UIM.storyAct);
     if (st && UIM.storyI < st.panels.length - 1){ UIM.storyI++; UIM.storyT = performance.now(); Audio.play(UIM.storyI % 2 ? "page2" : "page"); bump(); return; }
-    UIM.modal = null; Audio.play("start"); bump();
+    UIM.modal = null; Audio.play("start"); this.afterModal(); bump();
   },
-  storySkip(){ UIM.modal = null; Audio.play("close"); bump(); },
+  storySkip(){ UIM.modal = null; Audio.play("close"); this.afterModal(); bump(); },
+  /* 2.0: a yearly review that arrived during a story waits for it to close */
+  afterModal(){ if (UIM.yearQ && !UIM.modal){ const r = UIM.yearQ; UIM.yearQ = null; this.showYear(r); } },
+  showYear(rec){ UIM.yearRec = rec; UIM.modal = "year"; UIM.yearAt = performance.now(); Audio.play(rec.g ? "jingle" : "page", {vol:.7}); bump(); },
+  closeYear(){ if (UIM.modal !== "year") return; UIM.modal = null; Audio.play("close"); bump(); },
   startGame(char, mode){
     if (!P.Net.owns("char_" + char)) return;
     if (mode === "hard" && !UIM.worldNext && !P.hardUnlocked()){ UIM.msg = t("hardLockedMsg"); UIM.err = true; bump(); return; }
@@ -125,12 +151,14 @@ export const G = P.Game = {
       else if (m === "tutorial") this.tutAct("skip");
       else if (m === "learn") this.closeLearn();
       else if (m === "story") this.storyNext();
+      else if (m === "year") this.closeYear();
       else if (m === "skills") this.closeSkills();
       else if (S.tab) this.closeTab();
       else if (!S.event && !S.over && !m) this.pause();
       return;
     }
     if (m === "story" && (name === "space" || name === "enter")){ this.storyNext(); return; }
+    if (m === "year" && (name === "space" || name === "enter")){ if (performance.now() - (UIM.yearAt || 0) > 700) this.closeYear(); return; }
     if (S.event && /^[123]$/.test(name)){ const i = +name - 1, ev = P.currentEvent(); if (ev && i < ev.options.length && !UIM.eventLocked() && P.affordable(ev.options[i].fx)) P.chooseOption(i); return; }
     if (name === "t"){ if (m === "skills") this.closeSkills(); else this.openSkills(); return; }
     if (m && m !== "skills") return;
@@ -158,7 +186,7 @@ window.addEventListener("keydown", e => {
   const map = {" ":"space", Escape:"esc", Enter:"enter"}, kk = map[e.key] || (e.key && e.key.length === 1 ? e.key.toLowerCase() : null);
   if (!kk) return;
   if (kk === "space" && UIM.screen === "game") e.preventDefault();
-  if (kk === "enter" && UIM.modal !== "story") return;
+  if (kk === "enter" && UIM.modal !== "story" && UIM.modal !== "year") return;
   try { G.key(kk, e); } catch(err){ console.error(err); }
 });
 
@@ -169,9 +197,9 @@ function clock(now){
   if (UIM.screen === "game" && S.started && !S.over){
     S.realSec += dt;
     const sec = Math.floor(S.realSec); if (sec !== lastSec && UIM.modal === "pause"){ lastSec = sec; bump(); }
-    if (P.running()){
+    if (P.running() && !S.mp){   // 2.0: in multiplayer the server runs the clock
       acc += dt;
-      const step = P.SPEEDS[S.speed] || 4;
+      const step = P.secPerMonth();   // 2.0: Fast mode runs faster
       if (acc >= step){ acc -= step; if (acc > step) acc = 0; P.tick(); afterTick(); }
     }
   }
@@ -180,7 +208,7 @@ function clock(now){
   requestAnimationFrame(clock);
 }
 requestAnimationFrame(clock);
-P.tickProgress = () => (S.speed ? Math.min(1, acc / (P.SPEEDS[S.speed] || 4)) : 0);
+P.tickProgress = () => (S.speed ? Math.min(1, acc / P.secPerMonth()) : 0);
 
 /* quiet background soundscape: the clock in the last two years, otherwise the place you are zoomed into */
 const PLACE_BED = {NA:"highway", EU:"street", EA:"city", SA:"jungle", MEAF:"gale", SEA:"river"};
@@ -199,6 +227,7 @@ H.dirty = () => bump();
 const CE_AMB = {CE_BATTERY:"factory", CE_COAL:"factory", CE_DAM:"river", CE_FOREST:"jungle", CE_CBAM:"market", CE_REFUGEE:"crowd", CE_SEABED:"underwater", CE_NUKE:"lab", CE_ARCTIC:"arctic", CE_LOSS:"office", CE_SOLARWAR:"market", CE_GEOENG:"lab", CE_MARINE:"ocean", CE_PALM:"jungle", CE_DATA:"keyboard", CE_RAIL:"train"};
 H.showEvent = () => {
   if (UIM.modal === "skills" || UIM.modal === "charsel") UIM.modal = null;
+  UIM.evMin = false;
   if (S.cev && CE_AMB[S.cev.id]) Audio.ambience(CE_AMB[S.cev.id]);
   UIM.evAt = performance.now(); Audio.play("question", {delay:.35, vol:.7}); bump();
   setTimeout(() => Audio.play("tick", {vol:.5}), 1500);
@@ -212,8 +241,20 @@ H.showEnd = () => {
 };
 H.closeModal = () => { if (UIM.modal === "charsel") UIM.modal = null; bump(); };
 H.toast = a => { UIM.toastQ.push(a); bump(); };
+/* 2.0: losses with their reasons, disaster forecast cards, the yearly review */
+H.loss = o => addLoss(o);
+H.hazardWarn = h => { Audio.play("data", {vol:.5, delay:.25}); addAlert(h); };
+H.yearly = rec => {
+  if (S.simple || S.mp){ addLoss({k:"year", y:rec.y, good:rec.g, ep:rec.ep, pc:rec.pc, appr:rec.appr}); return; }   // Fast mode and multiplayer: a line, not a window
+  if (UIM.modal === "story" || UIM.modal === "intro"){ UIM.yearQ = rec; return; }
+  G.showYear(rec);
+};
 H.story = act => { if (UIM.modal === "skills") UIM.modal = null; G.showStory(act); };
-H.gameStart = () => { G.showStory(1); if (P.Net){ P.Net.startRun(); P.Net.statStart(); } };
+H.gameStart = () => {
+  if (S.training || S.mp) return;
+  UIM.modal = "intro"; bump();   // 2.0: a short opening scene instead of the act 1 text window
+  if (P.Net){ P.Net.startRun(); P.Net.statStart(); }
+};
 H.gameOver = () => { if (P.Net) P.Net.finishRun(); };
 const sfx0 = H.sfx;
 /* a few engine sounds get a second layer */

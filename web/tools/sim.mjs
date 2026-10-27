@@ -17,7 +17,7 @@ function makeEngine(seed){
   ctx.window = ctx; vm.createContext(ctx);
   // deterministic Math.random per game so runs can be repeated
   let s = seed >>> 0; ctx.Math = Object.create(Math); ctx.Math.random = () => { s = (s + 0x6D2B79F5) | 0; let x = Math.imul(s ^ (s >>> 15), 1 | s); x ^= x + Math.imul(x ^ (x >>> 7), 61 | x); return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
-  for (const f of fs.readdirSync(ENG).filter(f => /^(1\d|2\d|3\d)-.*\.js$/.test(f) && !(process.env.NOPOL && f.startsWith("32-"))).sort()) vm.runInContext(`(function(){${fs.readFileSync(path.join(ENG, f), "utf8")}})();`, ctx, {filename:f});
+  for (const f of fs.readdirSync(ENG).filter(f => /^(1\d|2\d|3\d)-.*\.js$/.test(f) && !(process.env.NOPOL && f.startsWith("32-")) && !(process.env.NOV20 && /^3[78]-/.test(f))).sort()) vm.runInContext(`(function(){${fs.readFileSync(path.join(ENG, f), "utf8")}})();`, ctx, {filename:f});
   return ctx.P2050;
 }
 
@@ -25,6 +25,7 @@ const co2Value = (P, n) => { const fx = n.fx || {}; let v = 0; if (fx.co2) v -= 
 
 function play(bot, seed){
   const P = makeEngine(seed), S = P.S;
+  if (process.env.YR && P.YEAR_RULES) Object.assign(P.YEAR_RULES, JSON.parse(process.env.YR));   // 2.0: try other yearly-review rules
   if (P.setBalance) P.setBalance(PRESET, process.env.BAL ? JSON.parse(process.env.BAL) : undefined);   // BAL='{"inc":1.1,"cost":.9}' tries a custom preset
   P.startGame("th", {mode:MODE, char:process.env.CHAR || "sci", charLv:+(process.env.LV || 1), seed, ab:PRESET});
   const R = () => P.rand();
@@ -97,7 +98,7 @@ function play(bot, seed){
     P.tick();
     if (process.env.TRACE && S.tick % 24 === 0 && !S.event) console.log(S.tick, P.netCO2().toFixed(1), S.regions.map(r => r.co2.toFixed(1) + '/' + r.comp.toFixed(0)).join(' '), 'appr', S.appr.toFixed(1), 'T', S.temp.toFixed(2), 'rel', P.relAll().toFixed(0), 'ep', Math.round(S.ep), 'haz', S.stats.dmg.length, 'skills', Object.keys(S.owned).length, 'bil', S.bilats.length, 'cr', S.crolls.length);
   }
-  return {over:S.over, grade:S.grade || "-", tick:S.tick, temp:S.temp, net:P.netCO2(), appr:S.appr, skills:Object.keys(S.owned).length, prot:(S.stats && S.stats.protests) || 0, grp:S.groups ? {...S.groups} : null, ms:[60, 120, 180, 240].map(t => (S.hist[t] ? S.hist[t].net : null)), msHit:S.ms17 ? {...S.ms17} : null};
+  return {over:S.over, grade:S.grade || "-", tick:S.tick, temp:S.temp, net:P.netCO2(), appr:S.appr, skills:Object.keys(S.owned).length, prot:(S.stats && S.stats.protests) || 0, grp:S.groups ? {...S.groups} : null, ms:[60, 120, 180, 240].map(t => (S.hist[t] ? S.hist[t].net : null)), msHit:S.ms17 ? {...S.ms17} : null, hist:S.hist.map(h => ({net:h.net})), years:S.years ? S.years.map(x => ({s:x.s, g:x.g})) : null};
 }
 
 for (const bot of (process.env.BOTS || "good,casual").split(",")){
@@ -111,6 +112,15 @@ if (process.env.MS) for (const bot of (process.env.BOTS || "good,casual").split(
   const res = []; for (let g = 0; g < N; g++) res.push(play(bot, 1000 + g * 7919));
   const q = (a, p) => { a = a.filter(x => x !== null).sort((x, y) => x - y); return a.length ? a[Math.floor(p * (a.length - 1))].toFixed(1) : "-"; };
   console.log(`${bot.padEnd(6)} net at 2030/35/40/45 (25%·50%·75%) · ` + [0, 1, 2, 3].map(i => [.25, .5, .75].map(p => q(res.map(r => r.ms[i]), p)).join("·")).join("  ") + " · hit " + [0, 1, 2, 3].map(i => res.filter(r => r.msHit && r.msHit[i] === 1).length).join("/"));
+}
+if (process.env.YEARS) for (const bot of (process.env.BOTS || "good,casual").split(",")){   // 2.0: net CO₂ every January (median) and the yearly review
+  const res = []; for (let g = 0; g < N; g++) res.push(play(bot, 1000 + g * 7919));
+  const med = a => { a = a.filter(x => x != null).sort((x, y) => x - y); return a.length ? a[Math.floor(.5 * (a.length - 1))] : null; };
+  const line = []; for (let y = 0; y <= 25; y++){ const m = med(res.map(r => r.hist[y * 12] ? r.hist[y * 12].net : null)); if (m != null) line.push(`${2026 + y}:${m.toFixed(1)}`); }
+  console.log(`${bot.padEnd(6)} net each January (median) · ${line.join(" ")}`);
+  if (res[0].years) { const gy = res.map(r => (r.years || []).filter(x => x.g).length), ny = res.map(r => (r.years || []).length);
+    const tiers = res.map(r => { const n = (r.years || []).filter(x => x.g).length; return n <= 10 ? 0 : n <= 20 ? 1 : 2; });
+    console.log(`${bot.padEnd(6)} good years avg ${(gy.reduce((a, b) => a + b, 0) / N).toFixed(1)} of ${(ny.reduce((a, b) => a + b, 0) / N).toFixed(1)} · tiers ≤10/11–20/21+ ${[0, 1, 2].map(k => tiers.filter(x => x === k).length).join("/")} · score median by year ${[...Array(25)].map((_, i) => { const m = med(res.map(r => (r.years || [])[i] ? r.years[i].s : null)); return m == null ? "-" : Math.round(m); }).join(",")}`); }
 }
 if (process.env.GRP) for (const bot of (process.env.BOTS || "good,casual").split(",")){   // 1.6: how the four groups end up
   const res = []; for (let g = 0; g < Math.min(N, 60); g++) res.push(play(bot, 1000 + g * 7919));
