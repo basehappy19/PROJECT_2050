@@ -82,14 +82,19 @@ test("co-op: room, ready, start, ministries, host speed, a vote", async t => {
   const inv = await B.wait(m => m.t === "invite"); assert.equal(inv.code, room.code);
   B.send("room.join", {code:room.code});
   await A.wait(m => m.t === "room" && m.room.players.length === 2);
-  B.send("room.pick", {roles:["diplo", "people"]});
-  await A.wait(m => m.t === "room" && m.room.players.some(p => p.roles.includes("diplo")));
   A.send("room.start"); await A.err("not_ready");
   B.send("room.ready", {ready:true});
   await A.wait(m => m.t === "room" && m.room.players.every(p => p.ready));
   A.send("room.start");
   await A.wait(m => m.t === "game.start"); await B.wait(m => m.t === "game.start");
-  const st = await B.wait(m => m.t === "game.state");
+  // ministries are picked in the game, before the clock starts
+  const p0 = await B.wait(m => m.t === "game.state" && m.phase === "pick"); assert.ok(p0.left > 0);
+  B.send("game.act", {fn:"buyNode", args:["D1"]}); await B.err("picking");
+  B.send("game.pick", {roles:["diplo", "people"]});
+  await A.wait(m => m.t === "game.state" && m.picks && Object.values(m.picks).some(p => p.roles.includes("diplo")));
+  A.send("game.pick", {roles:["diplo"]});   // taken by bob: refused quietly
+  A.send("game.pick", {ready:true}); B.send("game.pick", {ready:true});
+  const st = await B.wait(m => m.t === "game.state" && m.phase === "play");
   assert.deepEqual(st.roles[Object.keys(st.roles).find(k => st.roles[k].includes("diplo"))].sort(), ["diplo", "people"]);
   // bob can't approve an energy skill (energy belongs to alice)
   B.send("game.act", {fn:"buyNode", args:["E1"]});
@@ -123,10 +128,16 @@ test("versus: one world each, one shared temperature, aid between players", asyn
   const room = (await A.wait(m => m.t === "room" && m.room.mode === "versus")).room;
   B.send("lobby.list"); const lst = await B.wait(m => m.t === "lobby.rooms"); assert.ok(lst.rooms.some(x => x.code === room.code));
   B.send("room.join", {code:room.code}); await A.wait(m => m.t === "room" && m.room.code === room.code && m.room.players.length === 2);
-  B.send("room.pick", {bloc:"EU"}); B.send("room.ready", {ready:true});
-  await A.wait(m => m.t === "room" && m.room.code === room.code && m.room.players.every(p => p.ready) && m.room.players.some(p => p.bloc === "EU"));
+  B.send("room.ready", {ready:true});
+  await A.wait(m => m.t === "room" && m.room.code === room.code && m.room.players.every(p => p.ready));
   A.send("room.start");
-  const sa = await A.wait(m => m.t === "game.state" && m.mode === "versus"), sb = await B.wait(m => m.t === "game.state" && m.mode === "versus");
+  await B.wait(m => m.t === "game.state" && m.mode === "versus" && m.phase === "pick");
+  B.send("game.pick", {bloc:"EU"});
+  await A.wait(m => m.t === "game.state" && m.picks && Object.values(m.picks).some(p => p.bloc === "EU"));
+  A.send("game.pick", {bloc:"EU"});   // alice is too late for EU
+  B.send("game.pick", {ready:true}); A.send("game.pick", {ready:true});
+  const sa = await A.wait(m => m.t === "game.state" && m.mode === "versus" && m.phase === "play"), sb = await B.wait(m => m.t === "game.state" && m.mode === "versus" && m.phase === "play");
+  assert.equal(Object.values(sa.picks).filter(p => p.bloc === "EU").length, 1);
   assert.equal(sa.mode, "versus"); assert.equal(sa.ranking.length, 2);
   const g = app.hub.rooms.get(room.code).game;
   for (let i = 0; i < 5; i++){ for (const w of g.worlds()) if (w.S.event) w.P.chooseOption(0); g.tickAll(); }

@@ -7,6 +7,8 @@ import {G} from "../game.js";
 import {Mp, MPT} from "../mp.js";
 import {Icon, Rich} from "./icon.jsx";
 import {Btn, IconBtn, Seg, Tabs, Portrait} from "./widgets.jsx";
+import {RoleBadge} from "./rolebadge.jsx";
+import {GameMap} from "../map2d.js";
 
 const T = (th, en) => ({th, en});
 const W = {
@@ -15,7 +17,11 @@ const W = {
   refresh:T("รีเฟรช", "Refresh"), players:T("ผู้เล่น", "Players"), public:T("สาธารณะ", "Public"), private:T("ส่วนตัว (ใช้รหัส)", "Private (code only)"), diff:T("ความยาก", "Difficulty"),
   normal:T("ปกติ", "Normal"), hard:T("ยาก", "Hard"), leader:T("ผู้นำของทีม", "Team leader"), ready:T("พร้อม", "Ready"), notReady:T("ยังไม่พร้อม", "Not ready"), start:T("เริ่มเกม", "Start the game"),
   leave:T("ออกจากห้อง", "Leave the room"), host:T("หัวหน้าห้อง", "Host"), kick:T("เชิญออก", "Remove"), invite:T("ชวนเพื่อน", "Invite friends"), copy:T("คัดลอกรหัส", "Copy code"), copied:T("คัดลอกแล้ว", "Copied"),
-  roles:T("เลือกกระทรวงที่คุณดูแล (สูงสุด 2)", "Pick your ministries (up to 2)"), rolesNote:T("กระทรวงที่ไม่มีใครเลือก จะแบ่งให้อัตโนมัติตอนเริ่ม", "Unclaimed ministries are shared out when the game starts"),
+  roles:T("เลือกกระทรวงที่คุณดูแล (สูงสุด 2)", "Pick your ministries (up to 2)"), rolesNote:T("กระทรวงที่ไม่มีใครเลือก จะแบ่งให้อัตโนมัติเมื่อเริ่ม", "Ministries nobody picks are shared out when the clock starts"),
+  pickTitleCoop:T("แบ่งงานกันก่อนเริ่ม", "Split the work"), pickTitleVs:T("เลือกภูมิภาคบ้านของคุณ", "Choose your home region"),
+  pickWait:T("เวลาจะเริ่มเดินเมื่อทุกคนพร้อม หรือเมื่อหมดเวลา", "The clock starts when everyone is ready, or when time runs out"),
+  pickReady:T("พร้อมแล้ว", "I'm ready"), pickUnready:T("แก้ไข", "Change"), pickInGame:T("เลือกกระทรวงหรือภูมิภาคกันในเกม หลังกดเริ่ม", "Ministries or home regions are chosen in the game, after the start"),
+  takenBy:T("เลือกโดย", "taken by"), leftS:T("วิ", "s"),
   bloc:T("เลือกภูมิภาคบ้านของคุณ", "Pick your home region"), blocNote:T("ภูมิภาคบ้านเริ่มด้วยความร่วมมือ +10%", "Your home region starts 10% more on-plan"),
   search:T("ค้นหาด้วยชื่อผู้ใช้", "Search by username"), add:T("เพิ่มเพื่อน", "Add friend"), incoming:T("คำขอเป็นเพื่อน", "Friend requests"), outgoing:T("รอตอบรับ", "Waiting for them"),
   accept:T("ตอบรับ", "Accept"), decline:T("ไม่", "Decline"), noFriends:T("ยังไม่มีเพื่อน ค้นหาชื่อผู้ใช้ของเพื่อนแล้วกดเพิ่ม", "No friends yet: search for a username and add them"),
@@ -30,7 +36,7 @@ const W = {
   howVersus:T("ทุกคนเล่นโลกของตัวเอง (โลกเดียวกันตั้งแต่ต้น) แต่ใช้อุณหภูมิร่วมกัน ใครถึง Net Zero ก่อนชนะ ถ้าโลกร้อนถึง 3°C ทุกคนแพ้ ช่วยกันหรือกดดันกันก็ได้", "Everyone plays their own copy of the same world but shares one temperature. First to Net Zero wins; at 3°C everyone loses. Help each other, or put on the pressure."),
   rejoin:T("กลับเข้าเกม", "Back to the game"),
 };
-const REGN = id => L(P.RMETA[id].name);
+const REGN = id => P.RMETA[id] ? L(P.RMETA[id].name) : "—";
 const initials = s => String(s || "?").trim().slice(0, 2).toUpperCase();
 function Avatar({p, size = 34, ring}){
   const hue = (String(p.username || "").split("").reduce((a, c) => a + c.charCodeAt(0), 0) * 47) % 360;
@@ -119,8 +125,6 @@ export function SubRoom(){
   useEffect(() => { Mp.connect(); }, []);
   if (!r) return <div class="mp"><p class="muted">…</p><Btn kind="ghost" onClick={() => { UIM.sub = "mp"; bump(); }}>{L(W.rooms)}</Btn></div>;
   const me = Mp.me || {}, host = r.host === me.id, mine = r.players.find(p => p.id === me.id) || {}, coop = r.mode === "coop";
-  const taken = new Set(r.players.filter(p => p.id !== me.id).flatMap(p => p.roles));
-  const usedB = new Set(r.players.filter(p => p.id !== me.id).map(p => p.bloc));
   const allReady = r.players.every(p => p.ready || p.host);
   return <div class="mp mproomv">
     <div class="mpcodebox"><small class="muted">{L(W.code)}</small><b class="mono">{r.code}</b>
@@ -136,19 +140,12 @@ export function SubRoom(){
     <div class="mpplayers">{r.players.map(p => <div class={"mpplayer card " + (p.id === me.id ? "me" : "")} key={p.id}>
       <Avatar p={p} size={40}/><Bubble id={p.id}/>
       <span class="grow"><b>{p.displayName}{p.id === me.id ? <small class="muted"> ({L(W.you)})</small> : null}</b>
-        <small class="muted">{p.host ? <><Icon n="crown" size={12} color="gold"/> {L(W.host)} · </> : null}{coop ? (p.roles.length ? p.roles.map(x => L(P.MP.ROLE[x].name)).join(" + ") : "—") : REGN(p.bloc)}</small></span>
+        <small class="muted">{p.host ? <><Icon n="crown" size={12} color="gold"/> {L(W.host)}</> : (p.ready ? L(W.ready) : L(W.notReady))}</small></span>
       <span class={"mpready " + (p.ready || p.host ? "good" : "muted")}><Icon n={p.ready || p.host ? "circle-check" : "circle-dashed"} size={18}/></span>
       {host && p.id !== me.id ? <IconBtn n="user-x" title={L(W.kick)} onClick={() => Mp.kick(p.id)}/> : null}
     </div>)}{Array.from({length:Math.max(0, r.max - r.players.length)}, (_, i) => <div class="mpplayer card empty" key={"e" + i}><span class="mpav empty"><Icon n="user-plus" size={16}/></span><span class="muted small">…</span></div>)}</div>
-    {coop ? <><b class="mph">{L(W.roles)}</b>
-      <div class="mproles">{P.MP.ROLES.map(ro => { const on = (mine.roles || []).includes(ro.id), busy = taken.has(ro.id);
-        return <button type="button" key={ro.id} class={"mprole " + (on ? "on" : "") + (busy ? " busy" : "")} disabled={busy} style={{"--rc":ro.color}}
-          onClick={() => { Audio.play("toggle"); const cur = mine.roles || []; Mp.pick({roles:on ? cur.filter(x => x !== ro.id) : [...cur, ro.id].slice(-2)}); }}>
-          <Icon n={ro.icon} size={22}/><span><b>{L(ro.name)}</b><small>{L(ro.does)}</small></span></button>; })}</div>
-      <small class="muted">{L(W.rolesNote)}</small></>
-    : <><b class="mph">{L(W.bloc)}</b>
-      <div class="mpblocs">{["SEA", "EU", "NA", "EA", "SA", "MEAF"].map(b => <button type="button" key={b} class={"mpbloc " + (mine.bloc === b ? "on" : "")} disabled={usedB.has(b)} onClick={() => { Audio.play("toggle"); Mp.pick({bloc:b}); }}>
-        <Icon n="map-pin" size={16}/>{REGN(b)}</button>)}</div><small class="muted">{L(W.blocNote)}</small></>}
+    {coop ? <div class="mprolepeek">{P.MP.ROLES.map(ro => <span key={ro.id} title={L(ro.does)}><RoleBadge id={ro.id} size={34}/><small>{L(ro.name)}</small></span>)}</div> : null}
+    <p class="muted small"><Icon n="info" size={13}/> {L(W.pickInGame)}</p>
     <div class="mprow"><QuickBar/><Btn kind="ghost" size="sm" onClick={() => setInv(v => !v)}>{`[[user-plus]] ${L(W.invite)}`}</Btn></div>
     {inv ? <Friends inviting/> : null}
     {Mp.msg ? <p class="msg bad">{Mp.msg}</p> : null}
@@ -168,7 +165,7 @@ export function MpHud(){
     <div class="mpbar glass">
       {(r ? r.players : []).map(p => { const roles = (g.roles || {})[p.id] || []; return <span class={"mpm " + (p.id === me.id ? "me" : "")} key={p.id} title={p.displayName}>
         <Avatar p={p} size={30}/><Bubble id={p.id}/>
-        {g.mode === "coop" ? <span class="mproleic">{roles.map(x => <Icon key={x} n={P.MP.ROLE[x].icon} size={13} color={P.MP.ROLE[x].color}/>)}</span> : null}
+        {g.mode === "coop" ? <span class="mproleic">{roles.map(x => <RoleBadge key={x} id={x} size={18}/>)}</span> : <small class="mpblocm">{p.bloc || ""}</small>}
       </span>; })}
       <QuickBar compact/>
     </div>
@@ -178,7 +175,7 @@ export function MpHud(){
 function CoopBits(){
   const g = Mp.game, v = g.vote, me = Mp.me || {}, mine = Mp.myRoles();
   return <>
-    <div class="mpmine glass"><small class="muted">{L(W.yourRoles)}</small>{mine.map(x => <span key={x} class="mpchip" style={{"--rc":P.MP.ROLE[x].color}}><Icon n={P.MP.ROLE[x].icon} size={14}/>{L(P.MP.ROLE[x].name)}</span>)}</div>
+    <div class="mpmine glass"><small class="muted">{L(W.yourRoles)}</small>{mine.map(x => <span key={x} class="mpchip" style={{"--rc":P.MP.ROLE[x].color}}><RoleBadge id={x} size={22}/>{L(P.MP.ROLE[x].name)}</span>)}</div>
     {v && v.kind === "evac" ? <div class="mpvote glass-strong">
       <b><Icon n="siren" size={18} color="bad"/> {L(W.evacVote)} · {REGN(v.reg)}</b>
       <small class="muted">{v.n} · <Rich t={`${P.IC.ep} ${v.cost}`} iconColor="inherit"/> · {Mp.nameOf(v.by)}</small>
@@ -239,8 +236,42 @@ export function MpEnd(){
     <h2>{win ? L(W.coopWin) : L(W.coopLose)}</h2>
     {e2 ? <><p class={"end2t " + (win ? "good" : "bad")}>{L(e2.title)}</p><p>{L(e2.body)}</p></> : null}
     <p class="small muted">{L(P.UI2.yrGoodYears)} <b class="good mono">{ng}</b> / {(S.years || []).length} · CO₂ {P.netCO2().toFixed(1)} Gt · +{S.temp.toFixed(2)}°C</p>
-    <div class="mpplayers">{(r ? r.players : []).map(p => <div class="mpplayer card" key={p.id}><Avatar p={p}/><span class="grow"><b>{p.displayName}</b><small class="muted">{((g.roles || {})[p.id] || []).map(x => L(P.MP.ROLE[x].name)).join(" + ")}</small></span></div>)}</div>
+    <div class="mpplayers">{(r ? r.players : []).map(p => <div class="mpplayer card" key={p.id}><Avatar p={p}/><span class="grow"><b>{p.displayName}</b><span class="mpendroles">{((g.roles || {})[p.id] || []).map(x => <span key={x}><RoleBadge id={x} size={20}/>{L(P.MP.ROLE[x].name)}</span>)}</span></span></div>)}</div>
     <div class="endfoot"><span class="grow"/><Btn kind="ghost" onClick={() => Mp.leaveGame()}>{L(W.menu)}</Btn><Btn onClick={back}>{L(W.back)}</Btn></div>
   </section></div>;
 }
 export const MPW = W;
+
+/* ---------------- the opening pick (in the game, before the clock starts) ---------------- */
+export function MpPick(){
+  const g = Mp.game, me = Mp.me || {}, r = Mp.room; if (!g || !r) return null;
+  const picks = g.picks || {}, mine = picks[me.id] || {roles:[], bloc:null, ready:false}, coop = g.mode === "coop";
+  const who = id => { const p = r.players.find(x => x.id === Number(id)); return p ? p : {username:"?", displayName:"?"}; };
+  const owner = test => Object.entries(picks).find(([id, v]) => Number(id) !== me.id && test(v));
+  return <div class="veil mppick-veil"><section class="modal mppick" role="dialog" aria-modal="true">
+    <div class="mprow"><div class="tag accent grow"><Rich t={up(`[[${coop ? "users" : "swords"}]] ${L(coop ? P.UI.mpCoop : P.UI.mpVersus)}`)} iconColor="inherit"/></div><b class="mono warn">{g.left}{L(W.leftS)}</b></div>
+    <h2>{L(coop ? W.pickTitleCoop : W.pickTitleVs)}</h2>
+    <p class="muted small">{coop ? L(W.roles) + " · " + L(W.rolesNote) : L(W.blocNote)}</p>
+    {coop ? <div class="mproles big">{P.MP.ROLES.map(ro => {
+      const on = mine.roles.includes(ro.id), own = owner(v => v.roles.includes(ro.id));
+      return <button type="button" key={ro.id} class={"mprole " + (on ? "on" : "") + (own ? " busy" : "")} disabled={!!own || mine.ready} style={{"--rc":ro.color}}
+        onClick={() => { Audio.play("toggle"); const cur = ((Mp.game.picks || {})[me.id] || mine).roles || [];   // read it now: a newer state may have arrived since this render
+          Mp.pickRoles(cur.includes(ro.id) ? cur.filter(x => x !== ro.id) : [...cur, ro.id].slice(-2)); }}>
+        <RoleBadge id={ro.id} size={54}/>
+        <span><b>{L(ro.name)}</b><small>{L(ro.does)}</small>{own ? <em class="mptaken">{L(W.takenBy)} {who(own[0]).displayName}</em> : null}</span>
+        {on ? <Icon n="circle-check" size={20} cls="mpcheck"/> : null}
+      </button>; })}</div>
+    : <div class="mpblocs big">{["SEA", "EU", "NA", "EA", "SA", "MEAF"].map(b => {
+      const on = mine.bloc === b, own = owner(v => v.bloc === b);
+      return <button type="button" key={b} class={"mpbloc " + (on ? "on" : "")} disabled={!!own || mine.ready}
+        onPointerEnter={() => GameMap.focus && GameMap.focus(b, false)} onClick={() => { Audio.play("toggle"); Mp.pickBloc(b); GameMap.focus(b, true); }}>
+        <Icon n="map-pin" size={18}/><span><b>{REGN(b)}</b>{own ? <em class="mptaken">{L(W.takenBy)} {who(own[0]).displayName}</em> : null}</span>
+      </button>; })}</div>}
+    <div class="mppickers">{r.players.map(p => { const v = picks[p.id] || {}; return <span key={p.id} class={"mppk " + (v.ready ? "ready" : "")}>
+      <Avatar p={p} size={30}/><small>{p.displayName}</small>
+      <span class="mppkv">{coop ? (v.roles || []).map(x => <RoleBadge key={x} id={x} size={20}/>) : v.bloc ? <small class="mono acc">{v.bloc}</small> : null}{v.ready ? <Icon n="circle-check" size={16} color="good"/> : null}</span>
+    </span>; })}</div>
+    <div class="mpfoot"><small class="muted grow">{L(W.pickWait)}</small>
+      <Btn size="lg" kind={mine.ready ? "ghost" : "primary"} onClick={() => Mp.pickReady(!mine.ready)}>{mine.ready ? L(W.pickUnready) : `${L(W.pickReady)} [[check]]`}</Btn></div>
+  </section></div>;
+}

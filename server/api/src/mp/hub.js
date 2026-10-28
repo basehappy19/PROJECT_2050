@@ -11,8 +11,6 @@ const CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 const MAX_ROOMS = 200, GRACE_MS = 120000, MSG_RATE = 40;   // per 5 seconds
 const MIN_PLAYERS = Math.max(1, Number(process.env.MP_MIN_PLAYERS) || 2);
 const MODES = ["coop", "versus"], DIFFS = ["normal", "hard"], CHARS = ["sci", "dip", "eco", "act", "oce", "eng"];
-const BLOCS = ["NA", "EU", "EA", "SA", "MEAF", "SEA"];
-const ROLES = ["energy", "diplo", "disaster", "people"];
 const newCode = rooms => { for (;;){ let c = ""; for (let i = 0; i < 6; i++) c += CODE_CHARS[Math.floor(Math.random() * CODE_CHARS.length)]; if (!rooms.has(c)) return c; } };
 
 class Room {
@@ -26,13 +24,12 @@ class Room {
     this.result = null; this.dbId = null;
   }
   add(u){
-    if (!this.players.has(u.id)){ this.players.set(u.id, {id:u.id, username:u.username, displayName:u.displayName, ready:u.id === this.host, roles:[], bloc:this.freeBloc()}); this.order.push(u.id); }
+    if (!this.players.has(u.id)){ this.players.set(u.id, {id:u.id, username:u.username, displayName:u.displayName, ready:u.id === this.host, roles:[], bloc:null}); this.order.push(u.id); }
   }
   remove(uid){
     this.players.delete(uid); this.order = this.order.filter(x => x !== uid);
     if (this.host === uid && this.order.length) this.host = this.order.find(id => this.isOnline(id)) || this.order[0];
   }
-  freeBloc(){ const used = new Set([...this.players.values()].map(p => p.bloc)); return ["SEA", "EU", "NA", "EA", "SA", "MEAF"].find(b => !used.has(b)) || "SEA"; }
   isOnline(uid){ const c = this.hub.users.get(uid); return !!(c && c.conns.size && c.room === this.code); }
   anyOnline(){ return this.order.some(id => this.isOnline(id)); }
   nameOf(uid){ const p = this.players.get(uid); return p ? p.username : "?"; }
@@ -128,12 +125,6 @@ export function createHub(app, pool, {readAccess, originAllowed}){
     },
     "room.leave"(u){ hub.leaveRoom(u); },
     "room.ready"(u, ws, m){ const r = room(u); if (!r || r.state !== "lobby") return; r.players.get(u.id).ready = !!m.ready; r.changed(); },
-    "room.pick"(u, ws, m){   // a player's own choices: ministries (co-op) or home region (versus)
-      const r = room(u); if (!r || r.state !== "lobby") return; const p = r.players.get(u.id);
-      if (Array.isArray(m.roles)){ const taken = new Set([...r.players.values()].filter(x => x.id !== u.id).flatMap(x => x.roles)); p.roles = [...new Set(m.roles.filter(x => ROLES.includes(x) && !taken.has(x)))].slice(0, 2); }
-      if (BLOCS.includes(m.bloc) && ![...r.players.values()].some(x => x.id !== u.id && x.bloc === m.bloc)) p.bloc = m.bloc;
-      r.changed();
-    },
     "room.settings"(u, ws, m){
       const r = room(u); if (!r || r.host !== u.id || r.state !== "lobby") return err(ws, "host_only");
       if (MODES.includes(m.mode)) r.mode = m.mode;
@@ -167,7 +158,7 @@ export function createHub(app, pool, {readAccess, originAllowed}){
       if (ids.length < MIN_PLAYERS) return err(ws, "need_players");
       if (r.order.some(id => r.isOnline(id) && !r.players.get(id).ready && id !== r.host)) return err(ws, "not_ready");
       for (const id of [...r.order]) if (!r.isOnline(id)) r.remove(id);
-      if (r.mode === "versus"){ const used = new Set(); for (const id of r.order){ const p = r.players.get(id); if (used.has(p.bloc)) p.bloc = BLOCS.find(b => !used.has(b)); used.add(p.bloc); } }
+      for (const p of r.players.values()){ p.roles = []; p.bloc = null; }   // chosen in the game now (games.js · pick)
       try { r.game = r.mode === "versus" ? new VersusGame(r, (to, msg) => r.send(to, msg)) : new CoopGame(r, (to, msg) => r.send(to, msg)); }
       catch (e){ console.error("mp start", e); return err(ws, "start_failed"); }
       r.state = "playing"; r.result = null;
@@ -183,6 +174,7 @@ export function createHub(app, pool, {readAccess, originAllowed}){
       r.changed();
     },
     "game.act"(u, ws, m){ const r = room(u); if (!r || !r.game || r.state !== "playing") return err(ws, "no_game"); const res = r.game.act(u.id, m); if (res && res.error) err(ws, res.error, {role:res.role, fn:m.fn}); },
+    "game.pick"(u, ws, m){ const r = room(u); if (!r || !r.game || r.state !== "playing") return; const res = r.game.pick(u.id, m); if (res && res.error) err(ws, res.error); },
     "game.vote"(u, ws, m){ const r = room(u); if (!r || !r.game || !r.game.castVote) return; const res = r.game.castVote(u.id, m); if (res && res.error) err(ws, res.error); },
     "game.speed"(u, ws, m){ const r = room(u); if (!r || !r.game) return; const res = r.game.setSpeed(u.id, Number(m.v)); if (res && res.error) err(ws, res.error); },
     ping(u, ws){ ws.send('{"t":"pong"}'); },

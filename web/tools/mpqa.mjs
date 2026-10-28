@@ -64,14 +64,20 @@ try {
   await until(pb, () => window.P2050.Mp.invites.length > 0); await pb.waitForTimeout(400); await shot(pb, "invite");
   await click(pb, ".mpinv .btn");
   await until(pb, () => window.P2050.Mp.room && window.P2050.Mp.room.players.length === 2);
-  await ev(pb, () => window.P2050.Mp.pick({roles:["diplo", "disaster"]}));
-  await ev(pa, () => window.P2050.Mp.pick({roles:["energy", "people"]}));
   await ev(pb, () => window.P2050.Mp.chat(1)); await pa.waitForTimeout(500);
   await ev(pb, () => window.P2050.Mp.ready(true));
   await until(pa, () => window.P2050.Mp.room.players.every(p => p.ready || p.host));
   await pa.waitForTimeout(400); await shot(pa, "room-host"); await shot(pb, "room-guest");
   await click(pa, ".mpfoot .btn-lg");
   await until(pa, () => window.P2050.UIM.screen === "game" && window.P2050.S.mp); await until(pb, () => window.P2050.UIM.screen === "game" && window.P2050.S.mp);
+  // the opening pick, in the game: click the badges
+  await until(pa, () => !!document.querySelector(".modal.mppick")); await pa.waitForTimeout(600); await shot(pa, "coop-pick-empty");
+  await click(pb, ".mproles.big .mprole:nth-child(2)"); await click(pb, ".mproles.big .mprole:nth-child(3)");
+  await until(pa, () => document.querySelectorAll(".mproles.big .mprole.busy").length === 2);
+  await click(pa, ".mproles.big .mprole:nth-child(1)"); await pa.waitForTimeout(500); await shot(pa, "coop-pick-host"); await shot(pb, "coop-pick-guest");
+  await click(pb, ".mppick .mpfoot .btn"); await click(pa, ".mppick .mpfoot .btn");
+  await until(pa, () => !document.querySelector(".modal.mppick") && window.P2050.Mp.game.phase === "play");
+  console.log("roles", await ev(pa, () => JSON.stringify(window.P2050.Mp.game.roles)));
   await pa.waitForTimeout(2500); await shot(pa, "coop-game-host");
   // guest tries an energy skill: refused with a message; host buys it
   await ev(pb, () => { const P = window.P2050; return P.buyNode("E1"); });
@@ -103,10 +109,15 @@ try {
   await ev(pa, () => window.P2050.Mp.settings({mode:"versus"})); await pa.waitForTimeout(500);
   await until(pb, () => window.P2050.Mp.room && window.P2050.Mp.room.mode === "versus" && window.P2050.Mp.room.state === "lobby");
   if (await ev(pb, () => window.P2050.UIM.screen === "game")) await ev(pb, () => { window.P2050.Mp.exitGame(); window.P2050.UIM.sub = "room"; });
-  await ev(pb, () => { window.P2050.Mp.pick({bloc:"EU"}); window.P2050.Mp.ready(true); });
+  await ev(pb, () => { window.P2050.Mp.ready(true); });
   await until(pa, () => window.P2050.Mp.room.players.every(p => p.ready || p.host)); await shot(pa, "versus-room");
   await ev(pa, () => window.P2050.Mp.start());
   await until(pa, () => window.P2050.S.mp && window.P2050.S.mp.kind === "versus"); await until(pb, () => window.P2050.S.mp && window.P2050.S.mp.kind === "versus");
+  await until(pb, () => !!document.querySelector(".modal.mppick .mpblocs")); await pb.waitForTimeout(500);
+  await click(pb, ".mpblocs.big .mpbloc:nth-child(2)");   // EU
+  await until(pa, () => !!document.querySelector(".mpblocs.big .mpbloc:nth-child(2):disabled")); await pa.waitForTimeout(800); await shot(pa, "versus-pick");
+  await click(pb, ".mppick .mpfoot .btn"); await click(pa, ".mppick .mpfoot .btn");
+  await until(pa, () => window.P2050.Mp.game.phase === "play");
   const vg = app.hub.rooms.get(code).game; for (let i = 0; i < 24; i++){ for (const w of vg.worlds()) if (w.S.event) w.P.chooseOption(0); vg.tickAll(); } vg.dirty = true;
   await pa.waitForTimeout(1500); await shot(pa, "versus-race");
   await ev(pa, () => { const P = window.P2050, me = P.Mp.me.id, o = P.Mp.game.ranking.find(x => x.id !== me); P.Mp.vsAct("vsPact", o.id); });

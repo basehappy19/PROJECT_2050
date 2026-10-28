@@ -6,6 +6,7 @@ import {P, S, UIM, t, L, up, COL, bump} from "../core.js";
 import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {Icon, Rich} from "./icon.jsx";
+import {RoleBadge} from "./rolebadge.jsx";
 import {Btn, IconBtn, Pill, Meter, Key, GroupTilt} from "./widgets.jsx";
 
 const R = 50, COLW = 168, ROWH = 142;   // 1.7: a little more room for two-line names
@@ -127,7 +128,7 @@ function Detail({cat}){
       {n.type === "active" ? <Pill t={`${t("cooldownLen")} ${n.cd} ${t("months")}`} kind="gold"/> : null}
     </div>
     {!own ? <>
-      {S.mp && S.mp.kind === "coop" && P.Mp && !P.Mp.myRoles().includes(P.MP.CAT_ROLE[n.cat]) ? <p class="mpskrole"><Icon n={P.MP.ROLE[P.MP.CAT_ROLE[n.cat]].icon} size={16}/> {S.lang === "th" ? "สกิลนี้เป็นงานของกระทรวง" : "This skill belongs to"} <b>{L(P.MP.ROLE[P.MP.CAT_ROLE[n.cat]].name)}</b></p> : null}
+      {S.mp && S.mp.kind === "coop" && P.Mp && !P.Mp.myRoles().includes(P.MP.CAT_ROLE[n.cat]) ? <p class="mpskrole"><RoleBadge id={P.MP.CAT_ROLE[n.cat]} size={22}/> {S.lang === "th" ? "สกิลนี้เป็นงานของกระทรวง" : "This skill belongs to"} <b>{L(P.MP.ROLE[P.MP.CAT_ROLE[n.cat]].name)}</b></p> : null}
       <Btn block size="lg" disabled={!can} sound={null} onClick={() => { if (P.buyNode(n.id)){ if (P.SKILL_SND && P.SKILL_SND[n.id]) Audio.snippet(P.SKILL_SND[n.id]); bump(); } }}>{`[[lock-open]] ${t("unlock")}`}</Btn>
       {full ? <p class="bad small">{t("capFull")}</p> : st === "locked" ? <p class="warn small">{t("needReq")}</p>
         : !can && S.oreOn && P.matCost(n) && !P.matOk(n) ? <div class="skmat"><span class="bad small"><Rich t={`${t("matShortSk")} ${Object.entries(P.matCost(n)).filter(([g, v]) => (S.mat[g] || 0) < v).map(([g, v]) => `[[${P.MAT[g].icon}]] ${Math.ceil(v - (S.mat[g] || 0))}`).join("  ")}`} iconColor="inherit"/></span>

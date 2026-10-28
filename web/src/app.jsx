@@ -16,7 +16,7 @@ import {Menu} from "./ui/menu.jsx";
 import {LossFeed, HazardAlerts, EventPill} from "./ui/alerts.jsx";
 import {YearModal, Intro} from "./ui/year.jsx";
 import {Training} from "./ui/training.jsx";
-import {MpHud, MpEnd, Invites} from "./ui/mp.jsx";
+import {MpHud, MpEnd, Invites, MpPick} from "./ui/mp.jsx";
 
 /* ---------- loading ---------- */
 const PRELOAD = ["assets/img/globe-day{s}.jpg", "assets/img/globe-night{s}.jpg", "assets/img/globe-clouds{s}.jpg", "assets/img/ui/logo.png", "assets/data/world.json"];
@@ -103,6 +103,7 @@ function Windows(){
   if (k === "skills") return <Skills/>;
   if (k === "event") return UIM.evMin ? <EventPill/> : <EventModal/>;
   if (k === "year") return <YearModal/>;
+  if (k === "mppick") return <MpPick/>;
   if (k === "intro") return <Intro/>;
   if (k === "end") return <EndModal/>;
   if (k === "charsel") return <CharSel/>;

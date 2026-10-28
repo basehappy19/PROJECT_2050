@@ -86,7 +86,6 @@ export const Mp = {
   join(code){ this.msg = ""; this.send("room.join", {code}); this.invites = this.invites.filter(i => i.code !== code); },
   leave(){ this.send("room.leave"); this.room = null; if (UIM.sub === "room") UIM.sub = "mp"; bump(); },
   ready(v){ this.send("room.ready", {ready:v}); },
-  pick(o){ this.send("room.pick", o); },
   settings(o){ this.send("room.settings", o); },
   kick(id){ this.send("room.kick", {id}); },
   invite(username){ this.send("room.invite", {username}); },
@@ -108,7 +107,10 @@ export const Mp = {
   applyState(m){
     if (!this.game) this.game = {mode:m.mode, roles:{}};
     const g = this.game;
-    Object.assign(g, {mode:m.mode, roles:m.roles || g.roles, vote:m.vote || null, lastVote:m.lastVote || null, feed:m.feed || [], ranking:m.ranking || null, T:m.T, cd:m.cd || {}, offers:m.offers || [], evLeft:m.evLeft, winner:m.winner, over:m.over, progress:m.progress || 0, at:performance.now()});
+    Object.assign(g, {phase:m.phase || "play", left:m.left || 0, picks:m.picks || {}, mode:m.mode, roles:m.roles || g.roles, vote:m.vote || null, lastVote:m.lastVote || null, feed:m.feed || [], ranking:m.ranking || null, T:m.T, cd:m.cd || {}, offers:m.offers || [], evLeft:m.evLeft, winner:m.winner, over:m.over, progress:m.progress || 0, at:performance.now()});
+    // my own pick wins for a moment: a state sent before the server saw my tap would undo it
+    const me = this.me && this.me.id;
+    if (me && this._pick && performance.now() - this._pick.at < 1500 && g.picks[me]) Object.assign(g.picks[me], this._pick.v);
     // replace the state, keeping what this player is looking at
     const keep = {lang:S.lang, tab:S.tab, sel:S.sel, selC:S.selC, noSel:S.noSel, skillCat:S.skillCat, node:S.node};
     const wasEvent = S.event, wasOver = S.over;
@@ -150,6 +152,15 @@ export const Mp = {
     const a = fn === "popBubble" ? [args[0]] : args;
     this.send("game.act", {fn, args:a, sel:S.sel, selC:S.selC});
     return r === undefined ? true : r;
+  },
+  /* the opening pick */
+  pickRoles(roles){ this.myPick({roles}); },
+  pickBloc(bloc){ this.myPick({bloc}); },
+  pickReady(ready){ this.myPick({ready}); },
+  myPick(v){
+    this.send("game.pick", v);
+    const p = this.game && this.me && this.game.picks[this.me.id]; if (!p) return;
+    Object.assign(p, v); this._pick = {at:performance.now(), v:{roles:p.roles, bloc:p.bloc, ready:p.ready}}; bump();
   },
   vsAct(fn, target, extra){ this.send("game.act", {fn, args:[target, extra]}); },
   evacAll(reg){ this.send("game.act", {fn:"evacAll", args:[reg]}); },

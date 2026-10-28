@@ -4,6 +4,7 @@
 import { makeEngine, snapshot } from "./engine.js";
 
 const STEP_MS = 200, SEND_MS = 250, BEAT_MS = 3000;
+const PICK_SEC = 30;   // 2.0: players choose their ministries / home region in the game, before the clock starts
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const mean = a => (a.length ? a.reduce((s, x) => s + x, 0) / a.length : 0);
 const newSeed = () => (Math.random() * 2 ** 31) | 0;
@@ -11,7 +12,23 @@ const newSeed = () => (Math.random() * 2 ** 31) | 0;
 const okArgs = a => Array.isArray(a) && a.length <= 4 && a.every(x => x === null || typeof x === "string" && x.length <= 40 || typeof x === "number" && Number.isFinite(x) || typeof x === "boolean" || Array.isArray(x) && x.length <= 2 && x.every(Number.isFinite));
 
 class Base {
-  constructor(room, send){ this.room = room; this.send = send; this.last = Date.now(); this.acc = 0; this.sentAt = 0; this.dirty = true; this.over = false; this.feed = []; }
+  constructor(room, send){ this.room = room; this.send = send; this.last = Date.now(); this.acc = 0; this.sentAt = 0; this.dirty = true; this.over = false; this.feed = [];
+    this.phase = "pick"; this.pickUntil = Date.now() + PICK_SEC * 1000; this.picks = Object.fromEntries(room.order.map(id => [id, {roles:[], bloc:null, ready:false}])); }
+  /* ---- the opening pick: everyone chooses, then the clock starts (when all are ready or after 30 s) ---- */
+  pick(uid, m){
+    if (this.phase !== "pick") return {error:"not_picking"};
+    const p = this.picks[uid]; if (!p) return {error:"no_game"};
+    this.choose(uid, p, m);
+    if (typeof m.ready === "boolean") p.ready = m.ready;
+    this.dirty = true; return {ok:true};
+  }
+  pickStep(now){
+    if (this.phase !== "pick") return false;
+    const on = this.room.order.filter(id => this.room.isOnline(id));
+    if (now >= this.pickUntil || (on.length && on.every(id => this.picks[id] && this.picks[id].ready))){ this.finishPick(); this.phase = "play"; this.room.changed(); this.last = Date.now(); this.acc = 0; this.dirty = true; }
+    return this.phase === "pick";
+  }
+  publicPick(){ return {phase:this.phase, left:this.phase === "pick" ? Math.max(0, Math.ceil((this.pickUntil - Date.now()) / 1000)) : 0, picks:this.picks}; }
   start(){ this.timer = setInterval(() => { try { this.step(); } catch (e){ console.error("mp step", e); } }, STEP_MS); }
   stop(){ clearInterval(this.timer); this.timer = null; }
   dt(){ const now = Date.now(), d = Math.min(1, (now - this.last) / 1000); this.last = now; return d; }
@@ -33,12 +50,24 @@ export class CoopGame extends Base {
     const S = this.S = P.S;
     S.mp = {kind:"coop", n:ids.length}; S.speed = 1;
     this.E.take();
-    this.roles = P.MP.assignRoles(ids, Object.fromEntries(ids.map(id => [id, (room.players.get(id) || {}).roles || []])));
+    this.roles = {};
     this.vote = null;
+  }
+  /* ministries: up to 2 each, one player per ministry; whatever nobody took is shared out when the game starts */
+  choose(uid, p, m){
+    if (!Array.isArray(m.roles)) return;
+    const ids = this.P.MP.ROLES.map(r => r.id), taken = new Set(Object.entries(this.picks).filter(([k]) => Number(k) !== uid).flatMap(([, v]) => v.roles));
+    p.roles = [...new Set(m.roles.filter(r => ids.includes(r) && !taken.has(r)))].slice(0, 2);
+  }
+  finishPick(){
+    const ids = this.room.order.slice();
+    this.roles = this.P.MP.assignRoles(ids, Object.fromEntries(ids.map(id => [id, (this.picks[id] || {}).roles || []])));
+    for (const id of ids) this.room.players.has(id) && (this.room.players.get(id).roles = this.roles[id]);
   }
   get spm(){ return this.P.secPerMonth(this.S.speed); }
   step(){
     const dt = this.dt(), S = this.S, P = this.P, now = Date.now();
+    if (this.pickStep(now)){ if ((this.dirty && now - this.sentAt >= SEND_MS) || now - this.sentAt >= 1000) this.broadcast(); return; }
     if (!this.over){
       if (this.vote){ if (now >= this.vote.deadline || this.allVoted()) this.resolveVote(); }
       else if (S.speed > 0 && !S.event && !S.over && this.room.anyOnline()){
@@ -58,6 +87,7 @@ export class CoopGame extends Base {
   voters(){ return this.room.order.filter(id => this.room.isOnline(id)); }
   allVoted(){ const v = this.voters(); return v.length > 0 && v.every(id => id in this.vote.votes); }
   castVote(uid, m){
+    if (this.phase === "pick") return {error:"picking"};
     const v = this.vote; if (!v || !this.room.players.has(uid)) return {error:"no_vote"};
     if (v.kind === "event"){
       const e = this.P.currentEvent(); if (!e) return {error:"no_vote"};
@@ -87,6 +117,7 @@ export class CoopGame extends Base {
   /* ---- player actions ---- */
   act(uid, m){
     const P = this.P, S = this.S; if (this.over || S.over) return {error:"over"};
+    if (this.phase === "pick") return {error:"picking"};
     const fn = String(m.fn || ""), args = m.args || [];
     if (fn === "evacAll"){   // a region-wide evacuation is put to a vote
       if (!(this.roles[uid] || []).includes("disaster")) return {error:"not_your_role", role:"disaster"};
@@ -106,14 +137,14 @@ export class CoopGame extends Base {
     this.note(uid, fn, args[0], r !== false); this.dirty = true; this.after();
     return {ok:r !== false};
   }
-  setSpeed(uid, v){ if (uid !== this.room.host || ![0, 1, 2].includes(v)) return {error:"host_only"}; this.P.setSpeed(v); this.dirty = true; return {ok:true}; }
+  setSpeed(uid, v){ if (uid !== this.room.host || ![0, 1, 2].includes(v)) return {error:"host_only"}; if (this.phase === "pick") return {error:"picking"}; this.P.setSpeed(v); this.dirty = true; return {ok:true}; }
   /* ---- what the browsers get ---- */
   publicVote(){
     const v = this.vote; if (!v) return null;
     return {kind:v.kind, id:v.id || null, reg:v.reg || null, n:v.n || 0, cost:v.cost || 0, by:v.by || null, left:Math.max(0, Math.ceil((v.deadline - Date.now()) / 1000)), votes:v.votes};
   }
   state(){
-    return {t:"game.state", mode:"coop", S:snapshot(this.S), fx:[], roles:this.roles, vote:this.publicVote(), lastVote:this.lastVote || null, feed:this.feed.slice(0, 6),
+    return {t:"game.state", mode:"coop", ...this.publicPick(), S:snapshot(this.S), fx:[], roles:this.roles, vote:this.publicVote(), lastVote:this.lastVote || null, feed:this.feed.slice(0, 6),
       progress:this.S.speed ? clamp(this.acc / this.spm, 0, 1) : 0, over:this.over};
   }
   broadcast(){
@@ -135,16 +166,32 @@ export class VersusGame extends Base {
       const p = room.players.get(uid), E = makeEngine(this.seed), P = E.P;
       P.startGame(room.lang || "th", {mode:room.diff === "hard" ? "hard" : "normal", char:"sci", charLv:1, seed:this.seed, ab:"A"});
       P.S.mp = {kind:"versus"}; P.S.speed = 1;
-      P.MP.applyBloc(p.bloc || "SEA");
       E.take();
-      this.w.set(uid, {uid, E, P, S:P.S, bloc:p.bloc || "SEA", cd:{}, tariffs:[], evAt:0, out:false});
+      this.w.set(uid, {uid, E, P, S:P.S, bloc:null, cd:{}, tariffs:[], evAt:0, out:false});
     }
     this.T = 1.2; this.tip = 10; this.speed = 1; this.pacts = []; this.winner = null;
   }
   worlds(){ return [...this.w.values()]; }
+  /* home region: one player per region */
+  choose(uid, p, m){
+    const B = ["NA", "EU", "EA", "SA", "MEAF", "SEA"];
+    if (!B.includes(m.bloc)) return;
+    if (Object.entries(this.picks).some(([k, v]) => Number(k) !== uid && v.bloc === m.bloc)) return;
+    p.bloc = m.bloc;
+  }
+  finishPick(){
+    const B = ["SEA", "EU", "NA", "EA", "SA", "MEAF"], used = new Set(Object.values(this.picks).map(v => v.bloc).filter(Boolean));
+    for (const w of this.worlds()){
+      const p = this.picks[w.uid] || {};
+      let b = p.bloc; if (!b){ b = B.find(x => !used.has(x)); used.add(b); }
+      w.bloc = b; w.P.MP.applyBloc(b);
+      if (this.room.players.has(w.uid)) this.room.players.get(w.uid).bloc = b;
+    }
+  }
   get spm(){ const any = this.worlds()[0]; return any ? any.P.secPerMonth(this.speed) : 4.5; }
   step(){
     const dt = this.dt(), now = Date.now();
+    if (this.pickStep(now)){ if ((this.dirty && now - this.sentAt >= SEND_MS) || now - this.sentAt >= 1000) this.broadcast(); return; }
     if (!this.over){
       // a player with an event to answer holds the clock for up to 15 s; after that the first option is chosen for them
       const waiting = this.worlds().filter(w => w.S.event && !w.S.over);
@@ -194,6 +241,7 @@ export class VersusGame extends Base {
   }
   act(uid, m){
     const w = this.w.get(uid); if (!w || this.over || w.S.over) return {error:"over"};
+    if (this.phase === "pick") return {error:"picking"};
     const fn = String(m.fn || ""), args = m.args || [], P = w.P, S = w.S;
     if (fn === "vsAid" || fn === "vsTariff" || fn === "vsPact" || fn === "vsPactAnswer") return this.vsAct(w, fn, args);
     if (fn === "chooseOption"){ const i = Number(args[0]); if (!S.event || !Number.isInteger(i)) return {error:"bad_action"}; const e = P.currentEvent(); if (!(i === -1 || (i >= 0 && i < e.options.length))) return {error:"bad_action"}; P.chooseOption(i); w.evAt = 0; this.dirty = true; return {ok:true}; }
@@ -241,7 +289,7 @@ export class VersusGame extends Base {
     }
     this.dirty = true; return {ok:true};
   }
-  setSpeed(uid, v){ if (uid !== this.room.host || ![0, 1, 2].includes(v)) return {error:"host_only"}; this.speed = v; for (const w of this.worlds()) w.S.speed = v; this.dirty = true; return {ok:true}; }
+  setSpeed(uid, v){ if (uid !== this.room.host || ![0, 1, 2].includes(v)) return {error:"host_only"}; if (this.phase === "pick") return {error:"picking"}; this.speed = v; for (const w of this.worlds()) w.S.speed = v; this.dirty = true; return {ok:true}; }
   ranking(){
     const ws = this.worlds().map(w => ({id:w.uid, username:this.room.nameOf(w.uid), displayName:this.room.displayOf(w.uid), bloc:w.bloc, net:+w.P.netCO2().toFixed(2), appr:Math.round(w.S.appr), skills:Object.keys(w.S.owned).length,
       over:w.S.over || null, tick:w.S.tick, score:w.P.score(), online:this.room.isOnline(w.uid), tariffs:w.tariffs.length}));
@@ -254,7 +302,7 @@ export class VersusGame extends Base {
     const rk = this.ranking(), now = Date.now();
     for (const w of this.worlds()){
       const S = w.S;
-      this.send(w.uid, {t:"game.state", mode:"versus", S:snapshot(S), fx:w.E.take(), ranking:rk, T:+this.T.toFixed(3), cd:w.cd, winner:this.winner, over:this.over,
+      this.send(w.uid, {t:"game.state", mode:"versus", ...this.publicPick(), S:snapshot(S), fx:w.E.take(), ranking:rk, T:+this.T.toFixed(3), cd:w.cd, winner:this.winner, over:this.over,
         offers:this.pacts.filter(p => p.to === w.uid).map(p => ({from:p.from, username:this.room.nameOf(p.from), left:Math.max(0, 20 - Math.round((now - p.at) / 1000))})),
         evLeft:S.event && w.evAt ? Math.max(0, Math.ceil((w.evAt + w.P.MP.VOTE_SEC * 1000 - now) / 1000)) : null,
         progress:this.speed ? clamp(this.acc / this.spm, 0, 1) : 0});
