@@ -148,7 +148,7 @@ export function GroupList({full, onPick, extra}){
   return <div class={"glist " + (full ? "full" : "")}>{P.GROUPS.map(G => {
     const v = gs[G.id], st = P.groupState(G.id), [c, lab] = ST[st];
     return <div class={"grow1 " + st} key={G.id} style={{"--gc":G.color}} onClick={onPick}>
-      <div class="ghead"><Icon n={G.icon} size={full ? 22 : 16} cls="gic"/><b>{L(G.name)}</b><small class="muted mono">{Math.round(G.w * 100)}%</small><span class="grow"/><span class={"gst " + c}>{lab}</span><b class="mono gv">{v.toFixed(0)}%</b></div>
+      <div class="ghead"><Icon n={G.icon} size={full ? 22 : 16} cls="gic"/><b>{L(G.name)}</b><span class="grow"/><span class={"gst " + c}>{lab}</span><b class="mono gv">{v.toFixed(0)}%</b></div>
       <div class="gbar"><i style={{width:`${v}%`}}/><s style={{left:`${P.GROUP_ANGRY}%`}}/><s class="b" style={{left:`${P.GROUP_BACK}%`}}/></div>
       {full ? (() => {
         const h = (S.grpHist || {})[G.id] || [], d = h.length > 1 ? v - h[Math.max(0, h.length - 13)] : 0;

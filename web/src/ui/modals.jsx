@@ -310,16 +310,6 @@ function Spark({data, color, min, max}){
   const last = pts.split(" ").pop().split(",");
   return <svg class="spark" viewBox="0 0 120 36" preserveAspectRatio="none"><polyline points={pts} fill="none" stroke={color} stroke-width="2" stroke-linejoin="round" vector-effect="non-scaling-stroke"/><circle cx={last[0]} cy={last[1]} r="2.6" fill={color}/></svg>;
 }
-/* 1.6: politics at home — the four groups behind the approval number */
-export function Politics(){
-  const close = () => { UIM.modal = null; bump(); };
-  const th = S.lang === "th", gs = S.groups || {};
-  return <Modal kind="politics" wide onClose={close}>
-    <h2><Icon n="$appr" size={30}/> {th ? "ความนิยม" : "Approval"} <span class="mono">{S.appr.toFixed(0)}%</span></h2>
-    <div class="gmix" title={th ? "ความนิยมรวมมาจาก 4 กลุ่มตามน้ำหนัก" : "Approval is the weighted mix of the 4 groups"}>{P.GROUPS.map(G => <i key={G.id} style={{flex:G.w, "--gc":G.color}}><b style={{width:`${gs[G.id] || 0}%`}}/><span><Icon n={G.icon} size={13}/>{Math.round(G.w * 100)}%</span></i>)}</div>
-    <GroupList full/>
-  </Modal>;
-}
 /* 1.7: raw minerals waiting, refining speed, our refinery and friendly refiners */
 function Refinery({g}){
   const lv = (S.refLv || {})[g] || 0, b = (S.refBuild || {})[g], tl = P.tollers(g), k = P.refCost(g), max = P.refLevel(g) >= P.REF_MAX_LV;

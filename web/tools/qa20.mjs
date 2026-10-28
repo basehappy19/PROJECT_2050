@@ -116,6 +116,32 @@ scen.game = async () => {
   await page.mouse.move(800, 450); await page.mouse.down(); await page.mouse.move(700, 420, {steps:6}); await wait(page, 300); await shot(page, "panning"); await page.mouse.up();
   await page.close();
 };
+/* 2.0: the approval page: one number per group, the next step, things to do right there */
+scen.politics = async () => {
+  for (const [w, h, tag] of [[1600, 900, "desk"], [390, 844, "phone"]]){
+    const page = await open(w, h, {"p2050-trained":"1", "p2050-tut":"1"});
+    await ev(page, () => window.P2050.Game.newGame()); await page.waitForSelector(".charsel", {timeout:60000});
+    await ev(page, () => window.P2050.Game.startGame("sci", "normal")); await wait(page, 1500);
+    if (await ev(page, () => !!document.querySelector(".intro"))) await clickSel(page, ".intro .ifoot .btn");
+    await wait(page, 800);
+    await ev(page, () => { const P = window.P2050, S = P.S; P.setSpeed(0); S.ep = 400; S.pc = 80; S.lastEv = 999; S.bubbles.push({id:++S.bubId, type:"red", reg:"MEAF", cid:"KEN", ttl:3}); P.UIM.modal = "politics"; P._bump(); });
+    await wait(page, 900); await shot(page, "politics-" + tag);
+    if (tag === "phone"){ await ev(page, () => document.querySelector(".modal.politics").scrollTo(0, 99999)); await wait(page, 300); await shot(page, "politics-phone-bottom"); await page.close(); continue; }
+    // farmers angry: the headline says so and offers the best thing to do
+    await ev(page, () => { const P = window.P2050; P.groupTilt({farm:-60}, true); P._bump(); }); await wait(page, 700); await shot(page, "politics-angry");
+    const before = await ev(page, () => [window.P2050.S.groups.farm, Object.keys(window.P2050.S.owned).length]);
+    await clickSel(page, ".phead .padv .btn"); await wait(page, 700);
+    const after = await ev(page, () => [window.P2050.S.groups.farm, Object.keys(window.P2050.S.owned).length, window.P2050.UIM.modal]);
+    console.log("headline action", before, "→", after); if (!(after[0] > before[0] || after[2] === "skills")) errors.push("politics: headline action did nothing");
+    await shot(page, "politics-after");
+    // go to a red call from the page
+    await ev(page, () => { const P = window.P2050; P.UIM.modal = "politics"; P._bump(); }); await wait(page, 400);
+    await clickSel(page, ".ptips .btn"); await wait(page, 900);
+    if (await ev(page, () => window.P2050.UIM.modal)) errors.push("politics: go-to-red did not close");
+    await shot(page, "politics-go-red");
+    await page.close();
+  }
+};
 /* the ending screen with the yearly record */
 scen.end = async () => {
   const page = await open(1600, 900, {"p2050-trained":"1", "p2050-tut":"1"});

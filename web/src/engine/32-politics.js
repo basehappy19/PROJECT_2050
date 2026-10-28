@@ -221,6 +221,18 @@ function preview(t){
 const tiltOfSkill = id => preview(SKILL_TILT[id]);
 const tiltOfOption = (opt, ev) => preview(eventTilt(opt, ev));
 const tiltOfAction = aid => preview(ACT_TILT[aid]);
+/* 2.0: abilities too (rally the young moves them by exactly +10, the others make up the difference) */
+const tiltOfAbility = id => {
+  if (S.simple) return [];
+  if (id === "act2"){ const rest = GID.filter(g => g !== "youth"), rw = rest.reduce((s, g) => s + GW[g], 0); return [{g:"youth", v:10}, ...rest.map(g => ({g, v:-10 * GW.youth / rw}))]; }
+  return preview(ABIL_TILT[id]);
+};
+/* 2.0: how far a group is from backing you / from protesting (tilts never move the average, so the average is fixed) */
+const groupGoal = g => {
+  if (!S.groups) return null;
+  const v = S.groups[g], m = mean();
+  return {v, mean:m, toBack:Math.max(0, BACK - v, m + BACK_GAP - v), toAngry:v - ANGRY, toCalm:Math.max(0, ANGRY + 8 - v)};
+};
 const isBacking = (g, v, m) => (v >= BACK && v >= m + BACK_GAP) || ((S.grpFlag || {})[g] === 1 && v >= BACK - 8 && v >= m);
 const groupState = g => { if (!S.groups) return "ok"; const v = S.groups[g], m = mean(); return v < ANGRY ? "angry" : isBacking(g, v, m) ? "back" : v < 40 ? "low" : "ok"; };
 const angryCount = () => (S.groups ? GID.filter(g => S.groups[g] < ANGRY).length : 0);
@@ -232,4 +244,4 @@ function applyExact(t){
   rest.forEach(g => { S.groups[g] = clamp(S.groups[g] - d / rw, 0, 100); });
 }
 P.groupTilt = (t, exact) => { if (!S.groups || S.simple) return; sync(); if (exact) applyExact(t); else applyTilt(t); settle(); };
-Object.assign(P, {withGroupTilt:withTilt, groupPreview:preview, GROUPS, GROUP, GID, GROUP_BACK:BACK, GROUP_ANGRY:ANGRY, tiltOfSkill, tiltOfOption, tiltOfAction, groupState, angryCount, eventTilt, groupsTick});
+Object.assign(P, {withGroupTilt:withTilt, groupPreview:preview, GROUPS, GROUP, GID, GROUP_BACK:BACK, GROUP_ANGRY:ANGRY, tiltOfSkill, tiltOfOption, tiltOfAction, groupState, angryCount, eventTilt, groupsTick, tiltOfAbility, groupGoal, groupMean:() => (S.groups ? mean() : S.appr)});
