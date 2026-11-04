@@ -13,9 +13,9 @@ const T = (th, en) => ({th, en});
 P.UI2 = {
   // what you lost and why (LossFeed)
   lossEvac:T("อพยพแล้ว ความเสียหายลดลงมาก", "Evacuated: far less damage"),
-  lossNoEvac:T("ไม่ได้อพยพ · ครั้งหน้าแตะพยากรณ์ภัยเพื่ออพยพก่อน", "Not evacuated · next time tap the forecast to evacuate first"),
+  lossNoEvac:T("ไม่ได้อพยพ · ครั้งหน้ากดอพยพก่อน", "Not evacuated · evacuate first next time"),
   lossMiss:T("ไม่ได้ส่งความช่วยเหลือ", "Aid not sent"),
-  lossMissSub:T("ฟองสีแดงหมดเวลา · ความนิยมและมิตรภาพลดลง", "The red bubble ran out · approval and friendship fall"),
+  lossMissSub:T("ไม่ได้ช่วยทันเวลา", "Help came too late"),
   lossProtest:T("ออกมาประท้วง", "protest"),
   lossProtestSub:T("กลุ่มนี้ไม่พอใจมาก · แตะช่องความนิยมเพื่อดูว่าเขาชอบอะไร", "This group is very angry · tap approval to see what they like"),
   lossUpkeep:T("ค่าใช้จ่ายประจำเดือน", "Monthly costs"),

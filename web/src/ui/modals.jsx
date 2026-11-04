@@ -39,7 +39,7 @@ export function EventModal(){
         <p class="muted small rellegend"><Rich t={t("relLegend")} iconColor="inherit"/></p></> : null}
       <p class="desc"><Rich t={L(e.desc)}/></p>
       {e.news ? <p class="newsrc muted small"><Icon n="link" size={13}/> {t("source")}: <a href={e.news.url} target="_blank" rel="noopener noreferrer">{e.news.src}</a></p> : null}
-      <div class="ask"><Rich t={`[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`} iconColor="accent"/><Speak text={`${L(e.title)}. ${L(e.desc)}`} btn/>{P.hasKeyboard() ? <small class="mono muted">{t("evKeys")}</small> : null}
+      <div class="ask"><Rich t={`[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`} iconColor="accent"/><Speak text={`${L(e.title)}. ${L(e.desc)}`} btn/>
         <span class="grow"/>{!S.mp ? <Btn kind="ghost" size="sm" onClick={() => { UIM.evMin = true; bump(); }}>{`[[minimize-2]] ${L(P.UI2.evMin)}`}</Btn> : null}</div>
       {S.mp ? <VoteHead/> : null}
       <Meter v={f} color={locked ? "warn" : "accent"} h={4} cls="lockbar"/>
@@ -138,7 +138,7 @@ export function CharSel(){
           <Meter v={nx ? (xp - pv) / (nx - pv) : 1} color={c.color} h={4}/>
           <span class="pas"><Rich t={L(c.pas)}/></span>
           <ul class="acts">{c.acts.map(ab => <li key={ab.id}><Icon n={ab.icon} size={14} color={c.color}/>{L(ab.name)}{ab.lv ? <small class="muted"> (Lv{ab.lv})</small> : null}</li>)}</ul>
-          {!owned ? <span class="price"><Icon n="terra"/> {P.shopPrice({id:"char_" + c.id, price:c.price})} · {P.Net.user ? t("buyInShop") : t("loginToBuy")}</span> : null}
+          {!owned ? <span class="price" title={P.Net.user ? t("buyInShop") : t("loginToBuy")}><Icon n="terra"/> {P.shopPrice({id:"char_" + c.id, price:c.price})}</span> : null}
         </div>
       </button>;
     })}</div>
@@ -190,7 +190,7 @@ export function Story(){
       <div class="mfoot">
         <Btn kind="ghost" onClick={() => G.storySkip()}>{t("tutSkip")}</Btn>
         <Speak text={L(P.panelSay ? P.panelSay(st.panels[Math.min(UIM.storyI, st.panels.length - 1)]) : st.panels[Math.min(UIM.storyI, st.panels.length - 1)].say)} btn/>
-        {P.hasKeyboard() ? <small class="mono muted grow">{t("storyKeys")}</small> : <span class="grow"/>}
+        <span class="grow"/>
         <Btn onClick={() => G.storyNext()} sound={null}>{last ? `${t("storyGo")} [[play]]` : `${t("tutNext")} [[chevron-right]]`}</Btn>
       </div>
     </section>
@@ -346,8 +346,8 @@ export function Market(){
         <div class="mkprice">
           <div>
             <b class="mono"><Rich t={`${ep} ${pr.toFixed(1)}`}/></b>
-            <span class={"chg " + (chg > .5 ? "up" : chg < -.5 ? "down" : "")}>{chg > .5 ? "▲" : chg < -.5 ? "▼" : "•"} {Math.abs(chg).toFixed(0)}%</span>
-            <span class={"lvl " + (lvl > 1.15 ? "hi" : lvl < .9 ? "lo" : "")}>{lvl > 1.15 ? (th ? "แพง" : "high") : lvl < .9 ? (th ? "ถูก" : "cheap") : (th ? "ปกติ" : "normal")}</span>
+            {Math.abs(chg) > .5 ? <span class={"chg " + (chg > 0 ? "up" : "down")}>{chg > 0 ? "▲" : "▼"} {Math.abs(chg).toFixed(0)}%</span> : null}
+            {lvl > 1.15 || lvl < .9 ? <span class={"lvl " + (lvl > 1.15 ? "hi" : "lo")}>{lvl > 1.15 ? (th ? "แพง" : "high") : (th ? "ถูก" : "cheap")}</span> : null}
           </div>
           <Spark data={hist} color={G.col}/>
         </div>

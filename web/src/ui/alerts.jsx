@@ -40,6 +40,7 @@ function lossText(o){
 }
 const RECUR = {sanct:1, refinery:1, bond:1};
 let lossId = 0;
+const hintSeen = {};   // 2.1: a loss line explains itself the first two times, then stays one line
 /* engine hook: collect losses (monthly running costs of one month become one line) */
 export function addLoss(o){
   if (S.training && o.k !== "hazard" && o.k !== "miss") return;
@@ -50,7 +51,7 @@ export function addLoss(o){
     let u = L0.find(x => x.k === "upkeep" && x.tk === tk);
     if (!u){ u = {k:"upkeep", tk, ep:0, parts:[], id:++lossId, at:now()}; L0.unshift(u); }
     u.ep += o.ep || 0; u.parts.push(o);
-  } else L0.unshift({...o, tk, id:++lossId, at:now()});
+  } else { const k = o.k + (o.evac ? "e" : ""); hintSeen[k] = (hintSeen[k] || 0) + 1; L0.unshift({...o, tk, id:++lossId, at:now(), hint:hintSeen[k] <= 2 || S.training}); }
   if (L0.length > 8) L0.length = 8;
   // where it happened: a floating number on the map
   if (o.c && (o.k === "hazard" || o.k === "miss") && GameMap.active){
@@ -67,10 +68,10 @@ export function LossFeed(){
   if (!list.length) return null;
   return <div class="lossfeed" aria-live="polite">{list.map(o => {
     const d = lossText(o), age = (now() - o.at) / live;
-    return <button type="button" key={o.id} class={"lossline glass " + (age > .8 ? "fade" : "")} style={{"--lc":d.col}}
+    return <button type="button" key={o.id} class={"lossline " + (age > .8 ? "fade" : "")} style={{"--lc":d.col}}
       onClick={() => { if (o.c){ Audio.play("whoosh", {vol:.3}); GameMap.focusCountry(o.c); } }} title={o.c ? L(P.UI2.lossSee) : ""}>
       <i class="lic"><Icon n={d.icon} size={18}/></i>
-      <span class="ltxt"><b>{d.txt}</b>{d.sub ? <small>{d.sub}</small> : null}</span>
+      <span class="ltxt"><b>{d.txt}</b>{d.sub && (o.hint || o.k === "upkeep" || o.k === "delay") ? <small>{d.sub}</small> : null}</span>
       <Chips o={o}/>
     </button>;
   })}</div>;
@@ -91,26 +92,24 @@ export function HazardAlerts(){
   return <div class="hzalerts">{shown.map(({a, h}) => {
     const Z = P.HAZARDS[h.type], col = HZ_COL[h.type] || COL.bad, left = Math.max(0, h.at - S.tick), cost = P.evacCost(), can = S.ep >= cost;
     return <div class="hzalert glass-strong" key={a.id} style={{"--hc":col}}>
-      <i class="hic"><Icon n={Z.icon} size={26}/></i>
-      <div class="htxt">
-        <small class="mono">{L(T.alertTag)} · {left} {t("moShort")}</small>
-        <b>{L(Z.name)} → {P.cname(h.c)}</b>
-      </div>
+      <button type="button" class="hsee" title={L(T.alertSee)} onClick={() => GameMap.focusCountry(h.c)}>
+        <i class="hic"><Icon n={Z.icon} size={24}/></i>
+        <span class="htxt"><b>{L(Z.name)} → {P.cname(h.c)}</b><small>{S.lang === "th" ? `อีก ${left} เดือน` : `in ${left} mo`}</small></span>
+      </button>
       <div class="hbtns">
-        <Btn kind="ghost" size="sm" onClick={() => { GameMap.focusCountry(h.c); }}>{`[[map-pin]] ${L(T.alertSee)}`}</Btn>
         <Btn kind="primary" size="sm" disabled={!can} sound={null} onClick={() => { if (P.evacuate(h.id)){ Audio.play("shield"); UIM.alerts = UIM.alerts.filter(x => x.id !== h.id); bump(); } }}>{`[[siren]] ${L(T.alertEvac)} ${cost}`}</Btn>
       </div>
       {S.mp && S.mp.kind === "coop" && P.Mp && P.Mp.myRoles().includes("disaster") && (S.haz || []).filter(x => !x.evac && P.C(x.c).reg === P.C(h.c).reg).length >= 2 ?
         <Btn kind="danger" size="sm" onClick={() => P.Mp.evacAll(P.C(h.c).reg)}>{`[[users]] ${S.lang === "th" ? "อพยพทั้งภูมิภาค" : "Whole region"}`}</Btn> : null}
       <button type="button" class="hx" aria-label="close" onClick={() => { UIM.alerts = UIM.alerts.filter(x => x.id !== h.id); bump(); }}><Icon n="x" size={14}/></button>
     </div>;
-  })}{more > 0 ? <small class="hzmore mono">+{more} {L(T.alertMore)}</small> : null}</div>;
+  })}{more > 0 ? <small class="hzmore">+{more} {L(T.alertMore)}</small> : null}</div>;
 }
 
 /* a minimised event: the game stays paused; tap to open it again */
 export function EventPill(){
   const e = P.currentEvent(); if (!e) return null;
   return <div class="evpill-wrap"><button type="button" class="evpill glass-strong" onClick={() => { Audio.play("open"); UIM.evMin = false; bump(); }}>
-    <Icon n="siren" size={20} color="warn"/><span><small class="warn mono">{L(P.UI2.evWaiting)}</small><b>{L(e.title)}</b></span><Icon n="maximize-2" size={18}/>
+    <Icon n="siren" size={20} color="warn"/><span><small class="warn">{L(P.UI2.evWaiting)}</small><b>{L(e.title)}</b></span><Icon n="maximize-2" size={18}/>
   </button></div>;
 }

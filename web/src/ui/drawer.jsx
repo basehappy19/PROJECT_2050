@@ -1,10 +1,10 @@
 /* Right-hand drawer (bottom sheet on phones): Region / Country, Stats, News */
-import {P, S, t, L, up, COL, relCol, UIM, bump} from "../core.js";
+import {P, S, t, L, up, COL, relCol, UIM, bump, RSHORT} from "../core.js";
 import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {GameMap} from "../map2d.js";
 import {Icon, Rich} from "./icon.jsx";
-import {Btn, IconBtn, RelBar, Meter, H3, Key, GroupList, GroupTilt} from "./widgets.jsx";
+import {Btn, IconBtn, RelBar, Meter, H3, GroupList, GroupTilt} from "./widgets.jsx";
 
 const IC = () => P.IC;
 const costLabel = c => [c.ep ? `${IC().ep} ${c.ep}` : "", c.pc ? `${IC().pc} ${c.pc}` : "", c.ore ? `${IC().ore} ${c.ore}` : ""].filter(Boolean).join("  ");
@@ -43,7 +43,6 @@ export function Drawer(){
     <div class="dhead">
       {S.tab === "region" && S.selC ? <IconBtn n="arrow-left" title={t("dRegion")} onClick={() => { S.selC = null; GameMap.focus(S.sel, false); P.changed(); }}/> : null}
       <h2>{up(t(titles[S.tab]))}</h2>
-      <Key k="Esc"/>
       <IconBtn n="x" title="Close" onClick={() => G.closeTab()} sound={null}/>
     </div>
     <div class="scroll">
@@ -56,7 +55,7 @@ function RegionButtons(){
   return <div class="regbtns">{S.regions.map(r => {
     const c = P.heatRGB(P.regionHeatValue(r));
     return <button type="button" key={r.id} class={r.id === S.sel && !S.selC ? "on" : ""} onPointerEnter={() => Audio.hover()} onClick={() => G.selectRegion(r.id, true)}>
-      <span class="mono">{r.id}</span><i style={{background:`rgb(${c.join(",")})`}}/>
+      <span>{L(RSHORT[r.id])}</span><i style={{background:`rgb(${c.join(",")})`}}/>
     </button>;
   })}</div>;
 }
@@ -230,7 +229,7 @@ function PaneStats(){
     : tab === "people" ? (S.groups ? <div class="glist mini" onClick={() => { Audio.play("open"); UIM.modal = "politics"; bump(); }}><GroupList/></div> : null)
     : <>
       <H3>{t("shares")}</H3>
-      {S.regions.map(r => <div class="barrow" key={r.id}><span class="mono">{r.id}</span><Meter v={r.co2 / g} color="hot" h={8}/><span class="mono">{r.co2.toFixed(2)}</span></div>)}
+      {S.regions.map(r => <div class="barrow wide" key={r.id}><span>{L(RSHORT[r.id])}</span><Meter v={r.co2 / g} color="hot" h={8}/><span class="mono">{r.co2.toFixed(2)}</span></div>)}
       <H3>{t("topEmitters")}</H3>
       {S.countries.filter(x => !x.rest).sort((a, b) => b.co2 - a.co2).slice(0, 8).map(c => <div class="barrow wide" key={c.id}><span>{L(P.COUNTRY[c.id].name)}</span><Meter v={c.co2 / g} color="warn" h={8}/><span class="mono">{c.co2.toFixed(2)}</span></div>)}
     </>}

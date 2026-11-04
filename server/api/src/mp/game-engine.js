@@ -1787,12 +1787,12 @@ Object.assign(P.UI, {
   /* skills screen */
   skillsTitle:T("สกิล","Skills"), pausedHere:T("เกมหยุดชั่วคราวขณะเปิดหน้านี้","The game is paused while this screen is open"),
   buffInstant:T("ค้นพบใหม่: สกิลถัดไปเสร็จทันที","Breakthrough: next skill is instant"), buffDisc:T("ทุนวิจัย: สกิลถัดไปถูกลง 5%","Research sprint: next skill −5%"),
-  ready:T("พร้อม","Ready"), hiddenSkill:T("สกิลปริศนา","Unknown skill"), hiddenHint:T("ปลดล็อกสกิลก่อนหน้าเพื่อดูรายละเอียด:","Unlock the earlier skill to reveal it:"),
+  ready:T("พร้อม","Ready"), hiddenSkill:T("สกิลปริศนา","Unknown skill"), hiddenHint:T("ต้องปลดล็อกก่อน:","Unlock first:"),
   noRollouts:T("ยังไม่มีโครงการที่กำลังทยอยผล","No projects rolling out"), needReq:T("ต้องมีสกิลก่อนหน้าก่อน","Needs the earlier skill first"),
   useNow:T("ใช้ตอนนี้","Use now"), target:T("เป้าหมาย","Target"), rollingOut:T("กำลังทยอยผล","Rolling out"),
   unlock:T("ปลดล็อกสกิล","Unlock skill"), owned:T("มีแล้ว","Owned"), inProgress:T("โครงการที่ทยอยผล","Rolling out"),
   logTech:T("ปลดล็อกสกิล","Skill unlocked"),
-  skillTip:T("[[shield]] = รับมือภัย · [[scale]] = ได้อย่างเสียอย่าง · [[zap]] = สกิลกดใช้ · ซื้อถี่เกินไปจะเจอเงินเฟ้อสีเขียว","[[shield]] = disaster response · [[scale]] = trade-off · [[zap]] = active skill · buying too fast causes Greenflation"),
+  skillTip:T("[[shield]] รับมือภัย · [[scale]] ได้อย่างเสียอย่าง · [[zap]] กดใช้ได้","[[shield]] handles disasters · [[scale]] trade-off · [[zap]] can be used"),
   capFull:T("ทยอยผลพร้อมกันได้สูงสุด 3 โครงการ รอให้โครงการเดิมเสร็จก่อน","At most 3 roll-outs at once. Wait for one to finish."),
   /* end */
   winBodyS:T("การปล่อยคาร์บอนสุทธิแตะศูนย์ ขณะที่โลกยังร้อนไม่ถึง 1.6°C ป่าฟื้นตัว ทะเลกลับมาใส และเมืองทุกเมืองหายใจได้สะดวก","Net emissions hit zero with warming under 1.6°C. Forests recover, seas clear and every city breathes again."),
@@ -2204,6 +2204,7 @@ P.CHANGELOG = [
     "พยากรณ์ภัยใหม่ขึ้นเป็นการ์ดด้านบน กดดูหรือสั่งอพยพได้ทันที · ลูกศรที่ขอบจอชี้ไปยังภัยที่มองไม่เห็น · ฟองแดงกะพริบเมื่อใกล้หมดเวลา",
     "ย่อหน้าต่างเหตุการณ์เพื่อดูแผนที่และทรัพยากรก่อนตัดสินใจได้",
     "แผนที่ล็อกให้เต็มจอเสมอ (ซูมออกจนหลุดโลกไม่ได้) และ UI จางลงตอนลากแผนที่",
+    "หน้าตาใหม่ดูง่ายขึ้น: แสงเรืองและกล่องน้อยลง ตัวอักษรใหญ่ขึ้น แถบด้านบนรวมเป็นแถบเดียว แผนที่บอกชื่อทวีปแทนตัวย่อ และสกิลที่ยังไกลอยู่เห็นชื่อและภาพแล้ว",
   ], [
     "Multiplayer: \"Joint Taskforce\", 2–4 players save one world together. Each runs their own ministries (Energy & Industry, Diplomacy, Disasters & Cities, People & Nature) and events are decided by a 15-second vote.",
     "Multiplayer: \"Regional Race\", 2–4 players each run their own world but share one temperature. First to Net Zero wins. Send aid, tax a bigger emitter's carbon, or sign a climate pact.",
@@ -2219,6 +2220,7 @@ P.CHANGELOG = [
     "New disaster forecasts pop up as a card at the top: look at it or evacuate straight away · arrows at the screen edge point to disasters you can't see · red bubbles blink when they're about to run out.",
     "Events can be minimised so you can check the map and your resources before choosing.",
     "The map always fills the screen (no zooming out into space), and the HUD fades while you drag the map.",
+    "A cleaner look: fewer glows and boxes, larger text, one top bar, continent names on the map instead of codes, and skills further ahead show their name and picture.",
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",
@@ -5671,9 +5673,9 @@ const T = (th, en) => ({th, en});
 P.UI2 = {
   // what you lost and why (LossFeed)
   lossEvac:T("อพยพแล้ว ความเสียหายลดลงมาก", "Evacuated: far less damage"),
-  lossNoEvac:T("ไม่ได้อพยพ · ครั้งหน้าแตะพยากรณ์ภัยเพื่ออพยพก่อน", "Not evacuated · next time tap the forecast to evacuate first"),
+  lossNoEvac:T("ไม่ได้อพยพ · ครั้งหน้ากดอพยพก่อน", "Not evacuated · evacuate first next time"),
   lossMiss:T("ไม่ได้ส่งความช่วยเหลือ", "Aid not sent"),
-  lossMissSub:T("ฟองสีแดงหมดเวลา · ความนิยมและมิตรภาพลดลง", "The red bubble ran out · approval and friendship fall"),
+  lossMissSub:T("ไม่ได้ช่วยทันเวลา", "Help came too late"),
   lossProtest:T("ออกมาประท้วง", "protest"),
   lossProtestSub:T("กลุ่มนี้ไม่พอใจมาก · แตะช่องความนิยมเพื่อดูว่าเขาชอบอะไร", "This group is very angry · tap approval to see what they like"),
   lossUpkeep:T("ค่าใช้จ่ายประจำเดือน", "Monthly costs"),

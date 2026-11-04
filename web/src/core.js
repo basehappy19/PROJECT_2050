@@ -8,7 +8,11 @@ export const S = P.S;
 export const H = P.H = P.H || {};
 export const t = k => P.t(k);
 export const L = o => P.L(o);
-export const up = s => (S.lang === "en" ? String(s).split(/(\[\[\$?[a-z0-9-]+\]\])/).map(x => (/^\[\[/.test(x) ? x : x.toUpperCase())).join("") : String(s));
+/* 2.1: short continent names for the map labels (the full names are in the side panel) */
+export const RSHORT = {NA:{th:"อเมริกาเหนือ", en:"N. America"}, EU:{th:"สหภาพยุโรป", en:"EU"}, EA:{th:"เอเชียตะวันออก", en:"East Asia"},
+  SA:{th:"อเมริกาใต้", en:"S. America"}, MEAF:{th:"ตะวันออกกลาง-แอฟริกา", en:"Mid-East & Africa"}, SEA:{th:"เอเชียตะวันออกเฉียงใต้", en:"SE Asia"}};
+/* 2.1: headings stay in sentence case (no shouting capitals in English) */
+export const up = s => String(s);
 export const ls = {
   get(k, d = null){ try { const v = localStorage.getItem(k); return v === null ? d : v; } catch(e){ return d; } },
   set(k, v){ try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch(e){} },

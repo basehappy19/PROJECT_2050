@@ -5,7 +5,7 @@ import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {GameMap} from "../map2d.js";
 import {Icon, Rich, plain} from "./icon.jsx";
-import {IconBtn, Seg, LangSeg, Portrait, Key, Meter} from "./widgets.jsx";
+import {IconBtn, Seg, Portrait, Meter} from "./widgets.jsx";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -27,17 +27,17 @@ function AnimNum({v, fmt = x => Math.floor(x)}){
 /* a value in the top bar: hover (or tap) shows what it is and how to get more */
 function Kpi({label, value, fmt, sub, meter, cls = "", danger, stat, tip, onClick, badge, kid}){
   const [open, setOpen] = useState(false), touch = isTouch();
-  const box = <div class={`kpi glass ${cls} ${danger ? "danger" : ""} ${stat ? "has3d" : ""}`}>
+  const box = <div class={`kpi ${cls} ${danger ? "danger" : ""} ${stat ? "has3d" : ""}`}>
     {stat ? <Icon n={"$" + stat} size={30} cls="k3d"/> : null}
     <span class="k">{stat ? plain(label) : <Rich t={label}/>}</span>
     <span class="v">{typeof value === "number" ? <AnimNum v={value} fmt={fmt}/> : value}</span>
-    {sub ? <span class="s">{sub}</span> : null}
+    {sub && /sanct/.test(cls) ? <span class="s">{sub}</span> : null}
     {meter !== undefined ? <Meter v={meter.v} color={meter.c} h={4} cls="kmeter"/> : null}
     {badge ? <i class="kbadge">{badge}</i> : null}
   </div>;
   return <div class="kpiw" data-kpi={kid} onPointerEnter={e => { if (e.pointerType === "mouse") setOpen(true); }} onPointerLeave={() => setOpen(false)}
     onClick={() => { if (onClick) onClick(); else if (touch) setOpen(o => !o); }}>
-    {onClick ? <button type="button" class="kpibtn">{box}</button> : box}
+    {onClick ? <button type="button" class="kpibtn">{box}<Icon n="chevron-down" size={14} cls="kmore"/></button> : box}
     {open && tip ? <div class="ktip glass-strong" role="tooltip"><b><Rich t={label}/></b>{sub ? <span class="mono acc">{sub}</span> : null}<span><Rich t={tip}/></span></div> : null}
   </div>;
 }
@@ -47,10 +47,9 @@ export function TopBar(){
   const has3 = P.Net && P.Net.owns("speed3");
   const sp = [{id:"sp0", icon:"pause", on:S.speed === 0, fn:() => G.setSpeed(0), title:(S.lang === "th" ? "หยุด" : "Pause") + " (Space)", sound:null}, {id:"sp1", label:"1×", on:S.speed === 1, fn:() => G.setSpeed(1), sound:null}, {id:"sp2", label:"2×", on:S.speed === 2, fn:() => G.setSpeed(2), sound:null}];
   if (has3) sp.push({id:"sp3", label:"3×", on:S.speed === 3, fn:() => G.setSpeed(3), sound:null});
-  const fs = !!document.fullscreenElement, running = P.running();
+  const running = P.running();
   return <header class="topbar">
-    <div class="brand glass" onClick={() => G.pause()} title={t("pTitle")}><span>PROJECT</span><b>ZERO</b></div>
-    <div class="kpis">
+    <div class="kpis glass">
       <Kpi kid="ep" stat="money" label={t("ep")} value={S.ep} sub={P.sanctionsCost() ? `+${P.epGain()} −${P.sanctionsCost()}` : `+${P.epGain()}${t("perMo")}`} cls={P.sanctionsCost() ? "sanct" : ""} tip={t("tipEp")}/>
       <Kpi kid="pc" stat="policy" label={t("pc")} value={S.pc} sub={`+${P.pcGain()}${t("perMo")}`} tip={t("tipPc")}/>
       {S.oreOn ? <Kpi kid="ore" stat="ore" label={t("oreLbl")} value={P.matTotal()} sub={`+${Math.round(P.oreGain())}${t("perMo")}`} cls="ore mkton" tip={t("tipOre")} onClick={() => { Audio.play("open"); UIM.modal = "market"; bump(); }}/> : null}
@@ -63,9 +62,7 @@ export function TopBar(){
         <i class="month"><b key={S.tick + ":" + S.speed} style={{animationDuration:`${P.secPerMonth()}s`, animationPlayState:running ? "running" : "paused"}}/></i>
       </div>
       <Seg cls="speed" items={sp}/>
-      <LangSeg/>
       <div class="ibtns">
-        <IconBtn n={fs ? "minimize" : "maximize"} title="Fullscreen (F)" onClick={() => G.fullscreen()} cls="hide-sm"/>
         <IconBtn n={Audio.musicOn ? "music" : "music-off"} title={t("musicLbl")} onClick={() => { Audio.toggleMusic(); P._bump(); }} sound={null} cls="hide-xs"/>
         <IconBtn n={Audio.on ? "volume-2" : "volume-x"} title={t("sfxLbl")} onClick={() => { Audio.toggle(); P._bump(); }} sound={null} cls="hide-xs"/>
         <IconBtn n="menu" title={`${t("pTitle")} (Esc)`} onClick={() => G.pause()}/>
@@ -149,7 +146,7 @@ function MeterNZ(){
   else { proj = t("rising"); pcls = "bad"; }
   const pos = v => clamp(v / NZ_MAX, 0, 1), cls = net <= 8 ? "good" : net <= 20 ? "warn" : "bad";
   return <div class="mtr" title={plain(t("tipNZ"))}>
-    <div class="mtr-h"><Rich t={`[[flag]] ${up(t("nzTitle"))}`} cls="ttl"/><span class={"big " + cls}>{net.toFixed(1)}<small> Gt</small></span></div>
+    <div class="mtr-h"><Rich t={`[[flag]] ${t("nzTitle")}`} cls="ttl"/><span class={"big " + cls}>{net.toFixed(1)}<small> Gt</small></span></div>
     <div class="bar nz">
       <i class="fill" style={{width:`${(1 - pos(net)) * 100}%`}}/>
       <i class="ghost" style={{left:`${(1 - pos(start)) * 100}%`}}/>
@@ -160,21 +157,20 @@ function MeterNZ(){
       <i class={"dot " + cls} style={{left:`${(1 - pos(net)) * 100}%`}}/>
       <Icon n="trophy" size={17} cls="end good"/>
     </div>
-    <div class="mtr-f"><span>{t("vs2026")} <b class={net < start ? "good" : "bad"}>{P.fmt(net - start)}</b> · {trend <= 0 ? "▼" : "▲"} <b class={trend <= 0 ? "good" : "bad"}>{P.fmt(trend)}</b>/12{t("perMo").replace("/", "")}</span><span class={pcls}>{proj}</span></div>
+    <div class="mtr-f"><span class={pcls}>{proj}</span></div>
   </div>;
 }
 function MeterT(){
   const monthsLeft = Math.max(0, P.TOTAL_TICKS - S.tick), era = S.world && P.ERAS[S.era || "shift"], cls = S.temp >= 2.5 ? "bad" : S.temp >= 2.0 ? "hot" : S.temp >= 1.5 ? "warn" : "good";
   return <div class="mtr" title={plain(t("tipTemp"))}>
-    <div class="mtr-h"><Rich t={`[[$temp]] ${up(t("tTitle"))}`} cls="ttl"/><span class={"big " + cls}>+{S.temp.toFixed(2)}<small>°C</small></span></div>
+    <div class="mtr-h"><Rich t={`[[$temp]] ${t("tTitle")}`} cls="ttl"/><span class={"big " + cls}>+{S.temp.toFixed(2)}<small>°C</small></span></div>
     <div class="bar temp">
       <i class="z"/><i class="z"/><i class="z"/><i class="z"/>
-      <span class="tk" style={{left:"25%"}}>1.5</span><span class="tk" style={{left:"50%"}}>2.0</span><span class="tk" style={{left:"75%"}}>2.5</span>
       <i class={"dot " + cls} style={{left:`${clamp((S.temp - 1) / 2, 0, 1) * 100}%`}}/>
       <Icon n="triangle-alert" size={17} cls="end bad"/>
     </div>
     {era ? <div class="mtr-f"><span><Rich t={`[[${era.icon}]] ${L(era.name)}`} iconColor="accent"/></span><span class="muted">{L(era.goal)}</span></div>
-      : <div class="mtr-f"><span><b class={cls}>{Math.max(0, 3 - S.temp).toFixed(2)}°C</b> {t("toLose")} (3.0°C)</span><span>{t("left")} <b>{Math.floor(monthsLeft / 12)}</b> {t("yrs")} {monthsLeft % 12} {t("months")}</span></div>}
+      : <div class="mtr-f"><span><b class={cls}>{Math.max(0, 3 - S.temp).toFixed(1)}°C</b> {t("toLose")}</span><span>{t("left")} <b>{Math.ceil(monthsLeft / 12)}</b> {t("yrs")}</span></div>}
   </div>;
 }
 export function Bottom(){
@@ -186,12 +182,12 @@ export function Bottom(){
     <div class="meters glass"><MeterNZ/><MeterT/></div>
     <div class="row2">
       <button type="button" class="ticker glass" onClick={() => G.setTab("news")} key={S.log.length + ":" + (lg && lg.tk)}>
-        {lg ? <><span class="d">{P.dateStr(lg.tk)}</span><Rich t={lg.txt} cls={"txt " + (LCOL[lg.cls] || "fg")} iconColor="inherit"/></> : null}
+        {lg ? <><Rich t={lg.txt} cls={"txt " + (LCOL[lg.cls] || "fg")} iconColor="inherit"/></> : null}
       </button>
-      <nav class="tabbar">{tabs.map(([id, ic, key, kk]) => {
+      <nav class="tabbar glass">{tabs.map(([id, ic, key, kk]) => {
         const on = id === "tech" ? UIM.modal === "skills" : S.tab === id;
-        return <button type="button" key={id} data-tab={id} class={`tabbtn glass ${on ? "on" : ""} ${badge[id] ? "pulse" : ""}`} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>
-          <Icon n={ic} size={17}/><span>{up(t(key))}</span>{badge[id] ? <b class={"badge " + (id === "tech" ? "" : "b2")}>{badge[id]}</b> : <Key k={kk}/>}
+        return <button type="button" key={id} data-tab={id} class={`tabbtn ${on ? "on" : ""}`} title={`${t(key)} (${kk})`} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>
+          <Icon n={ic} size={17}/><span>{t(key)}</span>{badge[id] ? <b class={"badge " + (id === "tech" ? "" : "b2")}>{badge[id]}</b> : null}
         </button>;
       })}</nav>
     </div>

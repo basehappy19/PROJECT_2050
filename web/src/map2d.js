@@ -4,7 +4,7 @@
    and "fx" (labels, hazards, bubbles, plumes, weather effects, floating numbers — every frame).
    Controls: drag = pan · wheel / pinch / buttons = zoom · double-tap / H = whole world
    Tap a region (zoomed out) = zoom into it · tap a country (zoomed in) = select it · tap the sea = close the drawer. */
-import {P, S, H, UIM, t, L, COL, relCol, HZ_COL, ls, bump} from "./core.js";
+import {P, S, H, UIM, t, L, COL, relCol, HZ_COL, ls, bump, RSHORT} from "./core.js";
 import {MAP, ll} from "./geo.js";
 import {Audio} from "./audio.js";
 import ICONS from "./gen/icons.js";
@@ -440,9 +440,9 @@ export const GameMap = {
     if (!zc){
       for (const r of S.regions){
         const [wx, wy] = this.regionPoint(r.id), [x, y] = this.toScreen(wx, wy); if (!vis(x, y)) continue;
-        const sel = !S.noSel && S.sel === r.id, txt = `${r.id}  ${r.co2.toFixed(1)} Gt`;
+        const sel = !S.noSel && S.sel === r.id, txt = `${L(RSHORT[r.id] || P.RMETA[r.id].name)}  ${r.co2.toFixed(1)} Gt`;   // 2.1: a name, not a code
         const hov = this.hover && this.hover.hit === "lab-" + r.id;
-        const b = this.pill(x, y, txt, {font:"600 12px 'IBM Plex Mono', monospace", h:24, stroke:sel || hov ? COL.accent : "rgba(79,209,197,.25)", sw:sel ? 1.5 : 1, icon:S.alli[r.id] ? "handshake" : null, iconColor:COL.good, bg:sel ? "rgba(8,40,40,.9)" : undefined});
+        const b = this.pill(x, y, txt, {font:"600 12px 'IBM Plex Sans Thai', sans-serif", h:24, stroke:sel || hov ? COL.accent : "rgba(79,209,197,.25)", sw:sel ? 1.5 : 1, icon:S.alli[r.id] ? "handshake" : null, iconColor:COL.good, bg:sel ? "rgba(8,40,40,.9)" : undefined});
         this.hits.push({id:"lab-" + r.id, ...b, fn:() => G.selectRegion(r.id, true)});
       }
     } else {
@@ -471,8 +471,8 @@ export const GameMap = {
       c.fillStyle = "rgba(6,16,21,.9)"; c.beginPath(); c.arc(x, y, 18, 0, Math.PI * 2); c.fill(); c.lineWidth = 2; c.strokeStyle = col; c.stroke();
       const im = iconImg(Z.icon, col); if (im) c.drawImage(im, x - 11, y - 11, 22, 22);
       c.strokeStyle = col; c.globalAlpha = .6; c.beginPath(); c.moveTo(x, y + 18); c.lineTo(x, y0 - 2); c.stroke(); c.globalAlpha = 1;
-      const lab = h.evac ? `✓ ${t("evacShort")}` : `${left} ${t("moShort")} · ${t("evacShort")} ${P.evacCost()}`;
-      const b = this.pill(x, y + 33, lab, {font:"600 10.5px 'IBM Plex Mono', 'IBM Plex Sans Thai', monospace", h:19, bg:h.evac ? "rgba(95,211,154,.92)" : "rgba(6,16,21,.9)", color:h.evac ? "#04130c" : COL.fg, stroke:col});
+      const lab = h.evac ? `✓ ${t("evacShort")}` : `${left} ${t("moShort")}`;
+      const b = this.pill(x, y + 33, lab, {font:"600 12px 'IBM Plex Sans Thai', sans-serif", h:20, bg:h.evac ? "rgba(95,211,154,.92)" : "rgba(6,16,21,.9)", color:h.evac ? "#04130c" : COL.fg, stroke:col});
       if (!h.evac) this.hits.push({id:"hz-" + h.id, x:Math.min(x - 22, b.x), y:y - 20, w:Math.max(44, b.w), h:b.y + b.h - (y - 20), fn:() => { if (P.evacuate(h.id)){ this.floatText(x, y - 24, t("evacuated"), "good"); Audio.play("shield"); } }});
     }
     // bubbles (green = free Eco-Points · red = disaster aid)
@@ -492,7 +492,7 @@ export const GameMap = {
       const maxT = red ? 5 : 4; c.strokeStyle = "rgba(255,255,255,.75)"; c.lineWidth = 2; c.beginPath(); c.arc(x, y, R + 4, -Math.PI / 2, -Math.PI / 2 + Math.PI * 2 * clamp(bb.ttl / maxT, 0, 1)); c.stroke();
       const im3 = img3d(red ? "heart" : ore ? "ore" : "money"), im = im3 || iconImg(red ? "heart-handshake" : "leaf", col);
       if (im) c.drawImage(im, x - (im3 ? 13 : 10), y - (im3 ? 13 : 10), im3 ? 26 : 20, im3 ? 26 : 20);
-      if (red) this.pill(x, y + R + 14, `${P.aidCost()} · ${urgent ? "!" : ""}${bb.ttl} ${t("moShort")}`, {font:"600 10px 'IBM Plex Mono', monospace", h:17, icon:"coins", iconColor:COL.gold, bg:urgent && Math.floor(now * 3) % 2 ? "rgba(140,20,14,.95)" : "rgba(6,16,21,.88)"});
+      if (red) this.pill(x, y + R + 14, `${P.aidCost()} · ${urgent ? "!" : ""}${bb.ttl} ${t("moShort")}`, {font:"600 11px 'IBM Plex Sans Thai', sans-serif", h:18, icon:"coins", iconColor:COL.gold, bg:urgent && Math.floor(now * 3) % 2 ? "rgba(140,20,14,.95)" : "rgba(6,16,21,.88)"});
       this.hits.push({id:"bb-" + bb.id, x:x - R - 6, y:y - R - 6, w:2 * R + 12, h:2 * R + 12, fn:() => { if (P.popBubble(bb.id, x, y - 26)){ this.burst(x, y, col); if (!red) Audio.play("coin", {vol:.6}); } }});
       c.globalAlpha = 1;
     }

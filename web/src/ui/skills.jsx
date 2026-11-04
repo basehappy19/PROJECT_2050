@@ -1,6 +1,6 @@
 /* Skill screen (full screen, like Plague Inc). Hexagon grid of one category · details of the chosen skill · category tabs.
    Opening it pauses the game. Close with ✕, Esc, T or by tapping outside the window.
-   Only owned skills and the NEXT skills you can buy are shown; anything further away is "???". */
+   Only owned skills and the NEXT skills you can buy are shown; anything further away is shown dimmed with a lock (2.1: name and picture visible, details after the earlier skill). */
 import ICONS from "../gen/icons.js";
 import {P, S, UIM, t, L, up, COL, bump} from "../core.js";
 import {Audio} from "../audio.js";
@@ -24,23 +24,20 @@ export function Skills(){
   return <div class="veil skills-veil" onClick={e => { if (e.target === e.currentTarget) G.closeSkills(); }}>
     <section class="skills glass-strong" role="dialog" aria-label={t("skillsTitle")}>
       <header class="sk-head">
-        <h2><Icon n="network" size={22} color="accent"/>{up(t("skillsTitle"))}</h2>
+        <h2><Icon n="network" size={22} color="accent"/>{t("skillsTitle")}</h2>
         <div class="sk-res">
-          <span><Rich t={`${P.IC.ep} `}/><b>{Math.floor(S.ep)}</b><small>+{P.epGain()}{t("perMo")}</small></span>
-          <span><Rich t={`${P.IC.pc} `}/><b>{Math.floor(S.pc)}</b><small>+{P.pcGain()}{t("perMo")}</small></span>
-          {S.oreOn ? <span><Rich t={`${P.IC.ore} `}/><b>{P.isFullRes() ? P.matTotal() : Math.floor(S.ore)}</b><small>+{Math.round(P.oreGain())}{t("perMo")}</small></span> : null}
+          <span><Rich t={`${P.IC.ep} `}/><b>{Math.floor(S.ep)}</b></span>
+          <span><Rich t={`${P.IC.pc} `}/><b>{Math.floor(S.pc)}</b></span>
+          {S.oreOn ? <span><Rich t={`${P.IC.ore} `}/><b>{P.isFullRes() ? P.matTotal() : Math.floor(S.ore)}</b></span> : null}
           <span class={busy >= P.MAX_PROJECTS ? "warn" : "muted"}><Icon n="loader" size={15}/> {t("inProgress")} {busy}/{P.MAX_PROJECTS}</span>
           {P.recentBuys() ? <span class="bad"><Icon n="chart-line" size={15}/> {t("rush")} +{P.recentBuys() * 20}%</span> : null}
           {S.buff.instant ? <span class="good"><Icon n="lightbulb" size={15}/> {t("buffInstant")}</span> : S.buff.disc ? <span class="good"><Icon n="flask-round" size={15}/> {t("buffDisc")}</span> : null}
         </div>
-        <span class="muted small paused"><Icon n="pause" size={13}/> {t("pausedHere")}</span>
-        <Key k="T"/><Key k="Esc"/>
         <IconBtn n="x" title="Close" onClick={() => G.closeSkills()} sound={null} cls="big skclose"/>
       </header>
       <div class="sk-body">
         <div class="sk-grid">
           <svg viewBox={`0 0 ${maxX} ${maxY}`} preserveAspectRatio="xMidYMid meet">
-            <defs><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="5" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
             {nodes.flatMap(n => n.req.map(q => {
               const qn = P.SKILL[q]; if (!qn || qn.cat !== cat || (!visible(n) && !S.owned[q])) return null;
               const [x1, y1] = centre(qn), [x2, y2] = centre(n), ang = Math.atan2(y2 - y1, x2 - x1), r0 = R - 2;
@@ -54,19 +51,19 @@ export function Skills(){
             {nodes.map(n => {
               const [cx, cy] = centre(n), vis = visible(n), own = !!S.owned[n.id], c = P.nodeCost(n), p = P.rollProgress(n.id), sel = S.node === n.id;
               const afford = vis && !own && P.canAfford(n);
-              const lab = vis ? (p !== null ? `${Math.round(p * 100)}%` : own ? (n.type === "active" ? (S.actCd[n.id] ? `${S.actCd[n.id]} ${t("moShort")}` : t("ready")) : "✓") : `${c.ep}·${c.pc}`) : "???";
-              return <g key={n.id} data-node={n.id} class={`hex ${own ? "own" : vis ? (afford ? "afford" : "vis") : "hid"} ${n.type} ${sel ? "sel" : ""}`} onClick={() => pick(n.id)} onPointerEnter={() => Audio.hover()} tabIndex={0} role="button" aria-label={vis ? L(n.name) : t("hiddenSkill")} onKeyDown={e => { if (e.key === "Enter") pick(n.id); }}>
+              const lab = vis ? (p !== null ? `${Math.round(p * 100)}%` : own ? (n.type === "active" ? (S.actCd[n.id] ? `${S.actCd[n.id]} ${t("moShort")}` : t("ready")) : "✓") : `${c.ep}·${c.pc}`) : "";
+              return <g key={n.id} data-node={n.id} class={`hex ${own ? "own" : vis ? (afford ? "afford" : "vis") : "hid"} ${n.type} ${sel ? "sel" : ""}`} onClick={() => pick(n.id)} onPointerEnter={() => Audio.hover()} tabIndex={0} role="button" aria-label={L(n.name)} onKeyDown={e => { if (e.key === "Enter") pick(n.id); }}>
                 {afford ? <polygon class="halo" points={hexPts(cx, cy, R + 8)}/> : null}
                 <polygon class="body" points={hexPts(cx, cy, R)}/>
                 {p !== null ? <polygon class="prog" points={hexPts(cx, cy, R - 5)} style={{opacity:.15 + .35 * p}}/> : null}
                 {sel ? <polygon class="selring" points={hexPts(cx, cy, R + 5)}/> : null}
-                {vis ? <image href={`assets/img/ui/3d/sk-${n.id}.webp`} x={cx - 25} y={cy - 33} width="50" height="50" opacity={own || afford ? 1 : .7}/>
-                  : <SvgIcon n="circle-help" x={cx - 16} y={cy - 25} s={32} color={COL.muted} op={.35}/>}
+                <image href={`assets/img/ui/3d/sk-${n.id}.webp`} x={cx - 25} y={cy - 33} width="50" height="50" opacity={own || afford ? 1 : vis ? .7 : .3}/>
+                {!vis ? <SvgIcon n="lock" x={cx - 8} y={cy + 13} s={16} color={COL.muted}/> : null}
                 <text x={cx} y={cy + 25} class="lab">{lab}</text>
                 {n.type === "active" ? <SvgIcon n="zap" x={cx + R - 24} y={cy - R + 9} s={13} color={own ? COL.gold : COL.muted}/> : null}
                 {vis && n.trade ? <SvgIcon n="scale" x={cx - R + 11} y={cy - R + 9} s={13} color={COL.warn}/> : null}
                 {vis && n.resp ? <SvgIcon n="shield" x={cx - R + 11} y={cy - R + 9} s={13} color={COL.sky}/> : null}
-                <foreignObject x={cx - 80} y={cy + R + 2} width="160" height="40"><div class="hexname" xmlns="http://www.w3.org/1999/xhtml">{vis ? L(n.name) : t("hiddenSkill")}</div></foreignObject>
+                <foreignObject x={cx - 80} y={cy + R + 2} width="160" height="40"><div class="hexname" xmlns="http://www.w3.org/1999/xhtml">{L(n.name)}</div></foreignObject>
               </g>;
             })}
           </svg>
@@ -106,8 +103,8 @@ function Detail({cat}){
   const n = P.SKILL[S.node] && P.SKILL[S.node].cat === cat ? P.SKILL[S.node] : P.SKILLS.find(q => q.cat === cat);
   const vis = visible(n), own = !!S.owned[n.id], c = P.nodeCost(n), st = P.nodeState(n);
   if (!vis){
-    const req = n.req.filter(q => !S.owned[q]).map(q => (visible(P.SKILL[q]) ? L(P.SKILL[q].name) : "???"));
-    return <div class="sk-detail"><div class="dtop"><span class="dicon hid"><Icon n="circle-help" size={36}/></span><h3>{t("hiddenSkill")}</h3></div><p class="muted">{t("hiddenHint")} {req.join(", ")}</p></div>;
+    const req = n.req.filter(q => !S.owned[q]).map(q => L(P.SKILL[q].name));
+    return <div class="sk-detail"><div class="dtop"><span class="dicon d3 hid"><img src={`assets/img/ui/3d/sk-${n.id}.webp`} alt="" width="56" height="56" draggable="false"/></span><div class="grow"><h3>{L(n.name)}</h3></div></div><p class="muted"><Icon n="lock" size={15}/> {t("hiddenHint")} {req.join(", ")}</p></div>;
   }
   const tags = [n.type === "active" ? "active" : "passive", n.trade && "trade", n.resp && "resp", n.target === "country" && "country"].filter(Boolean);
   const oc = P.oreCost(n), full = st === "ready" && P.atCapacity(n), can = st === "ready" && !full && P.canAfford(n);

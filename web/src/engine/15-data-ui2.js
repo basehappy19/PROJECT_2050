@@ -52,12 +52,12 @@ Object.assign(P.UI, {
   /* skills screen */
   skillsTitle:T("สกิล","Skills"), pausedHere:T("เกมหยุดชั่วคราวขณะเปิดหน้านี้","The game is paused while this screen is open"),
   buffInstant:T("ค้นพบใหม่: สกิลถัดไปเสร็จทันที","Breakthrough: next skill is instant"), buffDisc:T("ทุนวิจัย: สกิลถัดไปถูกลง 5%","Research sprint: next skill −5%"),
-  ready:T("พร้อม","Ready"), hiddenSkill:T("สกิลปริศนา","Unknown skill"), hiddenHint:T("ปลดล็อกสกิลก่อนหน้าเพื่อดูรายละเอียด:","Unlock the earlier skill to reveal it:"),
+  ready:T("พร้อม","Ready"), hiddenSkill:T("สกิลปริศนา","Unknown skill"), hiddenHint:T("ต้องปลดล็อกก่อน:","Unlock first:"),
   noRollouts:T("ยังไม่มีโครงการที่กำลังทยอยผล","No projects rolling out"), needReq:T("ต้องมีสกิลก่อนหน้าก่อน","Needs the earlier skill first"),
   useNow:T("ใช้ตอนนี้","Use now"), target:T("เป้าหมาย","Target"), rollingOut:T("กำลังทยอยผล","Rolling out"),
   unlock:T("ปลดล็อกสกิล","Unlock skill"), owned:T("มีแล้ว","Owned"), inProgress:T("โครงการที่ทยอยผล","Rolling out"),
   logTech:T("ปลดล็อกสกิล","Skill unlocked"),
-  skillTip:T("[[shield]] = รับมือภัย · [[scale]] = ได้อย่างเสียอย่าง · [[zap]] = สกิลกดใช้ · ซื้อถี่เกินไปจะเจอเงินเฟ้อสีเขียว","[[shield]] = disaster response · [[scale]] = trade-off · [[zap]] = active skill · buying too fast causes Greenflation"),
+  skillTip:T("[[shield]] รับมือภัย · [[scale]] ได้อย่างเสียอย่าง · [[zap]] กดใช้ได้","[[shield]] handles disasters · [[scale]] trade-off · [[zap]] can be used"),
   capFull:T("ทยอยผลพร้อมกันได้สูงสุด 3 โครงการ รอให้โครงการเดิมเสร็จก่อน","At most 3 roll-outs at once. Wait for one to finish."),
   /* end */
   winBodyS:T("การปล่อยคาร์บอนสุทธิแตะศูนย์ ขณะที่โลกยังร้อนไม่ถึง 1.6°C ป่าฟื้นตัว ทะเลกลับมาใส และเมืองทุกเมืองหายใจได้สะดวก","Net emissions hit zero with warming under 1.6°C. Forests recover, seas clear and every city breathes again."),

@@ -26,7 +26,7 @@ const spot = sels => ev(sels => {
   for (const s of sels){
     const el = document.querySelector(s); if (!el) continue;
     const r = el.getBoundingClientRect(), d = document.createElement("div"); d.className = "tut-spot";
-    Object.assign(d.style, {position:"fixed", left:r.left - 6 + "px", top:r.top - 6 + "px", width:r.width + 12 + "px", height:r.height + 12 + "px", borderRadius:"14px", border:"2.5px solid #f2c14e", boxShadow:"0 0 24px rgba(242,193,78,.55)", zIndex:99, pointerEvents:"none"});
+    Object.assign(d.style, {position:"fixed", left:r.left - 6 + "px", top:r.top - 6 + "px", width:r.width + 12 + "px", height:r.height + 12 + "px", borderRadius:"14px", border:"2.5px solid #f2c14e", zIndex:99, pointerEvents:"none"});
     document.body.appendChild(d);
   }
   if (sels.length){ const v = document.createElement("div"); v.className = "tut-spot"; Object.assign(v.style, {position:"fixed", inset:0, background:"rgba(2,6,9,.35)", zIndex:98, pointerEvents:"none"}); document.body.appendChild(v); }
@@ -34,7 +34,7 @@ const spot = sels => ev(sels => {
 const shot = async (name, sels = [], wait = 900) => { await page.waitForTimeout(wait); await spot(sels); await idle(); await idle(); await page.screenshot({path:path.join(OUT, name), type:"jpeg", quality:84}); await spot([]); console.log("tut", name); };
 
 await page.goto(`http://localhost:${srv.address().port}/index.html`);
-await ev(() => { localStorage.setItem("p2050-tut", "1"); });
+await ev(() => { localStorage.setItem("p2050-tut", "1"); localStorage.setItem("p2050-trained", "1"); });   // 2.0: skip the forced training
 await page.goto(`http://localhost:${srv.address().port}/index.html`);
 await page.waitForSelector(".loading .enter", {timeout:90000});
 await page.click(".loading .enter"); await page.waitForTimeout(2500);
@@ -42,6 +42,8 @@ await ev(() => { const P = window.P2050; P.Game.newGame(); });
 await page.waitForSelector(".charsel", {timeout:60000});
 await ev(() => { const P = window.P2050; P.Game.startGame("sci", "normal"); P.UIM.modal = null; });
 await page.waitForTimeout(1500);
+if (await ev(() => !!document.querySelector(".intro"))) await ev(() => document.querySelector(".intro .ifoot .btn").click());
+await page.waitForTimeout(800);
 await page.addStyleTag({content:".toast{display:none !important}"});
 // play a few years so the world has some history
 await ev(() => { const P = window.P2050, S = P.S; S.ep = 900; S.pc = 260; P.unlockOre(); Object.keys(S.mat).forEach(g => S.mat[g] = 120);

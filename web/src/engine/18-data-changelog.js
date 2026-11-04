@@ -21,6 +21,7 @@ P.CHANGELOG = [
     "พยากรณ์ภัยใหม่ขึ้นเป็นการ์ดด้านบน กดดูหรือสั่งอพยพได้ทันที · ลูกศรที่ขอบจอชี้ไปยังภัยที่มองไม่เห็น · ฟองแดงกะพริบเมื่อใกล้หมดเวลา",
     "ย่อหน้าต่างเหตุการณ์เพื่อดูแผนที่และทรัพยากรก่อนตัดสินใจได้",
     "แผนที่ล็อกให้เต็มจอเสมอ (ซูมออกจนหลุดโลกไม่ได้) และ UI จางลงตอนลากแผนที่",
+    "หน้าตาใหม่ดูง่ายขึ้น: แสงเรืองและกล่องน้อยลง ตัวอักษรใหญ่ขึ้น แถบด้านบนรวมเป็นแถบเดียว แผนที่บอกชื่อทวีปแทนตัวย่อ และสกิลที่ยังไกลอยู่เห็นชื่อและภาพแล้ว",
   ], [
     "Multiplayer: \"Joint Taskforce\", 2–4 players save one world together. Each runs their own ministries (Energy & Industry, Diplomacy, Disasters & Cities, People & Nature) and events are decided by a 15-second vote.",
     "Multiplayer: \"Regional Race\", 2–4 players each run their own world but share one temperature. First to Net Zero wins. Send aid, tax a bigger emitter's carbon, or sign a climate pact.",
@@ -36,6 +37,7 @@ P.CHANGELOG = [
     "New disaster forecasts pop up as a card at the top: look at it or evacuate straight away · arrows at the screen edge point to disasters you can't see · red bubbles blink when they're about to run out.",
     "Events can be minimised so you can check the map and your resources before choosing.",
     "The map always fills the screen (no zooming out into space), and the HUD fades while you drag the map.",
+    "A cleaner look: fewer glows and boxes, larger text, one top bar, continent names on the map instead of codes, and skills further ahead show their name and picture.",
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",
