@@ -9,6 +9,8 @@ desktop.ini
 # GDevelop temporary / backup files
 gdevelop/*.autosave
 gdevelop/.game.json
+# sounds copied in from ../assets/audio by make-project.mjs (GDevelop only exports files inside its own folder)
+gdevelop/assets/audio/
 
 # build tools (gdevelop/_source/build)
 gdevelop/_source/build/node_modules/

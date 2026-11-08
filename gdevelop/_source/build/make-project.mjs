@@ -1,4 +1,4 @@
-// Builds the GDevelop 5 project (gdevelop/game.json) for Project : 2050 from the JavaScript in ../src,
+// Builds the GDevelop 5 project (gdevelop/game.json) for Project Zero from the JavaScript in ../src,
 // and with --export also makes an HTML5 test build in build/export/ (the website is the separate web/ project).
 //   cd gdevelop/_source/build && npm install && node make-project.mjs [--export]
 import { gd, loadProject, saveProject, exportProject } from "gdcore-tools";
@@ -34,12 +34,27 @@ for (const f of ENDS) img(`endings/${f}`, `assets/endings/${f}`);
 const TUTS = fs.readdirSync(`${OUT}/assets/tutorial`).filter(f => /\.(jpg|png)$/.test(f)).sort();
 for (const f of TUTS) img(`tutorial/${f}`, `assets/tutorial/${f}`);
 for (const f of fs.readdirSync(`${OUT}/assets/fonts`).filter(f => f.endsWith(".ttf")).sort()) font(f.slice(0, -4), `assets/fonts/${f}`);
-/* sounds and music: the website's files (assets/audio at the top of the repo), so both versions sound the same and nothing is stored twice */
-const AUD = `${REPO}/assets/audio`;
-for (const f of fs.readdirSync(AUD).filter(f => f.endsWith(".mp3")).sort()) audio(f, `../assets/audio/${f}`, f.startsWith("music-"));
+/* copy a file only when it is new or changed (size / time), so a rebuild stays quick */
+function syncFile(from, to){
+  const a = fs.statSync(from), b = fs.existsSync(to) ? fs.statSync(to) : null;
+  if (b && b.size === a.size && b.mtimeMs >= a.mtimeMs) return;
+  fs.mkdirSync(path.dirname(to), {recursive:true}); fs.copyFileSync(from, to);
+}
+/* sounds and music: the website's files (assets/audio at the top of the repo), so both versions sound the same.
+   GDevelop only packs files inside the project folder when it exports (Android / iOS / desktop / web), so they are
+   copied into gdevelop/assets/audio on every build (that copy is not kept in git, see .gitignore). */
+const AUD = `${REPO}/assets/audio`, AUD_OUT = `${OUT}/assets/audio`;
+for (const f of fs.readdirSync(AUD).filter(f => f.endsWith(".mp3")).sort()){ syncFile(`${AUD}/${f}`, `${AUD_OUT}/${f}`); audio(f, `assets/audio/${f}`, f.startsWith("music-")); }
 /* 2.3: recorded narration (assets/audio/narr): not preloaded, the game streams each line when it is read */
 const NARR_DIR = `${AUD}/narr`;
-if (fs.existsSync(NARR_DIR)) for (const f of fs.readdirSync(NARR_DIR).filter(f => f.endsWith(".mp3")).sort()) resources.push({file:`../assets/audio/narr/${f}`, kind:"audio", metadata:"", name:`narr-${f}`, preloadAsMusic:false, preloadAsSound:false, preloadInCache:false, userAdded:true});
+if (fs.existsSync(NARR_DIR)) for (const f of fs.readdirSync(NARR_DIR).filter(f => f.endsWith(".mp3")).sort()){ syncFile(`${NARR_DIR}/${f}`, `${AUD_OUT}/narr/${f}`); resources.push({file:`assets/audio/narr/${f}`, kind:"audio", metadata:"", name:`narr-${f}`, preloadAsMusic:false, preloadAsSound:false, preloadInCache:false, userAdded:true}); }
+/* 3.x: the website's satellite map photos and the 3D Earth's pictures (copied in, small "-s" sizes) */
+const IMG = `${REPO}/assets/img`;
+const PHOTOS = ["map-day", "map-night", "map-paint"], GLOBE_TEX = ["globe-day", "globe-night", "globe-clouds", "globe-water"];
+for (const n of PHOTOS) syncFile(`${IMG}/${n}-s.jpg`, `${OUT}/assets/photo/${n}.jpg`);
+for (const n of GLOBE_TEX) syncFile(`${IMG}/${n}-s.jpg`, `${OUT}/assets/globe/${n}.jpg`);
+for (const n of PHOTOS) img(`photo/${n}.jpg`, `assets/photo/${n}.jpg`);
+for (const n of GLOBE_TEX) img(`globe/${n}.jpg`, `assets/globe/${n}.jpg`);
 
 /* ------------------------------------------------------------------ objects */
 const frame = (image, ox = 0, oy = 0) => ({hasCustomCollisionMask:false, image, points:[], originPoint:{name:"origine", x:ox, y:oy}, centerPoint:{automatic:true, name:"centre", x:0, y:0}, customCollisionMask:[]});
@@ -66,6 +81,8 @@ const globalObjects = [
   sprite("Portrait", PORTRAITS.map(f => anim(f.slice(0, -4), `portraits/${f}`))),
   sprite("EndArt", ENDS.map(f => anim(f.slice(0, -4), `endings/${f}`))),
   sprite("Logo", [anim("Logo", "ui/logo.png")]),
+  // 3.x: never placed; it only makes GDevelop load the map photos and the Earth's pictures, which the 3D map / globe use as textures
+  sprite("MapTex", [...PHOTOS.map(n => anim(n, `photo/${n}.jpg`)), ...GLOBE_TEX.map(n => anim(n, `globe/${n}.jpg`))]),
   // 3.x: makes GDevelop include its 3D engine (three.js); the map layer is 3D so the camera can tilt like the website
   {assetStoreId:"", name:"Anchor3D", type:"Scene3D::Cube3DObject", variables:[], effects:[], behaviors:[], content:{width:1, height:1, depth:1, enableTextureTransparency:false, facesOrientation:"Y", frontFaceResourceName:"", backFaceResourceName:"", backFaceUpThroughWhichAxisRotation:"X", leftFaceResourceName:"", rightFaceResourceName:"", topFaceResourceName:"", bottomFaceResourceName:"", frontFaceVisible:false, backFaceVisible:false, leftFaceVisible:false, rightFaceVisible:false, topFaceVisible:false, bottomFaceVisible:false, frontFaceResourceRepeat:false, backFaceResourceRepeat:false, leftFaceResourceRepeat:false, rightFaceResourceRepeat:false, topFaceResourceRepeat:false, bottomFaceResourceRepeat:false, materialType:"Basic", tint:"255;255;255", isCastingShadow:false, isReceivingShadow:false}},
 ];
@@ -147,6 +164,7 @@ const MODULES = [
   ["70-v20.js", "Screens · 2.0 ฉากเปิดเกม, เลือกช่องบันทึก, แถบปี, ▲▼ ของกลุ่มประชาชน"],
   ["68-train.js", "Screens · โหมดฝึกซ้อม (ทีละขั้น เหมือนเว็บ)"],
   ["67-windows.js", "Screens · 3.3 ตลาดทรัพยากร (แบบ A), ความนิยม (แบบ B), สรุปรายปี"],
+  ["73-earth.js", "Earth · ภาพถ่ายดาวเทียมใต้แผนที่ และลูกโลก 3D ในหน้าเมนู (เหมือนเว็บ)"],
 ];
 const srcOf = f => (f.startsWith("@engine/") ? `${ENGINE}/${f.slice(8)}` : `${SRC}/${f}`);
 const COUNTRYGEO = fs.readFileSync(`${SOURCE}/assetgen/countrygeo.json`, "utf8");
@@ -164,7 +182,7 @@ const tutSizes = {};
 }
 const mapMetaSmall = {meta:META.meta, grid:META.grid};
 const coreEvents = [
-  comment("PROJECT : 2050 — โค้ดหลักของเกม (JavaScript)\nบล็อกด้านล่างทำงานครั้งเดียวตอนเริ่มฉาก Loading แล้วสร้าง window.P2050 ไว้ใช้ทั้งเกม\n• Data = ข้อความ TH/EN, ภูมิภาค, ผังเทคโนโลยี, เหตุการณ์ 152 เรื่อง, ข่าว, คู่มือ, ความสำเร็จ (แก้ตัวเลข/ข้อความได้ที่นี่)\n• Engine = กติกาการจำลองรายเดือน (เหมือนเวอร์ชันเว็บทุกอย่าง)\n• UI/Screens = วาดหน้าจอด้วยออบเจกต์ UIPainter, UIText, UIIcon, TutImage\nส่วนจังหวะเวลา การคลิก คีย์บอร์ด ดนตรี และการเปลี่ยนฉาก อยู่ใน Events ของแต่ละฉาก"),
+  comment("PROJECT ZERO — โค้ดหลักของเกม (JavaScript)\nบล็อกด้านล่างทำงานครั้งเดียวตอนเริ่มฉาก Loading แล้วสร้าง window.P2050 ไว้ใช้ทั้งเกม\n• Data = ข้อความ TH/EN, ภูมิภาค, ผังเทคโนโลยี, เหตุการณ์ 152 เรื่อง, ข่าว, คู่มือ, ความสำเร็จ (แก้ตัวเลข/ข้อความได้ที่นี่)\n• Engine = กติกาการจำลองรายเดือน (เหมือนเวอร์ชันเว็บทุกอย่าง)\n• UI/Screens = วาดหน้าจอด้วยออบเจกต์ UIPainter, UIText, UIIcon, TutImage\nส่วนจังหวะเวลา การคลิก คีย์บอร์ด ดนตรี และการเปลี่ยนฉาก อยู่ใน Events ของแต่ละฉาก"),
   std([atStart], [], MODULES.map(([f, title]) => {
     let code = fs.readFileSync(srcOf(f), "utf8");
     code = code.replace("/*MAPMETA*/null", JSON.stringify(mapMetaSmall)).replace("/*TUTSIZES*/{}", JSON.stringify(tutSizes)).replace("/*COUNTRYGEO*/null", COUNTRYGEO).replace("/*HEXCELLS*/null", HEXCELLS).replace("/*NARRFILES*/{}", NARRFILES);
@@ -189,7 +207,7 @@ const goEvents = names => names.map(n => std([strVar("GoTo", "=", `"${n}"`)], [A
 const plumePulse = forEach("Plume", [], [A("ChangeScale", ["Plume", "=", "Plume.Variable(Base) * (1 + 0.18 * sin(TimeFromStart() * 2.4 + Plume.Variable(Phase)))"])]);
 
 const loadingScene = scene("Loading", ["Backdrop", "", "Loader", "Toast"], [], [backdrop()], [
-  comment("ฉากโหลด: แสดงการ์ด PROJECT : 2050 ระหว่างโหลดภาพและเสียงของฉากอื่นเบื้องหลัง\nแล้วรอให้ผู้เล่นแตะหนึ่งครั้ง (เบราว์เซอร์อนุญาตให้เล่นเสียงหลังผู้เล่นแตะหน้าจอเท่านั้น)"),
+  comment("ฉากโหลด: แสดงการ์ด PROJECT ZERO ระหว่างโหลดภาพและเสียงของฉากอื่นเบื้องหลัง\nแล้วรอให้ผู้เล่นแตะหนึ่งครั้ง (เบราว์เซอร์อนุญาตให้เล่นเสียงหลังผู้เล่นแตะหน้าจอเท่านั้น)"),
   link("Core"),
   std([atStart], [], [js("window.P2050.Screens.setup(runtimeScene, \"loading\");")]),
   frameJs,
@@ -239,7 +257,7 @@ const project = {
   properties:{
     adaptGameResolutionAtRuntime:false, antialiasingMode:"MSAA", antialisingEnabledOnMobile:true, folderProject:false, orientation:"landscape",
     packageName:"com.project2050.climategame", pixelsRounding:false, projectUuid:"",   /* empty: no GDevelop analytics calls from the game */ scaleMode:"linear", sizeOnStartupMode:"", templateSlug:"", version:"2.0.0",
-    name:"Project : 2050", description:"เกมวางแผนกลยุทธ์ นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 (SDG 13) — Garena Academy Game Maker",
+    name:"Project Zero", description:"เกมวางแผนกลยุทธ์ นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 (SDG 13) — Garena Academy Game Maker",
     author:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์",
     windowWidth:1920, windowHeight:1080, latestCompilationDirectory:"", maxFPS:60, minFPS:20, verticalSync:false, platformSpecificAssets:{},
     loadingScreen:{backgroundColor:0x050b10, backgroundFadeInDuration:0.2, backgroundImageResourceName:"", gdevelopLogoStyle:"light", logoAndProgressFadeInDuration:0.2, logoAndProgressLogoFadeInDelay:0, minDuration:1, progressBarColor:0x8fd0ff, progressBarHeight:12, progressBarMaxWidth:300, progressBarMinWidth:40, progressBarWidthPercent:30, showGDevelopSplash:true, showProgressBar:true},

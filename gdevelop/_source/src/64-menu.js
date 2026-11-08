@@ -35,7 +35,7 @@ Screens.renderLoader = function(l){
   const w = 440, x = (k.W - w) / 2, y = 210, p = this._ldShown || 0;
   k.sprite(l, "Logo", "Logo", (k.W - 150) / 2, y - 120, 150, 150);
   k.text(l, "GLOBAL CLIMATE TASKFORCE · 2026 – 2050", x, y + 40, {font:"mono", size:11, color:"accent", w, align:"center"});
-  const parts = [["PROJECT ", {font:"logo", size:52}], [":", {font:"logo", size:52, color:"accent"}], [" 2050", {font:"logo", size:52}]];
+  const parts = [["PROJECT ", {font:"logo", size:52}], ["ZERO", {font:"logo", size:52, color:"accent"}]];
   W.runs(l, x + (w - W.runsW(parts)) / 2, y + 62, parts);
   const by = y + 148;
   k.rect(l, x, by, w, 10, "panel2", {r:5});
@@ -97,7 +97,7 @@ const go = sub => () => { UIM.sub = sub; UIM.msg = ""; UIM.err = false; const s 
 Screens.menuCard = function(l, w){
   const sub = UIM.sub; let y = 0;
   k.text(l, "GLOBAL CLIMATE TASKFORCE · 2026 – 2050", 0, y, {font:"mono", size:11.5, color:"accent"}); y += 22;
-  W.runs(l, 0, y, [["PROJECT ", {font:"logo", size:46, lh:1}], [":", {font:"logo", size:46, color:"accent", lh:1}], [" 2050", {font:"logo", size:46, lh:1}]]); y += 46 + 12;
+  W.runs(l, 0, y, [["PROJECT ", {font:"logo", size:46, lh:1}], ["ZERO", {font:"logo", size:46, color:"accent", lh:1}]]); y += 46 + 12;
   const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason", settings:"mSettingsS"};
   const tag2 = sub ? t(TITLES[sub]) : t("mDesc");
   y += k.text(l, tag2, 0, y, {size:sub ? 17 : 14, font:sub ? "dispS" : "body", color:sub ? "fg" : "muted", w:Math.min(w, 400)}).h + 14;
