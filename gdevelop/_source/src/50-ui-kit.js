@@ -10,7 +10,8 @@ if (P.mods && P.mods.kit) return;
    Layout is written in "design units" (1280×720). The game runs at 1920×1080, so K = 1.5.
    Each UI layer redraws only when marked dirty.
    ========================================================================= */
-const K = 1.5, W = 1280, Hh = 720;
+let K = 1.5;   // game px per design unit: 1.5 normally, more with the "large text" setting (Kit.fit)
+const W = 1280, Hh = 720;
 /* clean flat palette: one main colour (sea teal), one warning colour (orange-red), the rest greys */
 const COL = {
   bg:"#061015", glass:"#0b181e", panel:"#0e1d24", panel2:"#15272f", line:"#24414b", fg:"#e6f0ee", muted:"#8fa9a6",
@@ -112,7 +113,7 @@ function layout(str, fk, size, maxW){
 class Layer {
   constructor(name){ this.name = name; this.pools = {}; this.idx = {}; this.hits = []; this.dirty = true; this.clip = null; this.scroll = 0; this.content = 0; this.render = null; this.enabled = true; this.blocks = false; this.alpha = 1; this.ox = 0; this.oy = 0; this.baseX = 0; this.baseY = 0; this.master = null; }
   /* shift everything drawn on this layer (used for scrolling panels): moves the layer camera */
-  setOffset(x, y){ if (x === this.ox && y === this.oy) return; this.ox = x; this.oy = y; const l = this.scene.getLayer(this.name); l.setCameraX(960 - x * K); l.setCameraY(540 - y * K); }
+  setOffset(x, y){ if (x === this.ox && y === this.oy) return; this.ox = x; this.oy = y; const l = this.scene.getLayer(this.name); l.setCameraX(Kit.GW / 2 - x * K); l.setCameraY(540 - y * K); }
   /* content origin + clip rectangle (screen design units) for a scrolling panel */
   frame(x, y, clip, content){ this.baseX = x; this.baseY = y; this.clip = clip; this.content = content; const max = Math.max(0, content - clip.h); if (this.scroll > max) this.scroll = max; this.setOffset(x, y - this.scroll); }
   attach(scene){
@@ -150,7 +151,7 @@ class Layer {
   setAlpha(a){ if (this.alpha === a) return; this.alpha = a; const l = this.scene.getLayer(this.name); l.getRenderer().getRendererObject().alpha = a; }
 }
 const Kit = {
-  K, W, H:Hh, COL, FONT, ICON_COL, hexNum, rgbStr, mix, layout, measure,
+  K, W, GW:W * K, H:Hh, COL, FONT, ICON_COL, hexNum, rgbStr, mix, layout, measure,
   layers:{}, order:[], scene:null, mouse:{x:0, y:0, down:false, sx:0, sy:0, moved:0, onUI:false}, hover:null, hoverLayer:null, pressHit:null,
   /* call once per scene with the layer names, bottom → top */
   setup(scene, names){
@@ -348,7 +349,36 @@ const Kit = {
     return null;
   },
   /* per-frame: pointer, hover, wheel, drag-scroll, redraw dirty layers */
+  /* wide phones (20:9 …): the game grows wider instead of showing black bars; the height stays 720 design units.
+     Narrower screens keep 16:9 (letterboxed). W = design width, GW = game pixels. */
+  /* text size (settings, like the website's A11y): n · l · xl. The whole interface grows, so the design height shrinks;
+     it never gets narrower than 1200 design units, so on 16:9 screens the increase is limited */
+  uiScale:(() => { try { return {n:1, l:1.15, xl:1.3}[localStorage.getItem("p2050-gd-fs") || "n"] || 1; } catch(e){ return 1; } })(),
+  setTextSize(id){ try { localStorage.setItem("p2050-gd-fs", id); } catch(e){} this.uiScale = {n:1, l:1.15, xl:1.3}[id] || 1; this._fitKey = null; },
+  fit(game){
+    const vw = window.innerWidth || 1280, vh = window.innerHeight || 720, a = vw / Math.max(1, vh);
+    const gw = Math.round(Math.max(1920, Math.min(1080 * a, 1080 * 2.4)) / 2) * 2;
+    const k2 = Math.max(1.5, Math.min(1.5 * this.uiScale, gw / 1200)), key = gw + "|" + k2;
+    if (key === this._fitKey) return false;
+    this._fitKey = key;
+    const kChanged = k2 !== K;
+    K = k2; this.K = K; this.H = 1080 / K;
+    this.GW = gw; this.W = gw / K;
+    if (kChanged){   // everything measured in game px is stale: forget it
+      layoutCache.clear(); wCache.clear();
+      for (const n in this.layers){ const l = this.layers[n]; l.maskKey = null; for (const type in l.pools) for (const o of l.pools[type]) o.c = {hidden:o.c.hidden}; }
+    }
+    if (game.getGameResolutionWidth() !== gw) game.setGameResolutionSize(gw, 1080);
+    for (const n in this.layers){ const l = this.layers[n]; const ox = l.ox, oy = l.oy; l.ox = NaN; l.setOffset(ox, oy); }
+    if (P.Map && P.Map.onResize) P.Map.onResize(gw);
+    this.stretch(); this.dirty();
+    return true;
+  },
+  /* full-screen pictures follow the game width */
+  stretch(){ const sc = this.scene; if (!sc) return; for (const o of sc.getObjects("Backdrop") || []){ o.setX(0); o.setWidth(this.GW); } },
   update(scene){
+    if (!this._fitScene || this._fitScene !== scene){ this._fitScene = scene; this.stretch(); if (P.Map && P.Map.onResize) P.Map.onResize(this.GW); }
+    this.fit(scene.getGame());
     const im = scene.getGame().getInputManager();
     const mx = im.getCursorX() / K, my = im.getCursorY() / K, down = im.isMouseButtonPressed(0);
     const m = this.mouse;

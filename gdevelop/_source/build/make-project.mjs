@@ -34,7 +34,12 @@ for (const f of ENDS) img(`endings/${f}`, `assets/endings/${f}`);
 const TUTS = fs.readdirSync(`${OUT}/assets/tutorial`).filter(f => /\.(jpg|png)$/.test(f)).sort();
 for (const f of TUTS) img(`tutorial/${f}`, `assets/tutorial/${f}`);
 for (const f of fs.readdirSync(`${OUT}/assets/fonts`).filter(f => f.endsWith(".ttf")).sort()) font(f.slice(0, -4), `assets/fonts/${f}`);
-for (const f of fs.readdirSync(`${OUT}/assets/audio`).filter(f => f.endsWith(".mp3")).sort()) audio(f, `assets/audio/${f}`, f.startsWith("music-"));
+/* sounds and music: the website's files (assets/audio at the top of the repo), so both versions sound the same and nothing is stored twice */
+const AUD = `${REPO}/assets/audio`;
+for (const f of fs.readdirSync(AUD).filter(f => f.endsWith(".mp3")).sort()) audio(f, `../assets/audio/${f}`, f.startsWith("music-"));
+/* 2.3: recorded narration (assets/audio/narr): not preloaded, the game streams each line when it is read */
+const NARR_DIR = `${AUD}/narr`;
+if (fs.existsSync(NARR_DIR)) for (const f of fs.readdirSync(NARR_DIR).filter(f => f.endsWith(".mp3")).sort()) resources.push({file:`../assets/audio/narr/${f}`, kind:"audio", metadata:"", name:`narr-${f}`, preloadAsMusic:false, preloadAsSound:false, preloadInCache:false, userAdded:true});
 
 /* ------------------------------------------------------------------ objects */
 const frame = (image, ox = 0, oy = 0) => ({hasCustomCollisionMask:false, image, points:[], originPoint:{name:"origine", x:ox, y:oy}, centerPoint:{automatic:true, name:"centre", x:0, y:0}, customCollisionMask:[]});
@@ -136,10 +141,18 @@ const MODULES = [
   ["64-menu.js", "Screens · หน้าโหลด, เมนูหลัก, บัญชี, ร้านค้า, อันดับ, เกียรติบัตร, แจ้งเตือน"],
   ["65-skills.js", "Screens · หน้าสกิล (เต็มจอ)"],
   ["66-learn.js", "Screens · หน้าเรียนรู้"],
+  ["69-alerts.js", "Screens · 2.0 รายการความเสียหาย, การ์ดเตือนภัย, เหตุการณ์ที่ย่อไว้"],
+  ["71-place.js", "Screens · วางสิ่งก่อสร้างเอง (โลกต่อเนื่อง), ลูกศรขอบจอ, ป้ายชื่อประเทศเมื่อชี้"],
+  ["72-a11y.js", "Screens · ตัวอักษรใหญ่, สีสำหรับคนตาบอดสี, เสียงพากย์และคำบรรยาย"],
+  ["70-v20.js", "Screens · 2.0 ฉากเปิดเกม, เลือกช่องบันทึก, แถบปี, ▲▼ ของกลุ่มประชาชน"],
+  ["68-train.js", "Screens · โหมดฝึกซ้อม (ทีละขั้น เหมือนเว็บ)"],
   ["67-windows.js", "Screens · 3.3 ตลาดทรัพยากร (แบบ A), ความนิยม (แบบ B), สรุปรายปี"],
 ];
 const srcOf = f => (f.startsWith("@engine/") ? `${ENGINE}/${f.slice(8)}` : `${SRC}/${f}`);
 const COUNTRYGEO = fs.readFileSync(`${SOURCE}/assetgen/countrygeo.json`, "utf8");
+/* 2.3: the list of recorded narration lines, shared with the website (web/src/narr-files.js) */
+const NARRFILES = (() => { try { const m = fs.readFileSync(`${REPO}/web/src/narr-files.js`, "utf8").match(/NARR_FILES\s*=\s*(\{[\s\S]*?\});/); return m ? JSON.stringify(JSON.parse(m[1])) : "{}"; } catch(e){ return "{}"; } })();
+const HEXCELLS = fs.existsSync(`${SOURCE}/assetgen/hexcells.json`) ? fs.readFileSync(`${SOURCE}/assetgen/hexcells.json`, "utf8") : "[]";
 const tutSizes = {};
 { // read jpeg/png sizes
   for (const f of TUTS){
@@ -154,7 +167,7 @@ const coreEvents = [
   comment("PROJECT : 2050 — โค้ดหลักของเกม (JavaScript)\nบล็อกด้านล่างทำงานครั้งเดียวตอนเริ่มฉาก Loading แล้วสร้าง window.P2050 ไว้ใช้ทั้งเกม\n• Data = ข้อความ TH/EN, ภูมิภาค, ผังเทคโนโลยี, เหตุการณ์ 152 เรื่อง, ข่าว, คู่มือ, ความสำเร็จ (แก้ตัวเลข/ข้อความได้ที่นี่)\n• Engine = กติกาการจำลองรายเดือน (เหมือนเวอร์ชันเว็บทุกอย่าง)\n• UI/Screens = วาดหน้าจอด้วยออบเจกต์ UIPainter, UIText, UIIcon, TutImage\nส่วนจังหวะเวลา การคลิก คีย์บอร์ด ดนตรี และการเปลี่ยนฉาก อยู่ใน Events ของแต่ละฉาก"),
   std([atStart], [], MODULES.map(([f, title]) => {
     let code = fs.readFileSync(srcOf(f), "utf8");
-    code = code.replace("/*MAPMETA*/null", JSON.stringify(mapMetaSmall)).replace("/*TUTSIZES*/{}", JSON.stringify(tutSizes)).replace("/*COUNTRYGEO*/null", COUNTRYGEO);
+    code = code.replace("/*MAPMETA*/null", JSON.stringify(mapMetaSmall)).replace("/*TUTSIZES*/{}", JSON.stringify(tutSizes)).replace("/*COUNTRYGEO*/null", COUNTRYGEO).replace("/*HEXCELLS*/null", HEXCELLS).replace("/*NARRFILES*/{}", NARRFILES);
     return js(`/* ${title} */\n` + code);
   })),
 ];
@@ -184,7 +197,7 @@ const loadingScene = scene("Loading", ["Backdrop", "", "Loader", "Toast"], [], [
   ...goEvents(["Menu"]),
 ], commonVars);
 
-const menuScene = scene("Menu", ["Backdrop", "", "MapUI", "Menu", "MenuScroll", "Modal", "ModalScroll", "Toast"], [...mapObjects(), sprite("MenuShade", [anim("MenuShade", "ui/menu-shade.png")])], [backdrop(), ...mapInstances(), inst("MenuShade", "Menu", 0, 0, {w:900, h:1080, z:-10})], [
+const menuScene = scene("Menu", ["Backdrop", "", "MapUI", "Menu", "MenuScroll", "Modal", "ModalScroll", "Toast", "Train"], [...mapObjects(), sprite("MenuShade", [anim("MenuShade", "ui/menu-shade.png")])], [backdrop(), ...mapInstances(), inst("MenuShade", "Menu", 0, 0, {w:900, h:1080, z:-10})], [
   comment("เมนูหลัก: เกมใหม่ · เล่นต่อ · โหลดเกม (ช่องบันทึก + รหัสเซฟ) · ความสำเร็จ · วิธีเล่น — แผนที่โลกลอยอยู่ด้านหลัง"),
   std([atStart], [], [js("if (!window.P2050 || !window.P2050.ready) { runtimeScene.getVariables().get(\"GoTo\").setString(\"Loading\"); return; }\nwindow.P2050.Screens.setup(runtimeScene, \"menu\");")]),
   frameJs,
@@ -192,13 +205,11 @@ const menuScene = scene("Menu", ["Backdrop", "", "MapUI", "Menu", "MenuScroll", 
     std([released], [], [releaseJs]),
   ]),
   group("แอนิเมชันบนแผนที่", [plumePulse]),
-  group("ดนตรีประกอบ", [
-    std([numVar("MusicOn", "=", 1), C("MusicStopped", ["", "1"]), once], [A("PlayMusicOnChannel", ["", "music-menu.mp3", "1", "yes", "MusicVol", "1"])]),
-  ]),
+  comment("ดนตรีประกอบ: เลือกเพลงตามอารมณ์ของเกมในโค้ด Audio (51-audio.js) เหมือนเว็บ"),
   group("เปลี่ยนฉาก", goEvents(["Game", "Loading"])),
 ], commonVars);
 
-const gameScene = scene("Game", ["Backdrop", "", "MapUI", "HUD", "Drawer", "DrawerScroll", "Modal", "ModalScroll", "Toast"], mapObjects(), [backdrop(), ...mapInstances()], [
+const gameScene = scene("Game", ["Backdrop", "", "MapUI", "HUD", "Drawer", "DrawerScroll", "Alerts", "Modal", "ModalScroll", "Toast", "Train"], mapObjects(), [backdrop(), ...mapInstances()], [
   comment("ฉากเล่นเกม: 1 tick = 1 เดือนในเกม (ความเร็ว 1× = 4 วินาที, 2× = 2 วินาที, 3× = 1.33 วินาที) รวม 300 เดือน ม.ค. 2026 → ธ.ค. 2050\nตัวแปรฉาก Running = 1 เมื่อเวลาควรเดิน (ไม่ได้หยุด และไม่มีหน้าต่างตัดสินใจเปิดอยู่)"),
   std([atStart], [A("ResetTimer", ["", "\"tick\""])], [js("if (!window.P2050 || !window.P2050.ready) { runtimeScene.getVariables().get(\"GoTo\").setString(\"Loading\"); return; }\nwindow.P2050.Screens.setup(runtimeScene, \"game\");")]),
   frameJs,
@@ -217,12 +228,7 @@ const gameScene = scene("Game", ["Backdrop", "", "MapUI", "HUD", "Drawer", "Draw
     plumePulse,
     forEach("Bubble", [], [A("MettreY", ["Bubble", "=", "Bubble.Variable(BaseY) + sin(TimeFromStart() * 4.5 + Bubble.Variable(Phase)) * 5"])]),
   ]),
-  group("ดนตรีประกอบ (สลับ 2 เพลง)", [
-    std([numVar("MusicOn", "=", 1), C("MusicStopped", ["", "1"]), once], [setNum("Track", "=", "1 - Track")], [
-      std([numVar("Track", "=", 1)], [A("PlayMusicOnChannel", ["", "music-game1.mp3", "1", "no", "MusicVol", "1"])]),
-      std([numVar("Track", "=", 0)], [A("PlayMusicOnChannel", ["", "music-game2.mp3", "1", "no", "MusicVol", "1"])]),
-    ]),
-  ]),
+  comment("ดนตรีประกอบ: เพลงสงบ / ตึงเครียด / วิกฤต / ชนะ / แพ้ เปลี่ยนตามสถานการณ์ (โค้ด Audio ใน 51-audio.js) เหมือนเว็บ"),
   group("เปลี่ยนฉาก", goEvents(["Menu", "Loading"])),
 ], [...commonVars, ["Running", "number", 0], ["TickSeconds", "number", 4], ["Track", "number", 0]]);
 
@@ -232,12 +238,12 @@ const project = {
   gdVersion:{build:269, major:5, minor:6, revision:0},
   properties:{
     adaptGameResolutionAtRuntime:false, antialiasingMode:"MSAA", antialisingEnabledOnMobile:true, folderProject:false, orientation:"landscape",
-    packageName:"com.project2050.climategame", pixelsRounding:false, projectUuid:uuid(), scaleMode:"linear", sizeOnStartupMode:"", templateSlug:"", version:"2.0.0",
+    packageName:"com.project2050.climategame", pixelsRounding:false, projectUuid:"",   /* empty: no GDevelop analytics calls from the game */ scaleMode:"linear", sizeOnStartupMode:"", templateSlug:"", version:"2.0.0",
     name:"Project : 2050", description:"เกมวางแผนกลยุทธ์ นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 (SDG 13) — Garena Academy Game Maker",
     author:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์",
     windowWidth:1920, windowHeight:1080, latestCompilationDirectory:"", maxFPS:60, minFPS:20, verticalSync:false, platformSpecificAssets:{},
     loadingScreen:{backgroundColor:0x050b10, backgroundFadeInDuration:0.2, backgroundImageResourceName:"", gdevelopLogoStyle:"light", logoAndProgressFadeInDuration:0.2, logoAndProgressLogoFadeInDelay:0, minDuration:1, progressBarColor:0x8fd0ff, progressBarHeight:12, progressBarMaxWidth:300, progressBarMinWidth:40, progressBarWidthPercent:30, showGDevelopSplash:true, showProgressBar:true},
-    watermark:{placement:"bottom-left", showWatermark:true},
+    watermark:{placement:"bottom-left", showWatermark:false},
     authorIds:[], authorUsernames:[], categories:["strategy", "simulation", "educational"], playableDevices:["keyboard", "mobile"], extensionProperties:[],
     platforms:[{name:"GDevelop JS platform"}], currentPlatform:"GDevelop JS platform",
   },

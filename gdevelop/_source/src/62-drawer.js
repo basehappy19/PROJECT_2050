@@ -13,7 +13,7 @@ const k = Kit;
 
 Screens.renderDrawer = function(l){
   if (this.kind !== "game" || !S.tab){ k.clearSlave("DrawerScroll"); return; }
-  const dw = this.drawerWidth(), x = 1264 - dw, y = 64, h = 660 - y;   // 3.3: the bottom row is one slim line
+  const dw = this.drawerWidth(), x = (k.W - 16) - dw, y = 64, h = k.H - 60 - y;   // 3.3: the bottom row is one slim line
   W.panel(l, x, y, dw, h, 10, "panel");
   const titles = {region:S.selC ? "dCountry" : "dRegion", stats:"dStats", news:"dNews"};
   const title = t(titles[S.tab]);
@@ -72,7 +72,9 @@ Screens.orderCards = function(l, y, cw, scope){
     const tw = cw - 22 - btnW - 10;
     const h1 = k.text(l, L(a.name), 11, y + 9, {font:"bodyB", size:13.5, w:tw}).h;
     const h2 = k.text(l, cc ? L(UI["cact_" + a.id]) : L(a.desc), 11, y + 9 + h1, {size:11.5, color:"muted", w:tw, max:1}).h;   // 3.3: one line each
-    const ch = Math.max(8 + h1 + h2 + 8, 50);
+    const tilt = P.tiltOfAction ? P.tiltOfAction(a.id) : null, h3 = tilt && tilt.length ? 18 : 0;
+    if (h3) W.groupTilt(l, 11, y + 9 + h1 + h2 + 2, tilt);
+    const ch = Math.max(8 + h1 + h2 + h3 + 8, 50);
     W.card(l, 0, y, cw, ch);
     W.btn(l, "act-" + a.id, cw - 11 - btnW, y + (ch - 36) / 2, label, () => P.doAction(a.id, scope), {disabled:!ok, kind:ok ? "primary" : "ghost", w:btnW, sound:false});
     y += ch + 7;
@@ -142,7 +144,8 @@ Screens.paneCountry = function(l, cw){
   }
   y = Math.max(y, c.rest ? y : 46);
   const share = c.co2 / (r.co2 || 1);
-  y += k.text(l, `[[$co2]] ${c.co2.toFixed(2)} Gt · ${Math.round(share * 100)}% ${th3() ? "ของทวีป" : "of the continent"}${meta ? ` · [[$risk]] ${t("risk")} ${meta.risk}%` : ""}`, 0, y, {font:"mono", size:12, w:cw - ringW, color:"fg"}).h + 8;
+  y += k.text(l, `[[$co2]] ${c.co2.toFixed(2)} Gt · ${Math.round(share * 100)}% ${th3() ? "ของทวีป" : "of the continent"}${meta ? ` · [[$risk]] ${t("risk")} ${meta.risk}% · ${t("adapt")} ${Math.round(c.adapt)} · [[leaf]] ${Math.round(c.green || 0)}%` : ""}`, 0, y, {font:"mono", size:12, w:cw - ringW, color:"fg"}).h + 8;
+  if (this.countryWarn) y += this.countryWarn(l, y, cw, c);
   if (!c.rest && c.rel < 40){   // the next goal: friendship 40 opens a bilateral agreement
     const gh = 30; k.rect(l, 0, y, cw, gh, "accent", {r:9, a:.08, stroke:"accent", sa:.4});
     k.text(l, `[[target]] ${th3() ? `เป้าหมายถัดไป: มิตรภาพ 40 เพื่อปลดล็อก${t("bilatTitle")}` : `Next goal: friendship 40 unlocks ${t("bilatTitle")}`}`, 10, y + 6, {size:12, color:"accent", iconColor:"accent", w:cw - 20, max:1});
@@ -197,38 +200,173 @@ Screens.paneCountry = function(l, cw){
   }
   y += 6;
   W.h3(l, c.rest ? (th3() ? `คำสั่งเฉพาะทวีป ${L(RMETA[c.reg].name)}` : `Orders for ${L(RMETA[c.reg].name)}`) : (th3() ? `คำสั่งเฉพาะประเทศ ${P.cname(c.id)}` : `Orders for ${P.cname(c.id)} only`), 0, y, {w:cw}); y += 22;
-  return this.orderCards(l, y, cw, c.rest ? "region" : "country");
+  y = this.orderCards(l, y, cw, c.rest ? "region" : "country");
+  return this.countryExtras ? y + this.countryExtras(l, y, cw, c) : y;
 };
 
 /* ---------------- Stats ---------------- */
 Screens.paneStats = function(l, cw){
   let y = 0;
-  W.h3(l, t("chartCo2"), 0, y, {w:cw, size:11.5}); y += 20;
-  this.lineChart(l, 0, y, cw, 150, S.hist.map(h => h.net), {min:-5, max:45, ticks:[0,10,20,30,40], color:"hot", refs:[{v:0, c:"good"}]}); y += 150 + 14;
-  W.h3(l, t("chartTemp"), 0, y, {w:cw, size:11.5}); y += 20;
-  this.lineChart(l, 0, y, cw, 150, S.hist.map(h => h.temp), {min:1.0, max:3.0, ticks:[1.0,1.5,2.0,2.5,3.0], color:"accent", refs:[{v:1.5, c:"warn"}, {v:2.0, c:"bad"}]}); y += 150 + 14;
-  W.h3(l, t("shares"), 0, y, {w:cw, size:11.5}); y += 22;
-  const g = P.grossCO2() || 1;
-  for (const r of S.regions){
-    k.text(l, r.id, 0, y, {font:"mono", size:12});
-    W.meter(l, 56, y + 6, cw - 56 - 64, 8, r.co2 / g, "hot");
-    k.text(l, r.co2.toFixed(2), cw - 56, y, {font:"mono", size:12, w:56, align:"right"});
-    y += 24;
+  const th = S.lang === "th", g = P.grossCO2() || 1;
+  if (S.report && !S.report.read) y += this.reportCard(l, 0, y, cw) + 12;
+  // 1.6: four short tabs instead of one long page
+  const tab = S.stTab || "sum";
+  const TABS = [["sum", "chart-line", th ? "ภาพรวม" : "Overview"], ["money", "wallet", th ? "การเงิน" : "Money"], ["people", "users", th ? "ประชาชน" : "People"], ["world", "globe", th ? "โลก" : "World"]];
+  y += chipRow(l, 0, y, cw, TABS.map(([id, ic, name]) => ({id:"st-" + id, label:`[[${ic}]] ${name}`, on:tab === id, fn:() => { S.stTab = id; P.changed(); }}))) + 12;
+  if (tab === "sum"){
+    y += this.impactBox(l, cw, y);
+    W.h3(l, t("chartCo2"), 0, y, {w:cw, size:11.5}); y += 18;
+    k.line(l, 0, y + 8, 18, y + 8, "hot", {w:2}); k.text(l, th ? "โลกของคุณ" : "Your world", 22, y, {size:11, color:"muted"});
+    const lx = 30 + k.textW(th ? "โลกของคุณ" : "Your world", {size:11});
+    k.line(l, lx, y + 8, lx + 18, y + 8, "muted", {dash:3}); k.text(l, th ? "ถ้าไม่ทำอะไรเลย" : "If nothing was done", lx + 22, y, {size:11, color:"muted"}); y += 20;
+    this.lineChart(l, 0, y, cw, 150, S.hist.map(h => h.net), {min:-5, max:60, ticks:[0, 15, 30, 45, 60], color:"hot", refs:[{v:0, c:"good"}], data2:S.bau ? S.bau.hist : null}); y += 150 + 14;
+    W.h3(l, t("chartTemp"), 0, y, {w:cw, size:11.5}); y += 20;
+    this.lineChart(l, 0, y, cw, 150, S.hist.map(h => h.temp), {min:1.0, max:3.0, ticks:[1.0, 1.5, 2.0, 2.5, 3.0], color:"accent", refs:[{v:1.5, c:"warn"}, {v:2.0, c:"bad"}]}); y += 150 + 10;
+    k.rect(l, 0, y, cw, 12, "panel2", {r:3});
+    const sw = cw / (Math.max(P.TOTAL_TICKS, S.hist.length - 1) + 1);
+    S.hist.forEach((h, i) => k.rect(l, i * sw, y, sw + 0.4, 12, tempColor(h.temp)));
+    y += 20;
+    k.text(l, `[[timer]] ${P.fmtTime(S.realSec)}`, 0, y, {font:"mono", size:12, color:"muted", iconColor:"muted"}); y += 22;
+  } else if (tab === "money"){
+    y += this.moneyBox(l, cw, y);
+  } else if (tab === "people"){
+    if (S.groups){
+      const ST = {back:["good", th ? "สนับสนุน" : "Backing you"], ok:["fg", th ? "เฉยๆ" : "Neutral"], low:["warn", th ? "เริ่มไม่พอใจ" : "Unhappy"], angry:["bad", th ? "ไม่พอใจมาก" : "Very angry"]};
+      for (const G of P.GROUPS){
+        const v = S.groups[G.id], st = P.groupState(G.id), [c, lab] = ST[st], rh = 52;
+        W.card(l, 0, y, cw, rh, {r:10, stroke:st === "angry" ? "bad" : st === "back" ? "good" : "line"});
+        k.icon(l, G.icon, 12, y + 9, 16, G.color);
+        k.text(l, L(G.name), 34, y + 7, {font:"bodyB", size:13, w:cw - 160, max:1});
+        k.text(l, lab, cw - 120, y + 8, {size:11.5, color:c, w:66, align:"right", max:1});
+        k.text(l, `${v.toFixed(0)}%`, cw - 50, y + 6, {font:"monoB", size:13, w:40, align:"right"});
+        const bx = 12, bw = cw - 24, by = y + 34;
+        k.rect(l, bx, by, bw, 8, "panel", {r:4});
+        k.rect(l, bx, by, bw * v / 100, 8, G.color, {r:4});
+        k.rect(l, bx + bw * P.GROUP_ANGRY / 100, by - 2, 1.5, 12, "bad");
+        k.rect(l, bx + bw * P.GROUP_BACK / 100, by - 2, 1.5, 12, "good");
+        k.hit(l, "grp-" + G.id, 0, y, cw, rh, () => { Audio.play("open"); Screens.openWin("politics"); });
+        y += rh + 6;
+      }
+      y += k.text(l, th ? "แตะเพื่อดูว่าแต่ละกลุ่มชอบและไม่ชอบอะไร" : "Tap to see what each group likes and hates", 0, y, {size:11.5, color:"muted", w:cw}).h + 6;
+    }
+  } else {
+    W.h3(l, t("shares"), 0, y, {w:cw, size:11.5}); y += 22;
+    for (const r of S.regions){
+      k.text(l, L(P.RMETA[r.id].name), 0, y, {size:12, w:120, max:1});
+      W.meter(l, 124, y + 6, cw - 124 - 64, 8, r.co2 / g, "hot");
+      k.text(l, r.co2.toFixed(2), cw - 56, y, {font:"mono", size:12, w:56, align:"right"});
+      y += 24;
+    }
+    y += 8; W.h3(l, t("topEmitters"), 0, y, {w:cw, size:11.5}); y += 22;
+    for (const c of S.countries.filter(x => !x.rest).sort((a, b) => b.co2 - a.co2).slice(0, 8)){
+      k.text(l, L(COUNTRY[c.id].name), 0, y, {size:12, w:120, max:1});
+      W.meter(l, 124, y + 6, cw - 124 - 64, 8, c.co2 / g, "warn");
+      k.text(l, c.co2.toFixed(2), cw - 56, y, {font:"mono", size:12, w:56, align:"right"});
+      y += 24;
+    }
   }
-  y += 8; W.h3(l, t("topEmitters"), 0, y, {w:cw, size:11.5}); y += 22;
-  for (const c of S.countries.filter(x => !x.rest).sort((a, b) => b.co2 - a.co2).slice(0, 8)){
-    k.text(l, L(COUNTRY[c.id].name), 0, y, {size:12, w:120, max:1});
-    W.meter(l, 124, y + 6, cw - 124 - 64, 8, c.co2 / g, "warn");
-    k.text(l, c.co2.toFixed(2), cw - 56, y, {font:"mono", size:12, w:56, align:"right"});
-    y += 24;
-  }
-  y += 6; W.h3(l, S.lang === "th" ? "แถบอุณหภูมิรายเดือน" : "Warming stripes", 0, y, {w:cw, size:11.5}); y += 20;
-  k.rect(l, 0, y, cw, 12, "panel2", {r:3});
-  const sw = cw / (P.TOTAL_TICKS + 1);
-  S.hist.forEach((h, i) => k.rect(l, i * sw, y, sw + 0.4, 12, tempColor(h.temp)));
-  y += 22;
-  k.text(l, `${t("timePlayed")}: ${P.fmtTime(S.realSec)}`, 0, y, {font:"mono", size:12, color:"muted"}); y += 22;
   return y;
+};
+/* a row of chips that wraps (filters, tabs inside the panel) */
+function chipRow(l, x, y, w, items, o = {}){
+  const size = o.size || 12, h = 28; let cx = x, cy = y;
+  for (const it of items){
+    const iw = Math.ceil(k.textW(it.label, {size, font:"bodyB"})) + 22, hov = k.isHover(l, it.id);
+    if (cx + iw > x + w && cx > x){ cx = x; cy += h + 6; }
+    k.rect(l, cx, cy, iw, h, it.on ? "accent" : hov ? "panel2" : null, {r:14, stroke:it.on || hov ? "accent" : "line", bg:true});
+    k.text(l, it.label, cx + 11, cy + (h - size * 1.45) / 2, {font:"bodyB", size, color:it.on ? "ink" : "fg", iconColor:it.on ? "ink" : "accent"});
+    k.hit(l, it.id, cx, cy, iw, h, () => { Audio.play("click"); it.fn(); });
+    cx += iw + 6;
+  }
+  return cy + h - y;
+}
+/* phase 5: what the player's work changed (CO₂ saved compared with doing nothing, where the cuts came from, timeline) */
+Screens.impactBox = function(l, cw, y0){
+  if (!P.impactSummary) return 0;
+  const im = P.impactSummary(), th = S.lang === "th", tl = (S.tl || []).slice(-12).reverse();
+  let y = y0;
+  const sub = th ? `ถ้าไม่ทำอะไรเลย ตอนนี้โลกจะปล่อย ${im.bau.toFixed(1)} Gt/ปี และร้อนขึ้นถึง +${im.bauTemp.toFixed(2)}°C (ตอนนี้ +${S.temp.toFixed(2)}°C)` : `Doing nothing, the world would now emit ${im.bau.toFixed(1)} Gt/yr and be +${im.bauTemp.toFixed(2)}°C warmer (now +${S.temp.toFixed(2)}°C)`;
+  const sh = k.textH(sub, {size:11.5, w:cw - 24}), ch = 22 + 34 + sh + 12;
+  W.card(l, 0, y, cw, ch, {r:12, stroke:"good", sa:.5});
+  k.text(l, th ? "CO₂ ที่คุณช่วยลดได้ (เทียบกับถ้าไม่ทำอะไรเลย)" : "CO₂ you prevented (compared with doing nothing)", 12, y + 8, {size:11.5, color:"muted", w:cw - 24, max:1});
+  W.runs(l, 12, y + 26, [[`−${im.saved.toFixed(1)} `, {font:"monoB", size:24, color:"good", lh:1.2}], [`Gt/${th ? "ปี" : "yr"}`, {font:"mono", size:12, color:"good"}]]);
+  k.text(l, sub, 12, y + 60, {size:11.5, color:"muted", w:cw - 24});
+  y += ch + 12;
+  W.h3(l, th ? "ส่วนที่ช่วยลด CO₂" : "Where the cuts came from", 0, y, {w:cw, size:11.5}); y += 20;
+  for (const x of im.parts){
+    k.text(l, `[[${x.icon}]] ${L(x.t)}`, 0, y, {size:12, w:150, max:1, iconColor:x.col});
+    W.meter(l, 156, y + 6, cw - 156 - 44, 8, im.total ? x.v / im.total : 0, x.col);
+    k.text(l, `${im.total ? Math.round(x.v / im.total * 100) : 0}%`, cw - 40, y, {font:"mono", size:12, w:40, align:"right"});
+    y += 24;
+  }
+  if (tl.length){
+    y += 6; W.h3(l, th ? "ไทม์ไลน์" : "Timeline", 0, y, {w:cw, size:11.5}); y += 20;
+    for (const e of tl){ const x = P.timelineText(e); if (!x.txt) continue; k.text(l, P.dateStr(e.tk), 0, y + 1, {font:"mono", size:11, color:"muted", w:74, max:1}); y += k.text(l, `[[${x.icon}]] ${x.txt}`, 78, y, {size:12, w:cw - 78, iconColor:x.col}).h + 4; }
+  }
+  return y - y0 + 10;
+};
+/* 1.6: where money (or policy points) came from and went */
+Screens.moneyBox = function(l, cw, y0){
+  if (!P.ledgerSum) return 0;
+  const th = S.lang === "th", per = S.mnPer || "year", cur = S.mnCur || "ep", d = P.ledgerSum(per, cur);
+  const max = Math.max(1, ...d.inc.map(x => x.v), ...d.out.map(x => x.v)), net = d.tIn - d.tOut, ic = cur === "ep" ? "$money" : "$policy";
+  let y = y0;
+  const segW = W.seg(l, 0, y, [["year", th ? "ปีนี้" : "This year"], ["last", th ? "ปีที่แล้ว" : "Last year"], ["all", th ? "ทั้งเกม" : "Whole game"]].map(([v, lab]) => ({id:"mp-" + v, label:lab, on:per === v, fn:() => { Audio.play("click"); S.mnPer = v; P.changed(); }})), {w:76, h:28, font:"body", fontOn:"bodyB", size:11.5});
+  W.seg(l, cw - 72, y, [{id:"mc-ep", label:"[[$money]]", on:cur === "ep", fn:() => { Audio.play("click"); S.mnCur = "ep"; P.changed(); }}, {id:"mc-pc", label:"[[$policy]]", on:cur === "pc", fn:() => { Audio.play("click"); S.mnCur = "pc"; P.changed(); }}], {w:36, h:28, size:13});
+  y += 38;
+  const third = (cw - 12) / 3;
+  [[th ? "ได้" : "In", `+${d.tIn.toLocaleString()}`, "good"], [th ? "ใช้" : "Out", `−${d.tOut.toLocaleString()}`, "bad"], [th ? "สุทธิ" : "Net", `[[${ic}]]${net >= 0 ? "+" : "−"}${Math.abs(net).toLocaleString()}`, net >= 0 ? "good" : "bad"]].forEach(([lab, v, c], i) => {
+    const x = i * (third + 6);
+    W.card(l, x, y, third, 50, {r:10});
+    k.text(l, lab, x + 10, y + 5, {size:11, color:"muted"});
+    k.text(l, v, x + 10, y + 22, {font:"monoB", size:15, color:c, w:third - 16, max:1});
+  });
+  y += 62;
+  const rows = (list, kind) => {
+    if (!list.length){ k.text(l, "—", 0, y, {size:12, color:"muted"}); y += 22; return; }
+    for (const x of list){
+      const C = P.LEDGER_CATS[x.cat] || P.LEDGER_CATS.other;
+      k.icon(l, C.icon, 0, y + 1, 16, kind === "in" ? "good" : "bad");
+      k.text(l, L(C.t), 24, y, {size:12, w:cw - 24 - 70, max:1});
+      k.text(l, `${kind === "in" ? "+" : "−"}${x.v.toLocaleString()}`, cw - 70, y, {font:"mono", size:12, w:70, align:"right"});
+      k.rect(l, 24, y + 20, cw - 24, 4, "panel", {r:2});
+      k.rect(l, 24, y + 20, (cw - 24) * x.v / max, 4, kind === "in" ? "good" : "bad", {r:2});
+      y += 32;
+    }
+  };
+  W.h3(l, th ? "ได้มาจาก" : "Came from", 0, y, {w:cw, size:11.5}); y += 20; rows(d.inc, "in");
+  y += 4; W.h3(l, th ? "ใช้ไปกับ" : "Spent on", 0, y, {w:cw, size:11.5}); y += 20; rows(d.out, "out");
+  return y - y0;
+};
+/* 1.1: the yearly report, waiting in the statistics panel every January */
+Screens.reportCard = function(l, x, y0, cw){
+  const r = S.report; if (!r) return 0;
+  const th = S.lang === "th", arrow = v => (v <= 0 ? "▼" : "▲");
+  const tips = [];
+  if (r.nAngry) tips.push(`[[angry]] ${t("rpAngry").replace("{N}", r.nAngry)} ${P.joinNames(r.angry)}`);
+  if (r.sanct.length) tips.push(`[[ban]] ${t("rpSanct")} ${P.joinNames(r.sanct)}`);
+  tips.push(`[[map]] ${t("rpLag")} ${L(P.RMETA[r.lag].name)}`);
+  if (r.appr < 35) tips.push(`[[$appr]] ${t("rpAppr")}`);
+  if (r.friends < 10) tips.push(`[[handshake]] ${t("rpFriends").replace("{N}", r.friends)}`);
+  const cells = [[t("co2"), `${r.net.toFixed(1)} Gt ${arrow(r.dNet)}${Math.abs(r.dNet).toFixed(1)}`, r.dNet <= 0 ? "good" : "bad"], [t("temp"), `+${r.temp.toFixed(2)}°C ${arrow(-r.dTemp)}`, r.temp >= 2 ? "bad" : r.temp >= 1.5 ? "warn" : "good"],
+                 [t("appr"), `${r.appr.toFixed(0)}%`, r.appr < 35 ? "bad" : "good"], [th ? "ประเทศที่เป็นมิตร (40+)" : "Friendly (40+)", String(r.friends), "fg"]];
+  const tipH = tips.reduce((s, tp) => s + k.textH(tp, {size:12, w:cw - 24}) + 4, 0), h = 36 + 2 * 46 + tipH + 52;
+  W.card(l, x, y0, cw, h, {r:12, stroke:"accent", sa:.7});
+  let y = y0 + 10;
+  k.text(l, `[[chart-line]] ${t("rpTitle")} ${r.y}`, x + 12, y, {font:"dispS", size:15, iconColor:"accent"});
+  k.text(l, "NEW", x + cw - 52, y + 2, {font:"monoB", size:11, color:"ink"}); k.rect(l, x + cw - 58, y, 44, 20, "warn", {r:10, under:true});
+  y += 28;
+  const half = (cw - 30) / 2;
+  cells.forEach(([lab, v, c], i) => {
+    const cx = x + 12 + (i % 2) * (half + 6), cy = y + Math.floor(i / 2) * 46;
+    k.text(l, lab, cx, cy, {size:11, color:"muted", w:half, max:1, iconColor:"muted"});
+    k.text(l, v, cx, cy + 17, {font:"monoB", size:14, color:c, w:half, max:1});
+  });
+  y += 2 * 46;
+  for (const tp of tips) y += k.text(l, tp, x + 12, y, {size:12, w:cw - 24, color:"muted", iconColor:"muted"}).h + 4;
+  y += 6;
+  W.btn(l, "rp-read", x + 12, y, `[[check]] ${t("rpRead")} · ${IC.pc} +${r.reward}`, () => { P.readReport(); Audio.play("coin"); k.dirty(); }, {size:13, h:34, sound:false});
+  return h;
 };
 const STRIPE = ["#08306b","#2171b5","#6baed6","#c6dbef","#fee0d2","#fc9272","#ef3b2c","#a50f15","#67000d"];
 function tempColor(v){
@@ -238,7 +376,7 @@ function tempColor(v){
 Screens.lineChart = function(l, x, y, w, hgt, data, o){
   k.rect(l, x, y, w, hgt, "bg", {r:8, bg:true});
   const pad = {l:34, r:10, t:10, b:20}, Wd = w - pad.l - pad.r, Hd = hgt - pad.t - pad.b, lo = o.min, hi = o.max;
-  const sx = i => x + pad.l + i / P.TOTAL_TICKS * Wd, sy = v => y + pad.t + (1 - (P.clamp(v, lo, hi) - lo) / (hi - lo)) * Hd;
+  const span = Math.max(P.TOTAL_TICKS, data.length - 1, ((o.data2 || []).length) - 1), sx = i => x + pad.l + i / span * Wd, sy = v => y + pad.t + (1 - (P.clamp(v, lo, hi) - lo) / (hi - lo)) * Hd;
   o.ticks.forEach(v => { const yy = sy(v); k.line(l, x + pad.l, yy, x + w - pad.r, yy, "line"); k.text(l, String(v), x + 3, yy - 8, {font:"mono", size:10, color:"muted"}); });
   [2026, 2034, 2042, 2050].forEach(yr => k.text(l, String(yr), sx((yr - 2026) * 12) - 12, y + hgt - 17, {font:"mono", size:10, color:"muted"}));
   (o.refs || []).forEach(rf => k.line(l, x + pad.l, sy(rf.v), x + w - pad.r, sy(rf.v), rf.c, {dash:4}));
@@ -248,13 +386,27 @@ Screens.lineChart = function(l, x, y, w, hgt, data, o){
   k.poly(l, [...pts, sx(data.length - 1), base, sx(0), base], o.color, {a:.15});
   k.path(l, pts, o.color, {w:2});
   const li = data.length - 1; k.circle(l, sx(li), sy(data[li]), 4, o.color);
+  if (o.data2 && o.data2.length > 1){ for (let i = 3; i < o.data2.length; i += 3){ if ((i / 3) % 2) k.line(l, sx(i - 3), sy(o.data2[i - 3]), sx(i), sy(o.data2[i]), "muted", {w:1.5, a:.8}); } }
 };
 
 /* ---------------- News ---------------- */
 Screens.paneNews = function(l, cw){
   let y = 0;
-  const COLS = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg"};
-  for (const lg of S.log.slice(0, 80)){
+  const COLS = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg", in:"purple"}, f = S.newsF || "all";
+  // 1.1: the season forecast is real (one continent gets hit far more often)
+  const intel = S.intel && S.tick <= S.intel.until ? S.intel : null;
+  if (intel){
+    const sub = `${t("nfIntelHelp")} ${intel.until - S.tick} ${t("months")}`, sh = k.textH(sub, {size:11.5, w:cw - 24}), h = 34 + sh + 8;
+    W.card(l, 0, y, cw, h, {r:10, stroke:"purple", sa:.7});
+    k.text(l, `[[radar]] ${t("nfIntelNow")}: ${L(P.RMETA[intel.reg].name)}`, 12, y + 8, {font:"bodyB", size:13, w:cw - 24, iconColor:"purple"});
+    k.text(l, sub, 12, y + 32, {size:11.5, color:"muted", w:cw - 24});
+    y += h + 10;
+  }
+  const NEWS_F = [["all", "list", "nfAll"], ["in", "radar", "nfIntel"], ["al", "siren", "nfDanger"], ["gd", "circle-check", "nfGood"], ["ev", "lightbulb", "nfDecide"], ["nw", "newspaper", "nfWorld"]];
+  y += chipRow(l, 0, y, cw, NEWS_F.map(([id, ic, key]) => ({id:"nf-" + id, label:`[[${ic}]] ${t(key)}`, on:f === id, fn:() => { S.newsF = id; P.changed(); }})), {size:11.5}) + 10;
+  const list = S.log.filter(lg => f === "all" || lg.cls === f || (f === "gd" && lg.cls === "tc")).slice(0, 80);
+  if (!list.length){ k.text(l, t("nfEmpty"), 0, y, {size:12, color:"muted"}); return y + 24; }
+  for (const lg of list){
     const hh = k.text(l, lg.txt, 80, y + 5, {size:13, color:COLS[lg.cls] || "fg", w:cw - 80}).h;
     k.text(l, P.dateStr(lg.tk), 0, y + 6, {font:"mono", size:12, color:"muted"});
     y += hh + 10;

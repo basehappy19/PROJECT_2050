@@ -47,6 +47,25 @@ if (steps.includes("game")){
     }
   }
 }
+if (steps.includes("train")){
+  await ev(() => { localStorage.removeItem("p2050-trained"); P2050.Screens.goScene("Menu"); }); await W(2500);
+  await shot("t0-menu");
+  await ev(() => P2050.Train.start()); await W(4000); await shot("t1-hello");
+  const step = async (n, fn) => { if (fn) await ev(fn); await W(900); const i = await ev(() => P2050.UIM.train && P2050.UIM.train.i); await shot(`t${n}-step${i}`); };
+  await step(2, () => P2050.Train.next());          // goal
+  await step(3, () => P2050.Train.next());          // kpis
+  await step(4, () => P2050.Train.next());          // time
+  await step(5, () => P2050.setSpeed(1));           // -> green
+  await step(6, () => { const S = P2050.S; S.bubbles = S.bubbles.filter(b => !b.train); });   // -> skills
+  await step(7, () => P2050.Screens.openSkills());  // -> buy
+  await step(8, () => P2050.buyNode("E1"));         // -> skclose
+  await step(9, () => P2050.Screens.closeSkills()); // -> hazard
+  await step(10, () => { const h = P2050.S.haz[0]; if (h) P2050.evacuate(h.id); });
+  await W(3500); await step(11, null);
+  console.log("train at", await ev(() => P2050.UIM.train && P2050.UIM.train.i));
+  await ev(() => { const P = P2050; while (P.UIM.train && P.UIM.train.i < 19) P.Train.next(); }); await step(19, null);
+  await ev(() => P2050.Train.next()); await step(20, null);
+}
 if (steps.includes("full")){
   const r = await ev(() => { const P = P2050, S = P.S; let bought = 0, blocked = 0;
     for (let i = 0; i < 320 && !S.over; i++){

@@ -9,7 +9,7 @@ if (P.mods && P.mods.modals) return;
 const TUT_SIZES = /*TUTSIZES*/{};
 const {Kit, S, t, L, UI, Audio, W, UIM, Screens, TUT, CHARS, CHAR, STORY, ADVISOR, ENDINGS, HAZARDS, COUNTRY, IC} = P;
 const k = Kit;
-const WIDTH = {tutorial:720, charsel:1150, story:800, learn:980, end:640, event:660, pause:620, market:940, politics:860, year:600};
+const WIDTH = {intro:640, slotpick:620, tutorial:720, charsel:1150, story:800, learn:980, end:640, event:660, pause:680, market:940, politics:860, year:600};
 
 Screens.renderModal = function(l){
   const kind = UIM.kind();
@@ -17,7 +17,7 @@ Screens.renderModal = function(l){
   if (!kind){ k.clearSlave("ModalScroll"); return; }
   if (kind === "skills") return this.renderSkills(l);
   const pw = WIDTH[kind] || 620;
-  const px = kind === "end" ? 1280 - pw - 40 : (1280 - pw) / 2;
+  const px = kind === "end" ? k.W - pw - 40 : (k.W - pw) / 2;
   let ch = 0;
   k.slave("ModalScroll", s => {
     if (kind === "event") ch = this.mEvent(s, pw);
@@ -30,20 +30,22 @@ Screens.renderModal = function(l){
     else if (kind === "market") ch = this.mMarket(s, pw);
     else if (kind === "politics") ch = this.mPolitics(s, pw);
     else if (kind === "year") ch = this.mYear(s, pw);
-    const ph = Math.min(ch, 690), py = (720 - ph) / 2;
+    else if (kind === "intro") ch = this.mIntro(s, pw);
+    else if (kind === "slotpick") ch = this.mSlotPick(s, pw);
+    const ph = Math.min(ch, k.H - 30), py = (k.H - ph) / 2;
     s.frame(px, py, {x:px, y:py, w:pw, h:ph}, ch);
     this._modalBox = {px, py, pw, ph};
   });
   const {py, ph} = this._modalBox;
   if (kind === "end"){
     const e = ENDINGS[S.over] || ENDINGS.l3;
-    const art = k.sprite(l, "EndArt", S.over === "win" ? `end-win-${S.grade || "A"}` : e.img, 0, 0, 1280, 720);
+    const art = k.sprite(l, "EndArt", S.over === "win" ? `end-win-${S.grade || "A"}` : e.img, 0, (k.H - Math.max(k.W * 9 / 16, k.H)) / 2, Math.max(k.W, k.H * 16 / 9), Math.max(k.W * 9 / 16, k.H));   // keep 16:9, crop top and bottom on wide screens
     if (art.getZOrder() !== -10) art.setZOrder(-10);   // under the window frame
-    k.hgrad(l, 0, 0, 1280, 720, [[0, "#020609"], [.35, "#020609"], [1, "#020609"]], {a:.0, bg:true});
-    k.rect(l, px - 40, 0, pw + 80, 720, "#020609", {a:.55, bg:true});
-  } else k.rect(l, 0, 0, 1280, 720, "#020609", {a:kind === "story" ? .78 : .62, bg:true});
-  const closer = {pause:() => Screens.resume(), learn:() => Screens.closeLearn(), market:() => Screens.closeWin(), politics:() => Screens.closeWin(), year:() => Screens.closeWin()}[kind];
-  if (closer){ k.hit(l, "veil", 0, 0, 1280, 720, () => { Audio.play("close"); closer(); }, {cursor:false}); }
+    k.hgrad(l, 0, 0, k.W, k.H, [[0, "#020609"], [.35, "#020609"], [1, "#020609"]], {a:.0, bg:true});
+    k.rect(l, px - 40, 0, pw + 80, k.H, "#020609", {a:.55, bg:true});
+  } else k.rect(l, 0, 0, k.W, k.H, "#020609", {a:kind === "story" || kind === "intro" ? .8 : .62, bg:true});
+  const closer = {pause:() => Screens.resume(), learn:() => Screens.closeLearn(), market:() => Screens.closeWin(), politics:() => Screens.closeWin(), year:() => Screens.closeWin(), slotpick:() => { UIM.modal = "charsel"; k.dirty(); }}[kind];
+  if (closer){ k.hit(l, "veil", 0, 0, k.W, k.H, () => { Audio.play("close"); closer(); }, {cursor:false}); }
   k.hit(l, "mbox", px, py, pw, ph, () => {}, {cursor:false});
   const border = kind === "end" ? (S.over === "win" ? "good" : "bad") : "line";
   k.rect(l, px + 4, py + 10, pw, ph, "#000000", {a:.35, r:14, bg:true});
@@ -73,7 +75,9 @@ Screens.mEvent = function(l, pw){
   const e = P.currentEvent(); if (!e) return 100;
   const x = 22, w = pw - 44; let y = 18;
   const where = e.country ? t("evCountryTag") : e.target ? `${t("eventTag")} · ${L(P.RMETA[e.target].name)}` : `${t("eventTag")} · ${t("global")}`;
-  tag(l, `[[${e.country ? "globe" : "siren"}]] ${where}`, x, y, e.country ? "accent" : "warn"); y += 20;
+  tag(l, `[[${e.country ? "globe" : "siren"}]] ${where}`, x, y, e.country ? "accent" : "warn");
+  { const ml = `[[minimize-2]] ${L(P.UI2.evMin)}`, mw = W.btnW(ml, {size:11.5}); W.btn(l, "evmin", x + w - mw, y - 6, ml, () => { UIM.evMin = true; Audio.play("close"); k.dirty(); }, {kind:"ghost", size:11.5, h:26}); }
+  y += 26;
   y += h3(l, L(e.title), x, y, w).h + 6;
   if (e.country){
     const row = (lab, ids, col) => {
@@ -94,7 +98,8 @@ Screens.mEvent = function(l, pw){
   y += k.text(l, L(e.desc), x, y, {size:14, w, color:"muted"}).h + 12;
   // the question + countdown
   const locked = UIM.eventLocked(), f = UIM.eventLockFrac();
-  k.text(l, `[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`, x, y, {font:"dispS", size:16, color:"fg", iconColor:"accent"});
+  const askW = k.text(l, `[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`, x, y, {font:"dispS", size:16, color:"fg", iconColor:"accent"}).w;
+  if (W.speakBtn) W.speakBtn(l, "ev-say", x + askW + 8, y - 3, `${L(e.title)}. ${L(e.desc)}`);
   if (P.hasKeyboard()) k.text(l, t("evKeys"), x + w - 140, y + 4, {font:"mono", size:10.5, color:"muted", w:140, align:"right"});
   y += 28;
   W.meter(l, x, y, w, 4, f, locked ? "warn" : "accent"); y += 12;
@@ -126,6 +131,8 @@ Screens.mEvent = function(l, pw){
       }
       if (!chips.length) k.text(l, "—", cx, cy, {size:12, color:"muted"});
       cy += 26;
+      const tilt = i >= 0 && P.tiltOfOption ? P.tiltOfOption(o, e) : null;   // 1.6: who at home likes / dislikes this choice
+      if (tilt && tilt.length){ W.groupTilt(l, x + 48, cy, tilt, a); cy += 20; }
     } else { cy += k.text(l, `[[eye-off]] ${t("hardHidden")}`, x + 48, cy, {size:11.5, color:"muted", iconColor:"muted"}).h + 2; }
     if (!ok){ cy += 2; cy += k.text(l, t("cantAfford"), x + 48, cy, {size:12, color:"bad"}).h; }
     cy += 10;
@@ -169,6 +176,7 @@ Screens.mEnd = function(l, pw){
   y += 2 * (chh + 8) + 6;
   // your story
   const st = P.endStory();
+  { const ng = (S.years || []).filter(q => q.g).length; if ((S.years || []).length){ k.text(l, `${L(P.UI2.yrGoodYears)} ${ng} / ${(S.years || []).length}`, x, y, {size:12, color:"muted"}); y += 20; y += W.yearStrip(l, x, y, w, {big:true}) + 10; } }
   W.h3(l, t("yourStory"), x, y, {w}); y += 20;
   const lines = [];
   if (st.best) lines.push(`[[heart-handshake]] ${t("storyBest")}: ${P.cname(st.best)}`);
@@ -231,8 +239,8 @@ Screens.mCharSel = function(l, pw){
   y += chH + 14;
   // mode
   W.h3(l, t("modeTitle"), x, y, {w}); y += 22;
-  const modes = [["normal", "globe"], ["hard", "skull"], ["daily", "calendar-check"]];
-  const mw = (w - 2 * 10) / 3;
+  const modes = UIM.worldSel ? [["normal", "infinity"]] : [["fast", "zap"], ["normal", "globe"], ["hard", "skull"], ["daily", "calendar-check"]];   // 3.x: Fast mode (shared engine)
+  const mw = (w - (modes.length - 1) * 10) / modes.length;
   modes.forEach(([m, ic], i) => {
     const mx = x + i * (mw + 10), on = UIM.modeSel === m, id = "md-" + m, hov = k.isHover(l, id);
     const dis = m === "daily" && false;
@@ -247,12 +255,12 @@ Screens.mCharSel = function(l, pw){
   const go = () => {
     const ch = UIM.charSel || "sci"; if (!P.Net.owns("char_" + ch)) return;
     UIM.msg = ""; UIM.modal = null;
-    P.startGame(S.lang, {mode:UIM.modeSel, char:ch, charLv:P.levelOf(P.Net.charXp(ch)), seed:UIM.modeSel === "daily" ? P.dailySeed() : undefined});
+    Screens.startOrPick({mode:UIM.worldSel ? "normal" : UIM.modeSel, char:ch, charLv:P.levelOf(P.Net.charXp(ch)), seed:UIM.modeSel === "daily" ? P.dailySeed() : undefined, world:!!UIM.worldSel});
   };
   const sl = t("start"), sw = W.btnW(sl, {size:15}) + 20;
   W.btn(l, "start", x + w - sw, y, sl, go, {size:15, w:sw, h:40});
   let bx = x + w - sw - 8;
-  const tl = `[[graduation-cap]] ${t("tutMenu")}`, tw2 = W.btnW(tl); bx -= tw2; W.btn(l, "csTut", bx, y + 2, tl, () => Screens.openTutorial(0, true), {kind:"ghost"});
+  const tl = `[[graduation-cap]] ${L(P.UI2.trainMenu)}`, tw2 = W.btnW(tl); bx -= tw2; W.btn(l, "csTut", bx, y + 2, tl, () => P.Train.start(), {kind:"ghost"});
   const ml = t("mainMenu"), mw2 = W.btnW(ml); bx -= mw2 + 8; W.btn(l, "csMenu", bx, y + 2, ml, () => Screens.toMenu(), {kind:"ghost"});
   return y + 40 + 22;
 };
@@ -270,24 +278,65 @@ Screens.mStory = function(l, pw){
     const cx = x + (i % cols) * (gw + 12), cy = y + Math.floor(i / cols) * (gh + 12), a = i === UIM.storyI ? age : 1;
     k.rect(l, cx, cy, gw, gh, p.bg, {r:12, stroke:"line", a, bg:true});
     k.icon(l, p.icon, cx + gw - 92, cy + 16, 76, "#ffffff", .16 * a);
-    const who = p.who === "me" ? S.char : "adv";
-    W.portrait(l, cx + 12, cy + 12, 56, who, {a, ring:p.who === "me" ? CHAR[S.char].color : "#c3a6ff"});
-    const nm = p.who === "me" ? L(CHAR[S.char].person) : L(ADVISOR.name);
-    k.text(l, nm, cx + 78, cy + 14, {font:"bodyB", size:12, color:p.who === "me" ? CHAR[S.char].color : "purple", w:gw - 90, max:1, a});
-    // speech bubble
-    const th2 = k.text(null, L(p.say), 0, 0, {size:13.5, w:gw - 40, measure:true}).h;
+    // 2.0: panels can be said by the player, the advisor or one of the story people (P.NPC), and the words can depend on the character
+    const w0 = P.panelWho ? P.panelWho(p) : p.who, me = w0 === "me", npc = P.NPC && P.NPC[w0], who = me ? S.char : npc ? w0 : "adv";
+    const col = me ? CHAR[S.char].color : npc ? npc.color : "#c3a6ff";
+    W.portrait(l, cx + 12, cy + 12, 56, who, {a, ring:col});
+    const nm = me ? L(CHAR[S.char].person) : npc ? L(npc.name) : L(ADVISOR.name);
+    k.text(l, nm, cx + 78, cy + 14, {font:"bodyB", size:12, color:col, w:gw - 90, max:2, lh:1.25, a});
+    // speech bubble (the current panel types itself out)
+    const say = L(P.panelSay ? P.panelSay(p) : p.say), cur = i === UIM.storyI;
+    const ty = cur && P.typed ? P.typed(say, UIM.storyT || 0) : {s:say, done:true};
+    if (cur){ if (ty.done !== UIM.storyTyped){ UIM.storyTyped = ty.done; } if (!ty.done && Math.floor((performance.now() - (UIM.storyT || 0)) / 170) !== UIM._typeBeat){ UIM._typeBeat = Math.floor((performance.now() - (UIM.storyT || 0)) / 170); Audio.play("type", {vol:.35}); } }
+    const th2 = k.text(null, say, 0, 0, {size:13.5, w:gw - 40, measure:true}).h;
     const by2 = cy + 76;
     k.rect(l, cx + 12, by2 - 6, gw - 24, Math.min(gh - 76, th2 + 12), "#ffffff", {r:10, a:.94 * a});
     k.poly(l, [cx + 34, by2 - 6, cx + 46, by2 - 6, cx + 38, by2 - 16], "#ffffff", {a:.94 * a});
-    k.text(l, L(p.say), cx + 20, by2, {size:13.5, color:"#0b1a20", w:gw - 40, a});
+    k.text(l, ty.s, cx + 20, by2, {size:13.5, color:"#0b1a20", w:gw - 40, a});
   });
   y += Math.ceil((UIM.storyI + 1) / cols) * (gh + 12) + 6;
   const last = UIM.storyI >= n - 1;
   const nl = last ? `${t("storyGo")} [[play]]` : `${t("tutNext")} [[chevron-right]]`, nw = W.btnW(nl);
   W.btn(l, "snext", x + w - nw, y, nl, () => Screens.storyNext());
-  W.btn(l, "sskip", x, y, t("tutSkip"), () => Screens.storySkip(), {kind:"ghost"});
-  if (P.hasKeyboard()) k.text(l, t("storyKeys"), x + 90, y + 10, {font:"mono", size:10.5, color:"muted"});
+  const skW = W.btn(l, "sskip", x, y, t("tutSkip"), () => Screens.storySkip(), {kind:"ghost"});
+  if (W.speakBtn){ const pp = st.panels[Math.min(UIM.storyI, n - 1)]; W.speakBtn(l, "st-say", x + skW + 8, y + 4, L(P.panelSay ? P.panelSay(pp) : pp.say), P.narrWho ? P.narrWho(pp) : ""); }
+  if (P.hasKeyboard()) k.text(l, t("storyKeys"), x + 130, y + 10, {font:"mono", size:10.5, color:"muted"});
   return y + 36 + 20;
+};
+
+/* ---------------- one save slot (pause window): save · load · delete (asks first) ----------------
+   a game can save over its own slot or one of the same mode, never a game of another mode */
+Screens.slotRow = function(l, x, y, w, slot, saves, inGame){
+  const s = saves && saves[slot], m = s && s.meta, ok = s && P.validSave(s.S), cur = inGame && S.started && S.saveSlot === slot && m && m.id === S.saveId;
+  const canSave = inGame && P.slotFree(slot, saves) && !(S.mode === "hard" && slot !== S.saveSlot);
+  const lines = ok || !s ? P.slotMetaLines(ok ? m : null) : [t("oldSave")];
+  const note = inGame && m && !canSave && !cur ? (S.mode === "hard" ? t("hardNoManual") : t("slotOtherMode")) : "";
+  const sh = 28 + lines.length * 17 + (note ? 18 : 0) + 8;
+  W.card(l, x, y, w, sh, {r:10, stroke:cur ? "accent" : null});
+  k.text(l, `${P.slotName(slot, m)}${cur ? " ●" : ""}`, x + 12, y + 7, {font:"dispS", size:15, color:cur ? "accent" : "fg", w:w - 290, max:1});
+  lines.forEach((q, i) => k.text(l, q, x + 12, y + 28 + i * 17, {font:"mono", size:11.5, color:"muted", w:w - 290, max:1}));
+  if (note) k.text(l, note, x + 12, y + 28 + lines.length * 17, {size:11, color:"muted", w:w - 290, max:1});
+  // buttons from the right
+  let bx = x + w - 12; const by = y + (sh - 32) / 2;
+  if (m){
+    if (UIM.askDel === slot){
+      W.hbtn(l, "sdx-" + slot, bx - 32, by, "x", () => { UIM.askDel = null; k.dirty(); }, {s:32, color:"muted"}); bx -= 40;
+      const dl = `[[trash-2]] ${t("slotDelSure")}`, dw = W.btnW(dl, {size:12.5});
+      W.btn(l, "sdy-" + slot, bx - dw, by, dl, () => { P.deleteSlot(slot); UIM.askDel = null; UIM.msg = `${t("slotDeleted")} · ${P.slotName(slot)}`; UIM.err = false; k.dirty(); }, {kind:"danger", size:12.5, h:32}); bx -= dw + 8;
+    } else { W.hbtn(l, "sd-" + slot, bx - 32, by, "trash-2", () => { UIM.askDel = slot; k.dirty(); }, {s:32, color:"muted"}); bx -= 40; }
+  }
+  if (ok && !cur && UIM.askDel !== slot){ const ll = `[[folder-open]] ${t("load")}`, lw = W.btnW(ll, {size:12.5}); W.btn(l, "sl-" + slot, bx - lw, by, ll, () => { const s2 = P.readSaves(); if (s2 && s2[slot]) Screens.loadSave(s2[slot].S, slot); }, {kind:inGame ? "ghost" : "primary", size:12.5, h:32}); bx -= lw + 8; }
+  if (inGame && UIM.askDel !== slot){
+    const sl = `[[save]] ${t("save")}`, sw = W.btnW(sl, {size:12.5});
+    W.btn(l, "save-" + slot, bx - sw, by, sl, () => {
+      Audio.play("save"); P.Ach.unlock("saver");
+      const done = P.writeSlot(slot);
+      UIM.msg = done ? `${t("saved")} · ${P.slotName(slot)}` : t("noStore"); UIM.err = !done;
+      if (done && P.Net.user) P.Net.cloudSave(slot).then(r => { UIM.msg = r ? `${t("saved")} · ${P.slotName(slot)} · ${t("cloudOk")}` : UIM.msg; k.dirty(); });
+      k.dirty();
+    }, {kind:"ghost", size:12.5, h:32, disabled:!canSave, sound:false});
+  }
+  return sh;
 };
 
 /* ---------------- pause ---------------- */
@@ -300,41 +349,28 @@ Screens.mPause = function(l, pw){
   W.langSeg(l, x + w - 80, y + 3);
   y += 36 + 14;
   y += W.vol(l, x, y, w) + 12;
+  { const th = S.lang === "th", G = P.Gfx; k.icon(l, "monitor", x, y + 7, 18, "accent"); k.text(l, t("gfxLbl"), x + 28, y + 6, {size:13.5, w:120, max:1});
+    W.seg(l, x + w - 180, y + 1, [["low", "gfxLow"], ["high", "gfxHigh"]].map(([id, key]) => ({id:"pgfx-" + id, label:t(key), on:G.level === id, fn:() => { Audio.play("click"); G.set(id); k.dirty(); }})), {w:90, h:30, font:"body", fontOn:"bodyB", size:12.5}); y += 40; }
+  if (W.a11yRows) y += W.a11yRows(l, x, y, w) + 10;
   const saves = P.readSaves();
-  if (S.mode === "hard") y += k.text(l, `[[skull]] ${t("hardSaves")}`, x, y, {size:12.5, color:"warn", w, iconColor:"warn"}).h + 10;
-  else if (saves === null){ y += k.text(l, t("noStore"), x, y, {size:12.5, color:"bad", w}).h + 10; }
-  else for (const slot of ["s1", "s2", "s3"]){
-    const m = saves[slot] && saves[slot].meta, lines = P.slotMetaLines(m);
-    const sh = 22 + lines.length * 17 + 8;
-    W.card(l, x, y, w, sh, {r:10});
-    k.text(l, P.slotName(slot), x + 12, y + 7, {font:"dispS", size:15});
-    lines.forEach((s, i) => k.text(l, s, x + 12, y + 28 + i * 17, {font:"mono", size:11.5, color:"muted", w:w - 120, max:1}));
-    const bw = W.btnW(t("save"));
-    W.btn(l, "save-" + slot, x + w - 12 - bw, y + (sh - 36) / 2, t("save"), () => {
-      Audio.play("save"); P.Ach.unlock("saver");
-      const ok = P.writeSlot(slot);
-      UIM.msg = ok ? `${t("saved")} · ${P.slotName(slot)}` : t("noStore"); UIM.err = !ok;
-      if (ok && P.Net.user) P.Net.cloudSave(slot).then(r => { UIM.msg = r ? `${t("saved")} · ${P.slotName(slot)} · ${t("cloudOk")}` : UIM.msg; k.dirty(); });
-      k.dirty();
-    }, {kind:"ghost", sound:false});
-    y += sh + 7;
+  if (S.mode === "hard") y += k.text(l, `[[skull]] ${t("hardSaves")}`, x, y, {size:12.5, color:"warn", w, iconColor:"warn"}).h + 8;
+  if (saves === null){ y += k.text(l, t("noStore"), x, y, {size:12.5, color:"bad", w}).h + 10; }
+  else {
+    for (const slot of P.SLOTS) y += this.slotRow(l, x, y, w, slot, saves, true) + 7;
+    // 1.5.4: delete every save slot at once (asks first)
+    const n = P.SLOTS.filter(q => saves[q] && saves[q].meta).length;
+    if (n){
+      if (UIM.askClear){
+        k.text(l, t("slotClearSure").replace("{N}", n), x, y + 8, {size:12.5, color:"bad", w:w - 220, max:2});
+        const dl = `[[trash-2]] ${t("slotDelSure")}`, dw = W.btnW(dl, {size:12.5}), cl = t("cancel"), cw2 = W.btnW(cl, {size:12.5});
+        W.btn(l, "clr-yes", x + w - dw - cw2 - 8, y, dl, () => { P.SLOTS.forEach(q => { if (saves[q] && saves[q].meta) P.deleteSlot(q); }); UIM.askClear = false; UIM.msg = t("slotCleared"); UIM.err = false; k.dirty(); }, {kind:"danger", size:12.5, h:32});
+        W.btn(l, "clr-no", x + w - cw2, y, cl, () => { UIM.askClear = false; k.dirty(); }, {kind:"ghost", size:12.5, h:32});
+      } else W.btn(l, "clr", x, y, `[[trash-2]] ${t("slotClear")}`, () => { UIM.askClear = true; k.dirty(); }, {kind:"ghost", size:12.5, h:32});
+      y += 40;
+    }
   }
   y += 8;
-  if (S.mode !== "hard"){
-    k.text(l, t("codeTitle"), x, y, {size:12, color:"muted"}); y += 20;
-    if (!UIM.codeOut || UIM.codeOutTick !== S.tick){ UIM.codeOut = P.exportCode(); UIM.codeOutTick = S.tick; }
-    k.rect(l, x, y, w, 62, "bg", {r:8, stroke:"line", bg:true});
-    k.text(l, UIM.codeOut.slice(0, 360), x + 10, y + 7, {font:"mono", size:11, color:"muted", w:w - 20, max:3, lh:1.45});
-    y += 70;
-    const cbw = W.btn(l, "copy", x, y, t("codeCopy"), () => {
-      const txt = UIM.codeOut;
-      const done = ok => { UIM.msg = ok ? t("codeCopied") : t("codeFail"); UIM.err = !ok; k.dirty(); };
-      const legacy = () => { try { const ta = document.createElement("textarea"); ta.value = txt; ta.style.position = "fixed"; ta.style.opacity = "0"; document.body.appendChild(ta); ta.select(); const ok = document.execCommand("copy"); ta.remove(); done(ok); } catch(e) { done(false); } };
-      try { navigator.clipboard.writeText(txt).then(() => done(true), legacy); } catch(e) { legacy(); }
-    }, {kind:"ghost"});
-    if (UIM.msg) k.text(l, UIM.msg, x + cbw + 12, y + 9, {size:12.5, color:UIM.err ? "bad" : "good", w:w - cbw - 12, max:1});
-    y += 36 + 16;
-  } else if (UIM.msg){ k.text(l, UIM.msg, x, y, {size:12.5, color:UIM.err ? "bad" : "good", w}); y += 24; }
+  if (UIM.msg){ k.text(l, UIM.msg, x, y, {size:12.5, color:UIM.err ? "bad" : "good", w}); y += 24; }
   let bx = x;
   bx += W.btn(l, "ptut", bx, y, `[[graduation-cap]] ${t("tutMenu")}`, () => Screens.openTutorial(0, false), {kind:"ghost"}) + 8;
   bx += W.btn(l, "plearn", bx, y, `[[book-open]] ${t("mLearn")}`, () => Screens.openLearn(), {kind:"ghost"}) + 8;
@@ -361,7 +397,8 @@ Screens.mTutorial = function(l, pw){
   const dw = (n - 1) * 14 + 26; let dx = (pw - dw) / 2;
   for (let d = 0; d < n; d++){ const on = d === i; k.rect(l, dx, y, on ? 20 : 8, 8, on ? "accent" : "line", {r:4}); dx += (on ? 20 : 8) + 6; }
   y += 22;
-  W.btn(l, "tskip", x, y, t("tutSkip"), () => Screens.tutAct("skip"), {kind:"ghost"});
+  const tsW = W.btn(l, "tskip", x, y, t("tutSkip"), () => Screens.tutAct("skip"), {kind:"ghost"});
+  if (W.speakBtn) W.speakBtn(l, "tut-say", x + tsW + 8, y + 4, `${L(st.title)}. ${st.body[S.lang].join(" ")}`, "adv");
   const nl = last ? t("tutDone") : `${t("tutNext")} [[chevron-right]]`;
   const nw = W.btnW(nl);
   W.btn(l, "tnext", x + w - nw, y, nl, () => Screens.tutAct(last ? "done" : "next"));

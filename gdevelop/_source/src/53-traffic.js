@@ -115,6 +115,7 @@ const T = {
   remove(v){ for (const o of [v.obj, v.shadow, v.trail]) this.R.remove3DRendererObject(o); },
   update(dt){
     if (!this.R || !S.regions || !P.trafficLevels || Map.mode !== "game") return;
+    if (P.Gfx && P.Gfx.level === "low"){ if (this.list.length){ for (const v of this.list) this.remove(v); this.list = []; } return; }   // settings: low graphics
     const running = S.started && !S.over && S.speed > 0 && !(P.UIM && P.UIM.modalOpen && P.UIM.modalOpen());
     if (!running) dt = 0;
     const tl = P.trafficLevels(), want = {air:Math.round(QTY.air * tl.air), box:Math.round(QTY.box * tl.sea), oil:Math.round(QTY.oil * tl.oil), ore:Math.round(QTY.ore * tl.ore)};

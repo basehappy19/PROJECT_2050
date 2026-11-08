@@ -61,14 +61,15 @@ function countryPoint(id){
   const cap = P.CAPITALS && P.CAPITALS[id]; return cap ? toWorld(cap[0], cap[1]) : null;   // 3.x: small islands without an outline use their capital
 }
 /* ---- colours ---- */
-const HEAT = [[31,158,120],[217,166,43],[208,97,47],[224,48,42]];
+const HEAT_N = [[31,158,120],[217,166,43],[208,97,47],[224,48,42]], HEAT_CB = [[46,120,200],[140,170,205],[240,170,70],[225,110,25]];   // colour-blind: blue → orange
+let HEAT = HEAT_N;
 const HEAT_PAINT = [[134,201,170],[236,211,140],[233,160,128],[226,120,120]];
 const HEAT_NIGHT = [[22,96,82],[128,104,40],[128,64,36],[140,36,34]];
 function regionHeatValue(r){ return clamp(0.55 * (r.co2 / r.co2_0) + 0.35 * (r.vuln / 100) + (S.temp - 1.2) * 0.35 - 0.2, 0, 1); }
 function heatRGB(v, pal = HEAT){ const x = clamp(v, 0, 0.999) * (pal.length - 1), i = Math.floor(x), f = x - i, a = pal[i], b = pal[i + 1]; return [0,1,2].map(k => Math.round(a[k] + (b[k] - a[k]) * f)); }
 const theme = () => { try { const v = localStorage.getItem("p2050-theme") || ""; return P.Net && v && P.Net.owns("theme_" + v) ? v : ""; } catch(e) { return ""; } };
 const CITY_TOT = Object.fromEntries(Object.entries(CITIES).map(([k, l]) => [k, l.reduce((s, c) => s + c[2], 0)]));
-const W = 1920, Hh = 1080;
+let W = 1920; const Hh = 1080;   // W follows the screen width (Kit.fit)
 /* ---------- 3.x · the map drawn in real 3D ----------
    The map pieces are still GDevelop sprites (so their colour, size and visibility work as before), but on the 3D layer they
    are hidden and each one is mirrored by a textured plane in the layer's three.js scene. That gives a true perspective
@@ -211,13 +212,29 @@ const Map = {
     const o = c.position, kx = v.x - o.x, ky = v.y - o.y, kz = v.z - o.z, f = kz ? -o.z / kz : 0;
     return [o.x + kx * f, -(o.y + ky * f)];
   },
+  geoAt(x, y){ return geoAtWorld(x, y); },
+  colorsChanged(){ HEAT = P.A11y && P.A11y.cb ? HEAT_CB : HEAT_N; if (this.scene && this.refresh) this.refresh(); },
+  /* where a build pin goes: a seeded random point well inside the country (web/src/mapfx.js placePin) */
+  pinPoint(p){
+    if (p.xy) return p.xy;
+    this._pins = this._pins || {}; if (this._pins[p.id]) return this._pins[p.id];
+    const g = GEO_OF[p.c]; let pos = null;
+    if (g){
+      let seed = p.sd | 0; const r = () => { seed = (seed + 0x6D2B79F5) | 0; let x = Math.imul(seed ^ (seed >>> 15), 1 | seed); x ^= x + Math.imul(x ^ (x >>> 7), 61 | x); return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
+      const w = g.b[2] - g.b[0], h = g.b[3] - g.b[1], m = Math.min(w, h) * .08;
+      for (let i = 0; i < 80 && !pos; i++){ const x = g.b[0] + w * (.1 + .8 * r()), y = g.b[1] + h * (.1 + .8 * r()); if (inRings(g.p, x, y) && inRings(g.p, x + m, y) && inRings(g.p, x - m, y) && inRings(g.p, x, y + m) && inRings(g.p, x, y - m)) pos = [x, y]; }
+    }
+    if (!pos) pos = countryPoint(p.c);
+    return (this._pins[p.id] = pos);
+  },
   latlonScreen(lat, lon){ const [x, y] = toWorld(lat, lon); return this.toScreen(x, y); },
   clampCam(){
     const z = this.cam.z, halfW = W / 2 / z, halfH = Hh / 2 / z;
     this.cam.x = clamp(this.cam.x, Math.min(960, 0 + halfW - 500 / z), Math.max(960, 1920 - halfW + 500 / z));
     this.cam.y = clamp(this.cam.y, Math.min(516, MAP_TOP + halfH - 300 / z), Math.max(516, MAP_TOP + 807 - halfH + 300 / z));
   },
-  freeCx(){ const dw = P.Screens ? P.Screens.drawerWidth() : 0; return (1264 - dw - 16) / 2 * Kit.K; },
+  onResize(gw){ W = gw; this._ck = null; if (this.scene) this.applyCam(); },
+  freeCx(){ const dw = P.Screens ? P.Screens.drawerWidth() : 0; return (Kit.W - 16 - dw - 16) / 2 * Kit.K; },
   /* move the camera so a world point is centred in the part of the screen the drawer doesn't cover */
   lookAt(x, y, z){ this.zAnim = null; this.target = {x: x - (this.freeCx() - W / 2) / z, y: y + 20 / z, z}; },
   focus(reg, zoomIn){
@@ -261,7 +278,7 @@ const Map = {
       const v = p.getVariables(), reg = v.get("Reg").getAsString(), w = v.get("W").getAsNumber();
       const r = S.regions.find(q => q.id === reg); if (!r) continue;
       const amt = r.co2 * w / CITY_TOT[reg];
-      const size = amt <= 0.02 ? 0 : (0.035 + Math.sqrt(amt) * 0.075) * 300;   // px
+      const size = amt <= 0.02 || (P.Gfx && P.Gfx.level === "low") ? 0 : (0.035 + Math.sqrt(amt) * 0.075) * 300;   // px
       v.get("Base").setNumber(size / 96);
       const g = clamp(0.55 - r.co2 / r.co2_0 * 0.35, 0.15, 0.7);
       p.setColor(th === "night" ? `255;${Math.round(200 + g * 50)};120` : `255;${Math.round(g * 255)};38`);
@@ -299,6 +316,7 @@ const Map = {
   /* tap on the map (no UI or bubble under the pointer) */
   click(){
     const m = Kit.mouse; if (m.moved > 8 || this.pinchEnded > performance.now() - 250) return false;
+    if (P.UIM && P.UIM.placing && P.Screens.placeTap) return P.Screens.placeTap(m.x, m.y);   // placing a build: the grid takes every tap
     const now = performance.now();
     if (now - this.lastTap < 320 && Math.abs(m.x - this.lastTapX) + Math.abs(m.y - this.lastTapY) < 24){ this.lastTap = 0; this.resetView(); return true; }
     this.lastTap = now; this.lastTapX = m.x; this.lastTapY = m.y;
@@ -351,7 +369,7 @@ const Map = {
         this.target = null; this.zAnim = {z:clamp((A ? A.z : this.cam.z) * (wheel > 0 ? 1.15 : 1 / 1.15), ZMIN, ZMAX), sx:m.x, sy:m.y, wx:w[0], wy:w[1]};
       }
     } else {
-      this.cam.x = 690 + Math.sin(this.scene.getTimeManager().getTimeFromStart() / 9000) * 40;   // menu: slow drift
+      this.cam.x = 960 - (1230 + (W - 1920) * .6 - W / 2) + Math.sin(this.scene.getTimeManager().getTimeFromStart() / 9000) * 40;   // menu: slow drift
     }
     if (this.zAnim){
       const A = this.zAnim, k = 1 - Math.pow(.8, dt * 60);

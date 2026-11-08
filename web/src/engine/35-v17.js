@@ -130,6 +130,8 @@ P.STORY.forEach(a => { if (SC_TITLE[a.act]) a.title = SC_TITLE[a.act]; });
 /* what a panel says / who says it, for this game (lines can depend on the character or on what happened) */
 P.panelSay = p => { let s = typeof p.say === "function" ? p.say() : p.say; if (s && !s.th && (s[S.char] || s["*"])) s = s[S.char] || s["*"]; const v = S.sceneVars || {}; return {th:(s.th || "").replace(/\{(\w)\}/g, (m, k) => v[k] ?? m), en:(s.en || "").replace(/\{(\w)\}/g, (m, k) => v[k] ?? m)}; };
 P.panelWho = p => (typeof p.who === "function" ? p.who() : p.who);
+/* 2.3: who reads a panel aloud (the recorded narration has one voice per person) */
+P.narrWho = p => { const w = P.panelWho(p); return w === "me" ? S.char : (w || "adv"); };
 
 /* one scene at a time, never in the same month as a new disaster forecast, a story act or an event, and at least 4 months apart */
 function sceneTick(){

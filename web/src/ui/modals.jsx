@@ -189,7 +189,7 @@ export function Story(){
       })}</div>
       <div class="mfoot">
         <Btn kind="ghost" onClick={() => G.storySkip()}>{t("tutSkip")}</Btn>
-        <Speak text={L(P.panelSay ? P.panelSay(st.panels[Math.min(UIM.storyI, st.panels.length - 1)]) : st.panels[Math.min(UIM.storyI, st.panels.length - 1)].say)} btn/>
+        <Speak text={L(P.panelSay ? P.panelSay(st.panels[Math.min(UIM.storyI, st.panels.length - 1)]) : st.panels[Math.min(UIM.storyI, st.panels.length - 1)].say)} who={P.narrWho ? P.narrWho(st.panels[Math.min(UIM.storyI, st.panels.length - 1)]) : ""} btn/>
         <span class="grow"/>
         <Btn onClick={() => G.storyNext()} sound={null}>{last ? `${t("storyGo")} [[play]]` : `${t("tutNext")} [[chevron-right]]`}</Btn>
       </div>
@@ -292,7 +292,7 @@ export function Tutorial(){
       <div class="dots">{P.TUT.map((_, d) => <i key={d} class={d === i ? "on" : ""}/>)}</div>
       <div class="mfoot">
         <Btn kind="ghost" onClick={() => G.tutAct("skip")}>{t("tutSkip")}</Btn>
-        <Speak text={`${L(st.title)}. ${st.body[S.lang].join(" ")}`} btn/>
+        <Speak text={`${L(st.title)}. ${st.body[S.lang].join(" ")}`} who="adv" btn/>
         <span class="grow"/>
         {i ? <Btn kind="ghost" sound={null} onClick={() => G.tutAct("back")}>{`[[chevron-left]] ${t("tutBack")}`}</Btn> : null}
         <Btn sound={null} onClick={() => G.tutAct(last ? "done" : "next")}>{last ? t("tutDone") : `${t("tutNext")} [[chevron-right]]`}</Btn>

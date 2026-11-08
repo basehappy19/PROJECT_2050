@@ -92,6 +92,7 @@ kbd{font:500 11px var(--mono);color:var(--muted);border:1px solid var(--line);bo
 .msg{font-size:13px;margin:6px 0} .msg.good{color:var(--good)} .msg.bad{color:var(--bad)}
 .vol{display:flex;flex-direction:column;gap:6px;margin:8px 0}
 .volrow{display:flex;align-items:center;gap:10px} .volrow .lbl{width:90px;color:var(--muted);font-size:13px} .volrow .num{width:42px;text-align:right;font:500 12px var(--mono)}
+.volrow .ibtn{cursor:pointer} .volrow.off .ibtn{color:var(--muted);opacity:.75} .volrow.off .slider,.volrow.off .num{opacity:.45}
 .card{background:var(--panel2);border:1px solid var(--line);border-radius:var(--radius-md);padding:11px 12px;display:flex;flex-direction:column;gap:3px}
 .card.row{flex-direction:row;align-items:center;gap:12px}
 .card .grow{display:flex;flex-direction:column;gap:2px}

@@ -19,12 +19,12 @@ const UIM = P.UIM = {
     if (this.screen !== "game") return this.modal;
     if (this.modal === "story") return "story";
     if (S.over) return "end";
-    if (S.event) return "event";
+    if (S.event) return this.evMin ? null : "event";   // 2.0: a minimised event waits as a pill (the game stays paused)
     return this.modal;   // "skills" | "charsel"
   },
   modalOpen(){ return !!this.kind(); },
   get paused(){ return this.modal === "pause"; },
-  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market", "politics", "year"].includes(this.modal); },
+  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market", "politics", "year", "intro", "slotpick"].includes(this.modal); },
   eventLocked(){ return (performance.now() - this.evAt) / 1000 < EVENT_LOCK; },
   eventLockFrac(){ return Math.min(1, (performance.now() - this.evAt) / 1000 / EVENT_LOCK); },
 };
@@ -148,7 +148,7 @@ W.h3 = (l, txt, x, y, o = {}) => k.text(l, P.up(String(txt)), x, y, {font:"dispS
 W.portrait = (l, x, y, s, charId, o = {}) => {
   const ch = P.CHAR[charId], col = o.ring || (ch ? ch.color : "#8fd0ff");
   k.rect(l, x, y, s, s, "panel2", {r:o.r ?? s / 2, stroke:col, sw:o.sw || 2, bg:true});
-  const anim = charId === "adv" ? "adv" : `${charId}-${P.outfitOf ? P.outfitOf(charId) : "base"}`;
+  const anim = charId === "adv" || (P.NPC && P.NPC[charId]) ? charId : `${charId}-${o.outfit || (P.outfitOf ? P.outfitOf(charId) : "base")}`;
   k.sprite(l, "Portrait", anim, x + 2, y + 2, s - 4, s - 4, o.a ?? 1);
 };
 /* Terra amount with the coin icon */
@@ -157,17 +157,32 @@ W.terra = (l, x, y, amount, o = {}) => {
   k.icon(l, "terra", x, y + (size * 1.45 - is) / 2, is, "#ffffff", o.a ?? 1);
   return is + 4 + k.text(l, String(amount), x + is + 4, y, {font:o.font || "monoB", size, color:o.color || "fg", a:o.a ?? 1}).w;
 };
-/* volume rows */
+/* volume rows. 2.3: tapping the icon turns that sound on or off at once (back on at 80% if its slider was at 0); narration has its own row */
+W.flipSound = kind => {
+  const N = P.Narr;
+  if (kind === "narr"){ if (N.on && N.vol > 0) N.setOn(false); else { if (N.vol <= 0) N.setVol(.8); N.setOn(true); } }
+  else {
+    const on = kind === "music" ? Audio.musicOn : Audio.on, lv = kind === "music" ? Audio.lvMusic : Audio.lvSfx;
+    if (on && lv > 0){ if (kind === "music") Audio.toggleMusic(); else Audio.toggle(); }
+    else { if (lv <= 0) Audio.setLevel(kind, .8); if (!on){ if (kind === "music") Audio.toggleMusic(); else Audio.toggle(); } }
+    if (kind !== "sfx") Audio.play("toggle");
+  }
+  k.dirty();
+};
 W.vol = (l, x, y, w) => {
-  const row = (yy, kind, icon, iconOff, on, lv, label) => {
-    W.hbtn(l, "vol-" + kind, x, yy, on && lv > 0 ? icon : iconOff, () => { if (kind === "music") Audio.toggleMusic(); else Audio.toggle(); k.dirty(); });
+  const N = P.Narr, th = S.lang === "th";
+  const row = (yy, kind, icon, iconOff, on, lv, label, set) => {
+    const live = on && lv > 0;
+    W.hbtn(l, "vol-" + kind, x, yy, live ? icon : iconOff, () => W.flipSound(kind), {fill:live ? "accent" : null, color:live ? "#04201b" : "muted"});
     k.text(l, label, x + 40, yy + 5, {size:12.5, color:"muted", w:92, max:1});
-    W.slider(l, "sl-" + kind, x + 140, yy + 4, w - 140 - 52, lv, v => { Audio.setLevel(kind, v); k.dirty(); });
-    k.text(l, Math.round(lv * 100) + "%", x + w - 44, yy + 6, {font:"mono", size:12, w:44, align:"right"});
+    W.slider(l, "sl-" + kind, x + 140, yy + 4, w - 140 - 52, lv, v => { set(v); k.dirty(); });
+    k.text(l, Math.round(lv * 100) + "%", x + w - 44, yy + 6, {font:"mono", size:12, w:44, align:"right", color:live ? "fg" : "muted"});
   };
-  row(y, "music", "music", "music-off", Audio.musicOn, Audio.lvMusic, t("musicLbl"));
-  row(y + 38, "sfx", "volume-2", "volume-x", Audio.on, Audio.lvSfx, t("sfxLbl"));
-  return 70;
+  row(y, "music", "music", "music-off", Audio.musicOn, Audio.lvMusic, t("musicLbl"), v => Audio.setLevel("music", v));
+  row(y + 38, "sfx", "volume-2", "volume-x", Audio.on, Audio.lvSfx, t("sfxLbl"), v => Audio.setLevel("sfx", v));
+  if (!N || !N.available()) return 70;
+  row(y + 76, "narr", "audio-lines", "volume-x", N.on, N.vol, th ? "เสียงบรรยาย" : "Narration", v => { N.setVol(v); if (v > 0 && !N.on) N.setOn(true); });
+  return 108;
 };
 W.langSeg = (l, x, y) => W.seg(l, x, y, [
   {id:"lg-th", label:"TH", on:S.lang === "th", fn:() => { Audio.play("click"); P.setLang("th"); k.dirty(); }},
@@ -178,6 +193,12 @@ W.key = (l, x, y, txt) => { const w = k.textW(txt, {font:"mono", size:9.5}) + 8;
 P.W = W;
 const hasKeyboard = () => !(window.matchMedia && window.matchMedia("(pointer: coarse)").matches);
 P.hasKeyboard = hasKeyboard;
+
+/* graphics setting: "low" hides planes, ships and smoke glows (slow phones, low battery) */
+P.Gfx = {
+  level:(() => { try { return localStorage.getItem("p2050-gd-gfx") || "high"; } catch(e){ return "high"; } })(),
+  set(v){ this.level = v; try { localStorage.setItem("p2050-gd-gfx", v); } catch(e){} if (P.Map && P.Map.scene && P.Map.refresh) P.Map.refresh(); },
+};
 
 /* ---------------------------- actions ---------------------------- */
 const Screens = P.Screens = P.Screens || {};
@@ -203,8 +224,8 @@ Object.assign(Screens, {
     P.changed();
   },
   closeTab(){ Audio.play("close"); S.tab = null; P.Map.recenter(); P.changed(); },
-  openSkills(){ if (!S.started || S.over || S.event || (UIM.modal && UIM.modal !== "skills")) return; Audio.play("open"); UIM.modal = "skills"; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); },
-  closeSkills(){ if (UIM.modal !== "skills") return; Audio.play("close"); UIM.modal = null; k.dirty(); },
+  openSkills(){ if (!S.started || S.over || S.event || (UIM.modal && UIM.modal !== "skills")) return; Audio.play("skillsOpen"); UIM.modal = "skills"; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); },
+  closeSkills(){ if (UIM.modal !== "skills") return; Audio.play("skillsClose"); UIM.modal = null; k.dirty(); },
   goScene(name){ this.scene.getVariables().get("GoTo").setString(name); },
   pause(){ if (!S.started || S.over || S.event || (UIM.modal && UIM.modal !== "skills")) return; Audio.play("pause"); UIM.prevSpeed = S.speed || 1; UIM.modal = "pause"; UIM.msg = ""; k.dirty(); },
   resume(){ UIM.modal = null; k.dirty(); },
@@ -224,16 +245,18 @@ Object.assign(Screens, {
   },
   openLearn(tab){ UIM.learnFrom = UIM.modal; UIM.learnTab = tab || UIM.learnTab || "cards"; UIM.modal = "learn"; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; Audio.play("open"); k.dirty(); },
   closeLearn(){ UIM.modal = UIM.learnFrom === "pause" ? "pause" : null; Audio.play("close"); k.dirty(); },
-  showStory(act){ UIM.storyAct = act; UIM.storyI = 0; UIM.storyT = performance.now(); UIM.modal = "story"; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); },
+  showStory(act){ UIM.storyAct = act; UIM.storyI = 0; UIM.storyT = performance.now(); UIM.storyTyped = false; UIM.modal = "story"; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); },
   storyNext(){
     const st = P.STORY.find(a => a.act === UIM.storyAct);
-    if (st && UIM.storyI < st.panels.length - 1){ UIM.storyI++; UIM.storyT = performance.now(); Audio.play("click"); k.dirty(); return; }
-    UIM.modal = null; Audio.play("start"); k.dirty();
+    if (st && UIM.storyI < st.panels.length - 1){ UIM.storyI++; UIM.storyT = performance.now(); UIM.storyTyped = false; Audio.play("click"); k.dirty(); return; }
+    UIM.modal = null; Audio.play("start"); this.afterModal && this.afterModal(); k.dirty();
   },
-  storySkip(){ UIM.modal = null; k.dirty(); },
-  newGame(){ P.newGame(S.lang); UIM.screen = "game"; UIM.sub = null; UIM.modal = null; UIM.pendingIntro = true; this.goScene("Game"); },
-  loadSave(obj){
-    if (!P.loadState(obj)) return false;
+  storySkip(){ UIM.modal = null; Audio.play("close"); this.afterModal && this.afterModal(); k.dirty(); },
+  newGame(skipTraining){ if (!skipTraining && P.Train && !P.Train.trained()) return P.Train.start();   // 3.x: the first game is the training
+    P.newGame(S.lang); UIM.screen = "game"; UIM.sub = null; UIM.modal = null; UIM.pendingIntro = true; this.goScene("Game"); },
+  loadSave(obj, slot){
+    if (!P.loadState(obj, slot)) return false;
+    if (P.Alerts) P.Alerts.reset();
     UIM.screen = "game"; UIM.sub = null; UIM.modal = null; UIM.pendingIntro = false; this.goScene("Game"); return true;
   },
   /* ---- keyboard (PC) ---- T = skills · Esc = close · Space = pause · 1/2/3 = speed · H = whole world · +/− = zoom · R = regions · S = stats · N = news */
@@ -271,8 +294,8 @@ Object.assign(Screens, {
   setup(scene, kind){
     this.scene = scene; this.kind = kind; UIM.screen = kind === "loading" ? "menu" : kind;
     const layers = kind === "loading" ? ["Loader", "Toast"]
-      : kind === "menu" ? ["MapUI", "Menu", "MenuScroll", "Modal", "ModalScroll", "Toast"]
-      : ["MapUI", "HUD", "Drawer", "DrawerScroll", "Modal", "ModalScroll", "Toast"];
+      : kind === "menu" ? ["MapUI", "Menu", "MenuScroll", "Modal", "ModalScroll", "Toast", "Train"]
+      : ["MapUI", "HUD", "Drawer", "DrawerScroll", "Alerts", "Modal", "ModalScroll", "Toast", "Train"];
     k.setup(scene, layers);
     const set = (n, fn, master) => { const l = k.L(n); if (!l) return; if (fn) l.render = fn; if (master) l.master = master; };
     set("Loader", l => this.renderLoader(l));
@@ -282,10 +305,14 @@ Object.assign(Screens, {
     set("Menu", l => this.renderMenu(l)); set("MenuScroll", null, "Menu");
     set("Modal", l => this.renderModal(l)); set("ModalScroll", null, "Modal");
     set("Toast", l => this.renderToast(l));
+    set("Alerts", l => this.renderAlerts && this.renderAlerts(l));
+    set("Train", l => { if (this.renderTrain) this.renderTrain(l); if (this.renderSubs) this.renderSubs(l); });   // + narration subtitles on top
     Audio.setScene(scene);
+    if (kind === "menu") Audio.setMood("menu"); else if (kind === "game") setTimeout(() => Audio.setMood(S.started ? Audio.gameMood() : "calm", true), 50);   // a new piece of music for the game
     if (kind !== "loading") P.Map.init(scene, kind);
     if (kind === "game"){
-      if (!S.started){
+      if (UIM.trainPending && P.Train){ P.Train.begin(); }   // 3.x: training mode starts straight into a guided game
+      else if (!S.started){
         UIM.modal = null; UIM.charSel = UIM.charSel || S.char || "sci";
         if (!tutSeen()) this.openTutorial(0, true); else UIM.modal = "charsel";
       } else { UIM.modal = null; P.Map.focus(S.sel, false); }
@@ -303,6 +330,14 @@ Object.assign(Screens, {
     if (this.kind !== "loading") P.Map.update(dt);
     Audio.update(dt);
     this.toastUpdate(dt);
+    if (this.kind === "game" && P.Alerts && P.Alerts.busy()){ this._alT = (this._alT || 0) + dt; if (this._alT > .2){ this._alT = 0; k.dirty("Alerts"); } }   // fading lines, pulsing pill
+    if (this.kind === "game" && UIM.modal === "intro" && this.introTick) this.introTick();
+    if (this.narrTick) this.narrTick();
+    if (this.kind === "game" && this._hudAnim) k.dirty("HUD");   // numbers sliding to their new value
+    if (this.kind === "game"){ const m = k.mouse; if (m.x !== this._mx || m.y !== this._my){ this._mx = m.x; this._my = m.y; if (P.hasKeyboard()) k.dirty("MapUI"); }   // country name under the pointer
+      if (this._edgeAnim){ this._eaT = (this._eaT || 0) + dt; if (this._eaT > .1){ this._eaT = 0; k.dirty("MapUI"); } } }
+    if (this.kind === "game" && UIM.modal === "story" && !UIM.storyTyped) k.dirty("Modal");   // typewriter
+    if (UIM.train && P.Train && this.kind === "game"){ P.Train.tick(); k.dirty("Train"); }   // the lit-up target can move (map, windows)
     if (this.kind === "game"){
       const v = scene.getVariables();
       v.get("Running").setNumber(P.running() ? 1 : 0);
@@ -333,7 +368,9 @@ if (!P._keys){
 
 /* hooks used by the engine */
 H.dirty = () => k.dirty();
-H.showEvent = () => { if (UIM.modal === "skills" || UIM.modal === "charsel") UIM.modal = null; UIM.evAt = performance.now(); const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); };
+const CE_AMB = {CE_BATTERY:"factory", CE_COAL:"factory", CE_DAM:"river", CE_FOREST:"jungle", CE_CBAM:"market", CE_REFUGEE:"crowd", CE_SEABED:"underwater", CE_NUKE:"lab", CE_ARCTIC:"arctic", CE_LOSS:"office", CE_SOLARWAR:"market", CE_GEOENG:"lab", CE_MARINE:"ocean", CE_PALM:"jungle", CE_DATA:"keyboard", CE_RAIL:"train"};
+H.showEvent = () => { if (S.cev && CE_AMB[S.cev.id]) Audio.ambience(CE_AMB[S.cev.id]); Audio.play("question", {delay:.35, vol:.7}); setTimeout(() => Audio.play("tick", {vol:.5}), 1500);
+  if (UIM.modal === "skills" || UIM.modal === "charsel") UIM.modal = null; UIM.evMin = false; UIM.evAt = performance.now(); const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); };
 H.showEnd = () => {
   if (UIM.modal === "skills") UIM.modal = null; UIM.reward = null; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0;
   const e = P.ENDINGS[S.over]; if (e && e.amb) setTimeout(() => { if (S.over) Audio.ambience(e.amb); }, 1200);   // each ending has its own soundscape
@@ -342,7 +379,7 @@ H.showEnd = () => {
 H.closeModal = () => { if (UIM.modal === "charsel") UIM.modal = null; k.dirty(); };
 H.toast = a => { UIM.toastQ.push(a); };
 H.story = act => { if (UIM.modal === "skills") UIM.modal = null; Screens.showStory(act); };
-H.gameStart = () => { Screens.showStory(1); if (P.Net) P.Net.startRun(); };
+H.gameStart = () => { if (P.Alerts) P.Alerts.reset(); Screens.showStory(1); if (P.Net) P.Net.startRun(); };
 H.gameOver = () => { if (P.Net) P.Net.finishRun(); };
 /* 3.x, until the minerals market screen is ported: skills don't ask for minerals in this build
    (otherwise the shared engine would block them with no way to buy minerals here) */

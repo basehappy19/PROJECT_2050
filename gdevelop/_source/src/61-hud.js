@@ -13,18 +13,35 @@ const k = Kit;
    newest news line grows out of it to the right (fades after a few seconds) · top-right: date, speed, menu
    bottom: zoom (left) · Net Zero + warming, one slim row each (centre) · tabs (right) */
 const HUD_Y = 10, KPI_H = 46, KPI_W = 134;
+/* 1.1.3: numbers slide to their new value (450 ms), with a short +/− flash so you see what you gained or lost */
+const AN = {};
+function animNum(key, v){
+  let q = AN[key]; const now = performance.now();
+  if (!q || q.game !== S.saveId){ q = AN[key] = {from:v, to:v, t0:0, shown:v, d:0, dt:0, game:S.saveId}; }
+  if (v !== q.to){ const d = v - q.to; q.from = q.shown; q.to = v; q.t0 = now; if (Math.abs(d) >= 1){ q.d = d; q.dt = now; } }
+  const p = Math.min(1, (now - q.t0) / 450), e = 1 - Math.pow(1 - p, 3);
+  q.shown = q.from + (q.to - q.from) * e;
+  const fa = q.d ? Math.max(0, 1 - (now - q.dt) / 1100) : 0;
+  if (p < 1 || fa > 0) Screens._hudAnim = true;
+  return {v:q.shown, d:fa > 0 ? q.d : 0, fa, rise:(1 - fa) * 8};
+}
 Screens.renderHUD = function(l){
   if (this.kind !== "game") return;
-  const by = HUD_Y;
+  const by = HUD_Y; this._goalsBottom = 0;
   /* ---- KPIs ---- */
   const acls = S.appr < 25 ? "bad" : S.appr < 45 ? "warn" : "good";
+  Screens._hudAnim = false;
+  const aEp = animNum("ep", S.ep), aPc = animNum("pc", S.pc), aAp = animNum("appr", S.appr);
+  const sanct = P.sanctionsCost ? P.sanctionsCost() : 0;
   const kpis = [
-    {id:"ep", ic:"$money", k:t("ep"), v:String(Math.floor(S.ep)), s:`+${P.epGain()}${t("perMo")}`, c:"fg"},
-    {id:"pc", ic:"$policy", k:t("pc"), v:String(Math.floor(S.pc)), s:`+${P.pcGain()}${t("perMo")}`, c:"fg"},
+    {id:"ep", ic:"$money", k:t("ep"), v:String(Math.floor(aEp.v)), an:aEp, s:sanct ? `+${P.epGain()} −${sanct}` : `+${P.epGain()}${t("perMo")}`, c:"fg", tip:t("tipEp"), sc:sanct ? "bad" : "muted"},
+    {id:"pc", ic:"$policy", k:t("pc"), v:String(Math.floor(aPc.v)), an:aPc, s:`+${P.pcGain()}${t("perMo")}`, c:"fg", tip:t("tipPc")},
   ];
-  if (S.oreOn && P.matTotal) kpis.push({id:"ore", ic:"$ore", k:t("oreLbl"), v:String(P.matTotal()), s:`+${Math.round(P.oreGain ? P.oreGain() : 0)}${t("perMo")}`, c:"fg", fn:() => Screens.openWin("market")});
-  kpis.push({id:"appr", ic:"$appr", k:t("appr"), v:`${S.appr.toFixed(0)}%`, meter:S.appr / 100, c:acls, fn:S.groups ? () => Screens.openWin("politics") : null});
+  if (S.oreOn && P.matTotal){ const aOr = animNum("ore", P.matTotal()); kpis.push({id:"ore", ic:"$ore", k:t("oreLbl"), v:String(Math.round(aOr.v)), an:aOr, s:`+${Math.round(P.oreGain ? P.oreGain() : 0)}${t("perMo")}`, c:"fg", tip:t("tipOre"), fn:() => Screens.openWin("market")}); }
+  kpis.push({id:"appr", ic:"$appr", k:t("appr"), v:`${aAp.v.toFixed(0)}%`, an:aAp, meter:S.appr / 100, c:acls, badge:P.angryCount && P.angryCount() ? "!" : null,
+    tip:S.groups ? P.GROUPS.map(G => `[[${G.icon}]] ${Math.round(S.groups[G.id])}%`).join("  ") : t("tipAppr"), fn:S.groups ? () => Screens.openWin("politics") : null});
   const bw = KPI_W * kpis.length;
+  this._kpiRect = {x:14, y:by, w:bw, h:KPI_H};
   W.glass(l, 14, by, bw, KPI_H, 12);
   kpis.forEach((q, i) => {
     const x = 14 + i * KPI_W, danger = q.id === "appr" && S.appr < 25, hov = q.fn && k.isHover(l, "kpi-" + q.id);
@@ -35,14 +52,28 @@ Screens.renderHUD = function(l){
     k.text(l, q.k, x + 40, by + 4, {size:10.5, color:"muted", w:KPI_W - 60, max:1});
     const vr = k.text(l, q.v, x + 40, by + 18, {font:"monoB", size:18, color:q.c});
     if (q.meter !== undefined) W.meter(l, x + 44 + vr.w, by + 29, Math.max(18, KPI_W - 66 - vr.w), 4, q.meter, acls);
-    else if (q.s) k.text(l, q.s, x + 46 + vr.w, by + 24, {font:"mono", size:10, color:"muted", w:KPI_W - 52 - vr.w, max:1});
+    else if (q.s) k.text(l, q.s, x + 46 + vr.w, by + 24, {font:"mono", size:10, color:q.sc || "muted", w:KPI_W - 52 - vr.w, max:1});
+    if (q.an && q.an.d){ const dd = q.an.d, lab = `${dd > 0 ? "+" : "−"}${Math.abs(Math.round(dd))}`; k.text(l, lab, x + 40 + vr.w + 2, by + 6 - q.an.rise, {font:"monoB", size:11, color:dd > 0 ? "good" : "bad", a:q.an.fa}); }
+    if (q.badge){ k.circle(l, x + 32, by + 12, 7, "bad"); k.text(l, q.badge, x + 25, by + 4, {font:"monoB", size:10, color:"#ffffff", w:14, align:"center"}); }
     if (q.fn){ k.icon(l, "chevron-down", x + KPI_W - 18, by + 16, 13, "muted"); k.hit(l, "kpi-" + q.id, x, by, KPI_W, KPI_H, () => { Audio.play("open"); q.fn(); }); }
+    else k.hit(l, "kpi-" + q.id, x, by, KPI_W, KPI_H, () => { UIM.kpiTip = UIM.kpiTip === q.id ? null : q.id; k.dirty("HUD"); }, {cursor:false});   // tap (touch) shows what it is
   });
+  // a value in the top bar: hover (or tap) shows what it is and how to get more
+  const tipQ = kpis.find(q => q.tip && (k.isHover(l, "kpi-" + q.id) || UIM.kpiTip === q.id));
+  if (tipQ){
+    const i = kpis.indexOf(tipQ), tw = 280, tx = Math.min(14 + i * KPI_W, k.W - tw - 14), ty = by + KPI_H + 6;
+    const th = 24 + (tipQ.s && !tipQ.meter ? 18 : 0) + k.textH(tipQ.tip, {size:12, w:tw - 24}) + 12;
+    k.rect(l, tx, ty, tw, th, "panel", {r:10, stroke:"line", a:.97, bg:true});
+    k.text(l, tipQ.k, tx + 12, ty + 8, {font:"bodyB", size:13, w:tw - 24, max:1});
+    let yy = ty + 28;
+    if (tipQ.s && !tipQ.meter){ k.text(l, tipQ.s, tx + 12, yy, {font:"mono", size:11.5, color:"accent"}); yy += 18; }
+    k.text(l, tipQ.tip, tx + 12, yy, {size:12, color:"muted", w:tw - 24, iconColor:"muted"});
+  }
   /* ---- controls (right): date · speed · menu ---- */
   const has3 = P.Net && P.Net.owns("speed3");
   const sp = [{id:"sp0", icon:"pause", on:S.speed === 0, fn:() => P.setSpeed(0)}, {id:"sp1", label:"1×", on:S.speed === 1, fn:() => P.setSpeed(1)}, {id:"sp2", label:"2×", on:S.speed === 2, fn:() => P.setSpeed(2)}];
   if (has3) sp.push({id:"sp3", label:"3×", on:S.speed === 3, fn:() => P.setSpeed(3)});
-  const dateW = 112, ctrlW = 10 + dateW + 8 + sp.length * 34 + 8 + 30 + 10, cx0 = 1266 - ctrlW;
+  const dateW = 112, ctrlW = 10 + dateW + 8 + sp.length * 34 + 8 + 30 + 10, cx0 = (k.W - 14) - ctrlW;
   W.glass(l, cx0, by, ctrlW, KPI_H, 12);
   const se = P.seasonOf ? P.seasonOf() : null;
   k.text(l, `${se ? `[[${se.icon}]] ` : ""}${P.dateStr()}`, cx0 + 10, by + 12, {font:"dispS", size:16, w:dateW, max:1, iconColor:"accent"});
@@ -67,13 +98,23 @@ Screens.renderHUD = function(l){
       if (!Screens._newsTimer) Screens._newsTimer = setTimeout(() => { Screens._newsTimer = null; k.dirty("HUD"); }, age < 6 ? (6 - age) * 1000 + 30 : 120);
     }
   }
+  /* Continuous World: this season's goals under the news line */
+  if (S.world && S.goals && S.goals.length){
+    const gx = 14 + 54 + 8, gy = ay + 34, gw = Math.min(300, bw - 62), won = S.goals.filter(g => g.won).length;
+    const lines = S.goals.map(g => `${g.won ? "[[circle-check]]" : "[[target]]"} ${P.goalText(g)}`);
+    let gh = 30; const hs = lines.map(s2 => k.text(null, s2, 0, 0, {size:12, w:gw - 24, measure:true}).h); gh += hs.reduce((a, b) => a + b + 4, 0) + 6;
+    W.glass(l, gx, gy, gw, gh, 10); this._goalsBottom = gy + gh;
+    k.text(l, `[[target]] ${P.up(t("goalsTitle"))}`, gx + 12, gy + 8, {font:"mono", size:11, color:"accent", iconColor:"accent"});
+    k.text(l, `${won}/${S.goals.length}`, gx + gw - 40, gy + 8, {font:"mono", size:11, color:won === S.goals.length ? "good" : "muted", w:28, align:"right"});
+    let yy = gy + 28; lines.forEach((s2, i) => { k.text(l, s2, gx + 12, yy, {size:12, w:gw - 24, color:S.goals[i].won ? "good" : "fg", iconColor:S.goals[i].won ? "good" : "muted"}); yy += hs[i] + 4; });
+  }
   if (P.Map.isCountryZoom()){
-    const ht = `[[pointer]] ${t("tapCountry")}`, hw = k.textW(ht, {size:11.5}) + 24, hx = (16 + 1264 - this.drawerWidth()) / 2 - hw / 2;
-    k.rect(l, hx, 630, hw, 24, "bg", {r:12, a:.8, stroke:"line", bg:true});
-    k.text(l, ht, hx + 12, 633, {size:11.5, color:"muted", iconColor:"accent"});
+    const ht = `[[pointer]] ${t("tapCountry")}`, hw = k.textW(ht, {size:11.5}) + 24, hx = (16 + (k.W - 16) - this.drawerWidth()) / 2 - hw / 2;
+    k.rect(l, hx, k.H - 90, hw, 24, "bg", {r:12, a:.8, stroke:"line", bg:true});
+    k.text(l, ht, hx + 12, k.H - 87, {size:11.5, color:"muted", iconColor:"accent"});
   }
   /* ---- bottom row ---- */
-  const ny = 668, nh = 40, keys = P.hasKeyboard();
+  const ny = k.H - 52, nh = 40, keys = P.hasKeyboard();
   // zoom (left)
   W.glass(l, 14, ny, 3 * 34 + 8, nh, 10);
   W.hbtn(l, "zin", 18, ny + 5, "plus", () => P.Map.zoomBy(1.35));
@@ -83,7 +124,7 @@ Screens.renderHUD = function(l){
   const tabs = [["tech", "network", "nbTech", "T"], ["region", "map", "nbRegion", "R"], ["stats", "chart-line", "nbStats", "S"], ["news", "newspaper", "nbNews", "N"]];
   const readyCount = P.SKILLS.filter(n => P.nodeState(n) === "ready" && (P.canAfford ? P.canAfford(n) : true)).length;
   const widths = tabs.map(([id, ic, key]) => { const lab = P.up(t(key)); return 14 + 16 + 6 + k.textW(lab, {font:"dispS", size:13}) + 14 + (id === "tech" && readyCount ? 26 : 0) + (keys ? 20 : 0); });
-  let nx = 1266 - widths.reduce((a, b) => a + b, 0) - 6 * (tabs.length - 1);
+  let nx = (k.W - 14) - widths.reduce((a, b) => a + b, 0) - 6 * (tabs.length - 1);
   const tabsX = nx;
   tabs.forEach(([id, ic, key, kk], i) => {
     const on = id === "tech" ? UIM.modal === "skills" : S.tab === id, hov = k.isHover(l, "tab-" + id), w = widths[i];
@@ -97,11 +138,12 @@ Screens.renderHUD = function(l){
     nx += w + 6;
   });
   // Net Zero + warming (centre, between zoom and tabs)
-  const left = 14 + 3 * 34 + 8 + 10, room = tabsX - 10 - left, mw = Math.min(600, room), mx = Math.max(left, 640 - mw / 2 + Math.min(0, (tabsX - 10) - (640 + mw / 2)));
-  W.glass(l, mx, ny, mw, nh, 10);
+  const left = 14 + 3 * 34 + 8 + 10, room = tabsX - 10 - left, mw = Math.min(600, room), mx = Math.max(left, k.W / 2 - mw / 2 + Math.min(0, (tabsX - 10) - (k.W / 2 + mw / 2)));
+  W.glass(l, mx, ny, mw, nh, 10); this._metersRect = {x:mx, y:ny, w:mw, h:nh};
   const half = (mw - 24 - 18) / 2;
   this.meterRowNZ(l, mx + 12, ny + 11, half);
   this.meterRowT(l, mx + 12 + half + 18, ny + 11, half);
+  if (S.started && this.placeBar) this.placeBar(l, (S.world && S.goals && S.goals.length ? this._goalsBottom || 104 : 98) + 8);   // Continuous World: builds waiting to be placed
 };
 /* one slim row: title · bar · value (the Net Zero bar fills toward the trophy as CO₂ falls) */
 Screens.meterRowNZ = function(l, x, y, w){
@@ -243,9 +285,12 @@ Screens.meterT = function(l, x, y, w){
 const HZ_COL = {hurricane:"#c3a6ff", typhoon:"#c3a6ff", flood:"#8fd0ff", heat:"#ff8a3c", drought:"#f2c14e", wildfire:"#ff5a4a", saltwater:"#4fd1c5"};
 Screens.renderMapUI = function(l){
   const Map = P.Map; if (!Map || !Map.scene) return;
+  this._edgeAnim = false;
+  if (this.kind === "game" && this.placeGrid) this.placeGrid(l);   // Continuous World: the hex grid under everything else
+  if (this.kind === "game" && this.drawPins) this.drawPins(l);   // builds pinned on the map
   if (this.kind === "game"){
-    const ry = 60, rb = 660, zoomed = Map.isCountryZoom();
-    const leftLimit = 74, rightLimit = 1264 - this.drawerWidth();
+    const ry = 60, rb = k.H - 60, zoomed = Map.isCountryZoom();
+    const leftLimit = 74, rightLimit = (k.W - 16) - this.drawerWidth();
     if (!zoomed){
       for (const r of S.regions){
         const [lat, lon] = RMETA[r.id].lab; const [sx, sy] = Map.latlonScreen(lat, lon);
@@ -308,6 +353,23 @@ Screens.renderMapUI = function(l){
     for (const f of Map.fx){
       const [sx, sy] = Map.toScreen(f.x, f.y), p = f.t / 2.2, Z = HAZARDS[f.type], col = HZ_COL[f.type] || "#ff5a4a";
       const a = p < .8 ? 1 : 1 - (p - .8) / .2;
+      // weather over the struck country (web/src/map2d.js weatherFx, lighter)
+      { const R = 70 * Math.sqrt(Map.cam.z), wa = p < .15 ? p / .15 : p > .75 ? (1 - p) / .25 : 1, T = f.type, now = performance.now() / 1000, low = P.Gfx && P.Gfx.level === "low";
+        f.seed = f.seed || Array.from({length:120}, () => Math.random());
+        for (let i = 0; i < 3; i++){ const q = p * 1.6 - i * .18; if (q > 0 && q < 1) k.circle(l, sx, sy, 12 + q * R * 1.4, null, {stroke:col, sw:3 * (1 - q) + .5, sa:(1 - q) * .8}); }
+        if (T === "flood" || T === "hurricane" || T === "typhoon"){
+          for (let i = 0, n = low ? 20 : 50; i < n; i++){ const rx = sx + (f.seed[i] * 2 - 1) * R, ry = sy - R + ((now * 380 + f.seed[i + 60] * 1000) % (2 * R)); k.line(l, rx, ry, rx - 4, ry + 12, "#aad2ff", {w:1.2, a:wa * .8}); }
+          if (T === "flood") k.circle(l, sx, sy + 6, R * .6 * wa, "#3c78c8", {a:.22});
+        } else if (T === "heat" || T === "drought"){
+          k.circle(l, sx, sy, R * 1.2, T === "heat" ? "#ff7828" : "#e6b450", {a:.28 * wa});
+          for (let i = 0; i < 6; i++){ const yy = sy - R * .6 + i * R * .22, pts = []; for (let xx = -R * .7; xx <= R * .7; xx += 8) pts.push(sx + xx, yy + Math.sin(xx * .08 + now * 4 + i) * 3); k.path(l, pts, T === "heat" ? "#ffc88c" : "#e6c88c", {w:1.5, a:wa * .7}); }
+        } else if (T === "wildfire"){
+          k.circle(l, sx, sy, R, "#ff5a1e", {a:.3 * wa});
+          for (let i = 0, n = low ? 18 : 40; i < n; i++){ const q = (now * .7 + f.seed[i]) % 1, ex = sx + (f.seed[i + 50] * 2 - 1) * R * .7 + Math.sin(now * 3 + i) * 6, ey = sy + R * .3 - q * R * 1.2; k.circle(l, ex, ey, 1.5 + (1 - q) * 1.6, (255 << 16) | (Math.round(140 + 100 * (1 - q)) << 8) | 60, {a:(1 - q) * wa}); }
+        } else if (T === "saltwater"){
+          for (let i = 0; i < 4; i++){ const yy = sy - R * .3 + i * R * .2, pts = []; for (let xx = -R * .8; xx <= R * .8; xx += 6) pts.push(sx + xx, yy + Math.sin(xx * .06 + now * 3 + i) * 5); k.path(l, pts, "#4fd1c5", {w:2, a:wa * .7}); }
+        }
+      }
       k.circle(l, sx, sy, 20 + p * 70, col, {a:(1 - p) * .25});
       k.circle(l, sx, sy, 10 + p * 40, null, {stroke:col, sw:2, sa:(1 - p) * .9});
       const swing = Math.sin(p * Math.PI * 2) * 36, size = 34 + 10 * Math.sin(p * Math.PI);
@@ -320,4 +382,5 @@ Screens.renderMapUI = function(l){
     const w = k.textW(f.txt, {font:"monoB", size:14});
     k.text(l, f.txt, f.x - w / 2, f.y - 18 - p * 40, {font:"monoB", size:14, color:col, a, iconColor:col});
   }
+  if (this.kind === "game"){ if (this.edgeArrows) this.edgeArrows(l); if (this.mapHover) this.mapHover(l); }
 };

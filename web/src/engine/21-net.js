@@ -19,8 +19,9 @@ function candidates(){
   const out = [];
   if (window.P2050_API) out.push(window.P2050_API);
   const saved = ls.get("p2050-api"); if (saved) out.push(saved);
-  if (/^https?:$/.test(location.protocol)) out.push("/api");
-  out.push("http://localhost:8080/api");
+  const app = window.P2050_APP || location.host === "appassets.androidplatform.net";   // Android app: files come from the APK, so only the real server
+  if (/^https?:$/.test(location.protocol) && !app) out.push("/api");
+  if (!app) out.push("http://localhost:8080/api");
   return [...new Set(out)];
 }
 /* same merge as server/api/src/progress.js: lists joined, counters keep the larger value, achievements keep the first time */

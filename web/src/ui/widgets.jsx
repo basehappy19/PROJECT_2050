@@ -57,14 +57,30 @@ export function Portrait({id, size = 48, ring, cls = "", outfit, dim, lv}){
   return <span class={`portrait ${o === "gold" ? "gold" : ""} ${dim ? "dim" : ""} ${cls}`} style={{width:size, height:size, "--ring":col}}>
     <img src={portraitSrc(id, o)} alt={ch ? L(ch.person) : ""} loading="lazy" draggable="false"/>{lv ? <b class="lv">{lv}</b> : null}</span>;
 }
+/* 2.3: tapping the icon turns that sound on or off at once (and back on at 80% if its slider was at 0); narration has its own volume */
+function flipSound(kind){
+  if (kind === "narr"){ if (Narr.on && Narr.vol > 0) Narr.setOn(false); else { if (Narr.vol <= 0) Narr.setVol(.8); Narr.setOn(true); } }
+  else {
+    const on = kind === "music" ? Audio.musicOn : Audio.on, lv = kind === "music" ? Audio.lvMusic : Audio.lvSfx;
+    if (on && lv > 0){ if (kind === "music") Audio.toggleMusic(); else Audio.toggle(); }
+    else { if (lv <= 0) Audio.setLevel(kind, .8); if (!on){ if (kind === "music") Audio.toggleMusic(); else Audio.toggle(); } }
+    if (kind !== "sfx") Audio.play("toggle");
+  }
+  P._bump();
+}
 export function Volume(){
-  const row = (kind, icon, iconOff, on, lv, label) => <div class="volrow" key={kind}>
-    <IconBtn n={on && lv > 0 ? icon : iconOff} title={label} onClick={() => (kind === "music" ? Audio.toggleMusic() : Audio.toggle())} sound={null}/>
+  const th = S.lang === "th";
+  const row = (kind, icon, iconOff, on, lv, label, set) => <div class={"volrow" + (on && lv > 0 ? "" : " off")} key={kind}>
+    <IconBtn n={on && lv > 0 ? icon : iconOff} on={on && lv > 0} title={`${label}: ${on && lv > 0 ? (th ? "แตะเพื่อปิด" : "tap to turn off") : (th ? "แตะเพื่อเปิด" : "tap to turn on")}`} onClick={() => flipSound(kind)} sound={null}/>
     <span class="lbl">{label}</span>
-    <Slider v={lv} label={label} onSet={v => { Audio.setLevel(kind, v); P._bump(); }}/>
+    <Slider v={lv} label={label} onSet={v => { set(v); P._bump(); }}/>
     <span class="num">{Math.round(lv * 100)}%</span>
   </div>;
-  return <div class="vol">{row("music", "music", "music-off", Audio.musicOn, Audio.lvMusic, t("musicLbl"))}{row("sfx", "volume-2", "volume-x", Audio.on, Audio.lvSfx, t("sfxLbl"))}</div>;
+  return <div class="vol">
+    {row("music", "music", "music-off", Audio.musicOn, Audio.lvMusic, t("musicLbl"), v => Audio.setLevel("music", v))}
+    {row("sfx", "volume-2", "volume-x", Audio.on, Audio.lvSfx, t("sfxLbl"), v => Audio.setLevel("sfx", v))}
+    {Narr.available() ? row("narr", "audio-lines", "volume-x", Narr.on, Narr.vol, th ? "เสียงบรรยาย" : "Narration", v => { Narr.setVol(v); if (v > 0 && !Narr.on) Narr.setOn(true); }) : null}
+  </div>;
 }
 export const LangSeg = () => <Seg cls="lang" items={[
   {id:"th", label:"TH", on:S.lang === "th", fn:() => { P.setLang("th"); document.documentElement.lang = "th"; }},
@@ -78,19 +94,19 @@ export function GfxSeg(){
 }
 
 /* 1.9: reads `text` aloud when it appears (if narration is on); with `btn`, also shows a listen / stop button */
-export function Speak({text, btn, auto = true}){
-  useEffect(() => { if (auto) Narr.say(text); return () => Narr.stop(); }, [text]);
+export function Speak({text, btn, auto = true, who = ""}){
+  useEffect(() => { if (auto) Narr.say(text, {who}); return () => Narr.stop(); }, [text]);
   if (!btn || !Narr.available()) return null;
   const th = S.lang === "th";
   return <IconBtn n={Narr.speaking ? "square" : "volume-2"} cls="speakbtn" title={Narr.speaking ? (th ? "หยุดอ่าน" : "Stop reading") : (th ? "ฟังข้อความนี้" : "Listen")} sound={null}
-    onClick={e => { if (e && e.stopPropagation) e.stopPropagation(); if (Narr.speaking) Narr.stop(); else Narr.say(text, {force:true}); }}/>;
+    onClick={e => { if (e && e.stopPropagation) e.stopPropagation(); if (Narr.speaking) Narr.stop(); else Narr.say(text, {force:true, who}); }}/>;
 }
 /* 1.9: narration and subtitles settings */
 export function NarrRow(){
   const th = S.lang === "th", ok = Narr.available();
-  const rates = [[1, th ? "ช้า" : "Slow"], [1.25, th ? "ปกติ" : "Normal"], [1.5, th ? "เร็ว" : "Fast"]].map(([r, label]) => ({id:"r" + r, label, on:Narr.rate === r, fn:() => Narr.setRate(r)}));
+  const rates = Narr.RATES.map((r, i) => [r, [th ? "ช้า" : "Slow", th ? "ปกติ" : "Normal", th ? "เร็ว" : "Fast"][i]]).map(([r, label]) => ({id:"r" + r, label, on:Narr.rate === r, fn:() => Narr.setRate(r)}));
   return <div class="gfxrow narr"><Icon n="audio-lines" size={18}/><span class="lbl">{th ? "เสียงพากย์" : "Narration"}</span>
-    {ok ? <><Check on={Narr.on} onClick={() => { Narr.setOn(!Narr.on); if (Narr.on) Narr.say(th ? "เปิดเสียงพากย์แล้ว" : "Narration is on"); }}>{th ? "อ่านออกเสียง" : "Read aloud"}</Check>
+    {ok ? <><Check on={Narr.on} onClick={() => { Narr.setOn(!Narr.on); if (Narr.on) Narr.say(th ? "เปิดเสียงพากย์แล้ว" : "Narration is on", {who:"adv"}); }}>{th ? "อ่านออกเสียง" : "Read aloud"}</Check>
       <Check on={Narr.subs} onClick={() => Narr.setSubs(!Narr.subs)}>{th ? "คำบรรยาย" : "Subtitles"}</Check>
       {Narr.on ? <Seg cls="gfx" items={rates}/> : null}</>
       : <small class="muted">{!Narr.supported ? (th ? "เบราว์เซอร์นี้อ่านออกเสียงไม่ได้" : "This browser can't read aloud") : (th ? "เครื่องนี้ยังไม่มีเสียงภาษาไทย (เพิ่มได้ในการตั้งค่าภาษาของเครื่อง)" : "No voice for this language on this device")}</small>}

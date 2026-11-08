@@ -32,8 +32,8 @@ Screens.loaderUpdate = function(dt){
 };
 Screens.renderLoader = function(l){
   if (!P._extra || P._extra.fonts < P._extra.nf) return;
-  const w = 440, x = (1280 - w) / 2, y = 210, p = this._ldShown || 0;
-  k.sprite(l, "Logo", "Logo", (1280 - 150) / 2, y - 120, 150, 150);
+  const w = 440, x = (k.W - w) / 2, y = 210, p = this._ldShown || 0;
+  k.sprite(l, "Logo", "Logo", (k.W - 150) / 2, y - 120, 150, 150);
   k.text(l, "GLOBAL CLIMATE TASKFORCE · 2026 – 2050", x, y + 40, {font:"mono", size:11, color:"accent", w, align:"center"});
   const parts = [["PROJECT ", {font:"logo", size:52}], [":", {font:"logo", size:52, color:"accent"}], [" 2050", {font:"logo", size:52}]];
   W.runs(l, x + (w - W.runsW(parts)) / 2, y + 62, parts);
@@ -47,10 +47,10 @@ Screens.renderLoader = function(l){
   if (this._ldReady){
     const lab = t("enter"), bw = k.textW(lab, {font:"dispS", size:15}) + 40;
     W.btn(l, "enter", x + (w - bw) / 2, by + 52, lab, () => { Audio.play("start"); try { localStorage.setItem("p2050-entered", "1"); } catch(e) {} Screens.goScene("Menu"); }, {w:bw, h:42, size:15, sound:false});
-    k.hit(l, "enterAll", 0, 0, 1280, 720, () => { Audio.play("start"); Screens.goScene("Menu"); }, {cursor:false});
+    k.hit(l, "enterAll", 0, 0, k.W, k.H, () => { Audio.play("start"); Screens.goScene("Menu"); }, {cursor:false});
     l.hits.unshift(l.hits.pop());
   }
-  k.text(l, t("disclaimer"), 0, 690, {size:11.5, color:"muted", w:1280, align:"center"});
+  k.text(l, t("disclaimer"), 0, k.H - 30, {size:11.5, color:"muted", w:k.W, align:"center"});
 };
 
 /* ---------------- main menu ---------------- */
@@ -63,8 +63,8 @@ Screens.renderMenu = function(l){
   let ch = 0; UIM._googleRect = null;
   k.slave("MenuScroll", s => {
     ch = this.menuCard(s, w);
-    const top = Math.max(16, (720 - ch) / 2);
-    s.frame(x, top, {x:0, y:0, w:x + w + 40, h:720}, ch + Math.max(0, top - 16));
+    const top = Math.max(16, (k.H - ch) / 2);
+    s.frame(x, top, {x:0, y:0, w:x + w + 40, h:k.H}, ch + Math.max(0, top - 16));
   });
   if (P.Net) P.Net.googleOverlay(UIM._googleRect);
   this.accountChip(l);
@@ -74,31 +74,31 @@ Screens.accountChip = function(l){
   const N = P.Net, y = 16;
   if (!N.online){
     const txt = N.checking ? t("netChecking") : `[[wifi-off]] ${t("netOffline")}`, w = k.textW(txt, {size:12}) + 26;
-    k.rect(l, 1264 - w, y, w, 32, "glass", {r:16, stroke:"line", a:.9, bg:true});
-    k.text(l, txt, 1264 - w + 13, y + 6, {size:12, color:"muted", iconColor:"muted"});
+    k.rect(l, (k.W - 16) - w, y, w, 32, "glass", {r:16, stroke:"line", a:.9, bg:true});
+    k.text(l, txt, (k.W - 16) - w + 13, y + 6, {size:12, color:"muted", iconColor:"muted"});
     return;
   }
   if (!N.user){
     const lab = `[[log-in]] ${t("signIn")}`, w = W.btnW(lab);
-    W.btn(l, "chip-login", 1264 - w, y, lab, () => { UIM.sub = "account"; UIM.accTab = "login"; UIM.msg = ""; k.dirty(); });
+    W.btn(l, "chip-login", (k.W - 16) - w, y, lab, () => { UIM.sub = "account"; UIM.accTab = "login"; UIM.msg = ""; k.dirty(); });
     return;
   }
   const name = N.user.displayName, tw = k.textW(name, {font:"bodyB", size:13}), terra = String(N.user.terra);
   const w = 16 + tw + 16 + 22 + k.textW(terra, {font:"monoB", size:14}) + 16, id = "chip-acc", hov = k.isHover(l, id);
-  k.rect(l, 1264 - w, y, w, 36, "glass", {r:18, stroke:hov ? "accent" : "line", a:.92, bg:true});
-  k.text(l, name, 1264 - w + 16, y + 7, {font:"bodyB", size:13});
-  W.terra(l, 1264 - w + 16 + tw + 16, y + 8, terra, {size:14, color:"good"});
-  k.hit(l, id, 1264 - w, y, w, 36, () => { Audio.play("click"); UIM.sub = "account"; UIM.msg = ""; k.dirty(); });
+  k.rect(l, (k.W - 16) - w, y, w, 36, "glass", {r:18, stroke:hov ? "accent" : "line", a:.92, bg:true});
+  k.text(l, name, (k.W - 16) - w + 16, y + 7, {font:"bodyB", size:13});
+  W.terra(l, (k.W - 16) - w + 16 + tw + 16, y + 8, terra, {size:14, color:"good"});
+  k.hit(l, id, (k.W - 16) - w, y, w, 36, () => { Audio.play("click"); UIM.sub = "account"; UIM.msg = ""; k.dirty(); });
 };
 const back = (l, y) => { W.btn(l, "back", 0, y, t("mBack"), () => { UIM.sub = null; UIM.msg = ""; k.dirty(); const s = k.L("MenuScroll"); if (s) s.scroll = 0; }, {kind:"ghost"}); return 36; };
 const msgLine = (l, y, w) => UIM.msg ? k.text(l, UIM.msg, 0, y, {size:12.5, color:UIM.err ? "bad" : "good", w}).h + 8 : 0;
-const go = sub => () => { UIM.sub = sub; UIM.msg = ""; UIM.err = false; const s = k.L("MenuScroll"); if (s) s.scroll = 0; if (sub === "board") P.Net.loadBoard(); if (sub === "cert") P.Net.loadCerts(); if (sub === "shop" || sub === "account") P.Net.refresh(); k.dirty(); };
+const go = sub => () => { UIM.sub = sub; UIM.msg = ""; UIM.err = false; const s = k.L("MenuScroll"); if (s) s.scroll = 0; if (sub === "board") P.Net.loadBoard(); if (sub === "season") P.Net.loadSeason(); if (sub === "cert") P.Net.loadCerts(); if (sub === "shop" || sub === "account") P.Net.refresh(); k.dirty(); };
 
 Screens.menuCard = function(l, w){
   const sub = UIM.sub; let y = 0;
   k.text(l, "GLOBAL CLIMATE TASKFORCE · 2026 – 2050", 0, y, {font:"mono", size:11.5, color:"accent"}); y += 22;
   W.runs(l, 0, y, [["PROJECT ", {font:"logo", size:46, lh:1}], [":", {font:"logo", size:46, color:"accent", lh:1}], [" 2050", {font:"logo", size:46, lh:1}]]); y += 46 + 12;
-  const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert"};
+  const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason", settings:"mSettingsS"};
   const tag2 = sub ? t(TITLES[sub]) : t("mDesc");
   y += k.text(l, tag2, 0, y, {size:sub ? 17 : 14, font:sub ? "dispS" : "body", color:sub ? "fg" : "muted", w:Math.min(w, 400)}).h + 14;
   if (sub === "load") y = this.subLoad(l, y, w);
@@ -107,11 +107,15 @@ Screens.menuCard = function(l, w){
   else if (sub === "shop") y = this.subShop(l, y, w);
   else if (sub === "board") y = this.subBoard(l, y, w);
   else if (sub === "cert") y = this.subCert(l, y, w);
+  else if (sub === "updates") y = this.subUpdates(l, y, w);
+  else if (sub === "season") y = this.subSeason(l, y, w);
+  else if (sub === "settings") y = this.subSettings(l, y, w);
   else {
-    const saves = P.readSaves(), auto = saves && saves.auto, n = P.Ach.count();
+    const saves = P.readSaves(), lk = P.latestSlot(), auto = lk && saves[lk], n = P.Ach.count();
     const items = [
-      {id:"new", ic:"globe", t1:t("mNew"), t2:t("mNewS"), primary:!auto, fn:() => Screens.newGame()},
-      {id:"continue", ic:"play", t1:t("mCont"), t2:auto ? `${P.dateStr(auto.meta.tick)} · ΔT +${auto.meta.temp.toFixed(2)}°C · ${auto.meta.net.toFixed(1)} Gt` : t("mNoSave"), primary:!!auto, dis:!auto, fn:() => { const s2 = P.readSaves(); if (s2 && s2.auto && !Screens.loadSave(s2.auto.S)){ UIM.msg = t("oldSave"); UIM.err = true; k.dirty(); } }},
+      {id:"new", ic:"globe", t1:t("mNew"), t2:t("mNewS"), primary:!auto, fn:() => { UIM.worldSel = false; Screens.newGame(); }},
+      {id:"world", ic:P.worldUnlocked && P.worldUnlocked() ? "infinity" : "lock", t1:t("mWorldS2"), t2:P.worldUnlocked && P.worldUnlocked() ? t("mWorldS") : t("mWorldLock"), dis:!(P.worldUnlocked && P.worldUnlocked()), fn:() => { UIM.worldSel = true; Screens.newGame(true); }},
+      {id:"continue", ic:"play", t1:t("mCont"), t2:auto ? `${P.modeName(auto.meta)} · ${P.dateStr(auto.meta.tick)} · ΔT +${auto.meta.temp.toFixed(2)}°C · ${auto.meta.net.toFixed(1)} Gt` : t("mNoSave"), primary:!!auto, dis:!auto, fn:() => { const s2 = P.readSaves(), k2 = P.latestSlot(); if (!k2 || !Screens.loadSave(s2[k2].S, k2)){ UIM.msg = t("oldSave"); UIM.err = true; k.dirty(); } }},
     ];
     for (const it of items){
       const hh = 54, hov = !it.dis && k.isHover(l, it.id);
@@ -129,12 +133,17 @@ Screens.menuCard = function(l, w){
       {id:"loadmenu", ic:"save", t1:t("mLoad"), fn:go("load")},
       {id:"learn", ic:"book-open", t1:t("mLearn"), t2:`${P.cardCount()}/${P.cardTotal()}`, fn:() => Screens.openLearn("cards")},
       {id:"ach", ic:"trophy", t1:t("mAch"), t2:`${n}/${ACH.length}`, fn:go("ach")},
-      {id:"tutorial", ic:"graduation-cap", t1:t("mHow"), fn:() => Screens.openTutorial(0, false)},
+      {id:"train", ic:"graduation-cap", t1:L(P.UI2.trainMenu), fn:() => P.Train.start()},
+      {id:"tutorial", ic:"circle-help", t1:t("mHow"), fn:() => Screens.openTutorial(0, false)},
+      {id:"updates", ic:"sparkles", t1:t("mUpd"), t2:P.VERSION_NAME || "", fn:go("updates")},
+      {id:"season", ic:"calendar-check", t1:t("mSeasonS"), t2:P.Net.seasonReady && P.Net.seasonReady() ? "●" : "", fn:go("season")},
       {id:"shop", ic:"shopping-bag", t1:t("mShop"), fn:go("shop")},
       {id:"board", ic:"medal", t1:t("mBoard"), fn:go("board")},
       {id:"cert", ic:"award", t1:t("mCert"), fn:go("cert")},
       {id:"account", ic:"user-round", t1:P.Net.user ? t("mAccount") : t("signIn"), fn:go("account")},
+      {id:"settings", ic:"settings", t1:t("mSettingsS"), fn:go("settings")},
     ];
+    if (tiles.length % 2) tiles.pop();   // keep the grid even
     const tw = (w - 7) / 2, th = 48;
     tiles.forEach((it, i) => {
       const tx = (i % 2) * (tw + 7), ty = y + Math.floor(i / 2) * (th + 7), hov = k.isHover(l, it.id);
@@ -151,9 +160,9 @@ Screens.menuCard = function(l, w){
   k.text(l, P.up(t("teamK")), 0, y, {font:"mono", size:10.5, color:"muted"}); y += 18;
   y += k.text(l, t("team"), 0, y, {font:"dispS", size:14, lh:1.35, w}).h + 2;
   y += k.text(l, t("disclaimer"), 0, y, {size:11.5, color:"muted", w}).h + 12;
-  y += W.vol(l, 0, y, w) + 10;
-  const ft = k.text(l, t("mTag"), 0, y + 6, {size:11.5, color:"muted", w:w - 96});
-  W.langSeg(l, w - 80, y);
+  if (sub !== "settings"){ y += W.vol(l, 0, y, w) + 10; }   // the settings page has its own sound and language rows
+  const ft = k.text(l, t("mTag"), 0, y + 6, {size:11.5, color:"muted", w:sub === "settings" ? w : w - 96});
+  if (sub !== "settings") W.langSeg(l, w - 80, y);
   y += Math.max(30, ft.h + 6);
   return y + 10;
 };
@@ -169,7 +178,7 @@ Screens.subLoad = function(l, y, w){
     k.text(l, P.slotName(slot), 12, y + 7, {font:"dispS", size:15});
     lines.forEach((s, i) => k.text(l, s, 12, y + 28 + i * 17, {font:"mono", size:11.5, color:"muted", w:w - 110, max:1}));
     const bw = W.btnW(t("load"));
-    W.btn(l, "load-" + slot, w - 12 - bw, y + (sh - 36) / 2, t("load"), () => { const s2 = P.readSaves(); if (s2 && s2[slot]) Screens.loadSave(s2[slot].S); }, {disabled:!ok});
+    W.btn(l, "load-" + slot, w - 12 - bw, y + (sh - 36) / 2, t("load"), () => { const s2 = P.readSaves(); if (s2 && s2[slot] && !Screens.loadSave(s2[slot].S, slot)){ UIM.msg = t("oldSave"); UIM.err = true; k.dirty(); } }, {disabled:!ok});
     y += sh + 7;
   }
   if (P.Net.user){
@@ -181,20 +190,12 @@ Screens.subLoad = function(l, y, w){
       k.text(l, `[[cloud]] ${P.slotName(slot)}`, 12, y + 7, {font:"dispS", size:15, iconColor:"accent"});
       lines.forEach((s, i) => k.text(l, s, 12, y + 28 + i * 17, {font:"mono", size:11.5, color:"muted", w:w - 110, max:1}));
       const bw = W.btnW(t("load"));
-      W.btn(l, "cload-" + slot, w - 12 - bw, y + (sh - 36) / 2, t("load"), () => P.Net.cloudLoad(slot).then(st => { if (!st || !Screens.loadSave(st)){ UIM.msg = t("codeBad"); UIM.err = true; k.dirty(); } }), {disabled:!c, kind:"ghost"});
+      W.btn(l, "cload-" + slot, w - 12 - bw, y + (sh - 36) / 2, t("load"), () => P.Net.cloudLoad(slot).then(st => { if (!st || !Screens.loadSave(st, slot)){ UIM.msg = t("codeBad"); UIM.err = true; k.dirty(); } }), {disabled:!c, kind:"ghost"});
       y += sh + 7;
     }
   }
   y += 6;
-  k.text(l, t("codePaste"), 0, y, {size:12, color:"muted"}); y += 20;
-  const inp = k.input(l, 0, y, w, 70, {placeholder:"P2050:...", key:"code"});
-  y += 78;
-  const bw = W.btn(l, "import", 0, y, t("codeLoad"), () => {
-    const o = P.importCode(inp.getString ? inp.getString() : "");
-    if (!Screens.loadSave(o)){ UIM.msg = t("codeBad"); UIM.err = true; Audio.play("error"); k.dirty(); }
-  }, {kind:"ghost"});
-  if (UIM.msg) k.text(l, UIM.msg, bw + 12, y + 2, {size:12.5, color:UIM.err ? "bad" : "good", w:w - bw - 12});
-  y += 36 + 14;
+  if (UIM.msg){ y += k.text(l, UIM.msg, 0, y, {size:12.5, color:UIM.err ? "bad" : "good", w}).h + 10; }
   return y + back(l, y);
 };
 
@@ -369,6 +370,72 @@ Screens.subBoard = function(l, y, w){
   return y + back(l, y);
 };
 
+/* ---------------- season & weekly missions (same as the website) ---------------- */
+Screens.subSeason = function(l, y, w){
+  const N = P.Net, D = N.season, th = S.lang === "th";
+  if (!N.online){ y += k.text(l, t("netOfflineLong"), 0, y, {size:13, color:"muted", w}).h + 12; return y + back(l, y); }
+  if (!N.user){ y += k.text(l, t("seasonLogin"), 0, y, {size:13.5, color:"muted", w}).h + 10; W.btn(l, "se-login", 0, y, `[[log-in]] ${t("signIn")}`, go("account")); y += 46; return y + back(l, y); }
+  if (!D || D.error || !D.season){ y += k.text(l, D && D.error ? t("boardFail") : t("netChecking"), 0, y, {size:13, color:"muted"}).h + 10; return y + back(l, y); }
+  const Z = D.season, fmt = d => new Date(d + "T00:00:00+07:00").toLocaleDateString(th ? "th-TH" : "en-GB", {day:"numeric", month:"short"});
+  const next = Z.tiers.find(x => !x.reached), prevXp = next ? next.xp - Z.step : Z.tiers.length * Z.step, into = next ? Math.max(0, D.xp - prevXp) : Z.step;
+  const ITEM = id => { const it = P.SHOP.find(x => x.id === id); return it ? L(it.name) : id; };
+  // head card
+  W.card(l, 0, y, w, 98, {r:12});
+  k.icon(l, "calendar-check", 14, y + 12, 20, "accent");
+  k.text(l, L(Z.name), 42, y + 10, {font:"dispS", size:16, w:w - 200, max:1});
+  k.text(l, `${fmt(Z.start)} – ${fmt(Z.end)}`, w - 150, y + 14, {font:"mono", size:11.5, color:"muted", w:136, align:"right"});
+  k.text(l, t("seasonXp"), 14, y + 40, {size:12.5, color:"muted"});
+  k.text(l, String(D.xp), w - 114, y + 38, {font:"monoB", size:15, color:"accent", w:100, align:"right"});
+  W.meter(l, 14, y + 64, w - 28, 7, Math.min(1, into / Z.step), "accent");
+  k.text(l, `${next ? `${t("seasonTier")} ${next.tier}: ${into}/${Z.step} XP` : "★"}`, 14, y + 76, {font:"mono", size:11, color:"muted", w:w - 28, max:1});
+  y += 106;
+  y += k.text(l, t("seasonHow"), 0, y, {size:11.5, color:"muted", w}).h + 12;
+  // weekly missions
+  y += W.h3(l, `${t("seasonWeekly")} · ${t("seasonEnds")} ${fmt(D.weekly.ends)}`, 0, y, {w}).h + 8;
+  for (const m of D.weekly.missions){
+    const h = 58, ready = m.done && !m.claimed;
+    W.card(l, 0, y, w, h, {r:10, stroke:ready ? "gold" : null});
+    k.icon(l, m.claimed ? "circle-check" : ready ? "gift" : "target", 12, y + 18, 22, m.claimed ? "good" : ready ? "gold" : "accent");
+    const lab = m.claimed ? `[[check]] ${t("seasonDone")}` : `${m.terra} Terra`, bw = W.btnW(lab, {size:12.5});
+    k.text(l, L(m.name), 44, y + 7, {font:"bodyB", size:13, w:w - 44 - bw - 20, max:1});
+    W.meter(l, 44, y + 31, w - 44 - bw - 24, 5, m.progress / m.goal, m.claimed ? "good" : "accent");
+    k.text(l, `${m.progress}/${m.goal} · +${m.xp} XP`, 44, y + 39, {font:"mono", size:10.5, color:"muted"});
+    W.btn(l, "wk-" + m.id, w - 12 - bw, y + (h - 32) / 2, lab, () => N.claimMission(m.id), {kind:ready ? "primary" : "ghost", size:12.5, h:32, disabled:!ready || N.busy, sound:false});
+    y += h + 6;
+  }
+  y += 8;
+  // season pass tiers (two per row)
+  y += W.h3(l, t("seasonPass"), 0, y, {w}).h + 8;
+  const cw = (w - 8) / 2, chh = 56;
+  Z.tiers.forEach((x, i) => {
+    const cx = (i % 2) * (cw + 8), cy = y + Math.floor(i / 2) * (chh + 6), ready = x.reached && !x.claimed;
+    W.card(l, cx, cy, cw, chh, {r:10, stroke:ready ? "gold" : x.claimed ? "good" : null});
+    k.text(l, `${t("seasonTier")} ${x.tier} · ${x.xp} XP`, cx + 10, cy + 6, {font:"mono", size:10.5, color:"muted", w:cw - 70, max:1});
+    W.terra(l, cx + 10, cy + 24, x.terra, {size:13, color:x.reached ? "good" : "fg"});
+    if (x.item) k.text(l, `[[sparkles]] ${ITEM(x.item)}`, cx + 80, cy + 27, {size:10.5, color:"muted", w:cw - 80 - 60, max:1, iconColor:"gold"});
+    const lab = x.claimed ? "[[check]]" : x.reached ? t("seasonClaim") : "[[lock]]", bw = W.btnW(lab, {size:12});
+    W.btn(l, "tier-" + x.tier, cx + cw - 10 - bw, cy + (chh - 30) / 2, lab, () => N.claimTier(x.tier), {kind:ready ? "primary" : "ghost", size:12, h:30, disabled:!ready || N.busy, sound:false});
+  });
+  y += Math.ceil(Z.tiers.length / 2) * (chh + 6) + 6;
+  y += msgLine(l, y, w);
+  return y + back(l, y);
+};
+
+/* ---------------- settings ---------------- */
+Screens.subSettings = function(l, y, w){
+  const th = S.lang === "th", row = (ic, label) => { k.icon(l, ic, 0, y + 7, 18, "accent"); k.text(l, label, 28, y + 6, {size:13.5, w:150, max:1}); };
+  row("languages", th ? "ภาษา" : "Language"); W.langSeg(l, w - 80, y + 1); y += 44;
+  y += W.vol(l, 0, y, w) + 12;
+  row("monitor", t("gfxLbl"));
+  const G = P.Gfx, items = [["low", "gfxLow"], ["high", "gfxHigh"]].map(([id, key]) => ({id:"gfx-" + id, label:t(key), on:G.level === id, fn:() => { Audio.play("click"); G.set(id); k.dirty(); }}));
+  W.seg(l, w - 180, y + 1, items, {w:90, h:30, font:"body", fontOn:"bodyB", size:12.5}); y += 38;
+  y += k.text(l, th ? "ต่ำ: ปิดเครื่องบิน เรือ และแสงควันบนแผนที่ เหมาะกับเครื่องที่ช้าหรือแบตใกล้หมด" : "Low: no planes, ships or smoke glows on the map, for slow devices or a low battery.", 28, y, {size:11.5, color:"muted", w:w - 28}).h + 14;
+  if (W.a11yRows){ y += 4; y += W.a11yRows(l, 0, y, w) + 8; }
+  const ver = `${t("updVer")} ${P.VERSION_NAME || (P.CHANGELOG && P.CHANGELOG[0] ? P.CHANGELOG[0].v : "")}`;
+  W.btn(l, "set-ver", 0, y, ver, go("updates"), {kind:"ghost", size:12.5, h:32}); y += 44;
+  return y + back(l, y);
+};
+
 /* ---------------- certificate ---------------- */
 Screens.subCert = function(l, y, w){
   const N = P.Net, C = N.certs || {};
@@ -409,6 +476,17 @@ Screens.subCert = function(l, y, w){
 };
 
 /* ---------------- achievements list (used by the menu and the learning page) ---------------- */
+/* 3.x: update log (newest first; the latest version open, older ones as one line) */
+Screens.subUpdates = function(l, y, w){
+  (P.CHANGELOG || []).forEach((v, i) => {
+    const items = L(v.items) || [];
+    k.text(l, `${v.v} · ${L(v.name) || ""}`, 0, y, {font:"dispS", size:16, color:i === 0 ? "accent" : "fg", w}); 
+    k.text(l, v.date || "", w - 90, y + 3, {font:"mono", size:11, color:"muted", w:90, align:"right"}); y += 24;
+    if (i < 2) for (const it of items){ k.text(l, "•", 4, y, {size:12.5, color:"muted"}); y += k.text(l, it, 18, y, {size:12.5, w:w - 18, lh:1.4}).h + 4; }
+    y += 10;
+  });
+  return y + back(l, y);
+};
 Screens.achList = function(l, x, y0, w){
   const d = P.AchStore.data, n = P.Ach.count(), pct = Math.round(n / ACH.length * 100);
   let y = y0;
@@ -456,7 +534,7 @@ Screens.toastUpdate = function(dt){
 };
 Screens.renderToast = function(l){
   const a = UIM.toast; if (!a) return;
-  const w = 340, end = UIM.kind() === "end", x = end ? 16 : 1264 - w, h = 78, y = end ? 16 : this.kind === "game" ? 720 - 130 - h - 8 : 720 - 16 - h;
+  const w = 340, end = UIM.kind() === "end", x = end ? 16 : (k.W - 16) - w, h = 78, y = end ? 16 : this.kind === "game" ? k.H - 130 - h - 8 : k.H - 16 - h;
   k.rect(l, x, y, w, h, "panel", {r:12, stroke:"warn", sa:.6, bg:true});
   k.hgrad(l, x + 12, y + 13, 52, 52, [[0, "#f2b441"], [1, "#e0612f"]], {r:10});
   k.icon(l, a.icon, x + 25, y + 26, 26, "#2b1300");

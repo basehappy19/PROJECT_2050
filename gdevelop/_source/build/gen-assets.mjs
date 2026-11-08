@@ -1,6 +1,6 @@
 // Generates the new art for Project : 2050 (run once after changing the source):
 //   • Lucide icons used anywhere in src/*.js (white, tinted in game) + the Terra coin
-//   • character portraits (4 roles × 3 outfits + the advisor), ending illustrations, the game logo
+//   • character portraits (the website's pictures, cut to a circle), ending illustrations, the game logo
 //   • countrygeo.json: country outlines projected to world pixels (for borders, taps and labels)
 // usage: cd gdevelop/_source/build && npm install && node gen-assets.mjs   (then node make-project.mjs --export)
 import { chromium } from "playwright";
@@ -221,10 +221,57 @@ for (const n of icons){
 }
 await render(terra, 64, 64, `${OUT}/icons/terra.png`);
 const ART = !process.argv.includes("--icons-geo");   // --icons-geo: only icons + country outlines (keeps portraits, endings, logo)
-if (ART) for (const id of ["sci", "dip", "eco", "act"]) for (const o of ["base", "alt", "gold"]) await render(portrait(id, o), 256, 256, `${OUT}/portraits/${id}-${o}.png`);
-if (ART) await render(portrait("adv", "base"), 256, 256, `${OUT}/portraits/adv.png`);
+/* portraits: the website's pictures (assets/img/portraits/*.jpg: 6 roles × 3 outfits, the advisor and the story people), cut to a circle */
+const WEBP = path.resolve(HERE, "../../../assets/img/portraits");
+async function webPortrait(src, file){
+  const url = "data:image/jpeg;base64," + fs.readFileSync(src).toString("base64");
+  const data = await page.evaluate(async url => {
+    const im = new Image(); im.src = url; await im.decode();
+    const s = 256, c = document.createElement("canvas"); c.width = s; c.height = s; const g = c.getContext("2d");
+    g.beginPath(); g.arc(s / 2, s / 2, s / 2, 0, Math.PI * 2); g.clip();
+    const side = Math.min(im.width, im.height), sy = Math.max(0, (im.height - side) * .35);
+    g.drawImage(im, (im.width - side) / 2, sy, side, side, 0, 0, s, s);
+    return c.toDataURL("image/png");
+  }, url);
+  fs.writeFileSync(file, Buffer.from(data.split(",")[1], "base64"));
+}
+const PORTRAITS_ONLY = process.argv.includes("--portraits");
+if ((ART || PORTRAITS_ONLY) && fs.existsSync(WEBP)) for (const f of fs.readdirSync(WEBP).filter(f => f.endsWith(".jpg"))) await webPortrait(`${WEBP}/${f}`, `${OUT}/portraits/${f.replace(/\.jpg$/, ".png")}`);
+else if (ART){ for (const id of ["sci", "dip", "eco", "act"]) for (const o of ["base", "alt", "gold"]) await render(portrait(id, o), 256, 256, `${OUT}/portraits/${id}-${o}.png`); await render(portrait("adv", "base"), 256, 256, `${OUT}/portraits/adv.png`); }
 if (ART) for (const [k, f] of [["S", "end-win-S"], ["A", "end-win-A"], ["B", "end-win-B"], ["heat", "end-heat"], ["vote", "end-vote"], ["time", "end-time"]]) await render(ending(k), 1280, 720, `${OUT}/endings/${f}.jpg`, "jpg", .86);
 if (ART) await render(logo, 300, 300, `${OUT}/ui/logo.png`);
+/* Continuous World: the hex grid for placing builds by hand. Each land cell (~3° wide) gets a look sampled from the
+   website's satellite map (desert, green, snow, coast), which P.suitability() turns into a score (same as web/src/hexgrid.js) */
+const MAPIMG = path.resolve(HERE, "../../../assets/img/map-day-s.jpg");
+if (fs.existsSync(MAPIMG) && (ART || process.argv.includes("--hex"))){
+  const url = "data:image/jpeg;base64," + fs.readFileSync(MAPIMG).toString("base64");
+  const cells = await page.evaluate(async url => {
+    const im = new Image(); im.src = url; await im.decode();
+    const MW = 2400, LON0 = 11, LAT_TOP = 84, LAT_BOT = -57;
+    const ROB = [[1.0000,0.0000],[0.9986,0.0620],[0.9954,0.1240],[0.9900,0.1860],[0.9822,0.2480],[0.9730,0.3100],[0.9600,0.3720],[0.9427,0.4340],[0.9216,0.4958],[0.8962,0.5571],[0.8679,0.6176],[0.8350,0.6769],[0.7986,0.7346],[0.7597,0.7903],[0.7186,0.8435],[0.6732,0.8936],[0.6213,0.9394],[0.5722,0.9761],[0.5322,1.0000]];
+    const kS = MW / (2 * 0.8487 * Math.PI);
+    const rob = (lat, lon) => { let l = lon - LON0; while (l < -180) l += 360; while (l > 180) l -= 360; const a = Math.min(90, Math.abs(lat)) / 5, i = Math.min(17, Math.floor(a)), f = a - i; const X = ROB[i][0] + (ROB[i + 1][0] - ROB[i][0]) * f, Y = ROB[i][1] + (ROB[i + 1][1] - ROB[i][1]) * f; return [MW / 2 + kS * 0.8487 * X * l * Math.PI / 180, -kS * 1.3523 * Y * Math.sign(lat)]; };
+    const yTop = rob(LAT_TOP, LON0)[1], ll = (lat, lon) => { const [x, y] = rob(lat, lon); return [x, y - yTop]; };
+    const w = im.width, h = im.height, cv = document.createElement("canvas"); cv.width = w; cv.height = h;
+    const g = cv.getContext("2d", {willReadFrequently:true}); g.drawImage(im, 0, 0); const data = g.getImageData(0, 0, w, h).data;
+    const MH = h * MW / w;
+    const smp = (x, y) => { const i = (Math.max(0, Math.min(h - 1, Math.round(y / MH * h))) * w + Math.max(0, Math.min(w - 1, Math.round(x / MW * w)))) * 4; return [data[i], data[i + 1], data[i + 2]]; };
+    const water = ([r, gg, b]) => b > r + 12 && b >= gg - 6 && r + gg + b < 330;
+    const look = (px, nb) => { const [r, gg, b] = px, br = (r + gg + b) / 3, sat = Math.max(r, gg, b) - Math.min(r, gg, b);
+      return {a:+(Math.max(0, Math.min(1, (r - b - 12) / 40)) * (br > 90 ? 1 : .5)).toFixed(2), g:+(Math.max(0, Math.min(1, (gg - r + 8) / 30)) * (br < 150 ? 1 : .5)).toFixed(2), s:br > 195 && sat < 30 ? 1 : 0, c:nb.some(water) ? 1 : 0}; };
+    const DLON = 3.2, DLAT = 2.8, out = []; let row = 0;
+    for (let lat = LAT_TOP - 6; lat > LAT_BOT + 2; lat -= DLAT, row++){
+      for (let lon = LON0 - 180 + (row % 2 ? DLON / 2 : 0); lon < LON0 + 180; lon += DLON){
+        const [x, y] = ll(lat, lon), px = smp(x, y); if (water(px)) continue;
+        const nb = [[0, 2.4], [0, -2.4], [2.2, 0], [-2.2, 0], [1.6, 1.6], [-1.6, -1.6]].map(([a, b]) => { const p = ll(lat + a, lon + b); return smp(p[0], p[1]); });
+        out.push([+lat.toFixed(2), +lon.toFixed(2), look(px, nb)]);
+      }
+    }
+    return out;
+  }, url);
+  fs.writeFileSync(`${ROOT}/assetgen/hexcells.json`, JSON.stringify(cells));
+  console.log("hex cells", cells.length);
+}
 await browser.close();
 // remove icons that are no longer used
 const keep = new Set([...icons, "terra"]);

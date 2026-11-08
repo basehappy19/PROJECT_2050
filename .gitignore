@@ -41,6 +41,4 @@ service-account*.json
 api_key*.txt
 
 # GDevelop: Android builds and their downloaded tools
-gdevelop/*.apk
-gdevelop/_source/apk/.tools/
 gdevelop/_source/build/export/

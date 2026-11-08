@@ -9,13 +9,13 @@ if (P.mods && P.mods.skills) return;
    ========================================================================= */
 const {Kit, S, t, L, Audio, W, UIM, Screens, SKILLS, SKILL, SKILL_CATS, SKILL_TYPE, IC, HAZARDS} = P;
 const k = Kit;
-const BX = 36, BY = 26, BW = 1208, BH = 668;           // window
-const GX = BX + 24, GY = BY + 74, GW = 720, GH = 470;   // grid area
-const DX = GX + GW + 20, DW = BX + BW - 24 - DX;        // detail panel
-const HEXR = 50, COLW = 168, ROWH = 128;
+let BX = 36, BH = 668; const BY = 26, BW = 1208;           // window
+let GX = BX + 24, GH = 470; const GY = BY + 74, GW = 720;   // grid area
+let DX = GX + GW + 20; const DW = BX + BW - 24 - DX;        // detail panel
+let HEXR = 50, COLW = 168, ROWH = 128, SC = 1;   // scaled down so 5 columns × 4 rows fit the grid box
 
 const hexPts = (cx, cy, r) => { const p = []; for (let i = 0; i < 6; i++){ const a = Math.PI / 180 * (60 * i - 30); p.push(cx + r * Math.cos(a), cy + r * Math.sin(a)); } return p; };
-const centre = n => [GX + 92 + n.pos[0] * COLW, GY + 70 + n.pos[1] * ROWH + (n.pos[0] % 2 ? 26 : 0)];
+const centre = n => [GX + 92 * SC + n.pos[0] * COLW, GY + 66 * SC + n.pos[1] * ROWH + (n.pos[0] % 2 ? 26 * SC : 0)];
 /* "next" = all requirements owned; anything else that isn't owned stays hidden */
 const visible = n => S.owned[n.id] || n.req.every(q => S.owned[q]);
 const typeTags = n => {
@@ -30,8 +30,10 @@ const typeTags = n => {
 Screens.renderSkills = function(l){
   k.clearSlave("ModalScroll");
   const cat = S.skillCat || "energy";
-  k.rect(l, 0, 0, 1280, 720, "#020609", {a:.7, bg:true});
-  k.hit(l, "sk-veil", 0, 0, 1280, 720, () => Screens.closeSkills(), {cursor:false});
+  BX = Math.round((k.W - BW) / 2); BH = k.H - 52; GH = BH - 198; GX = BX + 24; DX = GX + GW + 20;   // centred on wide screens
+  SC = Math.min(1, (GW - 8) / (184 + 4 * 168), (GH - 6) / (66 + 3 * 128 + 26 + 50 + 30)); HEXR = 50 * SC; COLW = 168 * SC; ROWH = 128 * SC;
+  k.rect(l, 0, 0, k.W, k.H, "#020609", {a:.7, bg:true});
+  k.hit(l, "sk-veil", 0, 0, k.W, k.H, () => Screens.closeSkills(), {cursor:false});
   k.hit(l, "sk-box", BX, BY, BW, BH, () => {}, {cursor:false});
   k.rect(l, BX + 4, BY + 10, BW, BH, "#000000", {a:.35, r:16, bg:true});
   k.rect(l, BX, BY, BW, BH, "panel", {r:16, stroke:"line", bg:true});
@@ -83,7 +85,7 @@ Screens.renderSkills = function(l){
     if (n.trade) k.icon(l, "scale", cx - HEXR + 10, cy - HEXR + 8, 13, "warn", vis ? 1 : 0);
     if (n.resp) k.icon(l, "shield", cx - HEXR + 10, cy - HEXR + 8, 13, "sky", vis ? 1 : 0);
     // name under the hex
-    k.text(l, vis ? L(n.name) : t("hiddenSkill"), cx - 78, cy + HEXR + 4, {size:11.5, lh:1.25, color:vis ? "fg" : "muted", w:156, align:"center", max:2});
+    k.text(l, vis ? L(n.name) : t("hiddenSkill"), cx - COLW / 2, cy + HEXR + 3, {size:11, lh:1.2, color:vis ? "fg" : "muted", w:COLW, align:"center", max:2});
     k.hit(l, id, cx - HEXR, cy - HEXR, HEXR * 2, HEXR * 2 + 34, () => { Audio.play("click"); S.node = n.id; k.dirty(); });
   }
   // rollouts in progress (under the grid)
@@ -103,7 +105,7 @@ Screens.renderSkills = function(l){
   /* detail panel */
   this.skillDetail(l, DX, GY, DW, GH + 44);
   /* category tabs */
-  const ty = BY + BH - 62, tw = (BW - 48 - 4 * 8) / 5;
+  const NC = SKILL_CATS.length, ty = BY + BH - 62, tw = (BW - 48 - (NC - 1) * 8) / NC;
   SKILL_CATS.forEach((c, i) => {
     const tx = BX + 24 + i * (tw + 8), on = cat === c.id, id = "cat-" + c.id, hov = k.isHover(l, id);
     const list = SKILLS.filter(n => n.cat === c.id), own = list.filter(n => S.owned[n.id]).length;
@@ -148,6 +150,7 @@ Screens.skillDetail = function(l, x, y, w, h){
   if (n.months) pills.push({txt:`${t("rollout")} ${n.months} ${t("months")}`, kind:""});
   if (n.type === "active") pills.push({txt:`${t("cooldownLen")} ${n.cd} ${t("months")}`, kind:"gold"});
   cy += W.pills(l, px, cy, iw, pills) + 14;
+  { const tilt = P.tiltOfSkill ? P.tiltOfSkill(n.id) : null; if (vis && tilt && tilt.length){ k.text(l, t("grpWho"), px, cy, {size:11.5, color:"muted"}); W.groupTilt(l, px + k.textW(t("grpWho"), {size:11.5}) + 10, cy + 1, tilt); cy += 24; } }
   const full = st === "ready" && P.atCapacity(n);
   const can = st === "ready" && !full && (P.canAfford ? P.canAfford(n) && (!P.matOk || P.matOk(n)) : S.ep >= c.ep && S.pc >= c.pc);
   if (!own){
