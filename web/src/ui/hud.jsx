@@ -200,12 +200,11 @@ export function Bottom(){
   const tabs = [["tech", "network", "nbTech", "T"], ["region", "map", "nbRegion", "R"], ["stats", "chart-line", "nbStats", "S"], ["news", "newspaper", "nbNews", "N"]];
   const ready = P.SKILLS.filter(n => P.nodeState(n) === "ready" && P.canAfford(n)).length;
   const badge = {tech:ready, news:S.unread || 0, stats:S.report && !S.report.read ? "!" : 0};
-  /* 3.2: one row at the very bottom: Net Zero + warming (left) · zoom · tabs (right) */
+  /* 3.3: one row at the very bottom: zoom (left) · Net Zero + warming (centre) · tabs (right) */
   return <footer class="bottom">
     <div class="row2">
+      <div class="bl"><ZoomBtns/></div>
       <div class="meters glass"><MeterNZ/><MeterT/></div>
-      <span class="grow"/>
-      <ZoomBtns/>
       <nav class="tabbar glass">{tabs.map(([id, ic, key, kk]) => {
         const on = id === "tech" ? UIM.modal === "skills" : S.tab === id;
         return <button type="button" key={id} data-tab={id} class={`tabbtn ${on ? "on" : ""}`} title={`${t(key)} (${kk})`} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>

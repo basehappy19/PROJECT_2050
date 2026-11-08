@@ -9,7 +9,7 @@ import {Icon, Rich} from "./icon.jsx";
 import {Btn, IconBtn, Tabs, Seg, Check, Terra, Portrait, Volume, GfxSeg, A11ySeg, NarrRow, LangSeg, Msg, H3, SlotInfo} from "./widgets.jsx";
 import {SlotRow, ClearSlots} from "./modals.jsx";
 import {AchList} from "./learn.jsx";
-import {SubMp, SubRoom, Invites} from "./mp.jsx";
+import {SubMp, SubRoom} from "./mp.jsx";
 
 const N = () => P.Net;
 const goSub = sub => () => {
@@ -89,10 +89,8 @@ function Main(){
         {auto ? big("half", "globe", t("mNew"), null, () => G.newGame()) : null}
         {big("half world " + (world ? "" : "locked"), world ? "infinity" : "lock", t("mWorldS2"), null, () => G.newGame(true), !world)}
       </div>
-      {big("mpbtn", "users", t("mpTitle"), `${L(P.UI.mpCoop)} · ${L(P.UI.mpVersus)}`, goSub(P.Mp && P.Mp.room && P.Mp.room.state !== "ended" ? "room" : "mp"))}
     </div>
     <Msg UIM={UIM}/>
-    <Invites/>
     <div class="dock">{dock.map(it => <button type="button" key={it.id} class="dk" onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("click"); it.fn(); }}>
       <span class="dki"><Icon n={it.ic} size={24} color="accent"/>{it.dot ? <i class="dkdot"/> : null}</span><span class="dkl">{it.t1}</span>
     </button>)}</div>

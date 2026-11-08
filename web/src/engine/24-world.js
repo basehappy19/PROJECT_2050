@@ -182,7 +182,7 @@ function copEvent(){ return {...COP, title:{th:COP.title.th.replace("{N}", 31 + 
 function v1Init(){
   const st = S;
   if (st.ore === undefined) st.ore = 0;
-  if (st.oreOn === undefined) st.oreOn = false;
+  if (st.oreOn === undefined){ st.oreOn = !st.simple; if (!st.simple) st.ore += S.mode === "hard" ? 15 : 25; }   // 3.3: minerals are on from the first month (the box shows from the start)
   st.oreBan = st.oreBan || {}; st.oreFrom = st.oreFrom || {}; st.pins = st.pins || []; st.closed = st.closed || {};
   if (st.airCut === undefined) st.airCut = 0;
   greenInit();

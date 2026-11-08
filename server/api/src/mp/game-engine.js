@@ -2189,38 +2189,46 @@ const V = (v, date, name, th, en) => ({v, date, name, items:{th, en}});
 /* minor updates (1.1.1, 1.1.2, …) sit inside their main version as subs, newest first */
 const SUB = (v, date, th, en) => ({v, date, items:{th, en}});
 P.CHANGELOG = [
-  V("2.0", "2026-11-10", {th:"เล่นด้วยกัน", en:"Play Together"}, [
-    "เล่นหลายคน: \"คณะทำงานร่วม\" 2–4 คน ช่วยกันกู้โลกใบเดียว แต่ละคนดูแลกระทรวงของตัวเอง (พลังงานและอุตสาหกรรม การทูต ภัยพิบัติและเมือง ประชาชนและธรรมชาติ) และโหวตตัดสินเหตุการณ์ภายใน 15 วินาที",
-    "เล่นหลายคน: \"แข่งภูมิภาค\" 2–4 คน ทุกคนเล่นโลกของตัวเองแต่ใช้อุณหภูมิร่วมกัน ใครถึง Net Zero ก่อนชนะ ส่งเงินช่วยเพื่อน เก็บภาษีคาร์บอนจากคนที่ปล่อยมากกว่า หรือทำข้อตกลงภูมิอากาศร่วมกัน",
-    "ห้องสาธารณะและห้องส่วนตัว (เข้าด้วยรหัส 6 ตัว) เพิ่มเพื่อน ดูว่าเพื่อนออนไลน์ ชวนเพื่อนเข้าห้อง ข้อความด่วนและอีโมต (ไม่มีแชตพิมพ์เอง ปลอดภัยสำหรับโรงเรียน)",
-    "โหมดฝึกซ้อม: พาเล่นทีละขั้นด้วยการกดจริง ราว 8 นาที ผู้เล่นใหม่จะเข้าโหมดนี้ก่อนเล่นครั้งแรก และกลับมาฝึกได้ทุกเมื่อจากเมนู",
+  V("2.0", "2026-11-10", {th:"โลกที่เล่นง่ายขึ้น", en:"An Easier World to Read"}, [
+    "โหมดฝึกซ้อม: พาเล่นทีละขั้นด้วยการกดจริง ราว 8 นาที ผู้เล่นใหม่จะเข้าโหมดนี้ก่อนเล่นครั้งแรก และเล่นซ้ำได้จากเมนู",
     "โหมดเร็ว: เกมราว 15 นาที ไม่มีระบบทรัพยากรและกลุ่มคน เหตุการณ์น้อยลง เหมาะกับเล่นครั้งแรก",
-    "สรุปผลงานทุกปี: คะแนน 0–100 เทียบกับเป้า CO₂ ของปีนั้น ปีที่ดีได้งบเพิ่ม ปีที่แย่ความเชื่อมั่นลด แต่ละปีมีเรื่องราวของตัวเอง (50 เรื่อง) แทนเป้าหมายราย 5 ปี",
-    "ฉากจบใหม่ 12 แบบ ตามวิธีที่เกมจบและจำนวนปีที่ดี",
-    "ตัวละครวาดใหม่ทั้งหมด เป็นภาพเวกเตอร์ที่สร้างด้วยโค้ดทีละชิ้น ไม่ใช้ AI แต่ละคนหน้าตา อายุ และเสื้อผ้าไม่ซ้ำกัน",
-    "ฉากเปิดเกมใหม่ สั้นและเห็นภาพชัดว่าโลกกำลังเจออะไร",
-    "แก้บัค: ประเทศกว่า 100 ประเทศ (เช่น โซมาเลีย ฟิจิ มัลดีฟส์) ไม่แสดงพยากรณ์ภัยและฟองช่วยเหลือบนแผนที่ ทำให้โดนหักเงินและความนิยมโดยไม่มีอะไรให้กด",
-    "ทุกครั้งที่เสียเงินหรือความนิยมอัตโนมัติ จะมีบอกที่มุมซ้ายล่างว่าเพราะอะไร (ภัยพิบัติ ไม่ได้ช่วยผู้ประสบภัย ประท้วง ถูกคว่ำบาตร ค่าดูแลโรงแยกแร่ ผลจากการตัดสินใจก่อนหน้า)",
-    "พยากรณ์ภัยใหม่ขึ้นเป็นการ์ดด้านบน กดดูหรือสั่งอพยพได้ทันที · ลูกศรที่ขอบจอชี้ไปยังภัยที่มองไม่เห็น · ฟองแดงกะพริบเมื่อใกล้หมดเวลา",
+    "สรุปผลงานทุกปี: คะแนน 0–100 เทียบกับเป้า CO₂ ของปีนั้น ปีที่ดีได้งบเพิ่ม ปีที่แย่ความเชื่อมั่นลด แทนเป้าหมายทุก 5 ปีแบบเดิม",
+    "ฉากจบใหม่ 12 แบบ ตามวิธีที่เกมจบและจำนวนปีที่ดี · ฉากเปิดเกมใหม่ สั้นและเห็นภาพชัด",
+    "ตัวละครวาดใหม่ทั้งหมด เป็นภาพเวกเตอร์ที่สร้างด้วยโค้ดทีละชิ้น ไม่ใช้ AI",
+    "แผนที่เงยขึ้นเมื่อซูมเข้า เห็นประเทศเป็นมุมมอง 3 มิติ แต่ชื่อและไอคอนยังตั้งตรงอ่านง่าย",
+    "ซูมนุ่มขึ้นทั้งล้อเมาส์ ปุ่ม และการบีบนิ้ว · ซูมออกสุดเมื่อไรแผนที่กลับมาอยู่ตรงกลางเสมอ",
+    "แถบด้านบนจัดใหม่: เงิน แต้มนโยบาย ทรัพยากร และความนิยมอยู่แถบเดียว แถบความสามารถชิดอยู่ใต้ ข่าวล่าสุดต่อออกมาทางขวาแล้วค่อยจางหาย",
+    "หลอด Net Zero และอุณหภูมิโลกเล็กลง อยู่กลางจอด้านล่าง ปุ่มซูมอยู่ซ้ายล่าง แท็บอยู่ขวาล่าง",
+    "เป้าหมายโหมดโลกย่อ/ขยายได้ และอยู่ใต้แถบข่าว ไม่บังแผนที่",
+    "หน้าต่างประเทศและทวีปใหม่: วงกลมแสดงค่ามิตรภาพ ผลของแต่ละคำสั่งเป็นป้ายสั้น ๆ สีเขียว/แดง ไม่ต้องเลื่อนยาว",
+    "หน้าสกิลเต็มจอ และทุกหน้าต่างมีปุ่มปิดที่มุมขวาบนเหมือนกันหมด",
+    "หน้าต่างความนิยมใหม่: แถบเดียวบอกว่ากลุ่มไหนมีผลมากแค่ไหน แต่ละกลุ่มเหลือบรรทัดเดียว (หน้ายิ้ม % และอีกกี่ % จะสนับสนุน) และบอกสิ่งที่แต่ละกลุ่มไม่ชอบ",
+    "ตลาดทรัพยากรใหม่เป็นตารางเดียว: มีเท่าไร ราคา แนวโน้ม กำลังแปรรูป และซื้อ/ขายในแถวเดียว",
+    "ช่องทรัพยากรขึ้นตั้งแต่เริ่มเกม ไม่ต้องรอซื้อสกิลแรก (เริ่มมีทรัพยากรติดมือเล็กน้อย)",
+    "ภัยพิบัติไม่เด้งการ์ดกลางจอแล้ว ดูไอคอนบนแผนที่เอง ความเสียหายขึ้นเป็นตัวเลขที่ประเทศนั้นค้างไว้สักพัก",
     "ย่อหน้าต่างเหตุการณ์เพื่อดูแผนที่และทรัพยากรก่อนตัดสินใจได้",
-    "แผนที่ล็อกให้เต็มจอเสมอ (ซูมออกจนหลุดโลกไม่ได้) และ UI จางลงตอนลากแผนที่",
-    "หน้าตาใหม่ดูง่ายขึ้น: แสงเรืองและกล่องน้อยลง ตัวอักษรใหญ่ขึ้น แถบด้านบนรวมเป็นแถบเดียว แผนที่บอกชื่อทวีปแทนตัวย่อ และสกิลที่ยังไกลอยู่เห็นชื่อและภาพแล้ว",
+    "ปิดโหมดเล่นหลายคนไว้ก่อน เพื่อปรับให้ดีขึ้น",
+    "แก้บัค: ประเทศกว่า 100 ประเทศ (เช่น โซมาเลีย ฟิจิ มัลดีฟส์) ไม่แสดงพยากรณ์ภัยและฟองช่วยเหลือบนแผนที่ · ไอคอนทรัพยากรบางเครื่องไม่ขึ้น (มีไอคอนสำรองแล้ว) · ข้อความบางจุดถูกแถบสกิลบัง",
   ], [
-    "Multiplayer: \"Joint Taskforce\", 2–4 players save one world together. Each runs their own ministries (Energy & Industry, Diplomacy, Disasters & Cities, People & Nature) and events are decided by a 15-second vote.",
-    "Multiplayer: \"Regional Race\", 2–4 players each run their own world but share one temperature. First to Net Zero wins. Send aid, tax a bigger emitter's carbon, or sign a climate pact.",
-    "Public and private rooms (join with a 6-letter code), friends, who's online, invites, quick messages and emotes (no typed chat: safe for school).",
-    "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu any time.",
+    "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu.",
     "Fast mode: a 15-minute game without minerals or groups and with fewer events, great for a first game.",
-    "A year in review every January: a score from 0 to 100 against that year's CO₂ target. Good years bring more funding, bad years cost trust, and every year has its own story (50 in all). This replaces the 5-year milestones.",
-    "12 new endings, depending on how the game ended and how many good years you had.",
-    "All characters redrawn as vector illustrations built shape by shape in code, no AI. Everyone has their own face, age and clothes.",
-    "A new opening scene: short, and it shows what the world is facing.",
-    "Bug fix: over 100 countries (such as Somalia, Fiji and the Maldives) showed no disaster warnings or aid bubbles on the map, so money and approval were lost with nothing to tap.",
-    "Every automatic loss of money or approval now says why, at the bottom left (a disaster, missed aid, a protest, sanctions, refinery upkeep, an earlier decision catching up).",
-    "New disaster forecasts pop up as a card at the top: look at it or evacuate straight away · arrows at the screen edge point to disasters you can't see · red bubbles blink when they're about to run out.",
+    "A year in review every January: a score from 0 to 100 against that year's CO₂ target. Good years bring more funding, bad years cost trust. This replaces the 5-year milestones.",
+    "12 new endings depending on how the game ended and how many good years you had · a new, shorter opening scene.",
+    "All characters redrawn as vector illustrations built shape by shape in code, no AI.",
+    "The map tilts up as you zoom in, so countries look 3D, while names and icons stay upright and easy to read.",
+    "Smoother zoom with the wheel, the buttons and pinch · zoom all the way out and the map always comes back to the centre.",
+    "A new top bar: money, policy points, minerals and approval in one bar, the ability bar right under it, and the latest news growing out to its right before it fades.",
+    "Smaller Net Zero and warming meters in the bottom centre, zoom bottom left, tabs bottom right.",
+    "World-mode goals fold away and sit under the news line, off the map.",
+    "New country and continent panels: a ring shows friendship, and each order's effects are short green/red tags, with no long scrolling.",
+    "The skills screen fills the whole screen, and every window has its close button top right.",
+    "A new approval window: one bar shows how much each group counts, each group is one line (face, %, how far to backing), and what each group dislikes.",
+    "A new minerals market in one table: stock, price, trend, refining and buy/sell on a single row.",
+    "The minerals box shows from the start of the game, with a small starting stock, instead of after your first skill.",
+    "Disasters no longer pop up a card: watch for their icons on the map; losses appear as a number that stays on that country for a while.",
     "Events can be minimised so you can check the map and your resources before choosing.",
-    "The map always fills the screen (no zooming out into space), and the HUD fades while you drag the map.",
-    "A cleaner look: fewer glows and boxes, larger text, one top bar, continent names on the map instead of codes, and skills further ahead show their name and picture.",
+    "Multiplayer is switched off for now while we improve it.",
+    "Bug fixes: over 100 countries (such as Somalia, Fiji and the Maldives) showed no disaster warnings or aid bubbles · mineral icons were blank on some devices (there is a fallback now) · some text was hidden behind the ability bar.",
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",
@@ -4236,7 +4244,7 @@ function copEvent(){ return {...COP, title:{th:COP.title.th.replace("{N}", 31 + 
 function v1Init(){
   const st = S;
   if (st.ore === undefined) st.ore = 0;
-  if (st.oreOn === undefined) st.oreOn = false;
+  if (st.oreOn === undefined){ st.oreOn = !st.simple; if (!st.simple) st.ore += S.mode === "hard" ? 15 : 25; }   // 3.3: minerals are on from the first month (the box shows from the start)
   st.oreBan = st.oreBan || {}; st.oreFrom = st.oreFrom || {}; st.pins = st.pins || []; st.closed = st.closed || {};
   if (st.airCut === undefined) st.airCut = 0;
   greenInit();

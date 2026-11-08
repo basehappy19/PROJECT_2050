@@ -14,10 +14,9 @@ import {EventModal, EndModal, CharSel, Story, Pause, Tutorial, Market, SlotPick}
 import {Politics} from "./ui/politics.jsx";
 import {Learn} from "./ui/learn.jsx";
 import {Menu} from "./ui/menu.jsx";
-import {LossFeed, HazardAlerts, EventPill} from "./ui/alerts.jsx";
+import {LossFeed, EventPill} from "./ui/alerts.jsx";
 import {YearModal, Intro} from "./ui/year.jsx";
 import {Training} from "./ui/training.jsx";
-import {MpHud, MpEnd, Invites, MpPick} from "./ui/mp.jsx";
 
 /* ---------- loading ---------- */
 const PRELOAD = ["assets/img/globe-day{s}.jpg", "assets/img/globe-night{s}.jpg", "assets/img/globe-clouds{s}.jpg", "assets/img/ui/logo.png", "assets/data/world.json"];
@@ -79,6 +78,8 @@ function GameScreen(){
     const tb = r(q(".topbar")), bt = r(q(".bottom")), ab = r(q(".abar")), dr = r(q(".drawer")), W = window.innerWidth, Hh = window.innerHeight;
     const phone = W < 700;
     if (bt) document.documentElement.style.setProperty("--bottom-h", Math.round(Hh - bt.top) + "px");
+    // 3.3: the ability bar hangs right under the money bar; goals sit under the news line
+    const kp = r(q(".topbar .kpis")); if (kp) document.documentElement.style.setProperty("--kpi-b", Math.round(kp.bottom) + "px");
     GameMap.setInsets({t:tb ? tb.bottom : 0, b:bt ? Hh - bt.top : 0, l:ab && !phone ? ab.right : 0, r:dr && !phone ? W - dr.left + 8 : 0, ...(phone && dr ? {b:Hh - dr.top} : {})});
   });
   return <div class={"game " + (S.tab ? "has-drawer" : "")}>
@@ -90,10 +91,7 @@ function GameScreen(){
       <Drawer/>
       <Bottom/>
       {S.started ? <LossFeed/> : null}
-      {S.started ? <HazardAlerts/> : null}
-      {S.mp ? <MpHud/> : null}
     </div>
-    {S.started && !S.mp ? <div class="mpinv-game"><Invites/></div> : null}
   </div>;
 }
 
@@ -103,7 +101,6 @@ function Windows(){
   if (k === "skills") return <Skills/>;
   if (k === "event") return UIM.evMin ? <EventPill/> : <EventModal/>;
   if (k === "year") return <YearModal/>;
-  if (k === "mppick") return <MpPick/>;
   if (k === "intro") return <Intro/>;
   if (k === "end") return <EndModal/>;
   if (k === "charsel") return <CharSel/>;

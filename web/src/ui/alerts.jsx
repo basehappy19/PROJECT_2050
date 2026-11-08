@@ -56,14 +56,14 @@ export function addLoss(o){
   // where it happened: a floating number on the map
   if (o.c && (o.k === "hazard" || o.k === "miss") && GameMap.active){
     const pt = GameMap.countryPoint(o.c);
-    if (pt){ const [x, y] = GameMap.toScreen(pt[0], pt[1]); const bits = []; if (o.ep && Math.round(o.ep)) bits.push(`−${Math.round(-o.ep)} ${t("ep")}`); if (o.appr) bits.push(`−${n1(o.appr)}%`); if (bits.length) GameMap.floatText(x, y - 40, bits.join("  "), "bad"); }
+    if (pt){ const bits = []; if (o.ep && Math.round(o.ep)) bits.push(`−${Math.round(-o.ep)} ${t("ep")}`); if (o.appr) bits.push(`−${n1(o.appr)}%`); if (bits.length) GameMap.floatAt(pt[0], pt[1], bits.join("  "), "bad"); }
   }
   bump();
 }
 
 export function LossFeed(){
   const live = S.training ? 60000 : LIVE;
-  const list = (UIM.losses || []).filter(x => now() - x.at < live).slice(0, 4);
+  const list = (UIM.losses || []).filter(x => now() - x.at < live && x.k !== "hazard" && x.k !== "miss").slice(0, 4);   // 2.0: disasters show on the map only
   useEffect(() => { if (!list.length) return; const id = setTimeout(bump, 600); return () => clearTimeout(id); });
   if (!list.length) return null;
   return <div class="lossfeed" aria-live="polite">{list.map(o => {

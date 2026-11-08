@@ -1,12 +1,19 @@
 /* Icons (lucide, inlined SVG) and rich text with [[icon]] tokens */
 import ICONS from "../gen/icons.js";
-import {COL} from "../core.js";
+import {COL, bump} from "../core.js";
 
 const ICON_COL = {leaf:"good", sprout:"good", landmark:"purple", users:"accent", thermometer:"hot", cloud:"cloud", handshake:"warn", "shield-alert":"vuln", siren:"bad", newspaper:"muted"};
 const col = c => (c ? COL[c] || c : undefined);
+const BAD3D = new Set();
+const FALLBACK = {"mat-bat":"battery-charging", "mat-ree":"magnet", "mat-cu":"cable", "mat-si":"sun", "mat-u":"atom", ore:"pickaxe", money:"coins", policy:"scroll", appr:"smile", heart:"heart", gem:"gem"};
 
 export function Icon({n, size, color, cls = "", style, sw}){
-  if (n && n[0] === "$") return <img class={"ic ic3d " + cls} src={`assets/img/ui/3d/${n.slice(1)}.webp`} alt="" draggable="false" style={{width:size, height:size, ...style}}/>;
+  if (n && n[0] === "$"){
+    // 3.3: if a 3D picture can't load, fall back to a plain line icon so nothing is left blank
+    if (BAD3D.has(n)) return <Icon n={FALLBACK[n.slice(1)] || "circle"} size={size} color={color} cls={cls} style={style}/>;
+    return <img class={"ic ic3d " + cls} src={`assets/img/ui/3d/${n.slice(1)}.webp`} alt="" draggable="false" style={{width:size, height:size, ...style}}
+      onError={() => { if (!BAD3D.has(n)){ BAD3D.add(n); bump(); } }}/>;
+  }
   if (n === "terra") return <img class={"ic terra " + cls} src="assets/img/ui/3d/gem.webp" alt="" style={{width:size, height:size, ...style}}/>;
   const inner = ICONS[n] || ICONS["circle"] || "";
   return <svg class={"ic " + cls} viewBox="0 0 24 24" width={size} height={size} fill="none" stroke={col(color) || "currentColor"} stroke-width={sw || 2} stroke-linecap="round" stroke-linejoin="round" style={style} aria-hidden="true" dangerouslySetInnerHTML={{__html:inner}}/>;

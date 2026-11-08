@@ -44,6 +44,7 @@ await shot("4b-country-base", "P.UIM.cTab = 'base'; P._bump()");
 await run("P.UIM.cTab = 'orders'; P._bump()");
 await shot("5-skills", "G.closeTab(); G.openSkills ? G.openSkills() : G.setTab('tech')", 1200);
 await shot("5b-market", "G.closeSkills && G.closeSkills(); P.UIM.modal = 'market'; P._bump()", 900);
+await shot("5c-politics", "P.UIM.modal = 'politics'; P._bump()", 900);
 await run("P.UIM.modal = null; P._bump()");
 await shot("6-zoom", "G.closeSkills && G.closeSkills(); window.P2050.GameMap ? 0 : 0; document.querySelector('.zoom button') && [0,1,2,3].forEach(() => document.querySelector('.zoom button').click())", 2500);
 fs.writeFileSync(path.join(out, "errors.txt"), errs.join("\n"));

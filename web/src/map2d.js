@@ -54,7 +54,7 @@ export const GameMap = {
       const sh = {name:s.n, c:s.c || (P.COUNTRY_BY_GEO && P.COUNTRY_BY_GEO[s.n]) || null, r:s.r, b:s.b, l:s.l, rings, path};   // 1.1: countries added after the map data was built
       // 2.0 fix: countries added in 1.1 are matched by name (sh.c), not s.c; before this they had no map point,
       // so their disaster warnings and aid bubbles were never drawn (but still hit you)
-      this.shapes.push(sh); if (sh.c && !this.byCountry[sh.c]) this.byCountry[sh.c] = sh;
+      if (sh.c === "FRA") this.splitFrance(sh); this.shapes.push(sh); if (sh.c && !this.byCountry[sh.c]) this.byCountry[sh.c] = sh;
     }
     const regPaths = {};
     for (const sh of this.shapes){ (regPaths[sh.r] = regPaths[sh.r] || new Path2D()).addPath(sh.path); }
@@ -189,21 +189,36 @@ export const GameMap = {
   /* centre of the part of the screen not covered by the HUD / drawer */
   freeCentre(z = this.cam.z){ const H = this.hud; return this.viewToLocal((H.l + this.vw - H.r) / 2, (H.t + this.vh - H.b) / 2, this.tiltAt(z)); },
   lookAt(x, y, z){
-    z = clamp(z, ZMIN, ZMAX); const s = this.s0 * z, [fx, fy] = this.freeCentre(z);
+    this.zAnim = null; z = clamp(z, ZMIN, ZMAX); const s = this.s0 * z, [fx, fy] = this.freeCentre(z);
     const [cx, cy] = this.clampXY(x - (fx - this.w / 2) / s, y - (fy - this.h / 2) / s, z);
     this.target = {x:cx, y:cy, z};
   },
   homeView(){ const [fx, fy] = this.freeCentre(1), s = this.s0, [x, y] = this.clampXY(MAP.W / 2 - (fx - this.w / 2) / s * .5, MAP.H / 2 - (fy - this.h / 2) / s * .6, 1); return {x, y, z:1}; },
-  resetView(){ this.target = this.homeView(); },
+  resetView(){ this.zAnim = null; this.target = this.homeView(); },
   recenter(){ if (this.cam.z <= 1.08) this.target = this.homeView(); },
-  zoomBy(f){ const b = this.target || this.cam, z = clamp(b.z * f, ZMIN, ZMAX); const [fx, fy] = this.freeCentre(); const [wx, wy] = this.stageToWorld(fx, fy); this.lookAt(wx, wy, z); Audio.play("tick", {vol:.5}); },
+  zoomBy(f){ this.zAnim = null; const b = this.target || this.cam, z = clamp(b.z * f, ZMIN, ZMAX); if (z <= ZMIN + .001){ this.resetView(); Audio.play("tick", {vol:.5}); return; } const [fx, fy] = this.freeCentre(); const [wx, wy] = this.stageToWorld(fx, fy); this.lookAt(wx, wy, z); Audio.play("tick", {vol:.5}); },
   isCountryZoom(){ return this.cam.z >= ZCOUNTRY; },
   regionPoint(reg){ const m = P.RMETA[reg]; return ll(m.lab[0], m.lab[1]); },
   countryPoint(id){ if (!id) return null; if (id.startsWith("R_")) return this.regionPoint(id.slice(2)); const s = this.byCountry[id]; return s ? s.l : null; },
   focus(reg, zoomIn){ if (!P.RMETA[reg]) return; const [x, y] = this.regionPoint(reg); const z = zoomIn ? Math.max(this.cam.z, 1.75) : this.cam.z; this.lookAt(x, y, Math.max(z, 1)); },
   focusCountry(id){ const pt = this.countryPoint(id); if (!pt) return; const sh = this.byCountry[id]; let z = 2.4; if (sh){ const bw = sh.b[2] - sh.b[0], bh = sh.b[3] - sh.b[1], V = this.viewRect(), fw = V.R - V.L, fh = V.B - V.T; z = clamp(Math.min(fw * .55 / (bw * this.s0), fh * .55 / (bh * this.s0)), 1.8, 4.2); } this.lookAt(pt[0], pt[1], Math.max(this.cam.z, id.startsWith("R_") ? 1.8 : z)); },
   refresh(){ this.dirtyBase = true; this.loadImage(); },
-  floatText(x, y, txt, color){ this.floats.push({x, y, txt, color, t:0}); },
+  /* 3.3 fix: France's map shape also holds French Guiana (South America) and overseas islands, so hovering
+     Guiana said "France" and France's box spanned half the world. Guiana becomes its own South America shape;
+     the other far islands stay France but get their own box. */
+  splitFrance(sh){
+    const box = rs => { let b = [1e9, 1e9, -1e9, -1e9]; for (const r of rs) for (let i = 0; i < r.length; i += 2){ b[0] = Math.min(b[0], r[i]); b[1] = Math.min(b[1], r[i + 1]); b[2] = Math.max(b[2], r[i]); b[3] = Math.max(b[3], r[i + 1]); } return b; };
+    const mk = rs => { const p = new Path2D(); for (const r of rs){ p.moveTo(r[0], r[1]); for (let i = 2; i < r.length; i += 2) p.lineTo(r[i], r[i + 1]); p.closePath(); } return p; };
+    const [lx, ly] = sh.l, home = [], gf = [], far = [];
+    for (const r of sh.rings){ const b = box([r]), cx = (b[0] + b[2]) / 2, cy = (b[1] + b[3]) / 2; if (Math.hypot(cx - lx, cy - ly) < 150) home.push(r); else if (cx < 900 && cy > 600) gf.push(r); else far.push(r); }
+    if (!gf.length && !far.length) return;
+    sh.rings = home; sh.path = mk(home); sh.b = box(home);
+    if (gf.length) this.shapes.push({name:"French Guiana", nm:{th:"เฟรนช์เกียนา", en:"French Guiana"}, c:null, r:"SA", b:box(gf), l:null, rings:gf, path:mk(gf)});
+    if (far.length) this.shapes.push({name:"France (overseas)", c:"FRA", r:sh.r, b:box(far), l:sh.l, rings:far, path:mk(far)});
+  },
+  floatText(x, y, txt, color){ this.floats.push({x, y, txt, color, t:0, dur:1.4}); },
+  /* 2.0: a number pinned to a place on the map (disaster losses) — stays a while so you can scroll to it */
+  floatAt(wx, wy, txt, color, dur = 6){ this.floats.push({wx, wy, txt, color, t:0, dur}); },
   /* ---------- input ---------- */
   bindInput(){
     const c = this.fx;
@@ -216,7 +231,7 @@ export const GameMap = {
       if (this.ptrs.size === 1){ this.drag = {x:lx, y:ly, sx:lx, sy:ly, moved:0}; }
       else if (this.ptrs.size === 2){
         const [a, b] = [...this.ptrs.values()];
-        this.pinch = {d:Math.hypot(a.x - b.x, a.y - b.y), z:this.cam.z, w:this.toWorld((a.x + b.x) / 2, (a.y + b.y) / 2)}; this.drag = null; this.target = null;
+        this.pinch = {d:Math.hypot(a.x - b.x, a.y - b.y), z:this.cam.z, w:this.toWorld((a.x + b.x) / 2, (a.y + b.y) / 2)}; this.drag = null; this.target = null; this.zAnim = null;
       }
     });
     c.addEventListener("pointermove", e => {
@@ -230,7 +245,7 @@ export const GameMap = {
       } else if (this.drag){
         const dx = lx - this.drag.x, dy = ly - this.drag.y;
         this.drag.moved += Math.abs(dx) + Math.abs(dy);
-        if (this.drag.moved > 6){ this.setPanning(true); const s = this.scale(), [ax, ay] = this.viewToLocal(this.drag.x, this.drag.y), [bx, by] = this.viewToLocal(lx, ly); this.cam.x -= (bx - ax) / s; this.cam.y -= (by - ay) / s; this.target = null; this.clampCam(); this.moved(); c.style.cursor = "grabbing"; }
+        if (this.drag.moved > 6){ this.setPanning(true); const s = this.scale(), [ax, ay] = this.viewToLocal(this.drag.x, this.drag.y), [bx, by] = this.viewToLocal(lx, ly); this.cam.x -= (bx - ax) / s; this.cam.y -= (by - ay) / s; this.target = null; this.zAnim = null; this.clampCam(); this.moved(); c.style.cursor = "grabbing"; }
         this.drag.x = lx; this.drag.y = ly;
       }
     });
@@ -238,8 +253,9 @@ export const GameMap = {
       const had = this.ptrs.has(e.pointerId); this.ptrs.delete(e.pointerId);
       if (!this.ptrs.size) this.setPanning(false);
       if (!had) return;
-      if (this.pinch){ if (this.ptrs.size < 2){ this.pinch = null; this.pinchEnd = performance.now(); this.drag = null; } return; }
+      if (this.pinch){ if (this.ptrs.size < 2){ this.pinch = null; this.pinchEnd = performance.now(); this.drag = null; if (this.cam.z <= ZMIN + .02) this.resetView(); } return; }
       const d = this.drag; this.drag = null; c.style.cursor = "";
+      if (d && d.moved > 8 && this.cam.z <= ZMIN + .02) this.resetView();   // 3.3: fully zoomed out → always back to the centre
       if (d && d.moved <= 8 && e.type === "pointerup" && performance.now() - (this.pinchEnd || 0) > 250) this.click(e.offsetX, e.offsetY);
     };
     c.addEventListener("pointerup", end); c.addEventListener("pointercancel", end);
@@ -247,9 +263,11 @@ export const GameMap = {
     c.addEventListener("wheel", e => {
       if (this.locked()) return;
       e.preventDefault();
-      const f = Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0016)), z = clamp(this.cam.z * f, ZMIN, ZMAX);
-      const [wx, wy] = this.toWorld(e.offsetX, e.offsetY), s = this.s0 * z, [ex, ey] = this.viewToLocal(e.offsetX, e.offsetY, this.tiltAt(z));
-      this.target = null; this.cam.z = z; this.cam.x = wx - (ex - this.w / 2) / s; this.cam.y = wy - (ey - this.h / 2) / s; this.clampCam(); this.applyTilt(); this.moved();
+      // 3.3: smooth — the wheel sets a zoom goal; frame() eases toward it, keeping the point under the cursor still
+      const f = Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0016)), A = this.zAnim, sx = e.offsetX, sy = e.offsetY;
+      const same = A && Math.abs(A.sx - sx) + Math.abs(A.sy - sy) < 12;
+      const [wx, wy] = same ? [A.wx, A.wy] : this.toWorld(sx, sy);
+      this.target = null; this.zAnim = {z:clamp((A ? A.z : this.cam.z) * f, ZMIN, ZMAX), sx, sy, wx, wy};
     }, {passive:false});
   },
   /* the map takes input unless a window covers it (2.0: a minimised event leaves the map free to look around) */
@@ -298,6 +316,13 @@ export const GameMap = {
   frame(){
     const now = performance.now(), dt = Math.min(.05, (now - this.lastT) / 1000), rawDt = (now - this.lastT) / 1000; this.lastT = now;
     Gfx.sample(now, rawDt);
+    if (this.zAnim){
+      const A = this.zAnim, k = 1 - Math.pow(.8, dt * 60);
+      let z = Math.exp(Math.log(this.cam.z) + (Math.log(A.z) - Math.log(this.cam.z)) * k); if (Math.abs(A.z - z) < .002) z = A.z;
+      const s = this.s0 * z, [ex, ey] = this.viewToLocal(A.sx, A.sy, this.tiltAt(z));
+      this.cam.z = z; this.cam.x = A.wx - (ex - this.w / 2) / s; this.cam.y = A.wy - (ey - this.h / 2) / s; this.clampCam(); this.moved();
+      if (z === A.z){ this.zAnim = null; if (z <= ZMIN + .001) this.resetView(); }
+    }
     if (this.target){
       const k = 1 - Math.pow(.86, dt * 60), T = this.target;
       this.cam.x += (T.x - this.cam.x) * k; this.cam.y += (T.y - this.cam.y) * k; this.cam.z += (T.z - this.cam.z) * k;
@@ -570,21 +595,22 @@ export const GameMap = {
     if (this.parts){ for (const q of this.parts){ q.t += dt; q.x += q.vx * dt; q.y += q.vy * dt; q.vy += 140 * dt; c.globalAlpha = Math.max(0, 1 - q.t / .7); c.fillStyle = q.col; c.beginPath(); c.arc(q.x, q.y, q.r, 0, Math.PI * 2); c.fill(); } c.globalAlpha = 1; this.parts = this.parts.filter(q => q.t < .7); }
     // floating numbers
     for (const f of this.floats){
-      f.t += dt; const p = f.t / 1.4, a = p < .7 ? 1 : 1 - (p - .7) / .3;
+      f.t += dt; const pin = f.wx != null, p = f.t / f.dur, a = p < .7 ? 1 : 1 - (p - .7) / .3;
+      if (pin){ const q = this.toScreen(f.wx, f.wy); f.x = q[0]; f.y = q[1] - 40; }
       c.globalAlpha = Math.max(0, a); c.font = "700 15px 'IBM Plex Mono', 'Kanit', monospace"; c.textAlign = "center"; c.textBaseline = "middle";
       const col = f.color === "good" ? COL.good : f.color === "bad" ? COL.bad : COL.accent;
       const txt = String(f.txt).replace(/\[\[\$?[a-z0-9-]+\]\]/g, "").trim();
-      c.lineWidth = 4; c.strokeStyle = "rgba(0,0,0,.6)"; c.strokeText(txt, f.x, f.y - p * 46); c.fillStyle = col; c.fillText(txt, f.x, f.y - p * 46);
+      c.lineWidth = 4; c.strokeStyle = "rgba(0,0,0,.6)"; const rise = pin ? Math.min(1, f.t / .6) * 18 : p * 46; c.strokeText(txt, f.x, f.y - rise); c.fillStyle = col; c.fillText(txt, f.x, f.y - rise);
       c.textAlign = "left"; c.globalAlpha = 1;
     }
-    this.floats = this.floats.filter(f => f.t < 1.4);
+    this.floats = this.floats.filter(f => f.t < f.dur);
     this.drawEdge(c, now);
     if (hexHit) this.hits.push(hexHit);   // placing a build: the grid takes every tap
     drawInfo(this, c);
     // hover tooltip (country name, CO₂, relation)
     if (this.hover && this.hover.sh && !this.drag && P.RMETA[this.hover.sh.r]){
       const sh = this.hover.sh, cc = sh.c ? P.C(sh.c) : null;
-      const name = cc ? L(P.COUNTRY[cc.id].name) : sh.name;
+      const name = cc ? L(P.COUNTRY[cc.id].name) : sh.nm ? L(sh.nm) : sh.name;
       const line2 = cc ? `CO₂ ${cc.co2.toFixed(2)} Gt · ${t("relation")} ${cc.rel >= 0 ? "+" : ""}${Math.round(cc.rel)}` : L(P.RMETA[sh.r].name);
       c.font = "600 12.5px 'IBM Plex Sans Thai', sans-serif"; const w1 = c.measureText(name).width; c.font = "500 11px 'IBM Plex Mono', 'IBM Plex Sans Thai', monospace"; const w2 = c.measureText(line2).width;
       const w = Math.max(w1, w2) + 20, h = 42; let x = this.hover.x + 16, y = this.hover.y + 14; if (x + w > this.vw - 8) x = this.hover.x - w - 12; if (y + h > this.vh - 8) y = this.hover.y - h - 10;
