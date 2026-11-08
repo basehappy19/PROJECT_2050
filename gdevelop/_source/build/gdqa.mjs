@@ -1,0 +1,60 @@
+// QA for the GDevelop build (after node make-project.mjs --export): node gdqa.mjs [outDir]
+// Opens the HTML5 export, starts a game, plays a few years quickly and takes screenshots; prints page errors.
+import { chromium } from "playwright";
+import http from "node:http"; import fs from "node:fs"; import path from "node:path";
+import { fileURLToPath } from "node:url";
+const HERE = path.dirname(fileURLToPath(import.meta.url));
+const root = `${HERE}/export`, out = process.argv[2] || "/tmp/gdqa";
+fs.mkdirSync(out, {recursive:true});
+const types = {".html":"text/html",".js":"application/javascript",".json":"application/json",".png":"image/png",".jpg":"image/jpeg",".mp3":"audio/mpeg",".ttf":"font/ttf",".webp":"image/webp",".glb":"model/gltf-binary"};
+const srv = http.createServer((q, r) => { let p = decodeURIComponent(q.url.split("?")[0]); if (p === "/") p = "/index.html"; const f = path.join(root, p); if (!fs.existsSync(f) || fs.statSync(f).isDirectory()) { r.writeHead(404); return r.end(); } r.writeHead(200, {"Content-Type":types[path.extname(f)] || "application/octet-stream"}); fs.createReadStream(f).pipe(r); }).listen(0);
+const b = await chromium.launch({executablePath:process.env.CHROME || "/opt/pw-browsers/chromium-1243/chrome-linux64/chrome", args:["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist", "--autoplay-policy=no-user-gesture-required"]});
+const pg = await b.newPage({viewport:{width:+(process.env.W || 1280), height:+(process.env.H || 720)}});
+const errs = [];
+pg.on("pageerror", e => { errs.push(e.message); console.log("pageerror", e.message, (e.stack || "").split("\n").slice(0, 4).join(" | ")); });
+pg.on("console", m => { if (m.type() === "error" && !/Failed to load resource|net::|api/i.test(m.text())) { errs.push(m.text()); console.log("console", m.text().slice(0, 300)); } });
+await pg.addInitScript(() => { localStorage.setItem("p2050-tut", "1"); localStorage.setItem("p2050-trained", "1"); window.P2050_API = "http://localhost:9/api"; });
+await pg.goto(`http://localhost:${srv.address().port}/`);
+await pg.waitForFunction(() => window.P2050 && window.P2050.ready, null, {timeout:90000});
+const W = ms => pg.waitForTimeout(ms), ev = (f, a) => pg.evaluate(f, a);
+const shot = async n => { await W(400); await pg.screenshot({path:`${out}/${n}.png`}); console.log("shot", n); };
+await W(1500); await shot("0-loading"); await pg.mouse.click(640, 360); await W(2500); await shot("1-menu");
+const steps = (process.env.STEPS || "game").split(",");
+if (steps.includes("game")){
+  await ev(() => P2050.Screens.newGame()); await W(3500); await shot("2a-charsel");
+  await ev(() => { const P = P2050; P.UIM.modal = null; P.startGame("th", {mode:"normal", char:"sci", seed:12345}); P.UIM.modal = null; P.Kit && P.Kit.dirty(); });
+  await W(3000); await shot("2-game");
+  await ev(() => { const P = P2050, S = P.S; for (let i = 0; i < 40; i++){ P.tick(); S.event = null; S.cev = null; if (P.UIM) P.UIM.modal = null; } P.changed && P.changed(); });
+  await W(1500); await shot("3-after40");
+  await ev(() => { const P = P2050; P.Screens.selectCountry && P.Screens.selectCountry("CHN"); }); await W(1500); await shot("4-country");
+  await ev(() => { const P = P2050; P.Screens.closeTab && P.Screens.closeTab(); P.Map.lookAt(1400, 380, 3); }); await W(2500); await shot("4b-tilt");
+  const t = await ev(() => { const M = P2050.Map, a = M.toScreen(1400, 380), b = M.toWorldFromScreen(a[0], a[1]); return {cam:M.cam, tilt:M._tilt, scr:a, back:b}; }); console.log("tilt check", JSON.stringify(t));
+  await pg.mouse.move(640, 360); await pg.mouse.down(); for (let i = 1; i <= 8; i++){ await pg.mouse.move(640 - i * 25, 360 + i * 10); await W(40); } await pg.mouse.up(); await W(800); await shot("4c-drag");
+  for (let i = 0; i < 12; i++){ await pg.mouse.wheel(0, 400); await W(60); } await W(2500); await shot("4d-zoomout");
+  console.log("after zoom out", JSON.stringify(await ev(() => P2050.Map.cam)));
+  if (process.env.TRAFFIC){
+    await ev(() => { const P = P2050; P.UIM.modal = null; P.S.event = null; P.setSpeed(1); });
+    await W(9000);
+    const vs = await ev(() => { const T = P2050.Traffic; return T.list.map(v => ({k:v.kind, f:+v.f.toFixed(2), x:Math.round(v.obj.position.x), y:Math.round(v.obj.position.y)})); }); console.log("traffic", JSON.stringify(vs));
+    for (const [kind, z, tag] of [["box", 3.4, "ship"], ["air", 3.4, "plane"]]){
+      const ok = await ev(([kind, z]) => { const P = P2050, v = P.Traffic.list.find(v => v.kind === kind && v.f > .3 && v.f < .7) || P.Traffic.list.find(v => (v.kind === "air") === (kind === "air")); if (!v) return false; P.setSpeed(0); P.UIM.modal = null; P.S.event = null; P.Map.lookAt(v.obj.position.x, v.obj.position.y, z); return true; }, [kind, z]);
+      await W(2500); await shot("6-" + tag); await ev(() => P2050.setSpeed(1)); await W(1500);
+    }
+  }
+}
+if (steps.includes("full")){
+  const r = await ev(() => { const P = P2050, S = P.S; let bought = 0, blocked = 0;
+    for (let i = 0; i < 320 && !S.over; i++){
+      if (P.currentEvent && P.currentEvent()) P.chooseOption(0);
+      if (S.event) { try { P.chooseOption(0); } catch(e){} S.event = null; S.cev = null; }
+      for (const n of P.SKILLS){ if (P.nodeState(n) !== "ready") continue; const c = P.nodeCost(n); if (S.ep >= c.ep && S.pc >= c.pc){ if (P.canAfford(n)){ if (P.buyNode(n.id) !== false) bought++; } else blocked++; } }
+      (S.bubbles || []).slice().forEach(b => { try { P.popBubble ? P.popBubble(b.id) : 0; } catch(e){} });
+      P.tick(); if (P.UIM) P.UIM.modal = P.UIM.modal === "story" ? null : P.UIM.modal;
+    }
+    return {tick:S.tick, over:S.over, bought, blocked, owned:Object.keys(S.owned).length, mat:S.mat, ore:S.ore, temp:S.temp.toFixed(2), net:P.netCO2().toFixed(1), years:(S.years || []).length}; });
+  console.log("full game:", JSON.stringify(r));
+  await W(2500); await shot("5-end");
+}
+fs.writeFileSync(`${out}/errors.txt`, errs.join("\n"));
+console.log("errors:", errs.length);
+await b.close(); srv.close();

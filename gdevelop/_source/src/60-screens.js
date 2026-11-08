@@ -344,4 +344,19 @@ H.toast = a => { UIM.toastQ.push(a); };
 H.story = act => { if (UIM.modal === "skills") UIM.modal = null; Screens.showStory(act); };
 H.gameStart = () => { Screens.showStory(1); if (P.Net) P.Net.startRun(); };
 H.gameOver = () => { if (P.Net) P.Net.finishRun(); };
+/* 3.x, until the minerals market screen is ported: skills don't ask for minerals in this build
+   (otherwise the shared engine would block them with no way to buy minerals here) */
+if (!P.GD_MINERALS){ P.matOk = () => true; P.matCost = () => null; if (P.oreCost) P.oreCost = () => 0; P.spendOre = () => {}; }
+/* 3.x (shared engine): automatic losses show as a number at the country; the yearly review is a toast for now
+   (the full year window comes with the new screens) */
+H.loss = o => {
+  if (!o || !o.c || (o.k !== "hazard" && o.k !== "miss") || !P.Map || !P.countryPoint) return;
+  const pt = P.countryPoint(o.c); if (!pt) return;
+  const bits = []; if (o.ep && Math.round(o.ep)) bits.push(`−${Math.round(-o.ep)} ${t("ep")}`); if (o.appr) bits.push(`−${Math.abs(o.appr).toFixed(1).replace(/\.0$/, "")}%`);
+  if (bits.length) P.Map.floatText(pt[0], pt[1] - 30, bits.join("  "), "bad");
+};
+H.yearly = rec => {
+  const T = P.UI2 || {};
+  UIM.toastQ.push({icon:rec.g ? "trending-up" : "trending-down", title:`${L(T.yrTitle) || "Year"} ${rec.y}`, msg:`${rec.s}/100 · ${rec.g ? L(T.yrGood) : L(T.yrBad)}`});
+};
 H.stopAmb = () => Audio.stopAmb();

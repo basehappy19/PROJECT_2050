@@ -18,8 +18,10 @@ fs.mkdirSync(`${OUT}/portraits`, {recursive:true}); fs.mkdirSync(`${OUT}/endings
 const OLD = JSON.parse(fs.readFileSync(`${ROOT}/assetgen/lucide.json`, "utf8"));   // icons from the first version (e.g. music-off)
 const names = new Set([...fs.readdirSync(LUC_DIR).filter(f => f.endsWith(".svg")).map(f => f.slice(0, -4)), ...Object.keys(OLD)]);
 const used = new Set();
-for (const f of fs.readdirSync(`${ROOT}/src`)){
-  const s = fs.readFileSync(`${ROOT}/src/${f}`, "utf8");
+const ENGINE = path.resolve(ROOT, "../../web/src/engine");   // 3.x: game rules and data are shared with the website
+const SRC_FILES = [...fs.readdirSync(`${ROOT}/src`).map(f => `${ROOT}/src/${f}`), ...fs.readdirSync(ENGINE).filter(f => f.endsWith(".js")).map(f => `${ENGINE}/${f}`)];
+for (const file of SRC_FILES){
+  const s = fs.readFileSync(file, "utf8");
   for (const m of s.matchAll(/\[\[([a-z0-9-]+)\]\]/g)) used.add(m[1]);
   for (const m of s.matchAll(/["'`]([a-z][a-z0-9-]*[a-z0-9])["'`]/g)) if (names.has(m[1])) used.add(m[1]);
 }
@@ -161,7 +163,7 @@ function countryGeo(){
   const META = JSON.parse(fs.readFileSync(`${ROOT}/assetgen/mapmeta.json`, "utf8")).meta;
   const win = {}; new Function("window", fs.readFileSync(`${ROOT}/assetgen/geo.js`, "utf8"))(win);
   const P = {}; const fakeWin = {P2050:P};
-  for (const f of ["14-data-world.js"]) new Function("window", fs.readFileSync(`${ROOT}/src/${f}`, "utf8"))(fakeWin);
+  for (const f of ["14-data-world.js"]) new Function("window", fs.readFileSync(`${ENGINE}/${f}`, "utf8"))(fakeWin);
   const byGeo = P.COUNTRY_BY_GEO;
   const ROB = [[1.0000,0.0000],[0.9986,0.0620],[0.9954,0.1240],[0.9900,0.1860],[0.9822,0.2480],[0.9730,0.3100],[0.9600,0.3720],[0.9427,0.4340],[0.9216,0.4958],[0.8962,0.5571],[0.8679,0.6176],[0.8350,0.6769],[0.7986,0.7346],[0.7597,0.7903],[0.7186,0.8435],[0.6732,0.8936],[0.6213,0.9394],[0.5722,0.9761],[0.5322,1.0000]];
   const MAP_TOP = 84;
@@ -201,7 +203,7 @@ function countryGeo(){
 
 /* ---------------- render everything ---------------- */
 countryGeo();
-const browser = await chromium.launch(CHROME ? {executablePath:CHROME} : {});
+const browser = await chromium.launch({executablePath:CHROME || "/opt/pw-browsers/chromium-1243/chrome-linux64/chrome"});
 const page = await browser.newPage();
 await page.setContent("<html><body></body></html>");
 async function render(svg, w, h, file, type = "png", quality = .9){
@@ -218,10 +220,11 @@ for (const n of icons){
   await render(svg, 64, 64, `${OUT}/icons/${n}.png`);
 }
 await render(terra, 64, 64, `${OUT}/icons/terra.png`);
-for (const id of ["sci", "dip", "eco", "act"]) for (const o of ["base", "alt", "gold"]) await render(portrait(id, o), 256, 256, `${OUT}/portraits/${id}-${o}.png`);
-await render(portrait("adv", "base"), 256, 256, `${OUT}/portraits/adv.png`);
-for (const [k, f] of [["S", "end-win-S"], ["A", "end-win-A"], ["B", "end-win-B"], ["heat", "end-heat"], ["vote", "end-vote"], ["time", "end-time"]]) await render(ending(k), 1280, 720, `${OUT}/endings/${f}.jpg`, "jpg", .86);
-await render(logo, 300, 300, `${OUT}/ui/logo.png`);
+const ART = !process.argv.includes("--icons-geo");   // --icons-geo: only icons + country outlines (keeps portraits, endings, logo)
+if (ART) for (const id of ["sci", "dip", "eco", "act"]) for (const o of ["base", "alt", "gold"]) await render(portrait(id, o), 256, 256, `${OUT}/portraits/${id}-${o}.png`);
+if (ART) await render(portrait("adv", "base"), 256, 256, `${OUT}/portraits/adv.png`);
+if (ART) for (const [k, f] of [["S", "end-win-S"], ["A", "end-win-A"], ["B", "end-win-B"], ["heat", "end-heat"], ["vote", "end-vote"], ["time", "end-time"]]) await render(ending(k), 1280, 720, `${OUT}/endings/${f}.jpg`, "jpg", .86);
+if (ART) await render(logo, 300, 300, `${OUT}/ui/logo.png`);
 await browser.close();
 // remove icons that are no longer used
 const keep = new Set([...icons, "terra"]);

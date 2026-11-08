@@ -24,6 +24,9 @@ for (const f of fs.readdirSync(`${OUT}/assets/map`).sort()) img(`map/${f}`, `ass
 for (const f of fs.readdirSync(`${OUT}/assets/ui`).sort()) img(`ui/${f}`, `assets/ui/${f}`);
 const ICONS = fs.readdirSync(`${OUT}/assets/icons`).filter(f => f.endsWith(".png")).map(f => f.slice(0, -4)).sort();
 for (const n of ICONS) img(`icons/${n}.png`, `assets/icons/${n}.png`);
+// 3.x: the website's 3D icons (money, policy points, CO₂, minerals, skills…) as full-colour icons: [[$name]] in text
+const ICONS3D = fs.existsSync(`${OUT}/assets/icons3d`) ? fs.readdirSync(`${OUT}/assets/icons3d`).filter(f => f.endsWith(".png")).map(f => f.slice(0, -4)).sort() : [];
+for (const n of ICONS3D) img(`icons3d/${n}.png`, `assets/icons3d/${n}.png`);
 const PORTRAITS = fs.readdirSync(`${OUT}/assets/portraits`).filter(f => f.endsWith(".png")).sort();
 for (const f of PORTRAITS) img(`portraits/${f}`, `assets/portraits/${f}`);
 const ENDS = fs.readdirSync(`${OUT}/assets/endings`).filter(f => f.endsWith(".jpg")).sort();
@@ -51,13 +54,15 @@ const REGS = ["NA", "EU", "EA", "SA", "MEAF", "SEA"];
 const globalObjects = [
   painter("UIPainter"),
   textObj("UIText", "PlexThai-Regular", 21, [224, 235, 232]),
-  sprite("UIIcon", ICONS.map(n => anim(n, `icons/${n}.png`))),
+  sprite("UIIcon", [...ICONS.map(n => anim(n, `icons/${n}.png`)), ...ICONS3D.map(n => anim(`3d-${n}`, `icons3d/${n}.png`))]),
   sprite("TutImage", TUTS.map(f => anim(f.replace(/\.(jpg|png)$/, ""), `tutorial/${f}`))),
   textInput("CodeInput"),
   sprite("Backdrop", [anim("Backdrop", "ui/backdrop.jpg")]),
   sprite("Portrait", PORTRAITS.map(f => anim(f.slice(0, -4), `portraits/${f}`))),
   sprite("EndArt", ENDS.map(f => anim(f.slice(0, -4), `endings/${f}`))),
   sprite("Logo", [anim("Logo", "ui/logo.png")]),
+  // 3.x: makes GDevelop include its 3D engine (three.js); the map layer is 3D so the camera can tilt like the website
+  {assetStoreId:"", name:"Anchor3D", type:"Scene3D::Cube3DObject", variables:[], effects:[], behaviors:[], content:{width:1, height:1, depth:1, enableTextureTransparency:false, facesOrientation:"Y", frontFaceResourceName:"", backFaceResourceName:"", backFaceUpThroughWhichAxisRotation:"X", leftFaceResourceName:"", rightFaceResourceName:"", topFaceResourceName:"", bottomFaceResourceName:"", frontFaceVisible:false, backFaceVisible:false, leftFaceVisible:false, rightFaceVisible:false, topFaceVisible:false, bottomFaceVisible:false, frontFaceResourceRepeat:false, backFaceResourceRepeat:false, leftFaceResourceRepeat:false, rightFaceResourceRepeat:false, topFaceResourceRepeat:false, bottomFaceResourceRepeat:false, materialType:"Basic", tint:"255;255;255", isCastingShadow:false, isReceivingShadow:false}},
 ];
 const mapObjects = () => [
   sprite("Ocean", [anim("Ocean", "map/ocean.png")]),
@@ -79,7 +84,7 @@ function toWorld(lat, lon){ const M = META.meta; let l = lon - M.LON0; while (l 
   const X = ROB[i][0] + (ROB[i+1][0] - ROB[i][0]) * f, Y = ROB[i][1] + (ROB[i+1][1] - ROB[i][1]) * f;
   return [(0.8487 * X * l * Math.PI / 180 + M.XR) * M.U / SS, MAP_TOP + (M.YT - 1.3523 * Y * Math.sign(lat)) * M.U / SS]; }
 // cities from the game data (same table as in 10-data-a.js)
-const CITIES = new Function(fs.readFileSync(`${SRC}/10-data-a.js`, "utf8").match(/const CITIES = \{[\s\S]*?\n\};/)[0] + "; return CITIES;")();
+const CITIES = new Function(fs.readFileSync(`${REPO}/web/src/engine/10-data-a.js`, "utf8").match(/const CITIES = \{[\s\S]*?\n\};/)[0] + "; return CITIES;")();
 function mapInstances(){
   const out = [], pad = META.ocean.pad;
   out.push(inst("Ocean", "", -pad / SS, MAP_TOP - pad / SS, {w:(META.meta.SW + 2 * pad) / SS, h:(META.meta.SH + 2 * pad) / SS, z:0}));
@@ -114,18 +119,16 @@ const once = C("BuiltinCommonInstructions::Once", []);
 const guard = "const P = window.P2050; if (!P || !P.ready) return;\n";
 
 /* ------------------------------------------------------------------ core JS (external events "Core") */
+/* 3.x: the game rules and data come straight from the website (web/src/engine), so one change updates both versions.
+   39-mp.js (multiplayer) is left out: multiplayer is switched off. */
+const ENGINE = `${REPO}/web/src/engine`;
+const ENGINE_FILES = fs.readdirSync(ENGINE).filter(f => /^[123]\d-.*\.js$/.test(f) && f !== "39-mp.js").sort();
 const MODULES = [
-  ["10-data-a.js", "Data · ข้อความ TH/EN, ภูมิภาค, เมือง, การสั่งการรายภูมิภาค"],
-  ["11-data-events.js", "Data · เหตุการณ์ตัดสินใจ 152 เรื่อง"],
-  ["12-data-c.js", "Data · ข่าวทั่วไป, หน้าคู่มือ, ความสำเร็จ"],
-  ["13-data-skills.js", "Data · สกิล 40 สกิล 5 หมวด"],
-  ["14-data-world.js", "Data · ประเทศ, ภัยเฉพาะถิ่น, อีเวนต์ระหว่างประเทศ, ตัวละคร, เนื้อเรื่อง, ร้านค้า"],
-  ["15-data-ui2.js", "Data · ข้อความของระบบใหม่"],
-  ["20-engine.js", "Engine · การจำลองรายเดือน, ประเทศ, ความสัมพันธ์, ภัยเฉพาะถิ่น, เหตุการณ์, การบันทึก, ความสำเร็จ"],
-  ["21-net.js", "Net · เชื่อมต่อเซิร์ฟเวอร์: บัญชี, Terra, ร้านค้า, อันดับ, เกียรติบัตร"],
-  ["30-ui-kit.js", "UI toolkit · วาดแผง/ข้อความ/ไอคอนด้วย UIPainter, UIText, UIIcon"],
-  ["40-audio.js", "Audio · เสียงเอฟเฟกต์และเสียงบรรยากาศของเหตุการณ์"],
-  ["50-map.js", "Map · แผนที่โลก 2D, สีภูมิภาค, ควันมลพิษ, ฟอง, กล้อง"],
+  ...ENGINE_FILES.map(f => [`@engine/${f}`, `Engine · ${f.replace(/\.js$/, "")} (web/src/engine)`]),
+  ["50-ui-kit.js", "UI toolkit · วาดแผง/ข้อความ/ไอคอนด้วย UIPainter, UIText, UIIcon"],
+  ["51-audio.js", "Audio · เสียงเอฟเฟกต์และเสียงบรรยากาศของเหตุการณ์"],
+  ["52-map.js", "Map · แผนที่โลก 3D (เงยตามการซูม), สีภูมิภาค, ควันมลพิษ, ฟอง, กล้อง"],
+  ["53-traffic.js", "Traffic · เครื่องบินและเรือ 3D บนเส้นทางจริง"],
   ["60-screens.js", "Screens · วิดเจ็ต, สถานะหน้าจอ, ตั้งค่าฉาก, ลูปทุกเฟรม"],
   ["61-hud.js", "Screens · HUD และป้ายภูมิภาค"],
   ["62-drawer.js", "Screens · แผงเทคโนโลยี / ภูมิภาค / สถิติ / ข่าว"],
@@ -134,6 +137,7 @@ const MODULES = [
   ["65-skills.js", "Screens · หน้าสกิล (เต็มจอ)"],
   ["66-learn.js", "Screens · หน้าเรียนรู้"],
 ];
+const srcOf = f => (f.startsWith("@engine/") ? `${ENGINE}/${f.slice(8)}` : `${SRC}/${f}`);
 const COUNTRYGEO = fs.readFileSync(`${SOURCE}/assetgen/countrygeo.json`, "utf8");
 const tutSizes = {};
 { // read jpeg/png sizes
@@ -148,7 +152,7 @@ const mapMetaSmall = {meta:META.meta, grid:META.grid};
 const coreEvents = [
   comment("PROJECT : 2050 — โค้ดหลักของเกม (JavaScript)\nบล็อกด้านล่างทำงานครั้งเดียวตอนเริ่มฉาก Loading แล้วสร้าง window.P2050 ไว้ใช้ทั้งเกม\n• Data = ข้อความ TH/EN, ภูมิภาค, ผังเทคโนโลยี, เหตุการณ์ 152 เรื่อง, ข่าว, คู่มือ, ความสำเร็จ (แก้ตัวเลข/ข้อความได้ที่นี่)\n• Engine = กติกาการจำลองรายเดือน (เหมือนเวอร์ชันเว็บทุกอย่าง)\n• UI/Screens = วาดหน้าจอด้วยออบเจกต์ UIPainter, UIText, UIIcon, TutImage\nส่วนจังหวะเวลา การคลิก คีย์บอร์ด ดนตรี และการเปลี่ยนฉาก อยู่ใน Events ของแต่ละฉาก"),
   std([atStart], [], MODULES.map(([f, title]) => {
-    let code = fs.readFileSync(`${SRC}/${f}`, "utf8");
+    let code = fs.readFileSync(srcOf(f), "utf8");
     code = code.replace("/*MAPMETA*/null", JSON.stringify(mapMetaSmall)).replace("/*TUTSIZES*/{}", JSON.stringify(tutSizes)).replace("/*COUNTRYGEO*/null", COUNTRYGEO);
     return js(`/* ${title} */\n` + code);
   })),
@@ -161,7 +165,7 @@ const sceneVars = list => vars(list);
 function scene(name, layers, objects, instances, events, variables){
   return {b:16, disableInputWhenNotFocused:true, mangledName:name, name, r:5, standardSortMethod:true, stopSoundsOnStartup:true, title:"", v:11,
     uiSettings:{grid:false, gridType:"rectangular", gridWidth:32, gridHeight:32, gridOffsetX:0, gridOffsetY:0, gridColor:10401023, gridAlpha:0.8, snap:false, zoomFactor:0.5, windowMask:true},
-    objectsGroups:[], variables:sceneVars(variables), instances, objects, events, layers:layers.map(n => LAYER(n)), behaviorsSharedData:[]};
+    objectsGroups:[], variables:sceneVars(variables), instances, objects, events, layers:layers.map(n => { const L = LAYER(n); if (n === "" && name !== "Loading"){ L.renderingType = "3d"; L.cameraType = "perspective"; L.camera3DNearPlaneDistance = 1; L.camera3DFarPlaneDistance = 20000; L.camera3DFieldOfView = 40; } return L; }), behaviorsSharedData:[]};
 }
 const backdrop = () => inst("Backdrop", "Backdrop", 0, 0, {w:1920, h:1080});
 const commonVars = [["GoTo", "string", ""], ["UIConsumed", "number", 0]];
@@ -265,5 +269,7 @@ if (process.argv.includes("--export")){
   const loaded = await loadProject(`${OUT}/game.json`);
   const dir = `${HERE}/export`; fs.rmSync(dir, {recursive:true, force:true}); fs.mkdirSync(dir, {recursive:true});
   exportProject(loaded, dir);
+  // the 3D engine lists its .wasm decoder as a <script>; browsers then report a syntax error, so drop that tag
+  { const ix = `${dir}/index.html`; fs.writeFileSync(ix, fs.readFileSync(ix, "utf8").replace(/<script[^>]*src="[^"]*\.wasm"[^>]*><\/script>\s*/g, "")); }
   console.log("exported to", dir, fs.readdirSync(dir).length, "files (HTML5 test build; the website itself is the separate web/ project)");
 }
