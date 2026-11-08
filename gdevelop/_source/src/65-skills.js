@@ -141,18 +141,22 @@ Screens.skillDetail = function(l, x, y, w, h){
   }
   const pills = [];
   if (!own){ pills.push({txt:`${IC.ep} ${c.ep}`, kind:S.ep >= c.ep ? "acc" : "bad"}); pills.push({txt:`${IC.pc} ${c.pc}`, kind:S.pc >= c.pc ? "acc" : "bad"}); }
+  // 3.x: minerals this skill needs (from the shared engine), red when short — tap the minerals box to buy more
+  const mc = !own && P.matCost ? P.matCost(n) : null;
+  if (mc) for (const g of P.MAT_IDS) if (mc[g]) pills.push({txt:`[[$mat-${g}]] ${Math.ceil(mc[g])}`, kind:(S.mat[g] || 0) >= mc[g] ? "acc" : "bad"});
   pills.push({txt:`${t("needs")}: ${n.req.length ? n.req.map(q => L(SKILL[q].name)).join(" + ") : t("none")}`, kind:""});
   if (n.months) pills.push({txt:`${t("rollout")} ${n.months} ${t("months")}`, kind:""});
   if (n.type === "active") pills.push({txt:`${t("cooldownLen")} ${n.cd} ${t("months")}`, kind:"gold"});
   cy += W.pills(l, px, cy, iw, pills) + 14;
   const full = st === "ready" && P.atCapacity(n);
-  const can = st === "ready" && !full && S.ep >= c.ep && S.pc >= c.pc;
+  const can = st === "ready" && !full && (P.canAfford ? P.canAfford(n) && (!P.matOk || P.matOk(n)) : S.ep >= c.ep && S.pc >= c.pc);
   if (!own){
     const lab = `[[lock-open]] ${t("unlock")}`;
     W.btn(l, "buy", px, cy, lab, () => { if (P.buyNode(n.id)) Audio.play("buy"); k.dirty(); }, {disabled:!can, sound:false, h:42, size:15, w:iw});
     cy += 48;
     if (full) cy += k.text(l, t("capFull"), px, cy, {size:12, color:"bad", w:iw}).h + 4;
     else if (st === "locked") cy += k.text(l, t("needReq"), px, cy, {size:12, color:"warn", w:iw}).h + 4;
+    else if (!can && P.matOk && !P.matOk(n) && S.ep >= c.ep && S.pc >= c.pc){ cy += k.text(l, S.lang === "th" ? "ทรัพยากรไม่พอ: กดช่องทรัพยากรด้านบนเพื่อซื้อ" : "Not enough minerals: tap the minerals box at the top to buy", px, cy, {size:12, color:"bad", w:iw}).h + 4; W.btn(l, "tomkt", px, cy, `[[$ore]] ${S.lang === "th" ? "ตลาดทรัพยากร" : "Minerals market"}`, () => Screens.openWin("market"), {kind:"ghost", h:32, size:13}); cy += 38; }
     else if (!can) cy += k.text(l, t("cantAfford"), px, cy, {size:12, color:"bad", w:iw}).h + 4;
   } else if (n.type === "active"){
     const a = P.abilityList().find(q => q.id === n.id), ready = a && P.abilityReady(a), cd = S.actCd[n.id] || 0;

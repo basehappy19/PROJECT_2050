@@ -1356,7 +1356,7 @@ details.more > summary:hover{color:var(--fg)}
 /* ===================== 3.3 · layout ===================== */
 /* ability bar right under the money bar; the news line grows out of it to the right; goals under the news line */
 .abar{top:calc(var(--kpi-b, 62px) + 6px)}
-.topbar .ticker{margin-left:72px;width:calc(100% - 72px)}
+.topbar .ticker{margin-left:72px;width:0;min-width:calc(100% - 72px)}   /* width 0: a long news line never widens the money bar */
 .wside{top:calc(var(--kpi-b, 62px) + 42px);left:calc(86px + var(--safe-l))}
 /* bottom row: zoom left · meters centre · tabs right */
 .bottom .row2{display:grid;grid-template-columns:1fr minmax(0,700px) 1fr;align-items:stretch;gap:10px}

@@ -12,6 +12,8 @@ const pref = k => { try { return localStorage.getItem(k) !== "0"; } catch(e) { r
 const savePref = (k, v) => { try { localStorage.setItem(k, v ? "1" : "0"); } catch(e) {} };
 const lvl = (k, d) => { try { const v = parseFloat(localStorage.getItem(k)); return isNaN(v) ? d : Math.max(0, Math.min(1, v)); } catch(e) { return d; } };
 const SFX_HAVE = new Set(["action", "aid", "buy", "choose", "click", "close", "done", "error", "event", "lose", "miss", "news", "open", "pause", "pop", "save", "select", "spawnGreen", "spawnRed", "speed", "start", "warn", "win", "year"]);
+const AMB_HAVE = new Set(["air", "arctic", "bees", "birds", "city", "construction", "crowd", "explosion", "factory", "farm", "fire", "flood", "forest", "harbor", "heat", "lab", "market", "ocean", "office", "siren", "storm", "train", "underwater", "wind"]);
+const AMB_ALIAS = {gale:"wind", rain:"storm", sea:"ocean", jungle:"forest", river:"flood", keyboard:"office", space:"wind"};
 const SFX_ALIAS = {data:"news", shield:"done", whoosh:"select", coin:"buy", jingle:"done", tick:"click", impact:"warn", thunder:"warn", hover:null};
 const VOL = {sfx:60, amb:55, music:30, musicDuck:12};
 const A = {
@@ -35,6 +37,7 @@ const A = {
   },
   ambience(n){
     this.stopAmb(0);
+    n = AMB_ALIAS[n] || n; if (!AMB_HAVE.has(n)) return;   // 3.x: shared engine names a few sounds this build doesn't have
     if (!this.on || !n || !this.scene) return;
     this.amb = n; this.ambVol = 0; this.ambTarget = VOL.amb * this.lvSfx; this.ambStop = false;
     try { snd().playSoundOnChannel(this.scene, `amb-${n}.mp3`, 2, true, 0, 1); } catch(e) {}

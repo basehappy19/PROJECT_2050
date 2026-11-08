@@ -26,6 +26,11 @@ if (steps.includes("game")){
   await W(3000); await shot("2-game");
   await ev(() => { const P = P2050, S = P.S; for (let i = 0; i < 40; i++){ P.tick(); S.event = null; S.cev = null; if (P.UIM) P.UIM.modal = null; } P.changed && P.changed(); });
   await W(1500); await shot("3-after40");
+  await ev(() => { const P = P2050; P.S.log.unshift({tk:P.S.tick, txt:"[[newspaper]] ข่าวกรองฤดูกาล: 6 เดือนข้างหน้า เอเชียตะวันออกเฉียงใต้ เสี่ยงภัยพิบัติสูงกว่าที่อื่นมาก (คลื่นความร้อน, น้ำท่วมใหญ่, พายุไต้ฝุ่น) ช่วยเตรียมรับมือภัยหรือเก็บเงินไว้อพยพ", cls:"nw"}); P.Kit.dirty(); }); await W(900); await shot("3b-hud");
+  for (const win of ["market", "politics", "year"]){
+    await ev(w => { const P = P2050; if (w === "year") P.UIM.yearRec = {y:2027, s:62, g:1, net:35.1, tgt:35.4, cut:0.9, ep:40, pc:6, appr:0}; P.Screens.openWin(w); }, win); await W(1200); await shot("w-" + win);
+    await ev(() => P2050.Screens.closeWin());
+  }
   await ev(() => { const P = P2050; P.Screens.selectCountry && P.Screens.selectCountry("CHN"); }); await W(1500); await shot("4-country");
   await ev(() => { const P = P2050; P.Screens.closeTab && P.Screens.closeTab(); P.Map.lookAt(1400, 380, 3); }); await W(2500); await shot("4b-tilt");
   const t = await ev(() => { const M = P2050.Map, a = M.toScreen(1400, 380), b = M.toWorldFromScreen(a[0], a[1]); return {cam:M.cam, tilt:M._tilt, scr:a, back:b}; }); console.log("tilt check", JSON.stringify(t));

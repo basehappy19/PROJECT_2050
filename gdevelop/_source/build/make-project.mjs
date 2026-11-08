@@ -136,6 +136,7 @@ const MODULES = [
   ["64-menu.js", "Screens · หน้าโหลด, เมนูหลัก, บัญชี, ร้านค้า, อันดับ, เกียรติบัตร, แจ้งเตือน"],
   ["65-skills.js", "Screens · หน้าสกิล (เต็มจอ)"],
   ["66-learn.js", "Screens · หน้าเรียนรู้"],
+  ["67-windows.js", "Screens · 3.3 ตลาดทรัพยากร (แบบ A), ความนิยม (แบบ B), สรุปรายปี"],
 ];
 const srcOf = f => (f.startsWith("@engine/") ? `${ENGINE}/${f.slice(8)}` : `${SRC}/${f}`);
 const COUNTRYGEO = fs.readFileSync(`${SOURCE}/assetgen/countrygeo.json`, "utf8");

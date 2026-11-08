@@ -7,12 +7,13 @@ if (P.mods && P.mods.drawer) return;
    The drawer frame is drawn on layer "Drawer"; its content scrolls on "DrawerScroll".
    Tapping the empty map (or Esc) closes it.
    ========================================================================= */
+const th3 = () => P.S.lang === "th";
 const {Kit, S, t, L, UI, Audio, W, UIM, Screens, ACTIONS, RMETA, RESERVE, IC, COUNTRY, HAZARDS} = P;
 const k = Kit;
 
 Screens.renderDrawer = function(l){
   if (this.kind !== "game" || !S.tab){ k.clearSlave("DrawerScroll"); return; }
-  const dw = this.drawerWidth(), x = 1264 - dw, y = 64, h = 566 - y;
+  const dw = this.drawerWidth(), x = 1264 - dw, y = 64, h = 660 - y;   // 3.3: the bottom row is one slim line
   W.panel(l, x, y, dw, h, 10, "panel");
   const titles = {region:S.selC ? "dCountry" : "dRegion", stats:"dStats", news:"dNews"};
   const title = t(titles[S.tab]);
@@ -70,8 +71,8 @@ Screens.orderCards = function(l, y, cw, scope){
     const btnW = Math.ceil(k.textW(label, {font:"dispS", size:14})) + 30;
     const tw = cw - 22 - btnW - 10;
     const h1 = k.text(l, L(a.name), 11, y + 9, {font:"bodyB", size:13.5, w:tw}).h;
-    const h2 = k.text(l, cc ? L(UI["cact_" + a.id]) : L(a.desc), 11, y + 9 + h1, {size:12, color:"muted", w:tw}).h;
-    const ch = Math.max(9 + h1 + h2 + 9, 56);
+    const h2 = k.text(l, cc ? L(UI["cact_" + a.id]) : L(a.desc), 11, y + 9 + h1, {size:11.5, color:"muted", w:tw, max:1}).h;   // 3.3: one line each
+    const ch = Math.max(8 + h1 + h2 + 8, 50);
     W.card(l, 0, y, cw, ch);
     W.btn(l, "act-" + a.id, cw - 11 - btnW, y + (ch - 36) / 2, label, () => P.doAction(a.id, scope), {disabled:!ok, kind:ok ? "primary" : "ghost", w:btnW, sound:false});
     y += ch + 7;
@@ -118,7 +119,7 @@ Screens.paneRegion = function(l, cw){
     y += rh + 4;
   }
   y += 10;
-  W.h3(l, t("ordersRegion"), 0, y, {w:cw}); y += 22;
+  W.h3(l, th3() ? `คำสั่งเฉพาะทวีป ${L(meta.name)}` : `Orders for ${L(meta.name)}`, 0, y, {w:cw}); y += 22;
   return this.orderCards(l, y, cw, "region");
 };
 
@@ -126,23 +127,26 @@ Screens.paneRegion = function(l, cw){
 Screens.paneCountry = function(l, cw){
   const c = P.C(S.selC); if (!c){ S.selC = null; return 0; }
   const r = P.R(c.reg), meta = c.rest ? null : COUNTRY[c.id];
+  /* 3.3 · design C: name + continent, a friendship ring, one line of numbers, then the orders */
   let y = 0;
-  y += k.text(l, P.cname(c.id), 0, y, {font:"dispS", size:19, w:cw}).h;
-  y += k.text(l, L(RMETA[c.reg].name) + (S.alli[c.reg] && S.alli[c.reg].members.includes(c.id) ? ` · [[handshake]] ${t("allyMember")}` : ""), 0, y, {size:12, color:"muted", w:cw, iconColor:"good"}).h + 8;
+  const ringW = c.rest ? 0 : 74;
+  y += k.text(l, P.cname(c.id), 0, y, {font:"dispS", size:19, w:cw - ringW}).h;
+  y += k.text(l, L(RMETA[c.reg].name) + (S.alli[c.reg] && S.alli[c.reg].members.includes(c.id) ? ` · [[handshake]] ${t("allyMember")}` : ""), 0, y, {size:12, color:"muted", w:cw - ringW, iconColor:"good"}).h + 6;
   if (!c.rest){
-    // relation
-    W.card(l, 0, y, cw, 58);
-    k.text(l, t("relation"), 12, y + 8, {size:11, color:"muted"});
-    k.text(l, `${c.rel >= 0 ? "+" : ""}${Math.round(c.rel)}`, cw - 70, y + 4, {font:"monoB", size:20, color:W.relCol(c.rel), w:58, align:"right"});
-    W.relBar(l, 12, y + 36, cw - 24, c.rel);
-    k.text(l, t(c.rel >= 50 ? "relHigh" : c.rel >= 0 ? "relMid" : "relLow"), 12, y + 44, {size:10.5, color:"muted", w:cw - 24, max:1});
-    y += 66;
+    const rc = W.relCol(c.rel), cx = cw - 34, cy = 32, R = 30, fr = (c.rel + 100) / 200;
+    k.circle(l, cx, cy, R, "panel2");
+    for (let i = 0; i < 48; i++){ if (i / 48 > fr) break; const a = -Math.PI / 2 + i / 48 * Math.PI * 2; k.circle(l, cx + Math.cos(a) * (R - 4), cy + Math.sin(a) * (R - 4), 3.2, rc); }
+    k.circle(l, cx, cy, R - 9, "panel");
+    k.text(l, `${c.rel >= 0 ? "+" : ""}${Math.round(c.rel)}`, cx - 24, cy - 13, {font:"monoB", size:15, w:48, align:"center", color:rc});
+    k.text(l, t("relation"), cx - 26, cy + 5, {size:9, w:52, align:"center", color:"muted", max:1});
   }
+  y = Math.max(y, c.rest ? y : 46);
   const share = c.co2 / (r.co2 || 1);
-  y += statGrid(l, y, cw, [[t("co2Now"), `${c.co2.toFixed(2)} Gt`, "hot"], [t("shareOfRegion"), `${Math.round(share * 100)}%`], [t("risk"), c.rest ? "—" : `${meta.risk}%`, meta && meta.risk >= 65 ? "bad" : "fg"], [t("adapt"), `${Math.round(c.adapt)}`]]) + 4;
-  if (meta){
-    const hz = meta.hz.map(h => `[[${HAZARDS[h].icon}]] ${L(HAZARDS[h].name)}`).join("   ");
-    y += k.text(l, `${t("hazardsHere")}: ${hz}`, 0, y, {size:11.5, color:"muted", w:cw, iconColor:"warn"}).h + 10;
+  y += k.text(l, `[[$co2]] ${c.co2.toFixed(2)} Gt · ${Math.round(share * 100)}% ${th3() ? "ของทวีป" : "of the continent"}${meta ? ` · [[$risk]] ${t("risk")} ${meta.risk}%` : ""}`, 0, y, {font:"mono", size:12, w:cw - ringW, color:"fg"}).h + 8;
+  if (!c.rest && c.rel < 40){   // the next goal: friendship 40 opens a bilateral agreement
+    const gh = 30; k.rect(l, 0, y, cw, gh, "accent", {r:9, a:.08, stroke:"accent", sa:.4});
+    k.text(l, `[[target]] ${th3() ? `เป้าหมายถัดไป: มิตรภาพ 40 เพื่อปลดล็อก${t("bilatTitle")}` : `Next goal: friendship 40 unlocks ${t("bilatTitle")}`}`, 10, y + 6, {size:12, color:"accent", iconColor:"accent", w:cw - 20, max:1});
+    y += gh + 8;
   }
   const hz = S.haz.find(h => h.c === c.id);
   if (hz){
@@ -156,25 +160,25 @@ Screens.paneCountry = function(l, cw){
     y += ch + 8;
   }
   if (!c.rest){
-    W.h3(l, t("ordersCountry"), 0, y, {w:cw}); y += 22;
+    W.h3(l, th3() ? `สั่งการกับ ${P.cname(c.id)}` : `Deal with ${P.cname(c.id)}`, 0, y, {w:cw}); y += 22;
     for (const a of P.CACTS){
       if (a.req && !S.owned[a.req]) continue;
       const kk = P.cactCost(a), cd = c.cd[a.id] || 0, ok = P.cactOk(a, c);
       const label = cd ? `${t("cooldown")} ${cd}` : [kk.ep ? `${IC.ep} ${kk.ep}` : "", kk.pc ? `${IC.pc} ${kk.pc}` : ""].filter(Boolean).join("  ");
       const btnW = Math.ceil(k.textW(label, {font:"dispS", size:14})) + 30, tw = cw - 22 - btnW - 10;
       const h1 = k.text(l, `[[${a.icon}]] ${L(a.name)}`, 11, y + 9, {font:"bodyB", size:13.5, w:tw, iconColor:"accent"}).h;
-      const h2 = k.text(l, L(a.desc), 11, y + 9 + h1, {size:12, color:"muted", w:tw}).h;
-      const ch = Math.max(9 + h1 + h2 + 9, 56);
+      const h2 = k.text(l, L(a.desc), 11, y + 9 + h1, {size:11.5, color:"muted", w:tw, max:1}).h;
+      const ch = Math.max(8 + h1 + h2 + 8, 50);
       W.card(l, 0, y, cw, ch);
       W.btn(l, "ca-" + a.id, cw - 11 - btnW, y + (ch - 36) / 2, label, () => P.countryAction(a.id), {disabled:!ok, kind:ok ? "primary" : "ghost", w:btnW, sound:false});
       y += ch + 7;
     }
-    // bilateral agreement
+    // bilateral agreement (3.3: only once friendship reaches 40; the goal line above says how far)
+    if (c.rel >= 40){
     y += 4;
     W.h3(l, t("bilatTitle"), 0, y, {w:cw}); y += 20;
     y += k.text(l, `${t("bilatDesc")} · ${IC.ep} ${P.BILAT_COST.ep} ${IC.pc} ${P.BILAT_COST.pc}`, 0, y, {size:12, color:"muted", w:cw}).h + 6;
-    if (c.rel < 40) y += k.text(l, t("bilatNeedRel"), 0, y, {size:12, color:"warn", w:cw}).h + 8;
-    else {
+    {
       const ps = P.bilatPartners().sort((a, b) => b.rel - a.rel).slice(0, 12);
       if (!ps.length) y += k.text(l, t("bilatNone"), 0, y, {size:12, color:"muted", w:cw}).h + 8;
       let cx = 0, rowY = y; const afford = S.ep >= P.BILAT_COST.ep && S.pc >= P.BILAT_COST.pc;
@@ -189,9 +193,10 @@ Screens.paneCountry = function(l, cw){
       }
       if (ps.length) y = rowY + 36;
     }
+    }
   }
   y += 6;
-  W.h3(l, `${t("ordersRegion")} · ${c.rest ? L(RMETA[c.reg].name) : t("thisCountryOnly")}`, 0, y, {w:cw}); y += 22;
+  W.h3(l, c.rest ? (th3() ? `คำสั่งเฉพาะทวีป ${L(RMETA[c.reg].name)}` : `Orders for ${L(RMETA[c.reg].name)}`) : (th3() ? `คำสั่งเฉพาะประเทศ ${P.cname(c.id)}` : `Orders for ${P.cname(c.id)} only`), 0, y, {w:cw}); y += 22;
   return this.orderCards(l, y, cw, c.rest ? "region" : "country");
 };
 

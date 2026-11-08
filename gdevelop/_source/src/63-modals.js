@@ -9,7 +9,7 @@ if (P.mods && P.mods.modals) return;
 const TUT_SIZES = /*TUTSIZES*/{};
 const {Kit, S, t, L, UI, Audio, W, UIM, Screens, TUT, CHARS, CHAR, STORY, ADVISOR, ENDINGS, HAZARDS, COUNTRY, IC} = P;
 const k = Kit;
-const WIDTH = {tutorial:720, charsel:1150, story:800, learn:980, end:640, event:660, pause:620};
+const WIDTH = {tutorial:720, charsel:1150, story:800, learn:980, end:640, event:660, pause:620, market:940, politics:860, year:600};
 
 Screens.renderModal = function(l){
   const kind = UIM.kind();
@@ -27,6 +27,9 @@ Screens.renderModal = function(l){
     else if (kind === "pause") ch = this.mPause(s, pw);
     else if (kind === "tutorial") ch = this.mTutorial(s, pw);
     else if (kind === "learn") ch = this.mLearn(s, pw);
+    else if (kind === "market") ch = this.mMarket(s, pw);
+    else if (kind === "politics") ch = this.mPolitics(s, pw);
+    else if (kind === "year") ch = this.mYear(s, pw);
     const ph = Math.min(ch, 690), py = (720 - ph) / 2;
     s.frame(px, py, {x:px, y:py, w:pw, h:ph}, ch);
     this._modalBox = {px, py, pw, ph};
@@ -39,7 +42,7 @@ Screens.renderModal = function(l){
     k.hgrad(l, 0, 0, 1280, 720, [[0, "#020609"], [.35, "#020609"], [1, "#020609"]], {a:.0, bg:true});
     k.rect(l, px - 40, 0, pw + 80, 720, "#020609", {a:.55, bg:true});
   } else k.rect(l, 0, 0, 1280, 720, "#020609", {a:kind === "story" ? .78 : .62, bg:true});
-  const closer = {pause:() => Screens.resume(), learn:() => Screens.closeLearn()}[kind];
+  const closer = {pause:() => Screens.resume(), learn:() => Screens.closeLearn(), market:() => Screens.closeWin(), politics:() => Screens.closeWin(), year:() => Screens.closeWin()}[kind];
   if (closer){ k.hit(l, "veil", 0, 0, 1280, 720, () => { Audio.play("close"); closer(); }, {cursor:false}); }
   k.hit(l, "mbox", px, py, pw, ph, () => {}, {cursor:false});
   const border = kind === "end" ? (S.over === "win" ? "good" : "bad") : "line";

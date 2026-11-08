@@ -204,6 +204,74 @@ function spawn(M, kind){
   const ln = P.LANES[id], fwd = kind === "box" ? R() < .5 : true;
   return {kind, lane:id, from:fwd ? ln.a : ln.b, to:fwd ? ln.b : ln.a, rev:!fwd, path:lanePath(id), f:0, dur:(kind === "ore" ? 34 : 30) + R() * 14, clean:R() < tl.seaClean, res:ln.res};
 }
+/* ---------- 3.3: Plague Inc style vehicles — small shaded models drawn once into sprites, with a shadow on the ground ----------
+   Sprites point to +x and are drawn at 4× so they stay crisp when the map is zoomed in. */
+const SPR = new Map(), SPX = 4;
+function spr(key, w, h, draw){
+  let cv = SPR.get(key); if (cv) return cv;
+  cv = document.createElement("canvas"); cv.width = w * SPX; cv.height = h * SPX;
+  const g = cv.getContext("2d"); g.scale(SPX, SPX); g.translate(w / 2, h / 2); draw(g); SPR.set(key, cv); return cv;
+}
+const lin = (g, x0, y0, x1, y1, stops) => { const gr = g.createLinearGradient(x0, y0, x1, y1); stops.forEach(([o, col]) => gr.addColorStop(o, col)); return gr; };
+/* airliner seen from above, nose to the right (length 56) */
+function planeShape(g){
+  g.beginPath();   // wings
+  g.moveTo(6, -3); g.lineTo(-6, -26); g.lineTo(-11, -26); g.lineTo(-4, -3); g.closePath();
+  g.moveTo(6, 3); g.lineTo(-6, 26); g.lineTo(-11, 26); g.lineTo(-4, 3); g.closePath();
+  g.moveTo(-17, -2); g.lineTo(-24, -11); g.lineTo(-27, -11); g.lineTo(-23, -2); g.closePath();   // tailplane
+  g.moveTo(-17, 2); g.lineTo(-24, 11); g.lineTo(-27, 11); g.lineTo(-23, 2); g.closePath();
+  g.moveTo(28, 0); g.bezierCurveTo(28, -3.6, 24, -3.8, 20, -3.8); g.lineTo(-22, -3.2); g.quadraticCurveTo(-28, -2, -28, 0); g.quadraticCurveTo(-28, 2, -22, 3.2); g.lineTo(20, 3.8); g.bezierCurveTo(24, 3.8, 28, 3.6, 28, 0); g.closePath();   // body
+}
+function planeSprite(clean){
+  return spr("plane" + (clean ? "c" : ""), 64, 64, g => {
+    g.fillStyle = lin(g, 0, -26, 0, 26, [[0, "#ffffff"], [.5, "#e9eef2"], [1, "#a9b6bf"]]); planeShape(g); g.fill();
+    // light on the top of the body, shade under the wings
+    g.fillStyle = lin(g, 0, -4, 0, 4, [[0, "#ffffff"], [.55, "#f3f6f8"], [1, "#b8c4cc"]]);
+    g.beginPath(); g.moveTo(28, 0); g.bezierCurveTo(28, -3.6, 24, -3.8, 20, -3.8); g.lineTo(-22, -3.2); g.quadraticCurveTo(-28, -2, -28, 0); g.quadraticCurveTo(-28, 2, -22, 3.2); g.lineTo(20, 3.8); g.bezierCurveTo(24, 3.8, 28, 3.6, 28, 0); g.fill();
+    g.fillStyle = "#6f7f8a"; for (const y of [-11, 11]){ g.beginPath(); g.ellipse(-1, y, 4.2, 1.7, 0, 0, TAU); g.fill(); }   // engines
+    g.fillStyle = "#26323a"; g.beginPath(); g.moveTo(25.5, -1.8); g.quadraticCurveTo(27.4, 0, 25.5, 1.8); g.lineTo(23.6, 1.6); g.lineTo(23.6, -1.6); g.closePath(); g.fill();   // cockpit
+    g.fillStyle = clean ? "#3fbf86" : "#3aa6a0"; g.fillRect(-27, -.9, 9, 1.8);   // tail fin seen from above
+    g.strokeStyle = "rgba(40,55,65,.35)"; g.lineWidth = .6; planeShape(g); g.stroke();
+  });
+}
+function planeShadow(){ return spr("planeS", 64, 64, g => { g.filter = "blur(1.2px)"; g.fillStyle = "rgba(0,8,14,.42)"; planeShape(g); g.fill(); }); }
+/* ships seen from above, bow to the right (length 60) */
+function hullPath(g, L = 30, B = 7){ g.beginPath(); g.moveTo(L, 0); g.quadraticCurveTo(L - 4, -B, L - 12, -B); g.lineTo(-L + 2, -B); g.quadraticCurveTo(-L, -B, -L, -B + 2); g.lineTo(-L, B - 2); g.quadraticCurveTo(-L, B, -L + 2, B); g.lineTo(L - 12, B); g.quadraticCurveTo(L - 4, B, L, 0); g.closePath(); }
+function shipSprite(kind, clean, res){
+  return spr(`ship${kind}${clean ? "c" : ""}${res || ""}`, 68, 30, g => {
+    const hull = kind === "oil" ? ["#a3392f", "#6e2019"] : kind === "ore" ? ["#7c5b45", "#4e3627"] : ["#2f5d84", "#1b3a55"];
+    g.fillStyle = lin(g, 0, -7, 0, 7, [[0, hull[0]], [1, hull[1]]]); hullPath(g); g.fill();
+    g.fillStyle = kind === "oil" ? "#8e9aa3" : "#9aa6ae"; hullPath(g, 28, 5.6); g.fill();   // deck
+    g.fillStyle = "rgba(255,255,255,.35)"; g.fillRect(-26, -5.6, 50, 1.2);   // light along the deck edge
+    if (kind === "box"){   // containers as small blocks with a lit top and a shaded side
+      const cols = ["#e8743b", "#3fb4ac", "#e9b949", "#d8483c", "#5b7fb5", "#f0f0f0"];
+      for (let i = 0; i < 7; i++) for (let j = 0; j < 3; j++){
+        const x = -18 + i * 5.6, y = -4.6 + j * 3.1, col = cols[(i * 3 + j * 5) % cols.length];
+        g.fillStyle = "rgba(0,0,0,.35)"; g.fillRect(x + .5, y + .5, 5, 2.8);
+        g.fillStyle = col; g.fillRect(x, y, 5, 2.8);
+        g.fillStyle = "rgba(255,255,255,.35)"; g.fillRect(x, y, 5, .7);
+      }
+    } else if (kind === "oil"){
+      g.strokeStyle = "#5d6a72"; g.lineWidth = 1.2; g.beginPath(); g.moveTo(-18, 0); g.lineTo(22, 0); g.stroke();
+      g.fillStyle = "#c9d1d6"; for (const x of [-12, -2, 8, 18]){ g.beginPath(); g.arc(x, 0, 1.4, 0, TAU); g.fill(); }
+      g.fillStyle = "#6b777e"; g.fillRect(2, -4.4, 1.4, 8.8);   // manifold
+    } else {
+      const oc = (P.RES && P.RES[res] || {}).col || "#ff9a3c";
+      for (const x of [-15, -4, 7]){ g.fillStyle = "#5a4636"; g.fillRect(x - 4.4, -4.2, 8.8, 8.4); g.fillStyle = lin(g, x - 3, -3, x + 3, 3, [[0, "#ffffff"], [.25, oc], [1, "#3a2a1e"]]); g.beginPath(); g.ellipse(x, 0, 3.8, 3.4, 0, 0, TAU); g.fill(); }
+    }
+    // bridge at the stern: a white block with its shadow
+    g.fillStyle = "rgba(0,0,0,.4)"; g.fillRect(-26, -4.2, 7.5, 9.6);
+    g.fillStyle = lin(g, -27, -5, -20, 5, [[0, "#ffffff"], [1, "#cfd8de"]]); g.fillRect(-27.5, -5, 7.5, 9.6);
+    g.fillStyle = "#24323b"; g.fillRect(-21.2, -4.4, 1, 8.4);   // bridge windows
+    g.fillStyle = kind === "oil" ? "#2a2a2a" : "#e05a3c"; g.beginPath(); g.arc(-25.5, 0, 1.3, 0, TAU); g.fill();   // funnel
+    if (clean){   // a rigid wing sail across the deck, with its shadow
+      for (const x of [-6, 12]){ g.fillStyle = "rgba(0,0,0,.35)"; g.fillRect(x + 1, -9, 2.4, 18); g.fillStyle = "#f4fbf8"; g.fillRect(x, -10, 2.4, 18); g.fillStyle = "#5fd39a"; g.fillRect(x, -10, 2.4, 2); }
+    }
+    g.strokeStyle = "rgba(255,255,255,.55)"; g.lineWidth = .6; hullPath(g); g.stroke();
+  });
+}
+function shipShadow(){ return spr("shipS", 68, 30, g => { g.filter = "blur(1px)"; g.fillStyle = "rgba(0,8,14,.35)"; hullPath(g); g.fill(); }); }
+
 export function drawTraffic(M, c, dt, now, vis){
   if (!S.regions || !M.shapes.length || !P.trafficLevels) return;
   if (!P.running()) dt = 0;   // paused, an event open, a menu open: planes and ships stop where they are
@@ -211,43 +279,51 @@ export function drawTraffic(M, c, dt, now, vis){
   const want = {air:Math.round(q.air * tl.air), box:Math.round(q.box * tl.sea), oil:Math.round(q.oil * tl.oil), ore:Math.round(q.ore * tl.ore)};
   const list = M.traffic = M.traffic || [];
   for (const k of Object.keys(want)){ const have = list.filter(v => v.kind === k).length; if (have < want[k] && Math.random() < dt * .8){ const v = spawn(M, k); if (v){ v.f = list.length < 4 ? Math.random() * .6 : 0; list.push(v); } } }
-  const s = M.scale(), z = M.cam.z, size = clamp(5 + 2.2 * Math.sqrt(z), 6, 11), W = MAP.W * s;
+  const s = M.scale(), z = M.cam.z, size = clamp(5 + 2.2 * Math.sqrt(z), 6, 11);
+  const pShadow = planeShadow(), sShadow = shipShadow();
   for (const v of list){
     v.f += dt / v.dur;
     if (v.kind !== "air" && v.lane && !P.laneOpen(v.lane) && v.lane !== "asiaEuCape") v.f = 1.01;   // a closed route: the ship turns back out of sight
     if (v.f >= 1){ if (v.kind === "air" || v.f < 1.01) arrive(M, v); continue; }
-    const f = v.rev ? 1 - v.f : v.f, [wx, wy, ang0] = at(v.path, f), ang = v.rev ? ang0 + Math.PI : ang0;
-    const [x0, y] = M.toScreen(wx, wy);
-    for (const dx of [0, -W, W]){
-      const x = x0 + dx; if (!vis(x, y, 30)) continue;
-      const wxc = wx + (dx ? Math.sign(dx) * MAP.W : 0); if (wxc < -10 || wxc > MAP.W + 10) continue;   // only over the map itself, never in the empty space beside it
+    const f = v.rev ? 1 - v.f : v.f, [wx, wy] = at(v.path, f), dir = v.rev ? -1 : 1, air = v.kind === "air";
+    const [ax0, ay0] = at(v.path, clamp(f + dir * .004, 0, 1)), [bx0, by0] = at(v.path, clamp(f - dir * .004, 0, 1));
+    // 3.3 fix: copies across the date line are shifted in MAP units, then projected (a screen shift was wrong once the map tilts,
+    // so planes and ships slid along when you dragged a zoomed-in map)
+    for (const ox of [0, -MAP.W, MAP.W]){
+      const wxc = wx + ox; if (wxc < -10 || wxc > MAP.W + 10) continue;   // only over the map itself, never in the empty space beside it
+      const [x, y] = M.toScreen(wxc, wy); if (!vis(x, y, 30)) continue;
+      const [hx, hy] = M.toScreen(ax0 + ox, ay0), [tx, ty] = M.toScreen(bx0 + ox, by0);
+      const ang = Math.atan2(hy - ty, hx - tx);
+      const k = clamp(Math.hypot(hx - tx, hy - ty) / Math.max(1e-6, Math.hypot(ax0 - bx0, ay0 - by0) * s), .6, 1.6);   // nearer = bigger when tilted
+      const len = (air ? 3.2 : 3.6) * size * k;
       // trail: grey smoke (carbon) or a faint green line (clean fuel)
-      c.lineCap = "round"; c.lineWidth = v.kind === "air" ? 1.6 : 2.4;
-      const n = 10, step = (v.kind === "air" ? .05 : .025);
+      c.lineCap = "round"; c.lineWidth = (air ? 1.4 : 2.2) * k;
+      const n = 10, step = (air ? .05 : .025);
       for (let i = 1; i <= n; i++){
-        const fa = clamp(f - (v.rev ? -1 : 1) * step * (i - 1) / n * 2, 0, 1), fb = clamp(f - (v.rev ? -1 : 1) * step * i / n * 2, 0, 1);
-        const [ax, ay] = at(v.path, fa), [bx, by] = at(v.path, fb), [sax, say] = M.toScreen(ax, ay), [sbx, sby] = M.toScreen(bx, by);
+        const fa = clamp(f - dir * step * (i - 1) / n * 2, 0, 1), fb = clamp(f - dir * step * i / n * 2, 0, 1);
+        const [pax, pay] = at(v.path, fa), [pbx, pby] = at(v.path, fb), [sax, say] = M.toScreen(pax + ox, pay), [sbx, sby] = M.toScreen(pbx + ox, pby);
         const al = (1 - i / n) * (v.clean ? .35 : .5);
-        c.strokeStyle = v.clean ? `rgba(95,211,154,${al})` : v.kind === "air" ? `rgba(200,200,200,${al})` : `rgba(225,240,250,${al * .9})`;
-        c.beginPath(); c.moveTo(sax + dx, say); c.lineTo(sbx + dx, sby); c.stroke();
+        c.strokeStyle = v.clean ? `rgba(95,211,154,${al})` : air ? `rgba(220,226,230,${al})` : `rgba(225,240,250,${al * .9})`;
+        c.beginPath(); c.moveTo(sax, say); c.lineTo(sbx, sby); c.stroke();
       }
-      c.save(); c.translate(x, y); c.rotate(ang);
-      if (v.kind === "air"){
-        c.fillStyle = v.clean ? "#c8ffe0" : "#f4f8fa";
-        c.beginPath(); c.moveTo(size * .9, 0); c.lineTo(-size * .6, -size * .12); c.lineTo(-size * .75, -size * .5); c.lineTo(-size * .9, -size * .5); c.lineTo(-size * .65, 0); c.lineTo(-size * .9, size * .5); c.lineTo(-size * .75, size * .5); c.lineTo(-size * .6, size * .12); c.closePath(); c.fill();
-        c.fillRect(-size * .15, -size * .7, size * .22, size * 1.4);
+      if (air){
+        // the plane climbs, cruises and comes down: its shadow drifts further away the higher it is
+        const alt = Math.sin(Math.PI * clamp(v.f, 0, 1)), off = (2 + 10 * alt) * k, sc = len / 56, pc = planeSprite(v.clean);
+        c.save(); c.translate(x + off * .7, y + off); c.rotate(ang); c.globalAlpha = .8 - .35 * alt; c.drawImage(pShadow, -32 * sc, -32 * sc, 64 * sc, 64 * sc); c.restore();
+        const lift = 1 + .12 * alt;
+        c.save(); c.translate(x, y); c.rotate(ang); c.drawImage(pc, -32 * sc * lift, -32 * sc * lift, 64 * sc * lift, 64 * sc * lift); c.restore();
       } else {
-        const hull = v.kind === "oil" ? "#7a2a24" : v.kind === "ore" ? "#6b5040" : "#2b4a66";
-        c.fillStyle = hull; c.beginPath(); c.moveTo(size * 1.05, 0); c.lineTo(size * .55, -size * .42); c.lineTo(-size * .95, -size * .42); c.lineTo(-size * .95, size * .42); c.lineTo(size * .55, size * .42); c.closePath(); c.fill();
-        c.strokeStyle = "rgba(235,248,255,.85)"; c.lineWidth = 1.1; c.stroke();
-        if (v.kind === "box"){ ["#f07a3c", "#4fd1c5", "#f2c14e", "#ff5a4a"].forEach((col, i) => { c.fillStyle = col; c.fillRect(-size * .7 + i * size * .32, -size * .22, size * .26, size * .44); }); }
-        else if (v.kind === "ore"){ c.fillStyle = (P.RES[v.res] || {}).col || "#ff9a3c"; c.beginPath(); c.arc(-size * .1, 0, size * .22, 0, TAU); c.fill(); }
-        else { c.fillStyle = "#c8c8c8"; c.fillRect(-size * .6, -size * .1, size * 1.1, size * .2); }
-        if (v.clean){ c.fillStyle = "rgba(230,255,245,.9)"; c.beginPath(); c.moveTo(0, -size * .2); c.lineTo(0, -size * 1.1); c.lineTo(size * .45, -size * .3); c.closePath(); c.fill(); }
+        const sc = len / 60;
+        // wake: a soft V of foam behind the ship
+        c.save(); c.translate(x, y); c.rotate(ang);
+        c.strokeStyle = "rgba(235,248,255,.35)"; c.lineWidth = 1.1 * k;
+        c.beginPath(); c.moveTo(-28 * sc, -6 * sc); c.lineTo(-46 * sc, -12 * sc); c.moveTo(-28 * sc, 6 * sc); c.lineTo(-46 * sc, 12 * sc); c.stroke();
+        c.drawImage(sShadow, -34 * sc + 1.5 * k, -15 * sc + 2 * k, 68 * sc, 30 * sc);
+        c.drawImage(shipSprite(v.kind, v.clean, v.res), -34 * sc, -15 * sc, 68 * sc, 30 * sc);
+        c.restore();
       }
-      c.restore();
       // green technology on board: from a country that already uses it
-      const from = P.C(v.from); if (from && from.green >= 45){ const im = M.iconImg("leaf", COL.good); if (im) c.drawImage(im, x - 5, y - size - 11, 10, 10); }
+      const from = P.C(v.from); if (from && from.green >= 45){ const im = M.iconImg("leaf", COL.good); if (im) c.drawImage(im, x - 5, y - len * .5 - 11, 10, 10); }
       if (z >= 1.15) M.hits.push({id:"veh", x:x - 8, y:y - 8, w:16, h:16, fn:() => { M.info = {x, y:y - 12, t:performance.now(), txt:vehText(v)}; }});
     }
   }

@@ -24,7 +24,7 @@ const UIM = P.UIM = {
   },
   modalOpen(){ return !!this.kind(); },
   get paused(){ return this.modal === "pause"; },
-  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn"].includes(this.modal); },
+  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market", "politics", "year"].includes(this.modal); },
   eventLocked(){ return (performance.now() - this.evAt) / 1000 < EVENT_LOCK; },
   eventLockFrac(){ return Math.min(1, (performance.now() - this.evAt) / 1000 / EVENT_LOCK); },
 };
@@ -346,6 +346,7 @@ H.gameStart = () => { Screens.showStory(1); if (P.Net) P.Net.startRun(); };
 H.gameOver = () => { if (P.Net) P.Net.finishRun(); };
 /* 3.x, until the minerals market screen is ported: skills don't ask for minerals in this build
    (otherwise the shared engine would block them with no way to buy minerals here) */
+P.GD_MINERALS = true;   // 3.3: the market screen is here, so skills use minerals like on the website
 if (!P.GD_MINERALS){ P.matOk = () => true; P.matCost = () => null; if (P.oreCost) P.oreCost = () => 0; P.spendOre = () => {}; }
 /* 3.x (shared engine): automatic losses show as a number at the country; the yearly review is a toast for now
    (the full year window comes with the new screens) */
@@ -357,6 +358,11 @@ H.loss = o => {
 };
 H.yearly = rec => {
   const T = P.UI2 || {};
-  UIM.toastQ.push({icon:rec.g ? "trending-up" : "trending-down", title:`${L(T.yrTitle) || "Year"} ${rec.y}`, msg:`${rec.s}/100 · ${rec.g ? L(T.yrGood) : L(T.yrBad)}`});
+  if (S.simple){ UIM.toastQ.push({icon:rec.g ? "trending-up" : "trending-down", title:`${L(T.yrTitle) || "Year"} ${rec.y}`, msg:`${rec.s}/100 · ${rec.g ? L(T.yrGood) : L(T.yrBad)}`}); return; }
+  UIM.yearRec = rec;   // 3.3: the yearly review window (shown when no other window is open)
+  if (!UIM.modal) Screens.openWin("year");
 };
+/* 3.3: windows opened from the HUD (market, approval, yearly review); the game pauses while one is open */
+Screens.openWin = function(kind){ if (UIM.modal === "skills") UIM.modal = null; UIM.modal = kind; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); };
+Screens.closeWin = function(){ Audio.play("close"); UIM.modal = null; if (UIM.yearRec && UIM.yearShown !== UIM.yearRec){ /* shown */ } k.dirty(); };
 H.stopAmb = () => Audio.stopAmb();

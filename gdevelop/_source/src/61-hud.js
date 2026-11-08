@@ -8,106 +8,126 @@ if (P.mods && P.mods.hud) return;
 const {Kit, S, t, L, UI, Audio, W, UIM, Screens, RMETA, IC, MONTHS, HAZARDS, COUNTRY, SHORT, CHAR} = P;
 const k = Kit;
 
+/* 3.3 layout (same as the website):
+   top-left: one bar with money · policy points · minerals · approval; the ability bar hangs right under it and the
+   newest news line grows out of it to the right (fades after a few seconds) · top-right: date, speed, menu
+   bottom: zoom (left) · Net Zero + warming, one slim row each (centre) · tabs (right) */
+const HUD_Y = 10, KPI_H = 46, KPI_W = 134;
 Screens.renderHUD = function(l){
   if (this.kind !== "game") return;
-  /* ---- brand ---- */
-  const bx = 16, by = 10, bh = 44;
-  const p1 = "PROJECT ", p2 = ":", p3 = " 2050";
-  const bw = W.runsW([[p1, {font:"logo", size:20}], [p2, {font:"logo", size:20}], [p3, {font:"logo", size:20}]]) + 26;
-  W.glass(l, bx, by, bw, bh);
-  W.runs(l, bx + 13, by + 7, [[p1, {font:"logo", size:20}], [p2, {font:"logo", size:20, color:"accent"}], [p3, {font:"logo", size:20}]]);
+  const by = HUD_Y;
   /* ---- KPIs ---- */
   const acls = S.appr < 25 ? "bad" : S.appr < 45 ? "warn" : "good";
   const kpis = [
-    {k:t("ep"), v:String(Math.floor(S.ep)), s:`+${P.epGain()}${t("perMo")}`, c:"fg"},
-    {k:t("pc"), v:String(Math.floor(S.pc)), s:`+${P.pcGain()}${t("perMo")}`, c:"fg"},
-    {k:t("appr"), v:`${S.appr.toFixed(0)}%`, meter:S.appr / 100, c:acls},
+    {id:"ep", ic:"$money", k:t("ep"), v:String(Math.floor(S.ep)), s:`+${P.epGain()}${t("perMo")}`, c:"fg"},
+    {id:"pc", ic:"$policy", k:t("pc"), v:String(Math.floor(S.pc)), s:`+${P.pcGain()}${t("perMo")}`, c:"fg"},
   ];
-  let kx = bx + bw + 8;
-  const has3 = P.Net && P.Net.owns("speed3");
-  const ctrlW = 4 * 30 + 3 * 6 + 8 + 104 + 8 + (has3 ? 136 : 102) + 8 + 80 + 14;
-  const cx0 = 1264 - ctrlW;
-  const kw = Math.max(112, Math.min(150, (cx0 - 8 - kx) / 3 - 8));
+  if (S.oreOn && P.matTotal) kpis.push({id:"ore", ic:"$ore", k:t("oreLbl"), v:String(P.matTotal()), s:`+${Math.round(P.oreGain ? P.oreGain() : 0)}${t("perMo")}`, c:"fg", fn:() => Screens.openWin("market")});
+  kpis.push({id:"appr", ic:"$appr", k:t("appr"), v:`${S.appr.toFixed(0)}%`, meter:S.appr / 100, c:acls, fn:S.groups ? () => Screens.openWin("politics") : null});
+  const bw = KPI_W * kpis.length;
+  W.glass(l, 14, by, bw, KPI_H, 12);
   kpis.forEach((q, i) => {
-    const danger = i === 2 && S.appr < 25;
-    k.rect(l, kx, by, kw, bh, "glass", {a:.9, r:10, stroke:danger ? "bad" : "line", bg:true});
-    k.text(l, P.up(q.k), kx + 10, by + 4, {size:10.5, color:"muted", w:kw - 20, max:1});
-    k.text(l, q.v, kx + 10, by + 17, {font:"monoB", size:18, color:q.c});
-    if (q.s) k.text(l, q.s, kx + kw - 10 - k.textW(q.s, {font:"mono", size:10.5}), by + 24, {font:"mono", size:10.5, color:"muted"});
-    if (q.meter !== undefined){
-      const blink = danger && (Date.now() % 1000 < 500);
-      W.meter(l, kx + 62, by + 27, kw - 72, 5, q.meter, blink ? "panel2" : acls);
-      if (danger && !Screens._blink) Screens._blink = setTimeout(() => { Screens._blink = null; k.dirty("HUD"); }, 520);
-    }
-    kx += kw + 8;
+    const x = 14 + i * KPI_W, danger = q.id === "appr" && S.appr < 25, hov = q.fn && k.isHover(l, "kpi-" + q.id);
+    if (i) k.rect(l, x, by + 9, 1, KPI_H - 18, "line");
+    if (hov) k.rect(l, x + 3, by + 3, KPI_W - 6, KPI_H - 6, "accent", {r:9, a:.1});
+    if (danger) k.rect(l, x + 3, by + 3, KPI_W - 6, KPI_H - 6, null, {r:9, stroke:"bad"});
+    k.icon(l, q.ic, x + 9, by + 11, 24);
+    k.text(l, q.k, x + 40, by + 4, {size:10.5, color:"muted", w:KPI_W - 60, max:1});
+    const vr = k.text(l, q.v, x + 40, by + 18, {font:"monoB", size:18, color:q.c});
+    if (q.meter !== undefined) W.meter(l, x + 44 + vr.w, by + 29, Math.max(18, KPI_W - 66 - vr.w), 4, q.meter, acls);
+    else if (q.s) k.text(l, q.s, x + 46 + vr.w, by + 24, {font:"mono", size:10, color:"muted", w:KPI_W - 52 - vr.w, max:1});
+    if (q.fn){ k.icon(l, "chevron-down", x + KPI_W - 18, by + 16, 13, "muted"); k.hit(l, "kpi-" + q.id, x, by, KPI_W, KPI_H, () => { Audio.play("open"); q.fn(); }); }
   });
-  /* ---- controls (right) ---- */
-  W.glass(l, cx0, by, ctrlW, bh);
-  let cx = cx0 + 7; const cy = by + 7;
-  const fs = !!(document.fullscreenElement);
-  W.hbtn(l, "fs", cx, cy, fs ? "minimize" : "maximize", () => { Audio.play("click"); const g = this.scene.getGame().getRenderer(); try { g.setFullScreen(!fs); } catch(e) {} setTimeout(() => k.dirty(), 300); }); cx += 36;
-  W.hbtn(l, "mus", cx, cy, Audio.musicOn ? "music" : "music-off", () => { Audio.toggleMusic(); k.dirty(); }); cx += 36;
-  W.hbtn(l, "sfx", cx, cy, Audio.on ? "volume-2" : "volume-x", () => { Audio.toggle(); k.dirty(); }); cx += 36;
-  W.hbtn(l, "menu", cx, cy, "menu", () => Screens.pause()); cx += 30 + 8;
-  k.text(l, P.dateStr(), cx, by + 8, {font:"dispS", size:18, w:104, align:"center"}); cx += 104 + 8;
-  const sp = [
-    {id:"sp0", icon:"pause", on:S.speed === 0, fn:() => P.setSpeed(0)},
-    {id:"sp1", label:"1×", on:S.speed === 1, fn:() => P.setSpeed(1)},
-    {id:"sp2", label:"2×", on:S.speed === 2, fn:() => P.setSpeed(2)},
-  ];
+  /* ---- controls (right): date · speed · menu ---- */
+  const has3 = P.Net && P.Net.owns("speed3");
+  const sp = [{id:"sp0", icon:"pause", on:S.speed === 0, fn:() => P.setSpeed(0)}, {id:"sp1", label:"1×", on:S.speed === 1, fn:() => P.setSpeed(1)}, {id:"sp2", label:"2×", on:S.speed === 2, fn:() => P.setSpeed(2)}];
   if (has3) sp.push({id:"sp3", label:"3×", on:S.speed === 3, fn:() => P.setSpeed(3)});
-  cx += W.seg(l, cx, cy, sp, {w:34}) + 8;
-  W.langSeg(l, cx, cy);
-  /* ---- character + abilities (left column) ---- */
-  this.abilityBar(l, 16, 64);
-  /* ---- zoom buttons (right edge, beside the drawer) ---- */
-  const zx = 1264 - this.drawerWidth() - (S.tab ? 8 : 0) - 34, zy = 400;
-  W.glass(l, zx - 4, zy - 4, 38, 3 * 34 + 6, 9);
-  W.hbtn(l, "zin", zx, zy, "plus", () => P.Map.zoomBy(1.3));
-  W.hbtn(l, "zout", zx, zy + 34, "minus", () => P.Map.zoomBy(1 / 1.3));
-  W.hbtn(l, "zhome", zx, zy + 68, "locate-fixed", () => P.Map.resetView());
-  if (P.Map.isCountryZoom()){
-    const ht = `[[pointer]] ${t("tapCountry")}`, hw = k.textW(ht, {size:11.5}) + 24, hx = (16 + 1264 - this.drawerWidth()) / 2 - hw / 2;
-    k.rect(l, hx, 540, hw, 24, "bg", {r:12, a:.8, stroke:"line", bg:true});
-    k.text(l, ht, hx + 12, 543, {size:11.5, color:"muted", iconColor:"accent"});
-  }
-  /* ---- bottom meters ---- */
-  const mbx = 16, mby = 572, mbw = 1248, mbh = 86;
-  W.glass(l, mbx, mby, mbw, mbh);
-  const half = (mbw - 24 - 40) / 2;
-  this.meterNZ(l, mbx + 14, mby + 10, half);
-  this.meterT(l, mbx + 14 + half + 40, mby + 10, half);
-  /* ---- ticker + tab buttons ---- */
-  const ny = 666, nh = 40, keys = P.hasKeyboard();
-  const tabs = [["tech", "network", "nbTech", "T"], ["region", "map", "nbRegion", "R"], ["stats", "chart-line", "nbStats", "S"], ["news", "newspaper", "nbNews", "N"]];
-  const readyCount = P.SKILLS.filter(n => P.nodeState(n) === "ready" && !P.atCapacity(n) && S.ep >= P.nodeCost(n).ep && S.pc >= P.nodeCost(n).pc).length;
-  const widths = tabs.map(([id, ic, key, kk]) => { const lab = P.up(t(key)); return 14 + 16 + 6 + k.textW(lab, {font:"dispS", size:13}) + 14 + (id === "tech" && readyCount ? 26 : 0) + (keys ? 20 : 0); });
-  let nx = 1264 - widths.reduce((a, b) => a + b, 0) - 6 * (tabs.length - 1);
-  const tickerW = nx - 8 - 16;
-  W.glass(l, 16, ny, tickerW, nh);
+  const dateW = 112, ctrlW = 10 + dateW + 8 + sp.length * 34 + 8 + 30 + 10, cx0 = 1266 - ctrlW;
+  W.glass(l, cx0, by, ctrlW, KPI_H, 12);
+  const se = P.seasonOf ? P.seasonOf() : null;
+  k.text(l, `${se ? `[[${se.icon}]] ` : ""}${P.dateStr()}`, cx0 + 10, by + 12, {font:"dispS", size:16, w:dateW, max:1, iconColor:"accent"});
+  let cx = cx0 + 10 + dateW + 8;
+  cx += W.seg(l, cx, by + 8, sp, {w:34}) + 8;
+  W.hbtn(l, "menu", cx, by + 8, "menu", () => Screens.pause());
+  /* ---- character + abilities, right under the money bar ---- */
+  const ay = by + KPI_H + 6;
+  this.abilityBar(l, 14, ay);
+  /* ---- the newest news line, attached to the right of the ability bar ---- */
   const lg = S.log[0];
   if (lg){
-    const d = P.dateStr(lg.tk), dw = k.textW(d, {font:"mono", size:12}) + 10;
-    k.text(l, d, 28, ny + 11, {font:"mono", size:12, color:"muted"});
-    const col = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg"}[lg.cls] || "fg";
-    k.text(l, lg.txt, 28 + dw, ny + 10, {size:13, color:col, w:tickerW - dw - 26, max:1});
+    const key = S.log.length + ":" + lg.tk;
+    if (UIM.newsKey !== key){ UIM.newsKey = key; UIM.newsT = performance.now(); }
+    const age = (performance.now() - UIM.newsT) / 1000, a = age < 6 ? 1 : Math.max(0, 1 - (age - 6) / 1.2);
+    if (a > 0){
+      const nx = 14 + 54 + 8, nw = bw - 54 - 8, col = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg"}[lg.cls] || "fg";
+      k.rect(l, nx, ay, nw, 28, "glass", {a:.9 * a, r:10, stroke:"line", bg:true});
+      k.icon(l, "newspaper", nx + 10, ay + 7, 14, "muted", a);
+      k.text(l, lg.txt, nx + 30, ay + 5, {size:12.5, color:col, w:nw - 40, max:1, a});
+      k.hit(l, "newsline", nx, ay, nw, 28, () => Screens.setTab("news"));
+      if (!Screens._newsTimer) Screens._newsTimer = setTimeout(() => { Screens._newsTimer = null; k.dirty("HUD"); }, age < 6 ? (6 - age) * 1000 + 30 : 120);
+    }
   }
+  if (P.Map.isCountryZoom()){
+    const ht = `[[pointer]] ${t("tapCountry")}`, hw = k.textW(ht, {size:11.5}) + 24, hx = (16 + 1264 - this.drawerWidth()) / 2 - hw / 2;
+    k.rect(l, hx, 630, hw, 24, "bg", {r:12, a:.8, stroke:"line", bg:true});
+    k.text(l, ht, hx + 12, 633, {size:11.5, color:"muted", iconColor:"accent"});
+  }
+  /* ---- bottom row ---- */
+  const ny = 668, nh = 40, keys = P.hasKeyboard();
+  // zoom (left)
+  W.glass(l, 14, ny, 3 * 34 + 8, nh, 10);
+  W.hbtn(l, "zin", 18, ny + 5, "plus", () => P.Map.zoomBy(1.35));
+  W.hbtn(l, "zout", 52, ny + 5, "minus", () => P.Map.zoomBy(1 / 1.35));
+  W.hbtn(l, "zhome", 86, ny + 5, "locate-fixed", () => P.Map.resetView());
+  // tabs (right)
+  const tabs = [["tech", "network", "nbTech", "T"], ["region", "map", "nbRegion", "R"], ["stats", "chart-line", "nbStats", "S"], ["news", "newspaper", "nbNews", "N"]];
+  const readyCount = P.SKILLS.filter(n => P.nodeState(n) === "ready" && (P.canAfford ? P.canAfford(n) : true)).length;
+  const widths = tabs.map(([id, ic, key]) => { const lab = P.up(t(key)); return 14 + 16 + 6 + k.textW(lab, {font:"dispS", size:13}) + 14 + (id === "tech" && readyCount ? 26 : 0) + (keys ? 20 : 0); });
+  let nx = 1266 - widths.reduce((a, b) => a + b, 0) - 6 * (tabs.length - 1);
+  const tabsX = nx;
   tabs.forEach(([id, ic, key, kk], i) => {
     const on = id === "tech" ? UIM.modal === "skills" : S.tab === id, hov = k.isHover(l, "tab-" + id), w = widths[i];
     k.rect(l, nx, ny, w, nh, on ? "accent" : "glass", {a:on ? 1 : .9, r:10, stroke:on ? "accent" : hov ? "accent" : "line", bg:true});
     const col = on ? "ink" : "fg";
     k.icon(l, ic, nx + 14, ny + 12, 16, col);
-    const lab = P.up(t(key));
-    const tx = W.runs(l, nx + 36, ny + 10, [[lab, {font:"dispS", size:13, color:col}]]);
+    const tx = W.runs(l, nx + 36, ny + 10, [[P.up(t(key)), {font:"dispS", size:13, color:col}]]);
     if (keys && !on) W.key(l, tx + 6, ny + 13, kk);
-    if (id === "tech" && readyCount){
-      const bx2 = nx + w - 14 - 20;
-      k.rect(l, bx2, ny + 11, 20, 18, "good", {r:9});
-      k.text(l, String(readyCount), bx2, ny + 12, {font:"mono", size:11, color:"#04130c", w:20, align:"center"});
-    }
+    if (id === "tech" && readyCount){ const bx2 = nx + w - 14 - 20; k.rect(l, bx2, ny + 11, 20, 18, "good", {r:9}); k.text(l, String(readyCount), bx2, ny + 12, {font:"mono", size:11, color:"#04130c", w:20, align:"center"}); }
     k.hit(l, "tab-" + id, nx, ny, w, nh, () => Screens.setTab(id));
     nx += w + 6;
   });
+  // Net Zero + warming (centre, between zoom and tabs)
+  const left = 14 + 3 * 34 + 8 + 10, room = tabsX - 10 - left, mw = Math.min(600, room), mx = Math.max(left, 640 - mw / 2 + Math.min(0, (tabsX - 10) - (640 + mw / 2)));
+  W.glass(l, mx, ny, mw, nh, 10);
+  const half = (mw - 24 - 18) / 2;
+  this.meterRowNZ(l, mx + 12, ny + 11, half);
+  this.meterRowT(l, mx + 12 + half + 18, ny + 11, half);
+};
+/* one slim row: title · bar · value (the Net Zero bar fills toward the trophy as CO₂ falls) */
+Screens.meterRowNZ = function(l, x, y, w){
+  const NZ_MAX = 50, net = P.netCO2(), start = 36, pos = v => P.clamp(v / NZ_MAX, 0, 1);
+  const cls = net <= 8 ? "good" : net <= 20 ? "warn" : "bad";
+  const tr = k.text(l, w < 270 ? "[[flag]]" : `[[flag]] ${t("nzTitle")}`, x, y + 1, {font:"dispS", size:12, max:1});   // narrow: icon only
+  const vs = `${net.toFixed(1)}`, vw = k.textW(vs, {font:"monoB", size:15}), uw = k.textW(" Gt", {font:"mono", size:10});
+  k.text(l, vs, x + w - vw - uw, y - 1, {font:"monoB", size:15, color:cls}); k.text(l, " Gt", x + w - uw, y + 4, {font:"mono", size:10, color:"muted"});
+  const tx = x + tr.w + 10, tw = w - tr.w - vw - uw - 40, ty = y + 5, th = 8;
+  if (tw < 30) return;
+  k.hgrad(l, tx, ty, tw, th, [[0, "#ff5448"], [.5, "#d9a62b"], [1, "#5fd39a"]], {r:4, a:.17});
+  const fw = tw * (1 - pos(net)); if (fw > 1) k.hgrad(l, tx, ty, Math.max(fw, 8), th, [[0, "#e0302a"], [.35, "#e0612f"], [.65, "#d9a62b"], [1, "#1f9e78"]], {r:4, span:tw});
+  k.rect(l, tx + tw * (1 - pos(start)) - 1, ty - 3, 2, th + 6, "fg", {a:.4});
+  const mx = tx + tw * (1 - pos(net)); k.circle(l, mx, ty + th / 2, 6, "bg"); k.circle(l, mx, ty + th / 2, 4, k.COL[cls]);
+  k.icon(l, "trophy", tx + tw + 5, ty - 4, 14, "good");
+};
+Screens.meterRowT = function(l, x, y, w){
+  const cls = S.temp >= 2.5 ? "bad" : S.temp >= 2.0 ? "hot" : S.temp >= 1.5 ? "warn" : "good";
+  const tr = k.text(l, w < 270 ? "[[$temp]]" : `[[$temp]] ${t("tTitle")}`, x, y + 1, {font:"dispS", size:12, max:1});
+  const vs = `+${S.temp.toFixed(2)}`, vw = k.textW(vs, {font:"monoB", size:15}), uw = k.textW("°C", {font:"mono", size:10});
+  k.text(l, vs, x + w - vw - uw, y - 1, {font:"monoB", size:15, color:cls}); k.text(l, "°C", x + w - uw, y + 4, {font:"mono", size:10, color:"muted"});
+  const tx = x + tr.w + 10, tw = w - tr.w - vw - uw - 40, ty = y + 5, th = 8;
+  if (tw < 30) return;
+  [["#5fd39a", .32], ["#f2b441", .34], ["#f07a3c", .4], ["#ff5448", .5]].forEach(([c, a], i) => k.rect(l, tx + tw * i / 4, ty, tw / 4, th, c, {a, r:i === 0 || i === 3 ? 4 : 0}));
+  const mx = tx + tw * P.clamp((S.temp - 1.0) / 2.0, 0, 1); k.circle(l, mx, ty + th / 2, 6, "bg"); k.circle(l, mx, ty + th / 2, 4, k.COL[cls]);
+  k.icon(l, "triangle-alert", tx + tw + 5, ty - 4, 14, "bad");
 };
 
 /* character portrait + ability buttons (left side of the map) */
@@ -224,18 +244,18 @@ const HZ_COL = {hurricane:"#c3a6ff", typhoon:"#c3a6ff", flood:"#8fd0ff", heat:"#
 Screens.renderMapUI = function(l){
   const Map = P.Map; if (!Map || !Map.scene) return;
   if (this.kind === "game"){
-    const ry = 62, rb = 566, zoomed = Map.isCountryZoom();
+    const ry = 60, rb = 660, zoomed = Map.isCountryZoom();
     const leftLimit = 74, rightLimit = 1264 - this.drawerWidth();
     if (!zoomed){
       for (const r of S.regions){
         const [lat, lon] = RMETA[r.id].lab; const [sx, sy] = Map.latlonScreen(lat, lon);
         if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;
-        const a = r.id, b = r.co2.toFixed(1);
-        const w = k.textW(a, {font:"monoB", size:11}) + 5 + k.textW(b, {font:"mono", size:11}) + 16 + (S.alli[r.id] ? 18 : 0), h = 21;
+        const a = L(RMETA[r.id].name), b = `${r.co2.toFixed(1)} Gt`;   // 3.3: continent names, not codes
+        const w = k.textW(a, {font:"bodyB", size:11}) + 5 + k.textW(b, {font:"mono", size:11}) + 16 + (S.alli[r.id] ? 18 : 0), h = 21;
         const x = sx - w / 2, y = sy - h / 2, sel = S.sel === r.id, hov = k.isHover(l, "lab-" + r.id);
         if (sel) k.rect(l, x - 3, y - 3, w + 6, h + 6, "accent", {r:9, a:.22, bg:true});
         k.rect(l, x, y, w, h, "bg", {a:.8, r:7, stroke:sel || hov ? "accent" : "line", bg:true});
-        const ex = W.runs(l, x + 8, y + 2, [[a, {font:"monoB", size:11}]]);
+        const ex = W.runs(l, x + 8, y + 2, [[a, {font:"bodyB", size:11}]]);
         const ex2 = W.runs(l, ex + 5, y + 2, [[b, {font:"mono", size:11, color:"hot"}]]);
         if (S.alli[r.id]) k.icon(l, "handshake", ex2 + 4, y + 4, 13, "good");
         k.hit(l, "lab-" + r.id, x, y, w, h, () => Screens.selectRegion(r.id, true));
