@@ -21,7 +21,7 @@ const goSub = sub => () => {
 const goBack = () => { UIM.sub = null; UIM.msg = ""; bump(); };
 const Back = () => null;   // 1.5.4: every sub-page has its back button at the top (SubHead)
 function SubHead({title}){
-  return <div class="subhead"><IconBtn n="arrow-left" title={t("mBack")} sound="close" onClick={goBack}/><h2>{title}</h2></div>;
+  return <div class="subhead"><h2>{title}</h2><IconBtn n="x" title={t("mBack")} sound="close" onClick={goBack} cls="subclose"/></div>;   // 3.2: close ✕ top-right like every window
 }
 const Offline = () => <><p class="muted">{t("netOfflineLong")}</p><Back/></>;
 

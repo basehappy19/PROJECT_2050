@@ -61,7 +61,7 @@ export function drawHex(M, c, vis){
     c.fillStyle = col(s) + ".34)"; c.fill(); c.strokeStyle = col(s) + ".6)"; c.stroke();
     shown.push({cell, sx, sy});
   }
-  return {id:"hex", x:0, y:0, w:M.w, h:M.h, fn:(px, py) => {
+  return {id:"hex", x:0, y:0, w:M.vw, h:M.vh, fn:(px, py) => {
     if (px === undefined) return;
     let best = null, bd = 1e9; for (const q of shown){ const d = (q.sx - px) ** 2 + (q.sy - py) ** 2; if (d < bd){ bd = d; best = q; } }
     const lim = Math.max(18, 1.4 * R * (MAP.W / 360) * M.scale()); if (!best || bd > lim * lim) return;

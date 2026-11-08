@@ -20,7 +20,7 @@ const page = await browser.newPage({viewport:{width:W, height:H}, hasTouch:W < 8
 const errors = [];
 page.on("pageerror", e => errors.push(e.message));
 await page.goto(`http://localhost:${srv.address().port}/index.html`);
-await page.evaluate(() => { localStorage.setItem("p2050-tut", "1"); localStorage.setItem("p2050-gfx", "medium"); });
+await page.evaluate(() => { localStorage.setItem("p2050-tut", "1"); localStorage.setItem("p2050-trained", "1"); localStorage.setItem("p2050-gfx", "medium"); });   // 3.1: skip the forced first-game training (added in 2.0)
 await page.reload();
 await page.waitForSelector(".loading .enter", {timeout:90000});
 await page.click(".loading .enter"); await page.waitForTimeout(1200);

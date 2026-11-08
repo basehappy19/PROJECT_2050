@@ -14,6 +14,12 @@ import {drawHex, hexCells} from "./hexgrid.js";
 import {createMapGL} from "./mapgl.js";
 
 const ZMIN = 1, ZMAX = 5, ZCOUNTRY = 1.55;   // 2.0: can't zoom out past the whole world (it always fills the screen)
+/* 3.1: Plague Inc-style camera tilt. The whole world is flat; zooming in tips the map back a little at a time
+   (the base canvas sits on a "stage" that CSS turns with rotateX inside a perspective). The stage is drawn a bit
+   larger than the screen so the far edge still reaches the corners at full tilt. Off on the "low" graphics level.
+   3.2: only the map tilts. The overlay canvas (labels, icons, bubbles, planes, tooltips) stays flat and screen-sized;
+   its points are projected through the same camera (toScreen), so text is never skewed. */
+const TILT_MAX = 38 * Math.PI / 180, TZ0 = 1.2, TZ1 = 2.6, PERSP_K = 2.0;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 const HEAT_N = [[31,158,120],[217,166,43],[208,97,47],[224,48,42]], HEAT_CB = [[46,120,200],[140,170,205],[240,170,70],[225,110,25]];   // 1.1.4 colour-blind: blue → orange
 let HEAT = P.A11y && P.A11y.cb ? HEAT_CB : HEAT_N;
@@ -38,6 +44,7 @@ export const GameMap = {
   shapes:[], byCountry:{}, img:null, imgTheme:null,
   cam:{x:MAP.W / 2, y:MAP.H / 2, z:1}, target:null, s0:1, insets:{l:0, r:0, t:0, b:0},
   dirtyBase:true, floats:[], fx_:[], hits:[], hover:null, ptrs:new Map(), drag:null, pinch:null, lastTap:0, active:false,
+  stage:null, vw:0, vh:0, tilt:0, tiltMax:0, persp:1, tcy:0, vTop0:0, hud:{l:0, r:0, t:0, b:0},
   async load(){
     if (this.shapes.length) return;
     const j = await (await fetch("assets/data/world.json")).json();
@@ -82,10 +89,13 @@ export const GameMap = {
     if (!this.base){
       this.fx = document.createElement("canvas"); this.fx.className = "map-fx";
       this.fctx = this.fx.getContext("2d");
+      this.stage = document.createElement("div"); this.stage.className = "map-stage";
       this.makeBase(this.glWanted());
       this.bindInput();
+      Gfx.onChange(() => this.resize());
     }
-    el.append(this.base, this.fx);
+    this.stage.append(this.base);
+    el.append(this.stage, this.fx);
     this.loadImage();
     this._ro = new ResizeObserver(() => this.resize()); this._ro.observe(el);
     this.resize();
@@ -108,46 +118,90 @@ export const GameMap = {
   },
   setGL(on){ ls.set("p2050-mapgl", on ? "1" : "0"); if (!!this.gl !== !!on && this.base) this.makeBase(on); bump(); return !!this.gl === !!on; },
   usingGL(){ return !!this.gl; },
-  unmount(){ this.active = false; cancelAnimationFrame(this.raf); if (this._ro) this._ro.disconnect(); this.base && this.base.remove(); this.fx && this.fx.remove(); },
+  unmount(){ this.active = false; cancelAnimationFrame(this.raf); if (this._ro) this._ro.disconnect(); this.stage && this.stage.remove(); this.fx && this.fx.remove(); },
   resize(){
     if (!this.el) return;
-    const w = this.el.clientWidth, h = this.el.clientHeight, dpr = Gfx.dpr();
-    if (!w || !h) return;
+    const vw = this.el.clientWidth, vh = this.el.clientHeight, dpr = Gfx.dpr();
+    if (!vw || !vh) return;
+    // 3.1: stage size for the largest tilt (the screen's own size when tilting is off)
+    this.vw = vw; this.vh = vh; this.tcy = vh / 2; this.persp = PERSP_K * vh;
+    this.tiltMax = Gfx.level === "low" || ls.get("p2050-tilt", "1") === "0" ? 0 : TILT_MAX;
+    const a = this.tiltMax, Pp = this.persp, cy = this.tcy;
+    const vTop = a ? -cy * Pp / (Pp * Math.cos(a) - cy * Math.sin(a)) : -cy, vBot = a ? (vh - cy) * Pp / (Pp * Math.cos(a) + (vh - cy) * Math.sin(a)) : vh - cy;
+    const w = Math.ceil(vw * (Pp - vTop * Math.sin(a)) / Pp), h = Math.ceil(vBot - vTop);
+    this.vTop0 = vTop; this.sx0 = (w - vw) / 2; this.sy0 = -vTop - cy;   // stage → screen offset when flat
+    Object.assign(this.stage.style, {left:`${(vw - w) / 2}px`, top:`${cy + vTop}px`, width:`${w}px`, height:`${h}px`, transformOrigin:`${w / 2}px ${-vTop}px`});
+    Object.assign(this.el.style, {perspective:a ? `${Pp}px` : "", perspectiveOrigin:`50% ${cy}px`});
+    this.tilt = -1;
     this.w = w; this.h = h; this.dpr = dpr;
-    for (const c of [this.base, this.fx]){ if (!(c === this.base && this.gl)){ c.width = Math.round(w * dpr); c.height = Math.round(h * dpr); } c.style.width = w + "px"; c.style.height = h + "px"; }
+    if (!this.gl){ this.base.width = Math.round(w * dpr); this.base.height = Math.round(h * dpr); }
+    this.base.style.width = w + "px"; this.base.style.height = h + "px";
+    this.fx.width = Math.round(vw * dpr); this.fx.height = Math.round(vh * dpr); this.fx.style.width = vw + "px"; this.fx.style.height = vh + "px";
     if (this.gl) this.gl.setSize(w, h, dpr);
-    this.s0 = Math.max(w / MAP.W, (h * .55) / MAP.H);
-    this.clampCam(); this.dirtyBase = true; this.fxDirty = true;
+    this.s0 = Math.max(vw / MAP.W, (vh * .55) / MAP.H);   // 3.1: the whole world fits the screen, not the (larger) stage
+    this.applyTilt(); this.clampCam(); this.dirtyBase = true; this.fxDirty = true;
   },
   /* the camera changed: redraw the base now (fast, from the cached picture) and sharply once it stops */
   moved(){ this.dirtyBase = true; this.lastMove = performance.now(); },
-  setInsets(o){ const k = JSON.stringify(o); if (k === this._ins) return; this._ins = k; this.insets = o; },
+  /* o = parts of the SCREEN covered by the HUD (px); this.insets = the hidden parts of the STAGE at the current tilt */
+  setInsets(o){ const k = JSON.stringify(o); if (k === this._ins) return; this._ins = k; this.hud = o; this.updInsets(); },
+  /* ---------- 3.1 tilt ---------- */
+  tiltAt(z){ if (!this.tiltMax) return 0; const k = clamp((z - TZ0) / (TZ1 - TZ0), 0, 1); return this.tiltMax * k * k * (3 - 2 * k); },
+  applyTilt(){
+    const a = this.tiltAt(this.cam.z);
+    if (Math.abs(a - this.tilt) < 1e-4) return;
+    this.tilt = a; this.stage.style.transform = a ? `rotateX(${a.toFixed(5)}rad)` : "";
+    this.updInsets();
+  },
+  /* stage point → screen point (px inside the map element) */
+  localToView(ex, ey, a = this.tilt){
+    const Pp = this.persp, v = ey + this.vTop0, u = ex - this.w / 2, d = Pp - v * Math.sin(a);
+    return [this.vw / 2 + u * Pp / d, this.tcy + v * Math.cos(a) * Pp / d];
+  },
+  /* screen point → stage point */
+  viewToLocal(X, Y, a = this.tilt){
+    const Pp = this.persp, dy = Y - this.tcy, v = dy * Pp / (Pp * Math.cos(a) + dy * Math.sin(a)), u = (X - this.vw / 2) * (Pp - v * Math.sin(a)) / Pp;
+    return [u + this.w / 2, v - this.vTop0];
+  },
+  evLocal(e){ const r = this.el.getBoundingClientRect(); return this.viewToLocal(e.clientX - r.left, e.clientY - r.top); },
+  /* world point → screen point (for HTML placed over the map, e.g. the training spotlight) */
+  toViewport(x, y){ return this.toScreen(x, y); },
+  /* the part of the stage you can see at zoom z, minus the HUD: left/right edges at the middle row, top/bottom edges */
+  viewRect(z = this.cam.z, k = 1){
+    const a = this.tiltAt(z), H = this.hud, m = (this.w - this.vw) / 2;
+    return {L:m + H.l * k, R:this.w - m - H.r * k, T:this.viewToLocal(this.vw / 2, H.t, a)[1], B:this.viewToLocal(this.vw / 2, this.vh - H.b, a)[1]};
+  },
+  updInsets(){ if (!this.vw) return; const V = this.viewRect(); this.insets = {l:V.L, r:this.w - V.R, t:V.T, b:this.h - V.B}; },
   scale(){ return this.s0 * this.cam.z; },
-  toScreen(x, y){ const s = this.scale(); return [(x - this.cam.x) * s + this.w / 2, (y - this.cam.y) * s + this.h / 2]; },
-  toWorld(sx, sy){ const s = this.scale(); return [(sx - this.w / 2) / s + this.cam.x, (sy - this.h / 2) / s + this.cam.y]; },
+  /* world ↔ stage (the tilted map canvas) */
+  toStage(x, y){ const s = this.scale(); return [(x - this.cam.x) * s + this.w / 2, (y - this.cam.y) * s + this.h / 2]; },
+  stageToWorld(ex, ey){ const s = this.scale(); return [(ex - this.w / 2) / s + this.cam.x, (ey - this.h / 2) / s + this.cam.y]; },
+  /* world ↔ screen (the flat overlay, pointer events, HTML) */
+  toScreen(x, y){ const [ex, ey] = this.toStage(x, y); return this.tilt > 0 ? this.localToView(ex, ey) : [ex - this.sx0, ey - this.sy0]; },
+  toWorld(vx, vy){ return this.stageToWorld(...this.viewToLocal(vx, vy)); },
   /* 2.0: Plague Inc-style camera: the map can't be dragged off into space; its edge stops at the HUD */
   clampXY(x, y, z){
-    const s = this.s0 * z, hw = this.w / 2 / s, hh = this.h / 2 / s, i = this.insets || {l:0, r:0, t:0, b:0};
-    const x0 = hw - i.l * .6 / s, x1 = MAP.W - hw + i.r * .6 / s, y0 = hh - i.t / s, y1 = MAP.H - hh + i.b / s;
+    const s = this.s0 * z, V = this.viewRect(z, .6), hw = this.w / 2, hh = this.h / 2;
+    const x0 = (hw - V.L) / s, x1 = MAP.W - (V.R - hw) / s, y0 = (hh - V.T) / s, y1 = MAP.H - (V.B - hh) / s;
     return [x0 > x1 ? MAP.W / 2 : clamp(x, x0, x1), y0 > y1 ? MAP.H / 2 : clamp(y, y0, y1)];
   },
   clampCam(){ const [x, y] = this.clampXY(this.cam.x, this.cam.y, this.cam.z); this.cam.x = x; this.cam.y = y; },
   /* centre of the part of the screen not covered by the HUD / drawer */
-  freeCentre(){ const i = this.insets; return [(i.l + this.w - i.r) / 2, (i.t + this.h - i.b) / 2]; },
+  freeCentre(z = this.cam.z){ const H = this.hud; return this.viewToLocal((H.l + this.vw - H.r) / 2, (H.t + this.vh - H.b) / 2, this.tiltAt(z)); },
   lookAt(x, y, z){
-    const s = this.s0 * z, [fx, fy] = this.freeCentre();
-    z = clamp(z, ZMIN, ZMAX); const [cx, cy] = this.clampXY(x - (fx - this.w / 2) / s, y - (fy - this.h / 2) / s, z);
+    z = clamp(z, ZMIN, ZMAX); const s = this.s0 * z, [fx, fy] = this.freeCentre(z);
+    const [cx, cy] = this.clampXY(x - (fx - this.w / 2) / s, y - (fy - this.h / 2) / s, z);
     this.target = {x:cx, y:cy, z};
   },
-  homeView(){ const [fx, fy] = this.freeCentre(), s = this.s0, [x, y] = this.clampXY(MAP.W / 2 - (fx - this.w / 2) / s * .5, MAP.H / 2 - (fy - this.h / 2) / s * .6, 1); return {x, y, z:1}; },
+  homeView(){ const [fx, fy] = this.freeCentre(1), s = this.s0, [x, y] = this.clampXY(MAP.W / 2 - (fx - this.w / 2) / s * .5, MAP.H / 2 - (fy - this.h / 2) / s * .6, 1); return {x, y, z:1}; },
   resetView(){ this.target = this.homeView(); },
   recenter(){ if (this.cam.z <= 1.08) this.target = this.homeView(); },
-  zoomBy(f){ const b = this.target || this.cam, z = clamp(b.z * f, ZMIN, ZMAX); const [fx, fy] = this.freeCentre(); const [wx, wy] = this.toWorld(fx, fy); this.lookAt(wx, wy, z); Audio.play("tick", {vol:.5}); },
+  zoomBy(f){ const b = this.target || this.cam, z = clamp(b.z * f, ZMIN, ZMAX); const [fx, fy] = this.freeCentre(); const [wx, wy] = this.stageToWorld(fx, fy); this.lookAt(wx, wy, z); Audio.play("tick", {vol:.5}); },
   isCountryZoom(){ return this.cam.z >= ZCOUNTRY; },
   regionPoint(reg){ const m = P.RMETA[reg]; return ll(m.lab[0], m.lab[1]); },
   countryPoint(id){ if (!id) return null; if (id.startsWith("R_")) return this.regionPoint(id.slice(2)); const s = this.byCountry[id]; return s ? s.l : null; },
   focus(reg, zoomIn){ if (!P.RMETA[reg]) return; const [x, y] = this.regionPoint(reg); const z = zoomIn ? Math.max(this.cam.z, 1.75) : this.cam.z; this.lookAt(x, y, Math.max(z, 1)); },
-  focusCountry(id){ const pt = this.countryPoint(id); if (!pt) return; const sh = this.byCountry[id]; let z = 2.4; if (sh){ const bw = sh.b[2] - sh.b[0], bh = sh.b[3] - sh.b[1], fw = this.w - this.insets.l - this.insets.r, fh = this.h - this.insets.t - this.insets.b; z = clamp(Math.min(fw * .55 / (bw * this.s0), fh * .55 / (bh * this.s0)), 1.8, 4.2); } this.lookAt(pt[0], pt[1], Math.max(this.cam.z, id.startsWith("R_") ? 1.8 : z)); },
+  focusCountry(id){ const pt = this.countryPoint(id); if (!pt) return; const sh = this.byCountry[id]; let z = 2.4; if (sh){ const bw = sh.b[2] - sh.b[0], bh = sh.b[3] - sh.b[1], V = this.viewRect(), fw = V.R - V.L, fh = V.B - V.T; z = clamp(Math.min(fw * .55 / (bw * this.s0), fh * .55 / (bh * this.s0)), 1.8, 4.2); } this.lookAt(pt[0], pt[1], Math.max(this.cam.z, id.startsWith("R_") ? 1.8 : z)); },
   refresh(){ this.dirtyBase = true; this.loadImage(); },
   floatText(x, y, txt, color){ this.floats.push({x, y, txt, color, t:0}); },
   /* ---------- input ---------- */
@@ -157,26 +211,27 @@ export const GameMap = {
     c.addEventListener("pointerdown", e => {
       if (this.locked()) return;
       c.setPointerCapture(e.pointerId);
-      this.ptrs.set(e.pointerId, {x:e.offsetX, y:e.offsetY});
-      if (this.ptrs.size === 1){ this.drag = {x:e.offsetX, y:e.offsetY, sx:e.offsetX, sy:e.offsetY, moved:0}; }
+      const lx = e.offsetX, ly = e.offsetY;
+      this.ptrs.set(e.pointerId, {x:lx, y:ly});
+      if (this.ptrs.size === 1){ this.drag = {x:lx, y:ly, sx:lx, sy:ly, moved:0}; }
       else if (this.ptrs.size === 2){
         const [a, b] = [...this.ptrs.values()];
         this.pinch = {d:Math.hypot(a.x - b.x, a.y - b.y), z:this.cam.z, w:this.toWorld((a.x + b.x) / 2, (a.y + b.y) / 2)}; this.drag = null; this.target = null;
       }
     });
     c.addEventListener("pointermove", e => {
-      const p = this.ptrs.get(e.pointerId);
-      if (!p){ this.hoverAt(e.offsetX, e.offsetY); return; }
-      p.x = e.offsetX; p.y = e.offsetY;
+      const p = this.ptrs.get(e.pointerId), lx = e.offsetX, ly = e.offsetY;
+      if (!p){ this.hoverAt(lx, ly); return; }
+      p.x = lx; p.y = ly;
       if (this.pinch && this.ptrs.size >= 2){
         const [a, b] = [...this.ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
-        const z = clamp(this.pinch.z * d / Math.max(20, this.pinch.d), ZMIN, ZMAX), s = this.s0 * z;
-        this.setPanning(true); this.cam.z = z; this.cam.x = this.pinch.w[0] - (mx - this.w / 2) / s; this.cam.y = this.pinch.w[1] - (my - this.h / 2) / s; this.clampCam(); this.moved();
+        const z = clamp(this.pinch.z * d / Math.max(20, this.pinch.d), ZMIN, ZMAX), s = this.s0 * z, [ex, ey] = this.viewToLocal(mx, my, this.tiltAt(z));
+        this.setPanning(true); this.cam.z = z; this.cam.x = this.pinch.w[0] - (ex - this.w / 2) / s; this.cam.y = this.pinch.w[1] - (ey - this.h / 2) / s; this.clampCam(); this.applyTilt(); this.moved();
       } else if (this.drag){
-        const dx = e.offsetX - this.drag.x, dy = e.offsetY - this.drag.y;
+        const dx = lx - this.drag.x, dy = ly - this.drag.y;
         this.drag.moved += Math.abs(dx) + Math.abs(dy);
-        if (this.drag.moved > 6){ this.setPanning(true); const s = this.scale(); this.cam.x -= dx / s; this.cam.y -= dy / s; this.target = null; this.clampCam(); this.moved(); c.style.cursor = "grabbing"; }
-        this.drag.x = e.offsetX; this.drag.y = e.offsetY;
+        if (this.drag.moved > 6){ this.setPanning(true); const s = this.scale(), [ax, ay] = this.viewToLocal(this.drag.x, this.drag.y), [bx, by] = this.viewToLocal(lx, ly); this.cam.x -= (bx - ax) / s; this.cam.y -= (by - ay) / s; this.target = null; this.clampCam(); this.moved(); c.style.cursor = "grabbing"; }
+        this.drag.x = lx; this.drag.y = ly;
       }
     });
     const end = e => {
@@ -193,8 +248,8 @@ export const GameMap = {
       if (this.locked()) return;
       e.preventDefault();
       const f = Math.exp(-e.deltaY * (e.deltaMode ? 0.05 : 0.0016)), z = clamp(this.cam.z * f, ZMIN, ZMAX);
-      const [wx, wy] = this.toWorld(e.offsetX, e.offsetY), s = this.s0 * z;
-      this.target = null; this.cam.z = z; this.cam.x = wx - (e.offsetX - this.w / 2) / s; this.cam.y = wy - (e.offsetY - this.h / 2) / s; this.clampCam(); this.moved();
+      const [wx, wy] = this.toWorld(e.offsetX, e.offsetY), s = this.s0 * z, [ex, ey] = this.viewToLocal(e.offsetX, e.offsetY, this.tiltAt(z));
+      this.target = null; this.cam.z = z; this.cam.x = wx - (ex - this.w / 2) / s; this.cam.y = wy - (ey - this.h / 2) / s; this.clampCam(); this.applyTilt(); this.moved();
     }, {passive:false});
   },
   /* the map takes input unless a window covers it (2.0: a minimised event leaves the map free to look around) */
@@ -215,7 +270,7 @@ export const GameMap = {
   },
   hitAt(sx, sy){ for (let i = this.hits.length - 1; i >= 0; i--){ const h = this.hits[i]; if (sx >= h.x && sx <= h.x + h.w && sy >= h.y && sy <= h.y + h.h) return h; } return null; },
   hoverAt(sx, sy){
-    if (this.locked() || !this.w){ this.hover = null; return; }
+    if (this.locked() || !this.vw){ this.hover = null; return; }
     const h = this.hitAt(sx, sy);
     if (h){ this.fx.style.cursor = "pointer"; if (this.hover && this.hover.hit === h.id) return; this.hover = {hit:h.id}; return; }
     const sh = this.shapeAt(sx, sy);
@@ -249,6 +304,7 @@ export const GameMap = {
       if (Math.abs(T.x - this.cam.x) < .3 && Math.abs(T.y - this.cam.y) < .3 && Math.abs(T.z - this.cam.z) < .002){ Object.assign(this.cam, T); this.target = null; this.clampCam(); }
       this.moved();
     }
+    this.applyTilt();
     const zc = this.cam.z >= ZCOUNTRY; if (zc !== this._zc){ this._zc = zc; bump(); }
     const moving = now - (this.lastMove || 0) < 160;
     // once the camera stops, draw the base again from the full-size photo if the cached picture is too coarse at this zoom
@@ -349,10 +405,10 @@ export const GameMap = {
     this.baseFast = fast;
     if (fast){
       // copy the visible part of the cached picture (one image draw)
-      const k = Gfx.cfg.cache, [x0, y0] = this.toWorld(0, 0), [x1, y1] = this.toWorld(this.w, this.h);
+      const k = Gfx.cfg.cache, [x0, y0] = this.stageToWorld(0, 0), [x1, y1] = this.stageToWorld(this.w, this.h);
       const wx0 = clamp(x0, 0, MAP.W), wy0 = clamp(y0, 0, MAP.H), wx1 = clamp(x1, 0, MAP.W), wy1 = clamp(y1, 0, MAP.H);
       if (wx1 > wx0 && wy1 > wy0){
-        const [sx0, sy0] = this.toScreen(wx0, wy0), [sx1, sy1] = this.toScreen(wx1, wy1);
+        const [sx0, sy0] = this.toStage(wx0, wy0), [sx1, sy1] = this.toStage(wx1, wy1);
         c.imageSmoothingEnabled = true; c.imageSmoothingQuality = moving ? "low" : "medium";
         c.drawImage(this.cache, wx0 * k, wy0 * k, (wx1 - wx0) * k, (wy1 - wy0) * k, sx0, sy0, sx1 - sx0, sy1 - sy0);
       }
@@ -407,10 +463,10 @@ export const GameMap = {
   },
   drawFx(dt, now){
     const c = this.fctx, d = this.dpr; this.hits = [];
-    c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, this.w, this.h);
+    c.setTransform(d, 0, 0, d, 0, 0); c.clearRect(0, 0, this.vw, this.vh);
     if (!S.regions || !this.plumes) return;
     const s = this.scale(), zc = this.cam.z >= ZCOUNTRY, G = P.Game;
-    const vis = (x, y, m = 40) => x > this.insets.l - m && x < this.w - this.insets.r + m && y > this.insets.t - m && y < this.h - this.insets.b + m;
+    const H = this.hud, vis = (x, y, m = 40) => x > H.l - m && x < this.vw - H.r + m && y > H.t - m && y < this.vh - H.b + m;
     // CO₂ plumes (glowing smog over the big emitters)
     c.globalCompositeOperation = "lighter";
     const regById = {}; for (const r of S.regions) regById[r.id] = r;
@@ -425,10 +481,16 @@ export const GameMap = {
     // hovered country / region (drawn here so hovering never redraws the base)
     if (this.hover && this.hover.sh){
       const hs = this.hover.sh, list = zc ? [hs] : this.shapes.filter(x => x.r === hs.r), px = 1 / s;
-      c.setTransform(d * s, 0, 0, d * s, d * (this.w / 2 - this.cam.x * s), d * (this.h / 2 - this.cam.y * s));
-      c.fillStyle = "rgba(255,255,255,.08)"; for (const sh of list) c.fill(sh.path, "evenodd");
-      c.strokeStyle = "rgba(255,255,255,.6)"; c.lineWidth = 1.2 * px; for (const sh of list) c.stroke(sh.path);
-      c.setTransform(d, 0, 0, d, 0, 0);
+      if (!(this.tilt > 0)){   // flat: the shapes' own paths with one transform
+        c.setTransform(d * s, 0, 0, d * s, d * (this.w / 2 - this.sx0 - this.cam.x * s), d * (this.h / 2 - this.sy0 - this.cam.y * s));
+        c.fillStyle = "rgba(255,255,255,.08)"; for (const sh of list) c.fill(sh.path, "evenodd");
+        c.strokeStyle = "rgba(255,255,255,.6)"; c.lineWidth = 1.2 * px; for (const sh of list) c.stroke(sh.path);
+        c.setTransform(d, 0, 0, d, 0, 0);
+      } else {   // tilted: project the outline point by point
+        c.beginPath();
+        for (const sh of list) for (const r of sh.rings){ const step = r.length > 400 ? 4 : 2; for (let i = 0; i < r.length; i += step){ const [qx, qy] = this.toScreen(r[i], r[i + 1]); i ? c.lineTo(qx, qy) : c.moveTo(qx, qy); } c.closePath(); }
+        c.fillStyle = "rgba(255,255,255,.08)"; c.fill("evenodd"); c.strokeStyle = "rgba(255,255,255,.6)"; c.lineWidth = 1.2; c.stroke();
+      }
     }
     // builds on the map and the traffic between countries
     drawDetail(this, c, now, vis, iconImg);   // 1.7: capitals, smokestacks, sea chokepoints
@@ -525,7 +587,7 @@ export const GameMap = {
       const name = cc ? L(P.COUNTRY[cc.id].name) : sh.name;
       const line2 = cc ? `CO₂ ${cc.co2.toFixed(2)} Gt · ${t("relation")} ${cc.rel >= 0 ? "+" : ""}${Math.round(cc.rel)}` : L(P.RMETA[sh.r].name);
       c.font = "600 12.5px 'IBM Plex Sans Thai', sans-serif"; const w1 = c.measureText(name).width; c.font = "500 11px 'IBM Plex Mono', 'IBM Plex Sans Thai', monospace"; const w2 = c.measureText(line2).width;
-      const w = Math.max(w1, w2) + 20, h = 42; let x = this.hover.x + 16, y = this.hover.y + 14; if (x + w > this.w - 8) x = this.hover.x - w - 12; if (y + h > this.h - 8) y = this.hover.y - h - 10;
+      const w = Math.max(w1, w2) + 20, h = 42; let x = this.hover.x + 16, y = this.hover.y + 14; if (x + w > this.vw - 8) x = this.hover.x - w - 12; if (y + h > this.vh - 8) y = this.hover.y - h - 10;
       c.fillStyle = "rgba(6,16,21,.92)"; c.strokeStyle = "rgba(79,209,197,.5)"; c.lineWidth = 1; c.beginPath(); c.roundRect(x, y, w, h, 8); c.fill(); c.stroke();
       c.textBaseline = "top"; c.fillStyle = COL.fg; c.font = "600 12.5px 'IBM Plex Sans Thai', sans-serif"; c.fillText(name, x + 10, y + 5);
       c.fillStyle = cc ? COL[relCol(cc.rel)] : COL.muted; c.font = "500 11px 'IBM Plex Mono', 'IBM Plex Sans Thai', monospace"; c.fillText(line2, x + 10, y + 24); c.textBaseline = "alphabetic";
@@ -534,7 +596,7 @@ export const GameMap = {
   /* 2.0: arrows at the edge of the screen for disasters and aid bubbles you can't see (zoomed in elsewhere or under the HUD) */
   drawEdge(c, now){
     if (UIM.placing) return;
-    const i = this.insets, m = 30, L0 = i.l + m, R0 = this.w - i.r - m, T0 = i.t + m + 6, B0 = this.h - i.b - m;
+    const i = this.hud, m = 30, L0 = i.l + m, R0 = this.vw - i.r - m, T0 = i.t + m + 6, B0 = this.vh - i.b - m;
     if (R0 - L0 < 80 || B0 - T0 < 80) return;
     const cx = (L0 + R0) / 2, cy = (T0 + B0) / 2, list = [];
     for (const h of S.haz || []) if (!h.evac){ const pt = this.countryPoint(h.c); if (pt) list.push({pt, col:HZ_COL[h.type] || COL.bad, icon:P.HAZARDS[h.type].icon, id:"eh-" + h.id, c:h.c, n:Math.max(0, h.at - S.tick)}); }
@@ -571,7 +633,7 @@ export const GameMap = {
       for (let i = 0, n = Math.round(60 * Gfx.cfg.particles); i < n; i++){ const sx = x + ((f.seed[i] * 2 - 1) * R), sy = y - R + ((now * 380 + f.seed[i + 60] * 1000) % (2 * R)); c.beginPath(); c.moveTo(sx, sy); c.lineTo(sx - 4, sy + 12); c.stroke(); }
       if (T !== "flood"){ c.save(); c.translate(x, y); c.rotate(-now * 3); c.strokeStyle = "rgba(220,230,255,.6)"; c.lineWidth = 3; for (let i = 0; i < 4; i++){ c.rotate(Math.PI / 2); c.beginPath(); c.arc(0, 0, R * .55, 0, Math.PI * .6); c.stroke(); } c.restore(); }
       else { c.fillStyle = "rgba(60,120,200,.25)"; c.beginPath(); c.ellipse(x, y + 6, R * .8 * a, R * .35 * a, 0, 0, Math.PI * 2); c.fill(); }
-      if (T !== "flood" && Gfx.level !== "low" && Math.floor(now * 7) % 9 === 0){ c.fillStyle = "rgba(230,240,255,.18)"; c.fillRect(0, 0, this.w, this.h); }
+      if (T !== "flood" && Gfx.level !== "low" && Math.floor(now * 7) % 9 === 0){ c.fillStyle = "rgba(230,240,255,.18)"; c.fillRect(0, 0, this.vw, this.vh); }
     } else if (T === "heat" || T === "drought"){
       const g = c.createRadialGradient(x, y, 0, x, y, R * 1.3); g.addColorStop(0, T === "heat" ? `rgba(255,120,40,${.45 * a})` : `rgba(230,180,80,${.4 * a})`); g.addColorStop(1, "rgba(255,120,40,0)");
       c.fillStyle = g; c.beginPath(); c.arc(x, y, R * 1.3, 0, Math.PI * 2); c.fill();
@@ -612,3 +674,4 @@ H.hazardStrike = (h, d) => {
   if (!S.event && !(Audio.amb && !Audio.amb.stopping)){ Audio.ambience(amb, .9); setTimeout(() => { if (Audio.amb && Audio.amb.n === amb && !S.event) Audio.stopAmb(1400); }, 3600); }
 };
 /* H.hazardWarn: game.js (2.0: also shows a forecast card) */
+P._map = GameMap;   // 3.1: for the test tools (tools/tiltqa.mjs); not on window in the protected build

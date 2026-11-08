@@ -269,7 +269,7 @@ function vehText(v){
 export function drawInfo(M, c){
   const inf = M.info; if (!inf) return;
   const age = (performance.now() - inf.t) / 1000; if (age > 3.2){ M.info = null; return; }
-  M.pill(clamp(inf.x, 90, M.w - 90), inf.y - 16, inf.txt, {h:22, bg:"rgba(6,16,21,.94)", stroke:COL.accent, font:"600 11.5px 'IBM Plex Sans Thai', sans-serif"});
+  M.pill(clamp(inf.x, 90, M.vw - 90), inf.y - 16, inf.txt, {h:22, bg:"rgba(6,16,21,.94)", stroke:COL.accent, font:"600 11.5px 'IBM Plex Sans Thai', sans-serif"});
 }
 
 /* ---------- 1.7: a more lived-in map ----------

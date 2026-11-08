@@ -1,0 +1,50 @@
+/* UI review screenshots in one browser session: node tools/uishots.mjs <outDir> [w] [h] [world 0|1]
+   Takes: main HUD, region drawer, country drawer, skills screen, and a zoomed-in map. Needs `node build.mjs --open`. */
+import {chromium} from "playwright";
+import http from "node:http";
+import fs from "node:fs";
+import path from "node:path";
+import {fileURLToPath} from "node:url";
+const HERE = path.dirname(fileURLToPath(import.meta.url)), ROOT = path.resolve(HERE, "../..");
+const [out = "/tmp/shots", W = 1600, H = 900, WORLD = "1"] = process.argv.slice(2);
+fs.mkdirSync(out, {recursive:true});
+const TYPES = {".html":"text/html; charset=utf-8", ".js":"text/javascript", ".css":"text/css", ".json":"application/json", ".jpg":"image/jpeg", ".png":"image/png", ".webp":"image/webp", ".svg":"image/svg+xml", ".mp3":"audio/mpeg", ".woff2":"font/woff2"};
+const srv = http.createServer((req, res) => {
+  let p = decodeURIComponent(req.url.split("?")[0]); if (p.endsWith("/")) p += "index.html";
+  const f = path.join(ROOT, p);
+  if (!fs.existsSync(f) || fs.statSync(f).isDirectory()){ res.writeHead(404); return res.end(); }
+  res.writeHead(200, {"Content-Type":TYPES[path.extname(f)] || "application/octet-stream"}); fs.createReadStream(f).pipe(res);
+}).listen(0);
+const browser = await chromium.launch({executablePath:process.env.CHROME || "/opt/pw-browsers/chromium-1243/chrome-linux64/chrome", args:["--use-angle=swiftshader", "--enable-unsafe-swiftshader", "--ignore-gpu-blocklist"]});
+const mobile = +W < 800;
+const page = await browser.newPage({viewport:{width:+W, height:+H}, deviceScaleFactor:1, hasTouch:mobile, isMobile:mobile});
+const errs = [];
+page.on("pageerror", e => { errs.push(e.message); console.log("pageerror", e.message); });
+page.on("console", m => { if (m.type() === "error" && !/api|Failed to load resource|net::/.test(m.text())) { errs.push(m.text()); console.log("console", m.text()); } });
+await page.goto(`http://localhost:${srv.address().port}/index.html`);
+await page.evaluate(() => { localStorage.setItem("p2050-tut", "1"); localStorage.setItem("p2050-trained", "1"); localStorage.setItem("p2050-gfx", "medium"); });
+await page.reload();
+await page.waitForSelector(".loading .enter", {timeout:90000});
+await page.click(".loading .enter"); await page.waitForTimeout(1200);
+await page.evaluate(w => window.P2050.Game.newGame(w === "1"), WORLD); await page.waitForSelector(".charsel", {timeout:60000});
+await page.evaluate(() => { const P = window.P2050; P.Game.startGame("sci", "normal"); P.UIM.modal = null; P.setSpeed(0); P.UIM.toastQ.length = 0; });
+await page.addStyleTag({content:".toast{display:none !important}"});
+await page.waitForTimeout(2500);
+const run = js => page.evaluate(js => { const P = window.P2050, S = P.S, G = P.Game; return eval(js); }, js);
+const shot = async (name, js, wait = 900) => { if (js) await run(js); await page.waitForTimeout(wait); await page.screenshot({path:path.join(out, name + ".png")}); console.log("shot", name); };
+await run("P.UIM.modal = null; P.changed && P.changed(); P._bump && P._bump()");
+await run("S.world = true; S.goals = P.GOALS.filter(d => d.id === \"green\").concat(P.GOALS.filter(d => d.id !== \"green\").slice(0, 1)).map(d => ({id:d.id, ...d.make(), won:false})); P._bump()");
+await shot("1-main", "");
+await shot("1b-goals-min", "document.querySelector('.wghead') && document.querySelector('.wghead').click()", 600);
+await run("document.querySelector('.wghead') && document.querySelector('.wghead').click()");
+await shot("2-region", "G.setTab('region')");
+await shot("3-country", "G.selectCountry('CHN')", 1600);
+await shot("4-country-res", "P.UIM.cTab = 'res'; P._bump()");
+await shot("4b-country-base", "P.UIM.cTab = 'base'; P._bump()");
+await run("P.UIM.cTab = 'orders'; P._bump()");
+await shot("5-skills", "G.closeTab(); G.openSkills ? G.openSkills() : G.setTab('tech')", 1200);
+await shot("5b-market", "G.closeSkills && G.closeSkills(); P.UIM.modal = 'market'; P._bump()", 900);
+await run("P.UIM.modal = null; P._bump()");
+await shot("6-zoom", "G.closeSkills && G.closeSkills(); window.P2050.GameMap ? 0 : 0; document.querySelector('.zoom button') && [0,1,2,3].forEach(() => document.querySelector('.zoom button').click())", 2500);
+fs.writeFileSync(path.join(out, "errors.txt"), errs.join("\n"));
+await browser.close(); srv.close();

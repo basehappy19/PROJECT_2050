@@ -12,9 +12,9 @@ import {ll} from "../geo.js";
 const T = (th, en) => ({th, en});
 const $ = sel => document.querySelector(sel);
 const rectOf = el => { if (!el) return null; const r = el.getBoundingClientRect(); return r.width || r.height ? {x:r.left, y:r.top, w:r.width, h:r.height} : null; };
-const mapRect = (pt, dy = 0, r = 30) => { if (!pt || !GameMap.active) return null; const [x, y] = GameMap.toScreen(pt[0], pt[1]); return {x:x - r, y:y + dy - r, w:2 * r, h:2 * r}; };
+const mapRect = (pt, dy = 0, r = 30) => { if (!pt || !GameMap.active) return null; const [x, y] = GameMap.toViewport(pt[0], pt[1]); return {x:x - r, y:y + dy - r, w:2 * r, h:2 * r}; };
 const BKK = [13.75, 100.5];
-const hitRect = pre => { const h = GameMap.hits.find(q => q.id.startsWith(pre)); return h ? {x:h.x - 6, y:h.y - 6, w:h.w + 12, h:h.h + 12} : null; };
+const hitRect = pre => { const h = GameMap.hits.find(q => q.id.startsWith(pre)); return h ? {x:h.x - 6, y:h.y - 6, w:h.w + 12, h:h.h + 12} : null; };   // hit boxes are screen pixels (3.2: the overlay is flat)
 const ownedHaz = () => (S.haz || [])[0];
 const st = () => UIM.train;
 
@@ -74,7 +74,7 @@ export const STEPS = [
    text:T("ทุกเดือนมกราคม มีสรุปผลงานปี: ถ้า CO₂ ต่ำกว่าเป้าปีนั้น (ขีดสีทอง) = ปีที่ดี ได้งบเพิ่ม · ไม่ถึง = ปีที่แย่ ความเชื่อมั่นลด · จำนวนปีที่ดีเลือกฉากจบให้คุณ", "Every January you get a year in review: CO₂ below that year's target (the gold mark) = a good year and more funding · above it = a bad year and less trust · your number of good years picks your ending.")},
   {id:"edge", target:() => hitRect("eh-"),
    setup:() => { S.haz = []; P.addHazard(P.C("USA"), "hurricane"); if (UIM.alerts) UIM.alerts = []; GameMap.focusCountry("THA"); P.setSpeed(0); },
-   done:() => { const h = ownedHaz(); if (!h) return true; const pt = GameMap.countryPoint(h.c); if (!pt) return true; const [x, y] = GameMap.toScreen(pt[0], pt[1]); return x > 0 && x < GameMap.w && y > 0 && y < GameMap.h; },
+   done:() => { const h = ownedHaz(); if (!h) return true; const pt = GameMap.countryPoint(h.c); if (!pt) return true; const [x, y] = GameMap.toViewport(pt[0], pt[1]); return x > 0 && x < GameMap.vw && y > 0 && y < GameMap.vh; },
    text:T("ภัยที่อยู่นอกจอ จะมีลูกศรที่ขอบจอชี้ไปหา · แตะลูกศรเพื่อไปดู (ลากแผนที่ได้ และ UI จะจางลงให้เห็นชัด)", "Disasters off the screen get an arrow at the edge pointing to them · tap the arrow to go there (you can also drag the map; the HUD fades so you can see).")},
   {id:"done", hold:1, final:1, setup:() => { S.haz = []; S.bubbles = []; },
    text:T("เยี่ยมมาก! คุณพร้อมแล้ว · เคล็ดลับ: เก็บฟองเขียวบ่อย ๆ · อพยพก่อนภัยมา · ช่วยฟองแดงให้ทัน · ลงทุนสกิลพลังงานก่อน · ดูสรุปผลงานทุกปี", "Brilliant, you're ready! Tips: collect green bubbles often · evacuate before disasters · answer red bubbles in time · invest in energy skills first · check your year in review.")},

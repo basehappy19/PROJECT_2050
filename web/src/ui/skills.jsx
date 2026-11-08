@@ -21,8 +21,9 @@ export function Skills(){
   const maxX = Math.max(...nodes.map(n => centre(n)[0])) + 92, maxY = Math.max(...nodes.map(n => centre(n)[1])) + R + 44;
   const busy = P.busyIds().length;
   const pick = id => { Audio.play("select"); S.node = id; bump(); };
-  return <div class="veil skills-veil" onClick={e => { if (e.target === e.currentTarget) G.closeSkills(); }}>
-    <section class="skills glass-strong" role="dialog" aria-label={t("skillsTitle")}>
+  /* 3.1: a full-screen page (not a window over the map) · 3.2: close (✕) top-right like every window; Esc / T still close it */
+  return <div class="skills-page">
+    <section class="skills" role="region" aria-label={t("skillsTitle")}>
       <header class="sk-head">
         <h2><Icon n="network" size={22} color="accent"/>{t("skillsTitle")}</h2>
         <div class="sk-res">
@@ -33,7 +34,7 @@ export function Skills(){
           {P.recentBuys() ? <span class="bad"><Icon n="chart-line" size={15}/> {t("rush")} +{P.recentBuys() * 20}%</span> : null}
           {S.buff.instant ? <span class="good"><Icon n="lightbulb" size={15}/> {t("buffInstant")}</span> : S.buff.disc ? <span class="good"><Icon n="flask-round" size={15}/> {t("buffDisc")}</span> : null}
         </div>
-        <IconBtn n="x" title="Close" onClick={() => G.closeSkills()} sound={null} cls="big skclose"/>
+        <IconBtn n="x" title={(S.lang === "th" ? "ปิด" : "Close") + " (Esc)"} onClick={() => G.closeSkills()} sound={null} cls="big skclose"/>
       </header>
       <div class="sk-body">
         <div class="sk-grid">

@@ -49,12 +49,15 @@ export function TopBar(){
   if (has3) sp.push({id:"sp3", label:"3×", on:S.speed === 3, fn:() => G.setSpeed(3), sound:null});
   const running = P.running();
   return <header class="topbar">
+    <div class="tleft">
     <div class="kpis glass">
       <Kpi kid="ep" stat="money" label={t("ep")} value={S.ep} sub={P.sanctionsCost() ? `+${P.epGain()} −${P.sanctionsCost()}` : `+${P.epGain()}${t("perMo")}`} cls={P.sanctionsCost() ? "sanct" : ""} tip={t("tipEp")}/>
       <Kpi kid="pc" stat="policy" label={t("pc")} value={S.pc} sub={`+${P.pcGain()}${t("perMo")}`} tip={t("tipPc")}/>
       {S.oreOn ? <Kpi kid="ore" stat="ore" label={t("oreLbl")} value={P.matTotal()} sub={`+${Math.round(P.oreGain())}${t("perMo")}`} cls="ore mkton" tip={t("tipOre")} onClick={() => { Audio.play("open"); UIM.modal = "market"; bump(); }}/> : null}
       <Kpi kid="appr" stat="appr" label={t("appr")} value={S.appr} fmt={x => `${x.toFixed(0)}%`} meter={{v:S.appr / 100, c:acls}} cls={"appr mkton " + acls} danger={S.appr < 25} badge={P.angryCount && P.angryCount() ? "!" : null}
         tip={S.groups ? P.GROUPS.map(G => `[[${G.icon}]] ${Math.round(S.groups[G.id])}%`).join("  ") : t("tipAppr")} onClick={() => { Audio.play("open"); UIM.modal = "politics"; bump(); }}/>
+    </div>
+    {S.started ? <NewsLine/> : null}
     </div>
     <div class="ctrls glass">
       <div class="date">
@@ -63,12 +66,19 @@ export function TopBar(){
       </div>
       <Seg cls="speed" items={sp}/>
       <div class="ibtns">
-        <IconBtn n={Audio.musicOn ? "music" : "music-off"} title={t("musicLbl")} onClick={() => { Audio.toggleMusic(); P._bump(); }} sound={null} cls="hide-xs"/>
-        <IconBtn n={Audio.on ? "volume-2" : "volume-x"} title={t("sfxLbl")} onClick={() => { Audio.toggle(); P._bump(); }} sound={null} cls="hide-xs"/>
         <IconBtn n="menu" title={`${t("pTitle")} (Esc)`} onClick={() => G.pause()}/>
       </div>
     </div>
   </header>;
+}
+
+/* 3.2: the newest news line sits under the money / policy / approval bar; it fades after a few seconds and comes back with the next line */
+function NewsLine(){
+  const lg = S.log[0], LCOL = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg", in:"purple"};
+  if (!lg) return null;
+  return <button type="button" class="ticker glass fadeout" onClick={() => G.setTab("news")} key={S.log.length + ":" + lg.tk} title={t("nbNews")}>
+    <Icon n="newspaper" size={14} cls="tkic"/><Rich t={lg.txt} cls={"txt " + (LCOL[lg.cls] || "fg")} iconColor="inherit"/>
+  </button>;
 }
 
 /* character portrait + ability buttons */
@@ -103,14 +113,27 @@ export function AbilityBar(){
 }
 
 /* Continuous World: this season's two goals */
+/* 3.1: collapsible, placed under the money / policy bar (to the right of the ability bar, so the two never overlap) */
+const LS_GOALS = "p2050-goalsOpen";
+const goalsOpen = () => { try { const v = localStorage.getItem(LS_GOALS); return v === null ? !isTouch() : v === "1"; } catch { return true; } };
 export function WorldGoals(){
   if (!S.world) return null;
+  const open = UIM.goalsOpen ?? (UIM.goalsOpen = goalsOpen());
+  const toggle = () => { UIM.goalsOpen = !open; try { localStorage.setItem(LS_GOALS, UIM.goalsOpen ? "1" : "0"); } catch {} Audio.play(UIM.goalsOpen ? "open" : "close", {vol:.5}); bump(); };
+  const won = S.goals ? S.goals.filter(g => g.won).length : 0;
   return <div class="wside">
-    {S.goals ? <div class="wgoals glass">
-      <b class="mono acc small"><Icon n="target" size={14}/> {up(t("goalsTitle"))} · {L(P.seasonOf().name)}</b>
-      {S.goals.map((g, i) => { const d = P.GOALS.find(x => x.id === g.id); return <div class={"wg " + (g.won ? "won" : "")} key={i}>
-        <Icon n={g.won ? "circle-check" : d.icon} size={18}/><span>{P.goalText(g)}</span>
-      </div>; })}
+    {S.goals ? <div class={"wgoals glass " + (open ? "open" : "min")}>
+      <button type="button" class="wghead" onClick={toggle} aria-expanded={open}>
+        <Icon n="target" size={15}/><b class="mono small">{up(t("goalsTitle"))}</b>
+        <span class={"wgcount mono " + (won === S.goals.length ? "good" : "")}>{won}/{S.goals.length}</span>
+        <Icon n={open ? "chevron-up" : "chevron-down"} size={15} cls="wgchev"/>
+      </button>
+      {open ? <>
+        <small class="muted wgseason">{L(P.seasonOf().name)}</small>
+        {S.goals.map((g, i) => { const d = P.GOALS.find(x => x.id === g.id); return <div class={"wg " + (g.won ? "won" : "")} key={i}>
+          <Icon n={g.won ? "circle-check" : d.icon} size={17}/><span>{P.goalText(g)}</span>
+        </div>; })}
+      </> : null}
     </div> : null}
     <PlaceBar/>
   </div>;
@@ -145,8 +168,8 @@ function MeterNZ(){
   if (trend < -0.05){ const yr = 2026 + S.tick / 12 + net / -trend; proj = yr <= 2051 ? `${t("onTrack")} ${Math.floor(yr)}` : t("offTrack"); pcls = yr <= 2051 ? "good" : "bad"; }
   else { proj = t("rising"); pcls = "bad"; }
   const pos = v => clamp(v / NZ_MAX, 0, 1), cls = net <= 8 ? "good" : net <= 20 ? "warn" : "bad";
-  return <div class="mtr" title={plain(t("tipNZ"))}>
-    <div class="mtr-h"><Rich t={`[[flag]] ${t("nzTitle")}`} cls="ttl"/><span class={"big " + cls}>{net.toFixed(1)}<small> Gt</small></span></div>
+  return <div class="mtr" title={`${plain(t("tipNZ"))}\n${plain(proj)}`}>
+    <Rich t={`[[flag]] ${t("nzTitle")}`} cls="ttl"/>
     <div class="bar nz">
       <i class="fill" style={{width:`${(1 - pos(net)) * 100}%`}}/>
       <i class="ghost" style={{left:`${(1 - pos(start)) * 100}%`}}/>
@@ -155,35 +178,34 @@ function MeterNZ(){
       {!S.world && !S.v2 && P.MILESTONES ? P.MILESTONES.map((m, i) => { const st = (S.ms17 || {})[i], cur = st === undefined && P.MILESTONES.findIndex((q, k) => (S.ms17 || {})[k] === undefined) === i;
         return <i key={m.y} class={"ms " + (st === 1 ? "hit" : st === 0 ? "miss" : cur ? "next" : "")} style={{left:`${(1 - pos(m.v)) * 100}%`}} title={`${m.y}: CO₂ ≤ ${m.v} Gt`}><b>{st === 1 ? "✓" : st === 0 ? "✕" : ""}{m.y}</b></i>; }) : null}
       <i class={"dot " + cls} style={{left:`${(1 - pos(net)) * 100}%`}}/>
-      <Icon n="trophy" size={17} cls="end good"/>
+      <Icon n="trophy" size={14} cls="end good"/>
     </div>
-    <div class="mtr-f"><span class={pcls}>{proj}</span></div>
+    <span class={"big " + cls}>{net.toFixed(1)}<small> Gt</small><i class={"trend " + pcls} aria-hidden="true">{pcls === "good" ? "▼" : "▲"}</i></span>
   </div>;
 }
 function MeterT(){
   const monthsLeft = Math.max(0, P.TOTAL_TICKS - S.tick), era = S.world && P.ERAS[S.era || "shift"], cls = S.temp >= 2.5 ? "bad" : S.temp >= 2.0 ? "hot" : S.temp >= 1.5 ? "warn" : "good";
-  return <div class="mtr" title={plain(t("tipTemp"))}>
-    <div class="mtr-h"><Rich t={`[[$temp]] ${t("tTitle")}`} cls="ttl"/><span class={"big " + cls}>+{S.temp.toFixed(2)}<small>°C</small></span></div>
+  const foot = era ? `${L(era.name)} · ${L(era.goal)}` : `${Math.max(0, 3 - S.temp).toFixed(1)}°C ${t("toLose")} · ${t("left")} ${Math.ceil(monthsLeft / 12)} ${t("yrs")}`;
+  return <div class="mtr" title={`${plain(t("tipTemp"))}\n${plain(foot)}`}>
+    <Rich t={`[[$temp]] ${t("tTitle")}`} cls="ttl"/>
     <div class="bar temp">
       <i class="z"/><i class="z"/><i class="z"/><i class="z"/>
       <i class={"dot " + cls} style={{left:`${clamp((S.temp - 1) / 2, 0, 1) * 100}%`}}/>
-      <Icon n="triangle-alert" size={17} cls="end bad"/>
+      <Icon n="triangle-alert" size={14} cls="end bad"/>
     </div>
-    {era ? <div class="mtr-f"><span><Rich t={`[[${era.icon}]] ${L(era.name)}`} iconColor="accent"/></span><span class="muted">{L(era.goal)}</span></div>
-      : <div class="mtr-f"><span><b class={cls}>{Math.max(0, 3 - S.temp).toFixed(1)}°C</b> {t("toLose")}</span><span>{t("left")} <b>{Math.ceil(monthsLeft / 12)}</b> {t("yrs")}</span></div>}
+    <span class={"big " + cls}>+{S.temp.toFixed(2)}<small>°C</small></span>
   </div>;
 }
 export function Bottom(){
   const tabs = [["tech", "network", "nbTech", "T"], ["region", "map", "nbRegion", "R"], ["stats", "chart-line", "nbStats", "S"], ["news", "newspaper", "nbNews", "N"]];
   const ready = P.SKILLS.filter(n => P.nodeState(n) === "ready" && P.canAfford(n)).length;
-  const lg = S.log[0], LCOL = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg", in:"purple"};
   const badge = {tech:ready, news:S.unread || 0, stats:S.report && !S.report.read ? "!" : 0};
+  /* 3.2: one row at the very bottom: Net Zero + warming (left) · zoom · tabs (right) */
   return <footer class="bottom">
-    <div class="meters glass"><MeterNZ/><MeterT/></div>
     <div class="row2">
-      <button type="button" class="ticker glass" onClick={() => G.setTab("news")} key={S.log.length + ":" + (lg && lg.tk)}>
-        {lg ? <><Rich t={lg.txt} cls={"txt " + (LCOL[lg.cls] || "fg")} iconColor="inherit"/></> : null}
-      </button>
+      <div class="meters glass"><MeterNZ/><MeterT/></div>
+      <span class="grow"/>
+      <ZoomBtns/>
       <nav class="tabbar glass">{tabs.map(([id, ic, key, kk]) => {
         const on = id === "tech" ? UIM.modal === "skills" : S.tab === id;
         return <button type="button" key={id} data-tab={id} class={`tabbtn ${on ? "on" : ""}`} title={`${t(key)} (${kk})`} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>

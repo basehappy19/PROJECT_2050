@@ -3,22 +3,22 @@ import {P, S, t, L, up, COL, relCol, UIM, bump, RSHORT} from "../core.js";
 import {Audio} from "../audio.js";
 import {G} from "../game.js";
 import {GameMap} from "../map2d.js";
-import {Icon, Rich} from "./icon.jsx";
+import {Icon, Rich, plain} from "./icon.jsx";
 import {Btn, IconBtn, RelBar, Meter, H3, GroupList, GroupTilt} from "./widgets.jsx";
 
 const IC = () => P.IC;
 const costLabel = c => [c.ep ? `${IC().ep} ${c.ep}` : "", c.pc ? `${IC().pc} ${c.pc}` : "", c.ore ? `${IC().ore} ${c.ore}` : ""].filter(Boolean).join("  ");
 /* what a country has (real resources), what it sends us, and how far it has gone with green technology */
-function Resources({c}){
+function Resources({c, noGreen}){
   const refs = P.refinesList ? P.refinesList(c.id) : [];
   const cr = P.CRES[c.id], imp = P.IMPORTERS.includes(c.id), src = S.oreOn && P.oreSources().find(x => x.id === c.id), ban = (S.oreBan || {})[c.id];
   return <>
-    <div class="card greencard" title={t("greenHelp")}>
+    {!noGreen ? <div class="card greencard" title={t("greenHelp")}>
       <div class="row"><span class="muted"><Rich t={`[[leaf]] ${t("greenTech")}`} iconColor="good"/></span><b class="mono good">{Math.round(c.green || 0)}%</b></div>
       <Meter v={(c.green || 0) / 100} color="good" h={6}/>
-    </div>
+    </div> : null}
     {cr || imp || refs.length ? <>
-      <H3>{t("resTitle")}</H3>
+      {!noGreen ? <H3>{t("resTitle")}</H3> : null}
       {cr ? <div class="restiles">{cr.r.map(k => { const R = P.RES[k], g = P.groupOf && P.groupOf(k), ready = g && refs.includes(g); return <div class="rt" key={k} title={L(R.fact)} style={{"--rc":R.col}}>
         <Icon n={"$res-" + k} size={38}/><span>{L(R.name).replace(/\s*\(.*\)$/, "")}</span>
         {g ? <em class={"rtag " + (ready ? "ok" : "raw")}>{ready ? t("resReady") : t("resRaw")}</em> : null}
@@ -51,24 +51,56 @@ export function Drawer(){
   </aside>;
 }
 
+let chipSel = null;   // scroll the chosen region's chip into view only when the choice changes
 function RegionButtons(){
-  return <div class="regbtns">{S.regions.map(r => {
-    const c = P.heatRGB(P.regionHeatValue(r));
-    return <button type="button" key={r.id} class={r.id === S.sel && !S.selC ? "on" : ""} onPointerEnter={() => Audio.hover()} onClick={() => G.selectRegion(r.id, true)}>
+  return <div class="regbtns rowscroll">{S.regions.map(r => {
+    const c = P.heatRGB(P.regionHeatValue(r)), on = r.id === S.sel && !S.selC;
+    return <button type="button" key={r.id} class={on ? "on" : ""} ref={el => { if (el && on && chipSel !== r.id){ chipSel = r.id; requestAnimationFrame(() => el.scrollIntoView({inline:"center", block:"nearest", behavior:"smooth"})); } }} onPointerEnter={() => Audio.hover()} onClick={() => G.selectRegion(r.id, true)}>
       <span>{L(RSHORT[r.id])}</span><i style={{background:`rgb(${c.join(",")})`}}/>
     </button>;
   })}</div>;
 }
 const StatGrid = ({stats}) => <div class="statgrid">{stats.map(([a, b, col], i) => <div key={i} class="stat"><span><Rich t={a}/></span><b class={col || ""}>{b}</b></div>)}</div>;
+/* ---------- 3.2 (design C): friendship ring, one line per order with its effects as chips ---------- */
+const FX_IC = [[/มิตรภาพ|friendship/i, "$heart"], [/CO₂/, "$co2"], [/ปรับตัว|adaptation|เสียหาย|damage/i, "shield"], [/ทรัพยากร|mineral/i, "gem"],
+  [/ทำตามแผน|on-plan/i, "clipboard-check"], [/ความนิยม|approval/i, "$appr"], [/เปราะบาง|vulnerab/i, "shield"], [/คว่ำบาตร|sanction/i, "ban"]];
+/* the order's own description, cut into short effect chips (so they always match the game data) */
+function fxChips(desc){
+  const txt = plain(desc).replace(/\s*\([^)]*\)/g, "")
+    .replace(/ทรัพยากรที่ประเทศนี้มี/g, "ทรัพยากร").replace(/ภัยในประเทศนี้/g, "ภัย").replace(/มิตรภาพกับประเทศนี้/g, "มิตรภาพ").replace(/(ของ)?ประเทศนี้/g, "")
+    .replace(/this country's minerals/gi, "Minerals").replace(/ with this country/gi, "").replace(/this country's\s*/gi, "").replace(/\s+/g, " ").trim();
+  const parts = txt.split(/\s*(?:,|;|และ|\sand\s|\sbut\s)\s*|(?<=[\d%])\s(?=มิตรภาพ|ความนิยม|ทำตามแผน|CO₂)|\s(?=แต่)/i).map(x => x.replace(/^(แต่|but|and)\s+|^แต่/i, "").trim()).filter(Boolean);
+  return parts.slice(0, 5).map(x => {
+    const bad = /คว่ำบาตร|sanction|ตอบโต้/i.test(x) || (/CO₂/.test(x) ? /\+\d/.test(x) : (/−|-\d/.test(x) && /มิตรภาพ|ทำตามแผน|ความนิยม|friendship|on-plan|approval/i.test(x)));
+    const icon = (FX_IC.find(([re]) => re.test(x)) || [0, "sparkles"])[1];
+    return {t:x, bad, icon};
+  });
+}
+/* Rich text plus [b]bold[/b] */
+const RichB = ({t:txt, iconColor}) => <span>{String(txt).split(/\[b\](.*?)\[\/b\]/).map((p, i) => i % 2 ? <b key={i} class="fg">{p}</b> : <Rich key={i} t={p} iconColor={iconColor}/>)}</span>;
+const Chips = ({desc}) => <div class="fxs">{fxChips(desc).map((c, i) => <span key={i} class={"fx " + (c.bad ? "bad" : "good")}><Icon n={c.icon} size={12}/>{c.t}</span>)}</div>;
+function OrderLine({icon, name, desc, cost, cd, ok, onClick, tilt, data}){
+  return <div class={"oline " + (ok ? "" : "dim")} title={plain(desc)} data-cact={data}>
+    <Icon n={icon} size={18} cls="olic"/>
+    <div class="olm"><b>{name}</b><Chips desc={desc}/>{tilt ? <GroupTilt list={tilt}/> : null}</div>
+    <Btn kind={ok ? "primary" : "ghost"} disabled={!ok} sound={null} onClick={onClick}>{cd ? `${t("cooldown")} ${cd}` : costLabel(cost)}</Btn>
+  </div>;
+}
+function RelRing({rel}){
+  const col = relCol(rel);
+  return <div class={"relring " + col} style={{"--p":Math.min(100, Math.abs(rel)), "--rc":COL[col]}} title={t(rel >= 50 ? "relHigh" : rel >= 0 ? "relMid" : "relLow")}>
+    <b class="mono">{rel >= 0 ? "+" : ""}{Math.round(rel)}</b><small>{t("relation")}</small>
+  </div>;
+}
+const TT = (th, en) => (S.lang === "th" ? th : en);
 
+const ACT_IC = {fund:"zap", diplo:"globe", adapt:"shield-plus", tariff:"landmark"};
 function OrderCards({scope}){
   const r = P.R(S.sel);
-  return <div class="cards">{P.ACTIONS.map(a => {
+  return <div class="olist">{P.ACTIONS.map(a => {
     const cc = scope === "country", c = P.actionCost(a, r, cc), cd = r.cd[a.id] || 0, ok = !cd && S.ep >= c.ep && S.pc >= c.pc;
-    return <div class="card row" key={a.id}>
-      <div class="grow"><b>{L(a.name)}</b><span class="muted"><Rich t={cc ? L(P.UI["cact_" + a.id]) : L(a.desc)}/></span>{P.tiltOfAction ? <GroupTilt list={P.tiltOfAction(a.id)}/> : null}</div>
-      <Btn kind={ok ? "primary" : "ghost"} disabled={!ok} sound={null} onClick={() => P.doAction(a.id, scope)}>{cd ? `${t("cooldown")} ${cd}` : costLabel(c)}</Btn>
-    </div>;
+    return <OrderLine key={a.id} icon={a.icon || ACT_IC[a.id] || "megaphone"} name={L(a.name)} desc={cc ? L(P.UI["cact_" + a.id]) : L(a.desc)} cost={c} cd={cd} ok={ok}
+      tilt={P.tiltOfAction ? P.tiltOfAction(a.id) : null} onClick={() => P.doAction(a.id, scope)}/>;
   })}</div>;
 }
 
@@ -76,15 +108,17 @@ function PaneRegion(){
   const meta = P.RMETA[S.sel], r = P.R(S.sel), al = S.alli[S.sel];
   const list = P.regCountries(S.sel).slice().sort((a, b) => b.co2 - a.co2), tot = r.co2 || 1;
   return <>
-    <RegionButtons/>
-    <h3 class="title">{L(meta.name)}</h3>
-    <StatGrid stats={[[t("co2Now"), `${r.co2.toFixed(2)} Gt`, "hot"], [t("co2Start"), `${r.co2_0.toFixed(1)} Gt`], [t("compliance"), `${r.comp.toFixed(0)}%`], [t("vuln"), `${r.vuln.toFixed(0)}%`, r.vuln > 60 ? "bad" : ""]]}/>
+    <div class="pstick"><RegionButtons/></div>
+    <h3 class="title big">{L(meta.name)}</h3>
+    <p class="muted sub statline"><RichB t={`${t("co2Now")} [b]${r.co2.toFixed(2)} Gt[/b] · ${t("compliance")} [b]${r.comp.toFixed(0)}%[/b] · ${t("vuln")} [b]${r.vuln.toFixed(0)}%[/b]`}/></p>
     {al ? <div class="card good-b"><b class="good"><Rich t={`[[handshake]] ${t("allyOn")}`} iconColor="inherit"/></b><span class="muted">{P.joinNames(al.members)}</span></div>
       : S.owned.D3 ? <div class="card row">
         <div class="grow"><b><Rich t={`[[handshake]] ${t("allyForm")}`}/></b><span class="muted">{t("allyNeed")} ({P.allyCandidates(S.sel).length}/3)</span></div>
         <Btn disabled={!P.canAlly(S.sel)} kind={P.canAlly(S.sel) ? "primary" : "ghost"} onClick={() => { P.formAlliance(S.sel); Audio.play("bell"); }}>{`${IC().pc} ${P.ALLY_COST.pc}`}</Btn>
       </div> : null}
-    <H3>{t("countriesIn")}</H3>
+    <H3>{`${TT("คำสั่งเฉพาะทวีป", "Orders for the region of")} ${L(meta.name)}`}</H3>
+    <OrderCards scope="region"/>
+    <H3>{`${TT("ประเทศในทวีป", "Countries")} (${list.length})`}</H3>
     <div class="clist">{list.map(c => {
       const hz = !c.rest && S.haz.find(h => h.c === c.id);
       return <button type="button" key={c.id} class="crow" onPointerEnter={() => Audio.hover()} onClick={() => G.selectCountry(c.id)}>
@@ -93,8 +127,6 @@ function PaneRegion(){
         {!c.rest ? <><RelBar rel={c.rel}/><b class={"mono rel " + relCol(c.rel)}>{Math.round(c.rel)}</b></> : <Icon n="chevron-right" size={16} color="muted"/>}
       </button>;
     })}</div>
-    <H3>{t("ordersRegion")}</H3>
-    <OrderCards scope="region"/>
   </>;
 }
 
@@ -105,14 +137,13 @@ function BaseCard({c}){
     <b><Rich t={`[[flag]] ${L(W.title)}`} iconColor="accent"/></b>
     {hq ? <p class="good small"><Rich t={`[[landmark]] ${L(W.hqHere)}`} iconColor="inherit"/></p> : null}
     {amb ? <p class="good small"><Rich t={`[[flag]] ${L(W.ambHere)}`} iconColor="inherit"/></p> : null}
-    <small class="muted">{L(W.ambHelp)}</small>
     <div class="row gap wrap">
       {amb ? <Btn kind="ghost" onClick={() => P.ambRecall(c.id)}>{L(W.ambRecall)}</Btn>
         : <Btn kind={P.ambOk(c) ? "primary" : "ghost"} disabled={!P.ambOk(c)} onClick={() => { if (P.ambSend(c.id)) Audio.play("bell", {vol:.7}); }}>{`${L(W.ambSend)} · ${IC().pc} ${ka.pc} · ${(S.amb || []).length}/${P.AMB_MAX}`}</Btn>}
       {!hq ? <Btn kind={P.hqOk(c) ? "primary" : "ghost"} disabled={!P.hqOk(c)} onClick={() => { if (P.moveHQ(c.id)) Audio.play("bell", {vol:.7}); }}>{S.hqCd > 0 ? `${L(W.hqWait)} ${S.hqCd} ${t("months")}` : `${L(W.hqSet)} · ${IC().ep} ${kh.ep} ${IC().pc} ${kh.pc}`}</Btn> : null}
     </div>
     {!amb && (S.amb || []).length >= P.AMB_MAX ? <small class="warn">{L(W.ambFull)}</small> : null}
-    {!hq ? <small class="muted">{L(W.hqHelp)}</small> : null}
+    <small class="muted helpline"><span title={L(W.ambHelp)}><Icon n="info" size={13}/> {TT("ทูตทำอะไร", "What envoys do")}</span>{!hq ? <span title={L(W.hqHelp)}><Icon n="info" size={13}/> {TT("ฐานบัญชาการ", "Home base")}</span> : null}</small>
   </div>;
 }
 
@@ -142,37 +173,49 @@ function PaneCountry(){
   const r = P.R(c.reg), meta = c.rest ? null : P.COUNTRY[c.id], hz = S.haz.find(h => h.c === c.id);
   const share = c.co2 / (r.co2 || 1), member = S.alli[c.reg] && S.alli[c.reg].members.includes(c.id);
   const afford = S.ep >= P.BILAT_COST.ep && S.pc >= P.BILAT_COST.pc;
+  const sanct = (S.sanct || {})[c.id] > 0, name = P.cname(c.id), BIL = 40;
+  /* 3.2 (design C + the friendship ring of design A): name and numbers on top, then every order as one line */
   return <>
-    <h3 class="title big">{P.cname(c.id)}</h3>
-    <p class="muted sub"><Rich t={L(P.RMETA[c.reg].name) + (member ? ` · [[handshake]] ${t("allyMember")}` : "")} iconColor="good"/></p>
-    {!c.rest ? <div class="card relcard">
-      <div class="row"><span class="muted">{t("relation")}</span><b class={"mono big " + relCol(c.rel)}>{c.rel >= 0 ? "+" : ""}{Math.round(c.rel)}</b></div>
-      <RelBar rel={c.rel}/>
-      <small class="muted">{t(c.rel >= 50 ? "relHigh" : c.rel >= 0 ? "relMid" : "relLow")}</small>
+    <div class="chead">
+      <div class="grow">
+        <h3 class="title big">{name}</h3>
+        <p class="muted sub"><Rich t={L(P.RMETA[c.reg].name) + (member ? ` · [[handshake]] ${t("allyMember")}` : "")} iconColor="good"/></p>
+        <p class="muted sub statline"><RichB t={`CO₂ [b]${P.fmtCO2(c.co2)}[/b] · ${t("shareOfRegion")} [b]${Math.round(share * 100)}%[/b]` + (c.rest ? "" : ` · ${t("risk")} [b]${meta.risk}%[/b] · ${t("adapt")} [b]${Math.round(c.adapt)}[/b] · [[leaf]] [b]${Math.round(c.green || 0)}%[/b]`)} iconColor="good"/></p>
+      </div>
+      {!c.rest ? <RelRing rel={c.rel}/> : null}
+    </div>
+    {!c.rest && (c.rel <= P.HOSTILE || sanct) ? <div class="cwarn">
       {c.rel <= P.HOSTILE ? <small class="bad"><Rich t={`[[angry]] ${t("relHostile")}`} iconColor="inherit"/></small> : null}
-      {(S.sanct || {})[c.id] > 0 ? <small class="bad"><Rich t={`[[ban]] ${t("relSanct")} ${S.sanct[c.id]} ${t("months")} · ${IC().ep} −${P.sanctCost(c)}${t("perMo")}`} iconColor="inherit"/></small> : null}
+      {sanct ? <small class="bad"><Rich t={`[[ban]] ${t("relSanct")} ${S.sanct[c.id]} ${t("months")} · ${IC().ep} −${P.sanctCost(c)}${t("perMo")}`} iconColor="inherit"/></small> : null}
     </div> : null}
-    <StatGrid stats={[[t("co2Now"), P.fmtCO2(c.co2), "hot"], [t("shareOfRegion"), `${Math.round(share * 100)}%`], [t("risk"), c.rest ? "—" : `${meta.risk}%`, meta && meta.risk >= 65 ? "bad" : ""], [t("adapt"), `${Math.round(c.adapt)}`]]}/>
-    {S.world && !c.rest ? <BaseCard c={c}/> : null}
-    {!c.rest ? <Resources c={c}/> : null}
-    {meta ? <div class="hzchips"><small class="muted">{t("hazardsHere")}</small>{meta.hz.map(h => <span key={h}><Icon n={P.HAZARDS[h].icon} size={14}/>{L(P.HAZARDS[h].name)}</span>)}</div> : null}
     {hz ? <div class="card row bad-b">
       <div class="grow"><b class="bad"><Rich t={`[[${P.HAZARDS[hz.type].icon}]] ${t("forecast")}: ${L(P.HAZARDS[hz.type].name)} · ${Math.max(0, hz.at - S.tick)} ${t("months")}`} iconColor="inherit"/></b></div>
       <Btn kind={hz.evac ? "ghost" : "danger"} disabled={hz.evac || S.ep < P.evacCost()} onClick={() => { if (P.evacuate(hz.id)) Audio.play("shield"); }}>{hz.evac ? `[[check]] ${t("evacuated")}` : `${t("evacuate")} · ${IC().ep} ${P.evacCost()}`}</Btn>
     </div> : null}
-    {!c.rest ? <>
-      <H3>{t("ordersCountry")}</H3>
-      <div class="cards">{P.CACTS.filter(a => !a.req || S.owned[a.req]).map(a => {
+    {c.rest ? <>
+      <H3>{`${TT("คำสั่งเฉพาะทวีป", "Orders for the region of")} ${L(P.RMETA[c.reg].name)}`}</H3>
+      <OrderCards scope="region"/>
+    </> : <>
+      {c.rel < BIL ? <div class="goalbar" title={t("bilatTitle")}>
+        <Icon n="target" size={15}/><span><RichB t={TT(`เป้าหมายถัดไป: มิตรภาพ [b]${BIL}[/b] เพื่อปลดล็อก [b]ข้อตกลงทวิภาคี[/b]`, `Next: friendship [b]${BIL}[/b] unlocks a [b]bilateral agreement[/b]`)}/></span>
+        <i class="gb"><b style={{width:`${Math.max(0, Math.min(1, c.rel / BIL)) * 100}%`}}/></i>
+      </div> : null}
+      <H3>{`${TT("สั่งการกับ", "Orders with")} ${name}`}</H3>
+      <div class="olist">{P.CACTS.filter(a => !a.req || S.owned[a.req]).map(a => {
         const k = P.cactCost(a), cd = c.cd[a.id] || 0, ok = P.cactOk(a, c);
-        return <div class="card row" key={a.id} data-cact={a.id}>
-          <div class="grow"><b><Rich t={`[[${a.icon}]] ${L(a.name)}`} iconColor="accent"/></b><span class="muted"><Rich t={L(a.desc)}/></span></div>
-          <Btn kind={ok ? "primary" : "ghost"} disabled={!ok} sound={null} onClick={() => { const before = c.rel; P.countryAction(a.id); if (c.rel > before) Audio.play("relUp", {delay:.1}); }}>{cd ? `${t("cooldown")} ${cd}` : costLabel(k)}</Btn>
-        </div>;
+        return <OrderLine key={a.id} data={a.id} icon={a.icon} name={L(a.name)} desc={L(a.desc)} cost={k} cd={cd} ok={ok}
+          onClick={() => { const before = c.rel; P.countryAction(a.id); if (c.rel > before) Audio.play("relUp", {delay:.1}); }}/>;
       })}</div>
-      <Bilateral c={c} afford={afford}/>
-    </> : null}
-    <H3>{`${t("ordersRegion")} · ${c.rest ? L(P.RMETA[c.reg].name) : t("thisCountryOnly")}`}</H3>
-    <OrderCards scope={c.rest ? "region" : "country"}/>
+      {c.rel >= BIL ? <Bilateral c={c} afford={afford}/> : null}
+      <H3>{`${TT("คำสั่งเฉพาะประเทศ", "Orders for")} ${name}`}</H3>
+      <OrderCards scope="country"/>
+      <details class="more" open={UIM.cInfo || undefined} onToggle={e => { UIM.cInfo = e.currentTarget.open; }}>
+        <summary><Icon n="chevron-right" size={15} cls="chev"/>{TT("ทรัพยากรและภัยที่เกิดบ่อย", "Resources and common hazards")}</summary>
+        <Resources c={c} noGreen/>
+        {meta ? <div class="hzchips"><small class="muted">{t("hazardsHere")}</small>{meta.hz.map(h => <span key={h}><Icon n={P.HAZARDS[h].icon} size={15}/>{L(P.HAZARDS[h].name)}</span>)}</div> : null}
+      </details>
+      {S.world ? <BaseCard c={c}/> : null}
+    </>}
   </>;
 }
 
