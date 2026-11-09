@@ -30,6 +30,8 @@ const CATS = {
   sanct:{icon:"ban", t:T("ถูกคว่ำบาตร", "Sanctions")},
   protest:{icon:"megaphone", t:T("ประท้วง", "Protests")},
   bond:{icon:"banknote", t:T("ผ่อนพันธบัตร", "Bond repayments")},
+  harvest:{icon:"wheat", t:T("ผลผลิตเกษตรตามฤดู", "Seasonal harvest")},
+  season:{icon:"award", t:T("รางวัลสรุปฤดู", "Season rewards")},
   other:{icon:"ellipsis", t:T("อื่น ๆ", "Other")},
 };
 const year = () => 2026 + Math.floor((S.tick || 0) / 12);

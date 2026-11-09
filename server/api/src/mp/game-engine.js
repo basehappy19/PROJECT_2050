@@ -1144,8 +1144,8 @@ const TUT = [
    body:{th:["[[$money]] เงิน = เงิน · [[$policy]] แต้มนโยบาย = อำนาจ · [[$appr]] ความนิยม ถ้าเหลือ 0% จะถูกถอดถอน","ซ้ายบนคือตัวละครของคุณ แตะปุ่มใต้รูปเพื่อใช้สกิลพิเศษ (มีเวลาพัก)","เล่นจบได้ XP เลื่อนเลเวล · เลเวล 5 ได้สกิลพิเศษที่สอง"],
          en:["[[$money]] Money = money · [[$policy]] Policy points = clout · [[$appr]] Approval: hit 0% and you're removed","Top left is your character: tap the buttons below it for special skills (with cooldowns)","Finishing games earns XP; level 5 unlocks a second special skill"]}},
   {img:"t4-regions.jpg", title:{th:"แผนที่ ทวีป และประเทศ",en:"Map, regions and countries"},
-   body:{th:["แตะทวีปเพื่อซูมเข้าไป แล้วแตะประเทศเพื่อเปิดแผงสั่งการ","[[$heart]] มิตรภาพสูง = ร่วมมือดี ทำข้อตกลงและตั้งพันธมิตรได้","ซูม: ปุ่ม + − ล้อเมาส์ หรือถ่างสองนิ้ว · แตะสองครั้งเพื่อดูทั้งโลก"],
-         en:["Tap a region to zoom in, then tap a country to open its orders","[[$heart]] High friendship = cooperation, deals and alliances","Zoom: + − buttons, mouse wheel or pinch · double-tap for the whole world"]}},
+   body:{th:["แตะทวีปเพื่อซูมเข้าไป แล้วแตะประเทศเพื่อเปิดแผงสั่งการ","[[$heart]] มิตรภาพสูง = ร่วมมือดี ทำข้อตกลงและตั้งพันธมิตรได้","ซูม: ถ่างสองนิ้ว หรือแตะสองครั้งเพื่อซูมเข้า · สองนิ้วแตะพร้อมกัน = ซูมออก · ปัดแผนที่แรง ๆ ให้เลื่อนไหลต่อ"],
+         en:["Tap a region to zoom in, then tap a country to open its orders","[[$heart]] High friendship = cooperation, deals and alliances","Zoom: pinch, or double-tap to zoom in · tap with two fingers to zoom out · flick the map to glide · mouse: wheel, double-click = whole world"]}},
   {img:"t5-bubbles.jpg", title:{th:"ภัยเฉพาะถิ่นและฟอง",en:"Local hazards and bubbles"},
    body:{th:["[[cloud-lightning]] ไอคอนกะพริบ = พยากรณ์ภัย แตะเพื่อสั่งอพยพก่อนภัยมาถึง","[[siren]] หลังภัยถล่มจะมีฟองแดง แตะเพื่อส่งความช่วยเหลือ (มิตรภาพขึ้น)","[[sprout]] ฟองเขียว: แตะเพื่อเก็บเงินฟรี"],
          en:["[[cloud-lightning]] A pulsing icon = hazard forecast. Tap it to evacuate in time","[[siren]] After a hazard a red bubble appears. Tap to send aid (friendship improve)","[[sprout]] Green bubbles: tap to collect free Money"]}},
@@ -1727,7 +1727,28 @@ const gradeOf = temp => temp < 1.6 ? "S" : temp < 2.0 ? "A" : "B";
 /* ---------------- Terra rewards (shown in the UI; the server decides the real amount) ---------------- */
 const TERRA = {win:15, l3:6, l2:3, l1:2, bonusMax:8, capGame:23, capHard:34, hardMult:1.5};   // 1.7: gems are rarer
 
-Object.assign(P, {COUNTRIES, COUNTRY, COUNTRY_BY_GEO, REST_W, SHORT, HAZARDS, CEVENTS, CE_FIXED, CHARS, CHAR, LEVELS, levelOf, SHOP, PRICE, STORY, ADVISOR, ENDINGS, gradeOf, TERRA});
+/* 3.7.3: what each side says on the dispute screen (one line each, short) */
+const CE_SAY = {
+  CE_BATTERY:{A:{th:"โรงงานนี้สร้างงานเป็นหมื่น และทำแบตให้รถไฟฟ้าทั้งโลก",en:"Ten thousand jobs, and batteries for the world's electric cars"}, B:{th:"ควันพิษลอยมาบ้านเรา แล้วโรงงานเราก็จะเจ๊ง",en:"Their fumes drift over us, and our own factories go bust"}},
+  CE_COAL:{A:{th:"ขอสร้างเถอะ เศรษฐกิจเราจะโต",en:"Let us build. Our economies need to grow"}, B:{th:"อย่าสร้าง! เราโดนภัยพิบัติก่อนใคร",en:"Don't! We're the first to be hit by disasters"}},
+  CE_DAM:{A:{th:"แม่น้ำไหลผ่านเรา เราก็ควรได้ไฟจากมัน",en:"The river runs through us, so its power is ours"}, B:{th:"ถ้ากั้นน้ำ นาและปลาของเราตายหมด",en:"Dam it and our fields and fish die"}},
+  CE_FOREST:{A:{th:"ป่าคือรายได้ ประชาชนเราต้องกินต้องใช้",en:"The forest is income. Our people need to eat"}, B:{th:"ตัดป่าเมื่อไร เราเลิกซื้อของคุณทันที",en:"Cut it down and we stop buying from you"}},
+  CE_CBAM:{A:{th:"ใครปล่อยคาร์บอน ก็ต้องจ่ายค่าคาร์บอน",en:"If you emit carbon, you pay for carbon"}, B:{th:"นี่คือกำแพงภาษีชัด ๆ เราจะตอบโต้",en:"That's a trade wall. We'll hit back"}},
+  CE_REFUGEE:{A:{th:"บ้านเราจมน้ำแล้ว ช่วยรับคนของเราด้วย",en:"Our homes are under water. Please take our people"}, B:{th:"เรารับไม่ไหว บ้านเราก็มีปัญหาเหมือนกัน",en:"We can't take more. We have problems too"}},
+  CE_SEABED:{A:{th:"แร่ใต้ทะเลทำแบตได้ถูกลงครึ่งหนึ่ง",en:"Seabed metals make batteries half the price"}, B:{th:"ทะเลลึกพังแล้วไม่มีวันกลับมา",en:"Once the deep sea breaks, it never comes back"}},
+  CE_NUKE:{A:{th:"ไฟฟ้าสะอาดและมั่นคง ไม่ปล่อยคาร์บอน",en:"Clean, steady power with no carbon"}, B:{th:"ถ้าระเบิดขึ้นมา คนของเราอยู่ห่างแค่นิดเดียว",en:"If it blows, our people are right next door"}},
+  CE_ARCTIC:{A:{th:"น้ำแข็งละลายแล้ว น้ำมันอยู่ตรงหน้า",en:"The ice is gone and the oil is right there"}, B:{th:"ยิ่งขุด น้ำแข็งยิ่งละลายเร็วขึ้น",en:"Drill it and the ice melts even faster"}},
+  CE_LOSS:{A:{th:"พวกคุณปล่อยควัน แต่พวกเราจ่ายค่าเสียหาย",en:"You made the smoke, we pay the damage"}, B:{th:"เราไม่ใช่คนเดียวที่ทำให้โลกร้อน",en:"We're not the only ones who warmed the world"}},
+  CE_SOLARWAR:{A:{th:"แผงถูกลง ทุกคนก็ติดโซลาร์ได้",en:"Cheaper panels mean solar for everyone"}, B:{th:"ขายต่ำกว่าทุน โรงงานเราปิดหมดแน่",en:"Sold below cost, they'll shut our factories"}},
+  CE_GEOENG:{A:{th:"โลกร้อนเกินรอแล้ว ต้องลองบังแดด",en:"It's too hot to wait. Let's shade the sun"}, B:{th:"ถ้าฝนมรสุมเปลี่ยน ใครจะเลี้ยงคนของเรา",en:"If the monsoon shifts, who feeds our people?"}},
+  CE_MARINE:{A:{th:"ปิดทะเลสักพัก ปลาและปะการังจะกลับมา",en:"Close the sea a while and the fish come back"}, B:{th:"ชาวประมงของเราจะไม่มีอะไรกิน",en:"Our fishers will have nothing to eat"}},
+  CE_PALM:{A:{th:"ไบโอดีเซลจากปาล์มช่วยลดน้ำมัน",en:"Palm biodiesel cuts our oil use"}, B:{th:"นี่คือการตัดป่าฝนในชื่อใหม่",en:"That's rainforest clearing with a new name"}},
+  CE_DATA:{A:{th:"AI ต้องการไฟเยอะ ก๊าซหาได้เร็วที่สุด",en:"AI needs power, and gas is quickest"}, B:{th:"ถ้าจะสร้าง ก็ใช้พลังงานสะอาดสิ",en:"If you build it, run it on clean power"}},
+  CE_RAIL:{A:{th:"รถไฟเชื่อมเรา เดินทางเร็วและไม่ต้องบิน",en:"A railway links us: fast, and no flying"}, B:{th:"หนี้ก้อนโตและที่ดินของประชาชนจะหายไป",en:"Huge debts, and people lose their land"}}
+};
+/* 3.7.3: ISO 3166 alpha-2 code of each country, for its flag picture (assets/img/flags/<code>.webp, from flag-icons, MIT) */
+const FLAG2 = {"USA": "us", "CAN": "ca", "MEX": "mx", "CUB": "cu", "GTM": "gt", "DOM": "do", "HTI": "ht", "PAN": "pa", "CRI": "cr", "JAM": "jm", "RUS": "ru", "DEU": "de", "GBR": "gb", "FRA": "fr", "ITA": "it", "POL": "pl", "ESP": "es", "TUR": "tr", "UKR": "ua", "NLD": "nl", "SWE": "se", "NOR": "no", "GRC": "gr", "PRT": "pt", "BEL": "be", "CZE": "cz", "ROU": "ro", "CHE": "ch", "AUT": "at", "IRL": "ie", "FIN": "fi", "DNK": "dk", "HUN": "hu", "ISL": "is", "CHN": "cn", "JPN": "jp", "KOR": "kr", "TWN": "tw", "KAZ": "kz", "UZB": "uz", "MNG": "mn", "PRK": "kp", "BRA": "br", "ARG": "ar", "COL": "co", "CHL": "cl", "PER": "pe", "VEN": "ve", "ECU": "ec", "BOL": "bo", "URY": "uy", "SAU": "sa", "IRN": "ir", "ZAF": "za", "EGY": "eg", "ARE": "ae", "IRQ": "iq", "DZA": "dz", "NGA": "ng", "ISR": "il", "MAR": "ma", "KEN": "ke", "ETH": "et", "QAT": "qa", "KWT": "kw", "COD": "cd", "OMN": "om", "JOR": "jo", "GHA": "gh", "TZA": "tz", "AGO": "ao", "MOZ": "mz", "MDG": "mg", "IND": "in", "IDN": "id", "THA": "th", "VNM": "vn", "MYS": "my", "PHL": "ph", "PAK": "pk", "BGD": "bd", "AUS": "au", "NZL": "nz", "MMR": "mm", "LKA": "lk", "KHM": "kh", "SGP": "sg", "LAO": "la", "NPL": "np", "BRN": "bn", "PNG": "pg", "FJI": "fj", "SVK": "sk", "SVN": "si", "SRB": "rs", "MNE": "me", "MDA": "md", "MKD": "mk", "LUX": "lu", "LTU": "lt", "LVA": "lv", "EST": "ee", "GEO": "ge", "CYP": "cy", "HRV": "hr", "BGR": "bg", "BIH": "ba", "BLR": "by", "AZE": "az", "ARM": "am", "ALB": "al", "XKX": "xk", "ZWE": "zw", "ZMB": "zm", "YEM": "ye", "UGA": "ug", "TUN": "tn", "TGO": "tg", "SYR": "sy", "SWZ": "sz", "SSD": "ss", "SDN": "sd", "SOM": "so", "SLE": "sl", "SEN": "sn", "RWA": "rw", "NER": "ne", "NAM": "na", "MUS": "mu", "MRT": "mr", "MLT": "mt", "MLI": "ml", "MWI": "mw", "LBY": "ly", "LBR": "lr", "LBN": "lb", "PSE": "ps", "GIN": "gn", "GAB": "ga", "CIV": "ci", "COG": "cg", "TCD": "td", "CMR": "cm", "BFA": "bf", "BWA": "bw", "BEN": "bj", "BHR": "bh", "AFG": "af", "TTO": "tt", "NIC": "ni", "HND": "hn", "SLV": "sv", "BLZ": "bz", "BHS": "bs", "BRB": "bb", "ATG": "ag", "LCA": "lc", "GRD": "gd", "PRY": "py", "GUY": "gy", "SUR": "sr", "TKM": "tm", "TJK": "tj", "KGZ": "kg", "HKG": "hk", "MAC": "mo", "BTN": "bt", "MDV": "mv", "TLS": "tl", "SLB": "sb", "VUT": "vu", "PLW": "pw"};
+Object.assign(P, {COUNTRIES, COUNTRY, COUNTRY_BY_GEO, REST_W, SHORT, CE_SAY, FLAG2, HAZARDS, CEVENTS, CE_FIXED, CHARS, CHAR, LEVELS, levelOf, SHOP, PRICE, STORY, ADVISOR, ENDINGS, gradeOf, TERRA});
 
 })();
 
@@ -2218,6 +2239,10 @@ P.CHANGELOG = [
     "น้ำแข็งรอบโลกและเมฆจางลง ไม่บังแผนที่ · เหตุการณ์ขึ้นแล้วแผนที่อยู่ที่เดิม ไม่เลื่อนไปเอง",
     "แผนที่เป็นสี่เหลี่ยมเต็มจอแบบ Plague Inc ไม่เป็นวงรีแล้ว ซูมออกสุดก็ยังเต็มจอ ไม่เห็นขอบ · น้ำแข็งเหลือเพียงแถบบาง ๆ จาง ๆ แตกเป็นแพตามขอบบนและล่างของแผนที่",
     "ลูกโลกหน้าโหลดและหน้าหลักเป็นแบบเดียวกัน (แสงแดด ด้านมืด เมฆ และขอบฟ้าสีฟ้า) · เมฆบนแผนที่เป็นแผ่นบาง ๆ จาง ๆ และน้อยลง · เอาแสงเหนือออก · แก้แผนที่ซ้อนกันหลังอัปเดต",
+    "ป้ายชื่อประเทศเล็กขึ้นเฉพาะตอนซูมใกล้ ๆ ประเทศหลักขึ้นเสมอ และป้ายที่ทับกันจะซ่อนไว้ ไม่รกเหมือนก่อน",
+    "ลูกโลกหน้าโหลดและหน้าหลักสว่างเท่ากันแล้ว · แถบล่างไม่ทับกันในจอขนาดกลาง (จอแคบขึ้นแค่ไอคอนเมนู) · มือถือ: แผนที่เลื่อนซ้ายขวาได้อิสระ ไม่ดีดกลับกลาง ปัดแรง ๆ ให้ไหลต่อ แตะสองครั้งซูมเข้า สองนิ้วแตะซูมออก และแผนที่พอดีพื้นที่ระหว่างแถบบนกับล่าง",
+    "หน้าข้อพิพาทระหว่างประเทศแบบใหม่: สองฝ่ายเผชิญหน้ากัน (VS) พร้อมธงชาติและคำพูดของแต่ละฝ่าย ทางเลือกบอกสั้น ๆ ว่าฝ่ายไหนพอใจหรือไม่พอใจ",
+    "ฤดูกาลสำคัญขึ้น: โซลาร์ผลิตไฟได้มากหน้าร้อนแต่น้อยหน้าฝน กังหันลมแรงช่วงพายุและหน้าหนาว · ไฟฟ้าพีคหน้าร้อนทำให้ไฟดับ (สกิลลดการใช้ไฟช่วงพีกช่วยได้) · ผลผลิตเกษตรขึ้นกับมรสุม · แผนที่มีหิมะ ฝน หมอกควัน และไอร้อนตามฤดู · ยิ่งโลกร้อน ฤดูยิ่งรุนแรง · จบฤดูได้เกรด A–F และรางวัล",
   ], [
     "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu.",
     "Fast mode: a 15-minute game without minerals or groups and with fewer events, great for a first game.",
@@ -2247,6 +2272,10 @@ P.CHANGELOG = [
     "The ice round the world and the clouds are fainter so they don't get in the way, and an event no longer moves the map.",
     "The map is now a full-screen rectangle like Plague Inc instead of an oval: fully zoomed out it still fills the screen and its edge never shows · the ice is just a thin, faint band of broken sea ice along the top and bottom of the map.",
     "The Earth on the loading screen and on the home screen now look the same (sunlight, dark side, clouds and a blue sky at the rim) · clouds on the map are fewer, thin and faint · no more northern lights · fixed the map pictures not lining up after an update.",
+    "Names of small countries only appear when you zoom in closer; main countries always show, and labels that would overlap are hidden, so the map is no longer cluttered.",
+    "The loading-screen and home-screen Earths are now equally bright · the bottom bar no longer overlaps on mid-size screens (narrow screens show menu icons only) · phones: pan the map freely without it jumping back to the middle, flick to glide, double-tap to zoom in, two-finger tap to zoom out, and the map fits between the top and bottom bars",
+    "A new screen for disputes between countries: the two sides face each other (VS) with their flags and say one line each; each choice simply says which side will be pleased or upset.",
+    "Seasons matter more: solar makes more in the hot season and less under monsoon clouds, wind farms do best in storm season and winter · a summer power peak causes blackouts (Demand Response helps) · the harvest depends on the monsoon · snow, rain, smoke and heat haze show on the map · seasons get harsher as the world warms · each season ends with a grade A–F and a reward.",
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",
@@ -2732,7 +2761,7 @@ const R = id => S.regions.find(r => r.id === id);
 const C = id => S.countries.find(c => c.id === id);
 const regCountries = (reg, withRest = true) => S.countries.filter(c => c.reg === reg && (withRest || !c.rest));
 const avg = f => S.regions.reduce((s,r) => s + f(r), 0) / S.regions.length;
-const grossCO2 = () => S.regions.reduce((s,r) => s + r.co2, 0);
+const grossCO2 = () => S.regions.reduce((s,r) => s + r.co2, 0) + (S.seasCO2 || 0);   // 3.7.3: + this month's seasonal swing (40-seasons.js)
 const sinkEff = () => clamp(1 - Math.max(0, S.temp - 1.2) * 0.3, 0.5, 1);
 const netCO2 = () => grossCO2() - S.sink * sinkEff();
 const lastMile = r => 0.2 + 0.8 * clamp(r.co2 / r.co2_0, 0, 1);
@@ -5359,6 +5388,8 @@ const CATS = {
   sanct:{icon:"ban", t:T("ถูกคว่ำบาตร", "Sanctions")},
   protest:{icon:"megaphone", t:T("ประท้วง", "Protests")},
   bond:{icon:"banknote", t:T("ผ่อนพันธบัตร", "Bond repayments")},
+  harvest:{icon:"wheat", t:T("ผลผลิตเกษตรตามฤดู", "Seasonal harvest")},
+  season:{icon:"award", t:T("รางวัลสรุปฤดู", "Season rewards")},
   other:{icon:"ellipsis", t:T("อื่น ๆ", "Other")},
 };
 const year = () => 2026 + Math.floor((S.tick || 0) / 12);
@@ -6093,5 +6124,150 @@ Object.assign(P.UI, {
   mpVersus:T("แข่งภูมิภาค", "Regional Race"), mpVersusD:T("2–4 คน แข่งกันถึง Net Zero ก่อน แต่อุณหภูมิโลกใช้ร่วมกัน", "2–4 players race to Net Zero, but share one temperature"),
 });
 Object.assign(P, {MP:{ROLES, ROLE, CAT_ROLE, ACTS, roleFor, assignRoles, coopBalance, VOTE_SEC, VS, BLOC_BONUS, applyBloc, pactCut, QUICK, EMOTES}});
+
+})();
+
+/* ---- 40-seasons.js ---- */
+(function(){
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.seasons) return;
+(P.mods = P.mods || {}).seasons = 1;
+/* =========================================================================
+   3.7.3 · Seasons that matter (they used to change only where disasters strike)
+   · Energy by season: solar makes more in the hot season and less under monsoon clouds; wind is strongest in the
+     storm season and in winter. Batteries (E3) halve the dip. Shown as a seasonal swing in world CO₂ (S.seasCO2,
+     added to gross CO₂ each month, not stored in the regions).
+   · Summer power peak: air-conditioning pushes CO₂ up in the hot season and the northern summer, and power cuts
+     cost approval — unless Demand Response (E9) is owned.
+   · Farming by season: each monsoon brings a good harvest (money) or floods / drought (approval, an aid bubble);
+     Drought-Proof Crops (A3) and Low-Methane Rice (A1) improve the odds, a hotter world worsens them.
+   · Seasons get harsher as the world warms (seasonPower): hazard season weights, the power peak and the farming
+     odds all scale with it.
+   · Season report: when a season ends it gets a grade A–F (CO₂, approval, disaster damage, aid) and A–C pay a reward.
+   (The seasonal look of the map is drawn in life.js drawSeason.)
+   ========================================================================= */
+const {S} = P;
+const T = (th, en) => ({th, en});
+const L = o => P.L(o);
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const hook = (name, ...a) => (P.H && P.H[name] ? P.H[name](...a) : undefined);
+const has = id => !!(S.owned && S.owned[id]);
+
+/* 1 = today's seasons; up to ~1.9 at +2.7°C */
+const seasonPower = () => 1 + clamp(S.temp - 1.2, 0, 1.5) * 0.6;
+
+/* idea 7: seasons get harsher with warming — the hazard weights move further from 1 */
+const _sw = P.seasonWeight;
+if (_sw) P.seasonWeight = (type, cid) => { const w = _sw(type, cid); return Math.max(.1, 1 + (w - 1) * seasonPower()); };
+
+const TXT = {
+  report:T("สรุปฤดู", "Season report"), next:T("ฤดูนี้", "Now"), reward:T("รางวัล", "Reward"),
+  tip:{
+    cool:T("ลมแรง กังหันลมผลิตไฟได้ดี · คลื่นหนาวทำให้ใช้พลังงานมาก", "Strong winds: wind farms do well · cold snaps use more energy"),
+    hot:T("แดดจัด โซลาร์ผลิตได้มาก · ไฟฟ้าพีคจากแอร์ · ฤดูไฟป่าและหมอกควัน", "Strong sun: solar does well · air-conditioning peak · fire and haze season"),
+    monsoon:T("เมฆฝนบังแดด โซลาร์ผลิตน้อย · ผลผลิตเกษตรขึ้นกับฝน · น้ำท่วมในเอเชีย", "Rain clouds: solar makes less · the harvest depends on the rain · floods in Asia"),
+    storm:T("พายุเฮอริเคนและไต้ฝุ่นบ่อย · ลมแรง กังหันลมผลิตไฟได้ดี", "Hurricanes and typhoons · strong winds: wind farms do well"),
+  },
+  peak:T("[[plug-zap]] ไฟฟ้าพีคหน้าร้อน: แอร์ทำให้ไฟตกและไฟดับ ความนิยมลดลง (สกิล “ระบบลดการใช้ไฟช่วงพีก” ช่วยได้)", "[[plug-zap]] Summer power peak: air-conditioning causes brownouts and blackouts, approval falls (the Demand Response skill helps)"),
+  peakOk:T("[[plug-zap]] ไฟฟ้าพีคหน้าร้อน: ระบบลดการใช้ไฟช่วงพีกรับมือได้ ไม่มีไฟดับ", "[[plug-zap]] Summer power peak: Demand Response handles it, no blackouts"),
+  good:T("[[wheat]] ฝนดี ผลผลิตเกษตรล้นตลาด", "[[wheat]] Good rains: a bumper harvest"),
+  flood:T("[[cloud-rain]] มรสุมหนักเกินไป นาข้าวจมน้ำ", "[[cloud-rain]] Too much monsoon rain: rice fields flooded"),
+  dry:T("[[sun]] ฝนทิ้งช่วง ภัยแล้งทำให้พืชผลเสียหาย", "[[sun]] The rains failed: drought ruins crops"),
+  normal:T("[[wheat]] ฤดูเพาะปลูกปกติ", "[[wheat]] An ordinary growing season"),
+  solarUp:T("แดดจัด โซลาร์ผลิตไฟได้มาก", "Strong sun, solar makes more"), solarDown:T("เมฆฝนบังแดด โซลาร์ผลิตไฟลดลง", "Rain clouds, solar makes less"),
+  windUp:T("ลมแรง กังหันลมผลิตไฟได้มาก", "Strong winds, wind farms make more"),
+};
+
+/* idea 2 + 3: this month's seasonal CO₂ swing (Gt; + = more CO₂) */
+function seasonCO2(id){
+  const k = seasonPower(), E2 = has("E2") ? 1 : 0, E7 = has("E7") ? 1 : 0, dip = has("E3") ? .5 : 1;
+  let v = 0;
+  if (id === "hot") v += -.25 * E2 - .1 * E7;   // strong sun
+  if (id === "monsoon") v += (.2 * E2 + .1 * E7) * dip;   // clouds
+  if (id === "storm") v += -.2 * E2;   // strong wind
+  if (id === "cool") v += -.1 * E2 + .15 * k * (has("C2") ? .5 : 1);   // wind · heating in a cold snap
+  if (id === "hot" || id === "monsoon") v += (has("E9") ? .1 : .4) * k * (id === "hot" ? 1 : .6);   // air-conditioning peak
+  return +v.toFixed(3);
+}
+
+/* idea 4: the harvest, decided once a year in the middle of the monsoon */
+function harvest(){
+  const k = seasonPower() - 1;
+  const pGood = clamp(.5 - k * .5 + (has("A3") ? .15 : 0) + (has("A1") ? .05 : 0), .1, .8);
+  const pBad = clamp(.15 + k * .55 - (has("A3") ? .1 : 0), .05, .7);
+  const r = P.rand();
+  if (r < pGood){
+    const g = 25 + Math.round(10 * P.rand()); S.ep += g; if (P.ledgerTag) P.ledgerTag("harvest", g, 0);
+    P.addLog(`${L(TXT.good)} · ${P.IC.ep} +${g}`, "gd"); hook("toast", {icon:"wheat", title:L(TXT.good).replace(/\[\[[^\]]+\]\]\s*/, ""), msg:`${P.IC.ep} +${g}`});
+    return;
+  }
+  if (r < pGood + pBad){
+    const flood = P.rand() < .55, a0 = S.appr; S.appr = clamp(S.appr - 3 * seasonPower(), 0, 100);
+    const pool = S.countries.filter(c => !c.rest && ["SEA", "SA", "MEAF", "EA"].includes(c.reg) && P.COUNTRY[c.id] && (P.COUNTRY[c.id].tags || []).some(x => x === "farm" || x === "vul"));
+    const c = pool[Math.floor(P.rand() * pool.length)];
+    if (c) S.bubbles.push({id:++S.bubId, type:"red", reg:c.reg, cid:c.id, hz:flood ? "flood" : "drought", ttl:5});
+    const txt = flood ? TXT.flood : TXT.dry;
+    P.addLog(`${L(txt)}${c ? " · " + P.cname(c.id) : ""} · ${L(T("ความนิยม", "Approval"))} ${(S.appr - a0).toFixed(1)}%`, "al");
+    hook("toast", {icon:flood ? "cloud-rain" : "sun", title:L(txt).replace(/\[\[[^\]]+\]\]\s*/, ""), msg:c ? `${P.cname(c.id)} · ${L(T("แตะฟองสีแดงเพื่อช่วยเหลือ", "Tap the red bubble to send aid"))}` : ""});
+    hook("sfx", "warn");
+    return;
+  }
+  P.addLog(L(TXT.normal), "ev");
+}
+
+/* idea 8: a grade for the season that just ended */
+const baseNet = () => P.netCO2() - (S.seasCO2 || 0);   // without the seasonal swing, so a season is graded on real progress
+function snap(){ return {tick:S.tick, net:baseNet(), appr:S.appr, dmg:(S.stats.dmg || []).length, aid:S.stats.aid || 0, evac:S.stats.evac || 0, sid:P.seasonOf(S.tick).id}; }
+function grade(a){
+  const net = baseNet(), hits = (S.stats.dmg || []).slice(a.dmg), dN = a.net - net, dA = S.appr - a.appr;
+  let pts = 0;
+  pts += dN > .4 ? 3 : dN > .1 ? 2 : dN > -.25 ? 1 : 0;
+  pts += dA >= 0 ? 2 : dA > -3 ? 1 : 0;
+  const avgD = hits.length ? hits.reduce((s, h) => s + h.d, 0) / hits.length : 0;
+  pts += !hits.length || avgD < .45 ? 2 : avgD < .8 ? 1 : 0;
+  pts += (S.stats.aid || 0) > a.aid || (S.stats.evac || 0) > a.evac ? 1 : 0;
+  const g = pts >= 7 ? "A" : pts >= 5 ? "B" : pts >= 4 ? "C" : pts >= 2 ? "D" : "F";
+  return {g, pts, dN, dA, hits:hits.length};
+}
+const REWARD = {A:{ep:40, pc:10}, B:{ep:20, pc:5}, C:null, D:null, F:null};
+
+function seasonsTick(){
+  if (!S.started || S.training) return;
+  const m = S.tick % 12, sea = P.seasonOf(S.tick);
+  S.seasCO2 = seasonCO2(sea.id);
+  // summer peak: approval
+  if ((sea.id === "hot" || (sea.id === "monsoon" && m === 5)) && !has("E9")) S.appr = clamp(S.appr - .35 * seasonPower(), 0, 100);
+  if (m === 6) harvest();
+  // a new season starts (months 2, 5, 8, 11)
+  if (m % 3 === 2){
+    const prev = S.seaSnap;
+    let head = "", msg = `${L(TXT.next)}: ${L(sea.name)} · ${L(TXT.tip[sea.id])}`;
+    if (prev && S.tick - prev.tick >= 2){
+      const r = grade(prev), rw = REWARD[r.g], pname = L((P.SEASONS.find(s => s.id === prev.sid) || sea).name);
+      if (rw){ S.ep += rw.ep; S.pc += rw.pc; if (P.ledgerTag) P.ledgerTag("season", rw.ep, rw.pc); }
+      S.seaGrades = (S.seaGrades || []).concat(r.g).slice(-40);
+      head = `${L(TXT.report)} ${pname}: ${r.g}`;
+      const rwTxt = rw ? ` · ${L(TXT.reward)} ${P.IC.ep} +${rw.ep}${rw.pc ? ` ${P.IC.pc} +${rw.pc}` : ""}` : "";
+      P.addLog(`[[award]] ${head} (CO₂ ${r.dN >= 0 ? "−" : "+"}${Math.abs(r.dN).toFixed(1)} Gt · ${L(T("ความนิยม", "approval"))} ${r.dA >= 0 ? "+" : ""}${r.dA.toFixed(1)}% · ${L(T("ภัยพิบัติ", "disasters"))} ${r.hits})${rwTxt}`, r.g <= "B" ? "gd" : r.g === "C" ? "ev" : "al");
+      msg = `${rw ? `${L(TXT.reward)} +${rw.ep}${rw.pc ? ` · +${rw.pc}` : ""} · ` : ""}${msg}`;
+      hook("sfx", r.g <= "B" ? "done" : "tick");
+    }
+    S.seaSnap = snap();
+    if (sea.id === "hot") P.addLog(L(has("E9") ? TXT.peakOk : TXT.peak), has("E9") ? "gd" : "al");
+    hook("toast", {id:"season", icon:sea.icon, title:head || L(sea.name), msg, grade:head ? head.slice(-1) : null});
+  }
+}
+/* what the season does to energy right now, for the HUD (short lines) */
+function seasonInfo(){
+  const sea = P.seasonOf(S.tick), out = [];
+  if (has("E2") && sea.id === "hot") out.push(TXT.solarUp);
+  if (has("E2") && sea.id === "monsoon") out.push(TXT.solarDown);
+  if (has("E2") && (sea.id === "storm" || sea.id === "cool")) out.push(TXT.windUp);
+  return {sea, tip:TXT.tip[sea.id], co2:S.seasCO2 || 0, power:seasonPower(), lines:out};
+}
+
+const _v1 = P.v1Tick;
+P.v1Tick = () => { if (_v1) _v1(); seasonsTick(); };
+Object.assign(P, {seasonPower, seasonCO2, seasonsTick, seasonInfo, SEASON_TXT:TXT});
 
 })();

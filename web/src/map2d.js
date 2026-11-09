@@ -11,7 +11,7 @@ import {Audio} from "./audio.js";
 import ICONS from "./gen/icons.js";
 import {Gfx} from "./gfx.js";
 import {drawPins, drawTraffic, drawInfo, img3d, drawDetail, drawStatus, placePin} from "./mapfx.js";
-import {drawClouds, drawRigs, drawTrains} from "./life.js";
+import {drawClouds, drawRigs, drawTrains, drawSeason} from "./life.js";
 import {drawHex, hexCells} from "./hexgrid.js";
 import {createMapGL} from "./mapgl.js";
 import {iceCanvas, polarCanvas, ICE_TILE, POLAR, POLAR_S} from "./ice.js";
@@ -617,6 +617,7 @@ export const GameMap = {
     drawPins(this, c, now, vis);
     drawTrains(this, c, now, vis, placePin);   // 3.6: high-speed trains on finished rail builds
     drawTraffic(this, c, dt, now, vis);
+    drawSeason(this, c, now, vis);   // 3.7.3: snow, heat haze, smoke and rain of the current season
     drawClouds(this, c, dt, now, vis, night);   // 3.6: clouds and spinning storms, above the planes
     const hexHit = drawHex(this, c, vis);
     c.globalAlpha = 1; c.lineCap = "butt";

@@ -201,3 +201,44 @@ export function drawTrains(M, c, now, vis, pinPos){
   }
   return true;
 }
+
+/* ---------- 3.7.3: the season on the map ----------
+   winter: snow drifting over the north · hot season: heat haze over South Asia and the Middle East, smoke from
+   burning fields over mainland Southeast Asia · monsoon: rain over South and Southeast Asia, heat over the northern
+   summer · storm season: rain bands over the Western Pacific and the Caribbean. Stronger as the world warms. */
+const SEA_AREAS = {
+  cool:[[48, 66, -128, -62, "snow"], [47, 66, 2, 58, "snow"], [44, 64, 62, 138, "snow"]],
+  hot:[[10, 30, 68, 92, "heat"], [16, 32, 36, 58, "heat"], [14, 22, 96, 106, "smoke"], [-2, 6, 98, 116, "smoke"]],
+  monsoon:[[8, 27, 70, 92, "rain"], [8, 24, 94, 122, "rain"], [36, 48, -8, 30, "heat"], [30, 42, -118, -92, "heat"]],
+  storm:[[12, 30, 122, 150, "rain"], [14, 28, -88, -62, "rain"]],
+};
+const SEA_COL = {snow:[235, 245, 255], heat:[255, 140, 60], smoke:[150, 125, 100], rain:[70, 110, 150]};
+let seaParts = null;
+export function drawSeason(M, c, now, vis){
+  if (Gfx.level === "low" || !S.regions || !P.seasonOf) return;
+  const sea = P.seasonOf(S.tick), areas = SEA_AREAS[sea.id]; if (!areas) return;
+  const k = clamp((P.seasonPower ? P.seasonPower() : 1), 1, 2), z = M.cam.z, fade = clamp(1.6 - z * .25, .35, 1);
+  if (!seaParts){ seaParts = []; for (let i = 0; i < 260; i++) seaParts.push([rnd(), rnd(), rnd()]); }
+  const run = P.running && P.running(), t = run ? now : (M._seaT || now); if (run) M._seaT = now;
+  areas.forEach(([la0, la1, lo0, lo1, kind], ai) => {
+    const [x0, y0] = M.toScreen(...ll(la1, lo0)), [x1, y1] = M.toScreen(...ll(la0, lo1));
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, rx = Math.abs(x1 - x0) / 2, ry = Math.abs(y1 - y0) / 2;
+    if (cx + rx < 0 || cx - rx > M.vw || cy + ry < 0 || cy - ry > M.vh || rx < 4) return;
+    const [r, g, b] = SEA_COL[kind], a = (kind === "heat" ? .22 + .06 * Math.sin(t * 1.3 + ai) : kind === "smoke" ? .28 : kind === "rain" ? .3 : .22) * k * fade;
+    c.save(); c.translate(cx, cy); c.scale(1, ry / rx);
+    const gr = c.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, `rgba(${r},${g},${b},${a})`); gr.addColorStop(.65, `rgba(${r},${g},${b},${a * .55})`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
+    c.fillStyle = gr; c.beginPath(); c.arc(0, 0, rx, 0, TAU); c.fill(); c.restore();
+    if (kind === "heat") return;
+    // particles inside the oval
+    const n = Math.round((kind === "smoke" ? 14 : kind === "snow" ? 60 : 48) * k), sc = Math.sqrt(rx * ry) / 90;
+    c.lineCap = "round";
+    for (let i = 0; i < n; i++){
+      const p = seaParts[(i * 7 + ai * 41) % seaParts.length], ang = p[0] * TAU, rr = Math.sqrt(p[1]) * .9;
+      let px = cx + Math.cos(ang) * rr * rx, py = cy + Math.sin(ang) * rr * ry;
+      const ph = (t * (kind === "rain" ? .9 : kind === "snow" ? .18 : .05) + p[2]) % 1;
+      if (kind === "rain"){ py += (ph - .5) * ry * .5; px += (ph - .5) * ry * .15; const L0 = 10 * clamp(sc, .7, 1.6); c.strokeStyle = `rgba(200,225,250,${.65 * (1 - Math.abs(ph - .5) * 2) * fade})`; c.lineWidth = 1.3; c.beginPath(); c.moveTo(px, py); c.lineTo(px + L0 * .3, py + L0); c.stroke(); }
+      else if (kind === "snow"){ py += (ph - .5) * ry * .6; px += Math.sin(t + i) * 3; c.fillStyle = `rgba(250,252,255,${.85 * (1 - Math.abs(ph - .5) * 2) * fade})`; c.beginPath(); c.arc(px, py, 1.9 * clamp(sc, .8, 1.5), 0, TAU); c.fill(); }
+      else { px += ph * rx * .4; py -= ph * ry * .3; const R0 = 10 * clamp(sc, .6, 1.8) * (.6 + ph); c.fillStyle = `rgba(${r},${g},${b},${.26 * (1 - ph) * fade})`; c.beginPath(); c.arc(px, py, R0, 0, TAU); c.fill(); }
+    }
+  });
+}

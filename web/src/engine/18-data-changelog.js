@@ -37,6 +37,8 @@ P.CHANGELOG = [
     "ลูกโลกหน้าโหลดและหน้าหลักเป็นแบบเดียวกัน (แสงแดด ด้านมืด เมฆ และขอบฟ้าสีฟ้า) · เมฆบนแผนที่เป็นแผ่นบาง ๆ จาง ๆ และน้อยลง · เอาแสงเหนือออก · แก้แผนที่ซ้อนกันหลังอัปเดต",
     "ป้ายชื่อประเทศเล็กขึ้นเฉพาะตอนซูมใกล้ ๆ ประเทศหลักขึ้นเสมอ และป้ายที่ทับกันจะซ่อนไว้ ไม่รกเหมือนก่อน",
     "ลูกโลกหน้าโหลดและหน้าหลักสว่างเท่ากันแล้ว · แถบล่างไม่ทับกันในจอขนาดกลาง (จอแคบขึ้นแค่ไอคอนเมนู) · มือถือ: แผนที่เลื่อนซ้ายขวาได้อิสระ ไม่ดีดกลับกลาง ปัดแรง ๆ ให้ไหลต่อ แตะสองครั้งซูมเข้า สองนิ้วแตะซูมออก และแผนที่พอดีพื้นที่ระหว่างแถบบนกับล่าง",
+    "หน้าข้อพิพาทระหว่างประเทศแบบใหม่: สองฝ่ายเผชิญหน้ากัน (VS) พร้อมธงชาติและคำพูดของแต่ละฝ่าย ทางเลือกบอกสั้น ๆ ว่าฝ่ายไหนพอใจหรือไม่พอใจ",
+    "ฤดูกาลสำคัญขึ้น: โซลาร์ผลิตไฟได้มากหน้าร้อนแต่น้อยหน้าฝน กังหันลมแรงช่วงพายุและหน้าหนาว · ไฟฟ้าพีคหน้าร้อนทำให้ไฟดับ (สกิลลดการใช้ไฟช่วงพีกช่วยได้) · ผลผลิตเกษตรขึ้นกับมรสุม · แผนที่มีหิมะ ฝน หมอกควัน และไอร้อนตามฤดู · ยิ่งโลกร้อน ฤดูยิ่งรุนแรง · จบฤดูได้เกรด A–F และรางวัล",
   ], [
     "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu.",
     "Fast mode: a 15-minute game without minerals or groups and with fewer events, great for a first game.",
@@ -68,6 +70,8 @@ P.CHANGELOG = [
     "The Earth on the loading screen and on the home screen now look the same (sunlight, dark side, clouds and a blue sky at the rim) · clouds on the map are fewer, thin and faint · no more northern lights · fixed the map pictures not lining up after an update.",
     "Names of small countries only appear when you zoom in closer; main countries always show, and labels that would overlap are hidden, so the map is no longer cluttered.",
     "The loading-screen and home-screen Earths are now equally bright · the bottom bar no longer overlaps on mid-size screens (narrow screens show menu icons only) · phones: pan the map freely without it jumping back to the middle, flick to glide, double-tap to zoom in, two-finger tap to zoom out, and the map fits between the top and bottom bars",
+    "A new screen for disputes between countries: the two sides face each other (VS) with their flags and say one line each; each choice simply says which side will be pleased or upset.",
+    "Seasons matter more: solar makes more in the hot season and less under monsoon clouds, wind farms do best in storm season and winter · a summer power peak causes blackouts (Demand Response helps) · the harvest depends on the monsoon · snow, rain, smoke and heat haze show on the map · seasons get harsher as the world warms · each season ends with a grade A–F and a reward.",
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",

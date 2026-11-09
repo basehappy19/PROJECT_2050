@@ -29,21 +29,20 @@ export function EventModal(){
   if (opts.every(q => !q.ok)) opts.push({o:{label:{th:P.UI.postpone.th, en:P.UI.postpone.en}, fx:P.POSTPONE}, i:-1, ok:true});
   const where = e.country ? t("evCountryTag") : e.target ? `${t("eventTag")} · ${L(P.RMETA[e.target].name)}` : `${t("eventTag")} · ${t("global")}`;
   const side = (lab, ids, col) => <div class="side"><b class={col}>{lab}</b><div class="chips">{ids.map(id => { const c = P.C(id); return <span class="chip static" key={id} style={{borderColor:COL[col]}}><i style={{background:COL[relCol(c.rel)]}}/>{L(P.COUNTRY[id].name)}<small class={"mono relnum " + relCol(c.rel)} aria-label={t("relation")}><Icon n="$heart" size={14}/>{Math.round(c.rel)}</small></span>; })}</div></div>;
-  return <Modal kind="event">
+  return <Modal kind="event" cls={e.country ? "vsmodal" : ""}>
     <div class="hero photo" style={{backgroundImage:`url(${eventImg(e.id)}), ${mapCropBg(eventPoint(e))}`, "--tint":SND_TINT[eventSnd(e)] || COL.accent}}>
       <div class="tags"><Tag color={e.country ? "accent" : "warn"}>{`[[${e.country ? "globe" : "siren"}]] ${where}`}</Tag>{e.news ? <Tag color="good">{`[[newspaper]] ${t("realNews")} ${e.news.y}`}</Tag> : null}</div>
       <h2>{L(e.title)}</h2>
     </div>
     <div class="mbody">
-      {e.country ? <><div class="sides">{side(t("sideA"), e.A, "good")}{side(t("sideB"), e.B, "bad")}</div>
-        <p class="muted small rellegend"><Rich t={t("relLegend")} iconColor="inherit"/></p></> : null}
-      <p class="desc"><Rich t={L(e.desc)}/></p>
+      {e.country ? <Versus e={e}/> : <p class="desc"><Rich t={L(e.desc)}/></p>}
       {e.news ? <p class="newsrc muted small"><Icon n="link" size={13}/> {t("source")}: <a href={e.news.url} target="_blank" rel="noopener noreferrer">{e.news.src}</a></p> : null}
       <div class="ask"><Rich t={`[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`} iconColor="accent"/><Speak text={`${L(e.title)}. ${L(e.desc)}`} btn/>
         <span class="grow"/>{!S.mp ? <Btn kind="ghost" size="sm" onClick={() => { UIM.evMin = true; bump(); }}>{`[[minimize-2]] ${L(P.UI2.evMin)}`}</Btn> : null}</div>
       {S.mp ? <VoteHead/> : null}
       <Meter v={f} color={locked ? "warn" : "accent"} h={4} cls="lockbar"/>
-      <div class="opts">{opts.map(({o, i, ok}) => {
+      <div class={"opts" + (e.country ? " vsopts" : "")}>{opts.map(({o, i, ok}) => {
+        if (e.country) return <VsOpt key={i} o={o} i={i} ok={ok} locked={locked} hard={hard} e={e}/>;
         const usable = ok && !locked;
         return <button type="button" key={i} class={`opt ${ok ? "" : "no"} ${locked ? "locked" : ""}`} disabled={!usable} onPointerEnter={() => usable && Audio.hover()} onClick={() => { if (!UIM.eventLocked()) P.chooseOption(i); }}>
           <span class="letter">{i === -1 ? "!" : "ABC"[i]}</span>
@@ -61,6 +60,41 @@ export function EventModal(){
       })}</div>
     </div>
   </Modal>;
+}
+
+/* 3.7.3: dispute between countries — the two sides face each other (VS) with their flags and say one line each.
+   No friendship numbers: the choices only say which side will be pleased and which upset. */
+const flagSrc = id => P.FLAG2 && P.FLAG2[id] ? `assets/img/flags/${P.FLAG2[id]}.webp` : null;
+function VsSide({lab, ids, say, cls, right}){
+  return <div class={"vside " + cls + (right ? " r" : "")}>
+    <b class="vlab"><Icon n="message-circle" size={15}/>{lab}</b>
+    {say ? <div class="vsay">“{L(say)}”</div> : null}
+    <div class="vflags">{ids.map(id => <span class="vflag" key={id}>{flagSrc(id) ? <img src={flagSrc(id)} alt="" loading="lazy"/> : <i/>}<small>{L((P.SHORT && P.SHORT[id]) || P.COUNTRY[id].name)}</small></span>)}</div>
+  </div>;
+}
+function Versus({e}){
+  const say = (P.CE_SAY || {})[e.id] || {};
+  return <div class="versus">
+    <VsSide lab={t("sideA")} ids={e.A} say={say.A} cls="good"/>
+    <span class="vsb" aria-hidden="true">VS</span>
+    <VsSide lab={t("sideB")} ids={e.B} say={say.B} cls="bad" right/>
+  </div>;
+}
+const MOOD = {up:{th:"พอใจ", en:"pleased"}, down:{th:"ไม่พอใจ", en:"upset"}};
+function VsOpt({o, i, ok, locked, hard, e}){
+  const usable = ok && !locked, chips = !hard ? P.fxChips(o.fx, e.target) : [];
+  const sideOf = c => c.icon === "$heart" && c.txt.includes(t("sideA")) ? "A" : c.icon === "$heart" && c.txt.includes(t("sideB")) ? "B" : null;
+  const moods = chips.filter(sideOf), rest = chips.filter(c => !sideOf(c));
+  return <button type="button" class={`opt vsopt ${ok ? "" : "no"} ${locked ? "locked" : ""}`} disabled={!usable} onPointerEnter={() => usable && Audio.hover()} onClick={() => { if (!UIM.eventLocked()) P.chooseOption(i); }}>
+    <span class="vhead"><span class="letter">{i === -1 ? "!" : "ABC"[i]}</span><b>{L(o.label)}</b></span>
+    {!hard ? <>
+      {moods.length ? <span class="vmoods">{moods.map((c, k) => <span key={k} class="vmood"><span class="muted">{sideOf(c) === "A" ? t("sideA") : t("sideB")}</span> <b class={c.good ? "good" : "bad"}>{L(MOOD[c.good ? "up" : "down"])} {arrows(c.up, c.mag || 1)}</b></span>)}</span> : null}
+      <span class="fx">{rest.map((c, k) => <span class={"fxchip " + (c.good ? "good" : "bad")} key={k} aria-label={plain(c.txt)}><Icon n={c.icon || "circle"} size={15}/>{c.txt.includes(t("delayed")) ? <small>{t("later")}</small> : null}<b>{arrows(c.up, c.mag || 1)}</b></span>)}</span>
+      {i >= 0 && P.tiltOfOption ? <GroupTilt list={P.tiltOfOption(o, e)}/> : null}
+    </> : <span class="muted small"><Rich t={`[[eye-off]] ${t("hardHidden")}`} iconColor="inherit"/></span>}
+    {!ok ? <span class="bad small">{t("cantAfford")}</span> : null}
+    {S.mp ? <VoteDots i={i}/> : null}
+  </button>;
 }
 
 /* ---------------- end of game ---------------- */

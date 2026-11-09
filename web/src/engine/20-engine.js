@@ -77,7 +77,7 @@ const R = id => S.regions.find(r => r.id === id);
 const C = id => S.countries.find(c => c.id === id);
 const regCountries = (reg, withRest = true) => S.countries.filter(c => c.reg === reg && (withRest || !c.rest));
 const avg = f => S.regions.reduce((s,r) => s + f(r), 0) / S.regions.length;
-const grossCO2 = () => S.regions.reduce((s,r) => s + r.co2, 0);
+const grossCO2 = () => S.regions.reduce((s,r) => s + r.co2, 0) + (S.seasCO2 || 0);   // 3.7.3: + this month's seasonal swing (40-seasons.js)
 const sinkEff = () => clamp(1 - Math.max(0, S.temp - 1.2) * 0.3, 0.5, 1);
 const netCO2 = () => grossCO2() - S.sink * sinkEff();
 const lastMile = r => 0.2 + 0.8 * clamp(r.co2 / r.co2_0, 0, 1);

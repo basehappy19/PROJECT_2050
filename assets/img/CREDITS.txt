@@ -15,3 +15,5 @@ SDG ICONS (1.7)
 - assets/img/sdg/goal-*.svg — the United Nations Sustainable Development Goals icons, taken from the
   @haxtheweb/un-sdg package (Apache-2.0). Used for information, non-commercially, as the UN guidelines allow
   (https://www.un.org/sustainabledevelopment/news/communications-material/). The UN does not endorse this game.
+
+flags/: country flags from flag-icons by Panayiotis Lipiridis (https://github.com/lipis/flag-icons), MIT licence (flags/LICENSE.txt), converted to small WebP pictures.

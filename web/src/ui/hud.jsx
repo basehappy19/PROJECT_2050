@@ -63,7 +63,7 @@ export function TopBar(){
     </div>
     <div class="ctrls glass">
       <div class="date">
-        <span aria-label={L(P.seasonOf().name)}><Icon n={P.seasonOf().icon} size={14} cls="season"/> {P.dateStr()}</span>
+        <span aria-label={`${L(P.seasonOf().name)}\n${P.SEASON_TXT ? L(P.SEASON_TXT.tip[P.seasonOf().id]) : ""}`}><Icon n={P.seasonOf().icon} size={14} cls="season"/> {P.dateStr()}</span>
         <i class="month"><b key={S.tick + ":" + S.speed} style={{animationDuration:`${P.secPerMonth()}s`, animationPlayState:running ? "running" : "paused"}}/></i>
       </div>
       <Seg cls="speed" items={sp}/>
