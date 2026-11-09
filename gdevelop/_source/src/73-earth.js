@@ -13,24 +13,42 @@ if (P.mods && P.mods.earth) return;
 const {S, Kit, clamp} = P;
 const Map = P.Map;
 const DEG = Math.PI / 180;
-const LON0 = 11, LAT_TOP = 84, LAT_BOT = -57;   // the website's map runs 84°N … 57°S, centred on 11°E
+const LON0 = 11, LAT_TOP = 84;   // the map is centred on 11°E and starts at 84°N
 const imgMgr = () => Map.scene.getGame().getImageManager();
 const texOf = (name, srgb) => { const t = imgMgr().getThreeTexture(name); if (t && srgb && t.colorSpace !== THREE.SRGBColorSpace){ t.colorSpace = THREE.SRGBColorSpace; t.needsUpdate = true; } return t; };
 const themeName = () => { try { const v = localStorage.getItem("p2050-theme") || ""; return P.Net && v && P.Net.owns("theme_" + v) ? v : ""; } catch(e) { return ""; } };
-const flipFix = o => { o.scale.y *= -1; return o; };   // the layer's 3D group flips y; undo it for real 3D shapes
 
-/* ---------------------------------------------------------------- satellite photo under the map */
+/* ---------------------------------------------------------------- satellite photo under the map
+   The map's own Robinson (52-map.js toWorld) is not the website's d3 Robinson, so the picture is not simply stretched:
+   it is a latitude / longitude grid whose corners sit where this map puts them, and each corner reads the picture
+   where that place is in the picture. Day / night use the Earth's full pictures (latitude / longitude, whole world);
+   the paint theme only exists in the website's projection, so its corners use d3's Robinson. */
+const LAT_MAP_BOT = -56;   // this map's lower edge (mapmeta LAT_BOT)
+const D3K = [[0.9986,-0.062],[1,0],[0.9986,0.062],[0.9954,0.124],[0.99,0.186],[0.9822,0.248],[0.973,0.31],[0.96,0.372],[0.9427,0.434],[0.9216,0.4958],[0.8962,0.5571],[0.8679,0.6176],[0.835,0.6769],[0.7986,0.7346],[0.7597,0.7903],[0.7186,0.8435],[0.6732,0.8936],[0.6213,0.9394],[0.5722,0.9761],[0.5322,1]].map(([x, y]) => [x, y * 1.593415793900743]);
+function d3Robinson(lam, phi){   // d3-geo-projection robinsonRaw (radians in, unit-sphere coordinates out)
+  const i = Math.min(18, Math.abs(phi) * 36 / Math.PI), i0 = Math.floor(i), di = i - i0;
+  const [ax, ay] = D3K[i0], [bx, by] = D3K[i0 + 1], [cx, cy] = D3K[Math.min(19, i0 + 2)];
+  return [lam * (bx + di * (cx - ax) / 2 + di * di * (cx - 2 * bx + ax) / 2), Math.sign(phi) * (by + di * (cy - ay) / 2 + di * di * (cy - 2 * by + ay) / 2)];
+}
+const WEB_W = 2400, WEB_H = 1197, WEB_S = WEB_W / (2 * 0.8487 * Math.PI), WEB_Y84 = d3Robinson(0, 84 * DEG)[1];
+const uvEarth = (lat, lon) => [(lon + 180) / 360, (lat + 90) / 180];   // past 180°E u goes a little over 1: the picture repeats, so no seam
+const uvPaint = (lat, lon) => { const [x, y] = d3Robinson((lon - LON0) * DEG, lat * DEG); return [(WEB_W / 2 + x * WEB_S) / WEB_W, 1 - WEB_S * (WEB_Y84 - y) / WEB_H]; };
 const Photo = {
   mesh:null, theme:null,
   build(R){
-    const N = 96, pts = [];
-    for (let i = 0; i <= N; i++){ const [x, y] = P.toWorld(LAT_TOP - (LAT_TOP - LAT_BOT) * i / N, LON0 + 179.99); pts.push(new THREE.Vector2(x, y)); }
-    for (let i = 0; i <= N; i++){ const [x, y] = P.toWorld(LAT_BOT + (LAT_TOP - LAT_BOT) * i / N, LON0 - 179.99); pts.push(new THREE.Vector2(x, y)); }
-    const top = P.toWorld(LAT_TOP, LON0)[1], h = P.toWorld(LAT_BOT, LON0)[1] - top, w = 2 * P.toWorld(0, LON0)[0];
-    const g = new THREE.ShapeGeometry(new THREE.Shape(pts));
-    const pos = g.attributes.position, uv = g.attributes.uv;
-    for (let i = 0; i < pos.count; i++) uv.setXY(i, pos.getX(i) / w, 1 - (pos.getY(i) - top) / h);
-    uv.needsUpdate = true;
+    const NX = 144, NY = 64, pos = [], uvE = [], uvP = [], idx = [];
+    for (let j = 0; j <= NY; j++){
+      const lat = LAT_TOP - (LAT_TOP - LAT_MAP_BOT) * j / NY;
+      for (let i = 0; i <= NX; i++){
+        const lon = LON0 - 179.99 + 359.98 * i / NX, [x, y] = P.toWorld(lat, lon);
+        pos.push(x, y, 0); uvE.push(...uvEarth(lat, lon)); uvP.push(...uvPaint(lat, lon));
+        if (i < NX && j < NY){ const a = j * (NX + 1) + i, b = a + 1, c = a + NX + 1, d = c + 1; idx.push(a, c, b, b, c, d); }
+      }
+    }
+    const g = new THREE.BufferGeometry();
+    g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx);
+    this.uvE = new THREE.Float32BufferAttribute(uvE, 2); this.uvP = new THREE.Float32BufferAttribute(uvP, 2);
+    g.setAttribute("uv", this.uvE);
     const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide}));
     m.renderOrder = 3; m.frustumCulled = false;   // above the ocean (0), rim (1) and ice (2); under the regions (10)
     R.add3DRendererObject(m); this.mesh = m; this.theme = null; this.setTheme();
@@ -51,8 +69,10 @@ const Photo = {
   setTheme(){
     if (!this.mesh) return;
     const th = themeName(); if (th === this.theme) return; this.theme = th;
-    this.mesh.material.map = texOf(`photo/map-${th === "night" ? "night" : th === "paint" ? "paint" : "day"}.jpg`, true);
-    this.mesh.material.needsUpdate = true;
+    const paint = th === "paint", tex = texOf(paint ? "photo/map-paint.jpg" : `photo/earth-${th === "night" ? "night" : "day"}.jpg`, true);
+    if (tex){ const w = paint ? THREE.ClampToEdgeWrapping : THREE.RepeatWrapping; if (tex.wrapS !== w){ tex.wrapS = w; tex.wrapT = THREE.ClampToEdgeWrapping; tex.needsUpdate = true; } }
+    this.mesh.geometry.setAttribute("uv", paint ? this.uvP : this.uvE);
+    this.mesh.material.map = tex; this.mesh.material.needsUpdate = true;
   },
 };
 
@@ -166,8 +186,9 @@ const Globe = {
   /* where the globe sits: right of the menu panel on wide screens, centred on narrow ones (like web/src/ui/menu.jsx) */
   place(){
     const dw = Kit.W || 1920, H = Kit.H || 1080, wide = dw >= H * 1.25;   // screen size in design units
-    const cx = wide ? (Math.min(900, dw * .47) + dw) / 2 : dw / 2, cy = wide ? H / 2 : H * .3;
-    let r = wide ? Math.min(H * .40, (dw - Math.min(900, dw * .47)) * .46) : Math.min(dw * .42, H * .26);
+    const panel = 530;   // right edge of the menu panel (64-menu.js)
+    const cx = wide ? (panel + dw) / 2 : dw / 2, cy = wide ? H / 2 : H * .3;
+    let r = wide ? Math.min(H * .42, (dw - panel) * .44) : Math.min(dw * .42, H * .26);
     if (this.fly) r *= this.fly.r;
     const a = Map.toWorldFromScreen(cx, cy), b = Map.toWorldFromScreen(cx, cy + r), R = Math.max(10, Math.abs(b[1] - a[1]));
     this.root.position.set(a[0], a[1], 0); this.root.scale.set(R, -R, R);   // −R: undo the layer's y flip

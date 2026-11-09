@@ -61,9 +61,10 @@ Screens.renderMenu = function(l){
   const shade = (this.scene.getObjects("MenuShade") || [])[0];
   if (shade) shade.setWidth((w + (w > 430 ? 420 : 200)) * k.K);
   let ch = 0; UIM._googleRect = null;
+  k.rect(l, x - 24, 16, w + 48, k.H - 32, "glass", {r:18, a:.9, stroke:"line", bg:true});
   k.slave("MenuScroll", s => {
     ch = this.menuCard(s, w);
-    const top = Math.max(16, (k.H - ch) / 2);
+    const top = 40;   // 3.x: content starts at the top of the panel, like the website
     s.frame(x, top, {x:0, y:0, w:x + w + 40, h:k.H}, ch + Math.max(0, top - 16));
   });
   if (P.Net) P.Net.googleOverlay(UIM._googleRect);
@@ -94,15 +95,52 @@ const back = (l, y) => { W.btn(l, "back", 0, y, t("mBack"), () => { UIM.sub = nu
 const msgLine = (l, y, w) => UIM.msg ? k.text(l, UIM.msg, 0, y, {size:12.5, color:UIM.err ? "bad" : "good", w}).h + 8 : 0;
 const go = sub => () => { UIM.sub = sub; UIM.msg = ""; UIM.err = false; const s = k.L("MenuScroll"); if (s) s.scroll = 0; if (sub === "board") P.Net.loadBoard(); if (sub === "season") P.Net.loadSeason(); if (sub === "cert") P.Net.loadCerts(); if (sub === "shop" || sub === "account") P.Net.refresh(); k.dirty(); };
 
+/* 3.x: laid out like the website's menu panel (web/src/ui/menu.jsx): logo + title, SDG 13 tag, "what's new" pill,
+   one big mission button, Endless World, then a dock of 8 icon tiles; sign-in is the chip at the top right.
+   Sub-pages have a back arrow and their title at the top. */
+const SUB_TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason", settings:"mSettingsS"};
+const SEEN_KEY = "p2050.seenVersion";
+const seenVer = () => { try { return localStorage.getItem(SEEN_KEY); } catch(e){ return null; } };
 Screens.menuCard = function(l, w){
   const sub = UIM.sub; let y = 0;
-  k.text(l, "GLOBAL CLIMATE TASKFORCE · 2026 – 2050", 0, y, {font:"mono", size:11.5, color:"accent"}); y += 22;
-  W.runs(l, 0, y, [["PROJECT ", {font:"logo", size:46, lh:1}], ["ZERO", {font:"logo", size:46, color:"accent", lh:1}]]); y += 46 + 12;
-  const TITLES = {load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason", settings:"mSettingsS"};
-  const tag2 = sub ? t(TITLES[sub]) : t("mDesc");
-  y += k.text(l, tag2, 0, y, {size:sub ? 17 : 14, font:sub ? "dispS" : "body", color:sub ? "fg" : "muted", w:Math.min(w, 400)}).h + 14;
+  if (sub){
+    // back arrow + page title (close / back always at the top)
+    const hov = k.isHover(l, "subback");
+    k.rect(l, 0, y, 36, 36, "panel", {r:10, a:.92, stroke:hov ? "accent" : "line", bg:true});
+    k.icon(l, "chevron-left", 8, y + 8, 20, hov ? "accent" : "fg");
+    k.hit(l, "subback", 0, y, 36, 36, () => { Audio.play("click"); UIM.sub = sub === "cert" ? "ach" : null; UIM.msg = ""; k.dirty(); const s = k.L("MenuScroll"); if (s) s.scroll = 0; });
+    k.text(l, t(SUB_TITLES[sub]), 48, y + 5, {font:"dispS", size:20, w:w - 48, max:1});
+    y += 36 + 18;
+    if (sub === "updates") try { localStorage.setItem(SEEN_KEY, P.VERSION_NAME); } catch(e){}
+  } else {
+    // logo + title
+    k.sprite(l, "Logo", "Logo", 0, y, 46, 46);
+    W.runs(l, 58, y + 6, [["PROJECT ", {font:"logo", size:34, lh:1}], ["ZERO", {font:"logo", size:34, color:"accent", lh:1}]]);
+    y += 46 + 12;
+    // SDG 13 tag
+    k.rect(l, 0, y, 30, 30, "#3f7e44", {r:4});
+    k.text(l, "13", 0, y + 1, {font:"monoB", size:10, color:"#ffffff", w:30, align:"center"});
+    k.icon(l, "eye", 8, y + 13, 14, "#ffffff");
+    y += Math.max(30, k.text(l, t("mTag"), 40, y + 1, {size:12, color:"muted", w:w - 40}).h) + 14;
+    // what's new pill
+    const c = P.CHANGELOG && P.CHANGELOG[0], fresh = seenVer() !== P.VERSION_NAME;
+    if (c){
+      const lab = L(c.name), vw = k.textW(`v${P.VERSION_NAME}`, {font:"monoB", size:12});
+      const pw = Math.min(w, (fresh ? 14 : 0) + vw + 10 + k.textW(lab, {font:"bodyB", size:12.5}) + 46), hov = k.isHover(l, "whatsnew");
+      k.rect(l, 0, y, pw, 30, "panel", {r:15, a:.92, stroke:hov || fresh ? "accent" : "line", bg:true});
+      let px = 12; if (fresh){ k.circle(l, px + 3, y + 15, 4, "accent"); px += 14; }
+      k.text(l, `v${P.VERSION_NAME}`, px, y + 7, {font:"monoB", size:12, color:"accent"}); px += vw + 10;
+      k.text(l, lab, px, y + 6, {font:"bodyB", size:12.5, w:pw - px - 26, max:1});
+      k.icon(l, "chevron-right", pw - 22, y + 8, 14, "muted");
+      k.hit(l, "whatsnew", 0, y, pw, 30, () => { Audio.play("click"); go("updates")(); });
+      y += 30 + 14;
+    }
+  }
   if (sub === "load") y = this.subLoad(l, y, w);
-  else if (sub === "ach"){ y += this.achList(l, 0, y, w) + 12; y += back(l, y); }
+  else if (sub === "ach"){
+    W.btn(l, "certbtn", 0, y, `[[award]] ${t("mCert")}`, go("cert"), {kind:"ghost", w}); y += 36 + 10;   // the certificate page sits inside achievements, like the website
+    y += this.achList(l, 0, y, w) + 12;
+  }
   else if (sub === "account") y = this.subAccount(l, y, w);
   else if (sub === "shop") y = this.subShop(l, y, w);
   else if (sub === "board") y = this.subBoard(l, y, w);
@@ -111,60 +149,61 @@ Screens.menuCard = function(l, w){
   else if (sub === "season") y = this.subSeason(l, y, w);
   else if (sub === "settings") y = this.subSettings(l, y, w);
   else {
-    const saves = P.readSaves(), lk = P.latestSlot(), auto = lk && saves[lk], n = P.Ach.count();
-    const items = [
-      {id:"new", ic:"globe", t1:t("mNew"), t2:t("mNewS"), primary:!auto, fn:() => { UIM.worldSel = false; Screens.newGame(); }},
-      {id:"world", ic:P.worldUnlocked && P.worldUnlocked() ? "infinity" : "lock", t1:t("mWorldS2"), t2:P.worldUnlocked && P.worldUnlocked() ? t("mWorldS") : t("mWorldLock"), dis:!(P.worldUnlocked && P.worldUnlocked()), fn:() => { UIM.worldSel = true; Screens.newGame(true); }},
-      {id:"continue", ic:"play", t1:t("mCont"), t2:auto ? `${P.modeName(auto.meta)} · ${P.dateStr(auto.meta.tick)} · ΔT +${auto.meta.temp.toFixed(2)}°C · ${auto.meta.net.toFixed(1)} Gt` : t("mNoSave"), primary:!!auto, dis:!auto, fn:() => { const s2 = P.readSaves(), k2 = P.latestSlot(); if (!k2 || !Screens.loadSave(s2[k2].S, k2)){ UIM.msg = t("oldSave"); UIM.err = true; k.dirty(); } }},
-    ];
-    for (const it of items){
-      const hh = 54, hov = !it.dis && k.isHover(l, it.id);
-      const fill = it.primary ? (hov ? k.mix("accent", "#ffffff", .2) : "accent") : "panel";
-      k.rect(l, 0, y, w, hh, fill, {r:12, a:it.primary ? 1 : .92, stroke:it.primary ? "accent" : hov ? "accent" : "line", bg:true});
-      const a = it.dis ? .45 : 1, ink = it.primary ? "ink" : "fg";
-      k.icon(l, it.ic, 16, y + (hh - 22) / 2, 22, it.primary ? "ink" : "accent", a);
-      k.text(l, it.t1, 54, y + 5, {font:"dispS", size:17, color:ink, a});
-      k.text(l, it.t2, 54, y + 30, {font:"mono", size:12, color:it.primary ? "ink" : "muted", a:it.primary ? .75 : a, w:w - 70, max:1});
-      k.hit(l, it.id, 0, y, w, hh, () => { Audio.play("click"); it.fn(); }, {disabled:!!it.dis});
-      y += hh + 7;
+    const saves = P.readSaves(), lk = P.latestSlot(), auto = lk && saves[lk], world = !!(P.worldUnlocked && P.worldUnlocked());
+    // big buttons: continue (when there is a save) or the mission, then new game / Endless World
+    const big = (id, x, by, bw, bh, ic, title, subTxt, primary, dis, fn) => {
+      const hov = !dis && k.isHover(l, id);
+      const fill = primary ? (hov ? k.mix("accent", "#ffffff", .18) : "accent") : (hov ? "panel2" : "panel");
+      k.rect(l, x, by, bw, bh, fill, {r:12, a:primary ? 1 : .92, stroke:primary ? "accent" : hov ? "accent" : "line", bg:true});
+      const a = dis ? .45 : 1, ink = primary ? "ink" : "fg", ty = subTxt ? by + bh / 2 - 19 : by + bh / 2 - 12;
+      k.icon(l, ic, x + 16, by + (bh - 24) / 2, 24, primary ? "ink" : dis ? "muted" : "accent", a);
+      k.text(l, title, x + 52, ty, {font:"dispS", size:bh >= 56 ? 18 : 15.5, color:ink, a, w:bw - 84, max:1});
+      if (subTxt) k.text(l, subTxt, x + 52, ty + 24, {font:"mono", size:11.5, color:primary ? "ink" : "muted", a:primary ? .75 : a, w:bw - 84, max:1});
+      if (!dis) k.icon(l, "chevron-right", x + bw - 30, by + (bh - 18) / 2, 18, primary ? "ink" : "muted", .8);
+      k.hit(l, id, x, by, bw, bh, () => { Audio.play("start"); fn(); }, {disabled:!!dis});
+    };
+    const newGame = () => { UIM.worldSel = false; Screens.newGame(); };
+    const worldGame = () => { UIM.worldSel = true; Screens.newGame(true); };
+    const cont = () => { const s2 = P.readSaves(), k2 = P.latestSlot(); if (!k2 || !Screens.loadSave(s2[k2].S, k2)){ UIM.msg = t("oldSave"); UIM.err = true; k.dirty(); } };
+    if (auto){
+      big("continue", 0, y, w, 60, "play", t("mCont"), `${P.modeName(auto.meta)} · ${P.dateStr(auto.meta.tick)}`, true, false, cont); y += 60 + 8;
+      const hw = (w - 8) / 2;
+      big("new", 0, y, hw, 44, "globe", t("mNew"), null, false, false, newGame);
+      big("world", hw + 8, y, hw, 44, world ? "infinity" : "lock", t("mWorldS2"), null, false, !world, worldGame); y += 44 + 14;
+    } else {
+      big("new", 0, y, w, 60, "globe", t("mNew"), null, true, false, newGame); y += 60 + 8;
+      big("world", 0, y, w, 44, world ? "infinity" : "lock", t("mWorldS2"), null, false, !world, worldGame); y += 44 + 14;
     }
     y += msgLine(l, y, w);
-    const tiles = [
-      {id:"loadmenu", ic:"save", t1:t("mLoad"), fn:go("load")},
-      {id:"learn", ic:"book-open", t1:t("mLearn"), t2:`${P.cardCount()}/${P.cardTotal()}`, fn:() => Screens.openLearn("cards")},
-      {id:"ach", ic:"trophy", t1:t("mAch"), t2:`${n}/${ACH.length}`, fn:go("ach")},
-      {id:"train", ic:"graduation-cap", t1:L(P.UI2.trainMenu), fn:() => P.Train.start()},
-      {id:"tutorial", ic:"circle-help", t1:t("mHow"), fn:() => Screens.openTutorial(0, false)},
-      {id:"updates", ic:"sparkles", t1:t("mUpd"), t2:P.VERSION_NAME || "", fn:go("updates")},
-      {id:"season", ic:"calendar-check", t1:t("mSeasonS"), t2:P.Net.seasonReady && P.Net.seasonReady() ? "●" : "", fn:go("season")},
-      {id:"shop", ic:"shopping-bag", t1:t("mShop"), fn:go("shop")},
-      {id:"board", ic:"medal", t1:t("mBoard"), fn:go("board")},
-      {id:"cert", ic:"award", t1:t("mCert"), fn:go("cert")},
-      {id:"account", ic:"user-round", t1:P.Net.user ? t("mAccount") : t("signIn"), fn:go("account")},
+    // dock: 4 × 2 icon tiles
+    const dock = [
+      {id:"loadmenu", ic:"save", t1:t("mLoadS"), fn:go("load")},
+      {id:"learn", ic:"book-open", t1:t("mLearnS"), fn:() => Screens.openLearn("cards")},
+      {id:"train", ic:"graduation-cap", t1:L(P.UI2.trainMenu), dot:!(P.Train && P.Train.trained && P.Train.trained()), fn:() => P.Train.start()},
+      {id:"ach", ic:"trophy", t1:t("mAchS"), fn:go("ach")},
+      {id:"season", ic:"calendar-check", t1:t("mSeasonS"), dot:!!(P.Net.seasonReady && P.Net.seasonReady()), fn:go("season")},
+      {id:"board", ic:"medal", t1:t("mBoardS"), fn:go("board")},
+      {id:"shop", ic:"shopping-bag", t1:t("mShopS"), fn:go("shop")},
       {id:"settings", ic:"settings", t1:t("mSettingsS"), fn:go("settings")},
     ];
-    if (tiles.length % 2) tiles.pop();   // keep the grid even
-    const tw = (w - 7) / 2, th = 48;
-    tiles.forEach((it, i) => {
-      const tx = (i % 2) * (tw + 7), ty = y + Math.floor(i / 2) * (th + 7), hov = k.isHover(l, it.id);
-      k.rect(l, tx, ty, tw, th, "panel", {r:11, a:.92, stroke:hov ? "accent" : "line", bg:true});
-      k.icon(l, it.ic, tx + 14, ty + 14, 20, "accent");
-      k.text(l, it.t1, tx + 44, ty + 12, {font:"dispS", size:14.5, w:tw - 54 - (it.t2 ? 50 : 0), max:1});
-      if (it.t2) k.text(l, it.t2, tx + tw - 60, ty + 15, {font:"mono", size:11, color:"muted", w:50, align:"right"});
+    const gap = 8, tw = (w - gap * 3) / 4, th = 66;
+    dock.forEach((it, i) => {
+      const tx = (i % 4) * (tw + gap), ty = y + Math.floor(i / 4) * (th + gap), hov = k.isHover(l, it.id);
+      k.rect(l, tx, ty, tw, th, hov ? "panel2" : "panel", {r:12, a:.92, stroke:hov ? "accent" : "line", bg:true});
+      k.icon(l, it.ic, tx + (tw - 24) / 2, ty + 11, 24, "accent");
+      if (it.dot) k.circle(l, tx + tw / 2 + 14, ty + 12, 4, "warn");
+      k.text(l, it.t1, tx + 4, ty + 41, {font:"bodyB", size:12, w:tw - 8, align:"center", max:1});
       k.hit(l, it.id, tx, ty, tw, th, () => { Audio.play("click"); it.fn(); });
     });
-    y += Math.ceil(tiles.length / 2) * (th + 7);
+    y += 2 * (th + gap) - gap;
   }
-  y += 12;
-  k.line(l, 0, y, w, y, "line"); y += 12;
-  k.text(l, P.up(t("teamK")), 0, y, {font:"mono", size:10.5, color:"muted"}); y += 18;
-  y += k.text(l, t("team"), 0, y, {font:"dispS", size:14, lh:1.35, w}).h + 2;
-  y += k.text(l, t("disclaimer"), 0, y, {size:11.5, color:"muted", w}).h + 12;
-  if (sub !== "settings"){ y += W.vol(l, 0, y, w) + 10; }   // the settings page has its own sound and language rows
-  const ft = k.text(l, t("mTag"), 0, y + 6, {size:11.5, color:"muted", w:sub === "settings" ? w : w - 96});
-  if (sub !== "settings") W.langSeg(l, w - 80, y);
-  y += Math.max(30, ft.h + 6);
-  return y + 10;
+  if (sub) return y + 16;
+  y += 18;
+  k.line(l, 0, y, w, y, "line"); y += 14;
+  k.text(l, t("teamK"), 0, y, {size:11, color:"muted"}); y += 18;
+  y += k.text(l, t("team"), 0, y, {font:"dispS", size:13.5, lh:1.35, w}).h + 4;
+  y += k.text(l, `${t("disclaimer")} · Earth imagery: NASA Visible Earth · Sounds & music: CC0 / CC-BY`, 0, y, {size:11, color:"muted", w}).h;
+  return y + 16;
 };
 
 /* ---------------- load ---------------- */

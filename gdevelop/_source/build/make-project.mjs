@@ -14,6 +14,7 @@ const REPO = path.resolve(HERE, "../../..");              // the project folder 
 const SRC = `${SOURCE}/src`;
 const META = JSON.parse(fs.readFileSync(`${SOURCE}/assetgen/mapmeta.json`, "utf8"));
 const uuid = () => crypto.randomUUID();
+const API = process.env.P2050_API || "https://project-zero.basehappy19.site/api";   // the game server the GDevelop build talks to
 
 /* ------------------------------------------------------------------ resources */
 const resources = [];
@@ -50,8 +51,11 @@ const NARR_DIR = `${AUD}/narr`;
 if (fs.existsSync(NARR_DIR)) for (const f of fs.readdirSync(NARR_DIR).filter(f => f.endsWith(".mp3")).sort()){ syncFile(`${NARR_DIR}/${f}`, `${AUD_OUT}/narr/${f}`); resources.push({file:`assets/audio/narr/${f}`, kind:"audio", metadata:"", name:`narr-${f}`, preloadAsMusic:false, preloadAsSound:false, preloadInCache:false, userAdded:true}); }
 /* 3.x: the website's satellite map photos and the 3D Earth's pictures (copied in, small "-s" sizes) */
 const IMG = `${REPO}/assets/img`;
-const PHOTOS = ["map-day", "map-night", "map-paint"], GLOBE_TEX = ["globe-day", "globe-night", "globe-clouds", "globe-water"];
-for (const n of PHOTOS) syncFile(`${IMG}/${n}-s.jpg`, `${OUT}/assets/photo/${n}.jpg`);
+// in-game map: the full-size Earth pictures (whole world in latitude / longitude, laid on the map in 73-earth.js) and the
+// paint theme's picture (only made in the website's projection)
+const PHOTO_SRC = {"earth-day":"globe-day.jpg", "earth-night":"globe-night.jpg", "map-paint":"map-paint-s.jpg"}, PHOTOS = Object.keys(PHOTO_SRC);
+const GLOBE_TEX = ["globe-day", "globe-night", "globe-clouds", "globe-water"];
+for (const n of PHOTOS) syncFile(`${IMG}/${PHOTO_SRC[n]}`, `${OUT}/assets/photo/${n}.jpg`);
 for (const n of GLOBE_TEX) syncFile(`${IMG}/${n}-s.jpg`, `${OUT}/assets/globe/${n}.jpg`);
 for (const n of PHOTOS) img(`photo/${n}.jpg`, `assets/photo/${n}.jpg`);
 for (const n of GLOBE_TEX) img(`globe/${n}.jpg`, `assets/globe/${n}.jpg`);
@@ -183,11 +187,16 @@ const tutSizes = {};
 const mapMetaSmall = {meta:META.meta, grid:META.grid};
 const coreEvents = [
   comment("PROJECT ZERO — โค้ดหลักของเกม (JavaScript)\nบล็อกด้านล่างทำงานครั้งเดียวตอนเริ่มฉาก Loading แล้วสร้าง window.P2050 ไว้ใช้ทั้งเกม\n• Data = ข้อความ TH/EN, ภูมิภาค, ผังเทคโนโลยี, เหตุการณ์ 152 เรื่อง, ข่าว, คู่มือ, ความสำเร็จ (แก้ตัวเลข/ข้อความได้ที่นี่)\n• Engine = กติกาการจำลองรายเดือน (เหมือนเวอร์ชันเว็บทุกอย่าง)\n• UI/Screens = วาดหน้าจอด้วยออบเจกต์ UIPainter, UIText, UIIcon, TutImage\nส่วนจังหวะเวลา การคลิก คีย์บอร์ด ดนตรี และการเปลี่ยนฉาก อยู่ใน Events ของแต่ละฉาก"),
-  std([atStart], [], MODULES.map(([f, title]) => {
-    let code = fs.readFileSync(srcOf(f), "utf8");
-    code = code.replace("/*MAPMETA*/null", JSON.stringify(mapMetaSmall)).replace("/*TUTSIZES*/{}", JSON.stringify(tutSizes)).replace("/*COUNTRYGEO*/null", COUNTRYGEO).replace("/*HEXCELLS*/null", HEXCELLS).replace("/*NARRFILES*/{}", NARRFILES);
-    return js(`/* ${title} */\n` + code);
-  })),
+  std([atStart], [], [
+    /* the game server: the live site's API (the GDevelop preview and the Android / desktop apps have no /api of their own).
+       A local server (http://localhost:8080/api) is still tried after it. Set window.P2050_API before this to use another one. */
+    js(`if (!window.P2050_API) window.P2050_API = ${JSON.stringify(API)};`),
+    ...MODULES.map(([f, title]) => {
+      let code = fs.readFileSync(srcOf(f), "utf8");
+      code = code.replace("/*MAPMETA*/null", JSON.stringify(mapMetaSmall)).replace("/*TUTSIZES*/{}", JSON.stringify(tutSizes)).replace("/*COUNTRYGEO*/null", COUNTRYGEO).replace("/*HEXCELLS*/null", HEXCELLS).replace("/*NARRFILES*/{}", NARRFILES);
+      return js(`/* ${title} */\n` + code);
+    }),
+  ]),
 ];
 
 /* ------------------------------------------------------------------ scenes */

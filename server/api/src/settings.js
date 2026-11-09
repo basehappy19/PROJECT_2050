@@ -40,9 +40,16 @@ export async function getSettings(db, fresh = false){
 export const forgetSettings = () => { cache = null; };
 export const lastSettings = () => cache;
 
-/* which web pages may call the API: the site itself (PUBLIC_URL), anything in CORS_ORIGIN (old installs) and extraOrigins */
+/* the game's own app builds: GDevelop preview (http://127.0.0.1:<port>), the Android / iOS app (https://localhost,
+   capacitor://localhost, the old WebView APK) and desktop / file builds ("null"). Sign-in uses a bearer token, not cookies,
+   so letting these call the API gives another page nothing it could use. */
+const APP_ORIGIN = /^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?|capacitor:\/\/localhost|https:\/\/appassets\.androidplatform\.net|null|file:\/\/)$/;
+export const isAppOrigin = origin => APP_ORIGIN.test(origin || "");
+
+/* which web pages may call the API: the site itself (PUBLIC_URL), anything in CORS_ORIGIN (old installs), extraOrigins
+   and the game's own app builds */
 export function originAllowed(origin){
-  if (!origin) return true;
+  if (!origin || isAppOrigin(origin)) return true;
   const list = [...config.corsOrigin, ...((cache && cache.extraOrigins) || [])];
   if (config.publicUrl) list.push(config.publicUrl);
   if (!list.length || list.includes("*")) return true;

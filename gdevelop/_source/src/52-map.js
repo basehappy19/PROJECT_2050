@@ -181,6 +181,9 @@ const Map = {
   },
   layer(){ return this.scene.getLayer(""); },
   three(){ const R = this.layer().getRenderer(); return R && R.getThreeCamera ? R : null; },
+  /* three.js units per world px: GDevelop 5.6.27x+ scales the 3D scene (1 unit = 100 px, y flipped on the scene);
+     older versions used plain px with the y flip on the layer's group. Objects stay in px either way; only camera math needs it. */
+  ws(){ const sc = this.scene; return sc && sc.getRenderer3DInverseWorldScale ? sc.getRenderer3DInverseWorldScale() || 1 : 1; },
   /* place the 3D camera: zoom sets the distance, the tilt grows with the zoom, and the camera slides back
      so the point (cam.x, cam.y) stays in the middle of the screen */
   applyCam(){
@@ -201,7 +204,7 @@ const Map = {
   toScreen(x, y){
     const c = this.cam3();
     if (!c) return [((x - this.cam.x) * this.cam.z + W / 2) / Kit.K, ((y - this.cam.y) * this.cam.z + Hh / 2) / Kit.K];
-    const v = (this._v = this._v || new THREE.Vector3()).set(x, -y, 0).project(c);
+    const v = (this._v = this._v || new THREE.Vector3()).set(x * this.ws(), -y * this.ws(), 0).project(c);
     return [(v.x + 1) / 2 * W / Kit.K, (1 - v.y) / 2 * Hh / Kit.K];
   },
   /* screen design units → world px on the map plane */
@@ -210,7 +213,7 @@ const Map = {
     if (!c) return [(dx * Kit.K - W / 2) / this.cam.z + this.cam.x, (dy * Kit.K - Hh / 2) / this.cam.z + this.cam.y];
     const v = (this._u = this._u || new THREE.Vector3()).set(dx * Kit.K / W * 2 - 1, 1 - dy * Kit.K / Hh * 2, 0.5).unproject(c);
     const o = c.position, kx = v.x - o.x, ky = v.y - o.y, kz = v.z - o.z, f = kz ? -o.z / kz : 0;
-    return [o.x + kx * f, -(o.y + ky * f)];
+    const e = this.ws(); return [(o.x + kx * f) / e, -(o.y + ky * f) / e];
   },
   geoAt(x, y){ return geoAtWorld(x, y); },
   colorsChanged(){ HEAT = P.A11y && P.A11y.cb ? HEAT_CB : HEAT_N; if (this.scene && this.refresh) this.refresh(); },
