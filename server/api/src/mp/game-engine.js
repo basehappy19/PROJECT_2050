@@ -2243,6 +2243,7 @@ P.CHANGELOG = [
     "ลูกโลกหน้าโหลดและหน้าหลักสว่างเท่ากันแล้ว · แถบล่างไม่ทับกันในจอขนาดกลาง (จอแคบขึ้นแค่ไอคอนเมนู) · มือถือ: แผนที่เลื่อนซ้ายขวาได้อิสระ ไม่ดีดกลับกลาง ปัดแรง ๆ ให้ไหลต่อ แตะสองครั้งซูมเข้า สองนิ้วแตะซูมออก และแผนที่พอดีพื้นที่ระหว่างแถบบนกับล่าง",
     "หน้าข้อพิพาทระหว่างประเทศแบบใหม่: สองฝ่ายเผชิญหน้ากัน (VS) พร้อมธงชาติและคำพูดของแต่ละฝ่าย ทางเลือกบอกสั้น ๆ ว่าฝ่ายไหนพอใจหรือไม่พอใจ",
     "ฤดูกาลสำคัญขึ้น: โซลาร์ผลิตไฟได้มากหน้าร้อนแต่น้อยหน้าฝน กังหันลมแรงช่วงพายุและหน้าหนาว · ไฟฟ้าพีคหน้าร้อนทำให้ไฟดับ (สกิลลดการใช้ไฟช่วงพีกช่วยได้) · ผลผลิตเกษตรขึ้นกับมรสุม · แผนที่มีหิมะ ฝน หมอกควัน และไอร้อนตามฤดู · ยิ่งโลกร้อน ฤดูยิ่งรุนแรง · จบฤดูได้เกรด A–F และรางวัล",
+    "แท็บประเทศมีธงชาติของประเทศนั้น · ประเทศส่งทรัพยากรให้มากขึ้น 50% ซื้อจากประเทศได้ +12 ถึง +20 ฟองสีส้มให้ +8 ถึง +12 ส่วนการซื้อทันทีในตลาดแพงขึ้น 40% (ขายได้ครึ่งราคา)",
   ], [
     "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu.",
     "Fast mode: a 15-minute game without minerals or groups and with fewer events, great for a first game.",
@@ -2276,6 +2277,7 @@ P.CHANGELOG = [
     "The loading-screen and home-screen Earths are now equally bright · the bottom bar no longer overlaps on mid-size screens (narrow screens show menu icons only) · phones: pan the map freely without it jumping back to the middle, flick to glide, double-tap to zoom in, two-finger tap to zoom out, and the map fits between the top and bottom bars",
     "A new screen for disputes between countries: the two sides face each other (VS) with their flags and say one line each; each choice simply says which side will be pleased or upset.",
     "Seasons matter more: solar makes more in the hot season and less under monsoon clouds, wind farms do best in storm season and winter · a summer power peak causes blackouts (Demand Response helps) · the harvest depends on the monsoon · snow, rain, smoke and heat haze show on the map · seasons get harsher as the world warms · each season ends with a grade A–F and a reward.",
+    "The country tab shows the country's flag · countries send 50% more minerals, buying from a country gives +12 to +20 and orange bubbles +8 to +12, while instant buying on the market costs 40% more (selling pays half the price).",
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",
@@ -4070,7 +4072,7 @@ if (P.NODE_ICON) NEW_SKILLS.forEach(n => { P.NODE_ICON[n.id] = n.icon; });
 
 /* ---------------- minerals: income, costs, bubbles ---------------- */
 const relFactor = rel => rel >= 50 ? 1 : rel >= 20 ? .6 : rel >= 0 ? .3 : 0;
-const ORE_HOME = .25, ORE_SRC = .016;   // 1.1: much less free income (was .6 and .035)
+const ORE_HOME = .25, ORE_SRC = .024;   // 1.1: much less free income (was .6 and .035) · 3.7.5: countries send 50% more (.016 → .024)
 /* what each country sends us this month: [{id, amt}] */
 function oreSources(){
   const out = [];
@@ -4125,10 +4127,10 @@ function popOre(b){
   return gain;
 }
 /* country order: buy minerals from a country that has them */
-const ORE_BUY = {id:"ore", icon:"package", ep:30, pc:0, cd:6, name:T("ซื้อทรัพยากรจากประเทศนี้", "Buy resources here"), desc:T("ทรัพยากรที่ประเทศนี้มี +8 ถึง +14 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2", "This country's minerals +8 to +14 (more if friendly), friendship +2")};
+const ORE_BUY = {id:"ore", icon:"package", ep:30, pc:0, cd:6, name:T("ซื้อทรัพยากรจากประเทศนี้", "Buy resources here"), desc:T("ทรัพยากรที่ประเทศนี้มี +12 ถึง +20 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2", "This country's minerals +12 to +20 (more if friendly), friendship +2")};
 function oreBuyOk(c){ return !!(S.oreOn && c && !c.rest && CRES[c.id] && CRES[c.id].w && !((S.oreBan || {})[c.id] > 0)); }
 function oreBuy(c){
-  const gain = Math.round(8 + 6 * relFactor(c.rel));
+  const gain = Math.round(12 + 8 * relFactor(c.rel));   // 3.7.5: was 8 + 6
   S.ore = (S.ore || 0) + gain; (S.oreFrom = S.oreFrom || {})[c.id] = (S.oreFrom[c.id] || 0) + gain;
   return gain;
 }
@@ -4560,6 +4562,10 @@ const RECIPE = {
   N4:{cu:.5, si:.5}, N6:{si:1}, C2:{si:1}, C4:{si:.8, cu:.2}, C5:{si:1}, C7:{si:.5, cu:.5}, P5:{si:.5, cu:.5},
 };
 const groupOf = r => GIDS.find(g => GROUPS[g].res.includes(r));
+/* 3.7.5: how much of each group came from where (country id, "home" = our own mines, "MKT" = bought on the market) */
+function matFrom(id, g, n){ if (!n) return; const m = S.matFrom = S.matFrom || {}, e = m[id] = m[id] || {}; e[g] = (e[g] || 0) + n; }
+/* top sources: [{id, n, by:{g:n}}] sorted, optionally for one group */
+function matTop(g, k = 5){ const m = S.matFrom || {}; return Object.keys(m).map(id => ({id, by:m[id], n:g ? (m[id][g] || 0) : Object.values(m[id]).reduce((a, b) => a + b, 0)})).filter(x => x.n >= .5).sort((a, b) => b.n - a.n).slice(0, k); }
 const full = () => true;   // 1.1: every mode uses the five mineral groups (was Continuous World only)
 
 function marketInit(){
@@ -4621,6 +4627,7 @@ function marketTick(){
   // 1.7: what arrives raw has to go through a refinery first (33-supply.js); the rest is ready to use
   const sp = P.matSplit ? P.matSplit() : {raw:{}, ref:matGain()};
   GIDS.forEach(g => { S.mat[g] += sp.ref[g] || 0; if (sp.raw[g]) S.raw[g] = (S.raw[g] || 0) + sp.raw[g]; });
+  { const cut = (S.orePrice || 0) > 0 ? .7 : 1, home = ((P.ORE_HOME ?? .6) + (S.oreInc || 0)) / GIDS.length; matSources().forEach(x => matFrom(x.id, x.g, x.amt * cut)); GIDS.forEach(g => matFrom("home", g, home)); }
   if (P.refineTick) P.refineTick();
   const banned = Object.keys(S.oreBan || {}).filter(k => S.oreBan[k] > 0), R = P.rand;
   const dr = S.mktDrift = S.mktDrift || {bat:0, ree:0, cu:0, si:0, u:0}, hist = S.mktHist = S.mktHist || {bat:[], ree:[], cu:[], si:[], u:[]};
@@ -4639,12 +4646,15 @@ function marketTick(){
   });
   return true;
 }
-const price = g => Math.max(1, Math.round(GROUPS[g].base * S.mkt[g] * (P.bal ? P.bal().cost : 1) * 10) / 10);
+/* 3.7.5: the world market is the quick way, so it costs more (×1.4); selling pays half the price (was 70%), so selling
+   is worth about what it was. Countries send more, so trading with them is the better deal. */
+const BUY_K = 1.4, SELL_K = .5;
+const price = g => Math.max(1, Math.round(GROUPS[g].base * BUY_K * S.mkt[g] * (P.bal ? P.bal().cost : 1) * 10) / 10);
 const LOT = 10;
 /* buying lifts the price, selling lowers it (0.4% / 0.3% per unit) */
 const lotCost = (g, n) => Math.ceil(price(g) * n);
-function mktBuy(g, n = LOT){ marketInit(); n = Math.max(1, Math.round(n)); const k = lotCost(g, n); if (S.ep < k) return false; S.ep -= k; S.mat[g] += n; S.mkt[g] = clamp(S.mkt[g] + .004 * n, .5, 3); P.changed(); return true; }
-const sellGain = (g, n = LOT) => Math.floor(price(g) * n * .7);
+function mktBuy(g, n = LOT){ marketInit(); n = Math.max(1, Math.round(n)); const k = lotCost(g, n); if (S.ep < k) return false; S.ep -= k; S.mat[g] += n; matFrom("MKT", g, n); S.mkt[g] = clamp(S.mkt[g] + .004 * n, .5, 3); P.changed(); return true; }
+const sellGain = (g, n = LOT) => Math.floor(price(g) * n * SELL_K);
 function mktSell(g, n = LOT){ marketInit(); if ((S.mat[g] || 0) < n) return false; S.mat[g] -= n; S.ep += sellGain(g, n); S.mkt[g] = clamp(S.mkt[g] - .003 * n, .5, 3); P.changed(); return true; }
 /* how much of a group the skills we can buy next are short of (for "buy what's missing") */
 function matShort(g){
@@ -4666,18 +4676,18 @@ const _tick = P.oreTick; P.oreTick = () => { if (!S.oreOn) return _tick(); if (m
 const _pop = P.popOre; P.popOre = b => {
   if (!full()) return _pop(b);
   marketInit(); const cr = P.CRES[b.cid], gs = cr ? [...new Set(cr.r.map(groupOf).filter(Boolean))] : []; const g = gs.length ? gs[Math.floor(P.rand() * gs.length)] : "cu";
-  const gain = 5 + Math.round(P.rand() * 3); if (P.arrives) P.arrives(b.cid, g, gain); else S.mat[g] += gain; return gain;
+  const gain = 8 + Math.round(P.rand() * 4); if (P.arrives) P.arrives(b.cid, g, gain); else S.mat[g] += gain; return gain;
 };
 const _buy = P.oreBuy; P.oreBuy = c => {
   if (!full()) return _buy(c);
-  marketInit(); const gs = [...new Set((P.CRES[c.id] || {r:[]}).r.map(groupOf).filter(Boolean))]; const gain = Math.round(8 + 6 * P.relFactor(c.rel));
+  marketInit(); const gs = [...new Set((P.CRES[c.id] || {r:[]}).r.map(groupOf).filter(Boolean))]; const gain = Math.round(12 + 8 * P.relFactor(c.rel));
   const put = (g, n) => (P.arrives ? P.arrives(c.id, g, n) : (S.mat[g] += n));
   if (!gs.length) { put("cu", gain); return gain; } gs.forEach(g => put(g, Math.round(gain / gs.length))); return gain;
 };
 const _gain = P.oreGain; P.oreGain = () => (full() && S.oreOn ? Object.values(matGain()).reduce((a, b) => a + b, 0) : _gain());
 const _afford = P.canAfford; P.canAfford = n => _afford(n) && matOk(n);
 
-Object.assign(P, {MAT:GROUPS, MAT_IDS:GIDS, RECIPE, matCost, matOk, matSpend, matGain, matSources, marketInit, marketTick, mktPrice:price, MKT_LOT:LOT, mktBuy, mktSell, mktLotCost:lotCost, mktSellGain:sellGain, matShort, matUsers, matTotal, isFullRes:full, groupOf});
+Object.assign(P, {matFrom, matTop, MKT_BUY_K:BUY_K, MAT:GROUPS, MAT_IDS:GIDS, RECIPE, matCost, matOk, matSpend, matGain, matSources, marketInit, marketTick, mktPrice:price, MKT_LOT:LOT, mktBuy, mktSell, mktLotCost:lotCost, mktSellGain:sellGain, matShort, matUsers, matTotal, isFullRes:full, groupOf});
 
 })();
 
@@ -5290,6 +5300,7 @@ function matSplit(){
 function arrives(cid, g, n){
   supplyInit();
   if (refines(cid, g)) S.mat[g] += n; else S.raw[g] += n;
+  if (P.matFrom) P.matFrom(cid, g, n);
 }
 function refineTick(){
   supplyInit();

@@ -123,7 +123,7 @@ if (P.NODE_ICON) NEW_SKILLS.forEach(n => { P.NODE_ICON[n.id] = n.icon; });
 
 /* ---------------- minerals: income, costs, bubbles ---------------- */
 const relFactor = rel => rel >= 50 ? 1 : rel >= 20 ? .6 : rel >= 0 ? .3 : 0;
-const ORE_HOME = .25, ORE_SRC = .016;   // 1.1: much less free income (was .6 and .035)
+const ORE_HOME = .25, ORE_SRC = .024;   // 1.1: much less free income (was .6 and .035) · 3.7.5: countries send 50% more (.016 → .024)
 /* what each country sends us this month: [{id, amt}] */
 function oreSources(){
   const out = [];
@@ -178,10 +178,10 @@ function popOre(b){
   return gain;
 }
 /* country order: buy minerals from a country that has them */
-const ORE_BUY = {id:"ore", icon:"package", ep:30, pc:0, cd:6, name:T("ซื้อทรัพยากรจากประเทศนี้", "Buy resources here"), desc:T("ทรัพยากรที่ประเทศนี้มี +8 ถึง +14 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2", "This country's minerals +8 to +14 (more if friendly), friendship +2")};
+const ORE_BUY = {id:"ore", icon:"package", ep:30, pc:0, cd:6, name:T("ซื้อทรัพยากรจากประเทศนี้", "Buy resources here"), desc:T("ทรัพยากรที่ประเทศนี้มี +12 ถึง +20 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2", "This country's minerals +12 to +20 (more if friendly), friendship +2")};
 function oreBuyOk(c){ return !!(S.oreOn && c && !c.rest && CRES[c.id] && CRES[c.id].w && !((S.oreBan || {})[c.id] > 0)); }
 function oreBuy(c){
-  const gain = Math.round(8 + 6 * relFactor(c.rel));
+  const gain = Math.round(12 + 8 * relFactor(c.rel));   // 3.7.5: was 8 + 6
   S.ore = (S.ore || 0) + gain; (S.oreFrom = S.oreFrom || {})[c.id] = (S.oreFrom[c.id] || 0) + gain;
   return gain;
 }

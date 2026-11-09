@@ -31,6 +31,10 @@ const RECIPE = {
   N4:{cu:.5, si:.5}, N6:{si:1}, C2:{si:1}, C4:{si:.8, cu:.2}, C5:{si:1}, C7:{si:.5, cu:.5}, P5:{si:.5, cu:.5},
 };
 const groupOf = r => GIDS.find(g => GROUPS[g].res.includes(r));
+/* 3.7.5: how much of each group came from where (country id, "home" = our own mines, "MKT" = bought on the market) */
+function matFrom(id, g, n){ if (!n) return; const m = S.matFrom = S.matFrom || {}, e = m[id] = m[id] || {}; e[g] = (e[g] || 0) + n; }
+/* top sources: [{id, n, by:{g:n}}] sorted, optionally for one group */
+function matTop(g, k = 5){ const m = S.matFrom || {}; return Object.keys(m).map(id => ({id, by:m[id], n:g ? (m[id][g] || 0) : Object.values(m[id]).reduce((a, b) => a + b, 0)})).filter(x => x.n >= .5).sort((a, b) => b.n - a.n).slice(0, k); }
 const full = () => true;   // 1.1: every mode uses the five mineral groups (was Continuous World only)
 
 function marketInit(){
@@ -92,6 +96,7 @@ function marketTick(){
   // 1.7: what arrives raw has to go through a refinery first (33-supply.js); the rest is ready to use
   const sp = P.matSplit ? P.matSplit() : {raw:{}, ref:matGain()};
   GIDS.forEach(g => { S.mat[g] += sp.ref[g] || 0; if (sp.raw[g]) S.raw[g] = (S.raw[g] || 0) + sp.raw[g]; });
+  { const cut = (S.orePrice || 0) > 0 ? .7 : 1, home = ((P.ORE_HOME ?? .6) + (S.oreInc || 0)) / GIDS.length; matSources().forEach(x => matFrom(x.id, x.g, x.amt * cut)); GIDS.forEach(g => matFrom("home", g, home)); }
   if (P.refineTick) P.refineTick();
   const banned = Object.keys(S.oreBan || {}).filter(k => S.oreBan[k] > 0), R = P.rand;
   const dr = S.mktDrift = S.mktDrift || {bat:0, ree:0, cu:0, si:0, u:0}, hist = S.mktHist = S.mktHist || {bat:[], ree:[], cu:[], si:[], u:[]};
@@ -110,12 +115,15 @@ function marketTick(){
   });
   return true;
 }
-const price = g => Math.max(1, Math.round(GROUPS[g].base * S.mkt[g] * (P.bal ? P.bal().cost : 1) * 10) / 10);
+/* 3.7.5: the world market is the quick way, so it costs more (×1.4); selling pays half the price (was 70%), so selling
+   is worth about what it was. Countries send more, so trading with them is the better deal. */
+const BUY_K = 1.4, SELL_K = .5;
+const price = g => Math.max(1, Math.round(GROUPS[g].base * BUY_K * S.mkt[g] * (P.bal ? P.bal().cost : 1) * 10) / 10);
 const LOT = 10;
 /* buying lifts the price, selling lowers it (0.4% / 0.3% per unit) */
 const lotCost = (g, n) => Math.ceil(price(g) * n);
-function mktBuy(g, n = LOT){ marketInit(); n = Math.max(1, Math.round(n)); const k = lotCost(g, n); if (S.ep < k) return false; S.ep -= k; S.mat[g] += n; S.mkt[g] = clamp(S.mkt[g] + .004 * n, .5, 3); P.changed(); return true; }
-const sellGain = (g, n = LOT) => Math.floor(price(g) * n * .7);
+function mktBuy(g, n = LOT){ marketInit(); n = Math.max(1, Math.round(n)); const k = lotCost(g, n); if (S.ep < k) return false; S.ep -= k; S.mat[g] += n; matFrom("MKT", g, n); S.mkt[g] = clamp(S.mkt[g] + .004 * n, .5, 3); P.changed(); return true; }
+const sellGain = (g, n = LOT) => Math.floor(price(g) * n * SELL_K);
 function mktSell(g, n = LOT){ marketInit(); if ((S.mat[g] || 0) < n) return false; S.mat[g] -= n; S.ep += sellGain(g, n); S.mkt[g] = clamp(S.mkt[g] - .003 * n, .5, 3); P.changed(); return true; }
 /* how much of a group the skills we can buy next are short of (for "buy what's missing") */
 function matShort(g){
@@ -137,15 +145,15 @@ const _tick = P.oreTick; P.oreTick = () => { if (!S.oreOn) return _tick(); if (m
 const _pop = P.popOre; P.popOre = b => {
   if (!full()) return _pop(b);
   marketInit(); const cr = P.CRES[b.cid], gs = cr ? [...new Set(cr.r.map(groupOf).filter(Boolean))] : []; const g = gs.length ? gs[Math.floor(P.rand() * gs.length)] : "cu";
-  const gain = 5 + Math.round(P.rand() * 3); if (P.arrives) P.arrives(b.cid, g, gain); else S.mat[g] += gain; return gain;
+  const gain = 8 + Math.round(P.rand() * 4); if (P.arrives) P.arrives(b.cid, g, gain); else S.mat[g] += gain; return gain;
 };
 const _buy = P.oreBuy; P.oreBuy = c => {
   if (!full()) return _buy(c);
-  marketInit(); const gs = [...new Set((P.CRES[c.id] || {r:[]}).r.map(groupOf).filter(Boolean))]; const gain = Math.round(8 + 6 * P.relFactor(c.rel));
+  marketInit(); const gs = [...new Set((P.CRES[c.id] || {r:[]}).r.map(groupOf).filter(Boolean))]; const gain = Math.round(12 + 8 * P.relFactor(c.rel));
   const put = (g, n) => (P.arrives ? P.arrives(c.id, g, n) : (S.mat[g] += n));
   if (!gs.length) { put("cu", gain); return gain; } gs.forEach(g => put(g, Math.round(gain / gs.length))); return gain;
 };
 const _gain = P.oreGain; P.oreGain = () => (full() && S.oreOn ? Object.values(matGain()).reduce((a, b) => a + b, 0) : _gain());
 const _afford = P.canAfford; P.canAfford = n => _afford(n) && matOk(n);
 
-Object.assign(P, {MAT:GROUPS, MAT_IDS:GIDS, RECIPE, matCost, matOk, matSpend, matGain, matSources, marketInit, marketTick, mktPrice:price, MKT_LOT:LOT, mktBuy, mktSell, mktLotCost:lotCost, mktSellGain:sellGain, matShort, matUsers, matTotal, isFullRes:full, groupOf});
+Object.assign(P, {matFrom, matTop, MKT_BUY_K:BUY_K, MAT:GROUPS, MAT_IDS:GIDS, RECIPE, matCost, matOk, matSpend, matGain, matSources, marketInit, marketTick, mktPrice:price, MKT_LOT:LOT, mktBuy, mktSell, mktLotCost:lotCost, mktSellGain:sellGain, matShort, matUsers, matTotal, isFullRes:full, groupOf});

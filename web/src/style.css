@@ -1511,3 +1511,5 @@ details.more > summary:hover{color:var(--fg)}
 .versus{align-items:flex-start} .versus .vsb{align-self:center}
 .vflags{flex-wrap:nowrap} @media (max-width:640px){ .vflags{flex-wrap:wrap} }
 @media (min-width:700px){ .opts.vsopts{grid-template-columns:repeat(3,minmax(0,1fr))} }
+/* 3.7.5: the country's flag next to its name in the country tab */
+.cflagt{display:flex;align-items:center;gap:10px} .cflag{flex:none;width:40px;height:30px;border-radius:5px;object-fit:cover;box-shadow:0 0 0 1px rgba(255,255,255,.2)}

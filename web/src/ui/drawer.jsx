@@ -178,7 +178,7 @@ function PaneCountry(){
   return <>
     <div class="chead">
       <div class="grow">
-        <h3 class="title big">{name}</h3>
+        <h3 class="title big cflagt">{P.FLAG2 && P.FLAG2[c.id] ? <img class="cflag" src={`assets/img/flags/${P.FLAG2[c.id]}.webp`} alt=""/> : null}<span>{name}</span></h3>
         <p class="muted sub"><Rich t={L(P.RMETA[c.reg].name) + (member ? ` · [[handshake]] ${t("allyMember")}` : "")} iconColor="good"/></p>
         <p class="muted sub statline"><RichB t={`CO₂ [b]${P.fmtCO2(c.co2)}[/b] · ${t("shareOfRegion")} [b]${Math.round(share * 100)}%[/b]` + (c.rest ? "" : ` · ${t("risk")} [b]${meta.risk}%[/b] · ${t("adapt")} [b]${Math.round(c.adapt)}[/b] · [[leaf]] [b]${Math.round(c.green || 0)}%[/b]`)} iconColor="good"/></p>
       </div>

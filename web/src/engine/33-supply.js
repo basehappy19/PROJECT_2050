@@ -50,6 +50,7 @@ function matSplit(){
 function arrives(cid, g, n){
   supplyInit();
   if (refines(cid, g)) S.mat[g] += n; else S.raw[g] += n;
+  if (P.matFrom) P.matFrom(cid, g, n);
 }
 function refineTick(){
   supplyInit();
