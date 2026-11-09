@@ -275,6 +275,8 @@ const Map = {
   /* drawer closed: slide back to the whole-world view (when not zoomed in) */
   recenter(){ if (this.mode === "game" && this.cam.z <= 1.05) this.target = {...HOME}; },
   resetView(){ if (this.mode === "game"){ this.zAnim = null; this.target = {...HOME}; Kit.dirty(); } },
+  /* 3.9: arrow keys move the map a few screen pixels */
+  panBy(dx, dy){ if (this.mode !== "game") return; this.zAnim = null; this.fling = null; const b = this.target || this.cam; this.target = {x:b.x + dx / b.z, y:b.y + dy / b.z, z:b.z}; Kit.dirty(); },
   /* 3.7.3: smooth zoom toward / away from a screen point (double-tap, two-finger tap); never jumps back to the middle */
   zoomAt(sx, sy, f){ if (this.mode !== "game") return; const w = this.toWorldFromScreen(sx, sy); this.target = null; this.fling = null; this.zAnim = {z:clamp(this.cam.z * f, ZMIN, ZMAX), sx, sy, wx:w[0], wy:w[1], keep:true}; if (P.Audio) P.Audio.play("tick"); },
   zoomBy(f){

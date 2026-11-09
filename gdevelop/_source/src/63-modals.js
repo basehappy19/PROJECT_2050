@@ -9,7 +9,7 @@ if (P.mods && P.mods.modals) return;
 const TUT_SIZES = /*TUTSIZES*/{};
 const {Kit, S, t, L, UI, Audio, W, UIM, Screens, TUT, CHARS, CHAR, STORY, ADVISOR, ENDINGS, HAZARDS, COUNTRY, IC} = P;
 const k = Kit;
-const WIDTH = {intro:640, slotpick:620, tutorial:720, charsel:1150, story:800, learn:980, end:640, event:660, pause:680, market:940, politics:860, year:600};
+const WIDTH = {intro:640, slotpick:620, tutorial:720, charsel:1150, story:800, learn:980, end:640, event:660, pause:680, market:940, politics:860, year:600, keys:860};
 
 Screens.renderModal = function(l){
   const kind = UIM.kind();
@@ -32,6 +32,7 @@ Screens.renderModal = function(l){
     else if (kind === "year") ch = this.mYear(s, pw);
     else if (kind === "intro") ch = this.mIntro(s, pw);
     else if (kind === "slotpick") ch = this.mSlotPick(s, pw);
+    else if (kind === "keys") ch = this.mKeys(s, pw);
     const ph = Math.min(ch, k.H - 30), py = (k.H - ph) / 2;
     s.frame(px, py, {x:px, y:py, w:pw, h:ph}, ch);
     this._modalBox = {px, py, pw, ph};
@@ -44,7 +45,7 @@ Screens.renderModal = function(l){
     k.hgrad(l, 0, 0, k.W, k.H, [[0, "#020609"], [.35, "#020609"], [1, "#020609"]], {a:.0, bg:true});
     k.rect(l, px - 40, 0, pw + 80, k.H, "#020609", {a:.55, bg:true});
   } else k.rect(l, 0, 0, k.W, k.H, "#020609", {a:kind === "story" || kind === "intro" ? .8 : .62, bg:true});
-  const closer = {pause:() => Screens.resume(), learn:() => Screens.closeLearn(), market:() => Screens.closeWin(), politics:() => Screens.closeWin(), year:() => Screens.closeWin(), slotpick:() => { UIM.modal = "charsel"; k.dirty(); }}[kind];
+  const closer = {keys:() => Screens.closeKeys(), pause:() => Screens.resume(), learn:() => Screens.closeLearn(), market:() => Screens.closeWin(), politics:() => Screens.closeWin(), year:() => Screens.closeWin(), slotpick:() => { UIM.modal = "charsel"; k.dirty(); }}[kind];
   if (closer){ k.hit(l, "veil", 0, 0, k.W, k.H, () => { Audio.play("close"); closer(); }, {cursor:false}); }
   k.hit(l, "mbox", px, py, pw, ph, () => {}, {cursor:false});
   const border = kind === "end" ? (S.over === "win" ? "good" : "bad") : "line";
@@ -466,6 +467,7 @@ Screens.mPause = function(l, pw){
   let bx = x;
   bx += W.btn(l, "ptut", bx, y, `[[graduation-cap]] ${t("tutMenu")}`, () => Screens.openTutorial(0, false), {kind:"ghost"}) + 8;
   bx += W.btn(l, "plearn", bx, y, `[[book-open]] ${t("mLearn")}`, () => Screens.openLearn(), {kind:"ghost"}) + 8;
+  if (!k.touch) bx += W.btn(l, "pkeys", bx, y, `[[keyboard]] ${S.lang === "th" ? "ปุ่มลัด" : "Shortcuts"}`, () => Screens.openKeys(), {kind:"ghost"}) + 8;   // 3.9
   y += 44;
   W.btn(l, "pmain", x, y, t("pMain"), () => Screens.toMenu(), {kind:"ghost"});
   if (P.hasKeyboard()) k.text(l, t("keysHelp"), x, y + 46, {font:"mono", size:10.5, color:"muted", w});
@@ -496,4 +498,35 @@ Screens.mTutorial = function(l, pw){
   W.btn(l, "tnext", x + w - nw, y, nl, () => Screens.tutAct(last ? "done" : "next"));
   if (i){ const bl = `[[chevron-left]] ${t("tutBack")}`, bw = W.btnW(bl); W.btn(l, "tback", x + w - nw - 8 - bw, y, bl, () => Screens.tutAct("back"), {kind:"ghost"}); }
   return y + 36 + 20;
+};
+
+/* 3.9: every keyboard shortcut (the same list as the website, engine/44-keys.js) */
+const KCOL = {accent:"accent", sky:"sky", purple:"purple", gold:"gold", pink:"#ff7aa8", muted:"muted"};
+Screens.kbd = (l, key, x, y, draw = true) => {
+  const w = Math.max(24, k.textW(key, {font:"monoB", size:12}) + 12);
+  if (draw){ k.rect(l, x, y, w, 24, "#1d3640", {r:6, stroke:"#36606b", bg:true}); k.rect(l, x + 1, y + 21, w - 2, 3, "#36606b", {r:2}); k.text(l, key, x, y + 3, {font:"monoB", size:12, w, align:"center"}); }
+  return w;
+};
+Screens.mKeys = function(l, pw){
+  const x = 20, w = pw - 40; let y = 18;
+  y += h3(l, `[[keyboard]] ${S.lang === "th" ? "ปุ่มลัด" : "Keyboard shortcuts"}`, x, y, w - 40).h + 12;
+  const cols = w >= 760 ? 3 : 2, gw = (w - (cols - 1) * 10) / cols;
+  const heights = P.KEYS.map(g => 34 + g.keys.reduce((s2, [ks, what]) => s2 + Math.max(28, k.textH(L(what), {size:12.5, w:gw - 24 - ks.reduce((a, q) => a + Screens.kbd(null, q, 0, 0, false) + 3, 0) - 8}) + 6), 0) + 8);
+  for (let r = 0; r < P.KEYS.length; r += cols){
+    const rowH = Math.max(...heights.slice(r, r + cols));
+    P.KEYS.slice(r, r + cols).forEach((g, j) => {
+      const gx = x + j * (gw + 10), col = KCOL[g.col] || "accent";
+      k.rect(l, gx, y, gw, rowH, "panel2", {r:12, stroke:"line", bg:true});
+      k.icon(l, g.icon, gx + 12, y + 11, 16, col);
+      k.text(l, L(g.name), gx + 34, y + 8, {font:"dispS", size:14, color:col});
+      let yy = y + 34;
+      for (const [ks, what] of g.keys){
+        let kx = gx + 12; for (const q of ks) kx += Screens.kbd(l, q, kx, yy) + 3;
+        const tw = gw - (kx - gx) - 16, th2 = k.text(l, L(what), kx + 5, yy + 3, {size:12.5, w:tw}).h;
+        yy += Math.max(28, th2 + 6);
+      }
+    });
+    y += rowH + 10;
+  }
+  return y + 10;
 };

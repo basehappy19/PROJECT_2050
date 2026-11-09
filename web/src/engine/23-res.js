@@ -178,7 +178,7 @@ function popOre(b){
   return gain;
 }
 /* country order: buy minerals from a country that has them */
-const ORE_BUY = {id:"ore", icon:"package", ep:30, pc:0, cd:6, name:T("ซื้อทรัพยากรจากประเทศนี้", "Buy resources here"), desc:T("ทรัพยากรที่ประเทศนี้มี +12 ถึง +20 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2", "This country's minerals +12 to +20 (more if friendly), friendship +2")};
+const ORE_BUY = {id:"ore", icon:"package", ep:30, pc:0, cd:6, name:T("ซื้อแร่", "Buy minerals"), desc:T("ทรัพยากรที่ประเทศนี้มี +12 ถึง +20 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2", "This country's minerals +12 to +20 (more if friendly), friendship +2")};
 function oreBuyOk(c){ return !!(S.oreOn && c && !c.rest && CRES[c.id] && CRES[c.id].w && !((S.oreBan || {})[c.id] > 0)); }
 function oreBuy(c){
   const gain = Math.round(12 + 8 * relFactor(c.rel));   // 3.7.5: was 8 + 6

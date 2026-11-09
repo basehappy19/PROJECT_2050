@@ -2593,6 +2593,19 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
   ]),
 ];
 P.CHANGELOG.find(x => x.v === "2.1").subs = [
+  SUB("2.1.2", "2026-11-10", [
+    "แผงประเทศอ่านง่ายขึ้น: CO₂ ตัวใหญ่ (หน่วย Gt) ความเสี่ยงภัย ป้องกันภัย และเทคโนโลยีสีเขียวเป็นช่องของตัวเอง แร่ที่ประเทศนั้นมีขึ้นให้เห็นเลย และบอกว่าแร่ไหนต้องแปรรูปก่อน",
+    "คำสั่งกับประเทศรวมเป็นรายการเดียว แบ่งตามเป้าหมาย (ลด CO₂ · มิตรภาพ · ป้องกันภัย · ทรัพยากร) ผลของแต่ละคำสั่งเป็นไอคอนกับตัวเลขที่คิดจากสถานะจริงตอนนี้ ปุ่มซื้อขนาดเท่ากันทุกปุ่ม",
+    "\"ซื้อแร่\" บอกเลยว่าจะได้แร่อะไรกี่หน่วย",
+    "แถบข่าวกว้างขึ้น ตัวใหญ่ขึ้นตามขนาดจอ และข้อความยาววิ่งให้อ่านจนจบ",
+    "ปุ่มลัดบนคอมเพิ่ม: ลูกศรเลื่อนแผนที่ · Q/E สลับทวีป · A ไปยังภัย · ⌫ ย้อนกลับ · P ความนิยม · M ตลาดแร่ · Z X C สกิลพิเศษ · V เสียง · ? ดูปุ่มลัดทั้งหมด (โหมดฝึกซ้อมแนะนำปุ่มด้วย)",
+  ], [
+    "The country panel is easier to read: CO₂ as a big number in Gt, disaster risk, protection and green technology in their own boxes, the country's minerals right away, and which of them still need refining.",
+    "Orders for a country are one list grouped by goal (cut CO₂ · friendship · disaster protection · resources); each effect is an icon and a number worked out from the game right now, and every buy button is the same size.",
+    "\"Buy minerals\" says which minerals you get and how many.",
+    "The news line is wider, its text scales with the screen, and a long line scrolls so you can read it to the end.",
+    "More keyboard shortcuts: arrows move the map · Q/E switch region · A goes to the next disaster · Backspace goes back · P approval · M market · Z X C abilities · V sound · ? all shortcuts (training shows them too).",
+  ]),
   SUB("2.1.1", "2026-11-10", [
     "หน้าโหลดใช้ลูกโลก 3 มิติตัวเดียวกับหน้าหลัก คมชัดและหมุนลื่น พอกดเข้าเกม ลูกโลกเลื่อนไปที่หน้าหลักพอดี หมุนต่อจากเดิม",
     "ข้อความระหว่างโหลดสุ่มจากสิ่งต่าง ๆ ในเกม ทุกครั้งที่เปิดจะไม่ซ้ำกัน",
@@ -4158,7 +4171,7 @@ function popOre(b){
   return gain;
 }
 /* country order: buy minerals from a country that has them */
-const ORE_BUY = {id:"ore", icon:"package", ep:30, pc:0, cd:6, name:T("ซื้อทรัพยากรจากประเทศนี้", "Buy resources here"), desc:T("ทรัพยากรที่ประเทศนี้มี +12 ถึง +20 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2", "This country's minerals +12 to +20 (more if friendly), friendship +2")};
+const ORE_BUY = {id:"ore", icon:"package", ep:30, pc:0, cd:6, name:T("ซื้อแร่", "Buy minerals"), desc:T("ทรัพยากรที่ประเทศนี้มี +12 ถึง +20 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2", "This country's minerals +12 to +20 (more if friendly), friendship +2")};
 function oreBuyOk(c){ return !!(S.oreOn && c && !c.rest && CRES[c.id] && CRES[c.id].w && !((S.oreBan || {})[c.id] > 0)); }
 function oreBuy(c){
   const gain = Math.round(12 + 8 * relFactor(c.rel));   // 3.7.5: was 8 + 6
@@ -6439,5 +6452,124 @@ P.LD_POOL = {
   clouds:[T("พยากรณ์พายุไต้ฝุ่นในแปซิฟิก", "Forecasting typhoons in the Pacific"), T("ปล่อยเมฆลอยจากตะวันตกไปตะวันออก", "Letting the clouds drift west to east"), T("ตั้งสถานีเตือนภัยน้ำท่วม", "Setting up flood warning stations"),
     T("เตรียมแผนอพยพหนีคลื่นความร้อน", "Planning heatwave evacuations"), T("จัดฤดูมรสุมให้มาตรงเวลา", "Getting the monsoon to arrive on time"), T("เตรียมหิมะสำหรับฤดูหนาว", "Getting the winter snow ready")],
 };
+
+})();
+
+/* ---- 43-orders.js ---- */
+(function(){
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.orders39) return;
+(P.mods = P.mods || {}).orders39 = 1;
+/* =========================================================================
+   3.9 · The country panel, worked out once for the web drawer and the GDevelop drawer
+   · orders grouped by what they are for (cut CO₂ / friendship / disaster protection / resources)
+   · every effect as a short token computed from the real formulas (20-engine.js countryAction and doAction),
+     so "× on-plan" shows as the number you actually get now
+   · the minerals a country has, and whether they still need refining
+   ========================================================================= */
+const S = P.S, T = (th, en) => ({th, en});
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+P.ORDER_GOALS = [
+  {id:"co2", icon:"trending-down", col:"good", name:T("ลด CO₂", "Cut CO₂")},
+  {id:"rel", icon:"heart", col:"pink", name:T("มิตรภาพ", "Friendship")},
+  {id:"def", icon:"shield", col:"sky", name:T("ป้องกันภัย", "Disaster protection")},
+  {id:"res", icon:"package", col:"gold", name:T("ทรัพยากร", "Resources")},
+];
+/* kind "c" = an order with this country (CACTS) · kind "a" = a regional order aimed at this country (ACTIONS, country scope) */
+const GOAL = {c:{ore:"res", talk:"rel", fund:"co2", tech:"co2", shield:"def"}, a:{fund:"co2", diplo:"rel", adapt:"def", tariff:"co2"}};
+
+const num = v => { const a = Math.abs(v); return a >= 10 || a === Math.round(a) ? String(Math.round(a)) : a.toFixed(1); };
+const sg = v => (v < 0 ? "−" : "+") + num(v);
+/* one token: icon, value, bad?, and a longer line for the tooltip */
+const tk = (ic, v, bad, tip) => ({ic, v, bad:!!bad, tip:tip || null});
+const rel = v => tk("$heart", sg(v), v < 0, T(`มิตรภาพ ${sg(v)}`, `Friendship ${sg(v)}`));
+const co2 = (pct, tip) => tk("$co2", sg(pct) + "%", pct > 0, tip || T(`CO₂ ของประเทศนี้ ${sg(pct)}%`, `This country's CO₂ ${sg(pct)}%`));
+const green = v => tk("leaf", sg(v), false, T(`เทคโนโลยีสีเขียว ${sg(v)}`, `Green technology ${sg(v)}`));
+const shield = v => tk("shield", sg(v), false, T(`ป้องกันภัย ${sg(v)} (ภัยเสียหายน้อยลง)`, `Disaster protection ${sg(v)} (less damage)`));
+
+/* the mineral groups a country's mines feed, and whether that country refines them itself */
+function oreDetail(c){
+  const cr = P.CRES && P.CRES[c.id], rf = P.relFactor ? P.relFactor(c.rel) : .3, gain = Math.round(12 + 8 * rf);
+  if (!P.groupOf || !P.MAT) return [{g:null, n:gain, ready:true}];
+  const gs = [...new Set((cr ? cr.r : []).map(P.groupOf).filter(Boolean))];
+  if (!gs.length) return [{g:"cu", n:gain, ready:!!(P.refines && P.refines(c.id, "cu"))}];
+  return gs.map(g => ({g, n:Math.round(gain / gs.length), ready:!!(P.refines && P.refines(c.id, g))}));
+}
+function orderFx(kind, id, c){
+  const r = P.R(c.reg), comp = r ? r.comp / 100 : 1;
+  if (kind === "c"){
+    if (id === "talk") return [rel(10)];
+    if (id === "fund") return [rel(20), co2(-8, T("CO₂ ของประเทศนี้ −8% ภายใน 12 เดือน", "This country's CO₂ −8% over 12 months")), green(10)];
+    if (id === "tech") return [rel(8), co2(-5), green(15)];
+    if (id === "shield") return [shield(20), rel(4)];
+    if (id === "ore") return [...oreDetail(c).map(o => o.g ? {...tk(P.MAT[o.g].icon, "+" + o.n, false, T(`${P.L(P.MAT[o.g].name)} +${o.n}${o.ready ? "" : " (ต้องแปรรูป)"}`, `${P.L(P.MAT[o.g].name)} +${o.n}${o.ready ? "" : " (needs refining)"}`)), mat:P.MAT[o.g].name, raw:!o.ready} : tk("$ore", "+" + o.n)), rel(2)];
+  } else {
+    if (id === "fund") return [co2(-12 * comp, T(`CO₂ ของประเทศนี้ ${sg(-12 * comp)}% (−12% × ทำตามแผน ${Math.round(comp * 100)}%)`, `This country's CO₂ ${sg(-12 * comp)}% (−12% × on-plan ${Math.round(comp * 100)}%)`)), rel(3)];
+    if (id === "diplo") return [rel(12)];
+    if (id === "adapt") return [shield(20), rel(4)];
+    if (id === "tariff"){
+      const k = -20 * Math.pow(.7, c.tar || 0) * comp, out = [co2(k, T(`CO₂ ของประเทศนี้ ${sg(k)}% (ได้ผลน้อยลงทุกครั้งที่ใช้)`, `This country's CO₂ ${sg(k)}% (weaker each time)`)), rel(-22), tk("$appr", "−1%", true, T("ความนิยม −1%", "Approval −1%"))];
+      if (c.rel - 22 <= -20) out.push(tk("ban", "", true, T("อาจถูกคว่ำบาตร", "May bring sanctions")));
+      return out;
+    }
+  }
+  return null;
+}
+/* the minerals in a country, for the badges under its numbers */
+function countryMinerals(c){
+  const cr = P.CRES && P.CRES[c.id]; if (!cr || !P.RES) return [];
+  return cr.r.map(k => { const g = P.groupOf ? P.groupOf(k) : null;
+    return {k, icon:"$res-" + k, name:P.L(P.RES[k].name).replace(/\s*\(.*\)$/, ""), raw:!!g && !(P.refines && P.refines(c.id, g))}; });
+}
+/* the orders for one country, grouped by goal: [{goal, items:[{kind, a}]}] */
+function countryOrders(){
+  const items = [...(P.CACTS || []).filter(a => !a.req || S.owned[a.req]).map(a => ({kind:"c", a})), ...(P.ACTIONS || []).map(a => ({kind:"a", a}))];
+  return P.ORDER_GOALS.map(goal => ({goal, items:items.filter(x => (GOAL[x.kind][x.a.id] || "co2") === goal.id)})).filter(x => x.items.length);
+}
+/* CO₂ in Gt only: 3.05 · 0.45 · 0.025 */
+const fmtGt = g => (g >= .1 ? g.toFixed(2) : g >= .001 ? g.toFixed(3) : g.toFixed(4));
+Object.assign(P, {orderFx, oreDetail, countryMinerals, countryOrders, fmtGt});
+
+})();
+
+/* ---- 44-keys.js ---- */
+(function(){
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.keys39) return;
+(P.mods = P.mods || {}).keys39 = 1;
+/* 3.9: keyboard shortcuts on a computer, one list for the "?" window (web + GDevelop) and the keys shown in training.
+   [keys, what it does, new in 3.9] */
+const T = (th, en) => ({th, en});
+P.KEYS = [
+  {id:"time", icon:"clock", col:"accent", name:T("เวลา", "Time"), keys:[
+    [["Space"], T("หยุด / เดินต่อ", "Pause / resume")],
+    [["1", "2", "3"], T("ความเร็ว (ตอนมีเหตุการณ์ = เลือกทาง)", "Speed (during an event: pick an answer)")]]},
+  {id:"map", icon:"map", col:"sky", name:T("แผนที่", "Map"), keys:[
+    [["←", "↑", "↓", "→"], T("เลื่อนแผนที่", "Move the map"), 1],
+    [["+", "−"], T("ซูมเข้า / ออก", "Zoom in / out")],
+    [["H"], T("ดูทั้งโลก", "Whole world")],
+    [["Q", "E"], T("ทวีปก่อนหน้า / ถัดไป", "Previous / next region"), 1],
+    [["A"], T("ไปยังภัยที่กำลังจะมา (กดซ้ำ = ภัยถัดไป)", "Go to the next coming disaster"), 1]]},
+  {id:"pane", icon:"menu", col:"purple", name:T("แผงข้อมูล", "Panels"), keys:[
+    [["R"], T("แผงทวีป / ประเทศ", "Region / country panel")],
+    [["S"], T("แผงสถิติ", "Statistics")],
+    [["N"], T("แผงข่าว", "News")],
+    [["⌫"], T("ย้อนจากประเทศกลับไปทวีป", "Back from a country to its region"), 1]]},
+  {id:"win", icon:"monitor", col:"gold", name:T("หน้าต่าง", "Windows"), keys:[
+    [["T"], T("ต้นไม้สกิล", "Skill tree")],
+    [["P"], T("ความนิยม (กลุ่มคน 4 กลุ่ม)", "Approval (4 groups)"), 1],
+    [["M"], T("ตลาดแร่", "Mineral market"), 1]]},
+  {id:"char", icon:"user-round", col:"pink", name:T("ตัวละครและเหตุการณ์", "Character and events"), keys:[
+    [["Z", "X", "C"], T("สกิลพิเศษของตัวละคร ปุ่มที่ 1–3", "Character abilities 1–3"), 1],
+    [["Enter"], T("ปิดสรุปปีและบทเล่าเรื่อง", "Close the year report and story")]]},
+  {id:"etc", icon:"keyboard", col:"muted", name:T("อื่น ๆ", "Other"), keys:[
+    [["Esc"], T("ปิดหน้าต่าง หรือหยุดเกม", "Close a window, or pause")],
+    [["F"], T("เต็มจอ", "Full screen")],
+    [["V"], T("ปิด / เปิดเสียงทั้งหมด", "Sound off / on"), 1],
+    [["?"], T("ดูปุ่มลัดทั้งหมด", "All shortcuts"), 1]]},
+];
+/* keys shown on a training step (computer only) */
+P.TRAIN_KEYS = {time:["Space"], skills:["T"], skclose:["Esc"], hazard:["A"], event:["1", "2", "3"], appr:["P"], apprclose:["Esc"], ore:["M"], oreclose:["Esc"], ability:["Z", "X", "C"], year:["Enter"], edge:["A", "←↑↓→"], done:["?"]};
 
 })();

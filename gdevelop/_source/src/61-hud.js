@@ -92,19 +92,30 @@ Screens.renderHUD = function(l){
   if (lg){
     const key = S.log.length + ":" + lg.tk;
     if (UIM.newsKey !== key){ UIM.newsKey = key; UIM.newsT = performance.now(); }
-    const age = (performance.now() - UIM.newsT) / 1000, a = age < 6 ? 1 : Math.max(0, 1 - (age - 6) / 1.2);
+    const age = (performance.now() - UIM.newsT) / 1000;
+    /* 3.9: a longer, larger news line; a line that does not fit scrolls once from start to end, then fades */
+    const nx = 14 + 54 + 8, nw = Math.max(bw - 54 - 8, Math.min(900, k.W - 76 - 440)), nh = 32, fs = k.W >= 1500 ? 15 : 14, aw = nw - 44;
+    const plainTxt = String(lg.txt).replace(/\[\[\$?[a-z0-9-]+\]\]\s?/g, ""), over = k.textW(lg.txt, {size:fs}) > aw;
+    const g = over ? (UIM.newsG && UIM.newsG.k === key ? UIM.newsG.g : (UIM.newsG = {k:key, g:P.graphemes ? P.graphemes(plainTxt) : Array.from(plainTxt)}).g) : null;
+    let cut = 0, endT = 6;
+    if (over){
+      let n = 0; while (n < g.length && k.textW(g.slice(n).join(""), {size:fs}) > aw) n++;   // characters to scroll away so the end shows
+      cut = Math.min(n, Math.max(0, Math.floor((age - 1.2) * 9))); endT = 1.2 + n / 9 + 4;
+    }
+    const a = age < endT ? 1 : Math.max(0, 1 - (age - endT) / 1.2);
     if (a > 0){
-      const nx = 14 + 54 + 8, nw = bw - 54 - 8, col = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg"}[lg.cls] || "fg";
-      k.rect(l, nx, ay, nw, 28, "glass", {a:.9 * a, r:10, stroke:"line", bg:true});
-      k.icon(l, "newspaper", nx + 10, ay + 7, 14, "muted", a);
-      k.text(l, lg.txt, nx + 30, ay + 5, {size:12.5, color:col, w:nw - 40, max:1, a});
-      k.hit(l, "newsline", nx, ay, nw, 28, () => Screens.setTab("news"));
-      if (!Screens._newsTimer) Screens._newsTimer = setTimeout(() => { Screens._newsTimer = null; k.dirty("HUD"); }, age < 6 ? (6 - age) * 1000 + 30 : 120);
+      const col = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg"}[lg.cls] || "fg";
+      k.rect(l, nx, ay, nw, nh, "glass", {a:.9 * a, r:10, stroke:"line", bg:true});
+      k.icon(l, "newspaper", nx + 10, ay + (nh - 15) / 2, 15, "muted", a);
+      k.text(l, over ? g.slice(cut).join("") : lg.txt, nx + 32, ay + (nh - fs * 1.45) / 2, {size:fs, color:col, w:aw, max:1, a});
+      k.hit(l, "newsline", nx, ay, nw, nh, () => Screens.setTab("news"));
+      const moving = over && age < endT - 4;
+      if (!Screens._newsTimer) Screens._newsTimer = setTimeout(() => { Screens._newsTimer = null; k.dirty("HUD"); }, moving ? 110 : age < endT ? (endT - age) * 1000 + 30 : 120);
     }
   }
   /* Continuous World: this season's goals under the news line */
   if (S.world && S.goals && S.goals.length){
-    const gx = 14 + 54 + 8, gy = ay + 34, gw = Math.min(300, bw - 62), won = S.goals.filter(g => g.won).length;
+    const gx = 14 + 54 + 8, gy = ay + 38, gw = Math.min(300, bw - 62), won = S.goals.filter(g => g.won).length;
     const lines = S.goals.map(g => `${g.won ? "[[circle-check]]" : "[[target]]"} ${P.goalText(g)}`);
     let gh = 30; const hs = lines.map(s2 => k.text(null, s2, 0, 0, {size:12, w:gw - 24, measure:true}).h); gh += hs.reduce((a, b) => a + b + 4, 0) + 6;
     W.glass(l, gx, gy, gw, gh, 10); this._goalsBottom = gy + gh;

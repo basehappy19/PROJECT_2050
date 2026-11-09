@@ -67,20 +67,86 @@ Screens.orderCards = function(l, y, cw, scope){
   for (const a of ACTIONS){
     const cc = scope === "country";
     const c = P.actionCost(a, r, cc), cd = r.cd[a.id] || 0, ok = !cd && S.ep >= c.ep && S.pc >= c.pc;
-    const label = cd ? `${t("cooldown")} ${cd}` : [c.ep ? `${IC.ep} ${c.ep}` : "", c.pc ? `${IC.pc} ${c.pc}` : ""].filter(Boolean).join("  ");
-    const btnW = Math.ceil(k.textW(label, {font:"dispS", size:14})) + 30;
-    const tw = cw - 22 - btnW - 10;
+    const btnW = 96, tw = cw - 22 - btnW - 10;
     const h1 = k.text(l, L(a.name), 11, y + 9, {font:"bodyB", size:13.5, w:tw}).h;
     const h2 = k.text(l, cc ? L(UI["cact_" + a.id]) : L(a.desc), 11, y + 9 + h1, {size:11.5, color:"muted", w:tw, max:1}).h;   // 3.3: one line each
     const tilt = P.tiltOfAction ? P.tiltOfAction(a.id) : null, h3 = tilt && tilt.length ? 18 : 0;
     if (h3) W.groupTilt(l, 11, y + 9 + h1 + h2 + 2, tilt);
     const ch = Math.max(8 + h1 + h2 + h3 + 8, 50);
     W.card(l, 0, y, cw, ch);
-    W.btn(l, "act-" + a.id, cw - 11 - btnW, y + (ch - 36) / 2, label, () => P.doAction(a.id, scope), {disabled:!ok, kind:ok ? "primary" : "ghost", w:btnW, sound:false});
+    W.buyBtn(l, "act-" + a.id, cw - 11 - btnW, y + (ch - 40) / 2, c, cd, ok, () => P.doAction(a.id, scope));
     y += ch + 7;
   }
   return y;
 };
+
+/* 3.9: one size for every buy button (one price, two prices, short of money, waiting) */
+W.buyBtn = (l, id, x, y, cost, cd, ok, fn) => {
+  const w = 96, h = 40, hov = ok && !cd && k.isHover(l, id);
+  const price = [cost.ep ? `[[$money]]${cost.ep}` : "", cost.pc ? `[[$policy]]${cost.pc}` : "", cost.ore ? `[[$ore]]${cost.ore}` : ""].filter(Boolean).join(" ");
+  if (cd){
+    k.rect(l, x, y, w, h, "panel2", {r:10, stroke:"line", bg:true});
+    k.text(l, `[[clock]] ${th3() ? `รอ ${cd} เดือน` : `${cd} mo`}`, x, y + 11, {size:12, color:"muted", iconColor:"muted", w, align:"center", max:1});
+    k.hit(l, id, x, y, w, h, () => {}, {disabled:true});
+    return w;
+  }
+  if (ok){
+    k.rect(l, x, y, w, h, hov ? k.mix("#183038", "accent", .3) : "#183038", {r:10, stroke:"accent", sa:.6, bg:true});
+    k.text(l, price, x, y + 10, {font:"monoB", size:14, w, align:"center", max:1});
+    k.hit(l, id, x, y, w, h, () => { Audio.play("click"); fn(); });
+    return w;
+  }
+  const se = Math.max(0, Math.ceil((cost.ep || 0) - S.ep)), sp = Math.max(0, Math.ceil((cost.pc || 0) - S.pc));
+  k.rect(l, x, y, w, h, "panel2", {r:10, stroke:"line", bg:true});
+  if (se || sp){
+    k.text(l, price, x, y + 3, {font:"monoB", size:13, color:"muted", w, align:"center", max:1});
+    k.text(l, `${th3() ? "ขาด" : "Need"} ${se ? `[[$money]]${se}` : ""}${sp ? ` [[$policy]]${sp}` : ""}`, x, y + 21, {size:10.5, color:"bad", w, align:"center", max:1});
+  } else k.text(l, price, x, y + 10, {font:"monoB", size:14, color:"muted", w, align:"center", max:1});
+  k.hit(l, id, x, y, w, h, () => {}, {disabled:true});
+  return w;
+};
+/* 3.9: an order's effects as short tokens (icon + number); returns the height used */
+W.toks = (l, x, y, w, fx, draw = true) => {
+  let cx = 0, cy = 0;
+  for (const f of fx){
+    const txt = `[[${f.ic}]]${f.mat ? " " + L(f.mat) + " " : ""}${f.v}${f.raw ? " [[factory]]" : ""}`, col = f.mat ? "fg" : f.bad ? "bad" : "good";
+    const tw = k.textW(txt, {font:"monoB", size:12}) + 12;
+    if (cx && cx + tw > w){ cx = 0; cy += 24; }
+    if (draw){ k.rect(l, x + cx, y + cy, tw, 21, col, {r:10, a:.13}); k.text(l, txt, x + cx + 5, y + cy + 2, {font:"monoB", size:12, color:col, iconColor:f.raw ? "warn" : col}); }
+    cx += tw + 4;
+  }
+  return fx.length ? cy + 22 : 0;
+};
+const GOAL_HEX = {good:"#5fd39a", pink:"#ff7aa8", sky:"#8fd0ff", gold:"#f2c14e"};
+/* 3.9 (design 5): every order for one country in one list, grouped by what it is for */
+Screens.countryOrders = function(l, y, cw, c){
+  const r = P.R(c.reg), bw = 96, tx = 18, tw = cw - tx - bw - 10;
+  for (const {goal, items} of P.countryOrders()){
+    const col = GOAL_HEX[goal.col] || COL_FALLBACK;
+    k.icon(l, goal.icon, 0, y + 3, 15, col);
+    k.text(l, L(goal.name), 20, y, {font:"dispS", size:13, color:col}); y += 24;
+    items.forEach(({kind, a}, i) => {
+      const isC = kind === "c", cost = isC ? P.cactCost(a) : P.actionCost(a, r, true), cd = isC ? (c.cd[a.id] || 0) : (r.cd[a.id] || 0);
+      const ok = isC ? P.cactOk(a, c) : !cd && S.ep >= cost.ep && S.pc >= cost.pc;
+      const fx = P.orderFx(kind, a.id, c) || [], tilt = !isC && P.tiltOfAction ? P.tiltOfAction(a.id) : null;
+      const hint = isC && a.id === "ore" && c.rel < 50 ? (th3() ? "ยิ่งมิตรภาพสูงยิ่งได้มาก สูงสุด 20" : "More when friendlier, up to 20") : "";
+      const h1 = k.textH(L(a.name), {font:"bodyB", size:13.5, w:tw}), h2 = W.toks(l, 0, 0, tw, fx, false), h3 = tilt && tilt.length ? 20 : 0, h4 = hint ? 16 : 0;
+      const rh = Math.max(48, 8 + h1 + 4 + h2 + h3 + h4 + 6);
+      if (i) k.line(l, tx - 4, y, cw, y, "line", {a:.6});
+      k.rect(l, 6, y + 4, 2, rh - 8, col, {a:.45});
+      k.text(l, L(a.name), tx, y + 7, {font:"bodyB", size:13.5, w:tw, a:ok ? 1 : .72});
+      let yy = y + 8 + h1 + 4; W.toks(l, tx, yy, tw, fx); yy += h2;
+      if (h3){ W.groupTilt(l, tx, yy + 1, tilt); yy += h3; }
+      if (hint) k.text(l, hint, tx, yy, {size:10.5, color:"muted", w:tw, max:1});
+      const go = isC ? () => { const before = c.rel; P.countryAction(a.id); if (c.rel > before && Audio.play) Audio.play("relUp"); } : () => P.doAction(a.id, "country");
+      W.buyBtn(l, (isC ? "ca-" : "act-") + a.id, cw - bw, y + (rh - 40) / 2, cost, cd, ok, go);
+      y += rh;
+    });
+    y += 8;
+  }
+  return y;
+};
+const COL_FALLBACK = "#4fd1c5";
 
 /* ---------------- Region ---------------- */
 Screens.paneRegion = function(l, cw){
@@ -121,7 +187,7 @@ Screens.paneRegion = function(l, cw){
     y += rh + 4;
   }
   y += 10;
-  W.h3(l, th3() ? `คำสั่งเฉพาะทวีป ${L(meta.name)}` : `Orders for ${L(meta.name)}`, 0, y, {w:cw}); y += 22;
+  W.h3(l, th3() ? `คำสั่งเฉพาะทวีป${L(meta.name)}` : `Orders for ${L(meta.name)}`, 0, y, {w:cw}); y += 22;
   return this.orderCards(l, y, cw, "region");
 };
 
@@ -144,9 +210,39 @@ Screens.paneCountry = function(l, cw){
     k.text(l, `${c.rel >= 0 ? "+" : ""}${Math.round(c.rel)}`, cx - 24, cy - 13, {font:"monoB", size:15, w:48, align:"center", color:rc});
     k.text(l, t("relation"), cx - 26, cy + 5, {size:9, w:52, align:"center", color:"muted", max:1});
   }
-  y = Math.max(y, c.rest ? y : 46);
-  const share = c.co2 / (r.co2 || 1);
-  y += k.text(l, `[[$co2]] ${c.co2.toFixed(2)} Gt · ${Math.round(share * 100)}% ${th3() ? "ของทวีป" : "of the continent"}${meta ? ` · [[$risk]] ${t("risk")} ${meta.risk}% · ${t("adapt")} ${Math.round(c.adapt)} · [[leaf]] ${Math.round(c.green || 0)}%` : ""}`, 0, y, {font:"mono", size:12, w:cw - ringW, color:"fg"}).h + 8;
+  /* 3.9 (design A1): CO₂ in Gt as the big number, the three numbers that matter, then the minerals (raw ones say so) */
+  { const lab = th3() ? "CO₂ ต่อปี" : "CO₂ a year", lw = k.textW(lab, {font:"monoB", size:12}), v = P.fmtGt ? P.fmtGt(c.co2) : c.co2.toFixed(2);
+    k.text(l, lab, 0, y + 12, {font:"monoB", size:12, color:"muted"});
+    const vw = k.text(l, v, lw + 8, y, {font:"monoB", size:26}).w;
+    k.text(l, "Gt", lw + 12 + vw, y + 11, {font:"monoB", size:13, color:"muted"});
+    y += 40; }
+  y = Math.max(y, c.rest ? y : 70);
+  if (!c.rest){
+    const bw = (cw - 12) / 3, rc = meta.risk >= 60 ? "bad" : meta.risk >= 35 ? "warn" : "good";
+    [[`[[triangle-alert]] ${meta.risk}%`, rc, t("risk")], [`[[shield]] ${Math.round(c.adapt)}`, "sky", th3() ? "ป้องกันภัย" : "Protection"], [`[[leaf]] ${Math.round(c.green || 0)}%`, "good", t("greenTech")]].forEach(([v, col, lab], i) => {
+      const bx = i * (bw + 6); k.rect(l, bx, y, bw, 46, "panel2", {r:9, stroke:"line", bg:true});
+      k.text(l, v, bx + 8, y + 4, {font:"monoB", size:15, color:col, iconColor:col, w:bw - 12, max:1});
+      k.text(l, lab, bx + 8, y + 25, {size:11, color:"muted", w:bw - 12, max:1});
+    });
+    y += 52;
+    const mins = P.countryMinerals ? P.countryMinerals(c) : [];
+    if (mins.length){
+      const cols = Math.min(3, mins.length), mh = 26;
+      for (let i = 0; i < mins.length; i += cols){
+        const row = mins.slice(i, i + cols), mw = (cw - (row.length - 1) * 6) / row.length;
+        row.forEach((m, j) => {
+          const mx = j * (mw + 6);
+          k.rect(l, mx, y, mw, mh, "panel2", {r:13, stroke:m.raw ? "warn" : "line", sa:m.raw ? .55 : 1, bg:true});
+          k.icon(l, m.icon, mx + 5, y + 4, 18);
+          const rw = m.raw ? k.textW(`[[factory]] ${th3() ? "ต้องแปรรูป" : "refine"}`, {font:"bodyB", size:11}) + 8 : 0;
+          k.text(l, m.name, mx + 27, y + 4, {size:12, color:m.raw ? "fg" : "muted", w:mw - 32 - rw, max:1});
+          if (m.raw) k.text(l, `[[factory]] ${th3() ? "ต้องแปรรูป" : "refine"}`, mx + mw - rw - 2, y + 5, {font:"bodyB", size:11, color:"warn", iconColor:"warn"});
+        });
+        y += mh + 6;
+      }
+    }
+    y += 4;
+  } else y += 4;
   if (this.countryWarn) y += this.countryWarn(l, y, cw, c);
   if (!c.rest && c.rel < 40){   // the next goal: friendship 40 opens a bilateral agreement
     const gh = 30; k.rect(l, 0, y, cw, gh, "accent", {r:9, a:.08, stroke:"accent", sa:.4});
@@ -165,19 +261,7 @@ Screens.paneCountry = function(l, cw){
     y += ch + 8;
   }
   if (!c.rest){
-    W.h3(l, th3() ? `สั่งการกับ ${P.cname(c.id)}` : `Deal with ${P.cname(c.id)}`, 0, y, {w:cw}); y += 22;
-    for (const a of P.CACTS){
-      if (a.req && !S.owned[a.req]) continue;
-      const kk = P.cactCost(a), cd = c.cd[a.id] || 0, ok = P.cactOk(a, c);
-      const label = cd ? `${t("cooldown")} ${cd}` : [kk.ep ? `${IC.ep} ${kk.ep}` : "", kk.pc ? `${IC.pc} ${kk.pc}` : ""].filter(Boolean).join("  ");
-      const btnW = Math.ceil(k.textW(label, {font:"dispS", size:14})) + 30, tw = cw - 22 - btnW - 10;
-      const h1 = k.text(l, `[[${a.icon}]] ${L(a.name)}`, 11, y + 9, {font:"bodyB", size:13.5, w:tw, iconColor:"accent"}).h;
-      const h2 = k.text(l, L(a.desc), 11, y + 9 + h1, {size:11.5, color:"muted", w:tw, max:1}).h;
-      const ch = Math.max(8 + h1 + h2 + 8, 50);
-      W.card(l, 0, y, cw, ch);
-      W.btn(l, "ca-" + a.id, cw - 11 - btnW, y + (ch - 36) / 2, label, () => P.countryAction(a.id), {disabled:!ok, kind:ok ? "primary" : "ghost", w:btnW, sound:false});
-      y += ch + 7;
-    }
+    y = this.countryOrders(l, y, cw, c);
     // bilateral agreement (3.3: only once friendship reaches 40; the goal line above says how far)
     if (c.rel >= 40){
     y += 4;
@@ -200,9 +284,11 @@ Screens.paneCountry = function(l, cw){
     }
     }
   }
-  y += 6;
-  W.h3(l, c.rest ? (th3() ? `คำสั่งเฉพาะทวีป ${L(RMETA[c.reg].name)}` : `Orders for ${L(RMETA[c.reg].name)}`) : (th3() ? `คำสั่งเฉพาะประเทศ ${P.cname(c.id)}` : `Orders for ${P.cname(c.id)} only`), 0, y, {w:cw}); y += 22;
-  y = this.orderCards(l, y, cw, c.rest ? "region" : "country");
+  if (c.rest){
+    y += 6;
+    W.h3(l, th3() ? `คำสั่งเฉพาะทวีป${L(RMETA[c.reg].name)}` : `Orders for ${L(RMETA[c.reg].name)}`, 0, y, {w:cw}); y += 22;
+    y = this.orderCards(l, y, cw, "region");
+  }
   return this.countryExtras ? y + this.countryExtras(l, y, cw, c) : y;
 };
 

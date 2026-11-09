@@ -24,7 +24,7 @@ const UIM = P.UIM = {
   },
   modalOpen(){ return !!this.kind(); },
   get paused(){ return this.modal === "pause"; },
-  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market", "politics", "year", "intro", "slotpick"].includes(this.modal); },
+  get blocking(){ return ["charsel", "pause", "tutorial", "story", "skills", "learn", "market", "politics", "year", "intro", "slotpick", "keys"].includes(this.modal); },
   eventLocked(){ return (performance.now() - this.evAt) / 1000 < EVENT_LOCK; },
   eventLockFrac(){ return Math.min(1, (performance.now() - this.evAt) / 1000 / EVENT_LOCK); },
 };
@@ -269,19 +269,29 @@ Object.assign(Screens, {
       return;
     }
     const m = UIM.modal;
+    /* 3.9: "?" shows every shortcut */
+    if (name === "?"){ if (m === "keys") this.closeKeys(); else if (!m || m === "pause" || m === "skills") this.openKeys(); return; }
+    if (name === "esc" && m === "keys"){ this.closeKeys(); return; }
+    if (m === "keys") return;
     if (name === "esc"){
       if (m === "pause") this.resume();
       else if (m === "tutorial") this.tutAct("skip");
       else if (m === "learn") this.closeLearn();
       else if (m === "story") this.storyNext();
       else if (m === "skills") this.closeSkills();
+      else if (m === "politics" || m === "market" || m === "year") this.closeWin();
       else if (S.tab) this.closeTab();
       else if (!S.event && !S.over && !m) this.pause();
       return;
     }
     if (m === "story" && (name === "space" || name === "enter")){ this.storyNext(); return; }
+    if (m === "year" && (name === "space" || name === "enter")){ this.closeWin(); return; }
     if (S.event && /^[123]$/.test(name)){ const i = +name - 1, e = P.currentEvent(); if (e && i < e.options.length && !UIM.eventLocked() && P.affordable(e.options[i].fx)) P.chooseOption(i); return; }
     if (name === "t"){ if (m === "skills") this.closeSkills(); else this.openSkills(); return; }
+    /* 3.9: approval and the mineral market open and close with one key · V turns every sound off and back on */
+    if (name === "p" && S.started && !S.over && !S.event && !S.simple && (!m || m === "politics" || m === "skills")){ if (m === "politics") this.closeWin(); else { Audio.play("open"); this.openWin("politics"); } return; }
+    if (name === "m" && S.started && !S.over && !S.event && S.oreOn && (!m || m === "market" || m === "skills")){ if (m === "market") this.closeWin(); else { Audio.play("open"); this.openWin("market"); } return; }
+    if (name === "v"){ this.muteAll(); return; }
     if (m && m !== "skills") return;
     if (name === "space"){ if (S.started && !S.over && !S.event) P.setSpeed(S.speed === 0 ? (UIM.prevSpeed || 1) : (UIM.prevSpeed = S.speed, 0)); }
     else if (name === "1" || name === "2" || name === "3"){ if (S.started && !S.over) P.setSpeed(+name); }
@@ -291,6 +301,28 @@ Object.assign(Screens, {
     else if (!m && name === "r") this.setTab("region");
     else if (!m && name === "s") this.setTab("stats");
     else if (!m && name === "n") this.setTab("news");
+    /* 3.9: arrows move the map · Q/E regions · A the next coming disaster · Backspace back to the region · Z/X/C abilities */
+    else if (/^(left|right|up|down)$/.test(name)){ const d = 90, v = {left:[-d, 0], right:[d, 0], up:[0, -d], down:[0, d]}[name]; P.Map.panBy(v[0], v[1]); }
+    else if (!m && (name === "q" || name === "e") && S.regions){
+      const ids = S.regions.map(r => r.id), i = ids.indexOf(S.sel); this.selectRegion(ids[(i + (name === "e" ? 1 : -1) + ids.length) % ids.length], true);
+    }
+    else if (!m && name === "a"){
+      const hz = (S.haz || []).filter(h => P.C(h.c)).sort((x, y) => x.at - y.at); if (!hz.length){ Audio.play("error"); return; }
+      UIM.hzKey = ((UIM.hzKey ?? -1) + 1) % hz.length; this.selectCountry(hz[UIM.hzKey].c);
+    }
+    else if (!m && name === "backspace" && S.tab === "region" && S.selC){ Audio.play("close"); S.selC = null; P.Map.focus(S.sel, false); P.changed(); }
+    else if (!m && (name === "z" || name === "x" || name === "c") && S.started && !S.over){
+      const a = P.abilityList()[{z:0, x:1, c:2}[name]];
+      if (a && P.abilityReady(a) && P.useAbility(a.id)) Audio.play("powerup"); else Audio.play("error");
+    }
+    k.dirty();
+  },
+  openKeys(){ UIM.keysFrom = UIM.modal; UIM.modal = "keys"; Audio.play("open"); const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); },
+  closeKeys(){ UIM.modal = UIM.keysFrom || null; UIM.keysFrom = null; Audio.play("close"); k.dirty(); },
+  muteAll(){
+    if (Audio.on || Audio.musicOn){ UIM.muted = {sfx:Audio.on, music:Audio.musicOn}; if (Audio.musicOn) Audio.toggleMusic(); if (Audio.on) Audio.toggle(); }
+    else { const was = UIM.muted || {sfx:true, music:true}; if (was.sfx) Audio.toggle(); if (was.music) Audio.toggleMusic(); }
+    const on = Audio.on || Audio.musicOn; UIM.toastQ.push({id:"mute", icon:on ? "volume-2" : "volume-x", title:L(on ? {th:"เปิดเสียง", en:"Sound on"} : {th:"ปิดเสียง", en:"Sound off"}), msg:on ? "" : L({th:"กด V อีกครั้งเพื่อเปิด", en:"Press V again to turn it on"})});
     k.dirty();
   },
   /* ---- scene setup (called from each scene's "At the beginning of the scene" event) ---- */
@@ -364,9 +396,10 @@ if (!P._keys){
   window.addEventListener("keydown", e => {
     const tg = e.target, tag = tg && tg.tagName;
     if (tag === "INPUT" || tag === "TEXTAREA" || (tg && tg.isContentEditable)) return;
-    const map = {" ":"space", Escape:"esc", Enter:"enter"}, kk = map[e.key] || (e.key.length === 1 ? e.key.toLowerCase() : null);
+    if (e.ctrlKey || e.metaKey || e.altKey) return;   // 3.9: leave the browser's own shortcuts alone
+    const map = {" ":"space", Escape:"esc", Enter:"enter", ArrowLeft:"left", ArrowRight:"right", ArrowUp:"up", ArrowDown:"down", Backspace:"backspace"}, kk = map[e.key] || (e.key.length === 1 ? e.key.toLowerCase() : null);
     if (!kk || !P.Screens || !P.Screens.scene) return;
-    if (kk === "space") e.preventDefault();
+    if (kk === "space" || /^(left|right|up|down|backspace)$/.test(kk)) e.preventDefault();
     try { P.Screens.key(kk); } catch(err){ console.error(err); }
   });
 }

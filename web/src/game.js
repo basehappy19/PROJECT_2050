@@ -146,6 +146,9 @@ export const G = P.Game = {
     }
     if (UIM.transition) return;
     const m = UIM.modal;
+    if (name === "?"){ if (m === "keys") this.closeKeys(); else if (!m || m === "pause" || m === "skills") this.openKeys(); return; }
+    if (name === "esc" && m === "keys"){ this.closeKeys(); return; }
+    if (m === "keys") return;
     if (name === "esc"){
       if (m === "pause") this.resume();
       else if (m === "tutorial") this.tutAct("skip");
@@ -153,6 +156,7 @@ export const G = P.Game = {
       else if (m === "story") this.storyNext();
       else if (m === "year") this.closeYear();
       else if (m === "skills") this.closeSkills();
+      else if (m === "politics" || m === "market"){ Audio.play("close"); UIM.modal = null; bump(); }   // 3.9
       else if (S.tab) this.closeTab();
       else if (!S.event && !S.over && !m) this.pause();
       return;
@@ -161,6 +165,10 @@ export const G = P.Game = {
     if (m === "year" && (name === "space" || name === "enter")){ if (performance.now() - (UIM.yearAt || 0) > 700) this.closeYear(); return; }
     if (S.event && /^[123]$/.test(name)){ const i = +name - 1, ev = P.currentEvent(); if (ev && i < ev.options.length && !UIM.eventLocked() && P.affordable(ev.options[i].fx)) P.chooseOption(i); return; }
     if (name === "t"){ if (m === "skills") this.closeSkills(); else this.openSkills(); return; }
+    /* 3.9: approval and the mineral market open and close with one key */
+    if (name === "p" && S.started && !S.over && !S.event && (!m || m === "politics" || m === "skills") && !S.simple){ Audio.play(m === "politics" ? "close" : "open"); UIM.modal = m === "politics" ? null : "politics"; bump(); return; }
+    if (name === "m" && S.started && !S.over && !S.event && (!m || m === "market" || m === "skills") && S.oreOn){ Audio.play(m === "market" ? "close" : "open"); UIM.modal = m === "market" ? null : "market"; bump(); return; }
+    if (name === "v"){ this.muteAll(); return; }
     if (m && m !== "skills") return;
     if (name === "space"){ if (S.started && !S.over && !S.event) P.setSpeed(S.speed === 0 ? (UIM.prevSpeed || 1) : (UIM.prevSpeed = S.speed, 0)); }
     else if (name === "1" || name === "2" || name === "3"){ if (S.started && !S.over) P.setSpeed(+name); }
@@ -171,6 +179,29 @@ export const G = P.Game = {
     else if (!m && name === "s") this.setTab("stats");
     else if (!m && name === "n") this.setTab("news");
     else if (name === "f") this.fullscreen();
+    /* 3.9: more keys: arrows move the map · Q/E regions · A the next coming disaster · Backspace back to the region · Z/X/C abilities */
+    else if (/^(left|right|up|down)$/.test(name)){ const d = 90, v = {left:[-d, 0], right:[d, 0], up:[0, -d], down:[0, d]}[name]; GameMap.panBy(v[0], v[1]); }
+    else if (!m && (name === "q" || name === "e") && S.regions){
+      const ids = S.regions.map(r => r.id), i = ids.indexOf(S.sel), n = ids[(i + (name === "e" ? 1 : -1) + ids.length) % ids.length]; this.selectRegion(n, true);
+    }
+    else if (!m && name === "a"){
+      const hz = (S.haz || []).filter(h => P.C(h.c)).sort((x, y) => x.at - y.at); if (!hz.length){ Audio.play("error"); return; }
+      UIM.hzKey = ((UIM.hzKey ?? -1) + 1) % hz.length; this.selectCountry(hz[UIM.hzKey].c);
+    }
+    else if (!m && name === "backspace" && S.tab === "region" && S.selC){ S.selC = null; GameMap.focus(S.sel, false); Audio.play("close"); P.changed(); }
+    else if (!m && (name === "z" || name === "x" || name === "c") && S.started && !S.over){
+      const a = P.abilityList()[{z:0, x:1, c:2}[name]];
+      if (a && P.abilityReady(a) && P.useAbility(a.id)) Audio.play("powerup", {vol:.6}); else Audio.play("error");
+    }
+    bump();
+  },
+  openKeys(){ UIM.keysFrom = UIM.modal; UIM.modal = "keys"; Audio.play("open"); bump(); },
+  closeKeys(){ UIM.modal = UIM.keysFrom || null; UIM.keysFrom = null; Audio.play("close"); bump(); },
+  /* V: every sound off, and back on as it was */
+  muteAll(){
+    if (Audio.on || Audio.musicOn){ UIM.muted = {sfx:Audio.on, music:Audio.musicOn}; if (Audio.musicOn) Audio.toggleMusic(); if (Audio.on) Audio.toggle(); }
+    else { const was = UIM.muted || {sfx:true, music:true}; if (was.sfx) Audio.toggle(); if (was.music) Audio.toggleMusic(); Audio.play("toggle"); }
+    if (H.toast) H.toast({id:"mute", icon:Audio.on || Audio.musicOn ? "volume-2" : "volume-x", title:Audio.on || Audio.musicOn ? L({th:"เปิดเสียง", en:"Sound on"}) : L({th:"ปิดเสียง", en:"Sound off"}), msg:Audio.on || Audio.musicOn ? "" : L({th:"กด V อีกครั้งเพื่อเปิด", en:"Press V again to turn it on"})});
     bump();
   },
   fullscreen(){
@@ -183,9 +214,10 @@ export const G = P.Game = {
 window.addEventListener("keydown", e => {
   const tg = e.target, tag = tg && tg.tagName;
   if (tag === "INPUT" || tag === "TEXTAREA" || (tg && tg.isContentEditable)) return;
-  const map = {" ":"space", Escape:"esc", Enter:"enter"}, kk = map[e.key] || (e.key && e.key.length === 1 ? e.key.toLowerCase() : null);
+  if (e.ctrlKey || e.metaKey || e.altKey) return;   // 3.9: leave the browser's own shortcuts alone
+  const map = {" ":"space", Escape:"esc", Enter:"enter", ArrowLeft:"left", ArrowRight:"right", ArrowUp:"up", ArrowDown:"down", Backspace:"backspace"}, kk = map[e.key] || (e.key && e.key.length === 1 ? e.key.toLowerCase() : null);
   if (!kk) return;
-  if (kk === "space" && UIM.screen === "game") e.preventDefault();
+  if ((kk === "space" || /^(left|right|up|down|backspace)$/.test(kk)) && UIM.screen === "game") e.preventDefault();
   if (kk === "enter" && UIM.modal !== "story" && UIM.modal !== "year") return;
   try { G.key(kk, e); } catch(err){ console.error(err); }
 });

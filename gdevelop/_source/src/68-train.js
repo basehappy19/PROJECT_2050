@@ -33,13 +33,13 @@ const STEPS = [
   {id:"kpis", hold:1, next:T("ต่อไป", "Next"), target:() => Screens._kpiRect,
    text:T("[[$money]] เงิน และ [[$policy]] แต้มนโยบาย เข้ามาทุกเดือน ใช้ซื้อสกิลและสั่งการ · [[$appr]] ความนิยม ห้ามเหลือ 0% ไม่อย่างนั้นจะถูกปลด", "[[$money]] Money and [[$policy]] policy points come in every month; spend them on skills and orders · never let [[$appr]] approval reach 0% or you're voted out.")},
   {id:"time", target:() => hitRect("sp1"), setup:() => { P.setSpeed(0); }, done:() => S.speed > 0,
-   text:T("ตอนนี้เวลาหยุดอยู่ กดปุ่ม 1× เพื่อให้เวลาเดิน (หรือกด Space)", "Time is stopped. Press 1× to start the clock (or press Space).")},
+   text:T("ตอนนี้เวลาหยุดอยู่ กดปุ่ม 1× เพื่อให้เวลาเดิน", "Time is stopped. Press 1× to start the clock.")},
   {id:"green", target:() => { const b = (S.bubbles || []).find(q => q.type === "green" && q.train); return b ? mapRect(P.Map.bubblePoint(b), -28, 30) : null; },
    setup:() => { S.bubbles = S.bubbles.filter(b => b.type !== "green"); S.bubbles.push({id:++S.bubId, type:"green", reg:"SEA", lat:BKK[0], lon:BKK[1], ttl:99, train:1}); P.Map.refresh(); P.Map.focus("SEA", true); if (!S.speed) P.setSpeed(1); },
    done:() => !S.bubbles.some(b => b.type === "green" && b.train),
    text:T("ฟองสีเขียว = เงินฟรี! แตะฟองเพื่อเก็บ · เก็บได้เฉพาะตอนเวลาเดินอยู่", "Green bubble = free money! Tap it to collect · bubbles can only be collected while time is running.")},
   {id:"skills", hold:1, target:() => hitRect("tab-tech"), setup:() => { P.setSpeed(0); S.ep = Math.max(S.ep, 260); S.pc = Math.max(S.pc, 60); mats(); }, done:() => UIM.modal === "skills",
-   text:T("สกิลคือวิธีลด CO₂ ระยะยาว · เปิดหน้าสกิล (หรือกด T)", "Skills are how you cut CO₂ for good · open the skill tree (or press T).")},
+   text:T("สกิลคือวิธีลด CO₂ ระยะยาว · เปิดหน้าสกิล", "Skills are how you cut CO₂ for good · open the skill tree.")},
   {id:"buy", hold:1, target:() => hitRect("buy"), setup:() => { S.skillCat = "energy"; S.node = "E1"; mats(); k.dirty(); }, done:() => !!S.owned.E1,
    text:() => ({th:`นี่คือสกิลแรก "${P.SKILL.E1.name.th}" ดูผลและราคาแล้วกด "ปลดล็อก"`, en:`This is your first skill, "${P.SKILL.E1.name.en}". Check what it does and what it costs, then press "Unlock".`})},
   {id:"skclose", hold:1, target:() => hitRect("sk-close"), done:() => UIM.modal !== "skills",
@@ -121,7 +121,8 @@ Screens.renderTrain = function(l){
   }
   const txt = L(typeof s.text === "function" ? s.text() : s.text), cw = 380;
   // card height
-  const th = k.text(null, txt, 0, 0, {size:14, w:cw - 32, lh:1.45, measure:true}).h, ch = 44 + th + 18 + (s.next || s.final ? 48 : 26);
+  const keys = !k.touch && P.TRAIN_KEYS && P.TRAIN_KEYS[s.id], kh = keys ? 36 : 0;   // 3.9: the shortcut for this step, on a computer only
+  const th = k.text(null, txt, 0, 0, {size:14, w:cw - 32, lh:1.45, measure:true}).h + kh, ch = 44 + th + 18 + (s.next || s.final ? 48 : 26);
   let cx, cy;
   if (!r) { cx = (k.W - cw) / 2; cy = (k.H - ch) / 2; }
   else if (s.corner || r.h > 300){ cx = k.W - cw - 16; cy = k.H - ch - 16; }
@@ -135,6 +136,11 @@ Screens.renderTrain = function(l){
   k.text(l, `[[graduation-cap]] ${L(P.UI2.trainMenu)} · ${tr.i + 1}/${STEPS.length}`, cx + 16, cy + 12, {font:"mono", size:11.5, color:"accent", iconColor:"accent"});
   if (!s.final) W.btn(l, "tr-quit", cx + cw - 16 - W.btnW(S.lang === "th" ? "ออก" : "Quit", {size:12, h:26}), cy + 8, S.lang === "th" ? "ออก" : "Quit", () => Train.quit(), {kind:"ghost", size:12, h:26});
   k.text(l, txt, cx + 16, cy + 40, {size:14, w:cw - 32, lh:1.45});
+  if (keys){
+    const ky = cy + 40 + th - kh + 6; k.line(l, cx + 16, ky, cx + cw - 16, ky, "line", {dash:3});
+    let kx = cx + 16; k.icon(l, "keyboard", kx, ky + 10, 16, "muted"); kx += 24;
+    keys.forEach((q, i) => { if (i){ k.text(l, "/", kx, ky + 8, {size:11, color:"muted"}); kx += 10; } kx += Screens.kbd(l, q, kx, ky + 6) + 5; });
+  }
   const by = cy + 44 + th + 10;
   k.rect(l, cx + 16, by, cw - 32, 4, "panel2", {r:2}); k.rect(l, cx + 16, by, (cw - 32) * (tr.i + 1) / STEPS.length, 4, "accent", {r:2});
   if (s.next){ const lab = `${L(s.next)} [[chevron-right]]`; W.btn(l, "tr-next", cx + cw - 16 - W.btnW(lab, {size:13}), by + 12, lab, () => Train.next(), {size:13, h:32}); }

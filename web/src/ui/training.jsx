@@ -29,13 +29,13 @@ export const STEPS = [
   {id:"kpis", hold:1, next:T("ต่อไป", "Next"), target:() => rectOf($(".kpis")),
    text:T("[[$money]] เงิน และ [[$policy]] แต้มนโยบาย เข้ามาทุกเดือน ใช้ซื้อสกิลและสั่งการ · [[$appr]] ความนิยม ห้ามเหลือ 0% ไม่อย่างนั้นจะถูกปลด", "[[$money]] Money and [[$policy]] policy points arrive every month and pay for skills and orders · [[$appr]] approval must never reach 0% or you're removed.")},
   {id:"time", target:() => rectOf($(".ctrls .speed")), setup:() => { S.speed = 0; }, done:() => S.speed > 0,
-   text:T("ตอนนี้เวลาหยุดอยู่ กดปุ่ม 1× เพื่อให้เวลาเดิน (หรือกด Space)", "Time is stopped. Press 1× to start the clock (or press Space).")},
+   text:T("ตอนนี้เวลาหยุดอยู่ กดปุ่ม 1× เพื่อให้เวลาเดิน", "Time is stopped. Press 1× to start the clock.")},
   {id:"green", target:() => mapRect(ll(BKK[0], BKK[1]), -22, 30),
    setup:() => { S.bubbles = S.bubbles.filter(b => b.type !== "green"); S.bubbles.push({id:++S.bubId, type:"green", reg:"SEA", lat:BKK[0], lon:BKK[1], ttl:99}); GameMap.focus("SEA", true); if (!S.speed) P.setSpeed(1); },
    done:() => !S.bubbles.some(b => b.type === "green"),
    text:T("ฟองสีเขียว = เงินฟรี! แตะฟองเพื่อเก็บ · เก็บได้เฉพาะตอนเวลาเดินอยู่", "Green bubble = free money! Tap it to collect · bubbles can only be collected while time is running.")},
   {id:"skills", hold:1, target:() => rectOf($("[data-tab=tech]")), setup:() => { P.setSpeed(0); S.ep = Math.max(S.ep, 260); S.pc = Math.max(S.pc, 60); }, done:() => UIM.modal === "skills",
-   text:T("สกิลคือวิธีลด CO₂ ระยะยาว · เปิดหน้าสกิล (หรือกด T)", "Skills are how you cut CO₂ for good · open the skill tree (or press T).")},
+   text:T("สกิลคือวิธีลด CO₂ ระยะยาว · เปิดหน้าสกิล", "Skills are how you cut CO₂ for good · open the skill tree.")},
   {id:"buy", hold:1, target:() => rectOf($(".sk-detail .btn-lg")), setup:() => { S.skillCat = "energy"; S.node = "E1"; bump(); }, done:() => !!S.owned.E1,
    text:() => ({th:`นี่คือสกิลแรก "${P.SKILL.E1.name.th}" ดูผลและราคาแล้วกด "อนุมัติ"`, en:`This is your first skill, "${P.SKILL.E1.name.en}". Check what it does and what it costs, then press "Approve".`})},
   {id:"skclose", hold:1, target:() => rectOf($(".skclose")), done:() => UIM.modal !== "skills",
@@ -129,6 +129,7 @@ export function Training({onFinish, onQuit}){
       <div class="thead"><span class="mono acc small"><Icon n="graduation-cap" size={15}/> {L(P.UI2.trainMenu)} · {tr.i + 1}/{STEPS.length}</span><span class="grow"/>
         {!s.final ? <button type="button" class="tquit" onClick={onQuit}>{S.lang === "th" ? "ออก" : "Quit"}</button> : null}</div>
       <p><Rich t={L(txt)}/></p>
+      {P.TRAIN_KEYS && P.TRAIN_KEYS[s.id] && P.hasKeyboard() ? <div class="tkeys" aria-label={S.lang === "th" ? "ปุ่มลัด" : "Shortcut"}><Icon n="keyboard" size={16}/>{P.TRAIN_KEYS[s.id].map((k, i) => <span class="tk" key={k}>{i ? <i>/</i> : null}<kbd class="kbd">{k}</kbd></span>)}</div> : null}
       <div class="tbar"><i style={{width:`${(tr.i + 1) / STEPS.length * 100}%`}}/></div>
       {s.next ? <div class="tfoot"><Btn size="sm" onClick={() => Train.next()}>{`${L(s.next)} [[chevron-right]]`}</Btn></div> : null}
       {s.final ? <div class="tfoot"><Btn kind="ghost" onClick={() => onFinish(false)}>{S.lang === "th" ? "กลับเมนู" : "Main menu"}</Btn><Btn size="lg" onClick={() => onFinish(true)}>{`${S.lang === "th" ? "เล่นเกมจริง" : "Play for real"} [[play]]`}</Btn></div> : null}

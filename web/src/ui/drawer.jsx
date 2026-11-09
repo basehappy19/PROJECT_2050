@@ -83,8 +83,45 @@ function OrderLine({icon, name, desc, cost, cd, ok, onClick, tilt, data}){
   return <div class={"oline " + (ok ? "" : "dim")} aria-label={plain(desc)} data-cact={data}>
     <Icon n={icon} size={18} cls="olic"/>
     <div class="olm"><b>{name}</b><Chips desc={desc}/>{tilt ? <GroupTilt list={tilt}/> : null}</div>
-    <Btn kind={ok ? "primary" : "ghost"} disabled={!ok} sound={null} onClick={onClick}>{cd ? `${t("cooldown")} ${cd}` : costLabel(cost)}</Btn>
+    <BuyBtn cost={cost} cd={cd} ok={ok} onClick={onClick}/>
   </div>;
+}
+/* 3.9: one size for every buy button (one price, two prices, short of money, waiting) */
+function BuyBtn({cost, cd, ok, onClick}){
+  const shortEp = Math.max(0, Math.ceil((cost.ep || 0) - S.ep)), shortPc = Math.max(0, Math.ceil((cost.pc || 0) - S.pc));
+  const price = <span class="bb-row">{cost.ep ? <><Icon n="$money" size={16}/>{cost.ep}</> : null}{cost.pc ? <><Icon n="$policy" size={16}/>{cost.pc}</> : null}{cost.ore ? <><Icon n="$ore" size={16}/>{cost.ore}</> : null}</span>;
+  if (cd) return <button type="button" class="btn buybtn wait" disabled><span class="bb-row"><Icon n="clock" size={14}/>{TT(`รอ ${cd} เดือน`, `${cd} mo`)}</span></button>;
+  if (ok) return <button type="button" class="btn buybtn" onPointerEnter={() => Audio.hover()} onClick={() => { Audio.play("click"); onClick(); }}>{price}</button>;
+  return <button type="button" class="btn buybtn off" disabled>{price}{shortEp || shortPc ? <em>{TT("ขาด", "Need")} {shortEp ? <><Icon n="$money" size={11}/>{shortEp}</> : null}{shortPc ? <><Icon n="$policy" size={11}/>{shortPc}</> : null}</em> : null}</button>;
+}
+/* 3.9: an order's effects as short tokens (icon + number), the long words in the tooltip */
+const Toks = ({fx}) => <div class="toks">{fx.map((f, i) => <span key={i} class={"tok " + (f.mat ? "mat" : f.bad ? "bad" : "good")} aria-label={f.tip ? L(f.tip) : undefined}>
+  <Icon n={f.ic} size={15}/>{f.mat ? <span class="tn">{L(f.mat)}</span> : null}{f.v}{f.raw ? <Icon n="factory" size={12} cls="raw"/> : null}</span>)}</div>;
+const GOAL_COL = {good:"var(--good)", pink:"#ff7aa8", sky:"var(--sky)", gold:"var(--gold)"};
+/* 3.9 (design 5): every order for this country in one list, grouped by what it is for */
+function CountryOrders({c}){
+  const r = P.R(c.reg);
+  return <div class="cords">{P.countryOrders().map(({goal, items}) => <div class="cgoal" key={goal.id} style={{"--c":GOAL_COL[goal.col]}}>
+    <div class="cgh"><Icon n={goal.icon} size={15}/>{L(goal.name)}</div>
+    {items.map(({kind, a}) => {
+      const isC = kind === "c", cost = isC ? P.cactCost(a) : P.actionCost(a, r, true), cd = isC ? (c.cd[a.id] || 0) : (r.cd[a.id] || 0);
+      const ok = isC ? P.cactOk(a, c) : !cd && S.ep >= cost.ep && S.pc >= cost.pc;
+      const fx = P.orderFx(kind, a.id, c), tilt = !isC && P.tiltOfAction ? P.tiltOfAction(a.id) : null;
+      const go = isC ? () => { const before = c.rel; P.countryAction(a.id); if (c.rel > before) Audio.play("relUp", {delay:.1}); } : () => P.doAction(a.id, "country");
+      return <div class={"crow2 " + (ok ? "" : "dim")} key={kind + a.id} data-cact={isC ? a.id : "a-" + a.id}>
+        <div class="grow"><b>{L(a.name)}</b>{fx ? <Toks fx={fx}/> : <Chips desc={isC ? L(a.desc) : L(P.UI["cact_" + a.id])}/>}{tilt && tilt.length ? <GroupTilt list={tilt}/> : null}
+          {isC && a.id === "ore" && c.rel < 50 ? <small class="muted hint">{TT("ยิ่งมิตรภาพสูงยิ่งได้มาก สูงสุด 20", "More when friendlier, up to 20")}</small> : null}</div>
+        <BuyBtn cost={cost} cd={cd} ok={ok} onClick={go}/>
+      </div>;
+    })}
+  </div>)}</div>;
+}
+/* 3.9 (design A1): the minerals a country has; the ones that still need refining say so */
+function Minerals({c}){
+  const list = P.countryMinerals ? P.countryMinerals(c) : []; if (!list.length) return null;
+  const cols = Math.min(3, list.length);
+  return <div class="cmins" style={{"--cols":cols}}>{list.map(m => <span key={m.k} class={"cmin " + (m.raw ? "raw" : "")} aria-label={L(P.RES[m.k].use || P.RES[m.k].name)}>
+    <Icon n={m.icon} size={18}/><span class="nm">{m.name}</span>{m.raw ? <span class="st"><Icon n="factory" size={12}/>{TT("ต้องแปรรูป", "needs refining")}</span> : null}</span>)}</div>;
 }
 function RelRing({rel}){
   const col = relCol(rel);
@@ -116,7 +153,7 @@ function PaneRegion(){
         <div class="grow"><b><Rich t={`[[handshake]] ${t("allyForm")}`}/></b><span class="muted">{t("allyNeed")} ({P.allyCandidates(S.sel).length}/3)</span></div>
         <Btn disabled={!P.canAlly(S.sel)} kind={P.canAlly(S.sel) ? "primary" : "ghost"} onClick={() => { P.formAlliance(S.sel); Audio.play("bell"); }}>{`${IC().pc} ${P.ALLY_COST.pc}`}</Btn>
       </div> : null}
-    <H3>{`${TT("คำสั่งเฉพาะทวีป", "Orders for the region of")} ${L(meta.name)}`}</H3>
+    <H3>{TT(`คำสั่งเฉพาะทวีป${L(meta.name)}`, `Orders for the region of ${L(meta.name)}`)}</H3>
     <OrderCards scope="region"/>
     <H3>{`${TT("ประเทศในทวีป", "Countries")} (${list.length})`}</H3>
     <div class="clist">{list.map(c => {
@@ -171,7 +208,7 @@ function Bilateral({c, afford}){
 function PaneCountry(){
   const c = P.C(S.selC); if (!c){ S.selC = null; return null; }
   const r = P.R(c.reg), meta = c.rest ? null : P.COUNTRY[c.id], hz = S.haz.find(h => h.c === c.id);
-  const share = c.co2 / (r.co2 || 1), member = S.alli[c.reg] && S.alli[c.reg].members.includes(c.id);
+  const member = S.alli[c.reg] && S.alli[c.reg].members.includes(c.id);
   const afford = S.ep >= P.BILAT_COST.ep && S.pc >= P.BILAT_COST.pc;
   const sanct = (S.sanct || {})[c.id] > 0, name = P.cname(c.id), BIL = 40;
   /* 3.2 (design C + the friendship ring of design A): name and numbers on top, then every order as one line */
@@ -180,10 +217,17 @@ function PaneCountry(){
       <div class="grow">
         <h3 class="title big cflagt">{P.FLAG2 && P.FLAG2[c.id] ? <img class="cflag" src={`assets/img/flags/${P.FLAG2[c.id]}.webp`} alt=""/> : null}<span>{name}</span></h3>
         <p class="muted sub"><Rich t={L(P.RMETA[c.reg].name) + (member ? ` · [[handshake]] ${t("allyMember")}` : "")} iconColor="good"/></p>
-        <p class="muted sub statline"><RichB t={`CO₂ [b]${P.fmtCO2(c.co2)}[/b] · ${t("shareOfRegion")} [b]${Math.round(share * 100)}%[/b]` + (c.rest ? "" : ` · ${t("risk")} [b]${meta.risk}%[/b] · ${t("adapt")} [b]${Math.round(c.adapt)}[/b] · [[leaf]] [b]${Math.round(c.green || 0)}%[/b]`)} iconColor="good"/></p>
+        <div class="cco2"><small>{TT("CO₂ ต่อปี", "CO₂ a year")}</small><b class="mono">{P.fmtGt(c.co2)}<i>Gt</i></b></div>
       </div>
       {!c.rest ? <RelRing rel={c.rel}/> : null}
     </div>
+    {/* 3.9 (design A): the three numbers that matter for orders, with what they mean in the tooltip */}
+    {!c.rest ? <div class="cstats">
+      <span class="cst" aria-label={TT("โอกาสที่ภัยพิบัติจะเกิดกับประเทศนี้", "How likely disasters are here")}><b class={"mono " + (meta.risk >= 60 ? "bad" : meta.risk >= 35 ? "warn" : "good")}><Icon n="triangle-alert" size={15}/>{meta.risk}%</b><small>{t("risk")}</small></span>
+      <span class="cst" aria-label={TT(`ภัยเสียหายน้อยลง ${Math.round(c.adapt / 2)}% (สูงสุดครึ่งหนึ่งที่ 100)`, `${Math.round(c.adapt / 2)}% less disaster damage (half at 100)`)}><b class="mono sky"><Icon n="shield" size={15}/>{Math.round(c.adapt)}</b><small>{TT("ป้องกันภัย", "Protection")}</small></span>
+      <span class="cst" aria-label={t("greenHelp")}><b class="mono good"><Icon n="leaf" size={15}/>{Math.round(c.green || 0)}%</b><small>{t("greenTech")}</small></span>
+    </div> : null}
+    {!c.rest ? <Minerals c={c}/> : null}
     {!c.rest && (c.rel <= P.HOSTILE || sanct) ? <div class="cwarn">
       {c.rel <= P.HOSTILE ? <small class="bad"><Rich t={`[[angry]] ${t("relHostile")}`} iconColor="inherit"/></small> : null}
       {sanct ? <small class="bad"><Rich t={`[[ban]] ${t("relSanct")} ${S.sanct[c.id]} ${t("months")} · ${IC().ep} −${P.sanctCost(c)}${t("perMo")}`} iconColor="inherit"/></small> : null}
@@ -193,22 +237,15 @@ function PaneCountry(){
       <Btn kind={hz.evac ? "ghost" : "danger"} disabled={hz.evac || S.ep < P.evacCost()} onClick={() => { if (P.evacuate(hz.id)) Audio.play("shield"); }}>{hz.evac ? `[[check]] ${t("evacuated")}` : `${t("evacuate")} · ${IC().ep} ${P.evacCost()}`}</Btn>
     </div> : null}
     {c.rest ? <>
-      <H3>{`${TT("คำสั่งเฉพาะทวีป", "Orders for the region of")} ${L(P.RMETA[c.reg].name)}`}</H3>
+      <H3>{TT(`คำสั่งเฉพาะทวีป${L(P.RMETA[c.reg].name)}`, `Orders for the region of ${L(P.RMETA[c.reg].name)}`)}</H3>
       <OrderCards scope="region"/>
     </> : <>
       {c.rel < BIL ? <div class="goalbar" aria-label={t("bilatTitle")}>
         <Icon n="target" size={15}/><span><RichB t={TT(`เป้าหมายถัดไป: มิตรภาพ [b]${BIL}[/b] เพื่อปลดล็อก [b]ข้อตกลงทวิภาคี[/b]`, `Next: friendship [b]${BIL}[/b] unlocks a [b]bilateral agreement[/b]`)}/></span>
         <i class="gb"><b style={{width:`${Math.max(0, Math.min(1, c.rel / BIL)) * 100}%`}}/></i>
       </div> : null}
-      <H3>{`${TT("สั่งการกับ", "Orders with")} ${name}`}</H3>
-      <div class="olist">{P.CACTS.filter(a => !a.req || S.owned[a.req]).map(a => {
-        const k = P.cactCost(a), cd = c.cd[a.id] || 0, ok = P.cactOk(a, c);
-        return <OrderLine key={a.id} data={a.id} icon={a.icon} name={L(a.name)} desc={L(a.desc)} cost={k} cd={cd} ok={ok}
-          onClick={() => { const before = c.rel; P.countryAction(a.id); if (c.rel > before) Audio.play("relUp", {delay:.1}); }}/>;
-      })}</div>
+      <CountryOrders c={c}/>
       {c.rel >= BIL ? <Bilateral c={c} afford={afford}/> : null}
-      <H3>{`${TT("คำสั่งเฉพาะประเทศ", "Orders for")} ${name}`}</H3>
-      <OrderCards scope="country"/>
       <details class="more" open={UIM.cInfo || undefined} onToggle={e => { UIM.cInfo = e.currentTarget.open; }}>
         <summary><Icon n="chevron-right" size={15} cls="chev"/>{TT("ทรัพยากรและภัยที่เกิดบ่อย", "Resources and common hazards")}</summary>
         <Resources c={c} noGreen/>

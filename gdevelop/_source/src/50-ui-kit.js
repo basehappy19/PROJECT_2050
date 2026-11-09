@@ -57,6 +57,7 @@ function words(s){
   return out;
 }
 function graphemes(s){ return gseg ? Array.from(gseg.segment(s), x => x.segment) : Array.from(s); }
+P.graphemes = graphemes;   // 3.9: the news line scrolls by whole letters (Thai vowels stay on their consonant)
 /* Rich text = plain text with [[icon]] tokens. Returns lines of items {t:"s"|"i", v, w}. */
 const layoutCache = new Map();
 function layout(str, fk, size, maxW){

@@ -299,6 +299,7 @@ export function Pause(){
           {act("settings", th ? "ตั้งค่า" : "Settings", go("settings"), tab === "settings")}
           {act("graduation-cap", th ? "วิธีเล่น" : "How to", () => G.openTutorial(0, false))}
           {act("book-open", th ? "เรียนรู้" : "Learn", () => G.openLearn())}
+          {P.hasKeyboard() ? act("keyboard", th ? "ปุ่มลัด" : "Keys", () => G.openKeys()) : null}
           {document.fullscreenEnabled ? act(document.fullscreenElement ? "minimize" : "maximize", th ? "เต็มจอ" : "Full", () => G.fullscreen()) : null}
           {act("log-out", th ? "เมนูหลัก" : "Menu", () => (S.mp && P.Mp ? P.Mp.leaveGame() : G.toMenu()))}
         </div>

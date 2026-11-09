@@ -20556,7 +20556,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "148538c4-b0c6-4202-bb62-b445b995f529",
+          "persistentUuid": "367e1841-1906-4a8a-8777-d07261e5bf39",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -20885,7 +20885,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "0705a7dc-63db-46ca-a99f-187a9c1ed4aa",
+          "persistentUuid": "7f2e7e43-8a1e-45a8-8312-f6825d23a8b5",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -20901,7 +20901,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Ocean",
-          "persistentUuid": "61ea9802-62de-458e-adcd-94edf628875f",
+          "persistentUuid": "51d12b7c-ba45-43dc-a7c2-26243b4e52af",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -20917,7 +20917,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "MapRim",
-          "persistentUuid": "6253eb04-1e70-4bcc-ac33-e4fb9a8c0f7c",
+          "persistentUuid": "9cec6ecf-787e-4897-b41c-103263cd110b",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -20933,7 +20933,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "ArcticIce",
-          "persistentUuid": "1740e9d3-e72c-4d61-8218-532e56e7961c",
+          "persistentUuid": "58f3f880-1789-42c6-ae79-bc491aaec038",
           "width": 1920,
           "x": 0,
           "y": 84,
@@ -20949,7 +20949,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "e5147228-9af6-4981-bda0-a8e1c556381f",
+          "persistentUuid": "d0cb799b-d8e4-4df5-bd79-9c0065357ebd",
           "width": 1636.6666666666667,
           "x": 67.33333333333333,
           "y": 84.66666666666667,
@@ -20976,7 +20976,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "01ca5c99-7fb6-42b3-8168-d3d72ef5d3ae",
+          "persistentUuid": "4c9c867c-a436-4938-887a-e61416450b29",
           "width": 1069.3333333333333,
           "x": 610,
           "y": 92.66666666666667,
@@ -21003,7 +21003,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "e565bd1a-9e62-46aa-bf2c-6874d0df04a1",
+          "persistentUuid": "85b4e369-58fb-42f9-9e1e-990b0826c35c",
           "width": 486,
           "x": 1125.3333333333333,
           "y": 222.66666666666666,
@@ -21030,7 +21030,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "e22ab735-2db9-464e-9b2c-061b01e2f7ce",
+          "persistentUuid": "8af451b0-79e3-4076-884e-5097b44ef9df",
           "width": 251.33333333333334,
           "x": 466.6666666666667,
           "y": 480,
@@ -21057,7 +21057,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "4a9b5abe-6579-40dd-9b36-1cb992bf448d",
+          "persistentUuid": "38a80603-b156-4cc6-9d5a-ea30cdd738c4",
           "width": 474,
           "x": 807.3333333333334,
           "y": 315.33333333333337,
@@ -21084,7 +21084,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "b7c5e36f-3d4d-4d56-811c-a15df648c55f",
+          "persistentUuid": "37ffacce-7f80-45d8-a49b-c569cffbe58b",
           "width": 640,
           "x": 1213.3333333333333,
           "y": 330.66666666666663,
@@ -21111,7 +21111,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "e184fc32-3cb9-4a06-a8e4-6cab42408ae5",
+          "persistentUuid": "b7aae597-9bd1-402d-9816-282d97224f56",
           "width": 1638,
           "x": 66.66666666666667,
           "y": 84,
@@ -21138,7 +21138,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "196ab1d6-4e78-407d-a8b2-d4fa47a1a0af",
+          "persistentUuid": "c6667360-3cf3-415c-98fb-a8f2dffdc4d4",
           "width": 1070.6666666666667,
           "x": 609.3333333333334,
           "y": 92,
@@ -21165,7 +21165,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "4c80d1eb-65b8-40eb-a34d-e52c0607a7dc",
+          "persistentUuid": "8b1ed4d5-ca32-4f7f-946d-b02d163cfb42",
           "width": 488,
           "x": 1124,
           "y": 222,
@@ -21192,7 +21192,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "321318fe-2d0f-40a9-aad2-8cfd49de672e",
+          "persistentUuid": "d863cf83-10a7-44ec-aee0-406442f3635b",
           "width": 252.66666666666666,
           "x": 466,
           "y": 479.3333333333333,
@@ -21219,7 +21219,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "387adf9c-604d-433e-a386-f3c7f580f600",
+          "persistentUuid": "9c534c61-3567-49c1-b193-265ba4857f4f",
           "width": 474,
           "x": 807.3333333333334,
           "y": 314,
@@ -21246,7 +21246,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "f4da6654-e54e-4d21-92a9-c9bcb98d85b2",
+          "persistentUuid": "0e2ce974-67da-4540-993f-1cbe8f4d9f8c",
           "width": 640,
           "x": 1214,
           "y": 330,
@@ -21273,7 +21273,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f61ee288-2395-46cf-a6ec-d612a40200c0",
+          "persistentUuid": "ad14933f-701e-44c6-82b5-ab68c9217101",
           "width": 0,
           "x": 573.7,
           "y": 516.4,
@@ -21294,7 +21294,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.9
+              "value": 4.26
             }
           ]
         },
@@ -21305,7 +21305,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "c879f44f-b97d-4c75-80da-93e6fa70274c",
+          "persistentUuid": "529330f6-f87a-4753-88ee-521ed04046b7",
           "width": 0,
           "x": 444.5,
           "y": 591.2,
@@ -21326,7 +21326,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.62
+              "value": 2.05
             }
           ]
         },
@@ -21337,7 +21337,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "e030daa7-7090-415c-a0ad-b24ee09c7efa",
+          "persistentUuid": "d1418531-14cd-4620-be7d-325b7b6de1dc",
           "width": 0,
           "x": 306.8,
           "y": 563.1,
@@ -21358,7 +21358,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.3
+              "value": 0.55
             }
           ]
         },
@@ -21369,7 +21369,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "71d8158e-0669-4fae-b34e-7914a56e1699",
+          "persistentUuid": "71949af7-f060-493a-a824-98232b69b54e",
           "width": 0,
           "x": 491.6,
           "y": 507.7,
@@ -21390,7 +21390,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.23
+              "value": 5.31
             }
           ]
         },
@@ -21401,7 +21401,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "14188c22-aa19-420b-b1db-7599dddd2e8a",
+          "persistentUuid": "7a3e9ed0-78d7-4d20-982d-00e22ef76add",
           "width": 0,
           "x": 541.1,
           "y": 494.6,
@@ -21422,7 +21422,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.26
+              "value": 4
             }
           ]
         },
@@ -21433,7 +21433,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b79af1d8-c939-4e6f-b7d0-dd30cd4e0a54",
+          "persistentUuid": "aefb42dd-f2e3-473d-9d76-173bdf9c396a",
           "width": 0,
           "x": 422.1,
           "y": 658,
@@ -21454,7 +21454,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.27
+              "value": 3.58
             }
           ]
         },
@@ -21465,7 +21465,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ff8de1ce-4aac-420f-8e1f-600a1859ae70",
+          "persistentUuid": "cb3fef12-3020-43ed-ac0d-0a8daed73a02",
           "width": 0,
           "x": 335.2,
           "y": 418.4,
@@ -21486,7 +21486,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.85
+              "value": 2.19
             }
           ]
         },
@@ -21497,7 +21497,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "620ef74b-2654-41f1-b2d4-64fe91cfabe1",
+          "persistentUuid": "37954022-559e-4aeb-bb5f-3a00c8992f0d",
           "width": 0,
           "x": 1020,
           "y": 434.7,
@@ -21518,7 +21518,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.7
+              "value": 1.86
             }
           ]
         },
@@ -21529,7 +21529,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b6c219d1-e8b1-442d-9b7c-2c868d30e521",
+          "persistentUuid": "17dcc4c5-a220-4ac0-977f-6eec0a40e990",
           "width": 0,
           "x": 1034.8,
           "y": 455.2,
@@ -21550,7 +21550,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.78
+              "value": 3.07
             }
           ]
         },
@@ -21561,7 +21561,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a155e816-3a81-482e-8963-429f4cd8e8f6",
+          "persistentUuid": "6014e6ed-b378-420c-b2a0-03855d98f32a",
           "width": 0,
           "x": 1101.5,
           "y": 426.6,
@@ -21582,7 +21582,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.09
+              "value": 0.13
             }
           ]
         },
@@ -21593,7 +21593,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "c8c15820-1540-4b32-918e-8f62bc643c80",
+          "persistentUuid": "131c9752-0fda-452d-92a2-56e44cab8dff",
           "width": 0,
           "x": 1247.6,
           "y": 399.2,
@@ -21614,7 +21614,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.3
+              "value": 5.51
             }
           ]
         },
@@ -21625,7 +21625,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "eb6efd03-0844-4bd7-a80a-b185b8b4dca4",
+          "persistentUuid": "6e74d656-523d-4efe-9ca2-85e064b11001",
           "width": 0,
           "x": 1147.4,
           "y": 429,
@@ -21646,7 +21646,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.17
+              "value": 5.74
             }
           ]
         },
@@ -21657,7 +21657,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8cccd027-fc1e-4935-998d-31f18415da74",
+          "persistentUuid": "3667aff1-9543-46ea-8308-3528e68c4127",
           "width": 0,
           "x": 998.2,
           "y": 518.5,
@@ -21678,7 +21678,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.55
+              "value": 3.4
             }
           ]
         },
@@ -21689,7 +21689,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "0b70006a-8380-4d58-84b1-99f00777db53",
+          "persistentUuid": "9931bbba-977e-4bc1-a4a5-87de5bf8d4b3",
           "width": 0,
           "x": 1195.7,
           "y": 514.2,
@@ -21710,7 +21710,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.85
+              "value": 3.36
             }
           ]
         },
@@ -21721,7 +21721,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "bd672e81-a017-4f82-954b-a1bfe6f7983b",
+          "persistentUuid": "826a90ac-1bc9-48da-bf84-00e22a5aee86",
           "width": 0,
           "x": 1203.6,
           "y": 363.4,
@@ -21742,7 +21742,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.5
+              "value": 2.7
             }
           ]
         },
@@ -21753,7 +21753,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "2148c02a-8822-4269-a416-84b27eeebafd",
+          "persistentUuid": "8f4cc91f-7d78-4ba5-9719-cdf94372526e",
           "width": 0,
           "x": 1723.5,
           "y": 522.1,
@@ -21774,7 +21774,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.84
+              "value": 2.03
             }
           ]
         },
@@ -21785,7 +21785,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "92a05f3d-cf58-455b-b3c4-f2917e06e297",
+          "persistentUuid": "cbc05e3a-a730-43b4-a0a8-a01dc1e06189",
           "width": 0,
           "x": 1754.3,
           "y": 581.9,
@@ -21806,7 +21806,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.41
+              "value": 5.74
             }
           ]
         },
@@ -21817,7 +21817,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "3a08852c-5982-42a4-9c64-9217a78bdc15",
+          "persistentUuid": "0917301e-3162-4ce6-b4aa-11d6469eaeff",
           "width": 0,
           "x": 1864.2,
           "y": 551.5,
@@ -21838,7 +21838,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.02
+              "value": 2.82
             }
           ]
         },
@@ -21849,7 +21849,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "164a1328-bbd4-421b-aa83-56ebfecccf7e",
+          "persistentUuid": "4f57ce6d-eed0-4672-a919-c228c99b860a",
           "width": 0,
           "x": 1787.5,
           "y": 538.3,
@@ -21870,7 +21870,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.29
+              "value": 2.79
             }
           ]
         },
@@ -21881,7 +21881,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "3268686e-b72c-456b-a984-b952b78b00e5",
+          "persistentUuid": "0048de88-14a9-49d9-85b6-1f1a720d7d7a",
           "width": 0,
           "x": 1704.8,
           "y": 634.6,
@@ -21902,7 +21902,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.09
+              "value": 4.99
             }
           ]
         },
@@ -21913,7 +21913,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "7ab266d1-8f3f-4587-939a-4d05918bbf08",
+          "persistentUuid": "959e83ec-11a5-4664-9883-a39c7e88f2f8",
           "width": 0,
           "x": 1663.7,
           "y": 592.5,
@@ -21934,7 +21934,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.23
+              "value": 4.95
             }
           ]
         },
@@ -21945,7 +21945,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8ef0900b-d994-4707-bd74-6ef0e2cb67ae",
+          "persistentUuid": "39452933-1378-478a-9695-07adfa49e1f7",
           "width": 0,
           "x": 1485,
           "y": 498.3,
@@ -21966,7 +21966,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.78
+              "value": 3.57
             }
           ]
         },
@@ -21977,7 +21977,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "085e22c2-d8e0-4199-acfc-fde70a2189f3",
+          "persistentUuid": "b1ffea3e-a78e-4abd-86f2-5da618123fca",
           "width": 0,
           "x": 1765.8,
           "y": 508.5,
@@ -21998,7 +21998,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.88
+              "value": 6.16
             }
           ]
         },
@@ -22009,7 +22009,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "219c205e-5192-4769-bd6c-b56aca41c2cd",
+          "persistentUuid": "d436a787-822e-47b5-9740-22d892eaf31f",
           "width": 0,
           "x": 1627.5,
           "y": 693,
@@ -22030,7 +22030,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.67
+              "value": 0.02
             }
           ]
         },
@@ -22041,7 +22041,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "dac9d791-bd63-42fa-9904-167136f9bfe0",
+          "persistentUuid": "99aac179-8d85-41ff-88f0-9e5c7357ca67",
           "width": 0,
           "x": 1665.5,
           "y": 814.1,
@@ -22062,7 +22062,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.42
+              "value": 0.39
             }
           ]
         },
@@ -22073,7 +22073,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "847bc7ac-732f-417e-b7d9-432d1255cad4",
+          "persistentUuid": "c8a444bc-c43b-4c44-822e-657c5f8edcf0",
           "width": 0,
           "x": 1751.3,
           "y": 687.8,
@@ -22094,7 +22094,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.48
+              "value": 2.28
             }
           ]
         },
@@ -22105,7 +22105,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "74678f35-4f57-4a6a-a849-cbbb54ce21bd",
+          "persistentUuid": "0514fa59-a46b-4f9d-9e5c-0b921f46a0f5",
           "width": 0,
           "x": 1486.8,
           "y": 599.1,
@@ -22126,7 +22126,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.02
+              "value": 1.59
             }
           ]
         },
@@ -22137,7 +22137,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a8748fcf-cd22-4d06-b2d8-9659b0da51b4",
+          "persistentUuid": "cf8d4c20-e446-464b-874c-1fbbd9e841b6",
           "width": 0,
           "x": 1460.8,
           "y": 659.8,
@@ -22158,7 +22158,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.22
+              "value": 5.28
             }
           ]
         },
@@ -22169,7 +22169,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "c54f20ca-8912-45e9-aced-1dbd6f8f5008",
+          "persistentUuid": "45ccede1-52e3-4d1d-a98e-7815cb0237b7",
           "width": 0,
           "x": 1566.5,
           "y": 630.1,
@@ -22190,7 +22190,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.65
+              "value": 5.24
             }
           ]
         },
@@ -22201,7 +22201,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "bf464373-3416-4c50-a025-7006bbabb8b2",
+          "persistentUuid": "5d471189-469c-4e47-bdef-bc8067c10016",
           "width": 0,
           "x": 1933.7,
           "y": 989.4,
@@ -22222,7 +22222,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.7
+              "value": 3.82
             }
           ]
         },
@@ -22233,7 +22233,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "de8f7bce-989f-4902-9b23-3bb5efdc4cb8",
+          "persistentUuid": "c446f4b4-34ab-4124-8f3e-4603ff9ed29f",
           "width": 0,
           "x": 1664.9,
           "y": 711.1,
@@ -22254,7 +22254,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.59
+              "value": 4.89
             }
           ]
         },
@@ -22265,7 +22265,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "eb0f8d4d-67f5-43b0-a366-b1765e82e5cd",
+          "persistentUuid": "17c5e13a-b8d2-44f7-b93a-e9c893405ed3",
           "width": 0,
           "x": 1425.2,
           "y": 623.1,
@@ -22286,7 +22286,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.75
+              "value": 5.16
             }
           ]
         },
@@ -22297,7 +22297,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "209209b6-ba43-4bf2-928d-fd9d9c5cb97e",
+          "persistentUuid": "a01537b1-6771-458d-8162-d0e73d530f1d",
           "width": 0,
           "x": 739.2,
           "y": 921.1,
@@ -22318,7 +22318,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.26
+              "value": 3.31
             }
           ]
         },
@@ -22329,7 +22329,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "2d1bfe51-c8a0-4c40-aedf-223df1287764",
+          "persistentUuid": "dd3a03d0-7a43-43c7-b306-a886bf5e5022",
           "width": 0,
           "x": 667.9,
           "y": 994.1,
@@ -22350,7 +22350,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.38
+              "value": 5.97
             }
           ]
         },
@@ -22361,7 +22361,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b5a62eea-b682-4c6b-94dc-0d9f248fc8f0",
+          "persistentUuid": "f1971816-4638-4f4e-8a1d-0b06c512d8ec",
           "width": 0,
           "x": 555.6,
           "y": 849.4,
@@ -22382,7 +22382,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.24
+              "value": 5.77
             }
           ]
         },
@@ -22393,7 +22393,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "4a3943a8-f590-41bb-8afe-bc975aa81f18",
+          "persistentUuid": "f589f1ca-5eb6-45f3-b7ad-64071511f4e1",
           "width": 0,
           "x": 573.1,
           "y": 748.2,
@@ -22414,7 +22414,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.56
+              "value": 4.16
             }
           ]
         },
@@ -22425,7 +22425,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "2e290664-18d3-466c-906f-0b3b2a860a09",
+          "persistentUuid": "7148ffda-fddd-4cb3-bbbc-1b5a25b5a594",
           "width": 0,
           "x": 594.2,
           "y": 986,
@@ -22446,7 +22446,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.61
+              "value": 5.67
             }
           ]
         },
@@ -22457,7 +22457,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f993d5c6-71ed-458b-8fee-f255a00334d1",
+          "persistentUuid": "f424322f-cb70-485b-b5c9-870bc8cca5fe",
           "width": 0,
           "x": 658.2,
           "y": 795.3,
@@ -22478,7 +22478,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.64
+              "value": 1.67
             }
           ]
         },
@@ -22489,7 +22489,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "c77ea670-0d4d-4b3f-9bfb-1a8482ffd270",
+          "persistentUuid": "519312dc-79c2-47ee-8dec-fceb98785d67",
           "width": 0,
           "x": 1302.6,
           "y": 624.4,
@@ -22510,7 +22510,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.04
+              "value": 3.34
             }
           ]
         },
@@ -22521,7 +22521,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "0260e989-f5de-4199-9566-42c4382be191",
+          "persistentUuid": "4bf5571c-0572-4d97-bca2-d7ad91775aae",
           "width": 0,
           "x": 1331,
           "y": 551.5,
@@ -22542,7 +22542,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.58
+              "value": 0.77
             }
           ]
         },
@@ -22553,7 +22553,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "1e295ed6-3be1-446e-afe2-14ade35771ba",
+          "persistentUuid": "fa5b9d05-4521-4dc6-a5c3-ce183f3999a9",
           "width": 0,
           "x": 1209,
           "y": 589.9,
@@ -22574,7 +22574,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.19
+              "value": 0.82
             }
           ]
         },
@@ -22585,7 +22585,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "07f390fc-b917-45b0-94cc-3bb7c9f8021d",
+          "persistentUuid": "b5b6357d-953d-43a5-bb50-e031f5626ecc",
           "width": 0,
           "x": 1041.1,
           "y": 737.3,
@@ -22606,7 +22606,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.07
+              "value": 1.84
             }
           ]
         },
@@ -22617,7 +22617,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ec066052-8458-4b4d-8f9e-54c79d446094",
+          "persistentUuid": "03ce5e40-cbd9-4d0a-9661-4495be3788fe",
           "width": 0,
           "x": 1189.7,
           "y": 938.4,
@@ -22638,7 +22638,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.1
+              "value": 2.38
             }
           ]
         },
@@ -22649,7 +22649,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "c3f34337-0ec5-4fe7-b6fc-855ec5224e5d",
+          "persistentUuid": "daadca91-1c62-48aa-a27e-09a6b1a6a0a3",
           "width": 0,
           "x": 1354.5,
           "y": 621.1,
@@ -22670,7 +22670,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.21
+              "value": 3.88
             }
           ]
         },
@@ -22681,7 +22681,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ee8001ca-f279-4371-ae42-1c30bf1eeecb",
+          "persistentUuid": "b8fca161-b994-49da-ae17-14d2522644db",
           "width": 0,
           "x": 1242.8,
           "y": 784.4,
@@ -22702,7 +22702,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.01
+              "value": 2.21
             }
           ]
         },
@@ -22713,7 +22713,7 @@
           "keepRatio": true,
           "layer": "Menu",
           "name": "MenuShade",
-          "persistentUuid": "6f044c90-1505-49f7-8576-c0b213718779",
+          "persistentUuid": "42f2a0ec-3b6d-49cc-b137-06d64a0a49b4",
           "width": 900,
           "x": 0,
           "y": 0,
@@ -24023,7 +24023,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "157573a9-e7d1-4517-a049-0dd446ba8eae",
+          "persistentUuid": "6034fb7e-e8c6-46f7-8fee-58b776c85a62",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -24039,7 +24039,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Ocean",
-          "persistentUuid": "7f577828-d577-4220-a1ee-e1d9e6a8b0d9",
+          "persistentUuid": "4670be6a-bdf4-4c9b-a064-f77a15a7ecef",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -24055,7 +24055,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "MapRim",
-          "persistentUuid": "9261a552-06b5-480d-a2e8-e6ed161fa826",
+          "persistentUuid": "d65008ab-af1c-46c0-83f4-db50fb48f843",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -24071,7 +24071,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "ArcticIce",
-          "persistentUuid": "5901832e-3a27-40ce-855d-fe98e2bf34a0",
+          "persistentUuid": "4d4c11d1-6ff2-4893-aab0-5dbb36be994e",
           "width": 1920,
           "x": 0,
           "y": 84,
@@ -24087,7 +24087,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "68362e41-c40e-4018-821b-6a318ce114d6",
+          "persistentUuid": "63d6d373-a94d-4ec4-99ce-0efa1bd69cb7",
           "width": 1636.6666666666667,
           "x": 67.33333333333333,
           "y": 84.66666666666667,
@@ -24114,7 +24114,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "6e2bb158-55d9-4461-911c-1fd5c41b1410",
+          "persistentUuid": "680dfd44-82ba-4721-876d-e89d7b2a7a4b",
           "width": 1069.3333333333333,
           "x": 610,
           "y": 92.66666666666667,
@@ -24141,7 +24141,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "75bc3608-9a62-4198-b6d2-7db2f9e98712",
+          "persistentUuid": "8858ddc6-594b-4209-84ee-ced27c2c9534",
           "width": 486,
           "x": 1125.3333333333333,
           "y": 222.66666666666666,
@@ -24168,7 +24168,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "ddd9f313-53d6-4352-8c75-c53d328c951a",
+          "persistentUuid": "fcda0440-b6e9-4136-8206-1fff3b8e5da0",
           "width": 251.33333333333334,
           "x": 466.6666666666667,
           "y": 480,
@@ -24195,7 +24195,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "89f9c850-5d92-4375-a2f1-a2f913abf334",
+          "persistentUuid": "269f2980-db40-48d2-a761-b8db5840ea0d",
           "width": 474,
           "x": 807.3333333333334,
           "y": 315.33333333333337,
@@ -24222,7 +24222,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "b2dad4de-6dad-4936-8c5d-9f3929f543e5",
+          "persistentUuid": "d066365d-227d-4587-bed1-4edb62aff2c7",
           "width": 640,
           "x": 1213.3333333333333,
           "y": 330.66666666666663,
@@ -24249,7 +24249,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "959ed19c-bc06-4789-b99c-ec00a7ae426d",
+          "persistentUuid": "31807056-f976-4cd3-8fde-23b16fc00028",
           "width": 1638,
           "x": 66.66666666666667,
           "y": 84,
@@ -24276,7 +24276,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "f7f7d828-9543-4562-b8d4-0ec72852de81",
+          "persistentUuid": "a29b3c6f-9009-4c1c-996b-c45aed07775b",
           "width": 1070.6666666666667,
           "x": 609.3333333333334,
           "y": 92,
@@ -24303,7 +24303,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "1b2dc16d-d11d-4434-b33c-5c127cce3474",
+          "persistentUuid": "35e8af27-0cd8-40db-8fbb-09987415da7f",
           "width": 488,
           "x": 1124,
           "y": 222,
@@ -24330,7 +24330,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "17cbc8e8-6c28-473a-bd12-900ca07c7c7b",
+          "persistentUuid": "a8d6f5fe-13e7-4760-8a91-ce02dc566c22",
           "width": 252.66666666666666,
           "x": 466,
           "y": 479.3333333333333,
@@ -24357,7 +24357,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "688e0729-0840-4f8d-8e04-4c956eb49485",
+          "persistentUuid": "bd493c95-b2d3-46bb-8e72-5bbaaceaf096",
           "width": 474,
           "x": 807.3333333333334,
           "y": 314,
@@ -24384,7 +24384,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "75dde643-aba9-4a4a-9838-e267fe96aa53",
+          "persistentUuid": "f63ffc6d-f43f-4b2a-b0ad-f8ccf39e2c43",
           "width": 640,
           "x": 1214,
           "y": 330,
@@ -24411,7 +24411,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "6cd5c156-24de-4f0e-9258-b245b21d8efc",
+          "persistentUuid": "d5003b5d-5b41-4e81-9580-0fe8ca56a41b",
           "width": 0,
           "x": 573.7,
           "y": 516.4,
@@ -24432,7 +24432,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.14
+              "value": 3.27
             }
           ]
         },
@@ -24443,7 +24443,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "5b44e3cb-3715-4a60-bedd-9de68ed3b5e6",
+          "persistentUuid": "b8b1ae58-1ee2-456b-bd00-3149d6725e03",
           "width": 0,
           "x": 444.5,
           "y": 591.2,
@@ -24464,7 +24464,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.25
+              "value": 1.68
             }
           ]
         },
@@ -24475,7 +24475,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "2fc14cc7-5096-4074-9a67-6f76a0b2ea49",
+          "persistentUuid": "a85b4f61-f4a7-45a7-b828-cbf880374fde",
           "width": 0,
           "x": 306.8,
           "y": 563.1,
@@ -24496,7 +24496,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.63
+              "value": 6.21
             }
           ]
         },
@@ -24507,7 +24507,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "88c15557-960c-409d-902b-e1bd599aaeb1",
+          "persistentUuid": "f3ccd072-82ec-49b6-981a-b56490bd72c5",
           "width": 0,
           "x": 491.6,
           "y": 507.7,
@@ -24528,7 +24528,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.42
+              "value": 0.3
             }
           ]
         },
@@ -24539,7 +24539,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b705564e-e9e8-4fa7-815b-b89df237db96",
+          "persistentUuid": "2308d307-86c8-4b84-9a53-e80e0502eca8",
           "width": 0,
           "x": 541.1,
           "y": 494.6,
@@ -24560,7 +24560,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.46
+              "value": 3.67
             }
           ]
         },
@@ -24571,7 +24571,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "741e4413-d16f-43a2-8e01-b0a6a9c3e284",
+          "persistentUuid": "f84c56e8-958d-428f-b678-4bab54c6ab54",
           "width": 0,
           "x": 422.1,
           "y": 658,
@@ -24592,7 +24592,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.05
+              "value": 1.37
             }
           ]
         },
@@ -24603,7 +24603,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "2952aff9-5751-4fa0-86f3-9e2fd10a4495",
+          "persistentUuid": "1b396ec3-e970-44ce-86d4-165fb88b5733",
           "width": 0,
           "x": 335.2,
           "y": 418.4,
@@ -24624,7 +24624,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.67
+              "value": 1.94
             }
           ]
         },
@@ -24635,7 +24635,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "432f8278-d331-44df-9339-7eab33d96e5e",
+          "persistentUuid": "d9a6b7e1-882e-452b-a10d-45fee91b595d",
           "width": 0,
           "x": 1020,
           "y": 434.7,
@@ -24656,7 +24656,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.61
+              "value": 1.4
             }
           ]
         },
@@ -24667,7 +24667,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "7725fd5b-4fa4-4993-9b4d-8fb661f5891e",
+          "persistentUuid": "6c3dde60-c248-4553-bed3-fec8d13e47aa",
           "width": 0,
           "x": 1034.8,
           "y": 455.2,
@@ -24688,7 +24688,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.39
+              "value": 2.49
             }
           ]
         },
@@ -24699,7 +24699,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "9fb46d24-aece-4a16-8aaa-299312d8b1d6",
+          "persistentUuid": "f4cbde80-a2e5-45e8-8a8d-5993da3c7005",
           "width": 0,
           "x": 1101.5,
           "y": 426.6,
@@ -24720,7 +24720,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.96
+              "value": 4.79
             }
           ]
         },
@@ -24731,7 +24731,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "fe584f12-be02-43df-8f57-4b2f13f7b300",
+          "persistentUuid": "06e5dddb-17d9-4631-9f40-2fac2f8f886e",
           "width": 0,
           "x": 1247.6,
           "y": 399.2,
@@ -24752,7 +24752,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.44
+              "value": 3.91
             }
           ]
         },
@@ -24763,7 +24763,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "98f41536-099e-4a12-8ea4-223d414ed934",
+          "persistentUuid": "7ebc6ae8-06ea-4d46-b6b2-039d776ea77b",
           "width": 0,
           "x": 1147.4,
           "y": 429,
@@ -24784,7 +24784,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.05
+              "value": 5.69
             }
           ]
         },
@@ -24795,7 +24795,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d13c3ed0-b0e9-4cad-9994-ea534b2f43d3",
+          "persistentUuid": "b2f68e3b-0bcb-48ce-9068-1b5f15d6b735",
           "width": 0,
           "x": 998.2,
           "y": 518.5,
@@ -24816,7 +24816,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.15
+              "value": 1.73
             }
           ]
         },
@@ -24827,7 +24827,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "46813da9-87ec-4cfb-a2ac-796b2728bc4c",
+          "persistentUuid": "b1e8ed57-f443-4043-8f90-fb825a0af216",
           "width": 0,
           "x": 1195.7,
           "y": 514.2,
@@ -24848,7 +24848,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.22
+              "value": 3.24
             }
           ]
         },
@@ -24859,7 +24859,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "1b6229b1-6695-44ce-bac0-abbe1a099e67",
+          "persistentUuid": "f5f4c2b1-de0c-43a4-88df-e68cc4fbd8b4",
           "width": 0,
           "x": 1203.6,
           "y": 363.4,
@@ -24880,7 +24880,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.25
+              "value": 5.96
             }
           ]
         },
@@ -24891,7 +24891,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "1225a922-8531-4319-bda9-04f5643d3da8",
+          "persistentUuid": "501a4d12-2976-4b82-89c3-a7d8b1a49449",
           "width": 0,
           "x": 1723.5,
           "y": 522.1,
@@ -24912,7 +24912,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.43
+              "value": 2.96
             }
           ]
         },
@@ -24923,7 +24923,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "1032aa5c-96a0-425d-95a1-d71bb2225f33",
+          "persistentUuid": "8b3cc47f-2e15-4866-9dbb-c02b1c850302",
           "width": 0,
           "x": 1754.3,
           "y": 581.9,
@@ -24944,7 +24944,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.61
+              "value": 1.2
             }
           ]
         },
@@ -24955,7 +24955,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "9f7d5fe4-d61c-4f15-8a5c-477132a7faf3",
+          "persistentUuid": "e45a8e09-1863-4656-86dd-f8f499ce108d",
           "width": 0,
           "x": 1864.2,
           "y": 551.5,
@@ -24976,7 +24976,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.77
+              "value": 2.08
             }
           ]
         },
@@ -24987,7 +24987,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "6a3120fc-2d50-4343-a1a0-446299140a66",
+          "persistentUuid": "9905b1ea-3015-42c8-b811-1780a55e3ca5",
           "width": 0,
           "x": 1787.5,
           "y": 538.3,
@@ -25008,7 +25008,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.32
+              "value": 5.81
             }
           ]
         },
@@ -25019,7 +25019,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d05214bb-e446-47bc-91dc-357e8a9a3a42",
+          "persistentUuid": "d2fca018-5c8b-43b3-be5e-948397fc7b3f",
           "width": 0,
           "x": 1704.8,
           "y": 634.6,
@@ -25040,7 +25040,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.04
+              "value": 3.87
             }
           ]
         },
@@ -25051,7 +25051,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "0afbab85-c94a-4ff0-af3c-ae582d6b3a8c",
+          "persistentUuid": "bbb3cc45-90f8-47e5-967e-d5fc8057a7ee",
           "width": 0,
           "x": 1663.7,
           "y": 592.5,
@@ -25072,7 +25072,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.39
+              "value": 3.07
             }
           ]
         },
@@ -25083,7 +25083,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ef3a8b10-0e54-4e33-9f09-7b0238852790",
+          "persistentUuid": "85b5af09-caa4-4a91-9315-1f0cba39910a",
           "width": 0,
           "x": 1485,
           "y": 498.3,
@@ -25104,7 +25104,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.76
+              "value": 3.68
             }
           ]
         },
@@ -25115,7 +25115,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "96a2a37d-ca8e-4733-8db4-a93a3d363428",
+          "persistentUuid": "547664dd-4c95-4e13-a242-cd3faef8f526",
           "width": 0,
           "x": 1765.8,
           "y": 508.5,
@@ -25136,7 +25136,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.66
+              "value": 3.36
             }
           ]
         },
@@ -25147,7 +25147,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b3440a01-01cc-48a0-902b-74456bb71d70",
+          "persistentUuid": "a737f539-6594-46dc-928a-d086334d7013",
           "width": 0,
           "x": 1627.5,
           "y": 693,
@@ -25168,7 +25168,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.88
+              "value": 0.88
             }
           ]
         },
@@ -25179,7 +25179,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "93525340-8a29-4090-8cb6-e9957e35ef55",
+          "persistentUuid": "0622ea57-9d51-43bc-a972-8dbd7271e6d6",
           "width": 0,
           "x": 1665.5,
           "y": 814.1,
@@ -25200,7 +25200,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.76
+              "value": 2.75
             }
           ]
         },
@@ -25211,7 +25211,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "e2a8966d-dc45-4316-9735-2103fffd44d6",
+          "persistentUuid": "dac46c27-08ae-4c67-8231-e057bbc505b3",
           "width": 0,
           "x": 1751.3,
           "y": 687.8,
@@ -25232,7 +25232,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.06
+              "value": 1.46
             }
           ]
         },
@@ -25243,7 +25243,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "353588ff-c4a6-467d-8ea2-6dc1b939fdc4",
+          "persistentUuid": "7ab62f03-b0cd-4373-8370-c0e63fde12a9",
           "width": 0,
           "x": 1486.8,
           "y": 599.1,
@@ -25264,7 +25264,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.41
+              "value": 3.08
             }
           ]
         },
@@ -25275,7 +25275,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "c026d903-63ac-44fa-9b28-f47868019032",
+          "persistentUuid": "d665583f-2bf1-44ff-b8b2-5b4c16c2e552",
           "width": 0,
           "x": 1460.8,
           "y": 659.8,
@@ -25296,7 +25296,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.81
+              "value": 2.01
             }
           ]
         },
@@ -25307,7 +25307,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "96060c07-1431-4e3f-b18f-4c0b363a39cf",
+          "persistentUuid": "84a74d23-c5cc-4f73-9250-32ed17d2a9ad",
           "width": 0,
           "x": 1566.5,
           "y": 630.1,
@@ -25328,7 +25328,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.63
+              "value": 4.14
             }
           ]
         },
@@ -25339,7 +25339,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "380c2209-0eff-480a-82fc-d9fa6b3b519d",
+          "persistentUuid": "56fb3eb3-f392-4ef7-8253-5603f34ad868",
           "width": 0,
           "x": 1933.7,
           "y": 989.4,
@@ -25360,7 +25360,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.56
+              "value": 3.19
             }
           ]
         },
@@ -25371,7 +25371,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ae3c425f-78df-47c7-b35e-9a438e9a8464",
+          "persistentUuid": "6a3eae5e-8901-4c76-b024-cda73cf7f7c1",
           "width": 0,
           "x": 1664.9,
           "y": 711.1,
@@ -25392,7 +25392,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.12
+              "value": 5.13
             }
           ]
         },
@@ -25403,7 +25403,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "461f1951-fe38-4f57-934f-b0e30a1f169f",
+          "persistentUuid": "78dce84f-16f9-4a49-bed9-d9a2cd9f735d",
           "width": 0,
           "x": 1425.2,
           "y": 623.1,
@@ -25424,7 +25424,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.16
+              "value": 0.03
             }
           ]
         },
@@ -25435,7 +25435,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "4416cd19-fbd4-4aea-96f2-687f4dd587b7",
+          "persistentUuid": "854c7c39-5dcb-40ce-aacc-3eaa41eec1ca",
           "width": 0,
           "x": 739.2,
           "y": 921.1,
@@ -25456,7 +25456,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.33
+              "value": 4.95
             }
           ]
         },
@@ -25467,7 +25467,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "1dd6254e-ae9b-4a7a-8d8b-ccd487b26d5d",
+          "persistentUuid": "79a96b30-62a6-4e64-a3fc-82cb5b7e9e93",
           "width": 0,
           "x": 667.9,
           "y": 994.1,
@@ -25488,7 +25488,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.38
+              "value": 5.34
             }
           ]
         },
@@ -25499,7 +25499,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "54f5f0a0-ebd2-40ee-91cc-49fec4f161b8",
+          "persistentUuid": "c6bf8603-0cff-4465-b755-35a50863d769",
           "width": 0,
           "x": 555.6,
           "y": 849.4,
@@ -25520,7 +25520,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.13
+              "value": 3.49
             }
           ]
         },
@@ -25531,7 +25531,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "4f703fd3-c51a-4c54-94b1-a836561b2063",
+          "persistentUuid": "a5a65d31-873d-4ea8-8835-6d57bc333093",
           "width": 0,
           "x": 573.1,
           "y": 748.2,
@@ -25552,7 +25552,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.19
+              "value": 2.78
             }
           ]
         },
@@ -25563,7 +25563,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "0a034e25-8256-42dc-b755-3231a6355c21",
+          "persistentUuid": "d0cfc022-b41b-4c3b-8802-ae58e37e69ed",
           "width": 0,
           "x": 594.2,
           "y": 986,
@@ -25584,7 +25584,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.7
+              "value": 4.32
             }
           ]
         },
@@ -25595,7 +25595,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "377c3667-8096-4ca9-be56-387c48ffe423",
+          "persistentUuid": "5c165c85-9b30-436a-a1e3-e46fe5ff4c9f",
           "width": 0,
           "x": 658.2,
           "y": 795.3,
@@ -25616,7 +25616,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.2
+              "value": 5.26
             }
           ]
         },
@@ -25627,7 +25627,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "862fd968-2cfb-495c-a77f-17f73956dad1",
+          "persistentUuid": "233c4204-f0ad-48a5-8b83-e4de9d5a06c1",
           "width": 0,
           "x": 1302.6,
           "y": 624.4,
@@ -25648,7 +25648,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.65
+              "value": 0.5
             }
           ]
         },
@@ -25659,7 +25659,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "fa366e29-3601-4126-a79d-4cad91cb84c2",
+          "persistentUuid": "ac3b7ab9-f2b0-4ab6-88ed-617353e339d7",
           "width": 0,
           "x": 1331,
           "y": 551.5,
@@ -25680,7 +25680,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.04
+              "value": 2.55
             }
           ]
         },
@@ -25691,7 +25691,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8ba02b18-135f-4bc3-b75e-fb29313d832e",
+          "persistentUuid": "260ec78f-88c9-46e1-8f04-e9f6565f4963",
           "width": 0,
           "x": 1209,
           "y": 589.9,
@@ -25712,7 +25712,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.27
+              "value": 0.9
             }
           ]
         },
@@ -25723,7 +25723,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ef8f03ee-4283-48de-8ebd-9a23689dcba1",
+          "persistentUuid": "dc635a3c-49c2-4318-b2ac-a35b823fe282",
           "width": 0,
           "x": 1041.1,
           "y": 737.3,
@@ -25744,7 +25744,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.38
+              "value": 2.08
             }
           ]
         },
@@ -25755,7 +25755,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "e7cf72bc-d6f2-467f-ba62-874a63d43cc3",
+          "persistentUuid": "331f3d33-9f82-4dea-a498-217905918e74",
           "width": 0,
           "x": 1189.7,
           "y": 938.4,
@@ -25776,7 +25776,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.43
+              "value": 0.27
             }
           ]
         },
@@ -25787,7 +25787,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "e23b8be7-beb8-4a18-83de-897401f1e5ee",
+          "persistentUuid": "ab524ed6-7201-4ba4-957e-1100a275c570",
           "width": 0,
           "x": 1354.5,
           "y": 621.1,
@@ -25808,7 +25808,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.26
+              "value": 5.68
             }
           ]
         },
@@ -25819,7 +25819,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "696d2252-6d3d-41a1-bfe0-02a6f2acf4ed",
+          "persistentUuid": "99f36d27-f512-4a46-b5dc-e584bf836987",
           "width": 0,
           "x": 1242.8,
           "y": 784.4,
@@ -25840,7 +25840,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.96
+              "value": 3.76
             }
           ]
         }
@@ -30008,6 +30008,19 @@
                 "  ]),",
                 "];",
                 "P.CHANGELOG.find(x => x.v === \"2.1\").subs = [",
+                "  SUB(\"2.1.2\", \"2026-11-10\", [",
+                "    \"แผงประเทศอ่านง่ายขึ้น: CO₂ ตัวใหญ่ (หน่วย Gt) ความเสี่ยงภัย ป้องกันภัย และเทคโนโลยีสีเขียวเป็นช่องของตัวเอง แร่ที่ประเทศนั้นมีขึ้นให้เห็นเลย และบอกว่าแร่ไหนต้องแปรรูปก่อน\",",
+                "    \"คำสั่งกับประเทศรวมเป็นรายการเดียว แบ่งตามเป้าหมาย (ลด CO₂ · มิตรภาพ · ป้องกันภัย · ทรัพยากร) ผลของแต่ละคำสั่งเป็นไอคอนกับตัวเลขที่คิดจากสถานะจริงตอนนี้ ปุ่มซื้อขนาดเท่ากันทุกปุ่ม\",",
+                "    \"\\\"ซื้อแร่\\\" บอกเลยว่าจะได้แร่อะไรกี่หน่วย\",",
+                "    \"แถบข่าวกว้างขึ้น ตัวใหญ่ขึ้นตามขนาดจอ และข้อความยาววิ่งให้อ่านจนจบ\",",
+                "    \"ปุ่มลัดบนคอมเพิ่ม: ลูกศรเลื่อนแผนที่ · Q/E สลับทวีป · A ไปยังภัย · ⌫ ย้อนกลับ · P ความนิยม · M ตลาดแร่ · Z X C สกิลพิเศษ · V เสียง · ? ดูปุ่มลัดทั้งหมด (โหมดฝึกซ้อมแนะนำปุ่มด้วย)\",",
+                "  ], [",
+                "    \"The country panel is easier to read: CO₂ as a big number in Gt, disaster risk, protection and green technology in their own boxes, the country's minerals right away, and which of them still need refining.\",",
+                "    \"Orders for a country are one list grouped by goal (cut CO₂ · friendship · disaster protection · resources); each effect is an icon and a number worked out from the game right now, and every buy button is the same size.\",",
+                "    \"\\\"Buy minerals\\\" says which minerals you get and how many.\",",
+                "    \"The news line is wider, its text scales with the screen, and a long line scrolls so you can read it to the end.\",",
+                "    \"More keyboard shortcuts: arrows move the map · Q/E switch region · A goes to the next disaster · Backspace goes back · P approval · M market · Z X C abilities · V sound · ? all shortcuts (training shows them too).\",",
+                "  ]),",
                 "  SUB(\"2.1.1\", \"2026-11-10\", [",
                 "    \"หน้าโหลดใช้ลูกโลก 3 มิติตัวเดียวกับหน้าหลัก คมชัดและหมุนลื่น พอกดเข้าเกม ลูกโลกเลื่อนไปที่หน้าหลักพอดี หมุนต่อจากเดิม\",",
                 "    \"ข้อความระหว่างโหลดสุ่มจากสิ่งต่าง ๆ ในเกม ทุกครั้งที่เปิดจะไม่ซ้ำกัน\",",
@@ -31598,7 +31611,7 @@
                 "  return gain;",
                 "}",
                 "/* country order: buy minerals from a country that has them */",
-                "const ORE_BUY = {id:\"ore\", icon:\"package\", ep:30, pc:0, cd:6, name:T(\"ซื้อทรัพยากรจากประเทศนี้\", \"Buy resources here\"), desc:T(\"ทรัพยากรที่ประเทศนี้มี +12 ถึง +20 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2\", \"This country's minerals +12 to +20 (more if friendly), friendship +2\")};",
+                "const ORE_BUY = {id:\"ore\", icon:\"package\", ep:30, pc:0, cd:6, name:T(\"ซื้อแร่\", \"Buy minerals\"), desc:T(\"ทรัพยากรที่ประเทศนี้มี +12 ถึง +20 (ยิ่งเป็นมิตรยิ่งได้มาก) และมิตรภาพ +2\", \"This country's minerals +12 to +20 (more if friendly), friendship +2\")};",
                 "function oreBuyOk(c){ return !!(S.oreOn && c && !c.rest && CRES[c.id] && CRES[c.id].w && !((S.oreBan || {})[c.id] > 0)); }",
                 "function oreBuy(c){",
                 "  const gain = Math.round(12 + 8 * relFactor(c.rel));   // 3.7.5: was 8 + 6",
@@ -33884,6 +33897,135 @@
             {
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
+                "/* Engine · 43-orders (web/src/engine) */",
+                "const P = window.P2050 = window.P2050 || {};",
+                "if (P.mods && P.mods.orders39) return;",
+                "(P.mods = P.mods || {}).orders39 = 1;",
+                "/* =========================================================================",
+                "   3.9 · The country panel, worked out once for the web drawer and the GDevelop drawer",
+                "   · orders grouped by what they are for (cut CO₂ / friendship / disaster protection / resources)",
+                "   · every effect as a short token computed from the real formulas (20-engine.js countryAction and doAction),",
+                "     so \"× on-plan\" shows as the number you actually get now",
+                "   · the minerals a country has, and whether they still need refining",
+                "   ========================================================================= */",
+                "const S = P.S, T = (th, en) => ({th, en});",
+                "const clamp = (v, a, b) => Math.max(a, Math.min(b, v));",
+                "",
+                "P.ORDER_GOALS = [",
+                "  {id:\"co2\", icon:\"trending-down\", col:\"good\", name:T(\"ลด CO₂\", \"Cut CO₂\")},",
+                "  {id:\"rel\", icon:\"heart\", col:\"pink\", name:T(\"มิตรภาพ\", \"Friendship\")},",
+                "  {id:\"def\", icon:\"shield\", col:\"sky\", name:T(\"ป้องกันภัย\", \"Disaster protection\")},",
+                "  {id:\"res\", icon:\"package\", col:\"gold\", name:T(\"ทรัพยากร\", \"Resources\")},",
+                "];",
+                "/* kind \"c\" = an order with this country (CACTS) · kind \"a\" = a regional order aimed at this country (ACTIONS, country scope) */",
+                "const GOAL = {c:{ore:\"res\", talk:\"rel\", fund:\"co2\", tech:\"co2\", shield:\"def\"}, a:{fund:\"co2\", diplo:\"rel\", adapt:\"def\", tariff:\"co2\"}};",
+                "",
+                "const num = v => { const a = Math.abs(v); return a >= 10 || a === Math.round(a) ? String(Math.round(a)) : a.toFixed(1); };",
+                "const sg = v => (v < 0 ? \"−\" : \"+\") + num(v);",
+                "/* one token: icon, value, bad?, and a longer line for the tooltip */",
+                "const tk = (ic, v, bad, tip) => ({ic, v, bad:!!bad, tip:tip || null});",
+                "const rel = v => tk(\"$heart\", sg(v), v < 0, T(`มิตรภาพ ${sg(v)}`, `Friendship ${sg(v)}`));",
+                "const co2 = (pct, tip) => tk(\"$co2\", sg(pct) + \"%\", pct > 0, tip || T(`CO₂ ของประเทศนี้ ${sg(pct)}%`, `This country's CO₂ ${sg(pct)}%`));",
+                "const green = v => tk(\"leaf\", sg(v), false, T(`เทคโนโลยีสีเขียว ${sg(v)}`, `Green technology ${sg(v)}`));",
+                "const shield = v => tk(\"shield\", sg(v), false, T(`ป้องกันภัย ${sg(v)} (ภัยเสียหายน้อยลง)`, `Disaster protection ${sg(v)} (less damage)`));",
+                "",
+                "/* the mineral groups a country's mines feed, and whether that country refines them itself */",
+                "function oreDetail(c){",
+                "  const cr = P.CRES && P.CRES[c.id], rf = P.relFactor ? P.relFactor(c.rel) : .3, gain = Math.round(12 + 8 * rf);",
+                "  if (!P.groupOf || !P.MAT) return [{g:null, n:gain, ready:true}];",
+                "  const gs = [...new Set((cr ? cr.r : []).map(P.groupOf).filter(Boolean))];",
+                "  if (!gs.length) return [{g:\"cu\", n:gain, ready:!!(P.refines && P.refines(c.id, \"cu\"))}];",
+                "  return gs.map(g => ({g, n:Math.round(gain / gs.length), ready:!!(P.refines && P.refines(c.id, g))}));",
+                "}",
+                "function orderFx(kind, id, c){",
+                "  const r = P.R(c.reg), comp = r ? r.comp / 100 : 1;",
+                "  if (kind === \"c\"){",
+                "    if (id === \"talk\") return [rel(10)];",
+                "    if (id === \"fund\") return [rel(20), co2(-8, T(\"CO₂ ของประเทศนี้ −8% ภายใน 12 เดือน\", \"This country's CO₂ −8% over 12 months\")), green(10)];",
+                "    if (id === \"tech\") return [rel(8), co2(-5), green(15)];",
+                "    if (id === \"shield\") return [shield(20), rel(4)];",
+                "    if (id === \"ore\") return [...oreDetail(c).map(o => o.g ? {...tk(P.MAT[o.g].icon, \"+\" + o.n, false, T(`${P.L(P.MAT[o.g].name)} +${o.n}${o.ready ? \"\" : \" (ต้องแปรรูป)\"}`, `${P.L(P.MAT[o.g].name)} +${o.n}${o.ready ? \"\" : \" (needs refining)\"}`)), mat:P.MAT[o.g].name, raw:!o.ready} : tk(\"$ore\", \"+\" + o.n)), rel(2)];",
+                "  } else {",
+                "    if (id === \"fund\") return [co2(-12 * comp, T(`CO₂ ของประเทศนี้ ${sg(-12 * comp)}% (−12% × ทำตามแผน ${Math.round(comp * 100)}%)`, `This country's CO₂ ${sg(-12 * comp)}% (−12% × on-plan ${Math.round(comp * 100)}%)`)), rel(3)];",
+                "    if (id === \"diplo\") return [rel(12)];",
+                "    if (id === \"adapt\") return [shield(20), rel(4)];",
+                "    if (id === \"tariff\"){",
+                "      const k = -20 * Math.pow(.7, c.tar || 0) * comp, out = [co2(k, T(`CO₂ ของประเทศนี้ ${sg(k)}% (ได้ผลน้อยลงทุกครั้งที่ใช้)`, `This country's CO₂ ${sg(k)}% (weaker each time)`)), rel(-22), tk(\"$appr\", \"−1%\", true, T(\"ความนิยม −1%\", \"Approval −1%\"))];",
+                "      if (c.rel - 22 <= -20) out.push(tk(\"ban\", \"\", true, T(\"อาจถูกคว่ำบาตร\", \"May bring sanctions\")));",
+                "      return out;",
+                "    }",
+                "  }",
+                "  return null;",
+                "}",
+                "/* the minerals in a country, for the badges under its numbers */",
+                "function countryMinerals(c){",
+                "  const cr = P.CRES && P.CRES[c.id]; if (!cr || !P.RES) return [];",
+                "  return cr.r.map(k => { const g = P.groupOf ? P.groupOf(k) : null;",
+                "    return {k, icon:\"$res-\" + k, name:P.L(P.RES[k].name).replace(/\\s*\\(.*\\)$/, \"\"), raw:!!g && !(P.refines && P.refines(c.id, g))}; });",
+                "}",
+                "/* the orders for one country, grouped by goal: [{goal, items:[{kind, a}]}] */",
+                "function countryOrders(){",
+                "  const items = [...(P.CACTS || []).filter(a => !a.req || S.owned[a.req]).map(a => ({kind:\"c\", a})), ...(P.ACTIONS || []).map(a => ({kind:\"a\", a}))];",
+                "  return P.ORDER_GOALS.map(goal => ({goal, items:items.filter(x => (GOAL[x.kind][x.a.id] || \"co2\") === goal.id)})).filter(x => x.items.length);",
+                "}",
+                "/* CO₂ in Gt only: 3.05 · 0.45 · 0.025 */",
+                "const fmtGt = g => (g >= .1 ? g.toFixed(2) : g >= .001 ? g.toFixed(3) : g.toFixed(4));",
+                "Object.assign(P, {orderFx, oreDetail, countryMinerals, countryOrders, fmtGt});",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/* Engine · 44-keys (web/src/engine) */",
+                "const P = window.P2050 = window.P2050 || {};",
+                "if (P.mods && P.mods.keys39) return;",
+                "(P.mods = P.mods || {}).keys39 = 1;",
+                "/* 3.9: keyboard shortcuts on a computer, one list for the \"?\" window (web + GDevelop) and the keys shown in training.",
+                "   [keys, what it does, new in 3.9] */",
+                "const T = (th, en) => ({th, en});",
+                "P.KEYS = [",
+                "  {id:\"time\", icon:\"clock\", col:\"accent\", name:T(\"เวลา\", \"Time\"), keys:[",
+                "    [[\"Space\"], T(\"หยุด / เดินต่อ\", \"Pause / resume\")],",
+                "    [[\"1\", \"2\", \"3\"], T(\"ความเร็ว (ตอนมีเหตุการณ์ = เลือกทาง)\", \"Speed (during an event: pick an answer)\")]]},",
+                "  {id:\"map\", icon:\"map\", col:\"sky\", name:T(\"แผนที่\", \"Map\"), keys:[",
+                "    [[\"←\", \"↑\", \"↓\", \"→\"], T(\"เลื่อนแผนที่\", \"Move the map\"), 1],",
+                "    [[\"+\", \"−\"], T(\"ซูมเข้า / ออก\", \"Zoom in / out\")],",
+                "    [[\"H\"], T(\"ดูทั้งโลก\", \"Whole world\")],",
+                "    [[\"Q\", \"E\"], T(\"ทวีปก่อนหน้า / ถัดไป\", \"Previous / next region\"), 1],",
+                "    [[\"A\"], T(\"ไปยังภัยที่กำลังจะมา (กดซ้ำ = ภัยถัดไป)\", \"Go to the next coming disaster\"), 1]]},",
+                "  {id:\"pane\", icon:\"menu\", col:\"purple\", name:T(\"แผงข้อมูล\", \"Panels\"), keys:[",
+                "    [[\"R\"], T(\"แผงทวีป / ประเทศ\", \"Region / country panel\")],",
+                "    [[\"S\"], T(\"แผงสถิติ\", \"Statistics\")],",
+                "    [[\"N\"], T(\"แผงข่าว\", \"News\")],",
+                "    [[\"⌫\"], T(\"ย้อนจากประเทศกลับไปทวีป\", \"Back from a country to its region\"), 1]]},",
+                "  {id:\"win\", icon:\"monitor\", col:\"gold\", name:T(\"หน้าต่าง\", \"Windows\"), keys:[",
+                "    [[\"T\"], T(\"ต้นไม้สกิล\", \"Skill tree\")],",
+                "    [[\"P\"], T(\"ความนิยม (กลุ่มคน 4 กลุ่ม)\", \"Approval (4 groups)\"), 1],",
+                "    [[\"M\"], T(\"ตลาดแร่\", \"Mineral market\"), 1]]},",
+                "  {id:\"char\", icon:\"user-round\", col:\"pink\", name:T(\"ตัวละครและเหตุการณ์\", \"Character and events\"), keys:[",
+                "    [[\"Z\", \"X\", \"C\"], T(\"สกิลพิเศษของตัวละคร ปุ่มที่ 1–3\", \"Character abilities 1–3\"), 1],",
+                "    [[\"Enter\"], T(\"ปิดสรุปปีและบทเล่าเรื่อง\", \"Close the year report and story\")]]},",
+                "  {id:\"etc\", icon:\"keyboard\", col:\"muted\", name:T(\"อื่น ๆ\", \"Other\"), keys:[",
+                "    [[\"Esc\"], T(\"ปิดหน้าต่าง หรือหยุดเกม\", \"Close a window, or pause\")],",
+                "    [[\"F\"], T(\"เต็มจอ\", \"Full screen\")],",
+                "    [[\"V\"], T(\"ปิด / เปิดเสียงทั้งหมด\", \"Sound off / on\"), 1],",
+                "    [[\"?\"], T(\"ดูปุ่มลัดทั้งหมด\", \"All shortcuts\"), 1]]},",
+                "];",
+                "/* keys shown on a training step (computer only) */",
+                "P.TRAIN_KEYS = {time:[\"Space\"], skills:[\"T\"], skclose:[\"Esc\"], hazard:[\"A\"], event:[\"1\", \"2\", \"3\"], appr:[\"P\"], apprclose:[\"Esc\"], ore:[\"M\"], oreclose:[\"Esc\"], ability:[\"Z\", \"X\", \"C\"], year:[\"Enter\"], edge:[\"A\", \"←↑↓→\"], done:[\"?\"]};",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
                 "/* UI toolkit · วาดแผง/ข้อความ/ไอคอนด้วย UIPainter, UIText, UIIcon */",
                 "const P = window.P2050 = window.P2050 || {};",
                 "if (P.mods && P.mods.kit) return;",
@@ -33944,6 +34086,7 @@
                 "  return out;",
                 "}",
                 "function graphemes(s){ return gseg ? Array.from(gseg.segment(s), x => x.segment) : Array.from(s); }",
+                "P.graphemes = graphemes;   // 3.9: the news line scrolls by whole letters (Thai vowels stay on their consonant)",
                 "/* Rich text = plain text with [[icon]] tokens. Returns lines of items {t:\"s\"|\"i\", v, w}. */",
                 "const layoutCache = new Map();",
                 "function layout(str, fk, size, maxW){",
@@ -34786,6 +34929,8 @@
                 "  /* drawer closed: slide back to the whole-world view (when not zoomed in) */",
                 "  recenter(){ if (this.mode === \"game\" && this.cam.z <= 1.05) this.target = {...HOME}; },",
                 "  resetView(){ if (this.mode === \"game\"){ this.zAnim = null; this.target = {...HOME}; Kit.dirty(); } },",
+                "  /* 3.9: arrow keys move the map a few screen pixels */",
+                "  panBy(dx, dy){ if (this.mode !== \"game\") return; this.zAnim = null; this.fling = null; const b = this.target || this.cam; this.target = {x:b.x + dx / b.z, y:b.y + dy / b.z, z:b.z}; Kit.dirty(); },",
                 "  /* 3.7.3: smooth zoom toward / away from a screen point (double-tap, two-finger tap); never jumps back to the middle */",
                 "  zoomAt(sx, sy, f){ if (this.mode !== \"game\") return; const w = this.toWorldFromScreen(sx, sy); this.target = null; this.fling = null; this.zAnim = {z:clamp(this.cam.z * f, ZMIN, ZMAX), sx, sy, wx:w[0], wy:w[1], keep:true}; if (P.Audio) P.Audio.play(\"tick\"); },",
                 "  zoomBy(f){",
@@ -35186,7 +35331,7 @@
                 "  },",
                 "  modalOpen(){ return !!this.kind(); },",
                 "  get paused(){ return this.modal === \"pause\"; },",
-                "  get blocking(){ return [\"charsel\", \"pause\", \"tutorial\", \"story\", \"skills\", \"learn\", \"market\", \"politics\", \"year\", \"intro\", \"slotpick\"].includes(this.modal); },",
+                "  get blocking(){ return [\"charsel\", \"pause\", \"tutorial\", \"story\", \"skills\", \"learn\", \"market\", \"politics\", \"year\", \"intro\", \"slotpick\", \"keys\"].includes(this.modal); },",
                 "  eventLocked(){ return (performance.now() - this.evAt) / 1000 < EVENT_LOCK; },",
                 "  eventLockFrac(){ return Math.min(1, (performance.now() - this.evAt) / 1000 / EVENT_LOCK); },",
                 "};",
@@ -35431,19 +35576,29 @@
                 "      return;",
                 "    }",
                 "    const m = UIM.modal;",
+                "    /* 3.9: \"?\" shows every shortcut */",
+                "    if (name === \"?\"){ if (m === \"keys\") this.closeKeys(); else if (!m || m === \"pause\" || m === \"skills\") this.openKeys(); return; }",
+                "    if (name === \"esc\" && m === \"keys\"){ this.closeKeys(); return; }",
+                "    if (m === \"keys\") return;",
                 "    if (name === \"esc\"){",
                 "      if (m === \"pause\") this.resume();",
                 "      else if (m === \"tutorial\") this.tutAct(\"skip\");",
                 "      else if (m === \"learn\") this.closeLearn();",
                 "      else if (m === \"story\") this.storyNext();",
                 "      else if (m === \"skills\") this.closeSkills();",
+                "      else if (m === \"politics\" || m === \"market\" || m === \"year\") this.closeWin();",
                 "      else if (S.tab) this.closeTab();",
                 "      else if (!S.event && !S.over && !m) this.pause();",
                 "      return;",
                 "    }",
                 "    if (m === \"story\" && (name === \"space\" || name === \"enter\")){ this.storyNext(); return; }",
+                "    if (m === \"year\" && (name === \"space\" || name === \"enter\")){ this.closeWin(); return; }",
                 "    if (S.event && /^[123]$/.test(name)){ const i = +name - 1, e = P.currentEvent(); if (e && i < e.options.length && !UIM.eventLocked() && P.affordable(e.options[i].fx)) P.chooseOption(i); return; }",
                 "    if (name === \"t\"){ if (m === \"skills\") this.closeSkills(); else this.openSkills(); return; }",
+                "    /* 3.9: approval and the mineral market open and close with one key · V turns every sound off and back on */",
+                "    if (name === \"p\" && S.started && !S.over && !S.event && !S.simple && (!m || m === \"politics\" || m === \"skills\")){ if (m === \"politics\") this.closeWin(); else { Audio.play(\"open\"); this.openWin(\"politics\"); } return; }",
+                "    if (name === \"m\" && S.started && !S.over && !S.event && S.oreOn && (!m || m === \"market\" || m === \"skills\")){ if (m === \"market\") this.closeWin(); else { Audio.play(\"open\"); this.openWin(\"market\"); } return; }",
+                "    if (name === \"v\"){ this.muteAll(); return; }",
                 "    if (m && m !== \"skills\") return;",
                 "    if (name === \"space\"){ if (S.started && !S.over && !S.event) P.setSpeed(S.speed === 0 ? (UIM.prevSpeed || 1) : (UIM.prevSpeed = S.speed, 0)); }",
                 "    else if (name === \"1\" || name === \"2\" || name === \"3\"){ if (S.started && !S.over) P.setSpeed(+name); }",
@@ -35453,6 +35608,28 @@
                 "    else if (!m && name === \"r\") this.setTab(\"region\");",
                 "    else if (!m && name === \"s\") this.setTab(\"stats\");",
                 "    else if (!m && name === \"n\") this.setTab(\"news\");",
+                "    /* 3.9: arrows move the map · Q/E regions · A the next coming disaster · Backspace back to the region · Z/X/C abilities */",
+                "    else if (/^(left|right|up|down)$/.test(name)){ const d = 90, v = {left:[-d, 0], right:[d, 0], up:[0, -d], down:[0, d]}[name]; P.Map.panBy(v[0], v[1]); }",
+                "    else if (!m && (name === \"q\" || name === \"e\") && S.regions){",
+                "      const ids = S.regions.map(r => r.id), i = ids.indexOf(S.sel); this.selectRegion(ids[(i + (name === \"e\" ? 1 : -1) + ids.length) % ids.length], true);",
+                "    }",
+                "    else if (!m && name === \"a\"){",
+                "      const hz = (S.haz || []).filter(h => P.C(h.c)).sort((x, y) => x.at - y.at); if (!hz.length){ Audio.play(\"error\"); return; }",
+                "      UIM.hzKey = ((UIM.hzKey ?? -1) + 1) % hz.length; this.selectCountry(hz[UIM.hzKey].c);",
+                "    }",
+                "    else if (!m && name === \"backspace\" && S.tab === \"region\" && S.selC){ Audio.play(\"close\"); S.selC = null; P.Map.focus(S.sel, false); P.changed(); }",
+                "    else if (!m && (name === \"z\" || name === \"x\" || name === \"c\") && S.started && !S.over){",
+                "      const a = P.abilityList()[{z:0, x:1, c:2}[name]];",
+                "      if (a && P.abilityReady(a) && P.useAbility(a.id)) Audio.play(\"powerup\"); else Audio.play(\"error\");",
+                "    }",
+                "    k.dirty();",
+                "  },",
+                "  openKeys(){ UIM.keysFrom = UIM.modal; UIM.modal = \"keys\"; Audio.play(\"open\"); const ml = k.L(\"ModalScroll\"); if (ml) ml.scroll = 0; k.dirty(); },",
+                "  closeKeys(){ UIM.modal = UIM.keysFrom || null; UIM.keysFrom = null; Audio.play(\"close\"); k.dirty(); },",
+                "  muteAll(){",
+                "    if (Audio.on || Audio.musicOn){ UIM.muted = {sfx:Audio.on, music:Audio.musicOn}; if (Audio.musicOn) Audio.toggleMusic(); if (Audio.on) Audio.toggle(); }",
+                "    else { const was = UIM.muted || {sfx:true, music:true}; if (was.sfx) Audio.toggle(); if (was.music) Audio.toggleMusic(); }",
+                "    const on = Audio.on || Audio.musicOn; UIM.toastQ.push({id:\"mute\", icon:on ? \"volume-2\" : \"volume-x\", title:L(on ? {th:\"เปิดเสียง\", en:\"Sound on\"} : {th:\"ปิดเสียง\", en:\"Sound off\"}), msg:on ? \"\" : L({th:\"กด V อีกครั้งเพื่อเปิด\", en:\"Press V again to turn it on\"})});",
                 "    k.dirty();",
                 "  },",
                 "  /* ---- scene setup (called from each scene's \"At the beginning of the scene\" event) ---- */",
@@ -35526,9 +35703,10 @@
                 "  window.addEventListener(\"keydown\", e => {",
                 "    const tg = e.target, tag = tg && tg.tagName;",
                 "    if (tag === \"INPUT\" || tag === \"TEXTAREA\" || (tg && tg.isContentEditable)) return;",
-                "    const map = {\" \":\"space\", Escape:\"esc\", Enter:\"enter\"}, kk = map[e.key] || (e.key.length === 1 ? e.key.toLowerCase() : null);",
+                "    if (e.ctrlKey || e.metaKey || e.altKey) return;   // 3.9: leave the browser's own shortcuts alone",
+                "    const map = {\" \":\"space\", Escape:\"esc\", Enter:\"enter\", ArrowLeft:\"left\", ArrowRight:\"right\", ArrowUp:\"up\", ArrowDown:\"down\", Backspace:\"backspace\"}, kk = map[e.key] || (e.key.length === 1 ? e.key.toLowerCase() : null);",
                 "    if (!kk || !P.Screens || !P.Screens.scene) return;",
-                "    if (kk === \"space\") e.preventDefault();",
+                "    if (kk === \"space\" || /^(left|right|up|down|backspace)$/.test(kk)) e.preventDefault();",
                 "    try { P.Screens.key(kk); } catch(err){ console.error(err); }",
                 "  });",
                 "}",
@@ -35674,19 +35852,30 @@
                 "  if (lg){\r",
                 "    const key = S.log.length + \":\" + lg.tk;\r",
                 "    if (UIM.newsKey !== key){ UIM.newsKey = key; UIM.newsT = performance.now(); }\r",
-                "    const age = (performance.now() - UIM.newsT) / 1000, a = age < 6 ? 1 : Math.max(0, 1 - (age - 6) / 1.2);\r",
+                "    const age = (performance.now() - UIM.newsT) / 1000;\r",
+                "    /* 3.9: a longer, larger news line; a line that does not fit scrolls once from start to end, then fades */\r",
+                "    const nx = 14 + 54 + 8, nw = Math.max(bw - 54 - 8, Math.min(900, k.W - 76 - 440)), nh = 32, fs = k.W >= 1500 ? 15 : 14, aw = nw - 44;\r",
+                "    const plainTxt = String(lg.txt).replace(/\\[\\[\\$?[a-z0-9-]+\\]\\]\\s?/g, \"\"), over = k.textW(lg.txt, {size:fs}) > aw;\r",
+                "    const g = over ? (UIM.newsG && UIM.newsG.k === key ? UIM.newsG.g : (UIM.newsG = {k:key, g:P.graphemes ? P.graphemes(plainTxt) : Array.from(plainTxt)}).g) : null;\r",
+                "    let cut = 0, endT = 6;\r",
+                "    if (over){\r",
+                "      let n = 0; while (n < g.length && k.textW(g.slice(n).join(\"\"), {size:fs}) > aw) n++;   // characters to scroll away so the end shows\r",
+                "      cut = Math.min(n, Math.max(0, Math.floor((age - 1.2) * 9))); endT = 1.2 + n / 9 + 4;\r",
+                "    }\r",
+                "    const a = age < endT ? 1 : Math.max(0, 1 - (age - endT) / 1.2);\r",
                 "    if (a > 0){\r",
-                "      const nx = 14 + 54 + 8, nw = bw - 54 - 8, col = {tc:\"accent\", al:\"bad\", gd:\"good\", ev:\"warn\", nw:\"fg\"}[lg.cls] || \"fg\";\r",
-                "      k.rect(l, nx, ay, nw, 28, \"glass\", {a:.9 * a, r:10, stroke:\"line\", bg:true});\r",
-                "      k.icon(l, \"newspaper\", nx + 10, ay + 7, 14, \"muted\", a);\r",
-                "      k.text(l, lg.txt, nx + 30, ay + 5, {size:12.5, color:col, w:nw - 40, max:1, a});\r",
-                "      k.hit(l, \"newsline\", nx, ay, nw, 28, () => Screens.setTab(\"news\"));\r",
-                "      if (!Screens._newsTimer) Screens._newsTimer = setTimeout(() => { Screens._newsTimer = null; k.dirty(\"HUD\"); }, age < 6 ? (6 - age) * 1000 + 30 : 120);\r",
+                "      const col = {tc:\"accent\", al:\"bad\", gd:\"good\", ev:\"warn\", nw:\"fg\"}[lg.cls] || \"fg\";\r",
+                "      k.rect(l, nx, ay, nw, nh, \"glass\", {a:.9 * a, r:10, stroke:\"line\", bg:true});\r",
+                "      k.icon(l, \"newspaper\", nx + 10, ay + (nh - 15) / 2, 15, \"muted\", a);\r",
+                "      k.text(l, over ? g.slice(cut).join(\"\") : lg.txt, nx + 32, ay + (nh - fs * 1.45) / 2, {size:fs, color:col, w:aw, max:1, a});\r",
+                "      k.hit(l, \"newsline\", nx, ay, nw, nh, () => Screens.setTab(\"news\"));\r",
+                "      const moving = over && age < endT - 4;\r",
+                "      if (!Screens._newsTimer) Screens._newsTimer = setTimeout(() => { Screens._newsTimer = null; k.dirty(\"HUD\"); }, moving ? 110 : age < endT ? (endT - age) * 1000 + 30 : 120);\r",
                 "    }\r",
                 "  }\r",
                 "  /* Continuous World: this season's goals under the news line */\r",
                 "  if (S.world && S.goals && S.goals.length){\r",
-                "    const gx = 14 + 54 + 8, gy = ay + 34, gw = Math.min(300, bw - 62), won = S.goals.filter(g => g.won).length;\r",
+                "    const gx = 14 + 54 + 8, gy = ay + 38, gw = Math.min(300, bw - 62), won = S.goals.filter(g => g.won).length;\r",
                 "    const lines = S.goals.map(g => `${g.won ? \"[[circle-check]]\" : \"[[target]]\"} ${P.goalText(g)}`);\r",
                 "    let gh = 30; const hs = lines.map(s2 => k.text(null, s2, 0, 0, {size:12, w:gw - 24, measure:true}).h); gh += hs.reduce((a, b) => a + b + 4, 0) + 6;\r",
                 "    W.glass(l, gx, gy, gw, gh, 10); this._goalsBottom = gy + gh;\r",
@@ -36093,20 +36282,86 @@
                 "  for (const a of ACTIONS){",
                 "    const cc = scope === \"country\";",
                 "    const c = P.actionCost(a, r, cc), cd = r.cd[a.id] || 0, ok = !cd && S.ep >= c.ep && S.pc >= c.pc;",
-                "    const label = cd ? `${t(\"cooldown\")} ${cd}` : [c.ep ? `${IC.ep} ${c.ep}` : \"\", c.pc ? `${IC.pc} ${c.pc}` : \"\"].filter(Boolean).join(\"  \");",
-                "    const btnW = Math.ceil(k.textW(label, {font:\"dispS\", size:14})) + 30;",
-                "    const tw = cw - 22 - btnW - 10;",
+                "    const btnW = 96, tw = cw - 22 - btnW - 10;",
                 "    const h1 = k.text(l, L(a.name), 11, y + 9, {font:\"bodyB\", size:13.5, w:tw}).h;",
                 "    const h2 = k.text(l, cc ? L(UI[\"cact_\" + a.id]) : L(a.desc), 11, y + 9 + h1, {size:11.5, color:\"muted\", w:tw, max:1}).h;   // 3.3: one line each",
                 "    const tilt = P.tiltOfAction ? P.tiltOfAction(a.id) : null, h3 = tilt && tilt.length ? 18 : 0;",
                 "    if (h3) W.groupTilt(l, 11, y + 9 + h1 + h2 + 2, tilt);",
                 "    const ch = Math.max(8 + h1 + h2 + h3 + 8, 50);",
                 "    W.card(l, 0, y, cw, ch);",
-                "    W.btn(l, \"act-\" + a.id, cw - 11 - btnW, y + (ch - 36) / 2, label, () => P.doAction(a.id, scope), {disabled:!ok, kind:ok ? \"primary\" : \"ghost\", w:btnW, sound:false});",
+                "    W.buyBtn(l, \"act-\" + a.id, cw - 11 - btnW, y + (ch - 40) / 2, c, cd, ok, () => P.doAction(a.id, scope));",
                 "    y += ch + 7;",
                 "  }",
                 "  return y;",
                 "};",
+                "",
+                "/* 3.9: one size for every buy button (one price, two prices, short of money, waiting) */",
+                "W.buyBtn = (l, id, x, y, cost, cd, ok, fn) => {",
+                "  const w = 96, h = 40, hov = ok && !cd && k.isHover(l, id);",
+                "  const price = [cost.ep ? `[[$money]]${cost.ep}` : \"\", cost.pc ? `[[$policy]]${cost.pc}` : \"\", cost.ore ? `[[$ore]]${cost.ore}` : \"\"].filter(Boolean).join(\" \");",
+                "  if (cd){",
+                "    k.rect(l, x, y, w, h, \"panel2\", {r:10, stroke:\"line\", bg:true});",
+                "    k.text(l, `[[clock]] ${th3() ? `รอ ${cd} เดือน` : `${cd} mo`}`, x, y + 11, {size:12, color:\"muted\", iconColor:\"muted\", w, align:\"center\", max:1});",
+                "    k.hit(l, id, x, y, w, h, () => {}, {disabled:true});",
+                "    return w;",
+                "  }",
+                "  if (ok){",
+                "    k.rect(l, x, y, w, h, hov ? k.mix(\"#183038\", \"accent\", .3) : \"#183038\", {r:10, stroke:\"accent\", sa:.6, bg:true});",
+                "    k.text(l, price, x, y + 10, {font:\"monoB\", size:14, w, align:\"center\", max:1});",
+                "    k.hit(l, id, x, y, w, h, () => { Audio.play(\"click\"); fn(); });",
+                "    return w;",
+                "  }",
+                "  const se = Math.max(0, Math.ceil((cost.ep || 0) - S.ep)), sp = Math.max(0, Math.ceil((cost.pc || 0) - S.pc));",
+                "  k.rect(l, x, y, w, h, \"panel2\", {r:10, stroke:\"line\", bg:true});",
+                "  if (se || sp){",
+                "    k.text(l, price, x, y + 3, {font:\"monoB\", size:13, color:\"muted\", w, align:\"center\", max:1});",
+                "    k.text(l, `${th3() ? \"ขาด\" : \"Need\"} ${se ? `[[$money]]${se}` : \"\"}${sp ? ` [[$policy]]${sp}` : \"\"}`, x, y + 21, {size:10.5, color:\"bad\", w, align:\"center\", max:1});",
+                "  } else k.text(l, price, x, y + 10, {font:\"monoB\", size:14, color:\"muted\", w, align:\"center\", max:1});",
+                "  k.hit(l, id, x, y, w, h, () => {}, {disabled:true});",
+                "  return w;",
+                "};",
+                "/* 3.9: an order's effects as short tokens (icon + number); returns the height used */",
+                "W.toks = (l, x, y, w, fx, draw = true) => {",
+                "  let cx = 0, cy = 0;",
+                "  for (const f of fx){",
+                "    const txt = `[[${f.ic}]]${f.mat ? \" \" + L(f.mat) + \" \" : \"\"}${f.v}${f.raw ? \" [[factory]]\" : \"\"}`, col = f.mat ? \"fg\" : f.bad ? \"bad\" : \"good\";",
+                "    const tw = k.textW(txt, {font:\"monoB\", size:12}) + 12;",
+                "    if (cx && cx + tw > w){ cx = 0; cy += 24; }",
+                "    if (draw){ k.rect(l, x + cx, y + cy, tw, 21, col, {r:10, a:.13}); k.text(l, txt, x + cx + 5, y + cy + 2, {font:\"monoB\", size:12, color:col, iconColor:f.raw ? \"warn\" : col}); }",
+                "    cx += tw + 4;",
+                "  }",
+                "  return fx.length ? cy + 22 : 0;",
+                "};",
+                "const GOAL_HEX = {good:\"#5fd39a\", pink:\"#ff7aa8\", sky:\"#8fd0ff\", gold:\"#f2c14e\"};",
+                "/* 3.9 (design 5): every order for one country in one list, grouped by what it is for */",
+                "Screens.countryOrders = function(l, y, cw, c){",
+                "  const r = P.R(c.reg), bw = 96, tx = 18, tw = cw - tx - bw - 10;",
+                "  for (const {goal, items} of P.countryOrders()){",
+                "    const col = GOAL_HEX[goal.col] || COL_FALLBACK;",
+                "    k.icon(l, goal.icon, 0, y + 3, 15, col);",
+                "    k.text(l, L(goal.name), 20, y, {font:\"dispS\", size:13, color:col}); y += 24;",
+                "    items.forEach(({kind, a}, i) => {",
+                "      const isC = kind === \"c\", cost = isC ? P.cactCost(a) : P.actionCost(a, r, true), cd = isC ? (c.cd[a.id] || 0) : (r.cd[a.id] || 0);",
+                "      const ok = isC ? P.cactOk(a, c) : !cd && S.ep >= cost.ep && S.pc >= cost.pc;",
+                "      const fx = P.orderFx(kind, a.id, c) || [], tilt = !isC && P.tiltOfAction ? P.tiltOfAction(a.id) : null;",
+                "      const hint = isC && a.id === \"ore\" && c.rel < 50 ? (th3() ? \"ยิ่งมิตรภาพสูงยิ่งได้มาก สูงสุด 20\" : \"More when friendlier, up to 20\") : \"\";",
+                "      const h1 = k.textH(L(a.name), {font:\"bodyB\", size:13.5, w:tw}), h2 = W.toks(l, 0, 0, tw, fx, false), h3 = tilt && tilt.length ? 20 : 0, h4 = hint ? 16 : 0;",
+                "      const rh = Math.max(48, 8 + h1 + 4 + h2 + h3 + h4 + 6);",
+                "      if (i) k.line(l, tx - 4, y, cw, y, \"line\", {a:.6});",
+                "      k.rect(l, 6, y + 4, 2, rh - 8, col, {a:.45});",
+                "      k.text(l, L(a.name), tx, y + 7, {font:\"bodyB\", size:13.5, w:tw, a:ok ? 1 : .72});",
+                "      let yy = y + 8 + h1 + 4; W.toks(l, tx, yy, tw, fx); yy += h2;",
+                "      if (h3){ W.groupTilt(l, tx, yy + 1, tilt); yy += h3; }",
+                "      if (hint) k.text(l, hint, tx, yy, {size:10.5, color:\"muted\", w:tw, max:1});",
+                "      const go = isC ? () => { const before = c.rel; P.countryAction(a.id); if (c.rel > before && Audio.play) Audio.play(\"relUp\"); } : () => P.doAction(a.id, \"country\");",
+                "      W.buyBtn(l, (isC ? \"ca-\" : \"act-\") + a.id, cw - bw, y + (rh - 40) / 2, cost, cd, ok, go);",
+                "      y += rh;",
+                "    });",
+                "    y += 8;",
+                "  }",
+                "  return y;",
+                "};",
+                "const COL_FALLBACK = \"#4fd1c5\";",
                 "",
                 "/* ---------------- Region ---------------- */",
                 "Screens.paneRegion = function(l, cw){",
@@ -36147,7 +36402,7 @@
                 "    y += rh + 4;",
                 "  }",
                 "  y += 10;",
-                "  W.h3(l, th3() ? `คำสั่งเฉพาะทวีป ${L(meta.name)}` : `Orders for ${L(meta.name)}`, 0, y, {w:cw}); y += 22;",
+                "  W.h3(l, th3() ? `คำสั่งเฉพาะทวีป${L(meta.name)}` : `Orders for ${L(meta.name)}`, 0, y, {w:cw}); y += 22;",
                 "  return this.orderCards(l, y, cw, \"region\");",
                 "};",
                 "",
@@ -36170,9 +36425,39 @@
                 "    k.text(l, `${c.rel >= 0 ? \"+\" : \"\"}${Math.round(c.rel)}`, cx - 24, cy - 13, {font:\"monoB\", size:15, w:48, align:\"center\", color:rc});",
                 "    k.text(l, t(\"relation\"), cx - 26, cy + 5, {size:9, w:52, align:\"center\", color:\"muted\", max:1});",
                 "  }",
-                "  y = Math.max(y, c.rest ? y : 46);",
-                "  const share = c.co2 / (r.co2 || 1);",
-                "  y += k.text(l, `[[$co2]] ${c.co2.toFixed(2)} Gt · ${Math.round(share * 100)}% ${th3() ? \"ของทวีป\" : \"of the continent\"}${meta ? ` · [[$risk]] ${t(\"risk\")} ${meta.risk}% · ${t(\"adapt\")} ${Math.round(c.adapt)} · [[leaf]] ${Math.round(c.green || 0)}%` : \"\"}`, 0, y, {font:\"mono\", size:12, w:cw - ringW, color:\"fg\"}).h + 8;",
+                "  /* 3.9 (design A1): CO₂ in Gt as the big number, the three numbers that matter, then the minerals (raw ones say so) */",
+                "  { const lab = th3() ? \"CO₂ ต่อปี\" : \"CO₂ a year\", lw = k.textW(lab, {font:\"monoB\", size:12}), v = P.fmtGt ? P.fmtGt(c.co2) : c.co2.toFixed(2);",
+                "    k.text(l, lab, 0, y + 12, {font:\"monoB\", size:12, color:\"muted\"});",
+                "    const vw = k.text(l, v, lw + 8, y, {font:\"monoB\", size:26}).w;",
+                "    k.text(l, \"Gt\", lw + 12 + vw, y + 11, {font:\"monoB\", size:13, color:\"muted\"});",
+                "    y += 40; }",
+                "  y = Math.max(y, c.rest ? y : 70);",
+                "  if (!c.rest){",
+                "    const bw = (cw - 12) / 3, rc = meta.risk >= 60 ? \"bad\" : meta.risk >= 35 ? \"warn\" : \"good\";",
+                "    [[`[[triangle-alert]] ${meta.risk}%`, rc, t(\"risk\")], [`[[shield]] ${Math.round(c.adapt)}`, \"sky\", th3() ? \"ป้องกันภัย\" : \"Protection\"], [`[[leaf]] ${Math.round(c.green || 0)}%`, \"good\", t(\"greenTech\")]].forEach(([v, col, lab], i) => {",
+                "      const bx = i * (bw + 6); k.rect(l, bx, y, bw, 46, \"panel2\", {r:9, stroke:\"line\", bg:true});",
+                "      k.text(l, v, bx + 8, y + 4, {font:\"monoB\", size:15, color:col, iconColor:col, w:bw - 12, max:1});",
+                "      k.text(l, lab, bx + 8, y + 25, {size:11, color:\"muted\", w:bw - 12, max:1});",
+                "    });",
+                "    y += 52;",
+                "    const mins = P.countryMinerals ? P.countryMinerals(c) : [];",
+                "    if (mins.length){",
+                "      const cols = Math.min(3, mins.length), mh = 26;",
+                "      for (let i = 0; i < mins.length; i += cols){",
+                "        const row = mins.slice(i, i + cols), mw = (cw - (row.length - 1) * 6) / row.length;",
+                "        row.forEach((m, j) => {",
+                "          const mx = j * (mw + 6);",
+                "          k.rect(l, mx, y, mw, mh, \"panel2\", {r:13, stroke:m.raw ? \"warn\" : \"line\", sa:m.raw ? .55 : 1, bg:true});",
+                "          k.icon(l, m.icon, mx + 5, y + 4, 18);",
+                "          const rw = m.raw ? k.textW(`[[factory]] ${th3() ? \"ต้องแปรรูป\" : \"refine\"}`, {font:\"bodyB\", size:11}) + 8 : 0;",
+                "          k.text(l, m.name, mx + 27, y + 4, {size:12, color:m.raw ? \"fg\" : \"muted\", w:mw - 32 - rw, max:1});",
+                "          if (m.raw) k.text(l, `[[factory]] ${th3() ? \"ต้องแปรรูป\" : \"refine\"}`, mx + mw - rw - 2, y + 5, {font:\"bodyB\", size:11, color:\"warn\", iconColor:\"warn\"});",
+                "        });",
+                "        y += mh + 6;",
+                "      }",
+                "    }",
+                "    y += 4;",
+                "  } else y += 4;",
                 "  if (this.countryWarn) y += this.countryWarn(l, y, cw, c);",
                 "  if (!c.rest && c.rel < 40){   // the next goal: friendship 40 opens a bilateral agreement",
                 "    const gh = 30; k.rect(l, 0, y, cw, gh, \"accent\", {r:9, a:.08, stroke:\"accent\", sa:.4});",
@@ -36191,19 +36476,7 @@
                 "    y += ch + 8;",
                 "  }",
                 "  if (!c.rest){",
-                "    W.h3(l, th3() ? `สั่งการกับ ${P.cname(c.id)}` : `Deal with ${P.cname(c.id)}`, 0, y, {w:cw}); y += 22;",
-                "    for (const a of P.CACTS){",
-                "      if (a.req && !S.owned[a.req]) continue;",
-                "      const kk = P.cactCost(a), cd = c.cd[a.id] || 0, ok = P.cactOk(a, c);",
-                "      const label = cd ? `${t(\"cooldown\")} ${cd}` : [kk.ep ? `${IC.ep} ${kk.ep}` : \"\", kk.pc ? `${IC.pc} ${kk.pc}` : \"\"].filter(Boolean).join(\"  \");",
-                "      const btnW = Math.ceil(k.textW(label, {font:\"dispS\", size:14})) + 30, tw = cw - 22 - btnW - 10;",
-                "      const h1 = k.text(l, `[[${a.icon}]] ${L(a.name)}`, 11, y + 9, {font:\"bodyB\", size:13.5, w:tw, iconColor:\"accent\"}).h;",
-                "      const h2 = k.text(l, L(a.desc), 11, y + 9 + h1, {size:11.5, color:\"muted\", w:tw, max:1}).h;",
-                "      const ch = Math.max(8 + h1 + h2 + 8, 50);",
-                "      W.card(l, 0, y, cw, ch);",
-                "      W.btn(l, \"ca-\" + a.id, cw - 11 - btnW, y + (ch - 36) / 2, label, () => P.countryAction(a.id), {disabled:!ok, kind:ok ? \"primary\" : \"ghost\", w:btnW, sound:false});",
-                "      y += ch + 7;",
-                "    }",
+                "    y = this.countryOrders(l, y, cw, c);",
                 "    // bilateral agreement (3.3: only once friendship reaches 40; the goal line above says how far)",
                 "    if (c.rel >= 40){",
                 "    y += 4;",
@@ -36226,9 +36499,11 @@
                 "    }",
                 "    }",
                 "  }",
-                "  y += 6;",
-                "  W.h3(l, c.rest ? (th3() ? `คำสั่งเฉพาะทวีป ${L(RMETA[c.reg].name)}` : `Orders for ${L(RMETA[c.reg].name)}`) : (th3() ? `คำสั่งเฉพาะประเทศ ${P.cname(c.id)}` : `Orders for ${P.cname(c.id)} only`), 0, y, {w:cw}); y += 22;",
-                "  y = this.orderCards(l, y, cw, c.rest ? \"region\" : \"country\");",
+                "  if (c.rest){",
+                "    y += 6;",
+                "    W.h3(l, th3() ? `คำสั่งเฉพาะทวีป${L(RMETA[c.reg].name)}` : `Orders for ${L(RMETA[c.reg].name)}`, 0, y, {w:cw}); y += 22;",
+                "    y = this.orderCards(l, y, cw, \"region\");",
+                "  }",
                 "  return this.countryExtras ? y + this.countryExtras(l, y, cw, c) : y;",
                 "};",
                 "",
@@ -36516,7 +36791,7 @@
                 "const TUT_SIZES = {\"t1-goal\":[1280,720],\"t2-meters\":[1280,720],\"t3-resources\":[1280,720],\"t4-regions\":[1280,720],\"t5-bubbles\":[1280,720],\"t6-tree\":[1280,720],\"t7-event\":[1280,720],\"t8-win\":[1280,720]};",
                 "const {Kit, S, t, L, UI, Audio, W, UIM, Screens, TUT, CHARS, CHAR, STORY, ADVISOR, ENDINGS, HAZARDS, COUNTRY, IC} = P;",
                 "const k = Kit;",
-                "const WIDTH = {intro:640, slotpick:620, tutorial:720, charsel:1150, story:800, learn:980, end:640, event:660, pause:680, market:940, politics:860, year:600};",
+                "const WIDTH = {intro:640, slotpick:620, tutorial:720, charsel:1150, story:800, learn:980, end:640, event:660, pause:680, market:940, politics:860, year:600, keys:860};",
                 "",
                 "Screens.renderModal = function(l){",
                 "  const kind = UIM.kind();",
@@ -36539,6 +36814,7 @@
                 "    else if (kind === \"year\") ch = this.mYear(s, pw);",
                 "    else if (kind === \"intro\") ch = this.mIntro(s, pw);",
                 "    else if (kind === \"slotpick\") ch = this.mSlotPick(s, pw);",
+                "    else if (kind === \"keys\") ch = this.mKeys(s, pw);",
                 "    const ph = Math.min(ch, k.H - 30), py = (k.H - ph) / 2;",
                 "    s.frame(px, py, {x:px, y:py, w:pw, h:ph}, ch);",
                 "    this._modalBox = {px, py, pw, ph};",
@@ -36551,7 +36827,7 @@
                 "    k.hgrad(l, 0, 0, k.W, k.H, [[0, \"#020609\"], [.35, \"#020609\"], [1, \"#020609\"]], {a:.0, bg:true});",
                 "    k.rect(l, px - 40, 0, pw + 80, k.H, \"#020609\", {a:.55, bg:true});",
                 "  } else k.rect(l, 0, 0, k.W, k.H, \"#020609\", {a:kind === \"story\" || kind === \"intro\" ? .8 : .62, bg:true});",
-                "  const closer = {pause:() => Screens.resume(), learn:() => Screens.closeLearn(), market:() => Screens.closeWin(), politics:() => Screens.closeWin(), year:() => Screens.closeWin(), slotpick:() => { UIM.modal = \"charsel\"; k.dirty(); }}[kind];",
+                "  const closer = {keys:() => Screens.closeKeys(), pause:() => Screens.resume(), learn:() => Screens.closeLearn(), market:() => Screens.closeWin(), politics:() => Screens.closeWin(), year:() => Screens.closeWin(), slotpick:() => { UIM.modal = \"charsel\"; k.dirty(); }}[kind];",
                 "  if (closer){ k.hit(l, \"veil\", 0, 0, k.W, k.H, () => { Audio.play(\"close\"); closer(); }, {cursor:false}); }",
                 "  k.hit(l, \"mbox\", px, py, pw, ph, () => {}, {cursor:false});",
                 "  const border = kind === \"end\" ? (S.over === \"win\" ? \"good\" : \"bad\") : \"line\";",
@@ -36973,6 +37249,7 @@
                 "  let bx = x;",
                 "  bx += W.btn(l, \"ptut\", bx, y, `[[graduation-cap]] ${t(\"tutMenu\")}`, () => Screens.openTutorial(0, false), {kind:\"ghost\"}) + 8;",
                 "  bx += W.btn(l, \"plearn\", bx, y, `[[book-open]] ${t(\"mLearn\")}`, () => Screens.openLearn(), {kind:\"ghost\"}) + 8;",
+                "  if (!k.touch) bx += W.btn(l, \"pkeys\", bx, y, `[[keyboard]] ${S.lang === \"th\" ? \"ปุ่มลัด\" : \"Shortcuts\"}`, () => Screens.openKeys(), {kind:\"ghost\"}) + 8;   // 3.9",
                 "  y += 44;",
                 "  W.btn(l, \"pmain\", x, y, t(\"pMain\"), () => Screens.toMenu(), {kind:\"ghost\"});",
                 "  if (P.hasKeyboard()) k.text(l, t(\"keysHelp\"), x, y + 46, {font:\"mono\", size:10.5, color:\"muted\", w});",
@@ -37003,6 +37280,37 @@
                 "  W.btn(l, \"tnext\", x + w - nw, y, nl, () => Screens.tutAct(last ? \"done\" : \"next\"));",
                 "  if (i){ const bl = `[[chevron-left]] ${t(\"tutBack\")}`, bw = W.btnW(bl); W.btn(l, \"tback\", x + w - nw - 8 - bw, y, bl, () => Screens.tutAct(\"back\"), {kind:\"ghost\"}); }",
                 "  return y + 36 + 20;",
+                "};",
+                "",
+                "/* 3.9: every keyboard shortcut (the same list as the website, engine/44-keys.js) */",
+                "const KCOL = {accent:\"accent\", sky:\"sky\", purple:\"purple\", gold:\"gold\", pink:\"#ff7aa8\", muted:\"muted\"};",
+                "Screens.kbd = (l, key, x, y, draw = true) => {",
+                "  const w = Math.max(24, k.textW(key, {font:\"monoB\", size:12}) + 12);",
+                "  if (draw){ k.rect(l, x, y, w, 24, \"#1d3640\", {r:6, stroke:\"#36606b\", bg:true}); k.rect(l, x + 1, y + 21, w - 2, 3, \"#36606b\", {r:2}); k.text(l, key, x, y + 3, {font:\"monoB\", size:12, w, align:\"center\"}); }",
+                "  return w;",
+                "};",
+                "Screens.mKeys = function(l, pw){",
+                "  const x = 20, w = pw - 40; let y = 18;",
+                "  y += h3(l, `[[keyboard]] ${S.lang === \"th\" ? \"ปุ่มลัด\" : \"Keyboard shortcuts\"}`, x, y, w - 40).h + 12;",
+                "  const cols = w >= 760 ? 3 : 2, gw = (w - (cols - 1) * 10) / cols;",
+                "  const heights = P.KEYS.map(g => 34 + g.keys.reduce((s2, [ks, what]) => s2 + Math.max(28, k.textH(L(what), {size:12.5, w:gw - 24 - ks.reduce((a, q) => a + Screens.kbd(null, q, 0, 0, false) + 3, 0) - 8}) + 6), 0) + 8);",
+                "  for (let r = 0; r < P.KEYS.length; r += cols){",
+                "    const rowH = Math.max(...heights.slice(r, r + cols));",
+                "    P.KEYS.slice(r, r + cols).forEach((g, j) => {",
+                "      const gx = x + j * (gw + 10), col = KCOL[g.col] || \"accent\";",
+                "      k.rect(l, gx, y, gw, rowH, \"panel2\", {r:12, stroke:\"line\", bg:true});",
+                "      k.icon(l, g.icon, gx + 12, y + 11, 16, col);",
+                "      k.text(l, L(g.name), gx + 34, y + 8, {font:\"dispS\", size:14, color:col});",
+                "      let yy = y + 34;",
+                "      for (const [ks, what] of g.keys){",
+                "        let kx = gx + 12; for (const q of ks) kx += Screens.kbd(l, q, kx, yy) + 3;",
+                "        const tw = gw - (kx - gx) - 16, th2 = k.text(l, L(what), kx + 5, yy + 3, {size:12.5, w:tw}).h;",
+                "        yy += Math.max(28, th2 + 6);",
+                "      }",
+                "    });",
+                "    y += rowH + 10;",
+                "  }",
+                "  return y + 10;",
                 "};",
                 ""
               ],
@@ -38774,13 +39082,13 @@
                 "  {id:\"kpis\", hold:1, next:T(\"ต่อไป\", \"Next\"), target:() => Screens._kpiRect,",
                 "   text:T(\"[[$money]] เงิน และ [[$policy]] แต้มนโยบาย เข้ามาทุกเดือน ใช้ซื้อสกิลและสั่งการ · [[$appr]] ความนิยม ห้ามเหลือ 0% ไม่อย่างนั้นจะถูกปลด\", \"[[$money]] Money and [[$policy]] policy points come in every month; spend them on skills and orders · never let [[$appr]] approval reach 0% or you're voted out.\")},",
                 "  {id:\"time\", target:() => hitRect(\"sp1\"), setup:() => { P.setSpeed(0); }, done:() => S.speed > 0,",
-                "   text:T(\"ตอนนี้เวลาหยุดอยู่ กดปุ่ม 1× เพื่อให้เวลาเดิน (หรือกด Space)\", \"Time is stopped. Press 1× to start the clock (or press Space).\")},",
+                "   text:T(\"ตอนนี้เวลาหยุดอยู่ กดปุ่ม 1× เพื่อให้เวลาเดิน\", \"Time is stopped. Press 1× to start the clock.\")},",
                 "  {id:\"green\", target:() => { const b = (S.bubbles || []).find(q => q.type === \"green\" && q.train); return b ? mapRect(P.Map.bubblePoint(b), -28, 30) : null; },",
                 "   setup:() => { S.bubbles = S.bubbles.filter(b => b.type !== \"green\"); S.bubbles.push({id:++S.bubId, type:\"green\", reg:\"SEA\", lat:BKK[0], lon:BKK[1], ttl:99, train:1}); P.Map.refresh(); P.Map.focus(\"SEA\", true); if (!S.speed) P.setSpeed(1); },",
                 "   done:() => !S.bubbles.some(b => b.type === \"green\" && b.train),",
                 "   text:T(\"ฟองสีเขียว = เงินฟรี! แตะฟองเพื่อเก็บ · เก็บได้เฉพาะตอนเวลาเดินอยู่\", \"Green bubble = free money! Tap it to collect · bubbles can only be collected while time is running.\")},",
                 "  {id:\"skills\", hold:1, target:() => hitRect(\"tab-tech\"), setup:() => { P.setSpeed(0); S.ep = Math.max(S.ep, 260); S.pc = Math.max(S.pc, 60); mats(); }, done:() => UIM.modal === \"skills\",",
-                "   text:T(\"สกิลคือวิธีลด CO₂ ระยะยาว · เปิดหน้าสกิล (หรือกด T)\", \"Skills are how you cut CO₂ for good · open the skill tree (or press T).\")},",
+                "   text:T(\"สกิลคือวิธีลด CO₂ ระยะยาว · เปิดหน้าสกิล\", \"Skills are how you cut CO₂ for good · open the skill tree.\")},",
                 "  {id:\"buy\", hold:1, target:() => hitRect(\"buy\"), setup:() => { S.skillCat = \"energy\"; S.node = \"E1\"; mats(); k.dirty(); }, done:() => !!S.owned.E1,",
                 "   text:() => ({th:`นี่คือสกิลแรก \"${P.SKILL.E1.name.th}\" ดูผลและราคาแล้วกด \"ปลดล็อก\"`, en:`This is your first skill, \"${P.SKILL.E1.name.en}\". Check what it does and what it costs, then press \"Unlock\".`})},",
                 "  {id:\"skclose\", hold:1, target:() => hitRect(\"sk-close\"), done:() => UIM.modal !== \"skills\",",
@@ -38862,7 +39170,8 @@
                 "  }",
                 "  const txt = L(typeof s.text === \"function\" ? s.text() : s.text), cw = 380;",
                 "  // card height",
-                "  const th = k.text(null, txt, 0, 0, {size:14, w:cw - 32, lh:1.45, measure:true}).h, ch = 44 + th + 18 + (s.next || s.final ? 48 : 26);",
+                "  const keys = !k.touch && P.TRAIN_KEYS && P.TRAIN_KEYS[s.id], kh = keys ? 36 : 0;   // 3.9: the shortcut for this step, on a computer only",
+                "  const th = k.text(null, txt, 0, 0, {size:14, w:cw - 32, lh:1.45, measure:true}).h + kh, ch = 44 + th + 18 + (s.next || s.final ? 48 : 26);",
                 "  let cx, cy;",
                 "  if (!r) { cx = (k.W - cw) / 2; cy = (k.H - ch) / 2; }",
                 "  else if (s.corner || r.h > 300){ cx = k.W - cw - 16; cy = k.H - ch - 16; }",
@@ -38876,6 +39185,11 @@
                 "  k.text(l, `[[graduation-cap]] ${L(P.UI2.trainMenu)} · ${tr.i + 1}/${STEPS.length}`, cx + 16, cy + 12, {font:\"mono\", size:11.5, color:\"accent\", iconColor:\"accent\"});",
                 "  if (!s.final) W.btn(l, \"tr-quit\", cx + cw - 16 - W.btnW(S.lang === \"th\" ? \"ออก\" : \"Quit\", {size:12, h:26}), cy + 8, S.lang === \"th\" ? \"ออก\" : \"Quit\", () => Train.quit(), {kind:\"ghost\", size:12, h:26});",
                 "  k.text(l, txt, cx + 16, cy + 40, {size:14, w:cw - 32, lh:1.45});",
+                "  if (keys){",
+                "    const ky = cy + 40 + th - kh + 6; k.line(l, cx + 16, ky, cx + cw - 16, ky, \"line\", {dash:3});",
+                "    let kx = cx + 16; k.icon(l, \"keyboard\", kx, ky + 10, 16, \"muted\"); kx += 24;",
+                "    keys.forEach((q, i) => { if (i){ k.text(l, \"/\", kx, ky + 8, {size:11, color:\"muted\"}); kx += 10; } kx += Screens.kbd(l, q, kx, ky + 6) + 5; });",
+                "  }",
                 "  const by = cy + 44 + th + 10;",
                 "  k.rect(l, cx + 16, by, cw - 32, 4, \"panel2\", {r:2}); k.rect(l, cx + 16, by, (cw - 32) * (tr.i + 1) / STEPS.length, 4, \"accent\", {r:2});",
                 "  if (s.next){ const lab = `${L(s.next)} [[chevron-right]]`; W.btn(l, \"tr-next\", cx + cw - 16 - W.btnW(lab, {size:13}), by + 12, lab, () => Train.next(), {size:13, h:32}); }",

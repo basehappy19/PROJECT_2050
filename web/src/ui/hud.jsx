@@ -78,8 +78,18 @@ export function TopBar(){
 function NewsLine(){
   const lg = S.log[0], LCOL = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg", in:"purple"};
   if (!lg) return null;
-  return <button type="button" class="ticker glass fadeout" onClick={() => G.setTab("news")} key={S.log.length + ":" + lg.tk}>
-    <Icon n="newspaper" size={14} cls="tkic"/><Rich t={lg.txt} cls={"txt " + (LCOL[lg.cls] || "fg")} iconColor="inherit"/>
+  /* 3.9: a line longer than the bar scrolls once from start to end, then the bar fades (it stays up longer for long lines) */
+  const ref = useRef(null);
+  useEffect(() => {
+    const b = ref.current, box = b && b.querySelector(".tkbox"), tx = box && box.firstElementChild; if (!tx) return;
+    const over = tx.scrollWidth - box.clientWidth;
+    if (over > 4 && !matchMedia("(prefers-reduced-motion: reduce)").matches){
+      const run = 1.5 + over / 55;
+      b.style.setProperty("--dx", `${-over - 10}px`); b.style.setProperty("--run", `${run}s`); b.style.setProperty("--fade", `${run + 6}s`); b.classList.add("run");
+    }
+  }, [S.log.length, lg.tk]);
+  return <button type="button" ref={ref} class="ticker glass fadeout" onClick={() => G.setTab("news")} key={S.log.length + ":" + lg.tk} aria-label={plain(lg.txt)}>
+    <Icon n="newspaper" size={14} cls="tkic"/><span class="tkbox"><Rich t={lg.txt} cls={"txt " + (LCOL[lg.cls] || "fg")} iconColor="inherit"/></span>
   </button>;
 }
 
@@ -94,9 +104,9 @@ export function AbilityBar(){
     <button type="button" class="abar-char" {...charTp} onClick={e => { Audio.play("click"); charTp.onClick(e); }}>
       <Portrait id={S.char} size={52} lv={S.charLv}/>
     </button>
-    {list.map(a => {
+    {list.map((a, ai) => {
       const ready = P.abilityReady(a), cd = S.actCd[a.id] || 0;
-      return <button type="button" key={a.id} class={`abtn ${ready ? "ready" : ""} ${a.kind}`} aria-label={L(a.name)}
+      return <button type="button" key={a.id} class={`abtn ${ready ? "ready" : ""} ${a.kind}`} aria-label={L(a.name) + (P.hasKeyboard() ? ` (${"ZXC"[ai]})` : "")}
         data-tip={"ab-" + a.id}
         onPointerEnter={e => { if (e.pointerType === "mouse"){ showTip("ab-" + a.id); Audio.hover(); } }}
         onPointerLeave={e => { if (e.pointerType === "mouse") hideTip("ab-" + a.id); }}
@@ -212,7 +222,7 @@ export function Bottom(){
       <div class="meters glass"><MeterNZ/><MeterT/></div>
       <nav class="tabbar glass">{tabs.map(([id, ic, key, kk]) => {
         const on = id === "tech" ? UIM.modal === "skills" : S.tab === id;
-        return <button type="button" key={id} data-tab={id} class={`tabbtn ${on ? "on" : ""}`} aria-label={t(key)} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>
+        return <button type="button" key={id} data-tab={id} class={`tabbtn ${on ? "on" : ""}`} aria-label={P.hasKeyboard() ? `${t(key)} (${kk})` : t(key)} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>
           <Icon n={ic} size={17}/><span>{t(key)}</span>{badge[id] ? <b class={"badge " + (id === "tech" ? "" : "b2")}>{badge[id]}</b> : null}
         </button>;
       })}</nav>

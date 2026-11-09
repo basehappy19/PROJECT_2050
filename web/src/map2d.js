@@ -232,6 +232,8 @@ export const GameMap = {
   },
   homeView(){ const [fx, fy] = this.freeCentre(1), s = this.s0, [x, y] = this.clampXY(MAP.W / 2 - (fx - this.w / 2) / s * .5, MAP.H / 2 - (fy - this.h / 2) / s * .6, 1); return {x, y, z:1}; },
   resetView(){ this.zAnim = null; this.target = this.homeView(); },
+  /* 3.9: arrow keys move the map by a few screen pixels */
+  panBy(dx, dy){ this.zAnim = null; this.fling = null; const b = this.target || this.cam, s = this.s0 * b.z, [x, y] = this.clampXY(b.x + dx / s, b.y + dy / s, b.z); this.target = {x, y, z:b.z}; },
   recenter(){ if (this.cam.z <= 1.08) this.target = this.homeView(); },
   zoomBy(f){ this.zAnim = null; this.fling = null; const b = this.target || this.cam, z = clamp(b.z * f, ZMIN, ZMAX); if (z <= ZMIN + .001 && !this.portrait()){ this.resetView(); Audio.play("tick", {vol:.5}); return; } const [fx, fy] = this.freeCentre(); const [wx, wy] = this.stageToWorld(fx, fy); this.lookAt(wx, wy, z); Audio.play("tick", {vol:.5}); },
   /* 3.7.3: smooth zoom toward/away from a screen point (double-tap, two-finger tap) */

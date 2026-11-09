@@ -384,6 +384,19 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
   ]),
 ];
 P.CHANGELOG.find(x => x.v === "2.1").subs = [
+  SUB("2.1.2", "2026-11-10", [
+    "แผงประเทศอ่านง่ายขึ้น: CO₂ ตัวใหญ่ (หน่วย Gt) ความเสี่ยงภัย ป้องกันภัย และเทคโนโลยีสีเขียวเป็นช่องของตัวเอง แร่ที่ประเทศนั้นมีขึ้นให้เห็นเลย และบอกว่าแร่ไหนต้องแปรรูปก่อน",
+    "คำสั่งกับประเทศรวมเป็นรายการเดียว แบ่งตามเป้าหมาย (ลด CO₂ · มิตรภาพ · ป้องกันภัย · ทรัพยากร) ผลของแต่ละคำสั่งเป็นไอคอนกับตัวเลขที่คิดจากสถานะจริงตอนนี้ ปุ่มซื้อขนาดเท่ากันทุกปุ่ม",
+    "\"ซื้อแร่\" บอกเลยว่าจะได้แร่อะไรกี่หน่วย",
+    "แถบข่าวกว้างขึ้น ตัวใหญ่ขึ้นตามขนาดจอ และข้อความยาววิ่งให้อ่านจนจบ",
+    "ปุ่มลัดบนคอมเพิ่ม: ลูกศรเลื่อนแผนที่ · Q/E สลับทวีป · A ไปยังภัย · ⌫ ย้อนกลับ · P ความนิยม · M ตลาดแร่ · Z X C สกิลพิเศษ · V เสียง · ? ดูปุ่มลัดทั้งหมด (โหมดฝึกซ้อมแนะนำปุ่มด้วย)",
+  ], [
+    "The country panel is easier to read: CO₂ as a big number in Gt, disaster risk, protection and green technology in their own boxes, the country's minerals right away, and which of them still need refining.",
+    "Orders for a country are one list grouped by goal (cut CO₂ · friendship · disaster protection · resources); each effect is an icon and a number worked out from the game right now, and every buy button is the same size.",
+    "\"Buy minerals\" says which minerals you get and how many.",
+    "The news line is wider, its text scales with the screen, and a long line scrolls so you can read it to the end.",
+    "More keyboard shortcuts: arrows move the map · Q/E switch region · A goes to the next disaster · Backspace goes back · P approval · M market · Z X C abilities · V sound · ? all shortcuts (training shows them too).",
+  ]),
   SUB("2.1.1", "2026-11-10", [
     "หน้าโหลดใช้ลูกโลก 3 มิติตัวเดียวกับหน้าหลัก คมชัดและหมุนลื่น พอกดเข้าเกม ลูกโลกเลื่อนไปที่หน้าหลักพอดี หมุนต่อจากเดิม",
     "ข้อความระหว่างโหลดสุ่มจากสิ่งต่าง ๆ ในเกม ทุกครั้งที่เปิดจะไม่ซ้ำกัน",

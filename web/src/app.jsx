@@ -12,6 +12,7 @@ import {Skills} from "./ui/skills.jsx";
 import {Narr} from "./narrator.js";
 import {EventModal, EndModal, CharSel, Story, Pause, Tutorial, Market, SlotPick} from "./ui/modals.jsx";
 import {Politics} from "./ui/politics.jsx";
+import {KeysModal} from "./ui/keys.jsx";
 import {Learn} from "./ui/learn.jsx";
 import {Menu, ensureGlobe} from "./ui/menu.jsx";
 import {LossFeed, EventPill} from "./ui/alerts.jsx";
@@ -166,6 +167,7 @@ function Windows(){
   if (k === "market") return <Market/>;
   if (k === "politics") return <Politics/>;
   if (k === "slotpick") return <SlotPick/>;
+  if (k === "keys") return <KeysModal/>;
   return null;
 }
 
