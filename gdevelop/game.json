@@ -20556,7 +20556,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "31c3c4fa-df7b-48e8-babe-e7e958a706dd",
+          "persistentUuid": "148538c4-b0c6-4202-bb62-b445b995f529",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -20885,7 +20885,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "ac0881e4-90ff-4de0-9f61-e91dce46c242",
+          "persistentUuid": "0705a7dc-63db-46ca-a99f-187a9c1ed4aa",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -20901,7 +20901,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Ocean",
-          "persistentUuid": "054cfd8c-5b31-4d82-9f51-6810a668b4c7",
+          "persistentUuid": "61ea9802-62de-458e-adcd-94edf628875f",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -20917,7 +20917,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "MapRim",
-          "persistentUuid": "d73a85d7-4435-40e9-ba79-d86382d290b3",
+          "persistentUuid": "6253eb04-1e70-4bcc-ac33-e4fb9a8c0f7c",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -20933,7 +20933,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "ArcticIce",
-          "persistentUuid": "623ad2dc-3232-4952-9cb5-b0db3f2e2abc",
+          "persistentUuid": "1740e9d3-e72c-4d61-8218-532e56e7961c",
           "width": 1920,
           "x": 0,
           "y": 84,
@@ -20949,7 +20949,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "b4df746e-d483-4081-ba7c-841c25b014f4",
+          "persistentUuid": "e5147228-9af6-4981-bda0-a8e1c556381f",
           "width": 1636.6666666666667,
           "x": 67.33333333333333,
           "y": 84.66666666666667,
@@ -20976,7 +20976,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "1bf8bbf5-2660-420d-97f2-25a87023168d",
+          "persistentUuid": "01ca5c99-7fb6-42b3-8168-d3d72ef5d3ae",
           "width": 1069.3333333333333,
           "x": 610,
           "y": 92.66666666666667,
@@ -21003,7 +21003,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "2401755e-3d3d-4d71-a057-2d9ed52fd3ea",
+          "persistentUuid": "e565bd1a-9e62-46aa-bf2c-6874d0df04a1",
           "width": 486,
           "x": 1125.3333333333333,
           "y": 222.66666666666666,
@@ -21030,7 +21030,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "1fb5fac9-1ea7-4b0c-a133-712ec573cef6",
+          "persistentUuid": "e22ab735-2db9-464e-9b2c-061b01e2f7ce",
           "width": 251.33333333333334,
           "x": 466.6666666666667,
           "y": 480,
@@ -21057,7 +21057,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "d785d0c1-3bde-480c-934d-cdac251761c9",
+          "persistentUuid": "4a9b5abe-6579-40dd-9b36-1cb992bf448d",
           "width": 474,
           "x": 807.3333333333334,
           "y": 315.33333333333337,
@@ -21084,7 +21084,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "97b51cb6-0a63-4e08-ad83-3a8561711e3e",
+          "persistentUuid": "b7c5e36f-3d4d-4d56-811c-a15df648c55f",
           "width": 640,
           "x": 1213.3333333333333,
           "y": 330.66666666666663,
@@ -21111,7 +21111,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "8804c13f-36fc-4fb5-a00d-63688454e541",
+          "persistentUuid": "e184fc32-3cb9-4a06-a8e4-6cab42408ae5",
           "width": 1638,
           "x": 66.66666666666667,
           "y": 84,
@@ -21138,7 +21138,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "2edb03b3-d634-45a8-8b39-1427cacf3732",
+          "persistentUuid": "196ab1d6-4e78-407d-a8b2-d4fa47a1a0af",
           "width": 1070.6666666666667,
           "x": 609.3333333333334,
           "y": 92,
@@ -21165,7 +21165,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "3f982f64-ca1a-45d8-926c-e2fb4e500857",
+          "persistentUuid": "4c80d1eb-65b8-40eb-a34d-e52c0607a7dc",
           "width": 488,
           "x": 1124,
           "y": 222,
@@ -21192,7 +21192,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "342d62c5-1e02-4aa0-a7a7-dcee7540a122",
+          "persistentUuid": "321318fe-2d0f-40a9-aad2-8cfd49de672e",
           "width": 252.66666666666666,
           "x": 466,
           "y": 479.3333333333333,
@@ -21219,7 +21219,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "173469bb-e140-4900-8285-f869c838e285",
+          "persistentUuid": "387adf9c-604d-433e-a386-f3c7f580f600",
           "width": 474,
           "x": 807.3333333333334,
           "y": 314,
@@ -21246,7 +21246,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "f67130b6-6711-450b-b009-5ca09395ff1e",
+          "persistentUuid": "f4da6654-e54e-4d21-92a9-c9bcb98d85b2",
           "width": 640,
           "x": 1214,
           "y": 330,
@@ -21273,7 +21273,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a636322f-a152-452c-a9c9-7bb0b400a2a4",
+          "persistentUuid": "f61ee288-2395-46cf-a6ec-d612a40200c0",
           "width": 0,
           "x": 573.7,
           "y": 516.4,
@@ -21294,7 +21294,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.31
+              "value": 5.9
             }
           ]
         },
@@ -21305,7 +21305,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "7e6a67fd-4fb1-44fc-9cfa-3e528fd78d5d",
+          "persistentUuid": "c879f44f-b97d-4c75-80da-93e6fa70274c",
           "width": 0,
           "x": 444.5,
           "y": 591.2,
@@ -21326,7 +21326,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.71
+              "value": 2.62
             }
           ]
         },
@@ -21337,7 +21337,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "0af265db-2235-4a90-8c6a-f8f4f1df2a4f",
+          "persistentUuid": "e030daa7-7090-415c-a0ad-b24ee09c7efa",
           "width": 0,
           "x": 306.8,
           "y": 563.1,
@@ -21358,7 +21358,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.64
+              "value": 1.3
             }
           ]
         },
@@ -21369,7 +21369,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a4476980-a43d-4c6f-87cd-bcf26f33189e",
+          "persistentUuid": "71d8158e-0669-4fae-b34e-7914a56e1699",
           "width": 0,
           "x": 491.6,
           "y": 507.7,
@@ -21390,7 +21390,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.89
+              "value": 6.23
             }
           ]
         },
@@ -21401,7 +21401,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "732fa8df-1b77-4a82-a3dc-972dee556466",
+          "persistentUuid": "14188c22-aa19-420b-b1db-7599dddd2e8a",
           "width": 0,
           "x": 541.1,
           "y": 494.6,
@@ -21422,7 +21422,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.34
+              "value": 4.26
             }
           ]
         },
@@ -21433,7 +21433,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "55fe323f-8b2f-4f70-aab5-40b8ddbfcd28",
+          "persistentUuid": "b79af1d8-c939-4e6f-b7d0-dd30cd4e0a54",
           "width": 0,
           "x": 422.1,
           "y": 658,
@@ -21454,7 +21454,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.18
+              "value": 6.27
             }
           ]
         },
@@ -21465,7 +21465,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "77b00db1-4702-4ef5-a548-0c5a3777ba9d",
+          "persistentUuid": "ff8de1ce-4aac-420f-8e1f-600a1859ae70",
           "width": 0,
           "x": 335.2,
           "y": 418.4,
@@ -21486,7 +21486,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.04
+              "value": 1.85
             }
           ]
         },
@@ -21497,7 +21497,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "0d3a60f8-6dee-4ef2-b677-b97160281515",
+          "persistentUuid": "620ef74b-2654-41f1-b2d4-64fe91cfabe1",
           "width": 0,
           "x": 1020,
           "y": 434.7,
@@ -21518,7 +21518,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.83
+              "value": 3.7
             }
           ]
         },
@@ -21529,7 +21529,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f5f22471-3f34-4c8e-b51c-a696ea486945",
+          "persistentUuid": "b6c219d1-e8b1-442d-9b7c-2c868d30e521",
           "width": 0,
           "x": 1034.8,
           "y": 455.2,
@@ -21550,7 +21550,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.94
+              "value": 5.78
             }
           ]
         },
@@ -21561,7 +21561,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "cd34d89d-1fa7-4b8f-88a9-48712a35fd80",
+          "persistentUuid": "a155e816-3a81-482e-8963-429f4cd8e8f6",
           "width": 0,
           "x": 1101.5,
           "y": 426.6,
@@ -21582,7 +21582,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.44
+              "value": 2.09
             }
           ]
         },
@@ -21593,7 +21593,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "731649ba-f40e-46a6-85e4-af8a32e09522",
+          "persistentUuid": "c8c15820-1540-4b32-918e-8f62bc643c80",
           "width": 0,
           "x": 1247.6,
           "y": 399.2,
@@ -21614,7 +21614,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.87
+              "value": 5.3
             }
           ]
         },
@@ -21625,7 +21625,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "e6943a7f-dd47-473a-9fa2-1a4e1b0c31ef",
+          "persistentUuid": "eb6efd03-0844-4bd7-a80a-b185b8b4dca4",
           "width": 0,
           "x": 1147.4,
           "y": 429,
@@ -21646,7 +21646,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.04
+              "value": 6.17
             }
           ]
         },
@@ -21657,7 +21657,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "91f9bc5a-a160-47de-8352-ef2c4480e0ce",
+          "persistentUuid": "8cccd027-fc1e-4935-998d-31f18415da74",
           "width": 0,
           "x": 998.2,
           "y": 518.5,
@@ -21678,7 +21678,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.06
+              "value": 1.55
             }
           ]
         },
@@ -21689,7 +21689,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "dccd7261-0163-4aa6-adc4-e23a47f22a77",
+          "persistentUuid": "0b70006a-8380-4d58-84b1-99f00777db53",
           "width": 0,
           "x": 1195.7,
           "y": 514.2,
@@ -21710,7 +21710,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.45
+              "value": 3.85
             }
           ]
         },
@@ -21721,7 +21721,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "65c0c026-55c9-41cb-9a47-189da4016b90",
+          "persistentUuid": "bd672e81-a017-4f82-954b-a1bfe6f7983b",
           "width": 0,
           "x": 1203.6,
           "y": 363.4,
@@ -21742,7 +21742,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.22
+              "value": 5.5
             }
           ]
         },
@@ -21753,7 +21753,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b62446c6-9cb5-46ca-8833-d44d01f0719d",
+          "persistentUuid": "2148c02a-8822-4269-a416-84b27eeebafd",
           "width": 0,
           "x": 1723.5,
           "y": 522.1,
@@ -21774,7 +21774,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.76
+              "value": 2.84
             }
           ]
         },
@@ -21785,7 +21785,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "46fa4b2c-9196-4e01-9d72-2b9fc51c745b",
+          "persistentUuid": "92a05f3d-cf58-455b-b3c4-f2917e06e297",
           "width": 0,
           "x": 1754.3,
           "y": 581.9,
@@ -21806,7 +21806,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.43
+              "value": 2.41
             }
           ]
         },
@@ -21817,7 +21817,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "05e0a5aa-8391-4434-b78c-14121c233942",
+          "persistentUuid": "3a08852c-5982-42a4-9c64-9217a78bdc15",
           "width": 0,
           "x": 1864.2,
           "y": 551.5,
@@ -21838,7 +21838,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.91
+              "value": 0.02
             }
           ]
         },
@@ -21849,7 +21849,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "304fd9fd-9a0f-4abe-b79a-49ae7fbb85ab",
+          "persistentUuid": "164a1328-bbd4-421b-aa83-56ebfecccf7e",
           "width": 0,
           "x": 1787.5,
           "y": 538.3,
@@ -21870,7 +21870,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.79
+              "value": 2.29
             }
           ]
         },
@@ -21881,7 +21881,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a50fc033-b0cd-4502-b4e0-7a4f2433429e",
+          "persistentUuid": "3268686e-b72c-456b-a984-b952b78b00e5",
           "width": 0,
           "x": 1704.8,
           "y": 634.6,
@@ -21902,7 +21902,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.92
+              "value": 3.09
             }
           ]
         },
@@ -21913,7 +21913,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "be97ef69-24fe-4d14-b8cc-9edf9ea48060",
+          "persistentUuid": "7ab266d1-8f3f-4587-939a-4d05918bbf08",
           "width": 0,
           "x": 1663.7,
           "y": 592.5,
@@ -21934,7 +21934,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.16
+              "value": 5.23
             }
           ]
         },
@@ -21945,7 +21945,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "291838ce-d3d8-45ed-87bd-acdd56e92b8e",
+          "persistentUuid": "8ef0900b-d994-4707-bd74-6ef0e2cb67ae",
           "width": 0,
           "x": 1485,
           "y": 498.3,
@@ -21966,7 +21966,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.38
+              "value": 1.78
             }
           ]
         },
@@ -21977,7 +21977,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b249b565-1c6e-49ac-9564-ce1f2e32358c",
+          "persistentUuid": "085e22c2-d8e0-4199-acfc-fde70a2189f3",
           "width": 0,
           "x": 1765.8,
           "y": 508.5,
@@ -21998,7 +21998,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.95
+              "value": 5.88
             }
           ]
         },
@@ -22009,7 +22009,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ea683d49-f6cf-442b-a809-03f6fc91ebae",
+          "persistentUuid": "219c205e-5192-4769-bd6c-b56aca41c2cd",
           "width": 0,
           "x": 1627.5,
           "y": 693,
@@ -22030,7 +22030,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.12
+              "value": 2.67
             }
           ]
         },
@@ -22041,7 +22041,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "247d6fcc-e3a1-426d-84f7-a770cfa5707c",
+          "persistentUuid": "dac9d791-bd63-42fa-9904-167136f9bfe0",
           "width": 0,
           "x": 1665.5,
           "y": 814.1,
@@ -22062,7 +22062,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.13
+              "value": 2.42
             }
           ]
         },
@@ -22073,7 +22073,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "c711d93d-bcd5-4157-915f-ebaf09539406",
+          "persistentUuid": "847bc7ac-732f-417e-b7d9-432d1255cad4",
           "width": 0,
           "x": 1751.3,
           "y": 687.8,
@@ -22094,7 +22094,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.27
+              "value": 4.48
             }
           ]
         },
@@ -22105,7 +22105,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "9889fa30-4a44-4339-8a72-a08be021f82b",
+          "persistentUuid": "74678f35-4f57-4a6a-a849-cbbb54ce21bd",
           "width": 0,
           "x": 1486.8,
           "y": 599.1,
@@ -22126,7 +22126,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.01
+              "value": 2.02
             }
           ]
         },
@@ -22137,7 +22137,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "7d59d2d3-1b88-4689-a67e-c77bace8143b",
+          "persistentUuid": "a8748fcf-cd22-4d06-b2d8-9659b0da51b4",
           "width": 0,
           "x": 1460.8,
           "y": 659.8,
@@ -22158,7 +22158,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.6
+              "value": 0.22
             }
           ]
         },
@@ -22169,7 +22169,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "85be6488-7e59-4363-b390-238d59066fc3",
+          "persistentUuid": "c54f20ca-8912-45e9-aced-1dbd6f8f5008",
           "width": 0,
           "x": 1566.5,
           "y": 630.1,
@@ -22190,7 +22190,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.45
+              "value": 4.65
             }
           ]
         },
@@ -22201,7 +22201,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "5607c84f-39a1-4cd8-a3d2-05c607068aa7",
+          "persistentUuid": "bf464373-3416-4c50-a025-7006bbabb8b2",
           "width": 0,
           "x": 1933.7,
           "y": 989.4,
@@ -22222,7 +22222,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.2
+              "value": 3.7
             }
           ]
         },
@@ -22233,7 +22233,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "cc850135-0393-4fe0-9dbe-7499415e9804",
+          "persistentUuid": "de8f7bce-989f-4902-9b23-3bb5efdc4cb8",
           "width": 0,
           "x": 1664.9,
           "y": 711.1,
@@ -22254,7 +22254,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.84
+              "value": 5.59
             }
           ]
         },
@@ -22265,7 +22265,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b1a5c486-ba6e-44fe-83bc-49d37175eb5e",
+          "persistentUuid": "eb0f8d4d-67f5-43b0-a366-b1765e82e5cd",
           "width": 0,
           "x": 1425.2,
           "y": 623.1,
@@ -22286,7 +22286,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.19
+              "value": 4.75
             }
           ]
         },
@@ -22297,7 +22297,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "3154d7da-c211-49e6-8fef-0721b3dcd39c",
+          "persistentUuid": "209209b6-ba43-4bf2-928d-fd9d9c5cb97e",
           "width": 0,
           "x": 739.2,
           "y": 921.1,
@@ -22318,7 +22318,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.16
+              "value": 5.26
             }
           ]
         },
@@ -22329,7 +22329,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d94ce94c-4b85-4eca-9c05-0ac03196d96c",
+          "persistentUuid": "2d1bfe51-c8a0-4c40-aedf-223df1287764",
           "width": 0,
           "x": 667.9,
           "y": 994.1,
@@ -22350,7 +22350,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.79
+              "value": 1.38
             }
           ]
         },
@@ -22361,7 +22361,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "41664ecf-e40a-4abe-a944-4bb8bf926a4c",
+          "persistentUuid": "b5a62eea-b682-4c6b-94dc-0d9f248fc8f0",
           "width": 0,
           "x": 555.6,
           "y": 849.4,
@@ -22382,7 +22382,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.16
+              "value": 3.24
             }
           ]
         },
@@ -22393,7 +22393,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "23674a1f-6df2-422e-88f0-bedc8db143fd",
+          "persistentUuid": "4a3943a8-f590-41bb-8afe-bc975aa81f18",
           "width": 0,
           "x": 573.1,
           "y": 748.2,
@@ -22414,7 +22414,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.52
+              "value": 0.56
             }
           ]
         },
@@ -22425,7 +22425,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "735416a6-31c4-4eca-8159-c55f8db5eb25",
+          "persistentUuid": "2e290664-18d3-466c-906f-0b3b2a860a09",
           "width": 0,
           "x": 594.2,
           "y": 986,
@@ -22446,7 +22446,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.22
+              "value": 1.61
             }
           ]
         },
@@ -22457,7 +22457,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a4c05712-190c-4e62-817a-55c1f8fe19a7",
+          "persistentUuid": "f993d5c6-71ed-458b-8fee-f255a00334d1",
           "width": 0,
           "x": 658.2,
           "y": 795.3,
@@ -22478,7 +22478,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.22
+              "value": 1.64
             }
           ]
         },
@@ -22489,7 +22489,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "24cb9f05-0ff5-4947-a7cc-9221156a064d",
+          "persistentUuid": "c77ea670-0d4d-4b3f-9bfb-1a8482ffd270",
           "width": 0,
           "x": 1302.6,
           "y": 624.4,
@@ -22510,7 +22510,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.62
+              "value": 2.04
             }
           ]
         },
@@ -22521,7 +22521,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "812d831d-4c2f-447a-ba31-3ba6af915cf8",
+          "persistentUuid": "0260e989-f5de-4199-9566-42c4382be191",
           "width": 0,
           "x": 1331,
           "y": 551.5,
@@ -22542,7 +22542,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.42
+              "value": 0.58
             }
           ]
         },
@@ -22553,7 +22553,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "59c64343-cf83-49b7-a968-c4afffb6726d",
+          "persistentUuid": "1e295ed6-3be1-446e-afe2-14ade35771ba",
           "width": 0,
           "x": 1209,
           "y": 589.9,
@@ -22574,7 +22574,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.72
+              "value": 3.19
             }
           ]
         },
@@ -22585,7 +22585,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "5347066a-657b-41ee-8b51-181f787cd25c",
+          "persistentUuid": "07f390fc-b917-45b0-94cc-3bb7c9f8021d",
           "width": 0,
           "x": 1041.1,
           "y": 737.3,
@@ -22606,7 +22606,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.96
+              "value": 4.07
             }
           ]
         },
@@ -22617,7 +22617,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "1a19914d-9abf-4714-afe2-20b545b4a1d3",
+          "persistentUuid": "ec066052-8458-4b4d-8f9e-54c79d446094",
           "width": 0,
           "x": 1189.7,
           "y": 938.4,
@@ -22638,7 +22638,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.17
+              "value": 6.1
             }
           ]
         },
@@ -22649,7 +22649,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "03bdb294-0938-466a-a491-7382e6d4fbe3",
+          "persistentUuid": "c3f34337-0ec5-4fe7-b6fc-855ec5224e5d",
           "width": 0,
           "x": 1354.5,
           "y": 621.1,
@@ -22670,7 +22670,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.81
+              "value": 4.21
             }
           ]
         },
@@ -22681,7 +22681,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "25ddf7ae-4ce0-4545-ad5e-c66e13cb27d8",
+          "persistentUuid": "ee8001ca-f279-4371-ae42-1c30bf1eeecb",
           "width": 0,
           "x": 1242.8,
           "y": 784.4,
@@ -22702,7 +22702,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.83
+              "value": 5.01
             }
           ]
         },
@@ -22713,7 +22713,7 @@
           "keepRatio": true,
           "layer": "Menu",
           "name": "MenuShade",
-          "persistentUuid": "f22ac867-eed4-4104-9514-db1fba043dce",
+          "persistentUuid": "6f044c90-1505-49f7-8576-c0b213718779",
           "width": 900,
           "x": 0,
           "y": 0,
@@ -24023,7 +24023,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "7d85f039-b31f-443a-8482-50201d7361db",
+          "persistentUuid": "157573a9-e7d1-4517-a049-0dd446ba8eae",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -24039,7 +24039,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Ocean",
-          "persistentUuid": "9bdf37a0-a148-418f-bbab-7d150d065334",
+          "persistentUuid": "7f577828-d577-4220-a1ee-e1d9e6a8b0d9",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -24055,7 +24055,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "MapRim",
-          "persistentUuid": "04dde914-86fe-4e59-b58f-b7e187ae0672",
+          "persistentUuid": "9261a552-06b5-480d-a2e8-e6ed161fa826",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -24071,7 +24071,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "ArcticIce",
-          "persistentUuid": "90ae591e-18e6-4e21-b0e7-40c31b8a404b",
+          "persistentUuid": "5901832e-3a27-40ce-855d-fe98e2bf34a0",
           "width": 1920,
           "x": 0,
           "y": 84,
@@ -24087,7 +24087,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "0c616cd7-814d-45ad-8318-5d927ea6b57f",
+          "persistentUuid": "68362e41-c40e-4018-821b-6a318ce114d6",
           "width": 1636.6666666666667,
           "x": 67.33333333333333,
           "y": 84.66666666666667,
@@ -24114,7 +24114,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "0e4e6465-5631-4174-8b76-5cc4af887c4c",
+          "persistentUuid": "6e2bb158-55d9-4461-911c-1fd5c41b1410",
           "width": 1069.3333333333333,
           "x": 610,
           "y": 92.66666666666667,
@@ -24141,7 +24141,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "06261ed4-672e-479a-b490-3328468d1310",
+          "persistentUuid": "75bc3608-9a62-4198-b6d2-7db2f9e98712",
           "width": 486,
           "x": 1125.3333333333333,
           "y": 222.66666666666666,
@@ -24168,7 +24168,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "561b711f-322b-4947-a353-855b8d64d019",
+          "persistentUuid": "ddd9f313-53d6-4352-8c75-c53d328c951a",
           "width": 251.33333333333334,
           "x": 466.6666666666667,
           "y": 480,
@@ -24195,7 +24195,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "c8ae554e-24e0-40fa-b4f3-4b342becb236",
+          "persistentUuid": "89f9c850-5d92-4375-a2f1-a2f913abf334",
           "width": 474,
           "x": 807.3333333333334,
           "y": 315.33333333333337,
@@ -24222,7 +24222,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "46eb0ba8-9b2d-422b-ae1b-dc12f3908ea0",
+          "persistentUuid": "b2dad4de-6dad-4936-8c5d-9f3929f543e5",
           "width": 640,
           "x": 1213.3333333333333,
           "y": 330.66666666666663,
@@ -24249,7 +24249,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "873abd89-d0e6-4a8e-8e08-feb597794e0e",
+          "persistentUuid": "959ed19c-bc06-4789-b99c-ec00a7ae426d",
           "width": 1638,
           "x": 66.66666666666667,
           "y": 84,
@@ -24276,7 +24276,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "f1e2a52b-7ab1-4ee1-92c0-7f9f1d28e43f",
+          "persistentUuid": "f7f7d828-9543-4562-b8d4-0ec72852de81",
           "width": 1070.6666666666667,
           "x": 609.3333333333334,
           "y": 92,
@@ -24303,7 +24303,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "aecaf3bb-b364-41f3-acd3-505d8eddd0a8",
+          "persistentUuid": "1b2dc16d-d11d-4434-b33c-5c127cce3474",
           "width": 488,
           "x": 1124,
           "y": 222,
@@ -24330,7 +24330,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "bc05212c-bfc4-44cc-b3c7-24f1a5247985",
+          "persistentUuid": "17cbc8e8-6c28-473a-bd12-900ca07c7c7b",
           "width": 252.66666666666666,
           "x": 466,
           "y": 479.3333333333333,
@@ -24357,7 +24357,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "7e06301a-7f68-4f23-b3bd-b97a27bfcbd7",
+          "persistentUuid": "688e0729-0840-4f8d-8e04-4c956eb49485",
           "width": 474,
           "x": 807.3333333333334,
           "y": 314,
@@ -24384,7 +24384,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "a597774b-9fad-43fd-8fd9-7ee83e027dd4",
+          "persistentUuid": "75dde643-aba9-4a4a-9838-e267fe96aa53",
           "width": 640,
           "x": 1214,
           "y": 330,
@@ -24411,7 +24411,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "dd224760-230d-4323-9ce8-13c7c18bee03",
+          "persistentUuid": "6cd5c156-24de-4f0e-9258-b245b21d8efc",
           "width": 0,
           "x": 573.7,
           "y": 516.4,
@@ -24432,7 +24432,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.34
+              "value": 6.14
             }
           ]
         },
@@ -24443,7 +24443,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "fd32fb7a-1c23-490c-8347-52d6699a7f23",
+          "persistentUuid": "5b44e3cb-3715-4a60-bedd-9de68ed3b5e6",
           "width": 0,
           "x": 444.5,
           "y": 591.2,
@@ -24464,7 +24464,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.95
+              "value": 4.25
             }
           ]
         },
@@ -24475,7 +24475,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "fe266f7f-7862-47cd-866d-21bbecd0abea",
+          "persistentUuid": "2fc14cc7-5096-4074-9a67-6f76a0b2ea49",
           "width": 0,
           "x": 306.8,
           "y": 563.1,
@@ -24496,7 +24496,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.28
+              "value": 3.63
             }
           ]
         },
@@ -24507,7 +24507,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "23b30c25-44f3-4d10-afd4-dfd5b392c03b",
+          "persistentUuid": "88c15557-960c-409d-902b-e1bd599aaeb1",
           "width": 0,
           "x": 491.6,
           "y": 507.7,
@@ -24528,7 +24528,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.23
+              "value": 3.42
             }
           ]
         },
@@ -24539,7 +24539,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8c69f2bf-7ee8-4eb8-b4f5-8411b529a068",
+          "persistentUuid": "b705564e-e9e8-4fa7-815b-b89df237db96",
           "width": 0,
           "x": 541.1,
           "y": 494.6,
@@ -24560,7 +24560,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.81
+              "value": 0.46
             }
           ]
         },
@@ -24571,7 +24571,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a0c77a04-6148-45b1-9729-610f0d480b63",
+          "persistentUuid": "741e4413-d16f-43a2-8e01-b0a6a9c3e284",
           "width": 0,
           "x": 422.1,
           "y": 658,
@@ -24592,7 +24592,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.97
+              "value": 3.05
             }
           ]
         },
@@ -24603,7 +24603,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "406909de-be67-47f4-b844-36579cb19263",
+          "persistentUuid": "2952aff9-5751-4fa0-86f3-9e2fd10a4495",
           "width": 0,
           "x": 335.2,
           "y": 418.4,
@@ -24624,7 +24624,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.09
+              "value": 0.67
             }
           ]
         },
@@ -24635,7 +24635,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "e93f21fd-330a-4d43-a57e-d2dfa35a627c",
+          "persistentUuid": "432f8278-d331-44df-9339-7eab33d96e5e",
           "width": 0,
           "x": 1020,
           "y": 434.7,
@@ -24656,7 +24656,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.7
+              "value": 0.61
             }
           ]
         },
@@ -24667,7 +24667,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "af758c53-5c9e-443a-8f12-44c3d0d4b95b",
+          "persistentUuid": "7725fd5b-4fa4-4993-9b4d-8fb661f5891e",
           "width": 0,
           "x": 1034.8,
           "y": 455.2,
@@ -24688,7 +24688,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.73
+              "value": 1.39
             }
           ]
         },
@@ -24699,7 +24699,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "03c5d918-90f9-4d8f-865d-dda7bbe8d3d7",
+          "persistentUuid": "9fb46d24-aece-4a16-8aaa-299312d8b1d6",
           "width": 0,
           "x": 1101.5,
           "y": 426.6,
@@ -24720,7 +24720,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.27
+              "value": 5.96
             }
           ]
         },
@@ -24731,7 +24731,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "1b8fc3da-dd18-477f-9d89-bda5960067ef",
+          "persistentUuid": "fe584f12-be02-43df-8f57-4b2f13f7b300",
           "width": 0,
           "x": 1247.6,
           "y": 399.2,
@@ -24752,7 +24752,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.84
+              "value": 5.44
             }
           ]
         },
@@ -24763,7 +24763,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "67e7946b-3c48-40ba-9422-24be7f72ded8",
+          "persistentUuid": "98f41536-099e-4a12-8ea4-223d414ed934",
           "width": 0,
           "x": 1147.4,
           "y": 429,
@@ -24784,7 +24784,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.01
+              "value": 6.05
             }
           ]
         },
@@ -24795,7 +24795,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "08b27f93-5a3c-477d-b204-d3711568e0d3",
+          "persistentUuid": "d13c3ed0-b0e9-4cad-9994-ea534b2f43d3",
           "width": 0,
           "x": 998.2,
           "y": 518.5,
@@ -24816,7 +24816,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.98
+              "value": 1.15
             }
           ]
         },
@@ -24827,7 +24827,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "bab48566-9a7b-455b-bb4d-c59f1f9b7ede",
+          "persistentUuid": "46813da9-87ec-4cfb-a2ac-796b2728bc4c",
           "width": 0,
           "x": 1195.7,
           "y": 514.2,
@@ -24848,7 +24848,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.67
+              "value": 0.22
             }
           ]
         },
@@ -24859,7 +24859,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "bfcc696f-0f67-40a7-a149-51d93da2210e",
+          "persistentUuid": "1b6229b1-6695-44ce-bac0-abbe1a099e67",
           "width": 0,
           "x": 1203.6,
           "y": 363.4,
@@ -24880,7 +24880,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.8
+              "value": 1.25
             }
           ]
         },
@@ -24891,7 +24891,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "3ad300f4-0c80-4e79-9974-a4f25c2a0d14",
+          "persistentUuid": "1225a922-8531-4319-bda9-04f5643d3da8",
           "width": 0,
           "x": 1723.5,
           "y": 522.1,
@@ -24912,7 +24912,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.74
+              "value": 2.43
             }
           ]
         },
@@ -24923,7 +24923,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "e446d0a7-13be-47a4-94f0-62fe67be9592",
+          "persistentUuid": "1032aa5c-96a0-425d-95a1-d71bb2225f33",
           "width": 0,
           "x": 1754.3,
           "y": 581.9,
@@ -24944,7 +24944,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.22
+              "value": 0.61
             }
           ]
         },
@@ -24955,7 +24955,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "da7ea5e7-cf55-4b2b-b5fe-f35d2c46272b",
+          "persistentUuid": "9f7d5fe4-d61c-4f15-8a5c-477132a7faf3",
           "width": 0,
           "x": 1864.2,
           "y": 551.5,
@@ -24976,7 +24976,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.92
+              "value": 0.77
             }
           ]
         },
@@ -24987,7 +24987,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "23389398-6bbf-4a97-bbbe-ace482e585bb",
+          "persistentUuid": "6a3120fc-2d50-4343-a1a0-446299140a66",
           "width": 0,
           "x": 1787.5,
           "y": 538.3,
@@ -25008,7 +25008,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.88
+              "value": 2.32
             }
           ]
         },
@@ -25019,7 +25019,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ec04b448-31e4-449d-acd1-4905040be49c",
+          "persistentUuid": "d05214bb-e446-47bc-91dc-357e8a9a3a42",
           "width": 0,
           "x": 1704.8,
           "y": 634.6,
@@ -25040,7 +25040,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.19
+              "value": 6.04
             }
           ]
         },
@@ -25051,7 +25051,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "17d2a0fb-5380-4ce8-8fe2-f0b20551ea9a",
+          "persistentUuid": "0afbab85-c94a-4ff0-af3c-ae582d6b3a8c",
           "width": 0,
           "x": 1663.7,
           "y": 592.5,
@@ -25072,7 +25072,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.35
+              "value": 5.39
             }
           ]
         },
@@ -25083,7 +25083,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8f810d1a-0004-4e82-bb77-fd61336fccb7",
+          "persistentUuid": "ef3a8b10-0e54-4e33-9f09-7b0238852790",
           "width": 0,
           "x": 1485,
           "y": 498.3,
@@ -25104,7 +25104,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.25
+              "value": 0.76
             }
           ]
         },
@@ -25115,7 +25115,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "01cc7e1b-5370-4503-b60a-99cbadf3244b",
+          "persistentUuid": "96a2a37d-ca8e-4733-8db4-a93a3d363428",
           "width": 0,
           "x": 1765.8,
           "y": 508.5,
@@ -25136,7 +25136,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.79
+              "value": 0.66
             }
           ]
         },
@@ -25147,7 +25147,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "0ca2b3f5-32ca-44b6-89e0-9b1adf5fa7f7",
+          "persistentUuid": "b3440a01-01cc-48a0-902b-74456bb71d70",
           "width": 0,
           "x": 1627.5,
           "y": 693,
@@ -25168,7 +25168,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.54
+              "value": 5.88
             }
           ]
         },
@@ -25179,7 +25179,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "34610b07-7192-4d68-9f19-62753be201d4",
+          "persistentUuid": "93525340-8a29-4090-8cb6-e9957e35ef55",
           "width": 0,
           "x": 1665.5,
           "y": 814.1,
@@ -25200,7 +25200,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.63
+              "value": 1.76
             }
           ]
         },
@@ -25211,7 +25211,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "72660941-2037-403f-b422-1e0456210ce2",
+          "persistentUuid": "e2a8966d-dc45-4316-9735-2103fffd44d6",
           "width": 0,
           "x": 1751.3,
           "y": 687.8,
@@ -25232,7 +25232,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.42
+              "value": 1.06
             }
           ]
         },
@@ -25243,7 +25243,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ab287bca-49d4-4952-bf4e-782158b1d6f7",
+          "persistentUuid": "353588ff-c4a6-467d-8ea2-6dc1b939fdc4",
           "width": 0,
           "x": 1486.8,
           "y": 599.1,
@@ -25264,7 +25264,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.97
+              "value": 4.41
             }
           ]
         },
@@ -25275,7 +25275,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "92849fa4-cb9a-48e0-a4e4-55d99fda2c66",
+          "persistentUuid": "c026d903-63ac-44fa-9b28-f47868019032",
           "width": 0,
           "x": 1460.8,
           "y": 659.8,
@@ -25296,7 +25296,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.1
+              "value": 5.81
             }
           ]
         },
@@ -25307,7 +25307,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "763323b0-c649-433e-b91f-25cd7e1826da",
+          "persistentUuid": "96060c07-1431-4e3f-b18f-4c0b363a39cf",
           "width": 0,
           "x": 1566.5,
           "y": 630.1,
@@ -25328,7 +25328,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.16
+              "value": 2.63
             }
           ]
         },
@@ -25339,7 +25339,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8ad606c7-353e-4947-91c8-b6a5da7cdffa",
+          "persistentUuid": "380c2209-0eff-480a-82fc-d9fa6b3b519d",
           "width": 0,
           "x": 1933.7,
           "y": 989.4,
@@ -25360,7 +25360,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.67
+              "value": 0.56
             }
           ]
         },
@@ -25371,7 +25371,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "6bf80f79-ba4b-4337-8024-1cd35cda17c3",
+          "persistentUuid": "ae3c425f-78df-47c7-b35e-9a438e9a8464",
           "width": 0,
           "x": 1664.9,
           "y": 711.1,
@@ -25392,7 +25392,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.11
+              "value": 1.12
             }
           ]
         },
@@ -25403,7 +25403,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "c1d64046-16d1-4225-a680-5087a6886f79",
+          "persistentUuid": "461f1951-fe38-4f57-934f-b0e30a1f169f",
           "width": 0,
           "x": 1425.2,
           "y": 623.1,
@@ -25424,7 +25424,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.81
+              "value": 0.16
             }
           ]
         },
@@ -25435,7 +25435,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8bb845f2-b29c-4a25-a36a-5dfdb39565af",
+          "persistentUuid": "4416cd19-fbd4-4aea-96f2-687f4dd587b7",
           "width": 0,
           "x": 739.2,
           "y": 921.1,
@@ -25456,7 +25456,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.85
+              "value": 1.33
             }
           ]
         },
@@ -25467,7 +25467,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b07f7f1f-9c34-417a-8aa1-0b78e520dac4",
+          "persistentUuid": "1dd6254e-ae9b-4a7a-8d8b-ccd487b26d5d",
           "width": 0,
           "x": 667.9,
           "y": 994.1,
@@ -25488,7 +25488,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.7
+              "value": 3.38
             }
           ]
         },
@@ -25499,106 +25499,10 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f31d7ec4-c621-4539-9a25-2a1e57153d8e",
+          "persistentUuid": "54f5f0a0-ebd2-40ee-91cc-49fec4f161b8",
           "width": 0,
           "x": 555.6,
           "y": 849.4,
-          "zOrder": 30,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": [
-            {
-              "name": "Reg",
-              "type": "string",
-              "value": "SA"
-            },
-            {
-              "name": "W",
-              "type": "number",
-              "value": 1
-            },
-            {
-              "name": "Phase",
-              "type": "number",
-              "value": 4.99
-            }
-          ]
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "keepRatio": true,
-          "layer": "",
-          "name": "Plume",
-          "persistentUuid": "7f726a9a-1446-4c30-b21f-a375f4704188",
-          "width": 0,
-          "x": 573.1,
-          "y": 748.2,
-          "zOrder": 30,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": [
-            {
-              "name": "Reg",
-              "type": "string",
-              "value": "SA"
-            },
-            {
-              "name": "W",
-              "type": "number",
-              "value": 1
-            },
-            {
-              "name": "Phase",
-              "type": "number",
-              "value": 3.76
-            }
-          ]
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "keepRatio": true,
-          "layer": "",
-          "name": "Plume",
-          "persistentUuid": "f0d83427-82f9-4a6e-abf9-061d1052609a",
-          "width": 0,
-          "x": 594.2,
-          "y": 986,
-          "zOrder": 30,
-          "numberProperties": [],
-          "stringProperties": [],
-          "initialVariables": [
-            {
-              "name": "Reg",
-              "type": "string",
-              "value": "SA"
-            },
-            {
-              "name": "W",
-              "type": "number",
-              "value": 1
-            },
-            {
-              "name": "Phase",
-              "type": "number",
-              "value": 2.08
-            }
-          ]
-        },
-        {
-          "angle": 0,
-          "customSize": false,
-          "height": 0,
-          "keepRatio": true,
-          "layer": "",
-          "name": "Plume",
-          "persistentUuid": "2b95dd30-765a-46b5-8f29-5e902ac6c975",
-          "width": 0,
-          "x": 658.2,
-          "y": 795.3,
           "zOrder": 30,
           "numberProperties": [],
           "stringProperties": [],
@@ -25627,7 +25531,103 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a118157a-e3cf-4d00-958a-5dbcdf74a496",
+          "persistentUuid": "4f703fd3-c51a-4c54-94b1-a836561b2063",
+          "width": 0,
+          "x": 573.1,
+          "y": 748.2,
+          "zOrder": 30,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Reg",
+              "type": "string",
+              "value": "SA"
+            },
+            {
+              "name": "W",
+              "type": "number",
+              "value": 1
+            },
+            {
+              "name": "Phase",
+              "type": "number",
+              "value": 3.19
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Plume",
+          "persistentUuid": "0a034e25-8256-42dc-b755-3231a6355c21",
+          "width": 0,
+          "x": 594.2,
+          "y": 986,
+          "zOrder": 30,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Reg",
+              "type": "string",
+              "value": "SA"
+            },
+            {
+              "name": "W",
+              "type": "number",
+              "value": 1
+            },
+            {
+              "name": "Phase",
+              "type": "number",
+              "value": 2.7
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Plume",
+          "persistentUuid": "377c3667-8096-4ca9-be56-387c48ffe423",
+          "width": 0,
+          "x": 658.2,
+          "y": 795.3,
+          "zOrder": 30,
+          "numberProperties": [],
+          "stringProperties": [],
+          "initialVariables": [
+            {
+              "name": "Reg",
+              "type": "string",
+              "value": "SA"
+            },
+            {
+              "name": "W",
+              "type": "number",
+              "value": 1
+            },
+            {
+              "name": "Phase",
+              "type": "number",
+              "value": 1.2
+            }
+          ]
+        },
+        {
+          "angle": 0,
+          "customSize": false,
+          "height": 0,
+          "keepRatio": true,
+          "layer": "",
+          "name": "Plume",
+          "persistentUuid": "862fd968-2cfb-495c-a77f-17f73956dad1",
           "width": 0,
           "x": 1302.6,
           "y": 624.4,
@@ -25648,7 +25648,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.42
+              "value": 0.65
             }
           ]
         },
@@ -25659,7 +25659,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d7c4dcd7-59d1-4f24-9030-8bbc8aa67cdd",
+          "persistentUuid": "fa366e29-3601-4126-a79d-4cad91cb84c2",
           "width": 0,
           "x": 1331,
           "y": 551.5,
@@ -25680,7 +25680,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.28
+              "value": 5.04
             }
           ]
         },
@@ -25691,7 +25691,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "27884b19-0568-45a3-9010-fd1b225fc5aa",
+          "persistentUuid": "8ba02b18-135f-4bc3-b75e-fb29313d832e",
           "width": 0,
           "x": 1209,
           "y": 589.9,
@@ -25712,7 +25712,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.91
+              "value": 3.27
             }
           ]
         },
@@ -25723,7 +25723,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "54c809e7-216a-4e62-9349-2f944bca4f5b",
+          "persistentUuid": "ef8f03ee-4283-48de-8ebd-9a23689dcba1",
           "width": 0,
           "x": 1041.1,
           "y": 737.3,
@@ -25744,7 +25744,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.17
+              "value": 4.38
             }
           ]
         },
@@ -25755,7 +25755,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "528bdab4-9180-43fe-a8be-8abaf966dd42",
+          "persistentUuid": "e7cf72bc-d6f2-467f-ba62-874a63d43cc3",
           "width": 0,
           "x": 1189.7,
           "y": 938.4,
@@ -25776,7 +25776,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.43
+              "value": 5.43
             }
           ]
         },
@@ -25787,7 +25787,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "38b17bdc-987e-44d7-b06e-16755ffbbac1",
+          "persistentUuid": "e23b8be7-beb8-4a18-83de-897401f1e5ee",
           "width": 0,
           "x": 1354.5,
           "y": 621.1,
@@ -25808,7 +25808,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.54
+              "value": 1.26
             }
           ]
         },
@@ -25819,7 +25819,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "3c7ae7a4-b02c-4743-9be6-95025d159f0e",
+          "persistentUuid": "696d2252-6d3d-41a1-bfe0-02a6f2acf4ed",
           "width": 0,
           "x": 1242.8,
           "y": 784.4,
@@ -25840,7 +25840,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.62
+              "value": 0.96
             }
           ]
         }
@@ -34796,7 +34796,7 @@
                 "  },",
                 "  refresh(){",
                 "    if (!this.scene || !S.regions) return;",
-                "    const sel = this.mode === \"game\" ? S.sel : null, th = theme();",
+                "    const sel = this.mode === \"game\" && !S.noSel ? S.sel : null, th = theme();",
                 "    const pal = th === \"paint\" ? HEAT_PAINT : th === \"night\" ? HEAT_NIGHT : HEAT;",
                 "    for (const r of S.regions){",
                 "      const o = this.regions[r.id]; if (!o) continue;",
@@ -34955,7 +34955,7 @@
                 "      this._ck = key; this.applyCam(); Kit.dirty(\"MapUI\");",
                 "      if (this.borders) this.borders.getRendererObject().alpha = clamp((this.cam.z - 1.05) / (ZCOUNTRY - 1.05), 0, 1);",
                 "      if (this.borders3) this.borders3.material.opacity = .75 * clamp((this.cam.z - 1.05) / (ZCOUNTRY - 1.05), 0, 1);",
-                "      if (wasC !== isC){ Kit.dirty(\"HUD\"); for (const r of S.regions){ const ln = this.lines[r.id]; if (ln) ln.hide(S.sel !== r.id || isC); const l3 = this.regLines3 && this.regLines3[r.id]; if (l3) l3.visible = this.mode === \"game\" && S.sel === r.id && !isC; } this.drawSelected(); }",
+                "      if (wasC !== isC){ Kit.dirty(\"HUD\"); for (const r of S.regions){ const ln = this.lines[r.id]; if (ln) ln.hide(S.sel !== r.id || isC || S.noSel); const l3 = this.regLines3 && this.regLines3[r.id]; if (l3) l3.visible = this.mode === \"game\" && S.sel === r.id && !isC && !S.noSel; } this.drawSelected(); }",
                 "    }",
                 "    if (this.floats.length){ this.floats.forEach(f => f.t += dt); this.floats = this.floats.filter(f => f.t < 1.2); Kit.dirty(\"MapUI\"); }",
                 "    if (this.fx.length){ this.fx.forEach(f => f.t += dt); this.fx = this.fx.filter(f => f.t < 2.2); Kit.dirty(\"MapUI\"); }",
@@ -35373,22 +35373,22 @@
                 "  selectRegion(id, zoom = false){",
                 "    Audio.play(\"select\");",
                 "    if (S.sel !== id) S.selC = null;",
-                "    S.sel = id; S.tab = \"region\"; P.Map.focus(id, zoom); const dl = k.L(\"DrawerScroll\"); if (dl) dl.scroll = 0; P.changed();",
+                "    S.sel = id; S.noSel = false; S.tab = \"region\"; P.Map.focus(id, zoom); const dl = k.L(\"DrawerScroll\"); if (dl) dl.scroll = 0; P.changed();",
                 "  },",
                 "  selectCountry(id){",
                 "    Audio.play(\"select\");",
                 "    const c = P.C(id); if (!c) return;",
-                "    S.sel = c.reg; S.selC = id; S.tab = \"region\"; P.Map.focusCountry(id); const dl = k.L(\"DrawerScroll\"); if (dl) dl.scroll = 0; P.changed();",
+                "    S.sel = c.reg; S.selC = id; S.noSel = false; S.tab = \"region\"; P.Map.focusCountry(id); const dl = k.L(\"DrawerScroll\"); if (dl) dl.scroll = 0; P.changed();",
                 "  },",
                 "  setTab(tab){",
                 "    if (tab === \"tech\"){ this.openSkills(); return; }",
                 "    Audio.play(S.tab === tab ? \"close\" : \"open\");",
-                "    S.tab = S.tab === tab ? null : tab;",
+                "    if (S.tab === \"region\" && tab === \"region\"){ S.selC = null; S.noSel = true; } S.tab = S.tab === tab ? null : tab; if (S.tab === \"region\") S.noSel = false;",
                 "    const dl = k.L(\"DrawerScroll\"); if (dl) dl.scroll = 0;",
                 "    if (S.tab === \"region\") P.Map.focus(S.sel, false); else if (!S.tab) P.Map.recenter();",
                 "    P.changed();",
                 "  },",
-                "  closeTab(){ Audio.play(\"close\"); S.tab = null; P.Map.recenter(); P.changed(); },",
+                "  closeTab(){ Audio.play(\"close\"); if (S.tab === \"region\"){ S.selC = null; S.noSel = true; } S.tab = null; P.Map.recenter(); P.changed(); },",
                 "  openSkills(){ if (!S.started || S.over || S.event || (UIM.modal && UIM.modal !== \"skills\")) return; Audio.play(\"skillsOpen\"); UIM.modal = \"skills\"; const ml = k.L(\"ModalScroll\"); if (ml) ml.scroll = 0; k.dirty(); },",
                 "  closeSkills(){ if (UIM.modal !== \"skills\") return; Audio.play(\"skillsClose\"); UIM.modal = null; k.dirty(); },",
                 "  goScene(name){ this.scene.getVariables().get(\"GoTo\").setString(name); },",
@@ -35437,7 +35437,7 @@
                 "      else if (m === \"learn\") this.closeLearn();",
                 "      else if (m === \"story\") this.storyNext();",
                 "      else if (m === \"skills\") this.closeSkills();",
-                "      else if (S.tab){ S.tab = null; P.Map.recenter(); P.changed(); }",
+                "      else if (S.tab) this.closeTab();",
                 "      else if (!S.event && !S.over && !m) this.pause();",
                 "      return;",
                 "    }",
@@ -35580,440 +35580,440 @@
               "type": "BuiltinCommonInstructions::JsCode",
               "inlineCode": [
                 "/* Screens · HUD และป้ายภูมิภาค */",
-                "const P = window.P2050 = window.P2050 || {};",
-                "if (P.mods && P.mods.hud) return;",
-                "(P.mods = P.mods || {}).hud = 1;",
-                "/* =========================================================================",
-                "   Screens · HUD (top bar, KPIs, character + abilities, meters, ticker, tab buttons, zoom buttons)",
-                "   and the map overlay (region / country labels, hazard warnings, bubble timers, floating texts)",
-                "   ========================================================================= */",
-                "const {Kit, S, t, L, UI, Audio, W, UIM, Screens, RMETA, IC, MONTHS, HAZARDS, COUNTRY, SHORT, CHAR} = P;",
-                "const k = Kit;",
-                "",
-                "/* 3.3 layout (same as the website):",
-                "   top-left: one bar with money · policy points · minerals · approval; the ability bar hangs right under it and the",
-                "   newest news line grows out of it to the right (fades after a few seconds) · top-right: date, speed, menu",
-                "   bottom: zoom (left) · Net Zero + warming, one slim row each (centre) · tabs (right) */",
-                "const HUD_Y = 10, KPI_H = 46, KPI_W = 134;",
-                "/* 1.1.3: numbers slide to their new value (450 ms), with a short +/− flash so you see what you gained or lost */",
-                "const AN = {};",
-                "function animNum(key, v){",
-                "  let q = AN[key]; const now = performance.now();",
-                "  if (!q || q.game !== S.saveId){ q = AN[key] = {from:v, to:v, t0:0, shown:v, d:0, dt:0, game:S.saveId}; }",
-                "  if (v !== q.to){ const d = v - q.to; q.from = q.shown; q.to = v; q.t0 = now; if (Math.abs(d) >= 1){ q.d = d; q.dt = now; } }",
-                "  const p = Math.min(1, (now - q.t0) / 450), e = 1 - Math.pow(1 - p, 3);",
-                "  q.shown = q.from + (q.to - q.from) * e;",
-                "  const fa = q.d ? Math.max(0, 1 - (now - q.dt) / 1100) : 0;",
-                "  if (p < 1 || fa > 0) Screens._hudAnim = true;",
-                "  return {v:q.shown, d:fa > 0 ? q.d : 0, fa, rise:(1 - fa) * 8};",
-                "}",
-                "Screens.renderHUD = function(l){",
-                "  if (this.kind !== \"game\") return;",
-                "  this._hudTips = [];",
-                "  const by = HUD_Y; this._goalsBottom = 0;",
-                "  /* ---- KPIs ---- */",
-                "  const acls = S.appr < 25 ? \"bad\" : S.appr < 45 ? \"warn\" : \"good\";",
-                "  Screens._hudAnim = false;",
-                "  const aEp = animNum(\"ep\", S.ep), aPc = animNum(\"pc\", S.pc), aAp = animNum(\"appr\", S.appr);",
-                "  const sanct = P.sanctionsCost ? P.sanctionsCost() : 0;",
-                "  const kpis = [",
-                "    {id:\"ep\", ic:\"$money\", k:t(\"ep\"), v:String(Math.floor(aEp.v)), an:aEp, s:sanct ? `+${P.epGain()} −${sanct}` : `+${P.epGain()}${t(\"perMo\")}`, c:\"fg\", tip:t(\"tipEp\"), sc:sanct ? \"bad\" : \"muted\"},",
-                "    {id:\"pc\", ic:\"$policy\", k:t(\"pc\"), v:String(Math.floor(aPc.v)), an:aPc, s:`+${P.pcGain()}${t(\"perMo\")}`, c:\"fg\", tip:t(\"tipPc\")},",
-                "  ];",
-                "  if (S.oreOn && P.matTotal){ const aOr = animNum(\"ore\", P.matTotal()); kpis.push({id:\"ore\", ic:\"$ore\", k:t(\"oreLbl\"), v:String(Math.round(aOr.v)), an:aOr, s:`+${Math.round(P.oreGain ? P.oreGain() : 0)}${t(\"perMo\")}`, c:\"fg\", tip:t(\"tipOre\"), fn:() => Screens.openWin(\"market\")}); }",
-                "  kpis.push({id:\"appr\", ic:\"$appr\", k:t(\"appr\"), v:`${aAp.v.toFixed(0)}%`, an:aAp, meter:S.appr / 100, c:acls, badge:P.angryCount && P.angryCount() ? \"!\" : null,",
-                "    tip:S.groups ? P.GROUPS.map(G => `[[${G.icon}]] ${Math.round(S.groups[G.id])}%`).join(\"  \") : t(\"tipAppr\"), fn:S.groups ? () => Screens.openWin(\"politics\") : null});",
-                "  const bw = KPI_W * kpis.length;",
-                "  this._kpiRect = {x:14, y:by, w:bw, h:KPI_H};",
-                "  W.glass(l, 14, by, bw, KPI_H, 12);",
-                "  kpis.forEach((q, i) => {",
-                "    const x = 14 + i * KPI_W, danger = q.id === \"appr\" && S.appr < 25, hov = q.fn && k.isHover(l, \"kpi-\" + q.id);",
-                "    if (i) k.rect(l, x, by + 9, 1, KPI_H - 18, \"line\");",
-                "    if (hov) k.rect(l, x + 3, by + 3, KPI_W - 6, KPI_H - 6, \"accent\", {r:9, a:.1});",
-                "    if (danger) k.rect(l, x + 3, by + 3, KPI_W - 6, KPI_H - 6, null, {r:9, stroke:\"bad\"});",
-                "    k.icon(l, q.ic, x + 9, by + 11, 24);",
-                "    k.text(l, q.k, x + 40, by + 4, {size:10.5, color:\"muted\", w:KPI_W - 60, max:1});",
-                "    const vr = k.text(l, q.v, x + 40, by + 18, {font:\"monoB\", size:18, color:q.c});",
-                "    if (q.meter !== undefined) W.meter(l, x + 44 + vr.w, by + 29, Math.max(18, KPI_W - 66 - vr.w), 4, q.meter, acls);",
-                "    else if (q.s) k.text(l, q.s, x + 46 + vr.w, by + 24, {font:\"mono\", size:10, color:q.sc || \"muted\", w:KPI_W - 52 - vr.w, max:1});",
-                "    if (q.an && q.an.d){ const dd = q.an.d, lab = `${dd > 0 ? \"+\" : \"−\"}${Math.abs(Math.round(dd))}`; k.text(l, lab, x + 40 + vr.w + 2, by + 6 - q.an.rise, {font:\"monoB\", size:11, color:dd > 0 ? \"good\" : \"bad\", a:q.an.fa}); }",
-                "    if (q.badge){ k.circle(l, x + 32, by + 12, 7, \"bad\"); k.text(l, q.badge, x + 25, by + 4, {font:\"monoB\", size:10, color:\"#ffffff\", w:14, align:\"center\"}); }",
-                "    if (q.fn){ k.icon(l, \"chevron-down\", x + KPI_W - 18, by + 16, 13, \"muted\"); k.hit(l, \"kpi-\" + q.id, x, by, KPI_W, KPI_H, () => { Audio.play(\"open\"); q.fn(); }); }",
-                "    else k.hit(l, \"kpi-\" + q.id, x, by, KPI_W, KPI_H, () => { UIM.kpiTip = UIM.kpiTip === q.id ? null : q.id; k.dirty(\"HUD\"); }, {cursor:false});   // tap (touch) shows what it is",
-                "  });",
-                "  this._hudTips.push(tl => {   // 3.5: drawn on the Alerts layer (above the HUD), so the ability bar never covers it",
-                "    // a value in the top bar: hover (or tap) shows what it is and how to get more",
-                "    const tipQ = kpis.find(q => q.tip && (k.isHover(l, \"kpi-\" + q.id) || UIM.kpiTip === q.id));",
-                "    if (tipQ){",
-                "      const i = kpis.indexOf(tipQ), tw = 280, tx = Math.min(14 + i * KPI_W, k.W - tw - 14), ty = by + KPI_H + 6;",
-                "      const th = 24 + (tipQ.s && !tipQ.meter ? 18 : 0) + k.textH(tipQ.tip, {size:12, w:tw - 24}) + 12 + (k.touch ? 18 : 0);",
-                "      k.rect(tl, tx, ty, tw, th, \"panel\", {r:10, stroke:\"line\", a:.97, bg:true});",
-                "      k.text(tl, tipQ.k, tx + 12, ty + 8, {font:\"bodyB\", size:13, w:tw - 24, max:1});",
-                "      let yy = ty + 28;",
-                "      if (tipQ.s && !tipQ.meter){ k.text(tl, tipQ.s, tx + 12, yy, {font:\"mono\", size:11.5, color:\"accent\"}); yy += 18; }",
-                "      k.text(tl, tipQ.tip, tx + 12, yy, {size:12, color:\"muted\", w:tw - 24, iconColor:\"muted\"});",
-                "      if (k.touch) k.text(tl, Screens.tapClose(), tx + 12, ty + th - 22, {size:11, color:\"muted\", w:tw - 24, max:1});   // 3.5",
-                "    }",
-                "  });",
-                "  /* ---- controls (right): date · speed · menu ---- */",
-                "  const has3 = P.Net && P.Net.owns(\"speed3\");",
-                "  const sp = [{id:\"sp0\", icon:\"pause\", on:S.speed === 0, fn:() => P.setSpeed(0)}, {id:\"sp1\", label:\"1×\", on:S.speed === 1, fn:() => P.setSpeed(1)}, {id:\"sp2\", label:\"2×\", on:S.speed === 2, fn:() => P.setSpeed(2)}];",
-                "  if (has3) sp.push({id:\"sp3\", label:\"3×\", on:S.speed === 3, fn:() => P.setSpeed(3)});",
-                "  const dateW = 112, ctrlW = 10 + dateW + 8 + sp.length * 34 + 8 + 30 + 10, cx0 = (k.W - 14) - ctrlW;",
-                "  W.glass(l, cx0, by, ctrlW, KPI_H, 12);",
-                "  const se = P.seasonOf ? P.seasonOf() : null;",
-                "  k.text(l, `${se ? `[[${se.icon}]] ` : \"\"}${P.dateStr()}`, cx0 + 10, by + 12, {font:\"dispS\", size:16, w:dateW, max:1, iconColor:\"accent\"});",
-                "  let cx = cx0 + 10 + dateW + 8;",
-                "  cx += W.seg(l, cx, by + 8, sp, {w:34}) + 8;",
-                "  W.hbtn(l, \"menu\", cx, by + 8, \"menu\", () => Screens.pause());",
-                "  /* ---- character + abilities, right under the money bar ---- */",
-                "  const ay = by + KPI_H + 6;",
-                "  this.abilityBar(l, 14, ay);",
-                "  /* ---- the newest news line, attached to the right of the ability bar ---- */",
-                "  const lg = S.log[0];",
-                "  if (lg){",
-                "    const key = S.log.length + \":\" + lg.tk;",
-                "    if (UIM.newsKey !== key){ UIM.newsKey = key; UIM.newsT = performance.now(); }",
-                "    const age = (performance.now() - UIM.newsT) / 1000, a = age < 6 ? 1 : Math.max(0, 1 - (age - 6) / 1.2);",
-                "    if (a > 0){",
-                "      const nx = 14 + 54 + 8, nw = bw - 54 - 8, col = {tc:\"accent\", al:\"bad\", gd:\"good\", ev:\"warn\", nw:\"fg\"}[lg.cls] || \"fg\";",
-                "      k.rect(l, nx, ay, nw, 28, \"glass\", {a:.9 * a, r:10, stroke:\"line\", bg:true});",
-                "      k.icon(l, \"newspaper\", nx + 10, ay + 7, 14, \"muted\", a);",
-                "      k.text(l, lg.txt, nx + 30, ay + 5, {size:12.5, color:col, w:nw - 40, max:1, a});",
-                "      k.hit(l, \"newsline\", nx, ay, nw, 28, () => Screens.setTab(\"news\"));",
-                "      if (!Screens._newsTimer) Screens._newsTimer = setTimeout(() => { Screens._newsTimer = null; k.dirty(\"HUD\"); }, age < 6 ? (6 - age) * 1000 + 30 : 120);",
-                "    }",
-                "  }",
-                "  /* Continuous World: this season's goals under the news line */",
-                "  if (S.world && S.goals && S.goals.length){",
-                "    const gx = 14 + 54 + 8, gy = ay + 34, gw = Math.min(300, bw - 62), won = S.goals.filter(g => g.won).length;",
-                "    const lines = S.goals.map(g => `${g.won ? \"[[circle-check]]\" : \"[[target]]\"} ${P.goalText(g)}`);",
-                "    let gh = 30; const hs = lines.map(s2 => k.text(null, s2, 0, 0, {size:12, w:gw - 24, measure:true}).h); gh += hs.reduce((a, b) => a + b + 4, 0) + 6;",
-                "    W.glass(l, gx, gy, gw, gh, 10); this._goalsBottom = gy + gh;",
-                "    k.text(l, `[[target]] ${P.up(t(\"goalsTitle\"))}`, gx + 12, gy + 8, {font:\"mono\", size:11, color:\"accent\", iconColor:\"accent\"});",
-                "    k.text(l, `${won}/${S.goals.length}`, gx + gw - 40, gy + 8, {font:\"mono\", size:11, color:won === S.goals.length ? \"good\" : \"muted\", w:28, align:\"right\"});",
-                "    let yy = gy + 28; lines.forEach((s2, i) => { k.text(l, s2, gx + 12, yy, {size:12, w:gw - 24, color:S.goals[i].won ? \"good\" : \"fg\", iconColor:S.goals[i].won ? \"good\" : \"muted\"}); yy += hs[i] + 4; });",
-                "  }",
-                "  if (P.Map.isCountryZoom()){",
-                "    const ht = `[[pointer]] ${t(\"tapCountry\")}`, hw = k.textW(ht, {size:11.5}) + 24, hx = (16 + (k.W - 16) - this.drawerWidth()) / 2 - hw / 2;",
-                "    k.rect(l, hx, k.H - 90, hw, 24, \"bg\", {r:12, a:.8, stroke:\"line\", bg:true});",
-                "    k.text(l, ht, hx + 12, k.H - 87, {size:11.5, color:\"muted\", iconColor:\"accent\"});",
-                "  }",
-                "  /* ---- bottom row ---- */",
-                "  const ny = k.H - 52, nh = 40, keys = P.hasKeyboard();",
-                "  // zoom (left)",
-                "  W.glass(l, 14, ny, 3 * 34 + 8, nh, 10);",
-                "  W.hbtn(l, \"zin\", 18, ny + 5, \"plus\", () => P.Map.zoomBy(1.35));",
-                "  W.hbtn(l, \"zout\", 52, ny + 5, \"minus\", () => P.Map.zoomBy(1 / 1.35));",
-                "  W.hbtn(l, \"zhome\", 86, ny + 5, \"locate-fixed\", () => P.Map.resetView());",
-                "  // tabs (right)",
-                "  const tabs = [[\"tech\", \"network\", \"nbTech\", \"T\"], [\"region\", \"map\", \"nbRegion\", \"R\"], [\"stats\", \"chart-line\", \"nbStats\", \"S\"], [\"news\", \"newspaper\", \"nbNews\", \"N\"]];",
-                "  const readyCount = P.SKILLS.filter(n => P.nodeState(n) === \"ready\" && (P.canAfford ? P.canAfford(n) : true)).length;",
-                "  let widths = tabs.map(([id, ic, key]) => { const lab = P.up(t(key)); return 14 + 16 + 6 + k.textW(lab, {font:\"dispS\", size:13}) + 14 + (id === \"tech\" && readyCount ? 26 : 0) + (keys ? 20 : 0); });",
-                "  // 3.7.3: when the Net Zero bar would be squeezed, the four tabs show icons only (the badge sits on the icon)",
-                "  const compact = (k.W - 14 - widths.reduce((a, b) => a + b, 0) - 18) - (14 + 3 * 34 + 18) < 560;",
-                "  if (compact) widths = tabs.map(() => 46);",
-                "  let nx = (k.W - 14) - widths.reduce((a, b) => a + b, 0) - 6 * (tabs.length - 1);",
-                "  const tabsX = nx;",
-                "  tabs.forEach(([id, ic, key, kk], i) => {",
-                "    const on = id === \"tech\" ? UIM.modal === \"skills\" : S.tab === id, hov = k.isHover(l, \"tab-\" + id), w = widths[i];",
-                "    k.rect(l, nx, ny, w, nh, on ? \"accent\" : \"glass\", {a:on ? 1 : .9, r:10, stroke:on ? \"accent\" : hov ? \"accent\" : \"line\", bg:true});",
-                "    const col = on ? \"ink\" : \"fg\";",
-                "    k.icon(l, ic, nx + (compact ? 15 : 14), ny + 12, 16, col);",
-                "    if (!compact){ const tx = W.runs(l, nx + 36, ny + 10, [[P.up(t(key)), {font:\"dispS\", size:13, color:col}]]); if (keys && !on) W.key(l, tx + 6, ny + 13, kk); }",
-                "    if (compact && id === \"tech\" && readyCount){ k.circle(l, nx + w - 9, ny + 9, 8, \"good\"); k.text(l, String(readyCount), nx + w - 17, ny + 2, {font:\"mono\", size:10, color:\"#04130c\", w:16, align:\"center\"}); }",
-                "    else if (id === \"tech\" && readyCount){ const bx2 = nx + w - 14 - 20; k.rect(l, bx2, ny + 11, 20, 18, \"good\", {r:9}); k.text(l, String(readyCount), bx2, ny + 12, {font:\"mono\", size:11, color:\"#04130c\", w:20, align:\"center\"}); }",
-                "    k.hit(l, \"tab-\" + id, nx, ny, w, nh, () => Screens.setTab(id));",
-                "    nx += w + 6;",
-                "  });",
-                "  // Net Zero + warming (centre, between zoom and tabs)",
-                "  const left = 14 + 3 * 34 + 8 + 10, room = tabsX - 10 - left, mw = Math.min(600, room), mx = Math.max(left, k.W / 2 - mw / 2 + Math.min(0, (tabsX - 10) - (k.W / 2 + mw / 2)));",
-                "  W.glass(l, mx, ny, mw, nh, 10); this._metersRect = {x:mx, y:ny, w:mw, h:nh};",
-                "  const half = (mw - 24 - 18) / 2;",
-                "  this.meterRowNZ(l, mx + 12, ny + 11, half);",
-                "  this.meterRowT(l, mx + 12 + half + 18, ny + 11, half);",
-                "  if (S.started && this.placeBar) this.placeBar(l, (S.world && S.goals && S.goals.length ? this._goalsBottom || 104 : 98) + 8);   // Continuous World: builds waiting to be placed",
-                "  k.dirty(\"Alerts\");   // 3.5: the tooltips above are drawn there",
-                "};",
-                "/* one slim row: title · bar · value (the Net Zero bar fills toward the trophy as CO₂ falls) */",
-                "/* 3.5: tooltips collected while drawing the HUD, drawn on the Alerts layer above it */",
-                "Screens.drawHudTips = function(l){ if (this.kind === \"game\") for (const f of this._hudTips || []) f(l); };",
-                "Screens.meterRowNZ = function(l, x, y, w){",
-                "  const NZ_MAX = 50, net = P.netCO2(), start = 36, pos = v => P.clamp(v / NZ_MAX, 0, 1);",
-                "  const cls = net <= 8 ? \"good\" : net <= 20 ? \"warn\" : \"bad\";",
-                "  const tr = k.text(l, w < 270 ? \"[[flag]]\" : `[[flag]] ${t(\"nzTitle\")}`, x, y + 1, {font:\"dispS\", size:12, max:1});   // narrow: icon only",
-                "  const vs = `${net.toFixed(1)}`, vw = k.textW(vs, {font:\"monoB\", size:15}), uw = k.textW(\" Gt\", {font:\"mono\", size:10});",
-                "  k.text(l, vs, x + w - vw - uw, y - 1, {font:\"monoB\", size:15, color:cls}); k.text(l, \" Gt\", x + w - uw, y + 4, {font:\"mono\", size:10, color:\"muted\"});",
-                "  const tx = x + tr.w + 10, tw = w - tr.w - vw - uw - 40, ty = y + 5, th = 8;",
-                "  if (tw < 30) return;",
-                "  k.hgrad(l, tx, ty, tw, th, [[0, \"#ff5448\"], [.5, \"#d9a62b\"], [1, \"#5fd39a\"]], {r:4, a:.17});",
-                "  const fw = tw * (1 - pos(net)); if (fw > 1) k.hgrad(l, tx, ty, Math.max(fw, 8), th, [[0, \"#e0302a\"], [.35, \"#e0612f\"], [.65, \"#d9a62b\"], [1, \"#1f9e78\"]], {r:4, span:tw});",
-                "  k.rect(l, tx + tw * (1 - pos(start)) - 1, ty - 3, 2, th + 6, \"fg\", {a:.4});",
-                "  const mx = tx + tw * (1 - pos(net)); k.circle(l, mx, ty + th / 2, 6, \"bg\"); k.circle(l, mx, ty + th / 2, 4, k.COL[cls]);",
-                "  k.icon(l, \"trophy\", tx + tw + 5, ty - 4, 14, \"good\");",
-                "};",
-                "Screens.meterRowT = function(l, x, y, w){",
-                "  const cls = S.temp >= 2.5 ? \"bad\" : S.temp >= 2.0 ? \"hot\" : S.temp >= 1.5 ? \"warn\" : \"good\";",
-                "  const tr = k.text(l, w < 270 ? \"[[$temp]]\" : `[[$temp]] ${t(\"tTitle\")}`, x, y + 1, {font:\"dispS\", size:12, max:1});",
-                "  const vs = `+${S.temp.toFixed(2)}`, vw = k.textW(vs, {font:\"monoB\", size:15}), uw = k.textW(\"°C\", {font:\"mono\", size:10});",
-                "  k.text(l, vs, x + w - vw - uw, y - 1, {font:\"monoB\", size:15, color:cls}); k.text(l, \"°C\", x + w - uw, y + 4, {font:\"mono\", size:10, color:\"muted\"});",
-                "  const tx = x + tr.w + 10, tw = w - tr.w - vw - uw - 40, ty = y + 5, th = 8;",
-                "  if (tw < 30) return;",
-                "  [[\"#5fd39a\", .32], [\"#f2b441\", .34], [\"#f07a3c\", .4], [\"#ff5448\", .5]].forEach(([c, a], i) => k.rect(l, tx + tw * i / 4, ty, tw / 4, th, c, {a, r:i === 0 || i === 3 ? 4 : 0}));",
-                "  const mx = tx + tw * P.clamp((S.temp - 1.0) / 2.0, 0, 1); k.circle(l, mx, ty + th / 2, 6, \"bg\"); k.circle(l, mx, ty + th / 2, 4, k.COL[cls]);",
-                "  k.icon(l, \"triangle-alert\", tx + tw + 5, ty - 4, 14, \"bad\");",
-                "};",
-                "",
-                "/* character portrait + ability buttons (left side of the map) */",
-                "Screens.abilityBar = function(l, x, y){",
-                "  const ch = CHAR[S.char]; if (!ch) return;",
-                "  const list = P.abilityList();",
-                "  const w = 54, h = 62 + list.length * 48;",
-                "  W.glass(l, x, y, w, h, 12);",
-                "  W.portrait(l, x + 5, y + 5, 44, S.char);",
-                "  k.rect(l, x + 30, y + 37, 22, 15, \"bg\", {r:4, stroke:ch.color, bg:true});",
-                "  k.text(l, String(S.charLv), x + 30, y + 37, {font:\"monoB\", size:10, color:ch.color, w:22, align:\"center\"});",
-                "  k.hit(l, \"charinfo\", x, y, w, 54, () => { UIM.abTip = UIM.abTip === \"char\" ? null : \"char\"; k.dirty(\"HUD\"); }, {cursor:true});",
-                "  let yy = y + 60;",
-                "  list.forEach(a => {",
-                "    const ready = P.abilityReady(a), cd = S.actCd[a.id] || 0, id = \"ab-\" + a.id, hov = k.isHover(l, id);",
-                "    const lockedLv = a.lock;",
-                "    k.rect(l, x + 7, yy, 40, 40, ready ? (hov ? \"accent\" : \"panel2\") : \"bg\", {r:9, stroke:ready ? \"accent\" : \"line\", bg:true, a:ready ? 1 : .9});",
-                "    k.icon(l, lockedLv ? \"lock\" : a.icon, x + 17, yy + 10, 20, ready ? (hov ? \"ink\" : \"accent\") : \"muted\", ready ? 1 : .55);",
-                "    if (cd > 0){ k.rect(l, x + 7, yy + 40 - 40 * Math.min(1, cd / a.cd), 40, 40 * Math.min(1, cd / a.cd), \"bad\", {r:4, a:.18}); k.text(l, String(cd), x + 7, yy + 24, {font:\"monoB\", size:10, color:\"warn\", w:40, align:\"center\"}); }",
-                "    else if (lockedLv) k.text(l, `Lv${lockedLv}`, x + 7, yy + 26, {font:\"mono\", size:9, color:\"muted\", w:40, align:\"center\"});",
-                "    k.hit(l, id, x + 7, yy, 40, 40, () => {",
-                "      if (ready){ if (P.useAbility(a.id)) UIM.abTip = null; }",
-                "      else { UIM.abTip = UIM.abTip === a.id ? null : a.id; Audio.play(\"error\"); }   // 3.5: a second tap closes it",
-                "      k.dirty();",
-                "    }, {cursor:true});",
-                "    if (hov || UIM.abTip === a.id){ const ty = yy - 4; this._hudTips.push(tl => this.abilityTip(tl, x + w + 8, ty, a)); }",
-                "    yy += 48;",
-                "  });",
-                "  if (UIM.abTip === \"char\") this._hudTips.push(tl => this.charTip(tl, x + w + 8, y));",
-                "};",
-                "/* 3.5: on touch screens a tooltip says how to close it */",
-                "Screens.tapClose = () => S.lang === \"th\" ? \"แตะที่ไหนก็ได้เพื่อปิด\" : \"Tap anywhere to close\";",
-                "Screens.abilityTip = function(l, x, y, a){",
-                "  const w = 270; let h = 0;",
-                "  const cd = S.actCd[a.id] || 0;",
-                "  const note = a.lock ? `${t(\"unlockAtLv\")} ${a.lock}` : cd ? `${t(\"cooldown\")} ${cd} ${t(\"months\")}` : a.target === \"country\" && !(S.selC && !S.selC.startsWith(\"R_\")) ? t(\"needCountry\") : `${t(\"cooldownLen\")} ${a.cd} ${t(\"months\")}`;",
-                "  const draw = (dry) => {",
-                "    let yy = y + 8;",
-                "    yy += k.text(dry ? null : l, L(a.name), x + 10, yy, {font:\"dispS\", size:14, w:w - 20, measure:dry}).h;",
-                "    yy += k.text(dry ? null : l, L(a.desc), x + 10, yy, {size:12, color:\"muted\", w:w - 20, lh:1.35, measure:dry}).h + 4;",
-                "    yy += k.text(dry ? null : l, note, x + 10, yy, {font:\"mono\", size:11, color:cd || a.lock ? \"warn\" : \"accent\", w:w - 20, measure:dry}).h;",
-                "    if (k.touch) yy += 4 + k.text(dry ? null : l, Screens.tapClose(), x + 10, yy + 4, {size:11, color:\"muted\", w:w - 20, max:1, measure:dry}).h;",
-                "    return yy - y + 8;",
-                "  };",
-                "  h = draw(true);",
-                "  k.rect(l, x, y, w, h, \"panel\", {r:9, stroke:\"accent\", sa:.6, bg:true}); draw(false);",
-                "};",
-                "Screens.charTip = function(l, x, y){",
-                "  const ch = CHAR[S.char], w = 290; const xp = P.Net ? P.Net.charXp(S.char) : 0;",
-                "  const draw = dry => {",
-                "    let yy = y + 8;",
-                "    yy += k.text(dry ? null : l, `${L(ch.person)} · ${L(ch.name)}`, x + 10, yy, {font:\"dispS\", size:14, w:w - 20, measure:dry}).h;",
-                "    yy += k.text(dry ? null : l, `${t(\"level\")} ${S.charLv} · XP ${xp}`, x + 10, yy, {font:\"mono\", size:11, color:\"accent\", w:w - 20, measure:dry}).h + 2;",
-                "    yy += k.text(dry ? null : l, `${t(\"passive\")}: ${L(ch.pas)}`, x + 10, yy, {size:12, color:\"muted\", w:w - 20, lh:1.35, measure:dry}).h;",
-                "    if (k.touch) yy += 4 + k.text(dry ? null : l, Screens.tapClose(), x + 10, yy + 4, {size:11, color:\"muted\", w:w - 20, max:1, measure:dry}).h;",
-                "    return yy - y + 8;",
-                "  };",
-                "  const h = draw(true);",
-                "  k.rect(l, x, y, w, h, \"panel\", {r:9, stroke:ch.color, sa:.7, bg:true}); draw(false);",
-                "};",
-                "",
-                "/* Net Zero meter: scale 0 (win, right) … 50 Gt (left). Marker = current net CO₂, ghost tick = 2026 level. */",
-                "Screens.meterNZ = function(l, x, y, w){",
-                "  const NZ_MAX = 50, net = P.netCO2(), start = 36, prev = S.hist.length > 12 ? S.hist[S.hist.length - 13].net : start;",
-                "  const trend = net - prev;",
-                "  let proj, projCls;",
-                "  if (trend < -0.05){ const yrs = net / -trend, yr = 2026 + (S.tick / 12) + yrs; proj = yr <= 2051 ? `${t(\"onTrack\")} ${Math.floor(yr)}` : t(\"offTrack\"); projCls = yr <= 2051 ? \"good\" : \"bad\"; }",
-                "  else { proj = t(\"rising\"); projCls = \"bad\"; }",
-                "  const pos = v => P.clamp(v / NZ_MAX, 0, 1);",
-                "  const nzCls = net <= 8 ? \"good\" : net <= 20 ? \"warn\" : \"bad\";",
-                "  const title = P.up(t(\"nzTitle\"));",
-                "  k.text(l, `[[flag]] ${title}`, x, y + 2, {font:\"dispS\", size:13});",
-                "  const vs = net.toFixed(1), vw = k.textW(vs, {font:\"monoB\", size:21}), uw = k.textW(\" Gt\", {font:\"mono\", size:12});",
-                "  k.text(l, vs, x + w - vw - uw, y - 4, {font:\"monoB\", size:21, color:nzCls});",
-                "  k.text(l, \" Gt\", x + w - uw, y + 4, {font:\"mono\", size:12, color:\"muted\"});",
-                "  const tx = x + 22, tw = w - 48, ty = y + 26, th = 16;",
-                "  k.hgrad(l, tx, ty, tw, th, [[0, \"#ff5448\"], [.5, \"#d9a62b\"], [1, \"#5fd39a\"]], {r:8, a:.17});",
-                "  const fillW = tw * (1 - pos(net));",
-                "  if (fillW > 1) k.hgrad(l, tx, ty, Math.max(fillW, 16), th, [[0, \"#e0302a\"], [.35, \"#e0612f\"], [.65, \"#d9a62b\"], [1, \"#1f9e78\"]], {r:8, span:tw});",
-                "  k.icon(l, \"trophy\", tx + tw + 6, ty - 1, 18, \"good\");",
-                "  const gx = tx + tw * (1 - pos(start));",
-                "  k.rect(l, gx - 1, ty - 3, 2, th + 6, \"fg\", {a:.45});",
-                "  const mx = tx + tw * (1 - pos(net)), mc = k.COL[nzCls];",
-                "  k.circle(l, mx, ty + th / 2, 12, mc, {a:.25});",
-                "  k.circle(l, mx, ty + th / 2, 9, \"bg\"); k.circle(l, mx, ty + th / 2, 6, mc);",
-                "  const fy = y + 48;",
-                "  W.runs(l, x, fy, [[`${t(\"vs2026\")} `, {size:11.5, color:\"muted\"}], [P.fmt(net - start), {font:\"monoB\", size:11.5, color:net < start ? \"good\" : \"bad\"}],",
-                "    [` · ${trend <= 0 ? \"▼\" : \"▲\"} `, {size:11.5, color:\"muted\"}], [P.fmt(trend), {font:\"monoB\", size:11.5, color:trend <= 0 ? \"good\" : \"bad\"}], [`/12${t(\"perMo\").replace(\"/\", \"\")}`, {size:11.5, color:\"muted\"}]]);",
-                "  const pw = k.textW(proj, {size:11.5});",
-                "  k.text(l, proj, x + w - pw, fy, {size:11.5, color:projCls});",
-                "};",
-                "/* Warming meter: +1.0 → +3.0 °C with coloured danger zones */",
-                "Screens.meterT = function(l, x, y, w){",
-                "  const monthsLeft = Math.max(0, P.TOTAL_TICKS - S.tick), yearsLeft = monthsLeft / 12;",
-                "  const tCls = S.temp >= 2.5 ? \"bad\" : S.temp >= 2.0 ? \"hot\" : S.temp >= 1.5 ? \"warn\" : \"good\";",
-                "  const title = P.up(t(\"tTitle\"));",
-                "  k.text(l, `[[thermometer]] ${title}`, x, y + 2, {font:\"dispS\", size:13});",
-                "  const vs = `+${S.temp.toFixed(2)}`, vw = k.textW(vs, {font:\"monoB\", size:21}), uw = k.textW(\"°C\", {font:\"mono\", size:12});",
-                "  k.text(l, vs, x + w - vw - uw, y - 4, {font:\"monoB\", size:21, color:tCls});",
-                "  k.text(l, \"°C\", x + w - uw, y + 4, {font:\"mono\", size:12, color:\"muted\"});",
-                "  const tx = x, tw = w - 26, ty = y + 24, th = 14;",
-                "  const zones = [[\"#5fd39a\", .28], [\"#f2b441\", .3], [\"#f07a3c\", .35], [\"#ff5448\", .45]];",
-                "  k.rect(l, tx, ty, tw, th, \"panel2\", {r:7});",
-                "  zones.forEach(([c, a], i) => k.rect(l, tx + tw * i / 4, ty, tw / 4, th, c, {a, r:i === 0 || i === 3 ? 7 : 0}));",
-                "  [\"1.5\", \"2.0\", \"2.5\"].forEach((s, i) => k.text(l, s, tx + tw * (i + 1) / 4 - 12, ty + th + 1, {font:\"mono\", size:9.5, color:\"muted\", w:24, align:\"center\"}));",
-                "  k.icon(l, \"triangle-alert\", tx + tw + 6, ty - 2, 18, \"bad\");",
-                "  const mx = tx + tw * P.clamp((S.temp - 1.0) / 2.0, 0, 1), mc = k.COL[tCls];",
-                "  k.circle(l, mx, ty + th / 2, 12, mc, {a:.25});",
-                "  k.circle(l, mx, ty + th / 2, 9, \"bg\"); k.circle(l, mx, ty + th / 2, 6, mc);",
-                "  const fy = y + 48;",
-                "  W.runs(l, x, fy, [[`${Math.max(0, 3 - S.temp).toFixed(2)}°C`, {font:\"monoB\", size:11.5, color:tCls}], [` ${t(\"toLose\")} (3.0°C)`, {size:11.5, color:\"muted\"}]]);",
-                "  const right = [[`${t(\"left\")} `, {size:11.5, color:\"muted\"}], [String(Math.floor(yearsLeft)), {font:\"monoB\", size:11.5}], [` ${t(\"yrs\")} ${monthsLeft % 12} ${t(\"months\")}`, {size:11.5, color:\"muted\"}]];",
-                "  W.runs(l, x + w - W.runsW(right), fy, right);",
-                "};",
-                "",
-                "/* ---- MapUI layer: region / country labels, hazard warnings, bubble timers, floating texts ---- */",
-                "const HZ_COL = {hurricane:\"#c3a6ff\", typhoon:\"#c3a6ff\", flood:\"#8fd0ff\", heat:\"#ff8a3c\", drought:\"#f2c14e\", wildfire:\"#ff5a4a\", saltwater:\"#4fd1c5\"};",
-                "Screens.renderMapUI = function(l){",
-                "  const Map = P.Map; if (!Map || !Map.scene) return;",
-                "  this._edgeAnim = false;",
-                "  if (this.kind === \"game\" && this.placeGrid) this.placeGrid(l);   // Continuous World: the hex grid under everything else",
-                "  if (this.kind === \"game\" && this.drawSeason) this.drawSeason(l);   // 3.7.4: snow, rain, smoke and heat haze of the season",
-                "  if (this.kind === \"game\" && this.drawRigs) this.drawRigs(l);   // 3.6: oil rigs and their flares",
-                "  if (this.kind === \"game\" && this.drawPins) this.drawPins(l);   // builds pinned on the map",
-                "  if (this.kind === \"game\" && this.drawTrains) this.drawTrains(l);   // 3.6: high-speed trains",
-                "  if (this.kind === \"game\"){",
-                "    const ry = 60, rb = k.H - 60, zoomed = Map.isCountryZoom();",
-                "    const leftLimit = 74, rightLimit = (k.W - 16) - this.drawerWidth();",
-                "    if (!zoomed){",
-                "      for (const r of S.regions){",
-                "        const [lat, lon] = RMETA[r.id].lab; const [sx, sy] = Map.latlonScreen(lat, lon);",
-                "        if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;",
-                "        const a = L(RMETA[r.id].name), b = `${r.co2.toFixed(1)} Gt`;   // 3.3: continent names, not codes",
-                "        const w = k.textW(a, {font:\"bodyB\", size:11}) + 5 + k.textW(b, {font:\"mono\", size:11}) + 16 + (S.alli[r.id] ? 18 : 0), h = 21;",
-                "        const x = sx - w / 2, y = sy - h / 2, sel = S.sel === r.id, hov = k.isHover(l, \"lab-\" + r.id);",
-                "        if (sel) k.rect(l, x - 3, y - 3, w + 6, h + 6, \"accent\", {r:9, a:.22, bg:true});",
-                "        k.rect(l, x, y, w, h, \"bg\", {a:.8, r:7, stroke:sel || hov ? \"accent\" : \"line\", bg:true});",
-                "        const ex = W.runs(l, x + 8, y + 2, [[a, {font:\"bodyB\", size:11}]]);",
-                "        const ex2 = W.runs(l, ex + 5, y + 2, [[b, {font:\"mono\", size:11, color:\"hot\"}]]);",
-                "        if (S.alli[r.id]) k.icon(l, \"handshake\", ex2 + 4, y + 4, 13, \"good\");",
-                "        k.hit(l, \"lab-\" + r.id, x, y, w, h, () => Screens.selectRegion(r.id, true));",
-                "      }",
-                "    } else {",
-                "      // country labels (major countries in view) with a relation dot",
-                "      // 3.7.2: label tiers — main countries always, smaller ones only when zoomed in closer; overlapping labels are skipped",
-                "      const zz = Map.cam.z, placed = [];",
-                "      for (const c of S.countries.filter(x => !x.rest).sort((a, b) => (S.selC === b.id) - (S.selC === a.id) || COUNTRY[b.id].w - COUNTRY[a.id].w)){",
-                "        if (c.rest) continue;",
-                "        const pt = P.countryPoint(c.id); if (!pt) continue;",
-                "        const [sx, sy] = Map.toScreen(pt[0], pt[1]);",
-                "        if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;",
-                "        const sel0 = S.selC === c.id;",
-                "        if (!sel0 && COUNTRY[c.id].w < (zz >= 4 ? 0 : zz >= 3.2 ? 40 : zz >= 2.4 ? 100 : 250)) continue;",
-                "        const nm = L(SHORT[c.id] || COUNTRY[c.id].name), sel = sel0;",
-                "        const w = k.textW(nm, {font:\"bodyB\", size:10.5}) + 22, h = 18;",
-                "        if (!sel && placed.some(q => Math.abs(q[0] - sx) < (w + q[2]) / 2 + 4 && Math.abs(q[1] - sy) < 20)) continue;",
-                "        placed.push([sx, sy, w]);",
-                "        const x = sx - w / 2, y = sy - h / 2;",
-                "        k.rect(l, x, y, w, h, \"bg\", {a:sel ? .92 : .66, r:9, stroke:sel ? \"accent\" : null, bg:true});",
-                "        k.circle(l, x + 9, y + 9, 3.5, W.relCol(c.rel));",
-                "        k.text(l, nm, x + 16, y + 1, {font:\"bodyB\", size:10.5, color:sel ? \"accent\" : \"fg\"});",
-                "        k.hit(l, \"cl-\" + c.id, x, y, w, h, () => Screens.selectCountry(c.id));",
-                "      }",
-                "      // 3.8: capitals (gold stars, like the website): only closer in than the country names, and only for countries whose",
-                "      // name already shows; the capital's own name comes in closer still",
-                "      if (zz >= 2.4 && P.CAPITALS){",
-                "        const tier = zz >= 4 ? 0 : zz >= 3.2 ? 40 : 100, names = zz >= 3.2, th = S.lang === \"th\", capNames = [];",
-                "        for (const [id, cp] of Object.entries(P.CAPITALS)){",
-                "          const cc = COUNTRY[id]; if (!cc || (cc.w < tier && S.selC !== id)) continue;",
-                "          const [sx, sy] = Map.latlonScreen(cp[0], cp[1]);",
-                "          if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;",
-                "          if (placed.some(q => Math.abs(q[0] - sx) < q[2] / 2 + 5 && Math.abs(q[1] - sy) < 14)) continue;   // never under a country's name tag",
-                "          k.circle(l, sx, sy, 6, \"bg\", {a:.75});",
-                "          k.icon(l, \"star\", sx - 5, sy - 5, 10, \"gold\");",
-                "          if (!names) continue;",
-                "          const nm = th ? cp[2] : cp[3], nw = k.textW(nm, {size:10});",
-                "          if (placed.some(q => sx + 9 < q[0] + q[2] / 2 && sx + 9 + nw > q[0] - q[2] / 2 && Math.abs(q[1] - sy) < 16) || capNames.some(q => sx + 9 < q[0] + q[2] && sx + 9 + nw > q[0] && Math.abs(q[1] - sy) < 13)) continue;   // names that would overlap are left out",
-                "          capNames.push([sx + 9, sy, nw]);",
-                "          k.text(l, nm, sx + 9, sy - 8, {size:10, color:\"#f3e2b0\", max:1});",
-                "        }",
-                "      }",
-                "    }",
-                "    // 3.8: the stage of each tropical cyclone under it (depression → tropical storm → typhoon / hurricane / cyclone)",
-                "    if (P.stormList && P.Life && P.Life.storms) for (const st of P.stormList()){",
-                "      const o = P.Life.storms[st.id]; if (!o || !o.m.visible) continue;",
-                "      const [sx, sy] = Map.toScreen(o.sx, o.sy + o.D * .42);",
-                "      if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;",
-                "      const nm = L(st.name), tw = k.textW(nm, {font:\"bodyB\", size:11}) + 14;",
-                "      k.rect(l, sx - tw / 2, sy - 1, tw, 19, \"bg\", {a:.7, r:9, bg:true});",
-                "      k.text(l, nm, sx - tw / 2 + 7, sy, {font:\"bodyB\", size:11, color:st.stage === 2 ? \"#ffd2c4\" : \"fg\"});",
-                "    }",
-                "    // hazard forecasts: pulsing ring + icon + months left; tap = evacuate",
-                "    const now = performance.now() / 1000;",
-                "    for (const h of S.haz || []){",
-                "      const pt = P.countryPoint(h.c); if (!pt) continue;",
-                "      const [sx, sy0] = Map.toScreen(pt[0], pt[1]); const sy = sy0 - 26;",
-                "      if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;",
-                "      const Z = HAZARDS[h.type], col = HZ_COL[h.type] || \"#ff5a4a\", left = Math.max(0, h.at - S.tick);",
-                "      const ph = (now * 1.6) % 1;",
-                "      k.circle(l, sx, sy, 16 + ph * 16, col, {a:(1 - ph) * .35});",
-                "      k.circle(l, sx, sy, 17, \"bg\", {stroke:col, sw:2, a:.92});",
-                "      k.icon(l, Z.icon, sx - 10, sy - 10, 20, col);",
-                "      const lab = h.evac ? `[[check]] ${t(\"evacShort\")}` : `${left} ${t(\"moShort\")} · ${t(\"evacShort\")} ${IC.ep}${P.evacCost()}`;",
-                "      const lw = k.textW(lab, {font:\"mono\", size:10}) + 12;",
-                "      k.rect(l, sx - lw / 2, sy + 20, lw, 17, h.evac ? \"good\" : \"bg\", {a:h.evac ? .9 : .86, r:5, stroke:col, bg:true});",
-                "      k.text(l, lab, sx - lw / 2, sy + 21, {font:\"mono\", size:10, color:h.evac ? \"#04130c\" : \"fg\", w:lw, align:\"center\", iconColor:\"#04130c\"});",
-                "      k.hit(l, \"hz-\" + h.id, sx - Math.max(22, lw / 2), sy - 20, Math.max(44, lw), 58, () => { if (!h.evac){ if (P.evacuate(h.id)) Map.floatText(sx, sy - 20, t(\"evacuated\"), \"good\"); } });",
-                "    }",
-                "    for (const b of S.bubbles){",
-                "      const o = Map.bubbles[b.id]; if (!o) continue;",
-                "      const [sx, sy] = Map.toScreen(o.getX(), o.getVariables().get(\"BaseY\").getAsNumber());",
-                "      if (sy < ry || sy > rb) continue;",
-                "      const txt = b.type === \"red\" ? `${IC.ep}−${P.aidCost()} · ${b.ttl}` : `${b.ttl}`;",
-                "      const w = k.textW(txt, {font:\"mono\", size:10}) + 8;",
-                "      k.rect(l, sx - w / 2, sy + 3, w, 16, \"bg\", {a:.8, r:4, bg:true});",
-                "      k.text(l, txt, sx - w / 2, sy + 4, {font:\"mono\", size:10, w, align:\"center\"});",
-                "    }",
-                "    // hazard strike animation",
-                "    for (const f of Map.fx){",
-                "      const [sx, sy] = Map.toScreen(f.x, f.y), p = f.t / 2.2, Z = HAZARDS[f.type], col = HZ_COL[f.type] || \"#ff5a4a\";",
-                "      const a = p < .8 ? 1 : 1 - (p - .8) / .2;",
-                "      // weather over the struck country (web/src/map2d.js weatherFx, lighter)",
-                "      { const R = 70 * Math.sqrt(Map.cam.z), wa = p < .15 ? p / .15 : p > .75 ? (1 - p) / .25 : 1, T = f.type, now = performance.now() / 1000, low = P.Gfx && P.Gfx.level === \"low\";",
-                "        f.seed = f.seed || Array.from({length:120}, () => Math.random());",
-                "        for (let i = 0; i < 3; i++){ const q = p * 1.6 - i * .18; if (q > 0 && q < 1) k.circle(l, sx, sy, 12 + q * R * 1.4, null, {stroke:col, sw:3 * (1 - q) + .5, sa:(1 - q) * .8}); }",
-                "        if (T === \"flood\" || T === \"hurricane\" || T === \"typhoon\"){",
-                "          for (let i = 0, n = low ? 20 : 50; i < n; i++){ const rx = sx + (f.seed[i] * 2 - 1) * R, ry = sy - R + ((now * 380 + f.seed[i + 60] * 1000) % (2 * R)); k.line(l, rx, ry, rx - 4, ry + 12, \"#aad2ff\", {w:1.2, a:wa * .8}); }",
-                "          if (T === \"flood\") k.circle(l, sx, sy + 6, R * .6 * wa, \"#3c78c8\", {a:.22});",
-                "        } else if (T === \"heat\" || T === \"drought\"){",
-                "          k.circle(l, sx, sy, R * 1.2, T === \"heat\" ? \"#ff7828\" : \"#e6b450\", {a:.28 * wa});",
-                "          for (let i = 0; i < 6; i++){ const yy = sy - R * .6 + i * R * .22, pts = []; for (let xx = -R * .7; xx <= R * .7; xx += 8) pts.push(sx + xx, yy + Math.sin(xx * .08 + now * 4 + i) * 3); k.path(l, pts, T === \"heat\" ? \"#ffc88c\" : \"#e6c88c\", {w:1.5, a:wa * .7}); }",
-                "        } else if (T === \"wildfire\"){",
-                "          k.circle(l, sx, sy, R, \"#ff5a1e\", {a:.3 * wa});",
-                "          for (let i = 0, n = low ? 18 : 40; i < n; i++){ const q = (now * .7 + f.seed[i]) % 1, ex = sx + (f.seed[i + 50] * 2 - 1) * R * .7 + Math.sin(now * 3 + i) * 6, ey = sy + R * .3 - q * R * 1.2; k.circle(l, ex, ey, 1.5 + (1 - q) * 1.6, (255 << 16) | (Math.round(140 + 100 * (1 - q)) << 8) | 60, {a:(1 - q) * wa}); }",
-                "        } else if (T === \"saltwater\"){",
-                "          for (let i = 0; i < 4; i++){ const yy = sy - R * .3 + i * R * .2, pts = []; for (let xx = -R * .8; xx <= R * .8; xx += 6) pts.push(sx + xx, yy + Math.sin(xx * .06 + now * 3 + i) * 5); k.path(l, pts, \"#4fd1c5\", {w:2, a:wa * .7}); }",
-                "        }",
-                "      }",
-                "      k.circle(l, sx, sy, 20 + p * 70, col, {a:(1 - p) * .25});",
-                "      k.circle(l, sx, sy, 10 + p * 40, null, {stroke:col, sw:2, sa:(1 - p) * .9});",
-                "      const swing = Math.sin(p * Math.PI * 2) * 36, size = 34 + 10 * Math.sin(p * Math.PI);",
-                "      k.icon(l, Z.icon, sx - size / 2 + swing, sy - size / 2 - 6, size, col, a, (f.type === \"hurricane\" || f.type === \"typhoon\") ? p * 720 : 0);",
-                "    }",
-                "  }",
-                "  for (const f of Map.floats){",
-                "    const p = f.t / 1.2, a = p < .7 ? 1 : 1 - (p - .7) / .3;",
-                "    const col = f.color === \"good\" ? \"good\" : f.color === \"bad\" ? \"bad\" : \"accent\";",
-                "    const w = k.textW(f.txt, {font:\"monoB\", size:14});",
-                "    k.text(l, f.txt, f.x - w / 2, f.y - 18 - p * 40, {font:\"monoB\", size:14, color:col, a, iconColor:col});",
-                "  }",
-                "  if (this.kind === \"game\"){ if (this.edgeArrows) this.edgeArrows(l); if (this.mapHover) this.mapHover(l); }",
-                "};",
+                "const P = window.P2050 = window.P2050 || {};\r",
+                "if (P.mods && P.mods.hud) return;\r",
+                "(P.mods = P.mods || {}).hud = 1;\r",
+                "/* =========================================================================\r",
+                "   Screens · HUD (top bar, KPIs, character + abilities, meters, ticker, tab buttons, zoom buttons)\r",
+                "   and the map overlay (region / country labels, hazard warnings, bubble timers, floating texts)\r",
+                "   ========================================================================= */\r",
+                "const {Kit, S, t, L, UI, Audio, W, UIM, Screens, RMETA, IC, MONTHS, HAZARDS, COUNTRY, SHORT, CHAR} = P;\r",
+                "const k = Kit;\r",
+                "\r",
+                "/* 3.3 layout (same as the website):\r",
+                "   top-left: one bar with money · policy points · minerals · approval; the ability bar hangs right under it and the\r",
+                "   newest news line grows out of it to the right (fades after a few seconds) · top-right: date, speed, menu\r",
+                "   bottom: zoom (left) · Net Zero + warming, one slim row each (centre) · tabs (right) */\r",
+                "const HUD_Y = 10, KPI_H = 46, KPI_W = 134;\r",
+                "/* 1.1.3: numbers slide to their new value (450 ms), with a short +/− flash so you see what you gained or lost */\r",
+                "const AN = {};\r",
+                "function animNum(key, v){\r",
+                "  let q = AN[key]; const now = performance.now();\r",
+                "  if (!q || q.game !== S.saveId){ q = AN[key] = {from:v, to:v, t0:0, shown:v, d:0, dt:0, game:S.saveId}; }\r",
+                "  if (v !== q.to){ const d = v - q.to; q.from = q.shown; q.to = v; q.t0 = now; if (Math.abs(d) >= 1){ q.d = d; q.dt = now; } }\r",
+                "  const p = Math.min(1, (now - q.t0) / 450), e = 1 - Math.pow(1 - p, 3);\r",
+                "  q.shown = q.from + (q.to - q.from) * e;\r",
+                "  const fa = q.d ? Math.max(0, 1 - (now - q.dt) / 1100) : 0;\r",
+                "  if (p < 1 || fa > 0) Screens._hudAnim = true;\r",
+                "  return {v:q.shown, d:fa > 0 ? q.d : 0, fa, rise:(1 - fa) * 8};\r",
+                "}\r",
+                "Screens.renderHUD = function(l){\r",
+                "  if (this.kind !== \"game\") return;\r",
+                "  this._hudTips = [];\r",
+                "  const by = HUD_Y; this._goalsBottom = 0;\r",
+                "  /* ---- KPIs ---- */\r",
+                "  const acls = S.appr < 25 ? \"bad\" : S.appr < 45 ? \"warn\" : \"good\";\r",
+                "  Screens._hudAnim = false;\r",
+                "  const aEp = animNum(\"ep\", S.ep), aPc = animNum(\"pc\", S.pc), aAp = animNum(\"appr\", S.appr);\r",
+                "  const sanct = P.sanctionsCost ? P.sanctionsCost() : 0;\r",
+                "  const kpis = [\r",
+                "    {id:\"ep\", ic:\"$money\", k:t(\"ep\"), v:String(Math.floor(aEp.v)), an:aEp, s:sanct ? `+${P.epGain()} −${sanct}` : `+${P.epGain()}${t(\"perMo\")}`, c:\"fg\", tip:t(\"tipEp\"), sc:sanct ? \"bad\" : \"muted\"},\r",
+                "    {id:\"pc\", ic:\"$policy\", k:t(\"pc\"), v:String(Math.floor(aPc.v)), an:aPc, s:`+${P.pcGain()}${t(\"perMo\")}`, c:\"fg\", tip:t(\"tipPc\")},\r",
+                "  ];\r",
+                "  if (S.oreOn && P.matTotal){ const aOr = animNum(\"ore\", P.matTotal()); kpis.push({id:\"ore\", ic:\"$ore\", k:t(\"oreLbl\"), v:String(Math.round(aOr.v)), an:aOr, s:`+${Math.round(P.oreGain ? P.oreGain() : 0)}${t(\"perMo\")}`, c:\"fg\", tip:t(\"tipOre\"), fn:() => Screens.openWin(\"market\")}); }\r",
+                "  kpis.push({id:\"appr\", ic:\"$appr\", k:t(\"appr\"), v:`${aAp.v.toFixed(0)}%`, an:aAp, meter:S.appr / 100, c:acls, badge:P.angryCount && P.angryCount() ? \"!\" : null,\r",
+                "    tip:S.groups ? P.GROUPS.map(G => `[[${G.icon}]] ${Math.round(S.groups[G.id])}%`).join(\"  \") : t(\"tipAppr\"), fn:S.groups ? () => Screens.openWin(\"politics\") : null});\r",
+                "  const bw = KPI_W * kpis.length;\r",
+                "  this._kpiRect = {x:14, y:by, w:bw, h:KPI_H};\r",
+                "  W.glass(l, 14, by, bw, KPI_H, 12);\r",
+                "  kpis.forEach((q, i) => {\r",
+                "    const x = 14 + i * KPI_W, danger = q.id === \"appr\" && S.appr < 25, hov = q.fn && k.isHover(l, \"kpi-\" + q.id);\r",
+                "    if (i) k.rect(l, x, by + 9, 1, KPI_H - 18, \"line\");\r",
+                "    if (hov) k.rect(l, x + 3, by + 3, KPI_W - 6, KPI_H - 6, \"accent\", {r:9, a:.1});\r",
+                "    if (danger) k.rect(l, x + 3, by + 3, KPI_W - 6, KPI_H - 6, null, {r:9, stroke:\"bad\"});\r",
+                "    k.icon(l, q.ic, x + 9, by + 11, 24);\r",
+                "    k.text(l, q.k, x + 40, by + 4, {size:10.5, color:\"muted\", w:KPI_W - 60, max:1});\r",
+                "    const vr = k.text(l, q.v, x + 40, by + 18, {font:\"monoB\", size:18, color:q.c});\r",
+                "    if (q.meter !== undefined) W.meter(l, x + 44 + vr.w, by + 29, Math.max(18, KPI_W - 66 - vr.w), 4, q.meter, acls);\r",
+                "    else if (q.s) k.text(l, q.s, x + 46 + vr.w, by + 24, {font:\"mono\", size:10, color:q.sc || \"muted\", w:KPI_W - 52 - vr.w, max:1});\r",
+                "    if (q.an && q.an.d){ const dd = q.an.d, lab = `${dd > 0 ? \"+\" : \"−\"}${Math.abs(Math.round(dd))}`; k.text(l, lab, x + 40 + vr.w + 2, by + 6 - q.an.rise, {font:\"monoB\", size:11, color:dd > 0 ? \"good\" : \"bad\", a:q.an.fa}); }\r",
+                "    if (q.badge){ k.circle(l, x + 32, by + 12, 7, \"bad\"); k.text(l, q.badge, x + 25, by + 4, {font:\"monoB\", size:10, color:\"#ffffff\", w:14, align:\"center\"}); }\r",
+                "    if (q.fn){ k.icon(l, \"chevron-down\", x + KPI_W - 18, by + 16, 13, \"muted\"); k.hit(l, \"kpi-\" + q.id, x, by, KPI_W, KPI_H, () => { Audio.play(\"open\"); q.fn(); }); }\r",
+                "    else k.hit(l, \"kpi-\" + q.id, x, by, KPI_W, KPI_H, () => { UIM.kpiTip = UIM.kpiTip === q.id ? null : q.id; k.dirty(\"HUD\"); }, {cursor:false});   // tap (touch) shows what it is\r",
+                "  });\r",
+                "  this._hudTips.push(tl => {   // 3.5: drawn on the Alerts layer (above the HUD), so the ability bar never covers it\r",
+                "    // a value in the top bar: hover (or tap) shows what it is and how to get more\r",
+                "    const tipQ = kpis.find(q => q.tip && (k.isHover(l, \"kpi-\" + q.id) || UIM.kpiTip === q.id));\r",
+                "    if (tipQ){\r",
+                "      const i = kpis.indexOf(tipQ), tw = 280, tx = Math.min(14 + i * KPI_W, k.W - tw - 14), ty = by + KPI_H + 6;\r",
+                "      const th = 24 + (tipQ.s && !tipQ.meter ? 18 : 0) + k.textH(tipQ.tip, {size:12, w:tw - 24}) + 12 + (k.touch ? 18 : 0);\r",
+                "      k.rect(tl, tx, ty, tw, th, \"panel\", {r:10, stroke:\"line\", a:.97, bg:true});\r",
+                "      k.text(tl, tipQ.k, tx + 12, ty + 8, {font:\"bodyB\", size:13, w:tw - 24, max:1});\r",
+                "      let yy = ty + 28;\r",
+                "      if (tipQ.s && !tipQ.meter){ k.text(tl, tipQ.s, tx + 12, yy, {font:\"mono\", size:11.5, color:\"accent\"}); yy += 18; }\r",
+                "      k.text(tl, tipQ.tip, tx + 12, yy, {size:12, color:\"muted\", w:tw - 24, iconColor:\"muted\"});\r",
+                "      if (k.touch) k.text(tl, Screens.tapClose(), tx + 12, ty + th - 22, {size:11, color:\"muted\", w:tw - 24, max:1});   // 3.5\r",
+                "    }\r",
+                "  });\r",
+                "  /* ---- controls (right): date · speed · menu ---- */\r",
+                "  const has3 = P.Net && P.Net.owns(\"speed3\");\r",
+                "  const sp = [{id:\"sp0\", icon:\"pause\", on:S.speed === 0, fn:() => P.setSpeed(0)}, {id:\"sp1\", label:\"1×\", on:S.speed === 1, fn:() => P.setSpeed(1)}, {id:\"sp2\", label:\"2×\", on:S.speed === 2, fn:() => P.setSpeed(2)}];\r",
+                "  if (has3) sp.push({id:\"sp3\", label:\"3×\", on:S.speed === 3, fn:() => P.setSpeed(3)});\r",
+                "  const dateW = 112, ctrlW = 10 + dateW + 8 + sp.length * 34 + 8 + 30 + 10, cx0 = (k.W - 14) - ctrlW;\r",
+                "  W.glass(l, cx0, by, ctrlW, KPI_H, 12);\r",
+                "  const se = P.seasonOf ? P.seasonOf() : null;\r",
+                "  k.text(l, `${se ? `[[${se.icon}]] ` : \"\"}${P.dateStr()}`, cx0 + 10, by + 12, {font:\"dispS\", size:16, w:dateW, max:1, iconColor:\"accent\"});\r",
+                "  let cx = cx0 + 10 + dateW + 8;\r",
+                "  cx += W.seg(l, cx, by + 8, sp, {w:34}) + 8;\r",
+                "  W.hbtn(l, \"menu\", cx, by + 8, \"menu\", () => Screens.pause());\r",
+                "  /* ---- character + abilities, right under the money bar ---- */\r",
+                "  const ay = by + KPI_H + 6;\r",
+                "  this.abilityBar(l, 14, ay);\r",
+                "  /* ---- the newest news line, attached to the right of the ability bar ---- */\r",
+                "  const lg = S.log[0];\r",
+                "  if (lg){\r",
+                "    const key = S.log.length + \":\" + lg.tk;\r",
+                "    if (UIM.newsKey !== key){ UIM.newsKey = key; UIM.newsT = performance.now(); }\r",
+                "    const age = (performance.now() - UIM.newsT) / 1000, a = age < 6 ? 1 : Math.max(0, 1 - (age - 6) / 1.2);\r",
+                "    if (a > 0){\r",
+                "      const nx = 14 + 54 + 8, nw = bw - 54 - 8, col = {tc:\"accent\", al:\"bad\", gd:\"good\", ev:\"warn\", nw:\"fg\"}[lg.cls] || \"fg\";\r",
+                "      k.rect(l, nx, ay, nw, 28, \"glass\", {a:.9 * a, r:10, stroke:\"line\", bg:true});\r",
+                "      k.icon(l, \"newspaper\", nx + 10, ay + 7, 14, \"muted\", a);\r",
+                "      k.text(l, lg.txt, nx + 30, ay + 5, {size:12.5, color:col, w:nw - 40, max:1, a});\r",
+                "      k.hit(l, \"newsline\", nx, ay, nw, 28, () => Screens.setTab(\"news\"));\r",
+                "      if (!Screens._newsTimer) Screens._newsTimer = setTimeout(() => { Screens._newsTimer = null; k.dirty(\"HUD\"); }, age < 6 ? (6 - age) * 1000 + 30 : 120);\r",
+                "    }\r",
+                "  }\r",
+                "  /* Continuous World: this season's goals under the news line */\r",
+                "  if (S.world && S.goals && S.goals.length){\r",
+                "    const gx = 14 + 54 + 8, gy = ay + 34, gw = Math.min(300, bw - 62), won = S.goals.filter(g => g.won).length;\r",
+                "    const lines = S.goals.map(g => `${g.won ? \"[[circle-check]]\" : \"[[target]]\"} ${P.goalText(g)}`);\r",
+                "    let gh = 30; const hs = lines.map(s2 => k.text(null, s2, 0, 0, {size:12, w:gw - 24, measure:true}).h); gh += hs.reduce((a, b) => a + b + 4, 0) + 6;\r",
+                "    W.glass(l, gx, gy, gw, gh, 10); this._goalsBottom = gy + gh;\r",
+                "    k.text(l, `[[target]] ${P.up(t(\"goalsTitle\"))}`, gx + 12, gy + 8, {font:\"mono\", size:11, color:\"accent\", iconColor:\"accent\"});\r",
+                "    k.text(l, `${won}/${S.goals.length}`, gx + gw - 40, gy + 8, {font:\"mono\", size:11, color:won === S.goals.length ? \"good\" : \"muted\", w:28, align:\"right\"});\r",
+                "    let yy = gy + 28; lines.forEach((s2, i) => { k.text(l, s2, gx + 12, yy, {size:12, w:gw - 24, color:S.goals[i].won ? \"good\" : \"fg\", iconColor:S.goals[i].won ? \"good\" : \"muted\"}); yy += hs[i] + 4; });\r",
+                "  }\r",
+                "  if (P.Map.isCountryZoom()){\r",
+                "    const ht = `[[pointer]] ${t(\"tapCountry\")}`, hw = k.textW(ht, {size:11.5}) + 24, hx = (16 + (k.W - 16) - this.drawerWidth()) / 2 - hw / 2;\r",
+                "    k.rect(l, hx, k.H - 90, hw, 24, \"bg\", {r:12, a:.8, stroke:\"line\", bg:true});\r",
+                "    k.text(l, ht, hx + 12, k.H - 87, {size:11.5, color:\"muted\", iconColor:\"accent\"});\r",
+                "  }\r",
+                "  /* ---- bottom row ---- */\r",
+                "  const ny = k.H - 52, nh = 40, keys = P.hasKeyboard();\r",
+                "  // zoom (left)\r",
+                "  W.glass(l, 14, ny, 3 * 34 + 8, nh, 10);\r",
+                "  W.hbtn(l, \"zin\", 18, ny + 5, \"plus\", () => P.Map.zoomBy(1.35));\r",
+                "  W.hbtn(l, \"zout\", 52, ny + 5, \"minus\", () => P.Map.zoomBy(1 / 1.35));\r",
+                "  W.hbtn(l, \"zhome\", 86, ny + 5, \"locate-fixed\", () => P.Map.resetView());\r",
+                "  // tabs (right)\r",
+                "  const tabs = [[\"tech\", \"network\", \"nbTech\", \"T\"], [\"region\", \"map\", \"nbRegion\", \"R\"], [\"stats\", \"chart-line\", \"nbStats\", \"S\"], [\"news\", \"newspaper\", \"nbNews\", \"N\"]];\r",
+                "  const readyCount = P.SKILLS.filter(n => P.nodeState(n) === \"ready\" && (P.canAfford ? P.canAfford(n) : true)).length;\r",
+                "  let widths = tabs.map(([id, ic, key]) => { const lab = P.up(t(key)); return 14 + 16 + 6 + k.textW(lab, {font:\"dispS\", size:13}) + 14 + (id === \"tech\" && readyCount ? 26 : 0) + (keys ? 20 : 0); });\r",
+                "  // 3.7.3: when the Net Zero bar would be squeezed, the four tabs show icons only (the badge sits on the icon)\r",
+                "  const compact = (k.W - 14 - widths.reduce((a, b) => a + b, 0) - 18) - (14 + 3 * 34 + 18) < 560;\r",
+                "  if (compact) widths = tabs.map(() => 46);\r",
+                "  let nx = (k.W - 14) - widths.reduce((a, b) => a + b, 0) - 6 * (tabs.length - 1);\r",
+                "  const tabsX = nx;\r",
+                "  tabs.forEach(([id, ic, key, kk], i) => {\r",
+                "    const on = id === \"tech\" ? UIM.modal === \"skills\" : S.tab === id, hov = k.isHover(l, \"tab-\" + id), w = widths[i];\r",
+                "    k.rect(l, nx, ny, w, nh, on ? \"accent\" : \"glass\", {a:on ? 1 : .9, r:10, stroke:on ? \"accent\" : hov ? \"accent\" : \"line\", bg:true});\r",
+                "    const col = on ? \"ink\" : \"fg\";\r",
+                "    k.icon(l, ic, nx + (compact ? 15 : 14), ny + 12, 16, col);\r",
+                "    if (!compact){ const tx = W.runs(l, nx + 36, ny + 10, [[P.up(t(key)), {font:\"dispS\", size:13, color:col}]]); if (keys && !on) W.key(l, tx + 6, ny + 13, kk); }\r",
+                "    if (compact && id === \"tech\" && readyCount){ k.circle(l, nx + w - 9, ny + 9, 8, \"good\"); k.text(l, String(readyCount), nx + w - 17, ny + 2, {font:\"mono\", size:10, color:\"#04130c\", w:16, align:\"center\"}); }\r",
+                "    else if (id === \"tech\" && readyCount){ const bx2 = nx + w - 14 - 20; k.rect(l, bx2, ny + 11, 20, 18, \"good\", {r:9}); k.text(l, String(readyCount), bx2, ny + 12, {font:\"mono\", size:11, color:\"#04130c\", w:20, align:\"center\"}); }\r",
+                "    k.hit(l, \"tab-\" + id, nx, ny, w, nh, () => Screens.setTab(id));\r",
+                "    nx += w + 6;\r",
+                "  });\r",
+                "  // Net Zero + warming (centre, between zoom and tabs)\r",
+                "  const left = 14 + 3 * 34 + 8 + 10, room = tabsX - 10 - left, mw = Math.min(600, room), mx = Math.max(left, k.W / 2 - mw / 2 + Math.min(0, (tabsX - 10) - (k.W / 2 + mw / 2)));\r",
+                "  W.glass(l, mx, ny, mw, nh, 10); this._metersRect = {x:mx, y:ny, w:mw, h:nh};\r",
+                "  const half = (mw - 24 - 18) / 2;\r",
+                "  this.meterRowNZ(l, mx + 12, ny + 11, half);\r",
+                "  this.meterRowT(l, mx + 12 + half + 18, ny + 11, half);\r",
+                "  if (S.started && this.placeBar) this.placeBar(l, (S.world && S.goals && S.goals.length ? this._goalsBottom || 104 : 98) + 8);   // Continuous World: builds waiting to be placed\r",
+                "  k.dirty(\"Alerts\");   // 3.5: the tooltips above are drawn there\r",
+                "};\r",
+                "/* one slim row: title · bar · value (the Net Zero bar fills toward the trophy as CO₂ falls) */\r",
+                "/* 3.5: tooltips collected while drawing the HUD, drawn on the Alerts layer above it */\r",
+                "Screens.drawHudTips = function(l){ if (this.kind === \"game\") for (const f of this._hudTips || []) f(l); };\r",
+                "Screens.meterRowNZ = function(l, x, y, w){\r",
+                "  const NZ_MAX = 50, net = P.netCO2(), start = 36, pos = v => P.clamp(v / NZ_MAX, 0, 1);\r",
+                "  const cls = net <= 8 ? \"good\" : net <= 20 ? \"warn\" : \"bad\";\r",
+                "  const tr = k.text(l, w < 270 ? \"[[flag]]\" : `[[flag]] ${t(\"nzTitle\")}`, x, y + 1, {font:\"dispS\", size:12, max:1});   // narrow: icon only\r",
+                "  const vs = `${net.toFixed(1)}`, vw = k.textW(vs, {font:\"monoB\", size:15}), uw = k.textW(\" Gt\", {font:\"mono\", size:10});\r",
+                "  k.text(l, vs, x + w - vw - uw, y - 1, {font:\"monoB\", size:15, color:cls}); k.text(l, \" Gt\", x + w - uw, y + 4, {font:\"mono\", size:10, color:\"muted\"});\r",
+                "  const tx = x + tr.w + 10, tw = w - tr.w - vw - uw - 40, ty = y + 5, th = 8;\r",
+                "  if (tw < 30) return;\r",
+                "  k.hgrad(l, tx, ty, tw, th, [[0, \"#ff5448\"], [.5, \"#d9a62b\"], [1, \"#5fd39a\"]], {r:4, a:.17});\r",
+                "  const fw = tw * (1 - pos(net)); if (fw > 1) k.hgrad(l, tx, ty, Math.max(fw, 8), th, [[0, \"#e0302a\"], [.35, \"#e0612f\"], [.65, \"#d9a62b\"], [1, \"#1f9e78\"]], {r:4, span:tw});\r",
+                "  k.rect(l, tx + tw * (1 - pos(start)) - 1, ty - 3, 2, th + 6, \"fg\", {a:.4});\r",
+                "  const mx = tx + tw * (1 - pos(net)); k.circle(l, mx, ty + th / 2, 6, \"bg\"); k.circle(l, mx, ty + th / 2, 4, k.COL[cls]);\r",
+                "  k.icon(l, \"trophy\", tx + tw + 5, ty - 4, 14, \"good\");\r",
+                "};\r",
+                "Screens.meterRowT = function(l, x, y, w){\r",
+                "  const cls = S.temp >= 2.5 ? \"bad\" : S.temp >= 2.0 ? \"hot\" : S.temp >= 1.5 ? \"warn\" : \"good\";\r",
+                "  const tr = k.text(l, w < 270 ? \"[[$temp]]\" : `[[$temp]] ${t(\"tTitle\")}`, x, y + 1, {font:\"dispS\", size:12, max:1});\r",
+                "  const vs = `+${S.temp.toFixed(2)}`, vw = k.textW(vs, {font:\"monoB\", size:15}), uw = k.textW(\"°C\", {font:\"mono\", size:10});\r",
+                "  k.text(l, vs, x + w - vw - uw, y - 1, {font:\"monoB\", size:15, color:cls}); k.text(l, \"°C\", x + w - uw, y + 4, {font:\"mono\", size:10, color:\"muted\"});\r",
+                "  const tx = x + tr.w + 10, tw = w - tr.w - vw - uw - 40, ty = y + 5, th = 8;\r",
+                "  if (tw < 30) return;\r",
+                "  [[\"#5fd39a\", .32], [\"#f2b441\", .34], [\"#f07a3c\", .4], [\"#ff5448\", .5]].forEach(([c, a], i) => k.rect(l, tx + tw * i / 4, ty, tw / 4, th, c, {a, r:i === 0 || i === 3 ? 4 : 0}));\r",
+                "  const mx = tx + tw * P.clamp((S.temp - 1.0) / 2.0, 0, 1); k.circle(l, mx, ty + th / 2, 6, \"bg\"); k.circle(l, mx, ty + th / 2, 4, k.COL[cls]);\r",
+                "  k.icon(l, \"triangle-alert\", tx + tw + 5, ty - 4, 14, \"bad\");\r",
+                "};\r",
+                "\r",
+                "/* character portrait + ability buttons (left side of the map) */\r",
+                "Screens.abilityBar = function(l, x, y){\r",
+                "  const ch = CHAR[S.char]; if (!ch) return;\r",
+                "  const list = P.abilityList();\r",
+                "  const w = 54, h = 62 + list.length * 48;\r",
+                "  W.glass(l, x, y, w, h, 12);\r",
+                "  W.portrait(l, x + 5, y + 5, 44, S.char);\r",
+                "  k.rect(l, x + 30, y + 37, 22, 15, \"bg\", {r:4, stroke:ch.color, bg:true});\r",
+                "  k.text(l, String(S.charLv), x + 30, y + 37, {font:\"monoB\", size:10, color:ch.color, w:22, align:\"center\"});\r",
+                "  k.hit(l, \"charinfo\", x, y, w, 54, () => { UIM.abTip = UIM.abTip === \"char\" ? null : \"char\"; k.dirty(\"HUD\"); }, {cursor:true});\r",
+                "  let yy = y + 60;\r",
+                "  list.forEach(a => {\r",
+                "    const ready = P.abilityReady(a), cd = S.actCd[a.id] || 0, id = \"ab-\" + a.id, hov = k.isHover(l, id);\r",
+                "    const lockedLv = a.lock;\r",
+                "    k.rect(l, x + 7, yy, 40, 40, ready ? (hov ? \"accent\" : \"panel2\") : \"bg\", {r:9, stroke:ready ? \"accent\" : \"line\", bg:true, a:ready ? 1 : .9});\r",
+                "    k.icon(l, lockedLv ? \"lock\" : a.icon, x + 17, yy + 10, 20, ready ? (hov ? \"ink\" : \"accent\") : \"muted\", ready ? 1 : .55);\r",
+                "    if (cd > 0){ k.rect(l, x + 7, yy + 40 - 40 * Math.min(1, cd / a.cd), 40, 40 * Math.min(1, cd / a.cd), \"bad\", {r:4, a:.18}); k.text(l, String(cd), x + 7, yy + 24, {font:\"monoB\", size:10, color:\"warn\", w:40, align:\"center\"}); }\r",
+                "    else if (lockedLv) k.text(l, `Lv${lockedLv}`, x + 7, yy + 26, {font:\"mono\", size:9, color:\"muted\", w:40, align:\"center\"});\r",
+                "    k.hit(l, id, x + 7, yy, 40, 40, () => {\r",
+                "      if (ready){ if (P.useAbility(a.id)) UIM.abTip = null; }\r",
+                "      else { UIM.abTip = UIM.abTip === a.id ? null : a.id; Audio.play(\"error\"); }   // 3.5: a second tap closes it\r",
+                "      k.dirty();\r",
+                "    }, {cursor:true});\r",
+                "    if (hov || UIM.abTip === a.id){ const ty = yy - 4; this._hudTips.push(tl => this.abilityTip(tl, x + w + 8, ty, a)); }\r",
+                "    yy += 48;\r",
+                "  });\r",
+                "  if (UIM.abTip === \"char\") this._hudTips.push(tl => this.charTip(tl, x + w + 8, y));\r",
+                "};\r",
+                "/* 3.5: on touch screens a tooltip says how to close it */\r",
+                "Screens.tapClose = () => S.lang === \"th\" ? \"แตะที่ไหนก็ได้เพื่อปิด\" : \"Tap anywhere to close\";\r",
+                "Screens.abilityTip = function(l, x, y, a){\r",
+                "  const w = 270; let h = 0;\r",
+                "  const cd = S.actCd[a.id] || 0;\r",
+                "  const note = a.lock ? `${t(\"unlockAtLv\")} ${a.lock}` : cd ? `${t(\"cooldown\")} ${cd} ${t(\"months\")}` : a.target === \"country\" && !(S.selC && !S.selC.startsWith(\"R_\")) ? t(\"needCountry\") : `${t(\"cooldownLen\")} ${a.cd} ${t(\"months\")}`;\r",
+                "  const draw = (dry) => {\r",
+                "    let yy = y + 8;\r",
+                "    yy += k.text(dry ? null : l, L(a.name), x + 10, yy, {font:\"dispS\", size:14, w:w - 20, measure:dry}).h;\r",
+                "    yy += k.text(dry ? null : l, L(a.desc), x + 10, yy, {size:12, color:\"muted\", w:w - 20, lh:1.35, measure:dry}).h + 4;\r",
+                "    yy += k.text(dry ? null : l, note, x + 10, yy, {font:\"mono\", size:11, color:cd || a.lock ? \"warn\" : \"accent\", w:w - 20, measure:dry}).h;\r",
+                "    if (k.touch) yy += 4 + k.text(dry ? null : l, Screens.tapClose(), x + 10, yy + 4, {size:11, color:\"muted\", w:w - 20, max:1, measure:dry}).h;\r",
+                "    return yy - y + 8;\r",
+                "  };\r",
+                "  h = draw(true);\r",
+                "  k.rect(l, x, y, w, h, \"panel\", {r:9, stroke:\"accent\", sa:.6, bg:true}); draw(false);\r",
+                "};\r",
+                "Screens.charTip = function(l, x, y){\r",
+                "  const ch = CHAR[S.char], w = 290; const xp = P.Net ? P.Net.charXp(S.char) : 0;\r",
+                "  const draw = dry => {\r",
+                "    let yy = y + 8;\r",
+                "    yy += k.text(dry ? null : l, `${L(ch.person)} · ${L(ch.name)}`, x + 10, yy, {font:\"dispS\", size:14, w:w - 20, measure:dry}).h;\r",
+                "    yy += k.text(dry ? null : l, `${t(\"level\")} ${S.charLv} · XP ${xp}`, x + 10, yy, {font:\"mono\", size:11, color:\"accent\", w:w - 20, measure:dry}).h + 2;\r",
+                "    yy += k.text(dry ? null : l, `${t(\"passive\")}: ${L(ch.pas)}`, x + 10, yy, {size:12, color:\"muted\", w:w - 20, lh:1.35, measure:dry}).h;\r",
+                "    if (k.touch) yy += 4 + k.text(dry ? null : l, Screens.tapClose(), x + 10, yy + 4, {size:11, color:\"muted\", w:w - 20, max:1, measure:dry}).h;\r",
+                "    return yy - y + 8;\r",
+                "  };\r",
+                "  const h = draw(true);\r",
+                "  k.rect(l, x, y, w, h, \"panel\", {r:9, stroke:ch.color, sa:.7, bg:true}); draw(false);\r",
+                "};\r",
+                "\r",
+                "/* Net Zero meter: scale 0 (win, right) … 50 Gt (left). Marker = current net CO₂, ghost tick = 2026 level. */\r",
+                "Screens.meterNZ = function(l, x, y, w){\r",
+                "  const NZ_MAX = 50, net = P.netCO2(), start = 36, prev = S.hist.length > 12 ? S.hist[S.hist.length - 13].net : start;\r",
+                "  const trend = net - prev;\r",
+                "  let proj, projCls;\r",
+                "  if (trend < -0.05){ const yrs = net / -trend, yr = 2026 + (S.tick / 12) + yrs; proj = yr <= 2051 ? `${t(\"onTrack\")} ${Math.floor(yr)}` : t(\"offTrack\"); projCls = yr <= 2051 ? \"good\" : \"bad\"; }\r",
+                "  else { proj = t(\"rising\"); projCls = \"bad\"; }\r",
+                "  const pos = v => P.clamp(v / NZ_MAX, 0, 1);\r",
+                "  const nzCls = net <= 8 ? \"good\" : net <= 20 ? \"warn\" : \"bad\";\r",
+                "  const title = P.up(t(\"nzTitle\"));\r",
+                "  k.text(l, `[[flag]] ${title}`, x, y + 2, {font:\"dispS\", size:13});\r",
+                "  const vs = net.toFixed(1), vw = k.textW(vs, {font:\"monoB\", size:21}), uw = k.textW(\" Gt\", {font:\"mono\", size:12});\r",
+                "  k.text(l, vs, x + w - vw - uw, y - 4, {font:\"monoB\", size:21, color:nzCls});\r",
+                "  k.text(l, \" Gt\", x + w - uw, y + 4, {font:\"mono\", size:12, color:\"muted\"});\r",
+                "  const tx = x + 22, tw = w - 48, ty = y + 26, th = 16;\r",
+                "  k.hgrad(l, tx, ty, tw, th, [[0, \"#ff5448\"], [.5, \"#d9a62b\"], [1, \"#5fd39a\"]], {r:8, a:.17});\r",
+                "  const fillW = tw * (1 - pos(net));\r",
+                "  if (fillW > 1) k.hgrad(l, tx, ty, Math.max(fillW, 16), th, [[0, \"#e0302a\"], [.35, \"#e0612f\"], [.65, \"#d9a62b\"], [1, \"#1f9e78\"]], {r:8, span:tw});\r",
+                "  k.icon(l, \"trophy\", tx + tw + 6, ty - 1, 18, \"good\");\r",
+                "  const gx = tx + tw * (1 - pos(start));\r",
+                "  k.rect(l, gx - 1, ty - 3, 2, th + 6, \"fg\", {a:.45});\r",
+                "  const mx = tx + tw * (1 - pos(net)), mc = k.COL[nzCls];\r",
+                "  k.circle(l, mx, ty + th / 2, 12, mc, {a:.25});\r",
+                "  k.circle(l, mx, ty + th / 2, 9, \"bg\"); k.circle(l, mx, ty + th / 2, 6, mc);\r",
+                "  const fy = y + 48;\r",
+                "  W.runs(l, x, fy, [[`${t(\"vs2026\")} `, {size:11.5, color:\"muted\"}], [P.fmt(net - start), {font:\"monoB\", size:11.5, color:net < start ? \"good\" : \"bad\"}],\r",
+                "    [` · ${trend <= 0 ? \"▼\" : \"▲\"} `, {size:11.5, color:\"muted\"}], [P.fmt(trend), {font:\"monoB\", size:11.5, color:trend <= 0 ? \"good\" : \"bad\"}], [`/12${t(\"perMo\").replace(\"/\", \"\")}`, {size:11.5, color:\"muted\"}]]);\r",
+                "  const pw = k.textW(proj, {size:11.5});\r",
+                "  k.text(l, proj, x + w - pw, fy, {size:11.5, color:projCls});\r",
+                "};\r",
+                "/* Warming meter: +1.0 → +3.0 °C with coloured danger zones */\r",
+                "Screens.meterT = function(l, x, y, w){\r",
+                "  const monthsLeft = Math.max(0, P.TOTAL_TICKS - S.tick), yearsLeft = monthsLeft / 12;\r",
+                "  const tCls = S.temp >= 2.5 ? \"bad\" : S.temp >= 2.0 ? \"hot\" : S.temp >= 1.5 ? \"warn\" : \"good\";\r",
+                "  const title = P.up(t(\"tTitle\"));\r",
+                "  k.text(l, `[[thermometer]] ${title}`, x, y + 2, {font:\"dispS\", size:13});\r",
+                "  const vs = `+${S.temp.toFixed(2)}`, vw = k.textW(vs, {font:\"monoB\", size:21}), uw = k.textW(\"°C\", {font:\"mono\", size:12});\r",
+                "  k.text(l, vs, x + w - vw - uw, y - 4, {font:\"monoB\", size:21, color:tCls});\r",
+                "  k.text(l, \"°C\", x + w - uw, y + 4, {font:\"mono\", size:12, color:\"muted\"});\r",
+                "  const tx = x, tw = w - 26, ty = y + 24, th = 14;\r",
+                "  const zones = [[\"#5fd39a\", .28], [\"#f2b441\", .3], [\"#f07a3c\", .35], [\"#ff5448\", .45]];\r",
+                "  k.rect(l, tx, ty, tw, th, \"panel2\", {r:7});\r",
+                "  zones.forEach(([c, a], i) => k.rect(l, tx + tw * i / 4, ty, tw / 4, th, c, {a, r:i === 0 || i === 3 ? 7 : 0}));\r",
+                "  [\"1.5\", \"2.0\", \"2.5\"].forEach((s, i) => k.text(l, s, tx + tw * (i + 1) / 4 - 12, ty + th + 1, {font:\"mono\", size:9.5, color:\"muted\", w:24, align:\"center\"}));\r",
+                "  k.icon(l, \"triangle-alert\", tx + tw + 6, ty - 2, 18, \"bad\");\r",
+                "  const mx = tx + tw * P.clamp((S.temp - 1.0) / 2.0, 0, 1), mc = k.COL[tCls];\r",
+                "  k.circle(l, mx, ty + th / 2, 12, mc, {a:.25});\r",
+                "  k.circle(l, mx, ty + th / 2, 9, \"bg\"); k.circle(l, mx, ty + th / 2, 6, mc);\r",
+                "  const fy = y + 48;\r",
+                "  W.runs(l, x, fy, [[`${Math.max(0, 3 - S.temp).toFixed(2)}°C`, {font:\"monoB\", size:11.5, color:tCls}], [` ${t(\"toLose\")} (3.0°C)`, {size:11.5, color:\"muted\"}]]);\r",
+                "  const right = [[`${t(\"left\")} `, {size:11.5, color:\"muted\"}], [String(Math.floor(yearsLeft)), {font:\"monoB\", size:11.5}], [` ${t(\"yrs\")} ${monthsLeft % 12} ${t(\"months\")}`, {size:11.5, color:\"muted\"}]];\r",
+                "  W.runs(l, x + w - W.runsW(right), fy, right);\r",
+                "};\r",
+                "\r",
+                "/* ---- MapUI layer: region / country labels, hazard warnings, bubble timers, floating texts ---- */\r",
+                "const HZ_COL = {hurricane:\"#c3a6ff\", typhoon:\"#c3a6ff\", flood:\"#8fd0ff\", heat:\"#ff8a3c\", drought:\"#f2c14e\", wildfire:\"#ff5a4a\", saltwater:\"#4fd1c5\"};\r",
+                "Screens.renderMapUI = function(l){\r",
+                "  const Map = P.Map; if (!Map || !Map.scene) return;\r",
+                "  this._edgeAnim = false;\r",
+                "  if (this.kind === \"game\" && this.placeGrid) this.placeGrid(l);   // Continuous World: the hex grid under everything else\r",
+                "  if (this.kind === \"game\" && this.drawSeason) this.drawSeason(l);   // 3.7.4: snow, rain, smoke and heat haze of the season\r",
+                "  if (this.kind === \"game\" && this.drawRigs) this.drawRigs(l);   // 3.6: oil rigs and their flares\r",
+                "  if (this.kind === \"game\" && this.drawPins) this.drawPins(l);   // builds pinned on the map\r",
+                "  if (this.kind === \"game\" && this.drawTrains) this.drawTrains(l);   // 3.6: high-speed trains\r",
+                "  if (this.kind === \"game\"){\r",
+                "    const ry = 60, rb = k.H - 60, zoomed = Map.isCountryZoom();\r",
+                "    const leftLimit = 74, rightLimit = (k.W - 16) - this.drawerWidth();\r",
+                "    if (!zoomed){\r",
+                "      for (const r of S.regions){\r",
+                "        const [lat, lon] = RMETA[r.id].lab; const [sx, sy] = Map.latlonScreen(lat, lon);\r",
+                "        if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;\r",
+                "        const a = L(RMETA[r.id].name), b = `${r.co2.toFixed(1)} Gt`;   // 3.3: continent names, not codes\r",
+                "        const w = k.textW(a, {font:\"bodyB\", size:11}) + 5 + k.textW(b, {font:\"mono\", size:11}) + 16 + (S.alli[r.id] ? 18 : 0), h = 21;\r",
+                "        const x = sx - w / 2, y = sy - h / 2, sel = !S.noSel && S.sel === r.id, hov = k.isHover(l, \"lab-\" + r.id);\r",
+                "        if (sel) k.rect(l, x - 3, y - 3, w + 6, h + 6, \"accent\", {r:9, a:.22, bg:true});\r",
+                "        k.rect(l, x, y, w, h, \"bg\", {a:.8, r:7, stroke:sel || hov ? \"accent\" : \"line\", bg:true});\r",
+                "        const ex = W.runs(l, x + 8, y + 2, [[a, {font:\"bodyB\", size:11}]]);\r",
+                "        const ex2 = W.runs(l, ex + 5, y + 2, [[b, {font:\"mono\", size:11, color:\"hot\"}]]);\r",
+                "        if (S.alli[r.id]) k.icon(l, \"handshake\", ex2 + 4, y + 4, 13, \"good\");\r",
+                "        k.hit(l, \"lab-\" + r.id, x, y, w, h, () => Screens.selectRegion(r.id, true));\r",
+                "      }\r",
+                "    } else {\r",
+                "      // country labels (major countries in view) with a relation dot\r",
+                "      // 3.7.2: label tiers — main countries always, smaller ones only when zoomed in closer; overlapping labels are skipped\r",
+                "      const zz = Map.cam.z, placed = [];\r",
+                "      for (const c of S.countries.filter(x => !x.rest).sort((a, b) => (S.selC === b.id) - (S.selC === a.id) || COUNTRY[b.id].w - COUNTRY[a.id].w)){\r",
+                "        if (c.rest) continue;\r",
+                "        const pt = P.countryPoint(c.id); if (!pt) continue;\r",
+                "        const [sx, sy] = Map.toScreen(pt[0], pt[1]);\r",
+                "        if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;\r",
+                "        const sel0 = S.selC === c.id;\r",
+                "        if (!sel0 && COUNTRY[c.id].w < (zz >= 4 ? 0 : zz >= 3.2 ? 40 : zz >= 2.4 ? 100 : 250)) continue;\r",
+                "        const nm = L(SHORT[c.id] || COUNTRY[c.id].name), sel = sel0;\r",
+                "        const w = k.textW(nm, {font:\"bodyB\", size:10.5}) + 22, h = 18;\r",
+                "        if (!sel && placed.some(q => Math.abs(q[0] - sx) < (w + q[2]) / 2 + 4 && Math.abs(q[1] - sy) < 20)) continue;\r",
+                "        placed.push([sx, sy, w]);\r",
+                "        const x = sx - w / 2, y = sy - h / 2;\r",
+                "        k.rect(l, x, y, w, h, \"bg\", {a:sel ? .92 : .66, r:9, stroke:sel ? \"accent\" : null, bg:true});\r",
+                "        k.circle(l, x + 9, y + 9, 3.5, W.relCol(c.rel));\r",
+                "        k.text(l, nm, x + 16, y + 1, {font:\"bodyB\", size:10.5, color:sel ? \"accent\" : \"fg\"});\r",
+                "        k.hit(l, \"cl-\" + c.id, x, y, w, h, () => Screens.selectCountry(c.id));\r",
+                "      }\r",
+                "      // 3.8: capitals (gold stars, like the website): only closer in than the country names, and only for countries whose\r",
+                "      // name already shows; the capital's own name comes in closer still\r",
+                "      if (zz >= 2.4 && P.CAPITALS){\r",
+                "        const tier = zz >= 4 ? 0 : zz >= 3.2 ? 40 : 100, names = zz >= 3.2, th = S.lang === \"th\", capNames = [];\r",
+                "        for (const [id, cp] of Object.entries(P.CAPITALS)){\r",
+                "          const cc = COUNTRY[id]; if (!cc || (cc.w < tier && S.selC !== id)) continue;\r",
+                "          const [sx, sy] = Map.latlonScreen(cp[0], cp[1]);\r",
+                "          if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;\r",
+                "          if (placed.some(q => Math.abs(q[0] - sx) < q[2] / 2 + 5 && Math.abs(q[1] - sy) < 14)) continue;   // never under a country's name tag\r",
+                "          k.circle(l, sx, sy, 6, \"bg\", {a:.75});\r",
+                "          k.icon(l, \"star\", sx - 5, sy - 5, 10, \"gold\");\r",
+                "          if (!names) continue;\r",
+                "          const nm = th ? cp[2] : cp[3], nw = k.textW(nm, {size:10});\r",
+                "          if (placed.some(q => sx + 9 < q[0] + q[2] / 2 && sx + 9 + nw > q[0] - q[2] / 2 && Math.abs(q[1] - sy) < 16) || capNames.some(q => sx + 9 < q[0] + q[2] && sx + 9 + nw > q[0] && Math.abs(q[1] - sy) < 13)) continue;   // names that would overlap are left out\r",
+                "          capNames.push([sx + 9, sy, nw]);\r",
+                "          k.text(l, nm, sx + 9, sy - 8, {size:10, color:\"#f3e2b0\", max:1});\r",
+                "        }\r",
+                "      }\r",
+                "    }\r",
+                "    // 3.8: the stage of each tropical cyclone under it (depression → tropical storm → typhoon / hurricane / cyclone)\r",
+                "    if (P.stormList && P.Life && P.Life.storms) for (const st of P.stormList()){\r",
+                "      const o = P.Life.storms[st.id]; if (!o || !o.m.visible) continue;\r",
+                "      const [sx, sy] = Map.toScreen(o.sx, o.sy + o.D * .42);\r",
+                "      if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;\r",
+                "      const nm = L(st.name), tw = k.textW(nm, {font:\"bodyB\", size:11}) + 14;\r",
+                "      k.rect(l, sx - tw / 2, sy - 1, tw, 19, \"bg\", {a:.7, r:9, bg:true});\r",
+                "      k.text(l, nm, sx - tw / 2 + 7, sy, {font:\"bodyB\", size:11, color:st.stage === 2 ? \"#ffd2c4\" : \"fg\"});\r",
+                "    }\r",
+                "    // hazard forecasts: pulsing ring + icon + months left; tap = evacuate\r",
+                "    const now = performance.now() / 1000;\r",
+                "    for (const h of S.haz || []){\r",
+                "      const pt = P.countryPoint(h.c); if (!pt) continue;\r",
+                "      const [sx, sy0] = Map.toScreen(pt[0], pt[1]); const sy = sy0 - 26;\r",
+                "      if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;\r",
+                "      const Z = HAZARDS[h.type], col = HZ_COL[h.type] || \"#ff5a4a\", left = Math.max(0, h.at - S.tick);\r",
+                "      const ph = (now * 1.6) % 1;\r",
+                "      k.circle(l, sx, sy, 16 + ph * 16, col, {a:(1 - ph) * .35});\r",
+                "      k.circle(l, sx, sy, 17, \"bg\", {stroke:col, sw:2, a:.92});\r",
+                "      k.icon(l, Z.icon, sx - 10, sy - 10, 20, col);\r",
+                "      const lab = h.evac ? `[[check]] ${t(\"evacShort\")}` : `${left} ${t(\"moShort\")} · ${t(\"evacShort\")} ${IC.ep}${P.evacCost()}`;\r",
+                "      const lw = k.textW(lab, {font:\"mono\", size:10}) + 12;\r",
+                "      k.rect(l, sx - lw / 2, sy + 20, lw, 17, h.evac ? \"good\" : \"bg\", {a:h.evac ? .9 : .86, r:5, stroke:col, bg:true});\r",
+                "      k.text(l, lab, sx - lw / 2, sy + 21, {font:\"mono\", size:10, color:h.evac ? \"#04130c\" : \"fg\", w:lw, align:\"center\", iconColor:\"#04130c\"});\r",
+                "      k.hit(l, \"hz-\" + h.id, sx - Math.max(22, lw / 2), sy - 20, Math.max(44, lw), 58, () => { if (!h.evac){ if (P.evacuate(h.id)) Map.floatText(sx, sy - 20, t(\"evacuated\"), \"good\"); } });\r",
+                "    }\r",
+                "    for (const b of S.bubbles){\r",
+                "      const o = Map.bubbles[b.id]; if (!o) continue;\r",
+                "      const [sx, sy] = Map.toScreen(o.getX(), o.getVariables().get(\"BaseY\").getAsNumber());\r",
+                "      if (sy < ry || sy > rb) continue;\r",
+                "      const txt = b.type === \"red\" ? `${IC.ep}−${P.aidCost()} · ${b.ttl}` : `${b.ttl}`;\r",
+                "      const w = k.textW(txt, {font:\"mono\", size:10}) + 8;\r",
+                "      k.rect(l, sx - w / 2, sy + 3, w, 16, \"bg\", {a:.8, r:4, bg:true});\r",
+                "      k.text(l, txt, sx - w / 2, sy + 4, {font:\"mono\", size:10, w, align:\"center\"});\r",
+                "    }\r",
+                "    // hazard strike animation\r",
+                "    for (const f of Map.fx){\r",
+                "      const [sx, sy] = Map.toScreen(f.x, f.y), p = f.t / 2.2, Z = HAZARDS[f.type], col = HZ_COL[f.type] || \"#ff5a4a\";\r",
+                "      const a = p < .8 ? 1 : 1 - (p - .8) / .2;\r",
+                "      // weather over the struck country (web/src/map2d.js weatherFx, lighter)\r",
+                "      { const R = 70 * Math.sqrt(Map.cam.z), wa = p < .15 ? p / .15 : p > .75 ? (1 - p) / .25 : 1, T = f.type, now = performance.now() / 1000, low = P.Gfx && P.Gfx.level === \"low\";\r",
+                "        f.seed = f.seed || Array.from({length:120}, () => Math.random());\r",
+                "        for (let i = 0; i < 3; i++){ const q = p * 1.6 - i * .18; if (q > 0 && q < 1) k.circle(l, sx, sy, 12 + q * R * 1.4, null, {stroke:col, sw:3 * (1 - q) + .5, sa:(1 - q) * .8}); }\r",
+                "        if (T === \"flood\" || T === \"hurricane\" || T === \"typhoon\"){\r",
+                "          for (let i = 0, n = low ? 20 : 50; i < n; i++){ const rx = sx + (f.seed[i] * 2 - 1) * R, ry = sy - R + ((now * 380 + f.seed[i + 60] * 1000) % (2 * R)); k.line(l, rx, ry, rx - 4, ry + 12, \"#aad2ff\", {w:1.2, a:wa * .8}); }\r",
+                "          if (T === \"flood\") k.circle(l, sx, sy + 6, R * .6 * wa, \"#3c78c8\", {a:.22});\r",
+                "        } else if (T === \"heat\" || T === \"drought\"){\r",
+                "          k.circle(l, sx, sy, R * 1.2, T === \"heat\" ? \"#ff7828\" : \"#e6b450\", {a:.28 * wa});\r",
+                "          for (let i = 0; i < 6; i++){ const yy = sy - R * .6 + i * R * .22, pts = []; for (let xx = -R * .7; xx <= R * .7; xx += 8) pts.push(sx + xx, yy + Math.sin(xx * .08 + now * 4 + i) * 3); k.path(l, pts, T === \"heat\" ? \"#ffc88c\" : \"#e6c88c\", {w:1.5, a:wa * .7}); }\r",
+                "        } else if (T === \"wildfire\"){\r",
+                "          k.circle(l, sx, sy, R, \"#ff5a1e\", {a:.3 * wa});\r",
+                "          for (let i = 0, n = low ? 18 : 40; i < n; i++){ const q = (now * .7 + f.seed[i]) % 1, ex = sx + (f.seed[i + 50] * 2 - 1) * R * .7 + Math.sin(now * 3 + i) * 6, ey = sy + R * .3 - q * R * 1.2; k.circle(l, ex, ey, 1.5 + (1 - q) * 1.6, (255 << 16) | (Math.round(140 + 100 * (1 - q)) << 8) | 60, {a:(1 - q) * wa}); }\r",
+                "        } else if (T === \"saltwater\"){\r",
+                "          for (let i = 0; i < 4; i++){ const yy = sy - R * .3 + i * R * .2, pts = []; for (let xx = -R * .8; xx <= R * .8; xx += 6) pts.push(sx + xx, yy + Math.sin(xx * .06 + now * 3 + i) * 5); k.path(l, pts, \"#4fd1c5\", {w:2, a:wa * .7}); }\r",
+                "        }\r",
+                "      }\r",
+                "      k.circle(l, sx, sy, 20 + p * 70, col, {a:(1 - p) * .25});\r",
+                "      k.circle(l, sx, sy, 10 + p * 40, null, {stroke:col, sw:2, sa:(1 - p) * .9});\r",
+                "      const swing = Math.sin(p * Math.PI * 2) * 36, size = 34 + 10 * Math.sin(p * Math.PI);\r",
+                "      k.icon(l, Z.icon, sx - size / 2 + swing, sy - size / 2 - 6, size, col, a, (f.type === \"hurricane\" || f.type === \"typhoon\") ? p * 720 : 0);\r",
+                "    }\r",
+                "  }\r",
+                "  for (const f of Map.floats){\r",
+                "    const p = f.t / 1.2, a = p < .7 ? 1 : 1 - (p - .7) / .3;\r",
+                "    const col = f.color === \"good\" ? \"good\" : f.color === \"bad\" ? \"bad\" : \"accent\";\r",
+                "    const w = k.textW(f.txt, {font:\"monoB\", size:14});\r",
+                "    k.text(l, f.txt, f.x - w / 2, f.y - 18 - p * 40, {font:\"monoB\", size:14, color:col, a, iconColor:col});\r",
+                "  }\r",
+                "  if (this.kind === \"game\"){ if (this.edgeArrows) this.edgeArrows(l); if (this.mapHover) this.mapHover(l); }\r",
+                "};\r",
                 ""
               ],
               "parameterObjects": "",
@@ -39470,7 +39470,7 @@
                 "  Photo.setTheme();",
                 "  // the regions become a light heat tint over the photo (web: alpha .2, night .18, paint .26)",
                 "  const th = Photo.theme, a = th === \"night\" ? .18 : th === \"paint\" ? .26 : .2;",
-                "  const sel = this.mode === \"game\" ? S.sel : null;",
+                "  const sel = this.mode === \"game\" && !S.noSel ? S.sel : null;",
                 "  for (const r of S.regions){",
                 "    const col = P.heatRGB(P.regionHeatValue(r)), tm = Photo.tints && Photo.tints[r.id], o = this.regions[r.id];",
                 "    if (tm){ tm.material.color.setRGB(col[0] / 255, col[1] / 255, col[2] / 255, THREE.SRGBColorSpace); tm.material.opacity = sel === r.id ? a + .12 : a; }",

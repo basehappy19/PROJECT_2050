@@ -314,7 +314,7 @@ Screens.renderMapUI = function(l){
         if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;
         const a = L(RMETA[r.id].name), b = `${r.co2.toFixed(1)} Gt`;   // 3.3: continent names, not codes
         const w = k.textW(a, {font:"bodyB", size:11}) + 5 + k.textW(b, {font:"mono", size:11}) + 16 + (S.alli[r.id] ? 18 : 0), h = 21;
-        const x = sx - w / 2, y = sy - h / 2, sel = S.sel === r.id, hov = k.isHover(l, "lab-" + r.id);
+        const x = sx - w / 2, y = sy - h / 2, sel = !S.noSel && S.sel === r.id, hov = k.isHover(l, "lab-" + r.id);
         if (sel) k.rect(l, x - 3, y - 3, w + 6, h + 6, "accent", {r:9, a:.22, bg:true});
         k.rect(l, x, y, w, h, "bg", {a:.8, r:7, stroke:sel || hov ? "accent" : "line", bg:true});
         const ex = W.runs(l, x + 8, y + 2, [[a, {font:"bodyB", size:11}]]);

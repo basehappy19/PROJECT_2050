@@ -285,7 +285,7 @@ const Map = {
   },
   refresh(){
     if (!this.scene || !S.regions) return;
-    const sel = this.mode === "game" ? S.sel : null, th = theme();
+    const sel = this.mode === "game" && !S.noSel ? S.sel : null, th = theme();
     const pal = th === "paint" ? HEAT_PAINT : th === "night" ? HEAT_NIGHT : HEAT;
     for (const r of S.regions){
       const o = this.regions[r.id]; if (!o) continue;
@@ -444,7 +444,7 @@ const Map = {
       this._ck = key; this.applyCam(); Kit.dirty("MapUI");
       if (this.borders) this.borders.getRendererObject().alpha = clamp((this.cam.z - 1.05) / (ZCOUNTRY - 1.05), 0, 1);
       if (this.borders3) this.borders3.material.opacity = .75 * clamp((this.cam.z - 1.05) / (ZCOUNTRY - 1.05), 0, 1);
-      if (wasC !== isC){ Kit.dirty("HUD"); for (const r of S.regions){ const ln = this.lines[r.id]; if (ln) ln.hide(S.sel !== r.id || isC); const l3 = this.regLines3 && this.regLines3[r.id]; if (l3) l3.visible = this.mode === "game" && S.sel === r.id && !isC; } this.drawSelected(); }
+      if (wasC !== isC){ Kit.dirty("HUD"); for (const r of S.regions){ const ln = this.lines[r.id]; if (ln) ln.hide(S.sel !== r.id || isC || S.noSel); const l3 = this.regLines3 && this.regLines3[r.id]; if (l3) l3.visible = this.mode === "game" && S.sel === r.id && !isC && !S.noSel; } this.drawSelected(); }
     }
     if (this.floats.length){ this.floats.forEach(f => f.t += dt); this.floats = this.floats.filter(f => f.t < 1.2); Kit.dirty("MapUI"); }
     if (this.fx.length){ this.fx.forEach(f => f.t += dt); this.fx = this.fx.filter(f => f.t < 2.2); Kit.dirty("MapUI"); }

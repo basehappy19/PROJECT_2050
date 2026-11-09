@@ -211,22 +211,22 @@ Object.assign(Screens, {
   selectRegion(id, zoom = false){
     Audio.play("select");
     if (S.sel !== id) S.selC = null;
-    S.sel = id; S.tab = "region"; P.Map.focus(id, zoom); const dl = k.L("DrawerScroll"); if (dl) dl.scroll = 0; P.changed();
+    S.sel = id; S.noSel = false; S.tab = "region"; P.Map.focus(id, zoom); const dl = k.L("DrawerScroll"); if (dl) dl.scroll = 0; P.changed();
   },
   selectCountry(id){
     Audio.play("select");
     const c = P.C(id); if (!c) return;
-    S.sel = c.reg; S.selC = id; S.tab = "region"; P.Map.focusCountry(id); const dl = k.L("DrawerScroll"); if (dl) dl.scroll = 0; P.changed();
+    S.sel = c.reg; S.selC = id; S.noSel = false; S.tab = "region"; P.Map.focusCountry(id); const dl = k.L("DrawerScroll"); if (dl) dl.scroll = 0; P.changed();
   },
   setTab(tab){
     if (tab === "tech"){ this.openSkills(); return; }
     Audio.play(S.tab === tab ? "close" : "open");
-    S.tab = S.tab === tab ? null : tab;
+    if (S.tab === "region" && tab === "region"){ S.selC = null; S.noSel = true; } S.tab = S.tab === tab ? null : tab; if (S.tab === "region") S.noSel = false;
     const dl = k.L("DrawerScroll"); if (dl) dl.scroll = 0;
     if (S.tab === "region") P.Map.focus(S.sel, false); else if (!S.tab) P.Map.recenter();
     P.changed();
   },
-  closeTab(){ Audio.play("close"); S.tab = null; P.Map.recenter(); P.changed(); },
+  closeTab(){ Audio.play("close"); if (S.tab === "region"){ S.selC = null; S.noSel = true; } S.tab = null; P.Map.recenter(); P.changed(); },
   openSkills(){ if (!S.started || S.over || S.event || (UIM.modal && UIM.modal !== "skills")) return; Audio.play("skillsOpen"); UIM.modal = "skills"; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); },
   closeSkills(){ if (UIM.modal !== "skills") return; Audio.play("skillsClose"); UIM.modal = null; k.dirty(); },
   goScene(name){ this.scene.getVariables().get("GoTo").setString(name); },
@@ -275,7 +275,7 @@ Object.assign(Screens, {
       else if (m === "learn") this.closeLearn();
       else if (m === "story") this.storyNext();
       else if (m === "skills") this.closeSkills();
-      else if (S.tab){ S.tab = null; P.Map.recenter(); P.changed(); }
+      else if (S.tab) this.closeTab();
       else if (!S.event && !S.over && !m) this.pause();
       return;
     }

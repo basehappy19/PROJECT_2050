@@ -78,13 +78,13 @@ export const G = P.Game = {
   setTab(tab){
     if (tab === "tech"){ this.openSkills(); return; }
     Audio.play(S.tab === tab ? "close" : "open");
-    S.tab = S.tab === tab ? null : tab; this.scrollDrawer();
+    if (S.tab === "region" && tab === "region"){ S.selC = null; S.noSel = true; } S.tab = S.tab === tab ? null : tab; this.scrollDrawer();
     if (S.tab === "region") S.noSel = false;
     if (S.tab === "news" && P.readNews && P.readNews()) Audio.play("coin");
     if (S.tab === "region") GameMap.focus(S.sel, false); else if (!S.tab) GameMap.recenter();
     P.changed();
   },
-  closeTab(){ if (!S.tab) return; Audio.play("close"); S.tab = null; GameMap.recenter(); P.changed(); },
+  closeTab(){ if (!S.tab) return; Audio.play("close"); if (S.tab === "region"){ S.selC = null; S.noSel = true; } S.tab = null; GameMap.recenter(); P.changed(); },
   scrollDrawer(){ const d = document.querySelector(".drawer .scroll"); if (d) d.scrollTop = 0; },
   openSkills(){ if (!S.started || S.over || S.event || (UIM.modal && UIM.modal !== "skills")) return; Audio.play("skillsOpen"); UIM.modal = "skills"; bump(); },
   closeSkills(){ if (UIM.modal !== "skills") return; Audio.play("skillsClose"); UIM.modal = null; bump(); },

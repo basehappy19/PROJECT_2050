@@ -372,7 +372,7 @@ Map.refresh = function(){
   Photo.setTheme();
   // the regions become a light heat tint over the photo (web: alpha .2, night .18, paint .26)
   const th = Photo.theme, a = th === "night" ? .18 : th === "paint" ? .26 : .2;
-  const sel = this.mode === "game" ? S.sel : null;
+  const sel = this.mode === "game" && !S.noSel ? S.sel : null;
   for (const r of S.regions){
     const col = P.heatRGB(P.regionHeatValue(r)), tm = Photo.tints && Photo.tints[r.id], o = this.regions[r.id];
     if (tm){ tm.material.color.setRGB(col[0] / 255, col[1] / 255, col[2] / 255, THREE.SRGBColorSpace); tm.material.opacity = sel === r.id ? a + .12 : a; }
