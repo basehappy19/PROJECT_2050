@@ -53,3 +53,7 @@ export const newCode = () => {
   const s = Array.from(b, x => A[x % A.length]).join("");
   return `P2050-${s.slice(0, 4)}-${s.slice(4)}`;
 };
+
+/* app sign-in through the website: an 8-letter code the player compares (no look-alike letters) and a secret device id */
+export const newLinkCode = () => { const A = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789", b = crypto.randomBytes(8); return Array.from(b, x => A[x % A.length]).join(""); };
+export const linkDevice = () => crypto.randomBytes(32).toString("base64url");

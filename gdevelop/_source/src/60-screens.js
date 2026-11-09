@@ -202,6 +202,8 @@ P.Gfx = {
 
 /* ---------------------------- actions ---------------------------- */
 const Screens = P.Screens = P.Screens || {};
+/* 2.4: open a web page in the device's own browser (GDevelop: Electron → default browser, Android / iOS → system browser) */
+P.openUrl = url => { try { gdjs.evtTools.window.openURL(url, Screens.scene); } catch(e){ window.open(url, "_blank"); } };
 Object.assign(Screens, {
   scene:null, kind:null,
   drawerWidth(){ return this.kind === "game" && S.tab ? 420 : 0; },

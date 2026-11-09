@@ -162,3 +162,20 @@ P.END2 = {
 };
 /* tier: 0 = 10 good years or fewer · 1 = 11–20 · 2 = 21+ */
 P.endTier = n => (n <= 10 ? 0 : n <= 20 ? 1 : 2);
+/* 2.4: sign in from an app (GDevelop preview, Android / desktop) through the website, where Google sign-in works */
+Object.assign(P.UI, {
+  linkGoogle:T("เข้าสู่ระบบด้วย Google ผ่านเว็บไซต์", "Sign in with Google on the website"),
+  linkWhy:T("Google ไม่ให้เข้าสู่ระบบในแอปโดยตรง เกมจะเปิดเว็บไซต์ในเบราว์เซอร์ให้", "Google doesn't allow signing in inside apps, so the game opens the website in your browser"),
+  linkWait:T("เข้าสู่ระบบบนเว็บไซต์ที่เปิดขึ้น แล้วกดยืนยันรหัสนี้", "Sign in on the website that just opened, then confirm this code"),
+  linkWaiting:T("กำลังรอการยืนยันจากเว็บไซต์...", "Waiting for the website..."),
+  linkOpenAgain:T("เปิดเว็บไซต์อีกครั้ง", "Open the website again"),
+  linkCancel:T("ยกเลิก", "Cancel"),
+  linkTitle:T("เข้าสู่ระบบในเกม", "Sign in the game"),
+  linkCheck:T("ตรวจว่ารหัสนี้ตรงกับรหัสที่ขึ้นในเกม ถ้าคุณไม่ได้กดเข้าสู่ระบบในเกมเองเมื่อสักครู่ อย่ากดยืนยัน", "Check that this code matches the one in your game. If you didn't just press sign in in the game yourself, don't confirm."),
+  linkSignInFirst:T("เข้าสู่ระบบบัญชีของคุณก่อน (ใช้ Google ได้) แล้วกดยืนยัน", "Sign in to your account first (Google works here), then confirm"),
+  linkConfirm:T("ยืนยัน ให้เกมเข้าสู่ระบบด้วยบัญชีนี้", "Confirm: sign the game in with this account"),
+  linkDone:T("เรียบร้อย กลับไปที่เกมได้เลย เกมจะเข้าสู่ระบบให้เอง", "Done. Go back to the game, it signs in by itself"),
+  linkNoCode:T("ลิงก์นี้ไม่มีรหัส กดเข้าสู่ระบบในเกมใหม่อีกครั้ง", "This link has no code. Press sign in in the game again"),
+  err_link_expired:T("รหัสนี้หมดอายุหรือใช้ไปแล้ว กดเข้าสู่ระบบในเกมใหม่อีกครั้ง", "This code has expired or was already used. Press sign in in the game again"),
+  err_link_used:T("รหัสนี้ถูกยืนยันด้วยบัญชีอื่นไปแล้ว", "This code was already confirmed with another account"),
+});

@@ -91,7 +91,7 @@ Screens.accountChip = function(l){
   W.terra(l, (k.W - 16) - w + 16 + tw + 16, y + 8, terra, {size:14, color:"good"});
   k.hit(l, id, (k.W - 16) - w, y, w, 36, () => { Audio.play("click"); UIM.sub = "account"; UIM.msg = ""; k.dirty(); });
 };
-const back = (l, y) => { W.btn(l, "back", 0, y, t("mBack"), () => { UIM.sub = null; UIM.msg = ""; k.dirty(); const s = k.L("MenuScroll"); if (s) s.scroll = 0; }, {kind:"ghost"}); return 36; };
+const back = () => 0;   // 3.x: every sub-page has its back arrow at the top (menuCard), so no second one at the bottom
 const msgLine = (l, y, w) => UIM.msg ? k.text(l, UIM.msg, 0, y, {size:12.5, color:UIM.err ? "bad" : "good", w}).h + 8 : 0;
 const go = sub => () => { UIM.sub = sub; UIM.msg = ""; UIM.err = false; const s = k.L("MenuScroll"); if (s) s.scroll = 0; if (sub === "board") P.Net.loadBoard(); if (sub === "season") P.Net.loadSeason(); if (sub === "cert") P.Net.loadCerts(); if (sub === "shop" || sub === "account") P.Net.refresh(); k.dirty(); };
 
@@ -249,6 +249,20 @@ const val = key => { const g = UIM.inputs && UIM.inputs[key]; return g && g.getS
 Screens.subAccount = function(l, y, w){
   const N = P.Net;
   if (!N.online){ y += k.text(l, t("netOfflineLong"), 0, y, {size:13, color:"muted", w}).h + 12; return y + back(l, y); }
+  if (!N.user && N.link){   // 2.4: waiting for the player to confirm on the website
+    const L = N.link, left = Math.max(0, Math.round((L.until - Date.now()) / 1000));
+    k.rect(l, 0, y, w, 150, "panel", {r:12, a:.92, stroke:"accent", bg:true});
+    k.text(l, t("linkWait"), 16, y + 14, {size:13, color:"muted", w:w - 32, align:"center"});
+    k.text(l, L.code, 0, y + 52, {font:"monoB", size:34, color:"accent", w, align:"center"});
+    k.text(l, `${t("linkWaiting")}  ${Math.floor(left / 60)}:${String(left % 60).padStart(2, "0")}`, 0, y + 114, {size:12, color:"muted", w, align:"center"});
+    y += 150 + 12;
+    const hw = (w - 8) / 2;
+    W.btn(l, "link-open", 0, y, `[[globe]] ${t("linkOpenAgain")}`, () => N.openUrl(L.url), {w:hw, kind:"ghost"});
+    W.btn(l, "link-cancel", hw + 8, y, `[[x]] ${t("linkCancel")}`, () => N.linkCancel(), {w:hw, kind:"ghost"});
+    y += 46; y += msgLine(l, y, w);
+    if (!this._linkTick){ this._linkTick = setInterval(() => { if (P.Net.link) k.dirty(); else { clearInterval(this._linkTick); this._linkTick = null; } }, 1000); }   // the countdown
+    return y;
+  }
   if (!N.user){
     const tab = UIM.accTab || "login";
     W.tabs(l, 0, y, [{id:"at-login", label:t("signIn"), on:tab === "login", fn:() => { UIM.accTab = "login"; UIM.msg = ""; k.dirty(); }},
@@ -277,11 +291,11 @@ Screens.subAccount = function(l, y, w){
     if (N.cfg && N.cfg.googleClientId){
       k.line(l, 0, y + 10, w, y + 10, "line"); k.rect(l, w / 2 - 22, y + 2, 44, 16, "panel"); k.text(l, t("or"), w / 2 - 22, y + 1, {size:11, color:"muted", w:44, align:"center"});
       y += 26;
-      const sl = k.L("MenuScroll");
-      UIM._googleRect = {x:sl.ox, y:y + sl.oy, w:Math.min(w, 320), h:44, clip:sl.clip};
-      k.rect(l, 0, y, Math.min(w, 320), 44, "panel2", {r:8, stroke:"line"});
-      k.text(l, t("googleLoading"), 0, y + 12, {size:12, color:"muted", w:Math.min(w, 320), align:"center"});
-      y += 54;
+      // 2.4: Google won't sign in inside an app (preview / Android / desktop), so this opens the website in the browser
+      // and the game waits for the player to confirm there (Net.linkStart, server /auth/link/*)
+      W.btn(l, "g-link", 0, y, `[[globe]] ${t("linkGoogle")}`, () => N.linkStart(), {w, h:42, kind:"ghost", disabled:N.busy});
+      y += 48;
+      y += k.text(l, t("linkWhy"), 0, y, {size:11.5, color:"muted", w}).h + 10;
     }
     if (N.pendingGoogle){
       y += k.text(l, t("googlePickName"), 0, y, {size:13, color:"accent", w}).h + 6;
@@ -339,7 +353,7 @@ Screens.subAccount = function(l, y, w){
   }
   y += 44;
   y += msgLine(l, y, w);
-  const bw = back(l, y);
+  const bw = 40;
   W.btn(l, "logout", w - W.btnW(`[[log-out]] ${t("signOut")}`), y, `[[log-out]] ${t("signOut")}`, () => N.logout(), {kind:"ghost"});
   return y + bw;
 };

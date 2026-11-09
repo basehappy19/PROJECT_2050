@@ -24,6 +24,23 @@ function SubHead({title}){
   return <div class="subhead"><h2>{title}</h2><IconBtn n="x" title={t("mBack")} sound="close" onClick={goBack} cls="subclose"/></div>;   // 3.2: close ✕ top-right like every window
 }
 const Offline = () => <><p class="muted">{t("netOfflineLong")}</p><Back/></>;
+/* 2.4: the game (an app) sent the player here to sign in: ?link=CODE opens the confirm page */
+try {
+  const lc = new URLSearchParams(location.search).get("link");
+  if (lc !== null){ UIM.sub = "link"; UIM.linkCode = lc.toUpperCase().replace(/[^A-Z0-9-]/g, "").slice(0, 9); UIM.linkDone = false; }
+} catch(e){}
+function SubLink(){
+  const n = N(), code = UIM.linkCode;
+  if (!n.online) return <Offline/>;
+  if (!code) return <p class="muted">{t("linkNoCode")}</p>;
+  const confirm = async () => { if (await n.linkConfirm(code)){ UIM.linkDone = true; bump(); } };
+  return <>
+    <div class="card linkcard"><span class="muted">{t("linkCheck")}</span><b class="mono linkcode">{code}</b></div>
+    {UIM.linkDone ? <div class="card gdone"><b><Rich t={`[[circle-check]] ${t("linkDone")}`} iconColor="good"/></b></div>
+      : n.user ? <><Btn block size="lg" disabled={n.busy} onClick={confirm}>{`[[check]] ${t("linkConfirm")}`}</Btn><p class="muted small">{n.user.displayName} · @{n.user.username}</p><Msg UIM={UIM}/></>
+      : <><p class="muted">{t("linkSignInFirst")}</p><SubAccount/></>}
+  </>;
+}
 
 /* the globe lives outside Preact so it survives re-renders */
 function GlobeView(){
@@ -42,7 +59,7 @@ function GlobeView(){
 
 export function Menu(){
   const sub = UIM.sub;
-  const TITLES = {mp:"mpTitle", room:"mpTitle", load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason", settings:"mSettings"};
+  const TITLES = {link:"linkTitle", mp:"mpTitle", room:"mpTitle", load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason", settings:"mSettings"};
   return <div class={"home " + (UIM.transition ? "leaving" : "")}>
     <GlobeView/>
     <div class="home-vignette"/>
@@ -55,7 +72,7 @@ export function Menu(){
         </div>}
         {!sub ? <div class="sdgtag"><img src="assets/img/sdg/goal-13.svg" alt="SDG 13" width="38" height="38"/><span>{t("mTag")}</span></div> : null}
         {!sub && N().cfg && N().cfg.announcement && L(N().cfg.announcement) ? <div class="announce card"><Icon n="megaphone" size={18} color="warn"/><span>{L(N().cfg.announcement)}</span></div> : null}
-        {sub === "load" ? <SubLoad/> : sub === "ach" ? <><Btn kind="ghost" block onClick={goSub("cert")}>{`[[award]] ${t("mCert")}`}</Btn><AchList/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : sub === "season" ? <SubSeason/> : sub === "settings" ? <SubSettings/> : sub === "mp" ? <SubMp/> : sub === "room" ? <SubRoom/> : <Main/>}
+        {sub === "load" ? <SubLoad/> : sub === "ach" ? <><Btn kind="ghost" block onClick={goSub("cert")}>{`[[award]] ${t("mCert")}`}</Btn><AchList/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : sub === "season" ? <SubSeason/> : sub === "settings" ? <SubSettings/> : sub === "mp" ? <SubMp/> : sub === "room" ? <SubRoom/> : sub === "link" ? <SubLink/> : <Main/>}
         {sub ? null : <footer class="mfooter">
           <small class="muted">{t("teamK")}</small>
           <p class="team">{t("team")}</p>

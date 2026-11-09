@@ -3,7 +3,7 @@ import cors from "@fastify/cors";
 import rateLimit from "@fastify/rate-limit";
 import { config } from "./config.js";
 import { tx } from "./db.js";
-import { hashPassword, checkPassword, accessToken, readAccess, issueRefresh, useRefresh, revokeRefresh, verifyGoogle, googleTicket, readGoogleTicket, newCode } from "./auth.js";
+import { hashPassword, checkPassword, accessToken, readAccess, issueRefresh, useRefresh, revokeRefresh, verifyGoogle, googleTicket, readGoogleTicket, newCode, newLinkCode, linkDevice } from "./auth.js";
 import { seasonState, claimTier, claimMission } from "./season.js";
 import { SHOP, RENAME_PRICE, CHARS, MODES, levelOf, ACH_TERRA, terraFor, scoreFor, xpFor, dailyFactor, dailySeed, gradeOf, checkSummary } from "./game-rules.js";
 import { badWord } from "./words.js";
@@ -129,6 +129,44 @@ export function buildApp(pool, opts = {}){
     });
   });
   app.post("/api/auth/logout", async req => { await revokeRefresh(pool, (req.body || {}).refresh); return {ok:true}; });
+
+  /* ---------- sign in from an app through the website (like signing in on a TV) ----------
+     Google does not allow its sign-in inside app web views (GDevelop preview, Android / desktop apps), so the game:
+       1. POST /auth/link/start → a secret "device" id (kept by the game) and a short code (shown to the player)
+       2. opens the website (?link=CODE) in the normal browser; the player signs in there (Google works) and confirms
+          the code matches the one in the game → POST /auth/link/confirm (signed in)
+       3. polls POST /auth/link/poll with the device id until it gets a normal session (same reply as /auth/login).
+     Links live 10 minutes, in memory (a server restart only means pressing the button again). */
+  const LINK_MS = 10 * 60 * 1000, links = new Map(), byCode = new Map();
+  const linkGc = () => { const now = Date.now(); for (const [d, l] of links) if (l.exp < now){ links.delete(d); byCode.delete(l.code); } };
+  const normCode = s => String(s || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+  app.post("/api/auth/link/start", authLimit, async () => {
+    linkGc();
+    if (links.size > 5000) throw Object.assign(new Error("busy"), {statusCode:503});
+    let code; do { code = newLinkCode(); } while (byCode.has(code));
+    const device = linkDevice(), exp = Date.now() + LINK_MS;
+    links.set(device, {code, exp, uid:null}); byCode.set(code, device);
+    return {device, code:`${code.slice(0, 4)}-${code.slice(4)}`, expiresIn:LINK_MS / 1000};
+  });
+  app.post("/api/auth/link/confirm", {config:{auth:true, rateLimit:{max:12, timeWindow:"1 minute"}}}, async (req, reply) => {
+    linkGc();
+    const d = byCode.get(normCode((req.body || {}).code)), l = d && links.get(d);
+    if (!l) return fail(reply, 404, "link_expired");
+    if (l.uid && l.uid !== req.uid) return fail(reply, 409, "link_used");
+    l.uid = req.uid;
+    return {ok:true};
+  });
+  app.post("/api/auth/link/poll", {config:{rateLimit:{max:60, timeWindow:"1 minute"}}}, async (req, reply) => {
+    linkGc();
+    const device = String((req.body || {}).device || ""), l = links.get(device);
+    if (!l) return fail(reply, 404, "link_expired");
+    if (!l.uid) return {pending:true};
+    links.delete(device); byCode.delete(l.code);
+    const u = (await pool.query("SELECT banned FROM users WHERE id = $1", [l.uid])).rows[0];
+    if (!u) return fail(reply, 401, "unauthorized");
+    if (u.banned) return fail(reply, 403, "banned");
+    return tx(pool, db => session(db, l.uid));
+  });
 
   /* ---------- profile ---------- */
   app.get("/api/me", AUTH, async (req, reply) => { const b = await meBody(pool, req.uid); return b.user ? b : fail(reply, 401, "unauthorized"); });

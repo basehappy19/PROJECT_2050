@@ -605,6 +605,8 @@ canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
 .gbtn iframe{color-scheme:normal;border-radius:var(--radius-pill)}
 .gbtn{justify-content:center;margin:2px 0 4px}
 .gdone{flex-direction:column;gap:6px;margin:4px 0 14px;border-color:rgba(95,211,154,.45);background:rgba(95,211,154,.06)}
+.linkcard{display:flex;flex-direction:column;gap:10px;margin:4px 0 14px;text-align:center}
+.linkcard .linkcode{font-size:34px;letter-spacing:.14em;color:var(--accent)}
 .optrows{display:flex;flex-direction:column;gap:12px;margin-bottom:6px}
 .menu-panel .msg{margin:12px 0}
 .menu-panel .form{gap:14px}

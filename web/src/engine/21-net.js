@@ -114,6 +114,43 @@ const Net = {
   login(login, password){ if (!login || !password) return msg(t("err_missing"), true); return this.auth("/auth/login", {login, password}); },
   googleCredential(idToken){ return this.auth("/auth/google", {idToken}); },
   googleComplete(username){ if (!/^[a-z0-9_]{3,16}$/.test(username)) return msg(t("err_bad_username"), true); return this.auth("/auth/google/complete", {ticket:this.pendingGoogle, username}); },
+  /* 2.4: sign in from an app through the website (server: /auth/link/*). link = {device, code, url, until, state} */
+  link:null,
+  siteUrl(){ return /^https?:/.test(this.base || "") ? this.base.replace(/\/api\/?$/, "") : (typeof location !== "undefined" ? location.origin : ""); },
+  openUrl(url){ if (P.openUrl) P.openUrl(url); else window.open(url, "_blank", "noopener"); },
+  async linkStart(){
+    this.linkCancel(); this.busy = true; msg("");
+    try {
+      const j = await this.req("POST", "/auth/link/start", {}, false);
+      const url = `${this.siteUrl()}/?link=${encodeURIComponent(j.code)}`;
+      this.link = {device:j.device, code:j.code, url, until:Date.now() + j.expiresIn * 1000, state:"wait"};
+      this.openUrl(url);
+      const tick = async () => {
+        const L = this.link; if (!L || L.device !== j.device) return;
+        if (Date.now() > L.until){ this.link = null; msg(t("err_link_expired"), true); return; }
+        try {
+          const r = await this.req("POST", "/auth/link/poll", {device:L.device}, false);
+          if (this.link !== L) return;
+          if (r.pending){ L.timer = setTimeout(tick, 2500); return; }
+          this.link = null; this.afterAuth(r); dirty();
+        } catch(e){
+          if (this.link !== L) return;
+          if (e.error === "offline" || e.error === "rate_limited"){ L.timer = setTimeout(tick, 5000); return; }   // network hiccup: keep waiting
+          this.link = null; msg(errText(e), true);
+        }
+      };
+      this.link.timer = setTimeout(tick, 2500);
+    } catch(e){ msg(errText(e), true); }
+    finally { this.busy = false; dirty(); }
+  },
+  linkCancel(){ if (this.link && this.link.timer) clearTimeout(this.link.timer); this.link = null; dirty(); },
+  /* on the website: the signed-in player lets the game in */
+  async linkConfirm(code){
+    this.busy = true; msg("");
+    try { await this.req("POST", "/auth/link/confirm", {code}); msg(t("linkDone")); return true; }
+    catch(e){ msg(errText(e), true); return false; }
+    finally { this.busy = false; dirty(); }
+  },
   async logout(){ try { await this.req("POST", "/auth/logout", {refresh:this.refreshTok}, false); } catch(e) {} this.setTokens(null, null); this.user = null; this.owned = new Set(); this.chars = {}; this.cloud = null; msg(t("signedOut")); },
   async rename(name){
     name = (name || "").trim(); if (name.length < 2 || name.length > 20) return msg(t("err_bad_display"), true);
@@ -260,11 +297,12 @@ const Net = {
     const d = this._gDiv; if (!d) return;
     if (!rect || this.user || !this._gReady){ if (d.style.display !== "none") d.style.display = "none"; return; }
     const cv = P.Kit.canvas; if (!cv) return;
-    const b = cv.getBoundingClientRect(), s = b.width / 1280;
+    // GDevelop: the screen is P.Kit.H (720) design units tall and as wide as it needs (Kit.W), so scale by the height
+    const b = cv.getBoundingClientRect(), s = b.height / (P.Kit.H || 720);
     const vis = !rect.clip || (rect.y >= rect.clip.y && rect.y + rect.h <= rect.clip.y + rect.clip.h);
     d.style.display = vis ? "block" : "none";
     d.style.left = (b.left + rect.x * s) + "px"; d.style.top = (b.top + rect.y * s) + "px";
-    d.style.transform = `scale(${Math.min(1.4, Math.max(.6, s * 1.05))})`; d.style.transformOrigin = "0 0";
+    d.style.transform = `scale(${rect.w * s / 400})`; d.style.transformOrigin = "0 0";   // rendered 400 px wide (loadGoogle) → exactly the box
   },
 };
 P.Net = Net;

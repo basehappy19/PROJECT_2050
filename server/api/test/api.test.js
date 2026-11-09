@@ -198,6 +198,15 @@ test("weekly missions and the season pass are worked out from finished games", a
   r = await call("GET", "/api/me", null, t); assert.ok(r.body.owned.includes("frame"), JSON.stringify(r.body.owned));
   await pool.query("DELETE FROM game_config WHERE key IN ('season', 'weekly')"); forgetSettings();
 });
+test("app sign-in through the website: start, confirm, poll", async () => {
+  const s = await call("POST", "/api/auth/link/start", {});
+  assert.equal(s.status, 200);
+  assert.deepEqual((await call("POST", "/api/auth/link/poll", {device:s.body.device})).body, {pending:true});
+  assert.equal((await call("POST", "/api/auth/link/confirm", {code:s.body.code}, tok)).status, 200);
+  const p = await call("POST", "/api/auth/link/poll", {device:s.body.device});
+  assert.equal(p.status, 200, JSON.stringify(p.body)); assert.equal(p.body.user.username, "phukhieo"); assert.ok(p.body.refresh);
+  assert.equal((await call("POST", "/api/auth/refresh", {refresh:p.body.refresh})).status, 200);
+});
 test("logout revokes the refresh token", async () => {
   let r = await call("POST", "/api/auth/logout", {refresh}); assert.equal(r.status, 200);
   r = await call("POST", "/api/auth/refresh", {refresh}); assert.equal(r.status, 401);

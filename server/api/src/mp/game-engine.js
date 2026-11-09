@@ -3529,8 +3529,9 @@ function candidates(){
   const out = [];
   if (window.P2050_API) out.push(window.P2050_API);
   const saved = ls.get("p2050-api"); if (saved) out.push(saved);
-  if (/^https?:$/.test(location.protocol)) out.push("/api");
-  out.push("http://localhost:8080/api");
+  const app = window.P2050_APP || location.host === "appassets.androidplatform.net";   // Android app: files come from the APK, so only the real server
+  if (/^https?:$/.test(location.protocol) && !app) out.push("/api");
+  if (!app) out.push("http://localhost:8080/api");
   return [...new Set(out)];
 }
 /* same merge as server/api/src/progress.js: lists joined, counters keep the larger value, achievements keep the first time */
@@ -3623,6 +3624,43 @@ const Net = {
   login(login, password){ if (!login || !password) return msg(t("err_missing"), true); return this.auth("/auth/login", {login, password}); },
   googleCredential(idToken){ return this.auth("/auth/google", {idToken}); },
   googleComplete(username){ if (!/^[a-z0-9_]{3,16}$/.test(username)) return msg(t("err_bad_username"), true); return this.auth("/auth/google/complete", {ticket:this.pendingGoogle, username}); },
+  /* 2.4: sign in from an app through the website (server: /auth/link/*). link = {device, code, url, until, state} */
+  link:null,
+  siteUrl(){ return /^https?:/.test(this.base || "") ? this.base.replace(/\/api\/?$/, "") : (typeof location !== "undefined" ? location.origin : ""); },
+  openUrl(url){ if (P.openUrl) P.openUrl(url); else window.open(url, "_blank", "noopener"); },
+  async linkStart(){
+    this.linkCancel(); this.busy = true; msg("");
+    try {
+      const j = await this.req("POST", "/auth/link/start", {}, false);
+      const url = `${this.siteUrl()}/?link=${encodeURIComponent(j.code)}`;
+      this.link = {device:j.device, code:j.code, url, until:Date.now() + j.expiresIn * 1000, state:"wait"};
+      this.openUrl(url);
+      const tick = async () => {
+        const L = this.link; if (!L || L.device !== j.device) return;
+        if (Date.now() > L.until){ this.link = null; msg(t("err_link_expired"), true); return; }
+        try {
+          const r = await this.req("POST", "/auth/link/poll", {device:L.device}, false);
+          if (this.link !== L) return;
+          if (r.pending){ L.timer = setTimeout(tick, 2500); return; }
+          this.link = null; this.afterAuth(r); dirty();
+        } catch(e){
+          if (this.link !== L) return;
+          if (e.error === "offline" || e.error === "rate_limited"){ L.timer = setTimeout(tick, 5000); return; }   // network hiccup: keep waiting
+          this.link = null; msg(errText(e), true);
+        }
+      };
+      this.link.timer = setTimeout(tick, 2500);
+    } catch(e){ msg(errText(e), true); }
+    finally { this.busy = false; dirty(); }
+  },
+  linkCancel(){ if (this.link && this.link.timer) clearTimeout(this.link.timer); this.link = null; dirty(); },
+  /* on the website: the signed-in player lets the game in */
+  async linkConfirm(code){
+    this.busy = true; msg("");
+    try { await this.req("POST", "/auth/link/confirm", {code}); msg(t("linkDone")); return true; }
+    catch(e){ msg(errText(e), true); return false; }
+    finally { this.busy = false; dirty(); }
+  },
   async logout(){ try { await this.req("POST", "/auth/logout", {refresh:this.refreshTok}, false); } catch(e) {} this.setTokens(null, null); this.user = null; this.owned = new Set(); this.chars = {}; this.cloud = null; msg(t("signedOut")); },
   async rename(name){
     name = (name || "").trim(); if (name.length < 2 || name.length > 20) return msg(t("err_bad_display"), true);
@@ -3769,11 +3807,12 @@ const Net = {
     const d = this._gDiv; if (!d) return;
     if (!rect || this.user || !this._gReady){ if (d.style.display !== "none") d.style.display = "none"; return; }
     const cv = P.Kit.canvas; if (!cv) return;
-    const b = cv.getBoundingClientRect(), s = b.width / 1280;
+    // GDevelop: the screen is P.Kit.H (720) design units tall and as wide as it needs (Kit.W), so scale by the height
+    const b = cv.getBoundingClientRect(), s = b.height / (P.Kit.H || 720);
     const vis = !rect.clip || (rect.y >= rect.clip.y && rect.y + rect.h <= rect.clip.y + rect.clip.h);
     d.style.display = vis ? "block" : "none";
     d.style.left = (b.left + rect.x * s) + "px"; d.style.top = (b.top + rect.y * s) + "px";
-    d.style.transform = `scale(${Math.min(1.4, Math.max(.6, s * 1.05))})`; d.style.transformOrigin = "0 0";
+    d.style.transform = `scale(${rect.w * s / 400})`; d.style.transformOrigin = "0 0";   // rendered 400 px wide (loadGoogle) → exactly the box
   },
 };
 P.Net = Net;
@@ -5510,6 +5549,8 @@ P.STORY.forEach(a => { if (SC_TITLE[a.act]) a.title = SC_TITLE[a.act]; });
 /* what a panel says / who says it, for this game (lines can depend on the character or on what happened) */
 P.panelSay = p => { let s = typeof p.say === "function" ? p.say() : p.say; if (s && !s.th && (s[S.char] || s["*"])) s = s[S.char] || s["*"]; const v = S.sceneVars || {}; return {th:(s.th || "").replace(/\{(\w)\}/g, (m, k) => v[k] ?? m), en:(s.en || "").replace(/\{(\w)\}/g, (m, k) => v[k] ?? m)}; };
 P.panelWho = p => (typeof p.who === "function" ? p.who() : p.who);
+/* 2.3: who reads a panel aloud (the recorded narration has one voice per person) */
+P.narrWho = p => { const w = P.panelWho(p); return w === "me" ? S.char : (w || "adv"); };
 
 /* one scene at a time, never in the same month as a new disaster forecast, a story act or an event, and at least 4 months apart */
 function sceneTick(){
@@ -5830,6 +5871,23 @@ P.END2 = {
 };
 /* tier: 0 = 10 good years or fewer · 1 = 11–20 · 2 = 21+ */
 P.endTier = n => (n <= 10 ? 0 : n <= 20 ? 1 : 2);
+/* 2.4: sign in from an app (GDevelop preview, Android / desktop) through the website, where Google sign-in works */
+Object.assign(P.UI, {
+  linkGoogle:T("เข้าสู่ระบบด้วย Google ผ่านเว็บไซต์", "Sign in with Google on the website"),
+  linkWhy:T("Google ไม่ให้เข้าสู่ระบบในแอปโดยตรง เกมจะเปิดเว็บไซต์ในเบราว์เซอร์ให้", "Google doesn't allow signing in inside apps, so the game opens the website in your browser"),
+  linkWait:T("เข้าสู่ระบบบนเว็บไซต์ที่เปิดขึ้น แล้วกดยืนยันรหัสนี้", "Sign in on the website that just opened, then confirm this code"),
+  linkWaiting:T("กำลังรอการยืนยันจากเว็บไซต์...", "Waiting for the website..."),
+  linkOpenAgain:T("เปิดเว็บไซต์อีกครั้ง", "Open the website again"),
+  linkCancel:T("ยกเลิก", "Cancel"),
+  linkTitle:T("เข้าสู่ระบบในเกม", "Sign in the game"),
+  linkCheck:T("ตรวจว่ารหัสนี้ตรงกับรหัสที่ขึ้นในเกม ถ้าคุณไม่ได้กดเข้าสู่ระบบในเกมเองเมื่อสักครู่ อย่ากดยืนยัน", "Check that this code matches the one in your game. If you didn't just press sign in in the game yourself, don't confirm."),
+  linkSignInFirst:T("เข้าสู่ระบบบัญชีของคุณก่อน (ใช้ Google ได้) แล้วกดยืนยัน", "Sign in to your account first (Google works here), then confirm"),
+  linkConfirm:T("ยืนยัน ให้เกมเข้าสู่ระบบด้วยบัญชีนี้", "Confirm: sign the game in with this account"),
+  linkDone:T("เรียบร้อย กลับไปที่เกมได้เลย เกมจะเข้าสู่ระบบให้เอง", "Done. Go back to the game, it signs in by itself"),
+  linkNoCode:T("ลิงก์นี้ไม่มีรหัส กดเข้าสู่ระบบในเกมใหม่อีกครั้ง", "This link has no code. Press sign in in the game again"),
+  err_link_expired:T("รหัสนี้หมดอายุหรือใช้ไปแล้ว กดเข้าสู่ระบบในเกมใหม่อีกครั้ง", "This code has expired or was already used. Press sign in in the game again"),
+  err_link_used:T("รหัสนี้ถูกยืนยันด้วยบัญชีอื่นไปแล้ว", "This code was already confirmed with another account"),
+});
 
 })();
 
