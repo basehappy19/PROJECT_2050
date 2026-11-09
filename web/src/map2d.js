@@ -582,12 +582,19 @@ export const GameMap = {
       }
     } else {
       c.font = "600 11px 'IBM Plex Sans Thai', sans-serif";
-      for (const cc of S.countries){
+      // 3.7.2: label tiers — main countries always, smaller ones only when zoomed in closer; labels that would
+      // overlap an already placed (more important) one are skipped
+      const z = this.cam.z, placed = [];
+      for (const cc of S.countries.filter(x => !x.rest).sort((a, b) => (S.selC === b.id) - (S.selC === a.id) || P.COUNTRY[b.id].w - P.COUNTRY[a.id].w)){
         if (cc.rest) continue;
         const sh = this.byCountry[cc.id]; if (!sh) continue;
         const [x, y] = this.toScreen(sh.l[0], sh.l[1]); if (!vis(x, y, 0)) continue;
-        const big = P.COUNTRY[cc.id].w >= 250 || this.cam.z > 2.3 || S.selC === cc.id; if (!big) continue;
-        const nm = L((P.SHORT && P.SHORT[cc.id]) || P.COUNTRY[cc.id].name), sel = S.selC === cc.id;
+        const w0 = P.COUNTRY[cc.id].w, sel = S.selC === cc.id;
+        if (!sel && w0 < (z >= 4 ? 0 : z >= 3.2 ? 40 : z >= 2.4 ? 100 : 250)) continue;
+        const nm = L((P.SHORT && P.SHORT[cc.id]) || P.COUNTRY[cc.id].name);
+        const hw = c.measureText(nm).width / 2 + 16;
+        if (!sel && placed.some(q => Math.abs(q[0] - x) < hw + q[2] + 4 && Math.abs(q[1] - y) < 22)) continue;
+        placed.push([x, y, hw]);
         const b = this.pill(x, y, nm, {h:20, dot:COL[relCol(cc.rel)], stroke:sel ? COL.accent : null, color:sel ? COL.accent : COL.fg, bg:sel ? "rgba(6,16,21,.94)" : "rgba(6,16,21,.68)"});
         this.hits.push({id:"cl-" + cc.id, ...b, fn:() => G.selectCountry(cc.id)});
       }

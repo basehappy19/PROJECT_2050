@@ -320,15 +320,19 @@ Screens.renderMapUI = function(l){
       }
     } else {
       // country labels (major countries in view) with a relation dot
-      for (const c of S.countries){
+      // 3.7.2: label tiers — main countries always, smaller ones only when zoomed in closer; overlapping labels are skipped
+      const zz = Map.cam.z, placed = [];
+      for (const c of S.countries.filter(x => !x.rest).sort((a, b) => (S.selC === b.id) - (S.selC === a.id) || COUNTRY[b.id].w - COUNTRY[a.id].w)){
         if (c.rest) continue;
         const pt = P.countryPoint(c.id); if (!pt) continue;
         const [sx, sy] = Map.toScreen(pt[0], pt[1]);
         if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;
-        const big = COUNTRY[c.id].w >= 250 || Map.cam.z > 2.2;
-        if (!big) continue;
-        const nm = L(SHORT[c.id] || COUNTRY[c.id].name), sel = S.selC === c.id;
+        const sel0 = S.selC === c.id;
+        if (!sel0 && COUNTRY[c.id].w < (zz >= 4 ? 0 : zz >= 3.2 ? 40 : zz >= 2.4 ? 100 : 250)) continue;
+        const nm = L(SHORT[c.id] || COUNTRY[c.id].name), sel = sel0;
         const w = k.textW(nm, {font:"bodyB", size:10.5}) + 22, h = 18;
+        if (!sel && placed.some(q => Math.abs(q[0] - sx) < (w + q[2]) / 2 + 4 && Math.abs(q[1] - sy) < 20)) continue;
+        placed.push([sx, sy, w]);
         const x = sx - w / 2, y = sy - h / 2;
         k.rect(l, x, y, w, h, "bg", {a:sel ? .92 : .66, r:9, stroke:sel ? "accent" : null, bg:true});
         k.circle(l, x + 9, y + 9, 3.5, W.relCol(c.rel));
