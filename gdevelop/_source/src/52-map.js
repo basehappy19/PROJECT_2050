@@ -2,7 +2,7 @@ const P = window.P2050 = window.P2050 || {};
 if (P.mods && P.mods.map) return;
 (P.mods = P.mods || {}).map = 1;
 /* =========================================================================
-   Map · 2D world map (Robinson projection) on the base layer
+   Map · 2D world map (3.7: Miller projection, a full rectangle that fills the screen like Plague Inc) on the base layer
    Objects placed in the scene: Ocean, MapRim, ArcticIce, Region ×6, RegionLine ×6, Plume ×N
    Created at runtime: Bubble (green = Eco-Points, red = disaster aid), 2 UIPainter objects in world space
    (country borders + the selected country), drawn once and moved by the camera.
@@ -14,18 +14,21 @@ const CGEO = /*COUNTRYGEO*/null;         // [{g:geo name, c:country id|null, r:r
 const {S, Kit, RMETA, CITIES, clamp, COUNTRY, SHORT} = P;
 const M = MAPMETA.meta, GRID = MAPMETA.grid;
 const MAP_TOP = 84;                        // world y of the map's top edge (px)
+/* 3.7: the map is a rectangle MAPW × MAPH px (Miller, like the website's geo.js), sized so it is exactly the screen's
+   height (1080) at zoom 1: zoomed all the way out it still fills the screen and the edge never shows */
+const MAPW = M.MAPW || 2174, LAT_TOP = 84, LAT_BOT = M.LAT_BOT || -57, MK = MAPW / (2 * Math.PI);
+const millerY = lat => 1.25 * Math.log(Math.tan(Math.PI / 4 + 0.4 * lat * Math.PI / 180));
+const MAPH = (millerY(LAT_TOP) - millerY(LAT_BOT)) * MK;
 const ZMIN = 1, ZMAX = 3.4, ZCOUNTRY = 1.3;   // 3.x: like the website, the map can't be zoomed out past the whole world
 /* 3.x: the map layer is 3D; the camera tilts back as you zoom in (like the website / Plague Inc). Labels and icons stay flat on the UI layers. */
 const TILT_MAX = 38, TZ0 = 1.3, TZ1 = 2.6;
 const tiltAt = z => { const u = clamp((z - TZ0) / (TZ1 - TZ0), 0, 1); return TILT_MAX * u * u * (3 - 2 * u); };
-const HOME = {x:960, y:516, z:1};
-const ROB = [[1.0000,0.0000],[0.9986,0.0620],[0.9954,0.1240],[0.9900,0.1860],[0.9822,0.2480],[0.9730,0.3100],[0.9600,0.3720],[0.9427,0.4340],[0.9216,0.4958],[0.8962,0.5571],[0.8679,0.6176],[0.8350,0.6769],[0.7986,0.7346],[0.7597,0.7903],[0.7186,0.8435],[0.6732,0.8936],[0.6213,0.9394],[0.5722,0.9761],[0.5322,1.0000]];
+const HOME = {x:MAPW / 2, y:MAP_TOP + MAPH / 2, z:1};
 /* lat/lon → world px */
 function toWorld(lat, lon){
   let l = lon - M.LON0; while (l < -180) l += 360; while (l > 180) l -= 360;
-  const a = Math.min(90, Math.abs(lat)) / 5, i = Math.min(17, Math.floor(a)), f = a - i;
-  const X = ROB[i][0] + (ROB[i+1][0] - ROB[i][0]) * f, Y = ROB[i][1] + (ROB[i+1][1] - ROB[i][1]) * f;
-  return [(0.8487 * X * l * Math.PI / 180 + M.XR) * M.U / M.SS, MAP_TOP + (M.YT - 1.3523 * Y * Math.sign(lat)) * M.U / M.SS];
+  const la = clamp(lat, -89, 89);
+  return [(l / 360 + .5) * MAPW, MAP_TOP + (millerY(LAT_TOP) - millerY(la)) * MK];
 }
 /* decode the region hit grid (RLE: digit + base36 count, '.' separated) */
 const grid = new Uint8Array(GRID.w * GRID.h);
@@ -114,12 +117,12 @@ const Map = {
     this.scene = scene; this.mode = mode; this.regions = {}; this.lines = {}; this.plumes = []; this.bubbles = {}; this.floats = []; this.fx = []; this.drag = null; this.pinch = null;
     const vs = (o, n) => o.getVariables().get(n);
     for (const o of scene.getObjects("Region") || []) this.regions[vs(o, "Reg").getAsString()] = o;
-    for (const o of scene.getObjects("RegionLine") || []) this.lines[vs(o, "Reg").getAsString()] = o;
+    for (const o of scene.getObjects("RegionLine") || []) o.hide(true);   // 3.7: the outline pictures were in the old projection; outlines are drawn from the country shapes (regLines3)
     for (const o of scene.getObjects("Plume") || []){ o.setBlendMode(1); this.plumes.push(o); }
     this.ocean = (scene.getObjects("Ocean") || [])[0]; this.rim = (scene.getObjects("MapRim") || [])[0]; this.ice = (scene.getObjects("ArcticIce") || [])[0];
     if (this.rim) this.rim.setBlendMode(1);
     if (this.ice){ this.iceW = this.ice.getWidth(); this.iceH = this.ice.getHeight(); }
-    this.borders = null; this.selPaint = null; this._selKey = null; this.selMesh = null;
+    this.borders = null; this.selPaint = null; this._selKey = null; this.selMesh = null; this.regLines3 = null;
     Mirror.reset(); this.R3 = this.three();
     if (this.R3){
       if (this.R3.show2DRenderingPlane) this.R3.show2DRenderingPlane(false);   // the 2D copies stay for logic only
@@ -127,7 +130,7 @@ const Map = {
     }
     if (mode === "game") this.makePainters();
     if (mode === "menu") this.cam = {x:690, y:500, z:0.66};
-    else this.cam = {x:960, y:516, z:1};
+    else this.cam = {...HOME};
     this.target = null; this.applyCam(); this.refresh();
   },
   /* country borders: drawn once in world coordinates on the map layer, faded in when zoomed */
@@ -137,6 +140,14 @@ const Map = {
       const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3));
       this.borders3 = new THREE.LineSegments(g, new THREE.LineBasicMaterial({color:0x04100c, transparent:true, opacity:0, depthTest:false, depthWrite:false}));
       this.borders3.renderOrder = 25; this.borders3.frustumCulled = false; this.R3.add3DRendererObject(this.borders3);
+      // 3.7: the selected region's outline (was a picture per region)
+      this.regLines3 = {};
+      for (const c of CGEO){ if (!c.r) continue; const a = (this.regLines3[c.r] = this.regLines3[c.r] || []); for (const p of c.p) for (let i = 0; i < p.length; i += 2){ const j = (i + 2) % p.length; a.push(p[i], p[i + 1], 0, p[j], p[j + 1], 0); } }
+      for (const id in this.regLines3){
+        const lg = new THREE.BufferGeometry(); lg.setAttribute("position", new THREE.Float32BufferAttribute(this.regLines3[id], 3));
+        const ls = new THREE.LineSegments(lg, new THREE.LineBasicMaterial({color:0xa0fff5, transparent:true, opacity:.9, depthTest:false, depthWrite:false}));
+        ls.renderOrder = 26; ls.frustumCulled = false; ls.visible = false; this.R3.add3DRendererObject(ls); this.regLines3[id] = ls;
+      }
       return;
     }
     const mk = z => { const o = this.scene.createObject("UIPainter"); o.setLayer(""); o.setZOrder(z); o.setPosition(0, 0); if (o.setClearBetweenFrames) o.setClearBetweenFrames(false); return o; };
@@ -234,9 +245,20 @@ const Map = {
   latlonScreen(lat, lon){ const [x, y] = toWorld(lat, lon); return this.toScreen(x, y); },
   clampCam(){
     const z = this.cam.z, halfW = W / 2 / z, halfH = Hh / 2 / z;
-    // 3.5: like the website, the map can't be dragged past its edge (the ice round it shows only a little)
-    this.cam.x = clamp(this.cam.x, Math.min(960, 0 + halfW - 90 / z), Math.max(960, 1920 - halfW + 90 / z));
-    this.cam.y = clamp(this.cam.y, Math.min(516, MAP_TOP + halfH - 70 / z), Math.max(516, MAP_TOP + 807 - halfH + 70 / z));
+    // 3.7: the map's edge never comes inside the screen (it is a rectangle that always fills it)
+    this.cam.x = halfW * 2 >= MAPW ? MAPW / 2 : clamp(this.cam.x, halfW, MAPW - halfW);
+    this.cam.y = halfH * 2 >= MAPH ? MAP_TOP + MAPH / 2 : clamp(this.cam.y, MAP_TOP + halfH, MAP_TOP + MAPH - halfH);
+    // tilted: the far (top) row of the screen reaches further and wider, so check it in 3D too
+    if (this.mode === "game" && tiltAt(z) > .01 && this.three()){
+      for (let k = 0; k < 2; k++){
+        this.applyCam();
+        const tl = this.toWorldFromScreen(0, 0), tr = this.toWorldFromScreen(W / Kit.K, 0);
+        let dx = 0; if (tl[0] < 0) dx = -tl[0]; else if (tr[0] > MAPW) dx = MAPW - tr[0];
+        const dy = Math.max(0, MAP_TOP - tl[1]);
+        if (Math.abs(dx) < .5 && dy < .5) break;
+        if (tr[0] - tl[0] < MAPW) this.cam.x += dx; this.cam.y = Math.min(this.cam.y + dy, MAP_TOP + MAPH - halfH);
+      }
+    }
   },
   onResize(gw){ W = gw; this._ck = null; if (this.scene) this.applyCam(); },
   freeCx(){ const dw = P.Screens ? P.Screens.drawerWidth() : 0; return (Kit.W - 16 - dw - 16) / 2 * Kit.K; },
@@ -246,7 +268,7 @@ const Map = {
     if (this.mode !== "game" || !RMETA[reg]) return;
     const [lat, lon] = RMETA[reg].lab; const [x, y] = toWorld(lat, lon);
     const z = zoomIn ? Math.max(this.cam.z, 1.6) : this.cam.z;
-    if (z > 1.05) this.lookAt(x, y, z); else this.target = {x: x - (this.freeCx() - W / 2) / z, y:516, z};
+    if (z > 1.05) this.lookAt(x, y, z); else this.target = {x: x - (this.freeCx() - W / 2) / z, y:HOME.y, z};
   },
   focusCountry(id){ const pt = countryPoint(id); if (!pt || this.mode !== "game") return; this.lookAt(pt[0], pt[1], Math.max(this.cam.z, id.startsWith("R_") ? 1.6 : 2.0)); },
   /* drawer closed: slide back to the whole-world view (when not zoomed in) */
@@ -267,6 +289,7 @@ const Map = {
       let c = heatRGB(regionHeatValue(r), pal); if (sel === r.id) c = c.map(v => Math.min(255, v + 35));
       o.setColor(c.join(";"));
       const ln = this.lines[r.id]; if (ln) ln.hide(sel !== r.id || this.cam.z >= ZCOUNTRY);
+      const l3 = this.regLines3 && this.regLines3[r.id]; if (l3) l3.visible = sel === r.id && this.cam.z < ZCOUNTRY;
     }
     const T = S.temp || 1.2, warm = clamp((T - 1.2) / 1.6, 0, 1);
     let oc = [10 + warm * 26, 52 - warm * 10, 80 - warm * 24].map(v => v * 1.45);
@@ -374,7 +397,7 @@ const Map = {
         this.target = null; this.zAnim = {z:clamp((A ? A.z : this.cam.z) * (wheel > 0 ? 1.15 : 1 / 1.15), ZMIN, ZMAX), sx:m.x, sy:m.y, wx:w[0], wy:w[1]};
       }
     } else {
-      this.cam.x = 960 - (1230 + (W - 1920) * .6 - W / 2) + Math.sin(this.scene.getTimeManager().getTimeFromStart() / 9000) * 40;   // menu: slow drift
+      this.cam.x = MAPW / 2 - (1230 + (W - 1920) * .6 - W / 2) + Math.sin(this.scene.getTimeManager().getTimeFromStart() / 9000) * 40;   // menu: slow drift
     }
     if (this.zAnim){
       const A = this.zAnim, k = 1 - Math.pow(.8, dt * 60);
@@ -385,7 +408,9 @@ const Map = {
     }
     if (this.target){
       const k = 1 - Math.pow(0.86, dt * 60);
+      const px = this.cam.x, py = this.cam.y;
       this.cam.x += (this.target.x - this.cam.x) * k; this.cam.y += (this.target.y - this.cam.y) * k; this.cam.z += (this.target.z - this.cam.z) * k;
+      if (this.mode === "game"){ this.clampCam(); if (Math.abs(this.cam.x - px) + Math.abs(this.cam.y - py) < .02 && Math.abs(this.target.z - this.cam.z) < 0.002){ this.target.x = this.cam.x; this.target.y = this.cam.y; } }   // 3.7: the edge never shows, even mid-move
       if (Math.abs(this.target.x - this.cam.x) < 0.5 && Math.abs(this.target.y - this.cam.y) < 0.5 && Math.abs(this.target.z - this.cam.z) < 0.002){ this.cam.x = this.target.x; this.cam.y = this.target.y; this.cam.z = this.target.z; this.target = null; this.clampCam(); }
     }
     const key = `${this.cam.x.toFixed(1)},${this.cam.y.toFixed(1)},${this.cam.z.toFixed(3)}`;
@@ -394,7 +419,7 @@ const Map = {
       this._ck = key; this.applyCam(); Kit.dirty("MapUI");
       if (this.borders) this.borders.getRendererObject().alpha = clamp((this.cam.z - 1.05) / (ZCOUNTRY - 1.05), 0, 1);
       if (this.borders3) this.borders3.material.opacity = .75 * clamp((this.cam.z - 1.05) / (ZCOUNTRY - 1.05), 0, 1);
-      if (wasC !== isC){ Kit.dirty("HUD"); for (const r of S.regions){ const ln = this.lines[r.id]; if (ln) ln.hide(S.sel !== r.id || isC); } this.drawSelected(); }
+      if (wasC !== isC){ Kit.dirty("HUD"); for (const r of S.regions){ const ln = this.lines[r.id]; if (ln) ln.hide(S.sel !== r.id || isC); const l3 = this.regLines3 && this.regLines3[r.id]; if (l3) l3.visible = this.mode === "game" && S.sel === r.id && !isC; } this.drawSelected(); }
     }
     if (this.floats.length){ this.floats.forEach(f => f.t += dt); this.floats = this.floats.filter(f => f.t < 1.2); Kit.dirty("MapUI"); }
     if (this.fx.length){ this.fx.forEach(f => f.t += dt); this.fx = this.fx.filter(f => f.t < 2.2); Kit.dirty("MapUI"); }
@@ -403,7 +428,7 @@ const Map = {
   isCountryZoom(){ return this.cam.z >= ZCOUNTRY; },
 };
 const _upd = Map.update; Map.update = function(dt){ _upd.call(this, dt); if (this.R3) Mirror.sync(this._tilt || 0); };
-P.Map = Map; P._Mirror = Mirror; P.toWorld = toWorld; P.heatRGB = heatRGB; P.regionHeatValue = regionHeatValue; P.regionAtWorld = regionAtWorld; P.countryPoint = countryPoint; P.CGEO = CGEO; P.ZCOUNTRY = ZCOUNTRY;
+P.Map = Map; P._Mirror = Mirror; P.toWorld = toWorld; P.MAPW = MAPW; P.MAPH = MAPH; P.MAP_TOP = MAP_TOP; P.heatRGB = heatRGB; P.regionHeatValue = regionHeatValue; P.regionAtWorld = regionAtWorld; P.countryPoint = countryPoint; P.CGEO = CGEO; P.ZCOUNTRY = ZCOUNTRY;
 const H = P.H = P.H || {};
 H.mapRefresh = () => Map.refresh();
 H.mapFocus = () => {};   // 3.6.1: an event no longer moves the camera (like the website)

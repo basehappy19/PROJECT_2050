@@ -9,7 +9,7 @@ if (P.mods && P.mods.traffic) return;
    ========================================================================= */
 const {S, Map, toWorld, countryPoint} = P;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const MAPW = 1920;
+const MAPW = P.MAPW || 1920;
 const QTY = {air:9, box:4, oil:3, ore:4};
 const OIL_LANES = ["gulfAsia", "gulfEu", "gulfInd", "rusChn"], ORE_LANES = ["chileChn", "ausChn", "braChn", "codChn", "idnChn", "perChn"], BOX_LANES = ["asiaEu", "transPac", "transAtl", "panama"];
 

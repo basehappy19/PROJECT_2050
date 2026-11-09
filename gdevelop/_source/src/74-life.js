@@ -14,7 +14,7 @@ if (P.mods && P.mods.life) return;
 const {S, Map, toWorld, Kit, Screens, L} = P;
 const k = Kit;
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
-const TAU = Math.PI * 2, MAPW = 1920, LON0 = 11;
+const TAU = Math.PI * 2, MAPW = P.MAPW || 1920, LON0 = 11;
 let seed = 99; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
 const lowGfx = () => P.Gfx && P.Gfx.level === "low";
 const night = () => { try { const v = localStorage.getItem("p2050-theme") || ""; return v === "night" && P.Net && P.Net.owns("theme_night"); } catch(e) { return false; } };

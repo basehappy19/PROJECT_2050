@@ -104,11 +104,9 @@ const mapObjects = () => [
 const inst = (name, layer, x, y, o = {}) => ({angle:0, customSize:o.w !== undefined, height:o.h || 0, width:o.w || 0, keepRatio:true, layer, name, persistentUuid:uuid(), x, y, zOrder:o.z || 0,
   numberProperties:o.anim !== undefined ? [{name:"animation", value:o.anim}] : [], stringProperties:[], initialVariables:o.vars ? vars(o.vars) : []});
 const SS = META.meta.SS, MAP_TOP = 84;
-const ROB = [[1.0000,0.0000],[0.9986,0.0620],[0.9954,0.1240],[0.9900,0.1860],[0.9822,0.2480],[0.9730,0.3100],[0.9600,0.3720],[0.9427,0.4340],[0.9216,0.4958],[0.8962,0.5571],[0.8679,0.6176],[0.8350,0.6769],[0.7986,0.7346],[0.7597,0.7903],[0.7186,0.8435],[0.6732,0.8936],[0.6213,0.9394],[0.5722,0.9761],[0.5322,1.0000]];
-function toWorld(lat, lon){ const M = META.meta; let l = lon - M.LON0; while (l < -180) l += 360; while (l > 180) l -= 360;
-  const a = Math.min(90, Math.abs(lat)) / 5, i = Math.min(17, Math.floor(a)), f = a - i;
-  const X = ROB[i][0] + (ROB[i+1][0] - ROB[i][0]) * f, Y = ROB[i][1] + (ROB[i+1][1] - ROB[i][1]) * f;
-  return [(0.8487 * X * l * Math.PI / 180 + M.XR) * M.U / SS, MAP_TOP + (M.YT - 1.3523 * Y * Math.sign(lat)) * M.U / SS]; }
+// 3.7: Miller rectangle, the same as src/52-map.js toWorld
+function toWorld(lat, lon){ const M = META.meta, W = M.MAPW || 2174, K = W / (2 * Math.PI), my = d => 1.25 * Math.log(Math.tan(Math.PI / 4 + 0.4 * d * Math.PI / 180)); let l = lon - M.LON0; while (l < -180) l += 360; while (l > 180) l -= 360;
+  return [(l / 360 + .5) * W, MAP_TOP + (my(84) - my(Math.max(-89, Math.min(89, lat)))) * K]; }
 // cities from the game data (same table as in 10-data-a.js)
 const CITIES = new Function(fs.readFileSync(`${REPO}/web/src/engine/10-data-a.js`, "utf8").match(/const CITIES = \{[\s\S]*?\n\};/)[0] + "; return CITIES;")();
 function mapInstances(){

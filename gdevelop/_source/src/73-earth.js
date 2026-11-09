@@ -19,20 +19,14 @@ const texOf = (name, srgb) => { const t = imgMgr().getThreeTexture(name); if (t 
 const themeName = () => { try { const v = localStorage.getItem("p2050-theme") || ""; return P.Net && v && P.Net.owns("theme_" + v) ? v : ""; } catch(e) { return ""; } };
 
 /* ---------------------------------------------------------------- satellite photo under the map
-   The map's own Robinson (52-map.js toWorld) is not the website's d3 Robinson, so the picture is not simply stretched:
-   it is a latitude / longitude grid whose corners sit where this map puts them, and each corner reads the picture
-   where that place is in the picture. Day / night use the Earth's full pictures (latitude / longitude, whole world);
-   the paint theme only exists in the website's projection, so its corners use d3's Robinson. */
-const LAT_MAP_BOT = -56;   // this map's lower edge (mapmeta LAT_BOT)
-const D3K = [[0.9986,-0.062],[1,0],[0.9986,0.062],[0.9954,0.124],[0.99,0.186],[0.9822,0.248],[0.973,0.31],[0.96,0.372],[0.9427,0.434],[0.9216,0.4958],[0.8962,0.5571],[0.8679,0.6176],[0.835,0.6769],[0.7986,0.7346],[0.7597,0.7903],[0.7186,0.8435],[0.6732,0.8936],[0.6213,0.9394],[0.5722,0.9761],[0.5322,1]].map(([x, y]) => [x, y * 1.593415793900743]);
-function d3Robinson(lam, phi){   // d3-geo-projection robinsonRaw (radians in, unit-sphere coordinates out)
-  const i = Math.min(18, Math.abs(phi) * 36 / Math.PI), i0 = Math.floor(i), di = i - i0;
-  const [ax, ay] = D3K[i0], [bx, by] = D3K[i0 + 1], [cx, cy] = D3K[Math.min(19, i0 + 2)];
-  return [lam * (bx + di * (cx - ax) / 2 + di * di * (cx - 2 * bx + ax) / 2), Math.sign(phi) * (by + di * (cy - ay) / 2 + di * di * (cy - 2 * by + ay) / 2)];
-}
-const WEB_W = 2400, WEB_H = 1197, WEB_S = WEB_W / (2 * 0.8487 * Math.PI), WEB_Y84 = d3Robinson(0, 84 * DEG)[1];
+   3.7: the map is a Miller rectangle (52-map.js toWorld, like the website's geo.js). The picture is a latitude / longitude
+   grid whose corners sit where the map puts them, and each corner reads the picture where that place is in the picture.
+   Day / night use the Earth's full pictures (latitude / longitude, whole world); the paint theme uses the website's
+   Miller map picture. */
+const LAT_MAP_BOT = -57;   // this map's lower edge (mapmeta LAT_BOT)
+const millerY = lat => 1.25 * Math.log(Math.tan(Math.PI / 4 + 0.4 * lat * DEG));
 const uvEarth = (lat, lon) => [(lon + 180) / 360, (lat + 90) / 180];   // past 180°E u goes a little over 1: the picture repeats, so no seam
-const uvPaint = (lat, lon) => { const [x, y] = d3Robinson((lon - LON0) * DEG, lat * DEG); return [(WEB_W / 2 + x * WEB_S) / WEB_W, 1 - WEB_S * (WEB_Y84 - y) / WEB_H]; };
+const uvPaint = (lat, lon) => [(lon - LON0) / 360 + .5, 1 - (millerY(LAT_TOP) - millerY(lat)) / (millerY(LAT_TOP) - millerY(LAT_MAP_BOT))];
 const Photo = {
   mesh:null, theme:null,
   build(R){
@@ -77,11 +71,11 @@ const Photo = {
 };
 
 /* ---------------------------------------------------------------- 3.5: ice round the world (like web/src/ice.js)
-   Outside the map's outline the world sits in a sheet of polar ice that frosts over the map's edge, so the picture never
-   ends in a hard line and there is no empty space beside it. The texture is drawn once in code and tiles seamlessly. */
-const FROST_VS = "attribute float fade; varying float vA; varying vec2 vUv; void main(){ vUv = uv; vA = fade; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }";
-const FROST_FS = "uniform sampler2D map; uniform vec3 tint; varying float vA; varying vec2 vUv; void main(){ vec4 c = texture2D(map, vUv); gl_FragColor = vec4(c.rgb * tint, vA);\n#include <colorspace_fragment>\n}";
-const ICE_TILE = 336, FROST = 58;   // in world px (the map is 1920 wide; the website's 2400-wide map uses 420 / 72)
+   Outside the map the world sits in a sheet of polar ice (3.7: only seen at the far corners when the camera tilts, since
+   the map now always fills the screen). Along the top (Arctic) and bottom of the map lies a thin, faint, ragged band of
+   sea ice. Both textures are drawn once in code. */
+const MAPW = P.MAPW || 2174, MAPH = P.MAPH || 1080, MTOP = P.MAP_TOP || 84;
+const ICE_TILE = 380, POLAR = 109, POLAR_S = 63;   // in world px (the website's 2400-wide map uses 420 / 120 / 70)
 let iceTile = null;
 function iceCanvas(){
   if (iceTile) return iceTile;
@@ -110,37 +104,70 @@ function iceCanvas(){
   for (let i = 0; i < 900; i++){ const x = rnd() * N, y = rnd() * N; g.fillStyle = `rgba(255,255,255,${.25 + rnd() * .55})`; g.fillRect(x, y, rnd() < .1 ? 1.6 : .9, rnd() < .1 ? 1.6 : .9); }
   return (iceTile = cv);
 }
+/* the band of sea ice along the top of the map (web/src/ice.js polarCanvas): ice texture cut by noise, almost solid at
+   the very top, breaking up into ragged pack ice and small floes further down, at most ~80% opaque */
+let polarCv = null;
+function polarCanvas(){
+  if (polarCv) return polarCv;
+  const Wc = 4096, Hc = 200, cv = document.createElement("canvas"); cv.width = Wc; cv.height = Hc;
+  const g = cv.getContext("2d");
+  const pat = g.createPattern(iceCanvas(), "repeat"); pat.setTransform(new DOMMatrix().scale(420 / 512 * Wc / 2400 * .3));
+  g.fillStyle = pat; g.fillRect(0, 0, Wc, Hc);
+  g.fillStyle = "rgba(240,248,255,.55)"; g.fillRect(0, 0, Wc, Hc);
+  const hash = (i, j) => { const h = Math.sin(i * 127.1 + j * 311.7) * 43758.5453; return h - Math.floor(h); };
+  const sm = t => t * t * (3 - 2 * t);
+  const vn = (x, y) => { const i = Math.floor(x), j = Math.floor(y), fx = sm(x - i), fy = sm(y - j);
+    return (hash(i, j) * (1 - fx) + hash(i + 1, j) * fx) * (1 - fy) + (hash(i, j + 1) * (1 - fx) + hash(i + 1, j + 1) * fx) * fy; };
+  const fbm = (x, y) => .5 * vn(x / 150, y / 90) + .27 * vn(x / 52 + 17, y / 40 + 5) + .15 * vn(x / 19 + 41, y / 17 + 9) + .08 * vn(x / 7 + 3, y / 7 + 77);
+  const C = 13, cell = (i, j) => [(i + hash(i * 1.7 + 3, j * 2.3 + 1)) * C, (j + hash(i * 3.1 + 7, j * 1.3 + 5)) * C];
+  const img = g.getImageData(0, 0, Wc, Hc), d = img.data;
+  for (let y = 0; y < Hc; y++){
+    const v = y / Hc, gj = Math.floor(y / C);
+    for (let x = 0; x < Wc; x++){
+      const n = fbm(x, y), dens = 1.28 - v * 1.7 + (n - .5) * 1.35, t = dens - .5;
+      let ice = 0, shade = 1;
+      if (t > .22) ice = 1;
+      else if (t > -.22){
+        const gi = Math.floor(x / C); let f1 = 1e9, f2 = 1e9, ci = 0, cj = 0;
+        for (let dj = -1; dj <= 1; dj++) for (let di = -1; di <= 1; di++){
+          const [px, py] = cell(gi + di, gj + dj), dd = (px - x) * (px - x) + (py - y) * (py - y);
+          if (dd < f1){ f2 = f1; f1 = dd; ci = gi + di; cj = gj + dj; } else if (dd < f2) f2 = dd;
+        }
+        const u = (t + .22) / .44, r = hash(ci * 5.3 + 11, cj * 7.7 + 13), gap = .6 + (1 - u) * 2.2, e = Math.sqrt(f2) - Math.sqrt(f1);
+        ice = (r < u * 1.15 ? 1 : 0) * Math.max(0, Math.min(1, (e - gap) / 1.2)); shade = .9 + .16 * r;
+      }
+      const top = Math.max(0, 1 - v / .05), k = (y * Wc + x) * 4;
+      if (shade !== 1){ d[k] = Math.min(255, d[k] * shade); d[k + 1] = Math.min(255, d[k + 1] * shade); d[k + 2] = Math.min(255, d[k + 2] * shade + 6); }
+      const a = Math.min(.8, ice * (.4 + .28 * n) + top * .4) * Math.min(1, (1 - v) / .06);
+      d[k + 3] = Math.round(a * 255);
+    }
+  }
+  g.putImageData(img, 0, 0);
+  return (polarCv = cv);
+}
 const Ice = P.Ice = {
   build(R){
-    // the map's outline: east edge top → bottom, then west edge bottom → top
-    const ep = [], N = 90;
-    for (let i = 0; i <= N; i++) ep.push(P.toWorld(LAT_TOP - (LAT_TOP - LAT_MAP_BOT) * i / N, LON0 + 179.99));
-    for (let i = 0; i <= N; i++) ep.push(P.toWorld(LAT_MAP_BOT + (LAT_TOP - LAT_MAP_BOT) * i / N, LON0 - 179.99));
     const tex = new THREE.CanvasTexture(iceCanvas()); tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
-    const W = 1920, H = 900, outer = [[-3 * W, -3 * H], [4 * W, -3 * H], [4 * W, 4 * H], [-3 * W, 4 * H]].map(([x, y]) => new THREE.Vector2(x, y));
-    const hole = ep.map(([x, y]) => new THREE.Vector2(x, y)), all = outer.concat(hole), pos = [], uv = [];
+    // a big sheet with the map's rectangle cut out
+    const W = MAPW, H = MAPH, x0 = 0, y0 = MTOP, x1 = MAPW, y1 = MTOP + MAPH;
+    const outer = [[-3 * W, -3 * H], [4 * W, -3 * H], [4 * W, 4 * H], [-3 * W, 4 * H]].map(([x, y]) => new THREE.Vector2(x, y));
+    const hole = [[x0, y0], [x1, y0], [x1, y1], [x0, y1]].map(([x, y]) => new THREE.Vector2(x, y)), all = outer.concat(hole), pos = [], uv = [];
     for (const t of THREE.ShapeUtils.triangulateShape(outer, [hole])) for (const k of t){ pos.push(all[k].x, all[k].y, 0); uv.push(all[k].x / ICE_TILE, all[k].y / ICE_TILE); }
     const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
     this.mat = new THREE.MeshBasicMaterial({map:tex, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
     const m = this.mesh = new THREE.Mesh(g, this.mat); m.renderOrder = 2.5; m.frustumCulled = false; R.add3DRendererObject(m);   // over the ocean / rim, under the photo
-    // frost band along the edge: solid ice just outside → clear FROST px inside
-    let cx = 0, cy = 0; for (const [x, y] of ep){ cx += x; cy += y; } cx /= ep.length; cy /= ep.length;
-    const n = ep.length, ring = [[18, 1], [0, .8], [-FROST * .25, .5], [-FROST * .55, .22], [-FROST * .8, .06], [-FROST, 0]], bp = [], bu = [], bc = [], idx = [];
-    for (let i = 0; i < n; i++){
-      const [x, y] = ep[i], [ax, ay] = ep[(i - 1 + n) % n], [bx, by] = ep[(i + 1) % n];
-      let tx = bx - ax, ty = by - ay; const l = Math.hypot(tx, ty) || 1; tx /= l; ty /= l;
-      let nx = ty, ny = -tx; if (nx * (x - cx) + ny * (y - cy) < 0){ nx = -nx; ny = -ny; }
-      for (const [d, a] of ring){ const px = x + nx * d, py = y + ny * d; bp.push(px, py, 0); bu.push(px / ICE_TILE, py / ICE_TILE); bc.push(a); }
-    }
-    const RL = ring.length;
-    for (let i = 0; i < n; i++){ const j = (i + 1) % n; for (let k = 0; k < RL - 1; k++){ const a = i * RL + k, b = j * RL + k; idx.push(a, b, a + 1, b, b + 1, a + 1); } }
+    // 3.7: sea-ice bands, top and (flipped, mirrored) bottom
+    const ptex = new THREE.CanvasTexture(polarCanvas()); ptex.colorSpace = THREE.SRGBColorSpace;
+    const bp = [], bu = [];
+    const quad = (ax, ay, bx, by, u0, v0, u1, v1) => { bp.push(ax, ay, 0, bx, ay, 0, bx, by, 0, ax, ay, 0, bx, by, 0, ax, by, 0); bu.push(u0, v0, u1, v0, u1, v1, u0, v0, u1, v1, u0, v1); };
+    quad(x0, y0, x1, y0 + POLAR, 0, 1, 1, 0);
+    quad(x0, y1, x1, y1 - POLAR_S, 1, 1, 0, 0);
     const bg = new THREE.BufferGeometry(); bg.setAttribute("position", new THREE.Float32BufferAttribute(bp, 3)); bg.setAttribute("uv", new THREE.Float32BufferAttribute(bu, 2));
-    bg.setAttribute("fade", new THREE.Float32BufferAttribute(bc, 1)); bg.setIndex(idx);
-    this.frostMat = new THREE.ShaderMaterial({uniforms:{map:{value:tex}, tint:{value:new THREE.Color(0xffffff)}}, vertexShader:FROST_VS, fragmentShader:FROST_FS, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
-    const f = this.frost = new THREE.Mesh(bg, this.frostMat); f.renderOrder = 9; f.frustumCulled = false; R.add3DRendererObject(f);   // over the photo, under the region tints
+    this.frostMat = new THREE.MeshBasicMaterial({map:ptex, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
+    const f = this.frost = new THREE.Mesh(bg, this.frostMat); f.renderOrder = 10.4; f.frustumCulled = false; R.add3DRendererObject(f);   // over the photo and region tints, under borders
   },
-  /* muted ice (3.6.1), darker on the night map */
-  tone(night){ if (!this.mat) return; const c = night ? 0x3c4a54 : 0x74889a; this.mat.color.setHex(c); this.frostMat.uniforms.tint.value.setHex(c); },
+  /* muted ice (3.6.1), darker on the night map; the sea-ice bands a little dimmer at night */
+  tone(night){ if (!this.mat) return; this.mat.color.setHex(night ? 0x3c4a54 : 0x74889a); this.frostMat.color.setHex(night ? 0x8a9aa8 : 0xffffff); this.frostMat.opacity = night ? .75 : 1; },
 };
 
 /* ---------------------------------------------------------------- the 3D Earth on the menu (web/src/globe.js) */

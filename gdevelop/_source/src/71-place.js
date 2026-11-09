@@ -78,7 +78,7 @@ Screens.placeGrid = function(l){
 Screens.placeTap = function(mx, my){
   const kd = UIM.placing, shown = this._hexShown || []; if (!kd) return false;
   let best = null, bd = 1e9; for (const q of shown){ const d = (q.sx - mx) ** 2 + (q.sy - my) ** 2; if (d < bd){ bd = d; best = q; } }
-  const lim = Math.max(14, 1.4 * R * (1920 / 360) * P.Map.cam.z / Kit.K); if (!best || bd > lim * lim) return true;
+  const lim = Math.max(14, 1.4 * R * ((P.MAPW || 1920) / 360) * P.Map.cam.z / Kit.K); if (!best || bd > lim * lim) return true;
   if (P.placeAt(kd, best.cell.c, [best.cell.x, best.cell.y], best.cell.s)){ Audio.play("select"); P.Map.floatText(best.sx, best.sy - 10, best.cell.s >= .7 ? `+${L(P.PLACE_TXT.good)}` : best.cell.s >= .45 ? L(P.PLACE_TXT.ok) : L(P.PLACE_TXT.poor), best.cell.s >= .45 ? "good" : "accent"); k.dirty(); }
   return true;
 };

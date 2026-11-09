@@ -13,7 +13,7 @@ import {drawPins, drawTraffic, drawInfo, img3d, drawDetail, drawStatus, placePin
 import {drawClouds, drawAurora, drawRigs, drawTrains} from "./life.js";
 import {drawHex, hexCells} from "./hexgrid.js";
 import {createMapGL} from "./mapgl.js";
-import {iceCanvas, ICE_TILE, FROST} from "./ice.js";
+import {iceCanvas, polarCanvas, ICE_TILE, POLAR, POLAR_S} from "./ice.js";
 import {createAir3D} from "./air3d.js";
 
 const ZMIN = 1, ZMAX = 5, ZCOUNTRY = 1.55;   // 2.0: can't zoom out past the whole world (it always fills the screen)
@@ -62,14 +62,9 @@ export const GameMap = {
     const regPaths = {};
     for (const sh of this.shapes){ (regPaths[sh.r] = regPaths[sh.r] || new Path2D()).addPath(sh.path); }
     this.regPaths = regPaths;
-    // outline of the whole map (Robinson edge) from the edge of the texture area
-    const edge = new Path2D(), N = 90;
-    const {projection} = await import("./geo.js"); const pr = projection();
-    const ep = [];
-    for (let i = 0; i <= N; i++){ const p = pr([MAP.lon0 + 179.99, MAP.latTop - (MAP.latTop - MAP.latBot) * i / N]); i ? edge.lineTo(p[0], p[1]) : edge.moveTo(p[0], p[1]); ep.push(p[0], p[1]); }
-    for (let i = 0; i <= N; i++){ const p = pr([MAP.lon0 - 179.99, MAP.latBot + (MAP.latTop - MAP.latBot) * i / N]); edge.lineTo(p[0], p[1]); ep.push(p[0], p[1]); }
-    this.edgePts = new Float32Array(ep);
-    edge.closePath(); this.edge = edge;
+    // outline of the whole map (3.7: a plain rectangle, Plague Inc style)
+    const edge = new Path2D(); edge.rect(0, 0, MAP.W, MAP.H); this.edge = edge;
+    this.edgePts = new Float32Array([0, 0, MAP.W, 0, MAP.W, MAP.H, 0, MAP.H]);
     // CO₂ plume points
     this.plumes = [];
     for (const reg of Object.keys(P.CITIES)){ const tot = P.CITIES[reg].reduce((s, c) => s + c[2], 0); for (const [lat, lon, w, name] of P.CITIES[reg]){ const [x, y] = ll(lat, lon); this.plumes.push({reg, x, y, w:w / tot, name, ph:Math.random() * 6.28}); } }
@@ -150,7 +145,7 @@ export const GameMap = {
     this.base.style.width = w + "px"; this.base.style.height = h + "px";
     this.fx.width = Math.round(vw * dpr); this.fx.height = Math.round(vh * dpr); this.fx.style.width = vw + "px"; this.fx.style.height = vh + "px";
     if (this.gl) this.gl.setSize(w, h, dpr);
-    this.s0 = Math.max(vw / MAP.W, (vh * .55) / MAP.H);   // 3.1: the whole world fits the screen, not the (larger) stage
+    this.s0 = Math.max(vw / MAP.W, vh / MAP.H);   // 3.7: zoomed all the way out the map still fills the whole screen (Plague Inc)
     this.applyTilt(); this.clampCam(); this.dirtyBase = true; this.fxDirty = true;
     this.airUpdate();
   },
@@ -182,7 +177,7 @@ export const GameMap = {
   /* the part of the stage you can see at zoom z, minus the HUD: left/right edges at the middle row, top/bottom edges */
   viewRect(z = this.cam.z, k = 1){
     const a = this.tiltAt(z), H = this.hud, m = (this.w - this.vw) / 2;
-    return {L:m + H.l * k, R:this.w - m - H.r * k, T:this.viewToLocal(this.vw / 2, H.t, a)[1], B:this.viewToLocal(this.vw / 2, this.vh - H.b, a)[1]};
+    return {L:m + H.l * k, R:this.w - m - H.r * k, T:this.viewToLocal(this.vw / 2, H.t * k, a)[1], B:this.viewToLocal(this.vw / 2, this.vh - H.b * k, a)[1]};
   },
   updInsets(){ if (!this.vw) return; const V = this.viewRect(); this.insets = {l:V.L, r:this.w - V.R, t:V.T, b:this.h - V.B}; },
   scale(){ return this.s0 * this.cam.z; },
@@ -209,9 +204,10 @@ export const GameMap = {
   },
   /* 2.0: Plague Inc-style camera: the map can't be dragged off into space; its edge stops at the HUD */
   clampXY(x, y, z){
-    const s = this.s0 * z, V = this.viewRect(z, .25), hw = this.w / 2, hh = this.h / 2;   // 3.5: tighter, so the map edge stays at the screen edge
+    const s = this.s0 * z, V = this.viewRect(z, 0), hw = this.w / 2, hh = this.h / 2;   // 3.7: the map's edge never comes inside the screen (HUD or not)
+    const a = this.tiltAt(z); if (a > 0){ V.L = this.viewToLocal(0, 0, a)[0]; V.R = this.viewToLocal(this.vw, 0, a)[0]; }   // tilted: the far (top) row is the widest
     const x0 = (hw - V.L) / s, x1 = MAP.W - (V.R - hw) / s, y0 = (hh - V.T) / s, y1 = MAP.H - (V.B - hh) / s;
-    return [x0 > x1 ? MAP.W / 2 : clamp(x, x0, x1), y0 > y1 ? MAP.H / 2 : clamp(y, y0, y1)];
+    return [x0 > x1 ? (x0 + x1) / 2 : clamp(x, x0, x1), y0 > y1 ? (y0 + y1) / 2 : clamp(y, y0, y1)];
   },
   clampCam(){ const [x, y] = this.clampXY(this.cam.x, this.cam.y, this.cam.z); this.cam.x = x; this.cam.y = y; },
   /* centre of the part of the screen not covered by the HUD / drawer */
@@ -436,13 +432,10 @@ export const GameMap = {
   paintWorld(c, px, bAlpha){
     if (this.edge){ c.fillStyle = "#08202a"; c.fill(this.edge); }
     if (this.img){ c.save(); if (this.edge) c.clip(this.edge); c.imageSmoothingQuality = "high"; c.drawImage(this.img, 0, 0, MAP.W, MAP.H); c.restore(); }
-    // 3.5: frost fading from the ice into the map along its edge (soft wide strokes of the ice picture, inside the outline)
-    if (this.edge){
-      const night = this.theme() === "night";
-      c.save(); c.clip(this.edge); c.lineJoin = "round"; c.strokeStyle = this.icePattern(c);
-      for (let i = 0; i < 18; i++){ const u = 1 - i / 18; c.globalAlpha = (night ? .03 : .055) + (i === 17 ? .12 : 0); c.lineWidth = FROST * 2 * u; c.stroke(this.edge); }   // many thin steps so no bands show
-      c.restore();
-    }
+    // 3.7: thin, faint sea ice along the top and bottom of the map (see ice.js)
+    { const pc = polarCanvas(), night = this.theme() === "night";
+      c.save(); c.globalAlpha = night ? .6 : 1; c.drawImage(pc, 0, 0, MAP.W, POLAR);
+      c.translate(MAP.W, MAP.H); c.scale(-1, -1); c.drawImage(pc, 0, 0, MAP.W, POLAR_S); c.restore(); }
     if (!S.regions) return;
     const th = this.theme(), aBase = th === "night" ? .18 : th === "paint" ? .26 : .2;
     for (const r of S.regions){

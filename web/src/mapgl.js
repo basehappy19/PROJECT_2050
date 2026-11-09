@@ -9,11 +9,8 @@
    If the device has no WebGL 2, createMapGL returns null and map2d.js keeps drawing with Canvas 2D. */
 import * as THREE from "three";
 import {MAP} from "./geo.js";
-import {iceCanvas, edgeNormals, ICE_TILE, FROST} from "./ice.js";
+import {iceCanvas, polarCanvas, ICE_TILE, POLAR, POLAR_S} from "./ice.js";
 
-const FROST_VS = "attribute float fade; varying float vA; varying vec2 vUv; void main(){ vUv = uv; vA = fade; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }";
-const FROST_FS = "uniform sampler2D map; uniform vec3 tint; varying float vA; varying vec2 vUv; void main(){ vec4 c = texture2D(map, vUv); gl_FragColor = vec4(c.rgb * tint, vA);\n#include <colorspace_fragment>\n}";
-/* 3.5: the frost band is a small shader (texture × tint, alpha per vertex), so it matches the ice exactly on every GPU */
 const ORDER = {forest:4.5, ice:.5, frost:6.5, edge:1, glow:2, photo:3, tint:4, borderDark:5, borderLight:6, selFill:7, selGlow:8, selLine:9, cFill:10, cGlow:11, cLine:12, haze:13};
 
 /* ---------- geometry helpers ---------- */
@@ -112,7 +109,7 @@ class MapGL {
   addLine(rings, color, opacity, width, order, closed){ const mat = lineMat(color, opacity, width); const m = linesOf(rings, mat, order, closed); m.userData.w = width; this.lines.push(m); return m; }
   /* the world: shapes from map2d.js ({rings, r, c}), the outline points, region ids */
   build(shapes, edgePts, regionIds){
-    // outline of the map (Robinson edge): dark fill, three soft glows, the photo inside it
+    // outline of the map (3.7: a rectangle): dark fill, the photo inside it
     const edgePos = []; triangulate([edgePts], edgePos);
     this.edgeMesh = meshOf(edgePos, flat(0x08202a, 1), ORDER.edge); this.scene.add(this.edgeMesh);
     this.buildIce(edgePts);
@@ -137,8 +134,8 @@ class MapGL {
     this.haze = meshOf([-1e5, -1e5, 0, 1e5, -1e5, 0, 1e5, 1e5, 0, -1e5, -1e5, 0, 1e5, 1e5, 0, -1e5, 1e5, 0], flat(0xff5a28, 0), ORDER.haze); this.haze.visible = false; this.scene.add(this.haze);
     this.shapes = shapes;
   }
-  /* 3.5: a sheet of ice all round the map (a big rectangle with the map's outline cut out) and a frost band
-     that fades from the ice into the map along its edge, so the world never ends in a hard line */
+  /* 3.5: a sheet of ice all round the map (a big rectangle with the map cut out; 3.7: only seen at the far corners
+     when the camera tilts) and, 3.7, a thin faint band of ragged sea ice along the top and bottom of the map */
   buildIce(edgePts){
     const tex = new THREE.CanvasTexture(iceCanvas()); tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
     tex.anisotropy = Math.min(8, this.r.capabilities.getMaxAnisotropy());
@@ -150,22 +147,18 @@ class MapGL {
     const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
     this.iceMat = new THREE.MeshBasicMaterial({map:tex, color:0x8d9fac, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
     this.iceMesh = new THREE.Mesh(g, this.iceMat); this.iceMesh.renderOrder = ORDER.ice; this.iceMesh.frustumCulled = false; this.scene.add(this.iceMesh);
-    // frost band: outside (ice, solid) → the edge (mostly ice) → FROST units inside (clear)
-    const nrm = edgeNormals(edgePts), n = edgePts.length / 2, bp = [], bu = [], bc = [], idx = [];
-    const ring = [[18, 1], [0, .8], [-FROST * .25, .5], [-FROST * .55, .22], [-FROST * .8, .06], [-FROST, 0]];   // 3.6.1: softer
-    for (let i = 0; i < n; i++){
-      const x = edgePts[i * 2], y = edgePts[i * 2 + 1], nx = nrm[i * 2], ny = nrm[i * 2 + 1];
-      for (const [d, a] of ring){ const px = x + nx * d, py = y + ny * d; bp.push(px, py, 0); bu.push(px / ICE_TILE, py / ICE_TILE); bc.push(a); }
-    }
-    const R = ring.length;
-    for (let i = 0; i < n; i++){ const j = (i + 1) % n; for (let k = 0; k < R - 1; k++){ const a = i * R + k, b = j * R + k; idx.push(a, b, a + 1, b, b + 1, a + 1); } }
+    // sea-ice bands: the same strip at the top and, flipped and mirrored, at the bottom
+    const ptex = new THREE.CanvasTexture(polarCanvas()); ptex.colorSpace = THREE.SRGBColorSpace; ptex.anisotropy = tex.anisotropy;
+    const bp = [], bu = [];
+    const quad = (x0, y0, x1, y1, u0, v0, u1, v1) => { bp.push(x0, y0, 0, x1, y0, 0, x1, y1, 0, x0, y0, 0, x1, y1, 0, x0, y1, 0); bu.push(u0, v0, u1, v0, u1, v1, u0, v0, u1, v1, u0, v1); };
+    quad(0, 0, W, POLAR, 0, 1, 1, 0);              // texture v = 1 is the strip's top row (flipY)
+    quad(0, H, W, H - POLAR_S, 1, 1, 0, 0);        // bottom: top row on the bottom edge, mirrored
     const bg = new THREE.BufferGeometry(); bg.setAttribute("position", new THREE.Float32BufferAttribute(bp, 3)); bg.setAttribute("uv", new THREE.Float32BufferAttribute(bu, 2));
-    bg.setAttribute("fade", new THREE.Float32BufferAttribute(bc, 1)); bg.setIndex(idx);
-    this.frostMat = new THREE.ShaderMaterial({uniforms:{map:{value:tex}, tint:{value:new THREE.Color(0x8d9fac)}}, vertexShader:FROST_VS, fragmentShader:FROST_FS, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
+    this.frostMat = new THREE.MeshBasicMaterial({map:ptex, color:0xffffff, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
     this.frost = new THREE.Mesh(bg, this.frostMat); this.frost.renderOrder = ORDER.frost; this.frost.frustumCulled = false; this.scene.add(this.frost);
   }
   /* muted ice (3.6.1), darker on the night map, so the edge never stands out */
-  setIceTone(night){ if (!this.iceMat || this.iceNight === night) return; this.iceNight = night; const c = night ? 0x46555f : 0x8d9fac; this.iceMat.color.setHex(c); this.frostMat.uniforms.tint.value.setHex(c); }
+  setIceTone(night){ if (!this.iceMat || this.iceNight === night) return; this.iceNight = night; this.iceMat.color.setHex(night ? 0x46555f : 0x8d9fac); this.frostMat.color.setHex(night ? 0x8a9aa8 : 0xffffff); this.frostMat.opacity = night ? .75 : 1; }
   setImage(img){
     if (!img || this.imgSrc === img.src) return;
     this.imgSrc = img.src;
