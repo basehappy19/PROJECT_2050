@@ -298,7 +298,9 @@ Screens.renderMapUI = function(l){
   const Map = P.Map; if (!Map || !Map.scene) return;
   this._edgeAnim = false;
   if (this.kind === "game" && this.placeGrid) this.placeGrid(l);   // Continuous World: the hex grid under everything else
+  if (this.kind === "game" && this.drawRigs) this.drawRigs(l);   // 3.6: oil rigs and their flares
   if (this.kind === "game" && this.drawPins) this.drawPins(l);   // builds pinned on the map
+  if (this.kind === "game" && this.drawTrains) this.drawTrains(l);   // 3.6: high-speed trains
   if (this.kind === "game"){
     const ry = 60, rb = k.H - 60, zoomed = Map.isCountryZoom();
     const leftLimit = 74, rightLimit = (k.W - 16) - this.drawerWidth();

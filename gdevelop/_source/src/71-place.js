@@ -210,7 +210,11 @@ const KIND = {
 P.KIND_NAME = P.KIND_NAME || Object.fromEntries(Object.entries(KIND).map(([kk, v]) => [kk, v.name]));
 const kindName = kk => L((KIND[kk] || {}).name || {th:kk, en:kk});
 const TAU = Math.PI * 2;
+/* 3.6: zoomed in, a finished wind or solar build is a small field (back to front), like the website */
+const WIND_FIELD = [[-.55, -.55, .78], [.45, -.62, .74], [-1.05, .05, .82], [0, 0, 1], [.95, .1, .86], [-.4, .62, .9], [.55, .6, .88]];
+const SOLAR_FIELD = [[-.5, -.42], [.42, -.42], [-.95, .05], [-.04, .05], [.88, .05], [-.5, .52], [.42, .52]];
 function drawWind(l, x, y, s, now, sd){
+  k.line(l, x, y + s * .55, x + s * .32, y + s * .78, "#00080e", {w:Math.max(1, s * .07), a:.35});   // 3.6: shadow of the tower
   k.line(l, x, y + s * .55, x, y - s * .2, "#eef6f8", {w:Math.max(1.2, s * .09)});
   const a0 = now * 2.6 + sd;
   for (let i = 0; i < 3; i++){ const a = a0 + i * TAU / 3; k.line(l, x, y - s * .2, x + Math.cos(a) * s * .5, y - s * .2 + Math.sin(a) * s * .5, "#eef6f8", {w:Math.max(1.2, s * .09)}); }
@@ -274,8 +278,8 @@ Screens.drawPins = function(l){
     const [x, y] = M.toScreen(pos[0], pos[1]); if (!vis(x, y)) continue;
     const sd = p.sd % 100; anim = true;
     if (!p.done) drawBuilding(l, x, y, s, P.rollProgress(p.sk) ?? 1, now);
-    else if (p.k === "wind") drawWind(l, x, y, s, now, sd);
-    else if (p.k === "solar" || p.k === "floatsolar") drawSolar(l, x, y, s, now, p.k === "floatsolar");
+    else if (p.k === "wind"){ if (far) drawWind(l, x, y, s, now, sd); else for (const [dx, dy, kk] of WIND_FIELD) drawWind(l, x + dx * s, y + dy * s, s * kk, now, sd + dx * 2.3 + dy); }
+    else if (p.k === "solar" || p.k === "floatsolar"){ if (far) drawSolar(l, x, y, s, now, p.k === "floatsolar"); else for (const [dx, dy] of SOLAR_FIELD) drawSolar(l, x + dx * s, y + dy * s, s * .62, now + dx * .4, p.k === "floatsolar"); }
     else if (p.k === "nuclear" || p.k === "fusion") drawNuclear(l, x, y, s, now, p.k === "fusion");
     else if (p.k === "forest" || p.k === "mangrove") drawTrees(l, x, y, s, p.k === "mangrove");
     else if (p.k === "battery") drawBattery(l, x, y, s, now);

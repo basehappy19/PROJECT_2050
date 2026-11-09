@@ -169,6 +169,7 @@ const MODULES = [
   ["68-train.js", "Screens · โหมดฝึกซ้อม (ทีละขั้น เหมือนเว็บ)"],
   ["67-windows.js", "Screens · 3.3 ตลาดทรัพยากร (แบบ A), ความนิยม (แบบ B), สรุปรายปี"],
   ["73-earth.js", "Earth · ภาพถ่ายดาวเทียมใต้แผนที่ และลูกโลก 3D ในหน้าเมนู (เหมือนเว็บ)"],
+  ["74-life.js", "Life · 3.6 เมฆและพายุหมุน, แสงเหนือ, ป่าฟื้นตัว, แท่นขุดเจาะน้ำมัน, รถไฟความเร็วสูง (เหมือนเว็บ)"],
 ];
 const srcOf = f => (f.startsWith("@engine/") ? `${ENGINE}/${f.slice(8)}` : `${SRC}/${f}`);
 const COUNTRYGEO = fs.readFileSync(`${SOURCE}/assetgen/countrygeo.json`, "utf8");

@@ -26,7 +26,7 @@ function biggestShape(M, cid){
   const list = M.shapes.filter(s => s.c === cid); if (!list.length) return null;
   return list.reduce((a, b) => ((b.b[2] - b.b[0]) * (b.b[3] - b.b[1]) > (a.b[2] - a.b[0]) * (a.b[3] - a.b[1]) ? b : a));
 }
-function placePin(M, p){
+export function placePin(M, p){
   if (p.xy) return p.xy;   // placed by hand on the hex grid (Continuous World)
   if (pinPos.has(p.id)) return pinPos.get(p.id);
   const sh = biggestShape(M, p.c); let pos = null;
@@ -63,7 +63,12 @@ const KIND = {
 P.KIND_NAME = Object.fromEntries(Object.entries(KIND).map(([k, v]) => [k, v.name]));
 export const kindName = k => L((KIND[k] || {}).name || {th:k, en:k});
 
+/* 3.6: zoomed in, a finished wind or solar build is a small field: several turbines / rows of panels (back to front) */
+const WIND_FIELD = [[-.55, -.55, .78], [.45, -.62, .74], [-1.05, .05, .82], [0, 0, 1], [.95, .1, .86], [-.4, .62, .9], [.55, .6, .88]];
+const SOLAR_FIELD = [[-.5, -.42], [.42, -.42], [-.95, .05], [-.04, .05], [.88, .05], [-.5, .52], [.42, .52]];
 function drawWind(c, x, y, s, now, sd){
+  c.strokeStyle = "rgba(0,8,14,.35)"; c.lineWidth = Math.max(1, s * .07); c.lineCap = "round";   // 3.6: shadow of the tower
+  c.beginPath(); c.moveTo(x, y + s * .55); c.lineTo(x + s * .32, y + s * .78); c.stroke();
   c.strokeStyle = "#eef6f8"; c.lineWidth = Math.max(1.2, s * .09); c.lineCap = "round";
   c.beginPath(); c.moveTo(x, y + s * .55); c.lineTo(x, y - s * .2); c.stroke();
   const a0 = now * 2.6 + sd;
@@ -144,8 +149,8 @@ export function drawPins(M, c, now, vis){
     const [x, y] = M.toScreen(pos[0], pos[1]); if (!vis(x, y, 30)) continue;
     const sd = p.sd % 100;
     if (!p.done){ drawBuilding(c, x, y, s, P.rollProgress(p.sk) ?? 1, now); }
-    else if (p.k === "wind") drawWind(c, x, y, s, now, sd);
-    else if (p.k === "solar" || p.k === "floatsolar") drawSolar(c, x, y, s, now, p.k === "floatsolar");
+    else if (p.k === "wind"){ if (far) drawWind(c, x, y, s, now, sd); else for (const [dx, dy, k] of WIND_FIELD) drawWind(c, x + dx * s, y + dy * s, s * k, now, sd + dx * 2.3 + dy); }
+    else if (p.k === "solar" || p.k === "floatsolar"){ if (far) drawSolar(c, x, y, s, now, p.k === "floatsolar"); else for (const [dx, dy] of SOLAR_FIELD) drawSolar(c, x + dx * s, y + dy * s, s * .62, now + dx * .4, p.k === "floatsolar"); }
     else if (p.k === "nuclear" || p.k === "fusion") drawNuclear(c, x, y, s, now, p.k === "fusion");
     else if (p.k === "forest" || p.k === "mangrove") drawTrees(c, x, y, s, p.k === "mangrove");
     else if (p.k === "battery") drawBattery(c, x, y, s, now);

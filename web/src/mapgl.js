@@ -14,7 +14,7 @@ import {iceCanvas, edgeNormals, ICE_TILE, FROST} from "./ice.js";
 const FROST_VS = "attribute float fade; varying float vA; varying vec2 vUv; void main(){ vUv = uv; vA = fade; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }";
 const FROST_FS = "uniform sampler2D map; uniform vec3 tint; varying float vA; varying vec2 vUv; void main(){ vec4 c = texture2D(map, vUv); gl_FragColor = vec4(c.rgb * tint, vA);\n#include <colorspace_fragment>\n}";
 /* 3.5: the frost band is a small shader (texture × tint, alpha per vertex), so it matches the ice exactly on every GPU */
-const ORDER = {ice:.5, frost:6.5, edge:1, glow:2, photo:3, tint:4, borderDark:5, borderLight:6, selFill:7, selGlow:8, selLine:9, cFill:10, cGlow:11, cLine:12, haze:13};
+const ORDER = {forest:4.5, ice:.5, frost:6.5, edge:1, glow:2, photo:3, tint:4, borderDark:5, borderLight:6, selFill:7, selGlow:8, selLine:9, cFill:10, cGlow:11, cLine:12, haze:13};
 
 /* ---------- geometry helpers ---------- */
 function inRing(r, x, y){
@@ -226,6 +226,16 @@ class MapGL {
         this.cObjs = [fill, glow, line]; this.cObjs.forEach(o => this.scene.add(o));
       }
     }
+  }
+  /* 3.6: countries where planted forests are growing back: a green tint that deepens over the years ({country: alpha}) */
+  setForest(levels, shapesOf){
+    this.forest = this.forest || {};
+    for (const [cid, a] of Object.entries(levels)){
+      let m = this.forest[cid];
+      if (!m){ const pos = []; shapesOf(cid).forEach(sh => triangulate(sh.rings, pos)); if (!pos.length) continue; m = this.forest[cid] = meshOf(pos, flat(0x2fbf6a, 0), ORDER.forest); this.scene.add(m); }
+      m.visible = a > 0; m.material.opacity = a;
+    }
+    for (const [cid, m] of Object.entries(this.forest)) if (!(cid in levels)) m.visible = false;
   }
   cached(k, make){
     let o = this.cache.get(k);

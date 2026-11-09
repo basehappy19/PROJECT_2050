@@ -2214,6 +2214,7 @@ P.CHANGELOG = [
     "โลกในเกมล้อมด้วยน้ำแข็งที่ค่อย ๆ กลืนไปกับขอบแผนที่ ไม่มีที่ว่างรอบโลกแล้ว และเลื่อนแผนที่ออกนอกขอบไม่ได้",
     "เครื่องบินเป็นโมเดล 3 มิติ เงยไปพร้อมแผนที่เมื่อซูม เชิดหัวตอนขึ้น ก้มหัวตอนลง และเอียงตัวตอนเลี้ยว",
     "กดเข้าเกมแล้วโลกในหน้าโหลดเลื่อนไปเป็นโลกในหน้าหลักอย่างนุ่มนวล",
+    "แผนที่มีชีวิตชีวาขึ้น: เมฆลอยพร้อมเงา พายุเฮอริเคนและไต้ฝุ่นหมุนก่อนเข้า แสงเหนือที่ขั้วโลก ฟาร์มกังหันลมและโซลาร์เป็นทุ่ง รถไฟความเร็วสูงวิ่งเมื่อสร้างเสร็จ ป่าที่ปลูกค่อย ๆ เขียวขึ้น และแท่นขุดเจาะน้ำมันที่ไฟดับเมื่อประเทศนั้นหันมาใช้พลังงานสะอาด",
   ], [
     "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu.",
     "Fast mode: a 15-minute game without minerals or groups and with fewer events, great for a first game.",
@@ -2239,6 +2240,7 @@ P.CHANGELOG = [
     "The world now sits in a sheet of ice that fades into the map's edge: no empty space around it, and the map can't be dragged past its edge.",
     "Planes are 3D models that tip back with the map when you zoom in; they lift their nose to climb, dip it to land and bank into turns.",
     "Entering the game, the Earth on the loading screen glides over to become the globe on the home screen.",
+    "A livelier map: drifting clouds with shadows, hurricanes and typhoons spinning before they hit, northern lights, wind and solar farms as whole fields, high-speed trains once a line is built, planted forests slowly turning green, and oil rigs whose flares go out when that country goes green.",
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",

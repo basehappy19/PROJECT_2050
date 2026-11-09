@@ -9,7 +9,8 @@ import {MAP, ll} from "./geo.js";
 import {Audio} from "./audio.js";
 import ICONS from "./gen/icons.js";
 import {Gfx} from "./gfx.js";
-import {drawPins, drawTraffic, drawInfo, img3d, drawDetail, drawStatus} from "./mapfx.js";
+import {drawPins, drawTraffic, drawInfo, img3d, drawDetail, drawStatus, placePin} from "./mapfx.js";
+import {drawClouds, drawAurora, drawRigs, drawTrains} from "./life.js";
 import {drawHex, hexCells} from "./hexgrid.js";
 import {createMapGL} from "./mapgl.js";
 import {iceCanvas, ICE_TILE, FROST} from "./ice.js";
@@ -191,6 +192,13 @@ export const GameMap = {
   /* world ↔ screen (the flat overlay, pointer events, HTML) */
   toScreen(x, y){ const [ex, ey] = this.toStage(x, y); return this.tilt > 0 ? this.localToView(ex, ey) : [ex - this.sx0, ey - this.sy0]; },
   toWorld(vx, vy){ return this.stageToWorld(...this.viewToLocal(vx, vy)); },
+  /* 3.6: forests planted on the map grow back: each finished forest / mangrove build tints its country greener, a little more every month (full after 4 years) */
+  forestLevels(){
+    const out = {};
+    for (const p of S.pins || []) if ((p.k === "forest" || p.k === "mangrove") && p.done) out[p.c] = (out[p.c] || 0) + clamp((S.tick - (p.t || 0)) / 48, .15, 1) * .13;
+    for (const k in out) out[k] = Math.round(clamp(out[k], 0, .34) * 50) / 50;
+    return out;
+  },
   /* 3.5: a stage point relative to the tilt axis (what air3d.js works in) */
   stageAxis(ex, ey){ return [ex - this.w / 2, ey + this.vTop0]; },
   /* 3.5: world point h screen px above the map → screen point (the same perspective as the CSS tilt) */
@@ -359,7 +367,7 @@ export const GameMap = {
     if (this.dirtyBase){ this.drawBase(moving); this.dirtyBase = false; }
     // the overlay must follow the base exactly while it moves; otherwise it only animates gently, so it runs at the quality's frame rate
     const anim = this.fx_.length || this.floats.length || (this.parts && this.parts.length);
-    const live = (S.haz && S.haz.length) || (S.bubbles && S.bubbles.length) || (this.traffic && this.traffic.length) || this.hover;
+    const live = (S.haz && S.haz.length) || (S.bubbles && S.bubbles.length) || (this.traffic && this.traffic.length) || this.hover || (S.regions && Gfx.level !== "low");   // 3.6: clouds and aurora always move
     const gap = 1000 / (anim ? 60 : live ? Gfx.cfg.fxFps : 8);
     if (moved || this.fxDirty || now - (this._fxAt || 0) >= gap - 2){
       const fdt = Math.min(.1, (now - (this._fxAt || now)) / 1000) || dt;
@@ -370,7 +378,7 @@ export const GameMap = {
   /* cached picture of the whole map: photo + region colours + borders (rebuilt only when the colours change) */
   tintKey(){
     if (!S.regions) return "-";
-    return S.regions.map(r => heatRGB(regionHeatValue(r)).map(v => v >> 3).join(".")).join("|") + "|" + (HEAT === HEAT_CB ? "cb" : "") + "|" + this.theme() + "|" + (this.img ? this.img.width : 0) + "|" + Gfx.level;
+    return S.regions.map(r => heatRGB(regionHeatValue(r)).map(v => v >> 3).join(".")).join("|") + "|" + JSON.stringify(this.forestLevels()) + "|" + (HEAT === HEAT_CB ? "cb" : "") + "|" + this.theme() + "|" + (this.img ? this.img.width : 0) + "|" + Gfx.level;
   },
   buildCache(){
     const k = Gfx.cfg.cache, W = Math.round(MAP.W * k), Hh = Math.round(MAP.H * k);
@@ -441,6 +449,7 @@ export const GameMap = {
       const col = heatRGB(regionHeatValue(r)), path = this.regPaths[r.id]; if (!path) continue;
       c.fillStyle = `rgba(${col[0]},${col[1]},${col[2]},${aBase})`; c.fill(path, "evenodd");
     }
+    for (const [cid, a] of Object.entries(this.forestLevels())){ c.fillStyle = `rgba(47,191,106,${a})`; for (const sh of this.shapes) if (sh.c === cid) c.fill(sh.path, "evenodd"); }   // 3.6: forests growing back
     c.lineJoin = "round";
     c.strokeStyle = `rgba(4,16,12,${.55 * bAlpha})`; c.lineWidth = 1.1 * px;
     for (const sh of this.shapes) c.stroke(sh.path);
@@ -456,6 +465,7 @@ export const GameMap = {
     const th = this.theme(), aBase = th === "night" ? .18 : th === "paint" ? .26 : .2;
     const cols = {}; if (S.regions) for (const r of S.regions) cols[r.id] = heatRGB(regionHeatValue(r));
     G.setTints(cols, aBase);
+    G.setForest(this.forestLevels(), cid => this.shapes.filter(x => x.c === cid));
     const zc = this.cam.z >= ZCOUNTRY, sel = S.regions && !S.noSel ? S.sel : null, selC = S.regions && !S.noSel ? S.selC : null;
     const cShapes = !selC ? [] : selC.startsWith("R_") ? this.shapes.filter(x => !x.c && x.r === selC.slice(2)) : this.shapes.filter(x => x.c === selC);
     G.setSelection(sel && this.regPaths[sel] ? sel : null, sel && cols[sel] ? cols[sel] : [79, 209, 197], zc, cShapes, selC || null);
@@ -559,9 +569,14 @@ export const GameMap = {
       }
     }
     // builds on the map and the traffic between countries
+    const night = this.theme() === "night";
+    drawAurora(this, c, now, vis, night);   // 3.6: northern (and southern) lights
     drawDetail(this, c, now, vis, iconImg);   // 1.7: capitals, smokestacks, sea chokepoints
+    drawRigs(this, c, now, vis);   // 3.6: oil rigs, flaring until the country goes green
     drawPins(this, c, now, vis);
+    drawTrains(this, c, now, vis, placePin);   // 3.6: high-speed trains on finished rail builds
     drawTraffic(this, c, dt, now, vis);
+    drawClouds(this, c, dt, now, vis, night);   // 3.6: clouds and spinning storms, above the planes
     const hexHit = drawHex(this, c, vis);
     c.globalAlpha = 1; c.lineCap = "butt";
     // labels
