@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Project Zero — ภารกิจกู้วิกฤตโลก",
   "short_name": "Project Zero",
-  "description": "เกมวางแผนกลยุทธ์กู้วิกฤตโลกร้อน ลูกโลก 3 มิติ แผนที่ดาวเทียม 67 ประเทศ 40 สกิล 4 ตัวละคร นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 (SDG 13) · เล่นออฟไลน์ได้",
+  "description": "เกมวางแผนกลยุทธ์กู้วิกฤตโลกร้อนบนลูกโลก 3 มิติ ดูแล 67 ประเทศ พาโลกถึง Net Zero ก่อนปี 2050 (SDG 13) · Climate strategy game: reach Net Zero by 2050 · เล่นออฟไลน์ได้",
   "lang": "th",
   "start_url": "./",
   "scope": "./",
@@ -32,7 +32,7 @@
       "purpose": "any"
     },
     {
-      "src": "icon-512.png",
+      "src": "icon-maskable-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
@@ -40,7 +40,23 @@
     {
       "src": "favicon.svg",
       "sizes": "any",
-      "type": "image/svg+xml"
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ],
+  "dir": "ltr",
+  "shortcuts": [
+    {
+      "name": "English",
+      "short_name": "English",
+      "url": "./en/",
+      "icons": [
+        {
+          "src": "icon-192.png",
+          "sizes": "192x192",
+          "type": "image/png"
+        }
+      ]
     }
   ]
 }

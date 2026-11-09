@@ -143,16 +143,8 @@ function ending(kind){
   return s;
 }
 /* ---------------- logo + Terra coin ---------------- */
-const logo = `<svg xmlns="http://www.w3.org/2000/svg" width="300" height="300" viewBox="0 0 300 300"><defs>
-<radialGradient id="o" cx="40%" cy="35%" r="75%"><stop offset="0" stop-color="#5fd3c8"/><stop offset="1" stop-color="#0d4e5c"/></radialGradient>
-<clipPath id="cl"><circle cx="150" cy="150" r="96"/></clipPath></defs>
-<circle cx="150" cy="150" r="140" fill="#061015"/><circle cx="150" cy="150" r="128" fill="none" stroke="#4fd1c5" stroke-width="8"/>
-<circle cx="150" cy="150" r="96" fill="url(#o)"/>
-<g clip-path="url(#cl)" fill="#2f9e6f"><path d="M70 110 q30 -30 60 -10 q20 10 10 30 q-20 10 -10 30 q10 30 -20 40 q-30 0 -40 -30 q-20 -30 0 -60Z"/><path d="M170 80 q40 0 60 30 q10 30 -20 30 q-20 0 -30 20 q-10 20 -30 0 q-10 -30 0 -50 q5 -25 20 -30Z"/><path d="M180 190 q30 0 40 20 q-10 30 -40 30 q-20 -20 0 -50Z"/></g>
-<path d="M196 70 Q246 70 246 120 Q196 124 188 96 Q186 78 196 70Z" fill="#9be89a" stroke="#0c3a26" stroke-width="5"/><path d="M190 100 Q214 92 240 76" stroke="#0c3a26" stroke-width="4" fill="none"/>
-<path id="arc" d="M58 150 A92 92 0 0 0 242 150" fill="none"/>
-<text font-family="Arial Black, Arial" font-weight="900" font-size="34" fill="#e6f0ee" letter-spacing="6"><textPath href="#arc" startOffset="50%" text-anchor="middle">2050</textPath></text>
-</svg>`;
+// 3.4: the website's logo (design E50, sunrise over the Earth) — one source for both versions: assets/img/ui/logo.svg
+const logo = fs.readFileSync(path.resolve(ROOT, "../../assets/img/ui/logo.svg"), "utf8").replace(' width="512" height="512"', ' width="300" height="300"');
 const terra = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><defs><radialGradient id="t" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#7fe3d8"/><stop offset="1" stop-color="#147a7a"/></radialGradient><clipPath id="tc"><circle cx="32" cy="32" r="24"/></clipPath></defs>
 <circle cx="32" cy="32" r="30" fill="#f2c14e"/><circle cx="32" cy="32" r="27" fill="#b8860b"/><circle cx="32" cy="32" r="24" fill="url(#t)"/>
 <g clip-path="url(#tc)" fill="#3fbf6f"><path d="M12 26 q8 -10 18 -4 q4 6 -2 10 q-4 6 0 12 q-4 6 -10 2 q-8 -8 -6 -20Z"/><path d="M36 16 q12 0 16 10 q-4 6 -10 4 q-6 4 -8 -2 q-2 -8 2 -12Z"/><path d="M40 38 q8 0 10 6 q-4 8 -12 6 q-2 -8 2 -12Z"/></g>

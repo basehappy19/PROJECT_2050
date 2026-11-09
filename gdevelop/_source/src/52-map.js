@@ -148,6 +148,7 @@ const Map = {
     g.alpha = 0;
   },
   drawSelected(){
+    if (this.mode !== "game"){ if (this.selMesh && this.R3) this.R3.remove3DRendererObject(this.selMesh); this.selMesh = null; this._selKey = null; if (this.selPaint) this.selPaint.getRendererObject().clear(); return; }   // 3.4: the menu shows the 3D Earth, so the last game's selected country must not be drawn over it
     if (this.R3){
       const key = (S.selC || "") + "|" + (this.cam.z >= ZCOUNTRY ? 1 : 0); if (key === this._selKey) return; this._selKey = key;
       if (this.selMesh){ this.R3.remove3DRendererObject(this.selMesh); this.selMesh = null; }

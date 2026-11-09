@@ -1,47 +1,72 @@
 <!doctype html>
-<html lang="th">
+<html lang="__LANG__" dir="ltr">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
-<title>Project Zero — ภารกิจกู้วิกฤตโลก</title>
-<meta name="description" content="เกมวางแผนกลยุทธ์กู้วิกฤตโลกร้อน ลูกโลก 3 มิติ แผนที่ดาวเทียม 67 ประเทศ ภัยเฉพาะถิ่น 40 สกิล 4 ตัวละคร นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 ตามเป้าหมาย SDG 13 · เล่นได้ทั้งภาษาไทยและอังกฤษ · จัดทำเพื่อกิจกรรม Garena Academy Game Maker">
-<meta name="keywords" content="Project Zero, climate game, SDG 13, Net Zero, เกมภาวะโลกร้อน, Garena Academy Game Maker, strategy game">
+__BASE__<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>__TITLE__</title>
+<meta name="description" content="__DESC__">
+<meta name="keywords" content="__KEYWORDS__">
 <meta name="author" content="ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="application-name" content="Project Zero">
+<meta name="generator" content="Project Zero __VERSION__">
 <meta name="theme-color" content="#061015">
 <meta name="color-scheme" content="dark">
-<link rel="canonical" href="https://basehappy19.github.io/PROJECT_2050/">
+<meta name="format-detection" content="telephone=no">
+<link rel="canonical" href="__URL__">
+<link rel="alternate" hreflang="th" href="https://basehappy19.github.io/PROJECT_2050/">
+<link rel="alternate" hreflang="en" href="https://basehappy19.github.io/PROJECT_2050/en/">
+<link rel="alternate" hreflang="x-default" href="https://basehappy19.github.io/PROJECT_2050/">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="icon-32.png" type="image/png" sizes="32x32">
 <link rel="icon" href="icon-16.png" type="image/png" sizes="16x16">
-<link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="manifest" href="site.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png" sizes="180x180">
+<link rel="manifest" href="__MANIFEST__">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Project Zero">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="Project Zero">
-<meta property="og:locale" content="th_TH">
-<meta property="og:locale:alternate" content="en_US">
-<meta property="og:title" content="Project Zero — ภารกิจกู้วิกฤตโลก">
-<meta property="og:description" content="นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 · เกมวางแผนกลยุทธ์บนลูกโลก 3 มิติและแผนที่ดาวเทียม สำหรับกิจกรรม Garena Academy Game Maker">
-<meta property="og:url" content="https://basehappy19.github.io/PROJECT_2050/">
-<meta property="og:image" content="https://basehappy19.github.io/PROJECT_2050/og-image.png">
+<meta property="og:locale" content="__OG_LOCALE__">
+<meta property="og:locale:alternate" content="__OG_LOCALE_ALT__">
+<meta property="og:title" content="__OG_TITLE__">
+<meta property="og:description" content="__OG_DESC__">
+<meta property="og:url" content="__URL__">
+<meta property="og:image" content="https://basehappy19.github.io/PROJECT_2050/__OG_IMAGE__">
+<meta property="og:image:secure_url" content="https://basehappy19.github.io/PROJECT_2050/__OG_IMAGE__">
+<meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="__IMG_ALT__">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Project Zero — ภารกิจกู้วิกฤตโลก">
-<meta name="twitter:image" content="https://basehappy19.github.io/PROJECT_2050/og-image.png">
+<meta name="twitter:title" content="__OG_TITLE__">
+<meta name="twitter:description" content="__OG_DESC__">
+<meta name="twitter:image" content="https://basehappy19.github.io/PROJECT_2050/__OG_IMAGE__">
+<meta name="twitter:image:alt" content="__IMG_ALT__">
+<script type="application/ld+json">__JSONLD__</script>
+<link rel="preload" href="assets/img/ui/loader-earth.webp" as="image" type="image/webp" media="(min-width: 600px) and (min-height: 600px)">
+<link rel="preload" href="assets/img/ui/loader-earth-s.webp" as="image" type="image/webp" media="(max-width: 599px), (max-height: 599px)">
 <link rel="preload" href="assets/data/world.json" as="fetch" crossorigin>
 <!--CSS-->
 <style>
   html,body{margin:0;height:100%;background:#061015;color:#e6f0ee;overflow:hidden}
-  #boot{position:fixed;inset:0;display:grid;place-items:center;font:600 14px/1.4 system-ui,sans-serif;letter-spacing:.2em;color:#4fd1c5}
+  #boot{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px;box-sizing:border-box;text-align:center;
+    background:radial-gradient(ellipse at 18% 55%, #0b2230 0%, #03090d 55%, #010406 100%);font:400 15px/1.5 system-ui,sans-serif;color:#9fb8b4}
+  #boot img{width:72px;height:72px}
+  #boot h1{margin:0;font:700 28px/1.1 system-ui,sans-serif;letter-spacing:.18em;color:#e6f0ee}
+  #boot p{margin:0;max-width:34em}
+  #boot nav{font-size:13px} #boot a{color:#4fd1c5}
 </style>
 </head>
 <body>
-<div id="app"><div id="boot">PROJECT ZERO</div></div>
-<noscript><p style="padding:24px">Project Zero ต้องเปิด JavaScript · This game needs JavaScript.</p></noscript>
+<div id="app"><main id="boot">
+<img src="assets/img/ui/logo.svg" alt="Project Zero" width="72" height="72">
+<h1>PROJECT ZERO</h1>
+<p>__BOOT__</p>
+<nav aria-label="__NAV_LABEL__"><a href="https://basehappy19.github.io/PROJECT_2050/" hreflang="th" lang="th">ภาษาไทย</a> · <a href="https://basehappy19.github.io/PROJECT_2050/en/" hreflang="en" lang="en">English</a></nav>
+</main></div>
+<noscript><p style="position:fixed;bottom:0;left:0;right:0;padding:24px;margin:0;text-align:center">__NOSCRIPT__</p></noscript>
 <!--JS-->
 </body>
 </html>

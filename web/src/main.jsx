@@ -10,7 +10,10 @@ if (!CanvasRenderingContext2D.prototype.roundRect){
   CanvasRenderingContext2D.prototype.roundRect = function(x, y, w, h, r){ r = Math.min(typeof r === "number" ? r : 0, w / 2, h / 2); this.moveTo(x + r, y); this.arcTo(x + w, y, x + w, y + h, r); this.arcTo(x + w, y + h, x, y + h, r); this.arcTo(x, y + h, x, y, r); this.arcTo(x, y, x + w, y, r); this.closePath(); return this; };
 }
 document.documentElement.lang = S.lang || "th";
-render(<App/>, document.getElementById("app"));
+/* 3.4: the page arrives with a readable start screen (#boot, for search engines and slow networks); the game replaces it */
+const root = document.getElementById("app");
+root.textContent = "";
+render(<App/>, root);
 /* 1.1.5: a new version is picked up while the game is open: the service worker checks for updates when the tab comes back
    and every 20 minutes; when the new one takes over, the menu reloads at once and a game in progress offers "Update now" (it saves first) */
 if ("serviceWorker" in navigator && location.protocol === "https:"){

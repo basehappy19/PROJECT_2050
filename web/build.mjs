@@ -137,6 +137,46 @@ async function obfuscate(code){
   }).getObfuscatedCode();
 }
 
+
+/* ---------- 3.4: search engines and share cards (Thai + English) ---------- */
+const GH = "https://basehappy19.github.io/PROJECT_2050/";   // placeholder address in index.html, swapped for PUBLIC_URL
+const SEO = {
+  th:{
+    title:"Project Zero — เกมวางแผนกู้วิกฤตโลกร้อน พาโลกสู่ Net Zero 2050",
+    desc:"เกมวางแผนกู้วิกฤตโลกร้อนบนลูกโลก 3 มิติ ดูแล 67 ประเทศ รับมือภัยพิบัติ ใช้ 40 สกิลพาโลกถึง Net Zero ก่อนปี 2050 (SDG 13) เล่นฟรีบนเว็บและมือถือ",
+    keywords:"Project Zero, เกมโลกร้อน, เกมภาวะโลกร้อน, เกมวางแผน, เกมกลยุทธ์, Net Zero, SDG 13, การเปลี่ยนแปลงสภาพภูมิอากาศ, เกมการศึกษา, เกมเว็บ, Garena Academy Game Maker",
+    locale:"th_TH", localeAlt:"en_US",
+    ogTitle:"Project Zero — ภารกิจกู้วิกฤตโลก",
+    ogDesc:"คุณมีเวลา 24 ปีพาโลกถึง Net Zero · เกมวางแผนกลยุทธ์บนลูกโลก 3 มิติ 67 ประเทศ เล่นฟรีบนเว็บ",
+    ogImage:"og-image.png", imgAlt:"ลูกโลกจริงกับโลโก้ Project Zero และข้อความ ภารกิจกู้วิกฤตโลก Net Zero 2050",
+    boot:"เกมวางแผนกลยุทธ์กู้วิกฤตโลกร้อน · พาโลกถึง Net Zero ก่อนสิ้นปี 2050 · กำลังโหลด…",
+    noscript:"Project Zero เป็นเกมวางแผนกู้วิกฤตโลกร้อนที่ต้องเปิด JavaScript เพื่อเล่น · This game needs JavaScript.",
+    nav:"ภาษา", genre:["กลยุทธ์", "จำลองสถานการณ์", "การศึกษา"], name:"Project Zero — ภารกิจกู้วิกฤตโลก",
+  },
+  en:{
+    title:"Project Zero — Climate Strategy Game: Reach Net Zero by 2050",
+    desc:"Free climate strategy game in your browser. Steer 67 countries on a 3D globe, face disasters and use 40 skills to reach Net Zero before 2050 (SDG 13).",
+    keywords:"Project Zero, climate game, climate change game, strategy game, Net Zero, SDG 13, global warming game, educational game, browser game, Garena Academy Game Maker",
+    locale:"en_US", localeAlt:"th_TH",
+    ogTitle:"Project Zero — Save the planet by 2050",
+    ogDesc:"You have 24 years to bring the world to Net Zero. A free climate strategy game on a 3D globe with 67 countries.",
+    ogImage:"og-image-en.png", imgAlt:"The real Earth with the Project Zero logo and the words Climate strategy game, Net Zero 2050",
+    boot:"A climate strategy game · lead the world to Net Zero before the end of 2050 · loading…",
+    noscript:"Project Zero is a climate strategy game and needs JavaScript to play.",
+    nav:"Language", genre:["Strategy", "Simulation", "Educational"], name:"Project Zero",
+  },
+};
+const jsonLd = (L, m, url) => ({"@context":"https://schema.org", "@graph":[
+  {"@type":"WebSite", "@id":GH + "#website", url:GH, name:"Project Zero", inLanguage:["th", "en"]},
+  {"@type":"VideoGame", "@id":GH + "#game", url, name:m.name, alternateName:"Project Zero", description:m.desc, inLanguage:["th", "en"],
+    image:GH + m.ogImage, thumbnailUrl:GH + "icon-512.png", genre:m.genre, gamePlatform:["Web browser", "Android", "iOS", "Windows", "macOS"],
+    applicationCategory:"GameApplication", operatingSystem:"Any (web browser)", playMode:"SinglePlayer", numberOfPlayers:{"@type":"QuantitativeValue", minValue:1, maxValue:1},
+    isAccessibleForFree:true, offers:{"@type":"Offer", price:"0", priceCurrency:"THB", availability:"https://schema.org/InStock", url},
+    about:[{"@type":"Thing", name:L === "th" ? "การเปลี่ยนแปลงสภาพภูมิอากาศ" : "Climate change"}, {"@type":"Thing", name:"SDG 13 Climate Action"}],
+    keywords:m.keywords, softwareVersion:VERSION, isPartOf:{"@id":GH + "#website"},
+    creator:{"@type":"Organization", name:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์"}},
+]});
+
 const hash = buf => crypto.createHash("sha1").update(buf).digest("hex").slice(0, 10);
 
 async function build(){
@@ -157,15 +197,32 @@ async function build(){
     if (o.path.endsWith(".js")){ const js = PROTECT ? await obfuscate(o.text) : o.contents; jsName = `app-${hash(js)}.js`; fs.writeFileSync(path.join(ASSETS, jsName), js); }
     if (o.path.endsWith(".css")){ const c = fontCss + o.text; cssName = `app-${hash(c)}.css`; fs.writeFileSync(path.join(ASSETS, cssName), c); }
   }
-  // index.html
-  let html = fs.readFileSync(path.join(HERE, "index.html"), "utf8");
+  // index.html (3.4: one page per language — "/" Thai, "/en/" English — each with its own title, description, share card and JSON-LD)
+  const SITE = (process.env.PUBLIC_URL || "https://basehappy19.github.io/PROJECT_2050/").replace(/\/?$/, "/");
+  const tpl = fs.readFileSync(path.join(HERE, "index.html"), "utf8");
   const api = process.env.P2050_API ? `<script>window.P2050_API=${JSON.stringify(process.env.P2050_API)}</script>\n` : "";
-  html = html.replace("<!--CSS-->", `<link rel="stylesheet" href="assets/${cssName}">`).replace("<!--JS-->", `${api}<script type="module" src="assets/${jsName}"></script>`).replace(/__VERSION__/g, VERSION);
-  // share links (og:url, og:image, canonical) point at the real site when PUBLIC_URL is set in .env
-  if (process.env.PUBLIC_URL) html = html.split("https://basehappy19.github.io/PROJECT_2050/").join(process.env.PUBLIC_URL.replace(/\/?$/, "/"));
-  fs.writeFileSync(path.join(OUT, "index.html"), html);
+  for (const L of Object.keys(SEO)){
+    const m = SEO[L], url = GH + (L === "th" ? "" : L + "/");
+    const ld = JSON.stringify(jsonLd(L, m, url)).replace(/</g, "\\u003c");
+    const fill = {__LANG__:L, __BASE__:L === "th" ? "" : '<base href="../">\n', __TITLE__:m.title, __DESC__:m.desc, __KEYWORDS__:m.keywords, __URL__:url,
+      __OG_LOCALE__:m.locale, __OG_LOCALE_ALT__:m.localeAlt, __OG_TITLE__:m.ogTitle, __OG_DESC__:m.ogDesc, __OG_IMAGE__:m.ogImage, __IMG_ALT__:m.imgAlt,
+      __BOOT__:m.boot, __NOSCRIPT__:m.noscript, __NAV_LABEL__:m.nav, __MANIFEST__:"site.webmanifest", __JSONLD__:ld};
+    let html = tpl.replace(/__(LANG|BASE|TITLE|DESC|KEYWORDS|URL|OG_LOCALE_ALT|OG_LOCALE|OG_TITLE|OG_DESC|OG_IMAGE|IMG_ALT|BOOT|NOSCRIPT|NAV_LABEL|MANIFEST|JSONLD)__/g, k => fill[k]);
+    html = html.replace("<!--CSS-->", `<link rel="stylesheet" href="assets/${cssName}">`).replace("<!--JS-->", `${api}<script type="module" src="assets/${jsName}"></script>`).replace(/__VERSION__/g, VERSION);
+    // share links (og:url, og:image, canonical, hreflang) point at the real site when PUBLIC_URL is set in .env
+    html = html.split(GH).join(SITE);
+    const dir = L === "th" ? OUT : path.join(OUT, L);
+    fs.mkdirSync(dir, {recursive:true});
+    fs.writeFileSync(path.join(dir, "index.html"), html);
+  }
+  // robots.txt + sitemap.xml (with the language versions of each page)
+  const today = new Date().toISOString().slice(0, 10);
+  const alts = `<xhtml:link rel="alternate" hreflang="th" href="${SITE}"/><xhtml:link rel="alternate" hreflang="en" href="${SITE}en/"/><xhtml:link rel="alternate" hreflang="x-default" href="${SITE}"/>`;
+  fs.writeFileSync(path.join(OUT, "sitemap.xml"), `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n` +
+    [["", "og-image.png"], ["en/", "og-image-en.png"]].map(([p, img]) => `<url><loc>${SITE}${p}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>${p ? "0.9" : "1.0"}</priority>${alts}<image:image><image:loc>${SITE}${img}</image:loc></image:image></url>`).join("\n") + "\n</urlset>\n");
+  fs.writeFileSync(path.join(OUT, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /api/\nDisallow: /verify/\n\nSitemap: ${SITE}sitemap.xml\n`);
   // service worker: precache the shell; big media is cached when first used
-  const core = ["./", "index.html", "site.webmanifest", `assets/${jsName}`, `assets/${cssName}`, "assets/data/world.json",
+  const core = ["./", "index.html", "en/index.html", "site.webmanifest", "assets/img/ui/logo.svg", `assets/${jsName}`, `assets/${cssName}`, "assets/data/world.json",
     ...fs.readdirSync(path.join(ASSETS, "fonts")).map(f => `assets/fonts/${f}`)];
   let sw = fs.readFileSync(path.join(HERE, "sw.js"), "utf8");
   sw = sw.replace("/*CORE*/[]", JSON.stringify(core)).replace("__CACHE__", `p2050-web-${hash(core.join() + jsName + cssName)}`);
@@ -176,7 +233,7 @@ async function build(){
 await build();
 if (WATCH){
   const http = await import("node:http");
-  const TYPES = {".html":"text/html; charset=utf-8", ".js":"text/javascript", ".css":"text/css", ".json":"application/json", ".jpg":"image/jpeg", ".png":"image/png", ".webp":"image/webp", ".svg":"image/svg+xml", ".mp3":"audio/mpeg", ".woff2":"font/woff2", ".webmanifest":"application/manifest+json"};
+  const TYPES = {".html":"text/html; charset=utf-8", ".js":"text/javascript", ".css":"text/css", ".json":"application/json", ".jpg":"image/jpeg", ".png":"image/png", ".webp":"image/webp", ".svg":"image/svg+xml", ".mp3":"audio/mpeg", ".woff2":"font/woff2", ".webmanifest":"application/manifest+json", ".txt":"text/plain; charset=utf-8", ".xml":"application/xml"};
   http.createServer((req, res) => {
     let p = decodeURIComponent(req.url.split("?")[0]); if (p.endsWith("/")) p += "index.html";
     const f = path.join(OUT, p);

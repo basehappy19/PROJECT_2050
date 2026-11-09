@@ -37,8 +37,8 @@ function runApi(){
 
 /* ---------- static files + forwarding ---------- */
 const TYPES = {".html":"text/html; charset=utf-8", ".js":"text/javascript; charset=utf-8", ".css":"text/css; charset=utf-8", ".json":"application/json", ".webmanifest":"application/manifest+json",
-  ".jpg":"image/jpeg", ".png":"image/png", ".webp":"image/webp", ".svg":"image/svg+xml", ".mp3":"audio/mpeg", ".woff2":"font/woff2", ".txt":"text/plain; charset=utf-8"};
-const ROOT_FILES = new Set(["index.html", "sw.js", "site.webmanifest", "favicon.svg", "apple-touch-icon.png", "icon-16.png", "icon-32.png", "icon-192.png", "icon-512.png", "og-image.png"]);
+  ".jpg":"image/jpeg", ".png":"image/png", ".webp":"image/webp", ".svg":"image/svg+xml", ".mp3":"audio/mpeg", ".woff2":"font/woff2", ".txt":"text/plain; charset=utf-8", ".xml":"application/xml; charset=utf-8"};
+const ROOT_FILES = new Set(["index.html", "sw.js", "site.webmanifest", "favicon.svg", "apple-touch-icon.png", "icon-16.png", "icon-32.png", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "og-image.png", "og-image-en.png", "robots.txt", "sitemap.xml", "en/index.html"]);
 /* only game files are served; the rest of the project folder (code, .env) is never reachable */
 function resolveFile(urlPath, adminOnly){
   let p; try { p = decodeURIComponent(urlPath.split("?")[0]); } catch { return null; }
@@ -50,8 +50,10 @@ function resolveFile(urlPath, adminOnly){
     return {file:path.join(ADMIN_DIR, rel || "index.html"), cache:"no-cache"};
   }
   if (p === "/") return {file:path.join(ROOT, "index.html"), cache:"no-cache"};
+  if (p === "/en") return {redirect:"/en/"};                                              // 3.4: English page
+  if (p === "/en/") return {file:path.join(ROOT, "en/index.html"), cache:"no-cache"};
   const rel = p.slice(1);
-  if (ROOT_FILES.has(rel)) return {file:path.join(ROOT, rel), cache:/^(index\.html|sw\.js)$/.test(rel) ? "no-cache" : "public, max-age=86400"};
+  if (ROOT_FILES.has(rel)) return {file:path.join(ROOT, rel), cache:/^(index\.html|en\/index\.html|sw\.js|robots\.txt|sitemap\.xml)$/.test(rel) ? "no-cache" : "public, max-age=86400"};
   if (rel.startsWith("assets/")) return {file:path.join(ROOT, rel), cache:/^assets\/app-[0-9a-f]+\.(js|css)$/.test(rel) ? "public, max-age=31536000, immutable" : "public, max-age=86400"};
   return null;
 }
