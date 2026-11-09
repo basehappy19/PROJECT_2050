@@ -1,5 +1,5 @@
 /* Builds the 2D map data for the web version:
-   • public/data/world.json  — every country outline projected (Robinson, centred on 11°E) into map units, delta-encoded
+   • public/data/world.json  — every country outline projected (3.7: Miller rectangle, see src/geo.js; centred on 11°E) into map units, delta-encoded
    • tools/.cache/latlon.f32 — lat/lon of every pixel of the satellite map texture (read by make-textures.py)
    Run: node tools/make-world.mjs */
 import fs from "node:fs";
@@ -77,8 +77,8 @@ const nudge = {USA:[0, 12], CAN:[-20, 40], RUS:[-80, 30], NOR:[-8, 22], IDN:[-30
 for (const g of out) if (g.c && nudge[g.c]){ g.l[0] += nudge[g.c][0]; g.l[1] += nudge[g.c][1]; }
 const missing = Object.keys(COUNTRY).filter(id => !out.some(g => g.c === id));
 fs.mkdirSync(path.join(ROOT, "../assets/data"), {recursive:true});
-fs.writeFileSync(path.join(ROOT, "../assets/data/world.json"), JSON.stringify({map:MAP, shapes:out}));
-console.log("shapes", out.length, "countries", out.filter(g => g.c).length, "missing", missing, "bytes", fs.statSync(path.join(ROOT, "../assets/data/world.json")).size);
+fs.writeFileSync(path.join(ROOT, "../assets/data/world-m.json"), JSON.stringify({map:MAP, shapes:out}));
+console.log("shapes", out.length, "countries", out.filter(g => g.c).length, "missing", missing, "bytes", fs.statSync(path.join(ROOT, "../assets/data/world-m.json")).size);
 
 /* lat/lon for each texture pixel (texture covers the map rectangle 0..W × 0..H) */
 fs.mkdirSync(path.join(HERE, ".cache"), {recursive:true});

@@ -1,7 +1,6 @@
 /* 3.6: a livelier map — drawn on the overlay canvas (map2d.js drawFx), projected through the map's tilt
    · clouds drifting west → east above the planes, each with its shadow on the ground; hurricanes and typhoons spin
      over the countries they are about to hit
-   · aurora curtains over the far north (and faintly in the far south), taller and brighter on the night map
    · oil rigs on the big oil fields: the gas flare burns until that country goes green (green ≥ 60), then it goes out
    · high-speed trains running between the nearest big cities wherever a rail build is finished
    (wind / solar farms grow into small fields of turbines and panels in mapfx.js; regrowing forests are a green
@@ -16,22 +15,28 @@ let seed = 99; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483
 
 /* ---------- pictures (drawn once) ---------- */
 const SPR = {};
+/* 3.7: flat, thin sheets of cloud (wispy noise stretched along the wind), not round puffs */
 function cloudSprite(v, dark){
   const key = v + (dark ? "d" : "");
   if (SPR[key]) return SPR[key];
-  const W = 256, H = 168, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
-  const g = cv.getContext("2d"); let sd = 17 + v * 31; const r = () => ((sd = (sd * 16807) % 2147483647) / 2147483647);
-  if (dark) g.filter = "blur(6px)";
-  // a cluster of round puffs: lit white on top, a little blue-grey underneath
-  const puffs = [];
-  for (let i = 0; i < 22; i++){ const t = r(); puffs.push([W * (.18 + .64 * r()), H * (.35 + .3 * r() + .12 * Math.abs(t - .5)), 12 + r() * 30 * (1 - Math.abs(t - .5))]); }
-  puffs.sort((a, b) => a[1] - b[1]);
-  for (const [x, y, rad] of puffs){
-    if (dark){ g.fillStyle = "rgba(0,10,20,.22)"; g.beginPath(); g.arc(x, y, rad, 0, TAU); g.fill(); continue; }
-    const gr = g.createRadialGradient(x - rad * .25, y - rad * .35, rad * .1, x, y, rad);
-    gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(.7, "rgba(238,244,250,.95)"); gr.addColorStop(.92, "rgba(196,210,224,.75)"); gr.addColorStop(1, "rgba(196,210,224,0)");
-    g.fillStyle = gr; g.beginPath(); g.arc(x, y, rad, 0, TAU); g.fill();
+  const W = 384, H = 150, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const g = cv.getContext("2d"), img = g.createImageData(W, H), d = img.data;
+  const hash = (i, j) => { const h = Math.sin(i * 127.1 + j * 311.7 + v * 74.7) * 43758.5453; return h - Math.floor(h); };
+  const sm = t => t * t * (3 - 2 * t);
+  const vn = (x, y) => { const i = Math.floor(x), j = Math.floor(y), fx = sm(x - i), fy = sm(y - j);
+    return (hash(i, j) * (1 - fx) + hash(i + 1, j) * fx) * (1 - fy) + (hash(i, j + 1) * (1 - fx) + hash(i + 1, j + 1) * fx) * fy; };
+  const sk = .25 + .2 * (v % 3);   // how much the sheet leans
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){
+    const u = x / W * 2 - 1, w = y / H * 2 - 1, xx = x + y * sk * 2;
+    const n = .5 * vn(xx / 70, y / 26) + .28 * vn(xx / 30 + 9, y / 11 + 3) + .14 * vn(xx / 13 + 5, y / 5 + 7) + .08 * vn(xx / 6, y / 3 + 11);
+    const edge = Math.max(0, 1 - (u * u + w * w * 1.1));                   // soft oval outline
+    const a = Math.max(0, Math.min(1, (n - .42) * 2.4)) * Math.min(1, edge * 2.2);
+    const k = (y * W + x) * 4;
+    if (dark){ d[k] = 0; d[k + 1] = 10; d[k + 2] = 20; d[k + 3] = a * 90; }
+    else { const l = 232 + 23 * n; d[k] = l; d[k + 1] = l + 4; d[k + 2] = Math.min(255, l + 10); d[k + 3] = a * 200; }
   }
+  g.putImageData(img, 0, 0);
+  if (dark){ const b = document.createElement("canvas"); b.width = W; b.height = H; const bg = b.getContext("2d"); bg.filter = "blur(5px)"; bg.drawImage(cv, 0, 0); return (SPR[key] = b); }
   return (SPR[key] = cv);
 }
 function spiralSprite(dark){
@@ -66,7 +71,7 @@ function box(M, x, y, wu, hu, h){
 const STORM = {hurricane:1, typhoon:1};
 function initClouds(M){
   M.clouds = [];
-  for (let i = 0; i < 14; i++){
+  for (let i = 0; i < 8; i++){   // 3.7: fewer
     // mostly over the mid-latitudes and the tropics, like real weather bands
     const band = rnd(), lat = band < .4 ? 38 + rnd() * 24 : band < .7 ? -45 + rnd() * 18 : -8 + rnd() * 20;
     const [x, y] = ll(lat, MAP.lon0 - 180 + rnd() * 360);
@@ -76,12 +81,12 @@ function initClouds(M){
 export function drawClouds(M, c, dt, now, vis, night){
   if (Gfx.level === "low" || !S.regions) return;
   if (!M.clouds) initClouds(M);
-  const z = M.cam.z, h = 34 * Math.sqrt(z), aBase = .5 * clamp(1.45 - z * .2, .45, 1) * (night ? .5 : 1);   // 3.6.1: fainter, so they don't hide the map
+  const z = M.cam.z, h = 34 * Math.sqrt(z), aBase = .42 * clamp(1.45 - z * .2, .45, 1) * (night ? .5 : 1);   // 3.7: thin and faint, so they never hide the map
   const run = P.running && P.running();
   const items = [];
   for (const q of M.clouds){
     if (run) q.x += q.sp * dt; if (q.x > MAP.W + 220) q.x -= MAP.W + 440;
-    items.push({x:q.x, y:q.y, wu:260 * q.s, hu:170 * q.s, img:cloudSprite(q.v), sh:cloudSprite(q.v, true), a:aBase, rot:0});
+    items.push({x:q.x, y:q.y, wu:380 * q.s, hu:150 * q.s, img:cloudSprite(q.v), sh:cloudSprite(q.v, true), a:aBase, rot:0});
   }
   for (const hz of S.haz || []){
     if (!STORM[hz.type]) continue;
@@ -96,7 +101,7 @@ export function drawClouds(M, c, dt, now, vis, night){
       // shadow on the ground, nudged away from the sun
       const [gx, gy, gw, gh] = box(M, x, it.y, it.wu, it.hu, 0); if (!vis(gx, gy, Math.max(gw, gh))) continue;
       const [cx, cy, w, hh] = box(M, x, it.y, it.wu, it.hu, h);
-      c.globalAlpha = it.a * .55;
+      c.globalAlpha = it.a * (it.storm ? .55 : .35);
       drawRot(c, it.sh, gx + h * .22, gy + h * .28, gw, gh, it.rot);
       c.globalAlpha = it.a;
       drawRot(c, it.img, cx, cy, w, hh, it.rot);
@@ -108,30 +113,6 @@ export function drawClouds(M, c, dt, now, vis, night){
 function drawRot(c, img, x, y, w, h, rot){
   if (!rot){ c.drawImage(img, x - w / 2, y - h / 2, w, h); return; }
   c.save(); c.translate(x, y); c.scale(1, h / w); c.rotate(rot); c.drawImage(img, -w / 2, -w / 2, w, w); c.restore();
-}
-
-/* ---------- aurora ---------- */
-export function drawAurora(M, c, now, vis, night){
-  if (Gfx.level === "low" || !S.regions) return;
-  const z = M.cam.z, H = (44 + 30 * (night ? 1 : .7)) * Math.sqrt(z), base = night ? .75 : .5;
-  c.save(); c.globalCompositeOperation = "lighter";
-  for (const [lat0, k] of [[67, 1], [-54, .55]]){
-    const N = 72, pts = [];
-    for (let i = 0; i <= N; i++){
-      const lon = MAP.lon0 - 179 + 358 * i / N, lat = lat0 + 2.2 * Math.sin(lon * .07 + now * .25) + 1.2 * Math.sin(lon * .19 - now * .4);
-      const [x, y] = ll(lat, lon), hh = H * (.7 + .3 * Math.sin(i * .5 + now * .8)), north = lat0 > 0 ? -1 : 1;
-      pts.push({g:M.toScreen(x, y), t:M.toScreenAlt(x, y + north * 22, hh), b:.45 + .55 * Math.max(0, Math.sin(i * .37 + now * 1.1)) * (.6 + .4 * Math.sin(i * .11 - now * .5))});
-    }
-    for (let i = 0; i < N; i++){
-      const a = pts[i], b = pts[i + 1];
-      if (!vis(a.g[0], a.g[1], 120) && !vis(b.g[0], b.g[1], 120)) continue;
-      const al = base * k * (a.b + b.b) / 2;
-      const gr = c.createLinearGradient(a.g[0], a.g[1], a.t[0], a.t[1]);
-      gr.addColorStop(0, `rgba(80,255,170,${al})`); gr.addColorStop(.45, `rgba(60,220,190,${al * .55})`); gr.addColorStop(1, `rgba(150,90,255,0)`);
-      c.fillStyle = gr; c.beginPath(); c.moveTo(a.g[0], a.g[1]); c.lineTo(b.g[0], b.g[1]); c.lineTo(b.t[0], b.t[1]); c.lineTo(a.t[0], a.t[1]); c.closePath(); c.fill();
-    }
-  }
-  c.restore();
 }
 
 /* ---------- oil rigs ---------- */

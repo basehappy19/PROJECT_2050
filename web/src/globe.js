@@ -82,7 +82,7 @@ export class Globe {
     this.canvas = canvas; this.small = small;
     const r = this.renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false, powerPreference:"high-performance"});
     r.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.5 : 2, Gfx.cfg.globeDpr));
-    Gfx.onChange(() => { r.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.small ? 1.5 : 2, Gfx.cfg.globeDpr)); if (this.clouds) this.clouds.visible = Gfx.cfg.clouds; this.resize(); });
+    Gfx.onChange(() => { r.setPixelRatio(Math.min(window.devicePixelRatio || 1, this.small ? 1.5 : 2, Gfx.cfg.globeDpr)); this.resize(); });
     r.setClearColor(0x02070a, 1);
     r.outputColorSpace = THREE.SRGBColorSpace;
     this.scene = new THREE.Scene();
@@ -104,7 +104,7 @@ export class Globe {
     const cloudTex = tex("globe-clouds", false); cloudTex.wrapS = THREE.RepeatWrapping;
     this.cloudU = {map:{value:cloudTex}, sun:{value:this.sun}, shift:{value:0}};
     this.clouds = new THREE.Mesh(new THREE.SphereGeometry(1.012, seg, seg / 2), new THREE.ShaderMaterial({uniforms:this.cloudU, vertexShader:EARTH_VS, fragmentShader:CLOUD_FS, transparent:true, depthWrite:false}));
-    this.spinG.add(this.clouds); this.clouds.visible = Gfx.cfg.clouds;
+    this.spinG.add(this.clouds);   // 3.7: always on, like the loading screen's Earth
     this.atm = new THREE.Mesh(new THREE.SphereGeometry(1.08, 96, 48), new THREE.ShaderMaterial({uniforms:{sun:{value:this.sun}, heat:uni.heat}, vertexShader:ATM_VS, fragmentShader:ATM_FS, side:THREE.BackSide, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false}));
     this.scene.add(this.atm);
     this.makeStars(); this.makeHotspots(); this.makeArcs();

@@ -43,18 +43,26 @@ const LEarth = {
     const layer = scene.getLayer(""), cont = layer && layer.getRenderer().getRendererObject(); if (!cont) return;
     const N = this.N = 480, cv = this.cv = document.createElement("canvas"); cv.width = cv.height = N;
     this.ctx = cv.getContext("2d");
-    // glow ring behind and shading in front (drawn once)
+    // 3.7: lit exactly like the menu's 3D globe (same sun, dark side and blue atmosphere; web/src/ui/earth.js), drawn once:
+    // a blue halo behind, black shading over the picture and the atmosphere's blue added at the rim
     const ring = document.createElement("canvas"); ring.width = ring.height = 640; const rg = ring.getContext("2d");
-    const gr = rg.createRadialGradient(320, 320, 230, 320, 320, 320); gr.addColorStop(0, "rgba(79,209,197,.45)"); gr.addColorStop(.25, "rgba(79,209,197,.18)"); gr.addColorStop(1, "rgba(79,209,197,0)");
-    rg.fillStyle = gr; rg.fillRect(0, 0, 640, 640); rg.strokeStyle = "rgba(127,240,228,.5)"; rg.lineWidth = 3; rg.beginPath(); rg.arc(320, 320, 241, 0, Math.PI * 2); rg.stroke();
-    const shade = document.createElement("canvas"); shade.width = shade.height = N; const sg = shade.getContext("2d");
-    const sh = sg.createRadialGradient(N * .64, N * .36, 0, N * .5, N * .5, N * .5);
-    sh.addColorStop(0, "rgba(255,255,255,.10)"); sh.addColorStop(.38, "rgba(0,0,0,0)"); sh.addColorStop(.72, "rgba(0,4,10,.55)"); sh.addColorStop(1, "rgba(0,4,10,.92)");
-    sg.fillStyle = sh; sg.beginPath(); sg.arc(N / 2, N / 2, N / 2, 0, Math.PI * 2); sg.fill();
+    const gr = rg.createRadialGradient(306, 312, 236, 306, 312, 320); gr.addColorStop(0, "rgba(77,158,255,.5)"); gr.addColorStop(.3, "rgba(77,158,255,.16)"); gr.addColorStop(1, "rgba(77,158,255,0)");
+    rg.fillStyle = gr; rg.fillRect(0, 0, 640, 640);
+    const shade = document.createElement("canvas"), rim = document.createElement("canvas"); shade.width = shade.height = rim.width = rim.height = N;
+    { const sh = shade.getContext("2d").createImageData(N, N), gl = rim.getContext("2d").createImageData(N, N);
+      const SX = -.55, SY = .32, SZ = .78, SL = Math.hypot(SX, SY, SZ), sm = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+      for (let y = 0; y < N; y++){ const ny = (y + .5) / N * 2 - 1;
+        for (let x = 0; x < N; x++){ const nx = (x + .5) / N * 2 - 1, r2 = nx * nx + ny * ny; if (r2 > 1) continue;
+          const z = Math.sqrt(1 - r2), d = (SX * nx - SY * ny + SZ * z) / SL, q = (y * N + x) * 4;
+          const day = sm(-.12, .22, d), m = ((.08 + 1.05 * Math.max(d, 0)) * day + .035 * (1 - day)) / 1.13;
+          sh.data[q + 3] = Math.round(255 * Math.max(0, Math.min(1, 1 - m)));
+          const a = Math.pow(1 - z, 3) * (.15 + .85 * sm(-.3, .4, d)) * .55 * 255;
+          gl.data[q] = .32 * a; gl.data[q + 1] = .62 * a; gl.data[q + 2] = a; gl.data[q + 3] = 255; } }
+      shade.getContext("2d").putImageData(sh, 0, 0); rim.getContext("2d").putImageData(gl, 0, 0); }
     const root = this.root = new PIXI.Container();
     const mk = c => { const s = new PIXI.Sprite(PIXI.Texture.from(c)); s.anchor.set(.5); return s; };
-    this.glow = mk(ring); this.earth = mk(cv); this.shade = mk(shade); this.earth.alpha = 0;
-    root.addChild(this.glow, this.earth, this.shade);
+    this.glow = mk(ring); this.earth = mk(cv); this.shade = mk(shade); this.rim = mk(rim); this.rim.blendMode = PIXI.BLEND_MODES.ADD; this.earth.alpha = 0;
+    root.addChild(this.glow, this.earth, this.shade, this.rim);
     cont.addChild(root);
     this.t0 = performance.now(); this.last = 0; this.leave = null; this.off = 0;
     const img = new Image(); img.decoding = "async";
@@ -68,7 +76,7 @@ const LEarth = {
     const W = this.iw = img.naturalWidth, H = img.naturalHeight, N = this.N;
     const tc = document.createElement("canvas"); tc.width = W; tc.height = H; const tx = tc.getContext("2d"); tx.drawImage(img, 0, 0);
     this.tex = new Uint32Array(tx.getImageData(0, 0, W, H).data.buffer);
-    const tilt = .32, ct = Math.cos(tilt), st = Math.sin(tilt), idx = [], uu = [], rr = [];
+    const tilt = .21, ct = Math.cos(tilt), st = Math.sin(tilt), idx = [], uu = [], rr = [];
     for (let y = 0; y < N; y++){ const ny = (y + .5) / N * 2 - 1;
       for (let x = 0; x < N; x++){ const nx = (x + .5) / N * 2 - 1, r2 = nx * nx + ny * ny; if (r2 > 1) continue;
         const z = Math.sqrt(1 - r2), y2 = ny * ct - z * st, z2 = ny * st + z * ct, lat = Math.asin(Math.max(-1, Math.min(1, -y2))), lon = Math.atan2(nx, z2);
@@ -92,11 +100,11 @@ const LEarth = {
       const e0 = Math.min(1, (performance.now() - this.leave.t0) / this.leave.ms), e = e0 < .5 ? 4 * e0 * e0 * e0 : 1 - Math.pow(-2 * e0 + 2, 3) / 2, to = this.leave.to;
       p = {x:home.x + (to.x - home.x) * e, y:home.y + (to.y - home.y) * e, r:home.r + (to.r - home.r) * e};
       const ui = Screens.scene.getLayer("Loader"); if (ui) ui.getRenderer().getRendererObject().alpha = Math.max(0, 1 - e0 * 3);
-      if (e0 >= 1 && !this.leave.gone){ this.leave.gone = true; const go = this.leave.done; go(); }
+      if (e0 >= 1 && !this.leave.gone){ this.leave.gone = true; const go = this.leave.done; go(); if (!this.root) return; }
     }
     const K = Kit.K, s = this.root;
     s.position.set(p.x * K, p.y * K);
-    this.earth.width = this.earth.height = this.shade.width = this.shade.height = p.r * 2 * K;
+    this.earth.width = this.earth.height = this.shade.width = this.shade.height = this.rim.width = this.rim.height = p.r * 2 * K;
     this.glow.width = this.glow.height = p.r * 2 * K * 640 / 482;
   },
   frame(){

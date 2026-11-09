@@ -22,7 +22,7 @@ export function mapCrop(pt, zoom = 3, aspect = .3, theme = "day"){
   const Z = zoom, u = pt ? pt[0] / MAP.W : .5, v = pt ? pt[1] / MAP.H : .5, ih = Z * MAP.H / MAP.W;
   const px = Z > 1 ? Math.max(0, Math.min(1, (u * Z - .5) / (Z - 1))) : .5;
   const py = ih > aspect ? Math.max(0, Math.min(1, (v * ih - aspect / 2) / (ih - aspect))) : .5;
-  return {backgroundImage:`url(assets/img/map-${theme}-s.jpg)`, backgroundSize:`${Z * 100}% auto`, backgroundPosition:`${(px * 100).toFixed(1)}% ${(py * 100).toFixed(1)}%`};
+  return {backgroundImage:`url(assets/img/mapm-${theme}-s.jpg)`, backgroundSize:`${Z * 100}% auto`, backgroundPosition:`${(px * 100).toFixed(1)}% ${(py * 100).toFixed(1)}%`};
 }
 export function eventPoint(e){
   if (e.country && e.A && e.A.length) return P.countryPoint(e.A[0]);

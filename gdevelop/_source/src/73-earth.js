@@ -248,7 +248,7 @@ const Globe = {
     earth.renderOrder = 100; spinG.add(earth);
     this.cloudU = {map:{value:clouds}, sun:{value:this.sun}, shift:{value:0}};
     const cl = this.clouds = new THREE.Mesh(new THREE.SphereGeometry(1.012, seg, seg / 2), new THREE.ShaderMaterial({uniforms:this.cloudU, vertexShader:EARTH_VS, fragmentShader:CLOUD_FS, transparent:true, depthWrite:false}));
-    cl.renderOrder = 101; cl.visible = !low; spinG.add(cl);
+    cl.renderOrder = 101; spinG.add(cl);   // 3.7: always on, like the loading screen's Earth
     const atm = new THREE.Mesh(new THREE.SphereGeometry(1.08, 96, 48), new THREE.ShaderMaterial({uniforms:{sun:{value:this.sun}, heat:uni.heat}, vertexShader:ATM_VS, fragmentShader:ATM_FS, side:THREE.BackSide, transparent:true, blending:THREE.AdditiveBlending, depthWrite:false}));
     atm.renderOrder = 99; root.add(atm);
     // CO₂ hotspots on the big cities

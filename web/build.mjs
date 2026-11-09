@@ -222,7 +222,7 @@ async function build(){
     [["", "og-image.png"], ["en/", "og-image-en.png"]].map(([p, img]) => `<url><loc>${SITE}${p}</loc><lastmod>${today}</lastmod><changefreq>weekly</changefreq><priority>${p ? "0.9" : "1.0"}</priority>${alts}<image:image><image:loc>${SITE}${img}</image:loc></image:image></url>`).join("\n") + "\n</urlset>\n");
   fs.writeFileSync(path.join(OUT, "robots.txt"), `User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /api/\nDisallow: /verify/\n\nSitemap: ${SITE}sitemap.xml\n`);
   // service worker: precache the shell; big media is cached when first used
-  const core = ["./", "index.html", "en/index.html", "site.webmanifest", "assets/img/ui/logo.svg", `assets/${jsName}`, `assets/${cssName}`, "assets/data/world.json",
+  const core = ["./", "index.html", "en/index.html", "site.webmanifest", "assets/img/ui/logo.svg", `assets/${jsName}`, `assets/${cssName}`, "assets/data/world-m.json",
     ...fs.readdirSync(path.join(ASSETS, "fonts")).map(f => `assets/fonts/${f}`)];
   let sw = fs.readFileSync(path.join(HERE, "sw.js"), "utf8");
   sw = sw.replace("/*CORE*/[]", JSON.stringify(core)).replace("__CACHE__", `p2050-web-${hash(core.join() + jsName + cssName)}`);

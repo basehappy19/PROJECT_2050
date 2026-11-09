@@ -234,7 +234,7 @@ if (ART) for (const [k, f] of [["S", "end-win-S"], ["A", "end-win-A"], ["B", "en
 if (ART) await render(logo, 300, 300, `${OUT}/ui/logo.png`);
 /* Continuous World: the hex grid for placing builds by hand. Each land cell (~3° wide) gets a look sampled from the
    website's satellite map (desert, green, snow, coast), which P.suitability() turns into a score (same as web/src/hexgrid.js) */
-const MAPIMG = path.resolve(HERE, "../../../assets/img/map-day-s.jpg");
+const MAPIMG = path.resolve(HERE, "../../../assets/img/mapm-day-s.jpg");
 if (fs.existsSync(MAPIMG) && (ART || process.argv.includes("--hex"))){
   const url = "data:image/jpeg;base64," + fs.readFileSync(MAPIMG).toString("base64");
   const cells = await page.evaluate(async url => {

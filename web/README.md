@@ -50,7 +50,7 @@ P2050_DOMAINS=game.example.ac.th,.github.io node build.mjs   # ให้เก�
 
 ## สร้างไฟล์ภาพ/เสียงใหม่ (ไม่ต้องทำถ้าไม่ได้เปลี่ยนต้นฉบับ)
 
-- `node tools/make-world.mjs` — รูปร่างประเทศ (`../assets/data/world.json`)
+- `node tools/make-world.mjs` — รูปร่างประเทศ (`../assets/data/world-m.json`)
 - `python3 tools/make-textures.py` — ภาพลูกโลกและแผนที่จากภาพ NASA
 - `bash tools/make-audio.sh` — เสียงทั้งหมด
 - `node tools/tutshots.mjs` — ภาพประกอบหน้า "วิธีเล่น" จากเกมจริง (`node build.mjs --open` ก่อน)

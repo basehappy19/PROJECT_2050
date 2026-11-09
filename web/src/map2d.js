@@ -10,7 +10,7 @@ import {Audio} from "./audio.js";
 import ICONS from "./gen/icons.js";
 import {Gfx} from "./gfx.js";
 import {drawPins, drawTraffic, drawInfo, img3d, drawDetail, drawStatus, placePin} from "./mapfx.js";
-import {drawClouds, drawAurora, drawRigs, drawTrains} from "./life.js";
+import {drawClouds, drawRigs, drawTrains} from "./life.js";
 import {drawHex, hexCells} from "./hexgrid.js";
 import {createMapGL} from "./mapgl.js";
 import {iceCanvas, polarCanvas, ICE_TILE, POLAR, POLAR_S} from "./ice.js";
@@ -50,7 +50,7 @@ export const GameMap = {
   stage:null, vw:0, vh:0, tilt:0, tiltMax:0, persp:1, tcy:0, vTop0:0, hud:{l:0, r:0, t:0, b:0},
   async load(){
     if (this.shapes.length) return;
-    const j = await (await fetch("assets/data/world.json")).json();
+    const j = await (await fetch("assets/data/world-m.json")).json();   // 3.7: new name, see the map pictures
     for (const s of j.shapes){
       const rings = s.p.map(r => { const a = new Float32Array(r.length); let x = 0, y = 0; for (let i = 0; i < r.length; i += 2){ if (i === 0){ x = r[0]; y = r[1]; } else { x += r[i]; y += r[i + 1]; } a[i] = x / 10; a[i + 1] = y / 10; } return a; });
       const path = new Path2D(); for (const r of rings){ path.moveTo(r[0], r[1]); for (let i = 2; i < r.length; i += 2) path.lineTo(r[i], r[i + 1]); path.closePath(); }
@@ -77,7 +77,7 @@ export const GameMap = {
     const key = th + (big ? "" : "-s"); if (this.imgKey === key) return; this.imgKey = key;
     const im = new Image(); im.decoding = "async";
     im.onload = () => { if (this.imgKey === key){ this.img = im; this.dirtyBase = true; } };
-    im.src = `assets/img/map-${th === "night" ? "night" : th === "paint" ? "paint" : "day"}${big ? "" : "-s"}.jpg`;
+    im.src = `assets/img/mapm-${th === "night" ? "night" : th === "paint" ? "paint" : "day"}${big ? "" : "-s"}.jpg`;   // 3.7: new names (Miller), so an old cached Robinson picture is never used
     // load the small one first so something shows quickly
     if (big && !this.img){ const s = new Image(); s.onload = () => { if (!this.img){ this.img = s; this.dirtyBase = true; } }; s.src = im.src.replace(".jpg", "-s.jpg"); }
     if (!Gfx.cfg.bigImg && !big && this.img && this.img.width > 2400) this.img = null;
@@ -363,7 +363,7 @@ export const GameMap = {
     if (this.dirtyBase){ this.drawBase(moving); this.dirtyBase = false; }
     // the overlay must follow the base exactly while it moves; otherwise it only animates gently, so it runs at the quality's frame rate
     const anim = this.fx_.length || this.floats.length || (this.parts && this.parts.length);
-    const live = (S.haz && S.haz.length) || (S.bubbles && S.bubbles.length) || (this.traffic && this.traffic.length) || this.hover || (S.regions && Gfx.level !== "low");   // 3.6: clouds and aurora always move
+    const live = (S.haz && S.haz.length) || (S.bubbles && S.bubbles.length) || (this.traffic && this.traffic.length) || this.hover || (S.regions && Gfx.level !== "low");   // 3.6: clouds always move
     const gap = 1000 / (anim ? 60 : live ? Gfx.cfg.fxFps : 8);
     if (moved || this.fxDirty || now - (this._fxAt || 0) >= gap - 2){
       const fdt = Math.min(.1, (now - (this._fxAt || now)) / 1000) || dt;
@@ -563,7 +563,6 @@ export const GameMap = {
     }
     // builds on the map and the traffic between countries
     const night = this.theme() === "night";
-    drawAurora(this, c, now, vis, night);   // 3.6: northern (and southern) lights
     drawDetail(this, c, now, vis, iconImg);   // 1.7: capitals, smokestacks, sea chokepoints
     drawRigs(this, c, now, vis);   // 3.6: oil rigs, flaring until the country goes green
     drawPins(this, c, now, vis);

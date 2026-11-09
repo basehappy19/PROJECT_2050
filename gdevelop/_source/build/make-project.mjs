@@ -53,7 +53,7 @@ if (fs.existsSync(NARR_DIR)) for (const f of fs.readdirSync(NARR_DIR).filter(f =
 const IMG = `${REPO}/assets/img`;
 // in-game map: the full-size Earth pictures (whole world in latitude / longitude, laid on the map in 73-earth.js) and the
 // paint theme's picture (only made in the website's projection)
-const PHOTO_SRC = {"earth-day":"globe-day.jpg", "earth-night":"globe-night.jpg", "map-paint":"map-paint-s.jpg"}, PHOTOS = Object.keys(PHOTO_SRC);
+const PHOTO_SRC = {"earth-day":"globe-day.jpg", "earth-night":"globe-night.jpg", "map-paint":"mapm-paint-s.jpg"}, PHOTOS = Object.keys(PHOTO_SRC);
 const GLOBE_TEX = ["globe-day", "globe-night", "globe-clouds", "globe-water"];
 for (const n of PHOTOS) syncFile(`${IMG}/${PHOTO_SRC[n]}`, `${OUT}/assets/photo/${n}.jpg`);
 for (const n of GLOBE_TEX) syncFile(`${IMG}/${n}-s.jpg`, `${OUT}/assets/globe/${n}.jpg`);

@@ -5,7 +5,6 @@ if (P.mods && P.mods.life) return;
    Life · 3.6 — a livelier map (like web/src/life.js)
    3D on the map layer (tips back with the camera):
      · clouds drifting west → east above the planes, with shadows; hurricanes / typhoons spin over the country they will hit
-     · aurora curtains over the far north (faint in the far south), brighter on the night map
      · forests growing back: countries with finished forest / mangrove builds turn greener month by month
    2D on the MapUI layer (Screens.drawRigs / drawTrains, called from 61-hud.js; wind / solar fields in 71-place.js):
      · oil rigs on the big oil fields, flaring until the country goes green (green ≥ 60)
@@ -20,19 +19,26 @@ const lowGfx = () => P.Gfx && P.Gfx.level === "low";
 const night = () => { try { const v = localStorage.getItem("p2050-theme") || ""; return v === "night" && P.Net && P.Net.owns("theme_night"); } catch(e) { return false; } };
 
 /* ---------- pictures (the same as the website) ---------- */
+/* 3.7: flat, thin sheets of cloud (wispy noise stretched along the wind), not round puffs */
 function cloudCanvas(v, dark){
-  const W = 256, H = 168, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
-  const g = cv.getContext("2d"); let sd = 17 + v * 31; const r = () => ((sd = (sd * 16807) % 2147483647) / 2147483647);
-  if (dark) g.filter = "blur(6px)";
-  const puffs = [];
-  for (let i = 0; i < 22; i++){ const t = r(); puffs.push([W * (.18 + .64 * r()), H * (.35 + .3 * r() + .12 * Math.abs(t - .5)), 12 + r() * 30 * (1 - Math.abs(t - .5))]); }
-  puffs.sort((a, b) => a[1] - b[1]);
-  for (const [x, y, rad] of puffs){
-    if (dark){ g.fillStyle = "rgba(0,10,20,.22)"; g.beginPath(); g.arc(x, y, rad, 0, TAU); g.fill(); continue; }
-    const gr = g.createRadialGradient(x - rad * .25, y - rad * .35, rad * .1, x, y, rad);
-    gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(.7, "rgba(238,244,250,.95)"); gr.addColorStop(.92, "rgba(196,210,224,.75)"); gr.addColorStop(1, "rgba(196,210,224,0)");
-    g.fillStyle = gr; g.beginPath(); g.arc(x, y, rad, 0, TAU); g.fill();
+  const W = 384, H = 150, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
+  const g = cv.getContext("2d"), img = g.createImageData(W, H), d = img.data;
+  const hash = (i, j) => { const h = Math.sin(i * 127.1 + j * 311.7 + v * 74.7) * 43758.5453; return h - Math.floor(h); };
+  const sm = t => t * t * (3 - 2 * t);
+  const vn = (x, y) => { const i = Math.floor(x), j = Math.floor(y), fx = sm(x - i), fy = sm(y - j);
+    return (hash(i, j) * (1 - fx) + hash(i + 1, j) * fx) * (1 - fy) + (hash(i, j + 1) * (1 - fx) + hash(i + 1, j + 1) * fx) * fy; };
+  const sk = .25 + .2 * (v % 3);
+  for (let y = 0; y < H; y++) for (let x = 0; x < W; x++){
+    const u = x / W * 2 - 1, w = y / H * 2 - 1, xx = x + y * sk * 2;
+    const n = .5 * vn(xx / 70, y / 26) + .28 * vn(xx / 30 + 9, y / 11 + 3) + .14 * vn(xx / 13 + 5, y / 5 + 7) + .08 * vn(xx / 6, y / 3 + 11);
+    const edge = Math.max(0, 1 - (u * u + w * w * 1.1));
+    const a = Math.max(0, Math.min(1, (n - .42) * 2.4)) * Math.min(1, edge * 2.2);
+    const k = (y * W + x) * 4;
+    if (dark){ d[k] = 0; d[k + 1] = 10; d[k + 2] = 20; d[k + 3] = a * 90; }
+    else { const l = 232 + 23 * n; d[k] = l; d[k + 1] = l + 4; d[k + 2] = Math.min(255, l + 10); d[k + 3] = a * 200; }
   }
+  g.putImageData(img, 0, 0);
+  if (dark){ const b = document.createElement("canvas"); b.width = W; b.height = H; const bg = b.getContext("2d"); bg.filter = "blur(5px)"; bg.drawImage(cv, 0, 0); return b; }
   return cv;
 }
 function spiralCanvas(dark){
@@ -55,20 +61,6 @@ const texCache = {};
 const texOf = (key, make) => { if (!texCache[key]){ const t = new THREE.CanvasTexture(make()); t.colorSpace = THREE.SRGBColorSpace; texCache[key] = t; } return texCache[key]; };
 const plane = (tex, order) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({map:tex, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide})); m.renderOrder = order; m.frustumCulled = false; return m; };
 
-/* aurora picture: bright folds along the curtain, green at the bottom fading to violet and nothing at the top (tiles sideways) */
-function auroraCanvas(){
-  const W = 512, H = 128, cv = document.createElement("canvas"); cv.width = W; cv.height = H;
-  const g = cv.getContext("2d"), img = g.createImageData(W, H), d = img.data;
-  for (let x = 0; x < W; x++){
-    const u = x / W, b = .6 + .4 * Math.max(0, Math.sin(u * TAU * 6)) * (.6 + .4 * Math.sin(u * TAU * 2 + 1));
-    for (let y = 0; y < H; y++){
-      const v = 1 - y / H, a = Math.pow(1 - v, .9) * b, i = (y * W + x) * 4;
-      d[i] = 80 + 70 * v; d[i + 1] = 255 - 165 * v; d[i + 2] = 170 + 85 * v; d[i + 3] = Math.round(255 * Math.min(1, a));
-    }
-  }
-  g.putImageData(img, 0, 0); return cv;
-}
-
 const Life = {
   R:null, on:false,
   init(R, mode){
@@ -77,39 +69,25 @@ const Life = {
     try {
       // clouds
       this.clouds = [];
-      for (let i = 0; i < 14; i++){
+      for (let i = 0; i < 8; i++){   // 3.7: fewer
         const band = rnd(), lat = band < .4 ? 38 + rnd() * 24 : band < .7 ? -45 + rnd() * 18 : -8 + rnd() * 20;
         const [x, y] = toWorld(lat, LON0 - 180 + rnd() * 360), v = i % 6, s = .55 + rnd() * .6;
         const cl = {x, y, s, sp:5 + rnd() * 5, m:plane(texOf("c" + v, () => cloudCanvas(v)), 50), sh:plane(texOf("cd" + v, () => cloudCanvas(v, true)), 39)};
         R.add3DRendererObject(cl.sh); R.add3DRendererObject(cl.m); this.clouds.push(cl);
-      }
-      // aurora: a curtain along a wavy line, its top leaning toward the pole (so it shows even from straight above)
-      this.aur = [];
-      for (const [lat0, k1] of [[67, 1], [-53, .55]]){
-        const N = 90, pos = [], uv = [], idx = [], north = lat0 > 0 ? -1 : 1;
-        for (let i = 0; i <= N; i++){
-          const lon = LON0 - 179 + 358 * i / N, lat = lat0 + 2.2 * Math.sin(lon * .07) + 1.2 * Math.sin(lon * .19), [x, y] = toWorld(lat, lon);
-          pos.push(x, y, 0, x, y + north * 30, 64); uv.push(i / N * 4, 0, i / N * 4, 1);
-          if (i < N){ const a = i * 2; idx.push(a, a + 2, a + 1, a + 1, a + 2, a + 3); }
-        }
-        const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2)); g.setIndex(idx);
-        const tex = new THREE.CanvasTexture(auroraCanvas()); tex.wrapS = THREE.RepeatWrapping; tex.colorSpace = THREE.SRGBColorSpace;
-        const mat = new THREE.MeshBasicMaterial({map:tex, transparent:true, opacity:.5 * k1, depthTest:false, depthWrite:false, blending:THREE.AdditiveBlending, side:THREE.DoubleSide});
-        const m = new THREE.Mesh(g, mat); m.renderOrder = 45; m.frustumCulled = false; R.add3DRendererObject(m); this.aur.push({m, k:k1});
       }
     } catch(e){ console.warn("life", e); this.on = false; }
   },
   update(dt){
     if (!this.on || !this.R || Map.mode !== "game") return;
     const low = lowGfx(), z = Map.cam.z, run = S.started && !S.over && S.speed > 0, nt = night(), now = performance.now() / 1000;
-    const h = 46, a = (low ? 0 : .5) * clamp(1.45 - z * .2, .45, 1) * (nt ? .5 : 1);   // 3.6.1: fainter
+    const h = 46, a = (low ? 0 : .42) * clamp(1.45 - z * .2, .45, 1) * (nt ? .5 : 1);   // 3.7: thin and faint
     // clouds
     for (const cl of this.clouds || []){
       if (run) cl.x += cl.sp * dt; if (cl.x > MAPW + 180) cl.x -= MAPW + 360;
-      const w = 208 * cl.s, hh = 136 * cl.s;
+      const w = 304 * cl.s, hh = 120 * cl.s;
       cl.m.visible = cl.sh.visible = a > 0;
       cl.m.position.set(cl.x, cl.y, h); cl.m.scale.set(w, hh, 1); cl.m.material.opacity = a;
-      cl.sh.position.set(cl.x + h * .3, cl.y + h * .38, .4); cl.sh.scale.set(w, hh, 1); cl.sh.material.opacity = a * .55;
+      cl.sh.position.set(cl.x + h * .3, cl.y + h * .38, .4); cl.sh.scale.set(w, hh, 1); cl.sh.material.opacity = a * .35;
     }
     // storms: a spinning spiral over each hurricane / typhoon that is coming
     const want = new Set();
@@ -125,8 +103,6 @@ const Life = {
       st.m.visible = st.sh.visible = sa > 0;
     }
     for (const id of Object.keys(this.storms)) if (!want.has(+id)){ const st = this.storms[id]; this.R.remove3DRendererObject(st.m); this.R.remove3DRendererObject(st.sh); delete this.storms[id]; }
-    // aurora
-    for (const au of this.aur || []){ au.m.visible = !low; au.m.material.map.offset.x = (now * .012) % 1; au.m.material.opacity = (nt ? 1 : .8) * au.k; }
     // forests growing back (checked twice a second)
     this._fT = (this._fT || 0) + dt; if (this._fT > .5){ this._fT = 0; this.updateForest(); }
   },

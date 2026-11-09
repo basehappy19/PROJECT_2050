@@ -1,6 +1,6 @@
 """Builds the image textures from NASA public-domain imagery (see public/CREDITS.txt).
    Inputs (downloaded once into TEX): Blue Marble Next Generation (topo+bathy and plain), Black Marble 2016, cloud_combined_8192.
-   Outputs (public/img): globe-day/-night/-clouds/-water (3D home globe), map-day/-night/-paint (2D game map, Robinson).
+   Outputs (public/img): globe-day/-night/-clouds/-water (3D home globe), mapm-day/-night/-paint (2D game map; 3.7: Miller rectangle, see src/geo.js).
    Run: python3 tools/make-textures.py"""
 import numpy as np, os, sys
 from PIL import Image, ImageFilter, ImageEnhance
@@ -32,10 +32,15 @@ for w, tag in ((4096, ""), (2048, "-s")):
     save(clouds, f"globe-clouds{tag}.jpg", (w, w // 2), 80)
     save(water, f"globe-water{tag}.jpg", (w // 2, w // 4), 80)
 
-# ---- 2D map (Robinson) ----
-grid = np.fromfile(f"{HERE}/.cache/latlon-4800x2394.f32", dtype=np.float32).reshape(2394, 4800, 2)
-lon, lat = grid[..., 0], grid[..., 1]
-valid = ~np.isnan(lon)
+# ---- 2D map (3.7: Miller, 84N..57S, centred on 11E, 2 px per map unit; the same as src/geo.js) ----
+MW, MH = 4800, 2384
+ym = lambda la: 1.25 * np.log(np.tan(np.pi / 4 + .4 * np.radians(la)))
+K = MW / (2 * np.pi)
+yy = ym(84) - (np.arange(MH) + .5) / K
+latc = np.degrees((np.arctan(np.exp(yy / 1.25)) - np.pi / 4) / .4)
+lonc = 11 - 180 + (np.arange(MW) + .5) / MW * 360
+lon, lat = np.meshgrid(lonc, latc)
+valid = np.ones(lon.shape, bool)
 lonw = np.where(valid, ((lon + 180) % 360), 0)
 latw = np.where(valid, lat, 0)
 
@@ -57,7 +62,7 @@ def finish(v, name, grade):
     v = np.where(valid[..., None], v, BG)
     im = Image.fromarray(np.clip(v, 0, 255).astype(np.uint8))
     for w, tag in ((4800, ""), (2400, "-s")):
-        save(im, f"{name}{tag}.jpg", (w, round(w * 2394 / 4800)), 84 if w > 3000 else 82)
+        save(im, f"{name}{tag}.jpg", (w, round(w * MH / MW)), 84 if w > 3000 else 82)
 
 wm = sample(water)[..., 0:1] / 255   # 1 = sea
 
@@ -82,7 +87,7 @@ def grade_paint(v):
     sea = np.array([150, 196, 214], np.float32) * .9 + v * .1
     return land * (1 - wm) + sea * wm
 
-dv = sample(day); finish(dv, "map-day", grade_day)
-nv = sample(night); finish(nv, "map-night", grade_night)
+dv = sample(day); finish(dv, "mapm-day", grade_day)
+nv = sample(night); finish(nv, "mapm-night", grade_night)
 pv = np.asarray(Image.fromarray(np.clip(dv, 0, 255).astype(np.uint8)).filter(ImageFilter.ModeFilter(7)).filter(ImageFilter.SMOOTH_MORE)).astype(np.float32)
-finish(pv, "map-paint", grade_paint)
+finish(pv, "mapm-paint", grade_paint)

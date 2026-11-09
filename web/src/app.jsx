@@ -52,7 +52,7 @@ function LoadEarth(){
     const small = Math.min(screen.width, screen.height) < 600;
     const css = c.getBoundingClientRect().width || 600, dpr = Math.min(window.devicePixelRatio || 1, 2);
     const still = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-    const stop = LOAD.earth = mountEarth(c, {src:`assets/img/ui/loader-earth${small ? "-s" : ""}.webp`, px:Math.min(css * dpr, small || lowEnd() ? 480 : 720), still});
+    const stop = LOAD.earth = mountEarth(c, {src:`assets/img/ui/loader-globe${small ? "-s" : ""}.webp`, px:Math.min(css * dpr, small || lowEnd() ? 480 : 720), still});
     return () => { stop(); if (LOAD.earth === stop) LOAD.earth = null; };
   }, []);
   return <div class="learth" aria-hidden="true"><canvas ref={ref}/></div>;
@@ -87,7 +87,7 @@ function Loading({leaving}){
     const fonts = document.fonts ? Promise.all([document.fonts.load("600 16px Kanit"), document.fonts.load("400 16px 'IBM Plex Sans Thai'"), document.fonts.load("700 16px 'Chakra Petch'")]).catch(() => {}) : Promise.resolve();
     Promise.all([
       fonts.finally(mark("fonts")),
-      Promise.all([GameMap.load().catch(e => console.error(e)), get("assets/data/world.json")]).finally(mark("data")),
+      Promise.all([GameMap.load().catch(e => console.error(e)), get("assets/data/world-m.json")]).finally(mark("data")),
       Promise.all([get("assets/img/globe-day{s}.jpg"), get("assets/img/globe-night{s}.jpg")]).finally(mark("globe")),
       Promise.all([get("assets/img/globe-clouds{s}.jpg"), get("assets/img/ui/logo.png")]).finally(mark("clouds")),
     ]).then(() => setReady(true));

@@ -136,11 +136,10 @@ textarea.code{height:76px;padding:8px 10px;font:500 12px/1.45 var(--mono);resize
 .loading h1,.logo h1{font:700 clamp(34px,6vw,54px)/1 var(--logo);letter-spacing:.04em}
 .loading h1 b,.logo h1 b,.brand b{color:var(--accent)}
 .learth{position:absolute;width:111vh;height:111vh;left:calc(18vw - 55.5vh);top:calc(53vh - 55.5vh);border-radius:50%;
-  box-shadow:0 0 0 2px rgba(127,240,228,.35), 0 0 60px 8px rgba(79,209,197,.28), 0 0 160px 30px rgba(79,209,197,.12);background:#04101c}
+  box-shadow:-1.2vh -.7vh 3.2vh .4vh rgba(77,158,255,.42), -2vh -1.2vh 9vh 1.5vh rgba(77,158,255,.14);background:#02070a}
 .learth canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;opacity:0;transition:opacity 1.2s ease}
 .learth canvas.on{opacity:1}
-.learth::after{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle at 64% 36%, rgba(255,255,255,.10) 0%, rgba(0,0,0,0) 38%, rgba(0,4,10,.55) 72%, rgba(0,4,10,.92) 100%)}
+/* 3.7: the light and the atmosphere are drawn on the canvas, like the menu globe (ui/earth.js) */
 .lpanel{position:absolute;left:56vw;top:50%;transform:translateY(-50%);width:min(480px,38vw);display:flex;flex-direction:column;gap:14px;text-align:left}
 .lbrand{display:flex;align-items:center;gap:14px}
 .lbrand small{font-size:12px;letter-spacing:.22em;color:var(--accent)}
