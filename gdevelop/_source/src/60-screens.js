@@ -151,11 +151,12 @@ W.portrait = (l, x, y, s, charId, o = {}) => {
   const anim = charId === "adv" || (P.NPC && P.NPC[charId]) ? charId : `${charId}-${o.outfit || (P.outfitOf ? P.outfitOf(charId) : "base")}`;
   k.sprite(l, "Portrait", anim, x + 2, y + 2, s - 4, s - 4, o.a ?? 1);
 };
-/* Terra amount with the coin icon */
+/* Gems (เพชร) amount with the gem icon, like the website */
 W.terra = (l, x, y, amount, o = {}) => {
-  const size = o.size || 14, is = size * 1.2;
-  k.icon(l, "terra", x, y + (size * 1.45 - is) / 2, is, "#ffffff", o.a ?? 1);
-  return is + 4 + k.text(l, String(amount), x + is + 4, y, {font:o.font || "monoB", size, color:o.color || "fg", a:o.a ?? 1}).w;
+  // the website's 3D gem (Gems = เพชร). The picture has wide empty margins, so it is drawn larger and the margin is skipped
+  const size = o.size || 14, is = size * 2, gw = is * .62;
+  k.icon(l, "$gem", x - is * .19, y + (size * 1.45 - is) / 2, is, "#ffffff", o.a ?? 1);
+  return gw + 5 + k.text(l, String(amount), x + gw + 5, y, {font:o.font || "monoB", size, color:o.color || "fg", a:o.a ?? 1}).w;
 };
 /* volume rows. 2.3: tapping the icon turns that sound on or off at once (back on at 80% if its slider was at 0); narration has its own row */
 W.flipSound = kind => {

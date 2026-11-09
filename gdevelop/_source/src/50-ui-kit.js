@@ -297,7 +297,8 @@ const Kit = {
       for (const it of ln.items){
         if (it.t === "i"){
           const isz = lay.iconW, ic = it.v === "terra" ? "#ffffff" : (o.iconColor || ICON_COL[it.v] || color);
-          this.icon(l, it.v, cx, cy + (lh - isz) / 2, isz, ic, alpha);
+          if (it.v === "$gem"){ const g = isz * 1.6; this.icon(l, it.v, cx + (isz - g) / 2, cy + (lh - g) / 2, g, ic, alpha); }   // the gem picture has wide empty margins
+          else this.icon(l, it.v, cx, cy + (lh - isz) / 2, isz, ic, alpha);
         } else {
           const t = l.obj("UIText");
           this._setText(t, it.v, fk, size, colN, alpha, lhPx, "left");

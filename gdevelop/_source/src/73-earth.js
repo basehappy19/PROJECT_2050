@@ -186,7 +186,9 @@ const Globe = {
   /* where the globe sits: right of the menu panel on wide screens, centred on narrow ones (like web/src/ui/menu.jsx) */
   place(){
     const dw = Kit.W || 1920, H = Kit.H || 1080, wide = dw >= H * 1.25;   // screen size in design units
-    const panel = 530;   // right edge of the menu panel (64-menu.js)
+    // right edge of the menu panel (64-menu.js; wider for the shop / achievements pages), eased so the globe glides aside
+    const want = (P.Screens && P.Screens.menuPanelRight) || 530;
+    this.panel = this.panel == null ? want : this.panel + (want - this.panel) * .15; const panel = this.panel;
     const cx = wide ? (panel + dw) / 2 : dw / 2, cy = wide ? H / 2 : H * .3;
     let r = wide ? Math.min(H * .42, (dw - panel) * .44) : Math.min(dw * .42, H * .26);
     if (this.fly) r *= this.fly.r;

@@ -65,8 +65,10 @@ Screens.renderMenu = function(l){
   k.slave("MenuScroll", s => {
     ch = this.menuCard(s, w);
     const top = 40;   // 3.x: content starts at the top of the panel, like the website
-    s.frame(x, top, {x:0, y:0, w:x + w + 40, h:k.H}, ch + Math.max(0, top - 16));
+    // scroll inside the panel only (it runs from y 16 to H − 16), so long pages never draw over its border
+    s.frame(x, top, {x:0, y:24, w:x + w + 40, h:k.H - 48}, ch + (top - 24) + 16);
   });
+  Screens.menuPanelRight = x + w + 24;   // where the globe may start (73-earth.js)
   if (P.Net) P.Net.googleOverlay(UIM._googleRect);
   this.accountChip(l);
 };
@@ -319,21 +321,22 @@ Screens.subAccount = function(l, y, w){
   y += 104;
   // levels
   W.h3(l, t("charLevels"), 0, y, {w}); y += 22;
-  const cw = (w - 3 * 8) / 4;
+  const cols = 4, gap = 8, cw = (w - (cols - 1) * gap) / cols, chh = 96;   // 4 columns, more rows when there are more characters (like the website)
   CHARS.forEach((c, i) => {
-    const cx = i * (cw + 8), xp = N.charXp(c.id), lv = P.levelOf(xp), own = N.owns("char_" + c.id);
-    k.rect(l, cx, y, cw, 92, "panel2", {r:10, stroke:own ? c.color : "line", sa:.6, bg:true});
-    W.portrait(l, cx + (cw - 48) / 2, y + 6, 48, c.id, {a:own ? 1 : .4});
-    k.text(l, L(c.name), cx, y + 56, {size:11, w:cw, align:"center", max:1, color:own ? "fg" : "muted"});
-    k.text(l, own ? `Lv ${lv}` : "[[lock]]", cx, y + 72, {font:"mono", size:11, color:own ? c.color : "muted", w:cw, align:"center"});
+    const cx = (i % cols) * (cw + gap), cy = y + Math.floor(i / cols) * (chh + gap), xp = N.charXp(c.id), lv = P.levelOf(xp), own = N.owns("char_" + c.id);
+    k.rect(l, cx, cy, cw, chh, "panel2", {r:10, stroke:own ? c.color : "line", sa:.6, bg:true});
+    W.portrait(l, cx + (cw - 50) / 2, cy + 8, 50, c.id, {a:own ? 1 : .4});
+    k.text(l, L(c.name), cx + 4, cy + 60, {size:11, w:cw - 8, align:"center", max:1, color:own ? "fg" : "muted"});
+    k.text(l, own ? `Lv ${lv}` : "[[lock]]", cx, cy + 75, {font:"monoB", size:11.5, color:own ? c.color : "muted", w:cw, align:"center"});
   });
-  y += 104;
+  y += Math.ceil(CHARS.length / cols) * (chh + gap) + 8;
   // rename
   W.h3(l, t("renameTitle"), 0, y, {w}); y += 20;
   const free = !u.renamed;
-  const cost = free ? t("free") : `${PRICE.rename} Terra`;
-  (UIM.inputs = UIM.inputs || {})["rn-name"] = k.input(l, 0, y, w - 150, 36, {type:"text", placeholder:u.displayName, key:"rn-name", fontSize:14});
-  W.btn(l, "do-rename", w - 140, y, `${t("rename")} · ${cost}`, () => N.rename(val("rn-name")), {w:140, disabled:N.busy || (!free && u.terra < PRICE.rename)});
+  const cost = free ? t("free") : `${PRICE.rename} ${t("gemsWord")}`;
+  const rnLab = `${t("rename")} · ${cost}`, rnW = W.btnW(rnLab);
+  (UIM.inputs = UIM.inputs || {})["rn-name"] = k.input(l, 0, y, w - rnW - 10, 36, {type:"text", placeholder:u.displayName, key:"rn-name", fontSize:14});
+  W.btn(l, "do-rename", w - rnW, y, rnLab, () => N.rename(val("rn-name")), {w:rnW, disabled:N.busy || (!free && u.terra < PRICE.rename)});
   y += 46;
   // appearance: map theme + outfit
   W.h3(l, t("appearance"), 0, y, {w}); y += 22;
@@ -376,7 +379,7 @@ Screens.subShop = function(l, y, w){
   for (const it of SHOP){
     const own = N.owns(it.id), afford = N.user.terra >= it.price;
     const desc = it.kind === "char" ? L(CHAR[it.id.slice(5)].pas) : L(it.desc);
-    const lab = own ? `[[check]] ${t("owned2")}` : `[[terra]] ${it.price}`, bw = W.btnW(lab) + 6;
+    const lab = own ? `[[check]] ${t("owned2")}` : `[[$gem]] ${it.price}`, bw = W.btnW(lab) + 6;
     const h1 = k.text(l, L(it.name), 56, y + 10, {font:"dispS", size:15, w:w - 56 - bw - 20}).h;
     const h2 = k.text(l, desc, 56, y + 10 + h1, {size:12, color:"muted", w:w - 56 - bw - 20}).h;
     const ch = Math.max(62, h1 + h2 + 20);
