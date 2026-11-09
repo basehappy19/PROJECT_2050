@@ -202,3 +202,43 @@ Screens.drawTrains = function(l){
   }
   this._edgeAnim = true;
 };
+
+/* ---------- 2D: 3.7.4 the season on the map (like web/src/life.js drawSeason) ----------
+   winter: snow over the north · hot season: heat haze over South Asia / the Middle East, smoke over mainland Southeast
+   Asia · monsoon: rain over South and Southeast Asia, heat over the northern summer · storm season: rain bands over
+   the Western Pacific and the Caribbean. Stronger as the world warms (P.seasonPower). */
+const SEA_AREAS = {
+  cool:[[48, 66, -128, -62, "snow"], [47, 66, 2, 58, "snow"], [44, 64, 62, 138, "snow"]],
+  hot:[[10, 30, 68, 92, "heat"], [16, 32, 36, 58, "heat"], [14, 22, 96, 106, "smoke"], [-2, 6, 98, 116, "smoke"]],
+  monsoon:[[8, 27, 70, 92, "rain"], [8, 24, 94, 122, "rain"], [36, 48, -8, 30, "heat"], [30, 42, -118, -92, "heat"]],
+  storm:[[12, 30, 122, 150, "rain"], [14, 28, -88, -62, "rain"]],
+};
+const SEA_COL = {snow:"#ebf5ff", heat:"#ff8c3c", smoke:"#968264", rain:"#466e96"};
+const seaParts = []; for (let i = 0; i < 260; i++) seaParts.push([rnd(), rnd(), rnd()]);
+Screens.drawSeason = function(l){
+  if (lowGfx() || !S.regions || !P.seasonOf) return;
+  const sea = P.seasonOf(S.tick), areas = SEA_AREAS[sea.id]; if (!areas) return;
+  const M = Map, z = M.cam.z, kk = clamp(P.seasonPower ? P.seasonPower() : 1, 1, 2), fade = clamp(1.6 - z * .25, .35, 1);
+  const run = S.speed > 0 && !S.event && !(P.UIM && P.UIM.modalOpen()), t = run ? performance.now() / 1000 : (this._seaT || performance.now() / 1000); if (run) this._seaT = t;
+  let moving = false;
+  areas.forEach(([la0, la1, lo0, lo1, kind], ai) => {
+    const a0 = toWorld(la1, lo0), a1 = toWorld(la0, lo1), [x0, y0] = M.toScreen(a0[0], a0[1]), [x1, y1] = M.toScreen(a1[0], a1[1]);
+    const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, rx = Math.abs(x1 - x0) / 2, ry = Math.abs(y1 - y0) / 2;
+    if (cx + rx < 0 || cx - rx > k.W || cy + ry < 0 || cy - ry > k.H || rx < 4) return;
+    const col = SEA_COL[kind], a = (kind === "heat" ? .07 + .02 * Math.sin(t * 1.3 + ai) : kind === "snow" ? .06 : .09) * kk * fade;
+    // a soft oval: a few overlapping circles, fainter toward the edge
+    const n0 = Math.max(1, Math.round(rx / ry)); for (let i = 0; i < n0; i++){ const px = cx - rx + ry + (n0 > 1 ? i * (2 * rx - 2 * ry) / (n0 - 1) : rx - ry); k.circle(l, px, cy, ry, col, {a}); k.circle(l, px, cy, ry * .6, col, {a:a * .8}); }
+    if (kind === "heat") return;
+    moving = true;
+    const n = Math.round((kind === "smoke" ? 12 : kind === "snow" ? 50 : 40) * kk), sc = clamp(Math.sqrt(rx * ry) / 90, .7, 1.6);
+    for (let i = 0; i < n; i++){
+      const p = seaParts[(i * 7 + ai * 41) % seaParts.length], ang = p[0] * TAU, rr = Math.sqrt(p[1]) * .9;
+      let px = cx + Math.cos(ang) * rr * rx, py = cy + Math.sin(ang) * rr * ry;
+      const ph = (t * (kind === "rain" ? .9 : kind === "snow" ? .18 : .05) + p[2]) % 1, vis2 = 1 - Math.abs(ph - .5) * 2;
+      if (kind === "rain"){ py += (ph - .5) * ry * .5; px += (ph - .5) * ry * .15; const L0 = 10 * sc; k.line(l, px, py, px + L0 * .3, py + L0, "#c8e1fa", {w:1.3, a:.65 * vis2 * fade}); }
+      else if (kind === "snow"){ py += (ph - .5) * ry * .6; px += Math.sin(t + i) * 3; k.circle(l, px, py, 1.9 * sc, "#fafcff", {a:.85 * vis2 * fade}); }
+      else { px += ph * rx * .4; py -= ph * ry * .3; k.circle(l, px, py, 10 * sc * (.6 + ph), col, {a:.26 * (1 - ph) * fade}); }
+    }
+  });
+  if (moving && run) this._edgeAnim = true;   // redraw the map layer a few times a second while it rains / snows
+};

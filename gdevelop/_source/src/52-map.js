@@ -6,7 +6,8 @@ if (P.mods && P.mods.map) return;
    Objects placed in the scene: Ocean, MapRim, ArcticIce, Region ×6, RegionLine ×6, Plume ×N
    Created at runtime: Bubble (green = Eco-Points, red = disaster aid), 2 UIPainter objects in world space
    (country borders + the selected country), drawn once and moved by the camera.
-   Controls: drag = pan · wheel / pinch / + − buttons = zoom · double-tap or H = whole world
+   Controls: drag = pan (flick to glide) · wheel / pinch / + − buttons = zoom · double-click or H = whole world
+   3.7.3 touch: double-tap = zoom in there (whole world when already close) · two-finger tap = zoom out · no jump back to the middle
    Tap a region (zoomed out) = zoom into it · tap a country (zoomed in) = select the country
    ========================================================================= */
 const MAPMETA = /*MAPMETA*/null;
@@ -274,8 +275,10 @@ const Map = {
   /* drawer closed: slide back to the whole-world view (when not zoomed in) */
   recenter(){ if (this.mode === "game" && this.cam.z <= 1.05) this.target = {...HOME}; },
   resetView(){ if (this.mode === "game"){ this.zAnim = null; this.target = {...HOME}; Kit.dirty(); } },
+  /* 3.7.3: smooth zoom toward / away from a screen point (double-tap, two-finger tap); never jumps back to the middle */
+  zoomAt(sx, sy, f){ if (this.mode !== "game") return; const w = this.toWorldFromScreen(sx, sy); this.target = null; this.fling = null; this.zAnim = {z:clamp(this.cam.z * f, ZMIN, ZMAX), sx, sy, wx:w[0], wy:w[1], keep:true}; if (P.Audio) P.Audio.play("tick"); },
   zoomBy(f){
-    if (this.mode !== "game") return; this.zAnim = null;
+    if (this.mode !== "game") return; this.zAnim = null; this.fling = null;
     const z0 = this.target ? this.target.z : this.cam.z, z1 = clamp(z0 * f, ZMIN, ZMAX);
     if (z1 <= ZMIN + .001){ this.target = {...HOME}; return; }   // 3.x: fully zoomed out → always back to the centre
     const cx = this.target ? this.target.x : this.cam.x, cy = this.target ? this.target.y : this.cam.y; this.target = {x:cx, y:cy, z:z1};
@@ -346,7 +349,11 @@ const Map = {
     const m = Kit.mouse; if (m.moved > 8 || this.pinchEnded > performance.now() - 250) return false;
     if (P.UIM && P.UIM.placing && P.Screens.placeTap) return P.Screens.placeTap(m.x, m.y);   // placing a build: the grid takes every tap
     const now = performance.now();
-    if (now - this.lastTap < 320 && Math.abs(m.x - this.lastTapX) + Math.abs(m.y - this.lastTapY) < 24){ this.lastTap = 0; this.resetView(); return true; }
+    if (now - this.lastTap < 320 && Math.abs(m.x - this.lastTapX) + Math.abs(m.y - this.lastTapY) < 24){
+      this.lastTap = 0;
+      if (now - (this.touchAt || 0) < 800 && this.cam.z < ZMAX * .9) this.zoomAt(m.x, m.y, 2); else this.resetView();   // 3.7.3: touch → zoom in
+      return true;
+    }
     this.lastTap = now; this.lastTapX = m.x; this.lastTapY = m.y;
     // 3.x: bubbles first (found on screen, so a tilted map still picks the right one)
     for (const id in this.bubbles){ const o = this.bubbles[id], [bx, by] = this.toScreen(o.getX(), o.getY()); if (Math.hypot(bx - m.x, by - m.y) < 26){ if (P.popBubble(+id, bx, by - 26)) return true; } }
@@ -374,20 +381,33 @@ const Map = {
       if (ids.length >= 2 && !modal){
         const ax = im.getTouchX(ids[0]), ay = im.getTouchY(ids[0]), bx = im.getTouchX(ids[1]), by = im.getTouchY(ids[1]);
         const dist = Math.hypot(ax - bx, ay - by), mx = (ax + bx) / 2, my = (ay + by) / 2;
-        if (!this.pinch){ this.pinch = {d:dist, z:this.cam.z, w:this.toWorldFromScreen(mx / Kit.K, my / Kit.K)}; this.target = null; }
+        this.touchAt = performance.now();
+        if (!this.pinch){ this.pinch = {d:dist, d1:dist, t0:performance.now(), mx:mx / Kit.K, my:my / Kit.K, z:this.cam.z, w:this.toWorldFromScreen(mx / Kit.K, my / Kit.K)}; this.target = null; this.fling = null; }
         else {
-          const z1 = clamp(this.pinch.z * dist / Math.max(20, this.pinch.d), ZMIN, ZMAX);
+          this.pinch.d1 = dist; const z1 = clamp(this.pinch.z * dist / Math.max(20, this.pinch.d), ZMIN, ZMAX);
           this.cam.z = z1; this.applyCam(); const w = this.toWorldFromScreen(mx / Kit.K, my / Kit.K);
           this.cam.x += this.pinch.w[0] - w[0]; this.cam.y += this.pinch.w[1] - w[1]; this.clampCam();
         }
         this.drag = null;
       } else {
-        if (this.pinch){ this.pinch = null; this.pinchEnded = performance.now(); m.moved = 99; if (this.cam.z <= ZMIN + .02) this.target = {...HOME}; }
+        if (this.pinch){   // 3.7.3: a quick two-finger tap zooms out one step; no jump back to the middle
+          const Pn = this.pinch, tn = performance.now(); this.pinch = null; this.pinchEnded = tn; m.moved = 99;
+          if (tn - Pn.t0 < 260 && Math.abs(Pn.d1 - Pn.d) < 14) this.zoomAt(Pn.mx, Pn.my, .5);
+        }
+        if (ids.length) this.touchAt = performance.now();
         // drag to pan (only when the press started on the map)
         if (m.down && !m.onUI && !modal){
-          if (!this.drag) this.drag = {x:m.x, y:m.y};
-          else if (m.moved > 6){ const a = this.toWorldFromScreen(this.drag.x, this.drag.y), b = this.toWorldFromScreen(m.x, m.y); this.cam.x -= b[0] - a[0]; this.cam.y -= b[1] - a[1]; this.target = null; this.zAnim = null; this.drag = {x:m.x, y:m.y, did:true}; this.clampCam(); this.applyCam(); }
-        } else { if (this.drag && this.drag.did && this.cam.z <= ZMIN + .02) this.target = {...HOME}; this.drag = null; }
+          if (!this.drag){ this.drag = {x:m.x, y:m.y, vx:0, vy:0, t:performance.now()}; this.fling = null; }
+          else if (m.moved > 6){
+            const a = this.toWorldFromScreen(this.drag.x, this.drag.y), b = this.toWorldFromScreen(m.x, m.y), dx = b[0] - a[0], dy = b[1] - a[1], tn = performance.now(), dtm = Math.max(1, tn - this.drag.t), D = this.drag;
+            this.cam.x -= dx; this.cam.y -= dy; this.target = null; this.zAnim = null;
+            this.drag = {x:m.x, y:m.y, did:true, t:tn, vx:D.vx * .6 + (-dx / dtm * 1000) * .4, vy:D.vy * .6 + (-dy / dtm * 1000) * .4}; this.clampCam(); this.applyCam();
+          }
+        } else {
+          // 3.7.3: let go while moving fast → the map keeps gliding and slows down (no jump back to the middle)
+          const D = this.drag; if (D && D.did && performance.now() - D.t < 90 && Math.hypot(D.vx, D.vy) * this.cam.z > 150) this.fling = {vx:D.vx, vy:D.vy};
+          this.drag = null;
+        }
       }
       const wheel = im.getMouseWheelDelta ? im.getMouseWheelDelta() : 0;
       if (wheel && !Kit.wheelUsed && !Kit.overUI && !modal){
@@ -404,7 +424,12 @@ const Map = {
       let z = Math.exp(Math.log(this.cam.z) + (Math.log(A.z) - Math.log(this.cam.z)) * k); if (Math.abs(A.z - z) < .002) z = A.z;
       this.cam.z = z; this.applyCam(); const w = this.toWorldFromScreen(A.sx, A.sy);
       this.cam.x += A.wx - w[0]; this.cam.y += A.wy - w[1]; this.clampCam();
-      if (z === A.z){ this.zAnim = null; if (z <= ZMIN + .001) this.target = {...HOME}; }
+      if (z === A.z){ this.zAnim = null; if (z <= ZMIN + .001 && !A.keep) this.target = {...HOME}; }
+    }
+    if (this.fling && this.mode === "game"){   // 3.7.3: glide after a flick; stops at the edge
+      const F = this.fling, ox = this.cam.x + F.vx * dt, oy = this.cam.y + F.vy * dt; this.cam.x = ox; this.cam.y = oy; this.clampCam();
+      if (Math.abs(this.cam.x - ox) > 1e-3) F.vx = 0; if (Math.abs(this.cam.y - oy) > 1e-3) F.vy = 0;
+      const kk = Math.pow(.93, dt * 60); F.vx *= kk; F.vy *= kk; if (Math.hypot(F.vx, F.vy) * this.cam.z < 25) this.fling = null;
     }
     if (this.target){
       const k = 1 - Math.pow(0.86, dt * 60);

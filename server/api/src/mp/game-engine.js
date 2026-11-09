@@ -2210,6 +2210,33 @@ const V = (v, date, name, th, en) => ({v, date, name, items:{th, en}});
 /* minor updates (1.1.1, 1.1.2, …) sit inside their main version as subs, newest first */
 const SUB = (v, date, th, en) => ({v, date, items:{th, en}});
 P.CHANGELOG = [
+  V("2.1", "2026-11-10", {th:"โลกที่มีชีวิตชีวา", en:"A Living World"}, [
+    "แผนที่โฉมใหม่: เต็มจอ มีน้ำแข็งที่ขั้วโลก เมฆและพายุ เครื่องบิน 3 มิติ แท่นขุดเจาะ รถไฟ ฟาร์มลมและโซลาร์ และป่าที่ค่อย ๆ ฟื้นตัว",
+    "ฤดูกาลมีผลกับการเล่นมากขึ้น: พลังงานสะอาด ไฟฟ้าช่วงหน้าร้อน และผลผลิตเกษตรเปลี่ยนไปตามฤดู เห็นหิมะ ฝน และหมอกควันบนแผนที่ และได้เกรดพร้อมรางวัลเมื่อจบแต่ละฤดู",
+    "หน้าข้อพิพาทระหว่างประเทศใหม่: สองฝ่ายเผชิญหน้ากันพร้อมธงชาติและคำพูด เข้าใจง่ายว่าแต่ละทางเลือกทำให้ใครพอใจ",
+    "ธงชาติของทุกประเทศในแท็บประเทศ",
+    "ตลาดทรัพยากรใหม่: เห็นแร่ที่กำลังแปรรูป ราคาเทียบกับเดือนก่อน และประเทศที่ส่งแร่ให้เรามากที่สุด",
+    "หน้าสถิติใหม่ อ่านต่อกันเป็นเรื่องเดียว และบอกว่าทรัพยากรได้มาจากประเทศไหน",
+    "ปรับสมดุลทรัพยากร: ค้าขายกับประเทศต่าง ๆ คุ้มค่ากว่าเดิม ส่วนการซื้อทันทีในตลาดแพงขึ้น",
+    "ร้านค้าเปลี่ยนจากเพชรเป็นคาร์บอนเครดิต (จำนวนที่มีอยู่เท่าเดิม)",
+    "ลูกโลกหน้าโหลดและหน้าหลักเป็นแบบเดียวกัน และเปลี่ยนหน้าได้นุ่มนวล",
+    "เล่นบนมือถือและแท็บเล็ตง่ายขึ้น: เลื่อนและซูมแผนที่ลื่นขึ้น แถบเมนูไม่ทับกัน ชื่อประเทศไม่รก และแตะเพื่อดูคำอธิบายได้",
+    "ปรับปรุงประสิทธิภาพ เล่นลื่นขึ้นและใช้หน่วยความจำน้อยลง",
+    "แก้ไขบัคหลายจุด"
+  ], [
+    "A new-look map: full screen, with polar ice, clouds and storms, 3D planes, oil rigs, trains, wind and solar farms, and forests that grow back.",
+    "Seasons matter more: clean energy, summer power demand and harvests change with the season; snow, rain and haze show on the map, and each season ends with a grade and a reward.",
+    "A new screen for disputes between countries: the two sides face off with their flags and their own words, so it's clear who each choice will please.",
+    "Every country's flag in the country tab.",
+    "A new resources market: see minerals being refined, prices compared with last month, and the countries that send you the most.",
+    "A new statistics panel you read top to bottom, including where your resources came from.",
+    "Resource rebalance: trading with countries pays off more, while instant market buys cost more.",
+    "The shop now uses Carbon Credits instead of Gems (your balance stays the same).",
+    "The Earth on the loading and home screens now matches, with a smooth move between them.",
+    "Easier to play on phones and tablets: smoother map panning and zoom, menus that don't overlap, tidier country names, and tap-to-explain.",
+    "Performance improvements: smoother play and less memory use.",
+    "Various bug fixes."
+  ]),
   V("2.0", "2026-11-10", {th:"โลกที่เล่นง่ายขึ้น", en:"An Easier World to Read"}, [
     "โหมดฝึกซ้อม: พาเล่นทีละขั้นด้วยการกดจริง ราว 8 นาที ผู้เล่นใหม่จะเข้าโหมดนี้ก่อนเล่นครั้งแรก และเล่นซ้ำได้จากเมนู",
     "โหมดเร็ว: เกมราว 15 นาที ไม่มีระบบทรัพยากรและกลุ่มคน เหตุการณ์น้อยลง เหมาะกับเล่นครั้งแรก",
@@ -2229,22 +2256,7 @@ P.CHANGELOG = [
     "ภัยพิบัติไม่เด้งการ์ดกลางจอแล้ว ดูไอคอนบนแผนที่เอง ความเสียหายขึ้นเป็นตัวเลขที่ประเทศนั้นค้างไว้สักพัก",
     "ย่อหน้าต่างเหตุการณ์เพื่อดูแผนที่และทรัพยากรก่อนตัดสินใจได้",
     "ปิดโหมดเล่นหลายคนไว้ก่อน เพื่อปรับให้ดีขึ้น",
-    "แก้บัค: ประเทศกว่า 100 ประเทศ (เช่น โซมาเลีย ฟิจิ มัลดีฟส์) ไม่แสดงพยากรณ์ภัยและฟองช่วยเหลือบนแผนที่ · ไอคอนทรัพยากรบางเครื่องไม่ขึ้น (มีไอคอนสำรองแล้ว) · ข้อความบางจุดถูกแถบสกิลบัง",
-    "ค่าเงินในร้านค้าเปลี่ยนจากเพชรเป็นคาร์บอนเครดิต พร้อมไอคอนใหม่ (จำนวนที่มีอยู่เท่าเดิม)",
-    "คำอธิบายค่าต่าง ๆ บน iPad และมือถือ: แตะเพื่อดู แตะที่ไหนก็ได้เพื่อปิด ไม่ค้างแล้ว · ไม่มีกล่องข้อความของเบราว์เซอร์เด้งขึ้นมาแล้ว",
-    "โลกในเกมล้อมด้วยน้ำแข็งที่ค่อย ๆ กลืนไปกับขอบแผนที่ ไม่มีที่ว่างรอบโลกแล้ว และเลื่อนแผนที่ออกนอกขอบไม่ได้",
-    "เครื่องบินเป็นโมเดล 3 มิติ เงยไปพร้อมแผนที่เมื่อซูม เชิดหัวตอนขึ้น ก้มหัวตอนลง และเอียงตัวตอนเลี้ยว",
-    "กดเข้าเกมแล้วโลกในหน้าโหลดเลื่อนไปเป็นโลกในหน้าหลักอย่างนุ่มนวล",
-    "แผนที่มีชีวิตชีวาขึ้น: เมฆลอยพร้อมเงา พายุเฮอริเคนและไต้ฝุ่นหมุนก่อนเข้า แสงเหนือที่ขั้วโลก ฟาร์มกังหันลมและโซลาร์เป็นทุ่ง รถไฟความเร็วสูงวิ่งเมื่อสร้างเสร็จ ป่าที่ปลูกค่อย ๆ เขียวขึ้น และแท่นขุดเจาะน้ำมันที่ไฟดับเมื่อประเทศนั้นหันมาใช้พลังงานสะอาด",
-    "น้ำแข็งรอบโลกและเมฆจางลง ไม่บังแผนที่ · เหตุการณ์ขึ้นแล้วแผนที่อยู่ที่เดิม ไม่เลื่อนไปเอง",
-    "แผนที่เป็นสี่เหลี่ยมเต็มจอแบบ Plague Inc ไม่เป็นวงรีแล้ว ซูมออกสุดก็ยังเต็มจอ ไม่เห็นขอบ · น้ำแข็งเหลือเพียงแถบบาง ๆ จาง ๆ แตกเป็นแพตามขอบบนและล่างของแผนที่",
-    "ลูกโลกหน้าโหลดและหน้าหลักเป็นแบบเดียวกัน (แสงแดด ด้านมืด เมฆ และขอบฟ้าสีฟ้า) · เมฆบนแผนที่เป็นแผ่นบาง ๆ จาง ๆ และน้อยลง · เอาแสงเหนือออก · แก้แผนที่ซ้อนกันหลังอัปเดต",
-    "ป้ายชื่อประเทศเล็กขึ้นเฉพาะตอนซูมใกล้ ๆ ประเทศหลักขึ้นเสมอ และป้ายที่ทับกันจะซ่อนไว้ ไม่รกเหมือนก่อน",
-    "ลูกโลกหน้าโหลดและหน้าหลักสว่างเท่ากันแล้ว · แถบล่างไม่ทับกันในจอขนาดกลาง (จอแคบขึ้นแค่ไอคอนเมนู) · มือถือ: แผนที่เลื่อนซ้ายขวาได้อิสระ ไม่ดีดกลับกลาง ปัดแรง ๆ ให้ไหลต่อ แตะสองครั้งซูมเข้า สองนิ้วแตะซูมออก และแผนที่พอดีพื้นที่ระหว่างแถบบนกับล่าง",
-    "หน้าข้อพิพาทระหว่างประเทศแบบใหม่: สองฝ่ายเผชิญหน้ากัน (VS) พร้อมธงชาติและคำพูดของแต่ละฝ่าย ทางเลือกบอกสั้น ๆ ว่าฝ่ายไหนพอใจหรือไม่พอใจ",
-    "ฤดูกาลสำคัญขึ้น: โซลาร์ผลิตไฟได้มากหน้าร้อนแต่น้อยหน้าฝน กังหันลมแรงช่วงพายุและหน้าหนาว · ไฟฟ้าพีคหน้าร้อนทำให้ไฟดับ (สกิลลดการใช้ไฟช่วงพีกช่วยได้) · ผลผลิตเกษตรขึ้นกับมรสุม · แผนที่มีหิมะ ฝน หมอกควัน และไอร้อนตามฤดู · ยิ่งโลกร้อน ฤดูยิ่งรุนแรง · จบฤดูได้เกรด A–F และรางวัล",
-    "แท็บประเทศมีธงชาติของประเทศนั้น · ประเทศส่งทรัพยากรให้มากขึ้น 50% ซื้อจากประเทศได้ +12 ถึง +20 ฟองสีส้มให้ +8 ถึง +12 ส่วนการซื้อทันทีในตลาดแพงขึ้น 40% (ขายได้ครึ่งราคา)",
-    "ตลาดทรัพยากรแบบใหม่: เห็นแร่ดิบรอแปรรูปไหลบนสายพานเข้าเครื่องแปรรูป · ราคาบอกราคาเดือนก่อนและขึ้นลงกี่ % (เขียว = ขึ้น แดง = ลง) · ธงประเทศที่ส่งแร่ให้มากสุด · หน้าสถิติใหม่อ่านต่อกันเป็นเรื่องเดียว พร้อมบอกว่าทรัพยากรได้มาจากประเทศไหนเท่าไหร่",
+    "แก้บัค: ประเทศกว่า 100 ประเทศ (เช่น โซมาเลีย ฟิจิ มัลดีฟส์) ไม่แสดงพยากรณ์ภัยและฟองช่วยเหลือบนแผนที่ · ไอคอนทรัพยากรบางเครื่องไม่ขึ้น (มีไอคอนสำรองแล้ว) · ข้อความบางจุดถูกแถบสกิลบัง"
   ], [
     "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu.",
     "Fast mode: a 15-minute game without minerals or groups and with fewer events, great for a first game.",
@@ -2264,22 +2276,7 @@ P.CHANGELOG = [
     "Disasters no longer pop up a card: watch for their icons on the map; losses appear as a number that stays on that country for a while.",
     "Events can be minimised so you can check the map and your resources before choosing.",
     "Multiplayer is switched off for now while we improve it.",
-    "Bug fixes: over 100 countries (such as Somalia, Fiji and the Maldives) showed no disaster warnings or aid bubbles · mineral icons were blank on some devices (there is a fallback now) · some text was hidden behind the ability bar.",
-    "The shop currency is now Carbon Credits instead of Gems, with a new icon (your balance stays the same).",
-    "On iPad and phones, tap a value to see what it means and tap anywhere to close it; tooltips no longer get stuck, and the browser's own tooltips are gone.",
-    "The world now sits in a sheet of ice that fades into the map's edge: no empty space around it, and the map can't be dragged past its edge.",
-    "Planes are 3D models that tip back with the map when you zoom in; they lift their nose to climb, dip it to land and bank into turns.",
-    "Entering the game, the Earth on the loading screen glides over to become the globe on the home screen.",
-    "A livelier map: drifting clouds with shadows, hurricanes and typhoons spinning before they hit, northern lights, wind and solar farms as whole fields, high-speed trains once a line is built, planted forests slowly turning green, and oil rigs whose flares go out when that country goes green.",
-    "The ice round the world and the clouds are fainter so they don't get in the way, and an event no longer moves the map.",
-    "The map is now a full-screen rectangle like Plague Inc instead of an oval: fully zoomed out it still fills the screen and its edge never shows · the ice is just a thin, faint band of broken sea ice along the top and bottom of the map.",
-    "The Earth on the loading screen and on the home screen now look the same (sunlight, dark side, clouds and a blue sky at the rim) · clouds on the map are fewer, thin and faint · no more northern lights · fixed the map pictures not lining up after an update.",
-    "Names of small countries only appear when you zoom in closer; main countries always show, and labels that would overlap are hidden, so the map is no longer cluttered.",
-    "The loading-screen and home-screen Earths are now equally bright · the bottom bar no longer overlaps on mid-size screens (narrow screens show menu icons only) · phones: pan the map freely without it jumping back to the middle, flick to glide, double-tap to zoom in, two-finger tap to zoom out, and the map fits between the top and bottom bars",
-    "A new screen for disputes between countries: the two sides face each other (VS) with their flags and say one line each; each choice simply says which side will be pleased or upset.",
-    "Seasons matter more: solar makes more in the hot season and less under monsoon clouds, wind farms do best in storm season and winter · a summer power peak causes blackouts (Demand Response helps) · the harvest depends on the monsoon · snow, rain, smoke and heat haze show on the map · seasons get harsher as the world warms · each season ends with a grade A–F and a reward.",
-    "The country tab shows the country's flag · countries send 50% more minerals, buying from a country gives +12 to +20 and orange bubbles +8 to +12, while instant buying on the market costs 40% more (selling pays half the price).",
-    "A new resources market: raw minerals flow along a belt into the refinery · each price shows last month's price and the % change (green = up, red = down) · flags of the countries that sent the most · a new statistics panel you read top to bottom, including where each mineral came from.",
+    "Bug fixes: over 100 countries (such as Somalia, Fiji and the Maldives) showed no disaster warnings or aid bubbles · mineral icons were blank on some devices (there is a fallback now) · some text was hidden behind the ability bar."
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",
@@ -2293,7 +2290,7 @@ P.CHANGELOG = [
     "เสียงพากย์อ่านเร็วขึ้น ต่อประโยคเป็นธรรมชาติขึ้น และอีเวนต์อ่านเฉพาะเรื่อง ไม่อ่านตัวเลือก",
     "หน้าวิธีเล่นใหม่ทั้งหมด ภาพและข้อความตรงกับเกมตอนนี้",
     "เพชรหายากขึ้น ราคาตัวละครตั้งตามโอกาสชนะ (ยิ่งชนะง่ายยิ่งแพง)",
-    "แก้บัค: กดเก็บฟองได้ขณะหยุดเวลา และข้อความบางจุดไม่ตรงกับค่าจริง",
+    "แก้บัค: กดเก็บฟองได้ขณะหยุดเวลา และข้อความบางจุดไม่ตรงกับค่าจริง"
   ], [
     "Every character has a background and their own lines in all three acts.",
     "New people in the story: Fon, a mangrove volunteer in Samut Prakan; Uncle Thongdee, a Chachoengsao rice farmer; and Krai, who pushes back for old energy.",
@@ -2306,7 +2303,7 @@ P.CHANGELOG = [
     "Narration reads faster and more naturally, and events are read without their options.",
     "A new How to Play, with pictures and text that match the game today.",
     "Gems are rarer, and characters are priced by how often they win.",
-    "Fixes: bubbles could be collected while paused, and some texts did not match the real numbers.",
+    "Fixes: bubbles could be collected while paused, and some texts did not match the real numbers."
   ]),
   V("1.6", "2026-10-22", {th:"โลกกว้างขึ้น ดูง่ายขึ้น", en:"A Bigger, Clearer World"}, [
     "เพิ่มประเทศอีก 80 ประเทศ รวมเป็น 172 ประเทศ เช่น เซอร์เบีย ลิทัวเนีย ซูดาน เซเนกัล ฮอนดูรัส ปารากวัย เติร์กเมนิสถาน ภูฏาน มัลดีฟส์",
@@ -2315,7 +2312,7 @@ P.CHANGELOG = [
     "หน้าความนิยม: เห็นว่าแต่ละกลุ่มชอบและไม่ชอบอะไร เปลี่ยนไปเท่าไรใน 1 ปี และได้หรือเสียอะไร",
     "หน้าสถิติแบ่งเป็น 4 แท็บ และมีแท็บการเงิน บอกว่าเงินและแต้มนโยบายได้มาจากไหน ใช้ไปกับอะไร รายปีหรือทั้งเกม",
     "สกิลใหม่ตอนเลเวล 5: นักการทูต “ทูตสันถวไมตรี” ยกเลิกการคว่ำบาตรทั้งหมด และนักเคลื่อนไหว “พลังเยาวชน” ทำให้คนรุ่นใหม่พอใจขึ้น",
-    "ปรับความยากใหม่ให้เหมาะกับประเทศที่เพิ่มขึ้น",
+    "ปรับความยากใหม่ให้เหมาะกับประเทศที่เพิ่มขึ้น"
   ], [
     "80 more countries, 172 in all, such as Serbia, Lithuania, Sudan, Senegal, Honduras, Paraguay, Turkmenistan, Bhutan and the Maldives.",
     "Country pages show each resource as “ready” or “needs refining”, and supply status in one line.",
@@ -2323,55 +2320,55 @@ P.CHANGELOG = [
     "The approval window shows what each group likes and dislikes, how it changed in a year and what it gives or costs.",
     "Statistics in four tabs, with a new Money tab: where money and policy points came from and went, per year or for the whole game.",
     "New level 5 abilities: the Diplomat’s “Goodwill Tour” ends every sanction, and the Activist’s “Youth Power” wins over young people.",
-    "Difficulty retuned for the bigger world.",
+    "Difficulty retuned for the bigger world."
   ]),
   V("1.5", "2026-10-22", {th:"ซีซั่นแรก", en:"Season One"}, [
     "ภารกิจรายสัปดาห์: ทุกสัปดาห์มี 3 ภารกิจ (ง่าย กลาง ยาก) ทำสำเร็จแล้วกดรับเพชร",
     "รางวัลซีซั่น: ทุกเกมที่เล่นจบได้ XP ซีซั่น สะสมครบแต่ละขั้นรับเพชรและของพิเศษ เช่น กรอบโปรไฟล์ และธีมแผนที่",
     "ดูได้ที่เมนู “ซีซั่นและภารกิจ” (ต้องเข้าสู่ระบบ)",
-    "แก้บัคและปรับปรุงประสิทธิภาพ",
+    "แก้บัคและปรับปรุงประสิทธิภาพ"
   ], [
     "Weekly missions: three each week (easy, medium, hard); finish one and claim gems.",
     "Season rewards: every finished game gives season XP; each tier pays gems and special items such as a profile frame and a map theme.",
     "Find them under “Season & missions” on the menu (sign-in needed).",
-    "Bug fixes and performance improvements.",
+    "Bug fixes and performance improvements."
   ]),
   V("1.4", "2026-10-22", {th:"จากเหมืองสู่โรงงาน", en:"From Mine to Factory"}, [
     "ห่วงโซ่อุปทานแร่: แร่ที่ขุดได้เป็นแร่ดิบ ต้องผ่านโรงแยกแร่ก่อนจึงใช้สร้างสกิลได้",
     "ประเทศที่มีโรงแยกแร่ เช่น จีน อินโดนีเซีย ชิลี ส่งแร่แบบพร้อมใช้ ประเทศอื่นส่งแร่ดิบ",
     "สร้างโรงแยกแร่ของเราเองได้ในตลาดทรัพยากร (แยกได้เร็วขึ้น แต่มีค่าดูแลรายเดือน) และประเทศที่มีโรงแยกแร่ซึ่งเป็นมิตรจะช่วยแยกแร่ให้",
-    "แก้บัคและปรับปรุงประสิทธิภาพ",
+    "แก้บัคและปรับปรุงประสิทธิภาพ"
   ], [
     "The mineral supply chain: dug-up minerals are raw and must go through a refinery before skills can use them.",
     "Countries with refineries, such as China, Indonesia and Chile, send minerals ready to use; others send them raw.",
     "Build our own refineries in the minerals market (faster refining, but a monthly upkeep), and friendly refining countries lend a hand.",
-    "Bug fixes and performance improvements.",
+    "Bug fixes and performance improvements."
   ]),
   V("1.3", "2026-10-22", {th:"เสียงของประชาชน", en:"Voices at Home"}, [
     "การเมืองในประเทศ: ความนิยมแบ่งเป็น 4 กลุ่ม คนเมือง ภาคอุตสาหกรรม เกษตรกร และคนรุ่นใหม่ แต่ละกลุ่มพอใจไม่เท่ากัน",
     "ทุกสกิล ตัวเลือกในเหตุการณ์ และคำสั่ง มีคนได้และคนเสีย ดูสัญลักษณ์ ▲ ▼ ว่ากลุ่มไหนจะพอใจหรือไม่พอใจ",
     "กลุ่มที่สนับสนุนให้โบนัส เช่น อุตสาหกรรมเพิ่มรายได้ คนรุ่นใหม่เพิ่มแต้มนโยบาย กลุ่มที่โกรธมากอาจออกมาประท้วง",
     "กดที่ความนิยมด้านบนเพื่อดูทั้ง 4 กลุ่ม และดูได้ในแท็บสถิติ",
-    "แก้บัคและปรับปรุงประสิทธิภาพ",
+    "แก้บัคและปรับปรุงประสิทธิภาพ"
   ], [
     "Politics at home: approval is now made of four groups (city people, industry, farmers and young people), each with its own mood.",
     "Every skill, event choice and order has winners and losers: the ▲ ▼ marks show which group will be pleased or upset.",
     "Groups that back you give bonuses (industry adds income, young people add policy points); very angry groups may protest.",
     "Tap approval at the top to see all four groups; they are in the statistics tab too.",
-    "Bug fixes and performance improvements.",
+    "Bug fixes and performance improvements."
   ]),
   V("1.2", "2026-10-22", {th:"คนใหม่ ทางเลือกใหม่", en:"New Faces, New Paths"}, [
     "ตัวละครใหม่ 2 คน: ดร.นาวา นักสมุทรศาสตร์ (รับมือพายุ น้ำท่วม และน้ำเค็มรุกได้ดี) และคุณกล้า วิศวกรเมือง (สร้างโครงการได้เร็ว)",
     "หมวดสกิลใหม่ “อาหารและน้ำ” 8 สกิล เช่น ชลประทานน้ำหยด ลดขยะอาหาร โรงกลั่นน้ำทะเลพลังแสงอาทิตย์ และข้อตกลงความมั่นคงทางอาหารโลก",
     "ความสำเร็จใหม่สำหรับหมวดอาหารและน้ำ",
     "ปรับสมดุลตัวละครทุกคนให้ใกล้เคียงกันขึ้น และปรับความยากโดยรวม",
-    "แก้บัคและปรับปรุงประสิทธิภาพ",
+    "แก้บัคและปรับปรุงประสิทธิภาพ"
   ], [
     "Two new characters: Dr. Nawa the Ocean Scientist (handles storms, floods and saltwater well) and Kla the City Engineer (builds projects fast).",
     "A new skill branch, “Food & Water”, with 8 skills such as drip irrigation, cutting food waste, solar desalination and a world food security pact.",
     "A new achievement for the Food & Water branch.",
     "All characters rebalanced to be closer to each other, and the overall difficulty retuned.",
-    "Bug fixes and performance improvements.",
+    "Bug fixes and performance improvements."
   ]),
   V("1.1", "2026-10-22", {th:"โลกที่ต้องคิดหนักขึ้น", en:"A Tougher World"}, [
     "เกมยากขึ้น ต้องวางแผนมากขึ้น: เงินรายเดือนน้อยลงแต่ฟองสีเขียวให้มากขึ้น ความนิยมลดง่ายขึ้น ภัยพิบัติมาบ่อยขึ้นและเกิดหลายที่พร้อมกันได้ และโลกร้อนได้ถึง +3.0°C ถ้าไม่ลดจริงจัง",
@@ -2383,7 +2380,7 @@ P.CHANGELOG = [
     "หน้าข่าวมีข่าวกรอง และหน้าสถิติมีรายงานประจำปี อ่านแล้วได้แต้มนโยบาย",
     "เพิ่มประเทศอีก 24 ประเทศ",
     "ปรับหน้าตาให้อ่านง่ายขึ้น ไอคอนใหม่ และพื้นหลังอวกาศเมื่อซูมออก",
-    "แก้บัคและปรับปรุงประสิทธิภาพหลายจุด",
+    "แก้บัคและปรับปรุงประสิทธิภาพหลายจุด"
   ], [
     "A tougher game that needs more planning: less money each month but bigger green bubbles, approval is easier to lose, disasters come more often and can hit several places at once, and the world can reach +3.0°C if you don't cut hard.",
     "Friendship matters more: unhappy countries may stop cooperating or sanction you, and the carbon tariff can't be spammed any more.",
@@ -2394,7 +2391,7 @@ P.CHANGELOG = [
     "Forecasts in the news and a yearly report in statistics, worth policy points when you read them.",
     "24 more countries.",
     "Easier-to-read screens, new icons, and space behind the map when you zoom out.",
-    "Bug fixes and performance improvements.",
+    "Bug fixes and performance improvements."
   ]),
   V("1.0", "2026-10-21", {th:"โลกที่มีชีวิต", en:"A Living World"}, [
     "เกมเปลี่ยนชื่อเป็น Project Zero พร้อมโลโก้และภาพตัวอย่างเวลาแชร์ลิงก์แบบใหม่",
@@ -2419,7 +2416,7 @@ P.CHANGELOG = [
     "โหมด Hard Core เปิดให้เล่นหลังชนะโหมดปกติครั้งแรก",
     "ประกาศนียบัตรแบบใหม่: ต้องชนะทั้งโหมดปกติและ Hard Core ขอได้คนละ 1 ใบ มีผลการเรียนรู้ที่ได้จากเกม และ QR สำหรับตรวจสอบ",
     "ช่องบันทึกเกมแสดงความคืบหน้าเป็นแถบ ดูง่ายว่าไปถึงไหนแล้ว",
-    "เข้าสู่ระบบครั้งเดียวอยู่ได้นาน 1 ปี จนกว่าจะกดออกจากระบบเอง",
+    "เข้าสู่ระบบครั้งเดียวอยู่ได้นาน 1 ปี จนกว่าจะกดออกจากระบบเอง"
   ], [
     "The game is now called Project Zero, with a new logo and a new preview picture for shared links.",
     "New “Continuous World” mode with no end year: seasons, season goals and a yearly COP summit. Unlocks after your first Mission 2050 win; you can also press “Keep playing this world” when you win.",
@@ -2443,73 +2440,73 @@ P.CHANGELOG = [
     "Hard Core opens after your first Normal win.",
     "New certificate: win both Normal and Hard Core, one per player, with the learning outcomes from the game and a QR code to check it.",
     "Save slots show your progress as bars, so you can see at a glance how far you are.",
-    "Sign in once and stay signed in for a year, until you sign out yourself.",
+    "Sign in once and stay signed in for a year, until you sign out yourself."
   ]),
   V("0.9", "2026-10-21", {th:"เว็บเต็มตัว", en:"The Full Web Game"}, [
     "เขียนเกมเวอร์ชันเว็บใหม่ทั้งหมด ภาพคมชัดเต็มจอ",
     "หน้าแรกเป็นลูกโลก 3 มิติ หมุนได้ เข้าเกมแล้วเป็นแผนที่ดาวเทียม 2 มิติ",
-    "ตัวละครวาดใหม่ และเพลงเปลี่ยนตามสถานการณ์ในเกม พร้อมเสียงเหตุการณ์และเสียงบรรยากาศมากขึ้น",
+    "ตัวละครวาดใหม่ และเพลงเปลี่ยนตามสถานการณ์ในเกม พร้อมเสียงเหตุการณ์และเสียงบรรยากาศมากขึ้น"
   ], [
     "The web version was rewritten from scratch: sharp and full screen.",
     "A 3D globe you can spin on the home screen, and a 2D satellite map in the game.",
-    "Newly drawn characters, music that follows what is happening, and many more event and ambient sounds.",
+    "Newly drawn characters, music that follows what is happening, and many more event and ambient sounds."
   ]),
   V("0.6 beta", "2026-10-20", {th:"ประเทศ ตัวละคร และบัญชีผู้เล่น", en:"Countries, Characters and Accounts"}, [
     "แผนที่ 67 ประเทศ มีมิตรภาพ ข้อตกลงสองประเทศ พันธมิตร และข้อพิพาทระหว่างประเทศ",
     "ภัยพิบัติท้องถิ่นพร้อมพยากรณ์ล่วงหน้าและการอพยพ",
     "40 สกิลใน 5 หมวด ตัวละคร 4 คนที่มีเลเวล เนื้อเรื่อง 3 องก์ และฉากจบเกรด S/A/B",
     "โหมด Hard Core และ Daily Challenge",
-    "บัญชีผู้เล่น ร้านค้า ตารางอันดับ เซฟบนคลาวด์ และประกาศนียบัตร",
+    "บัญชีผู้เล่น ร้านค้า ตารางอันดับ เซฟบนคลาวด์ และประกาศนียบัตร"
   ], [
     "A map of 67 countries with friendship, two-country deals, alliances and international disputes.",
     "Local disasters with forecasts and evacuations.",
     "40 skills in 5 categories, 4 characters with levels, a 3-act story and S/A/B endings.",
     "Hard Core mode and the Daily Challenge.",
-    "Player accounts, a shop, leaderboards, cloud saves and certificates.",
+    "Player accounts, a shop, leaderboards, cloud saves and certificates."
   ]),
   V("0.5 beta", "2026-10-17", {th:"เวอร์ชัน GDevelop", en:"The GDevelop Version"}, [
-    "สร้างเกมเวอร์ชัน GDevelop 5 สำหรับกิจกรรม Garena Academy Game Maker",
+    "สร้างเกมเวอร์ชัน GDevelop 5 สำหรับกิจกรรม Garena Academy Game Maker"
   ], [
-    "A GDevelop 5 version of the game for the Garena Academy Game Maker activity.",
+    "A GDevelop 5 version of the game for the Garena Academy Game Maker activity."
   ]),
   V("0.4 beta", "2026-10-01", {th:"เล่นได้แม้ไม่มีเน็ต", en:"Play Offline"}, [
-    "ติดตั้งเกมเป็นแอปบนมือถือหรือคอม และเล่นได้แม้ไม่มีอินเทอร์เน็ต",
+    "ติดตั้งเกมเป็นแอปบนมือถือหรือคอม และเล่นได้แม้ไม่มีอินเทอร์เน็ต"
   ], [
-    "Install the game as an app on a phone or computer and play without the internet.",
+    "Install the game as an app on a phone or computer and play without the internet."
   ]),
   V("0.3.1 beta", "2026-09-30", {th:"ปรับให้เล่นสบายขึ้น", en:"Comfort Update"}, [
     "ปรับระดับเสียงเพลงและเสียงประกอบแยกกันได้",
     "ความสำเร็จ (Achievements) ให้ปลดล็อก",
-    "เล่นแนวนอนบนมือถือได้ มีปุ่มเต็มจอ และเกมลื่นขึ้น",
+    "เล่นแนวนอนบนมือถือได้ มีปุ่มเต็มจอ และเกมลื่นขึ้น"
   ], [
     "Separate volume for music and sound effects.",
     "Achievements to unlock.",
-    "Landscape play on phones, a full-screen button, and smoother performance.",
+    "Landscape play on phones, a full-screen button, and smoother performance."
   ]),
   V("0.3 beta", "2026-09-30", {th:"152 เหตุการณ์", en:"152 Events"}, [
     "เหตุการณ์ 152 เรื่อง แต่ละเรื่องมี 2–3 ทางเลือกที่ต้องตัดสินใจ",
     "เสียงจริง หน้าโหลด และบทสอนเล่นแบบมีภาพ",
-    "ต้นไม้เทคโนโลยีแบบเคลื่อนไหว และ “เงินเฟ้อสีเขียว” เมื่อซื้อโครงการถี่เกินไป",
+    "ต้นไม้เทคโนโลยีแบบเคลื่อนไหว และ “เงินเฟ้อสีเขียว” เมื่อซื้อโครงการถี่เกินไป"
   ], [
     "152 events, each with 2–3 choices to weigh up.",
     "Real recorded sounds, a loading screen and a picture tutorial.",
-    "An animated technology tree, and “Greenflation” when you buy projects too fast.",
+    "An animated technology tree, and “Greenflation” when you buy projects too fast."
   ]),
   V("0.2 alpha", "2026-09-29", {th:"เกมเริ่มท้าทาย", en:"A Real Challenge"}, [
     "เศรษฐกิจในเกมตึงขึ้น เกมยาว 15–30 นาที",
     "ไอคอนทรัพยากร ต้นไม้เทคโนโลยีแบบภาพ และเสียงประกอบ",
-    "ฟองบนแผนที่ช้าลงและตัวหนังสือน้อยลง",
+    "ฟองบนแผนที่ช้าลงและตัวหนังสือน้อยลง"
   ], [
     "A tighter economy and 15–30 minute games.",
     "Resource icons, a visual technology tree and sound effects.",
-    "Slower bubbles on the map and less text.",
+    "Slower bubbles on the map and less text."
   ]),
   V("0.1 alpha", "2026-09-29", {th:"จุดเริ่มต้น", en:"The Beginning"}, [
     "ต้นแบบแรกของเกม: ลูกโลก 3 มิติ เมนูหลัก เซฟและโหลดเกม และแถบข่าว",
-    "ไอคอนแอปและภาพตัวอย่างเวลาแชร์ลิงก์",
+    "ไอคอนแอปและภาพตัวอย่างเวลาแชร์ลิงก์"
   ], [
     "The first prototype: a 3D globe, main menu, saving and loading, and a news ticker.",
-    "App icons and a preview picture for shared links.",
+    "App icons and a preview picture for shared links."
   ]),
 ];
 P.CHANGELOG.find(x => x.v === "1.1").subs = [
@@ -2529,14 +2526,14 @@ P.CHANGELOG.find(x => x.v === "1.1").subs = [
     "ปุ่มเข้าสู่ระบบด้วย Google แบบใหม่",
     "หน้าตรวจสอบประกาศนียบัตรสวยและอ่านง่ายขึ้น",
     "บนมือถือ ปุ่มปิดของหน้าต่างยาว ๆ อยู่ด้านบนเสมอ",
-    "แก้บัคและปรับปรุงประสิทธิภาพ",
+    "แก้บัคและปรับปรุงประสิทธิภาพ"
   ], [
     "A new minerals market: prices move every month, with price charts, how much you're short of, and a button to buy just what's missing.",
     "3D icons for every mineral group, easy to tell apart.",
     "A new “Continue with Google” button.",
     "A cleaner, easier-to-read certificate check page.",
     "On phones, the close button of long windows stays at the top.",
-    "Bug fixes and performance improvements.",
+    "Bug fixes and performance improvements."
   ]),
 ];
 /* the newest version number, counting minor updates */
@@ -2548,7 +2545,7 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
     "ตลาดทรัพยากร ความนิยม และหน้าประเทศ ใช้ภาพและไอคอนแทนข้อความยาว ๆ",
     "ไอคอน 3 มิติของทรัพยากรครบทุกชนิดในหน้าเรียนรู้และหน้าประเทศ",
     "กราฟราคาทรัพยากรขึ้นลงตามจริงตั้งแต่เริ่มเกม",
-    "ลบช่องบันทึกได้ทั้งจากหน้าโหลดและตอนหยุดเกม และมีปุ่มลบเซฟทั้งหมด",
+    "ลบช่องบันทึกได้ทั้งจากหน้าโหลดและตอนหยุดเกม และมีปุ่มลบเซฟทั้งหมด"
   ], [
     "A new home screen with fewer buttons, and a separate Settings menu.",
     "Close and back buttons sit at the top of every page.",
@@ -2556,38 +2553,38 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
     "The resources market, approval and country pages use pictures and icons instead of long text.",
     "3D icons for every resource on the learning page and country pages.",
     "Resource price charts move up and down from the very start.",
-    "Delete a save slot from the Load page or the pause window, or delete all saves at once.",
+    "Delete a save slot from the Load page or the pause window, or delete all saves at once."
   ]),
   SUB("1.5.3", "2026-10-22", [
     "เกมยากขึ้น: ชนะยากขึ้นในทุกโหมด ต้องวางแผนมากขึ้น",
     "ปรับสมดุลตัวละคร: นักเศรษฐศาสตร์ นักการทูต และนักเคลื่อนไหวแรงน้อยลง",
-    "สกิลที่ 2 ของตัวละคร (เลเวล 5) และโบนัสเลเวล 3 อ่อนลงและใช้ได้ห่างขึ้น",
+    "สกิลที่ 2 ของตัวละคร (เลเวล 5) และโบนัสเลเวล 3 อ่อนลงและใช้ได้ห่างขึ้น"
   ], [
     "The game is harder: winning takes more planning in every mode.",
     "Characters rebalanced: the Economist, the Diplomat and the Activist are less strong.",
-    "Characters' second abilities (level 5) and level 3 bonuses are weaker and recharge more slowly.",
+    "Characters' second abilities (level 5) and level 3 bonuses are weaker and recharge more slowly."
   ]),
   SUB("1.5.2", "2026-10-22", [
     "แผนที่ในเกมวาดด้วยการ์ดจอ (GPU) เลื่อนและซูมลื่นขึ้น ประหยัดแบตเตอรี่ โดยเฉพาะบน iPad และเครื่องสเปกต่ำ",
     "เครื่องที่ใช้ GPU ไม่ได้ เกมกลับไปวาดแบบเดิมให้เอง",
     "ปรับสมดุลความยากใหม่หลังเพิ่มระบบการเมืองและห่วงโซ่แร่",
     "เปลี่ยนชื่อ “แร่” เป็น “ทรัพยากร” เช่น ช่องทรัพยากรด้านบน และตลาดทรัพยากรโลก",
-    "แก้บัคและปรับปรุงประสิทธิภาพ",
+    "แก้บัคและปรับปรุงประสิทธิภาพ"
   ], [
     "The in-game map is drawn on the graphics card (GPU): smoother panning and zooming and longer battery life, above all on iPads and slower computers.",
     "Devices without a usable GPU go back to the old renderer by themselves.",
     "Difficulty retuned after the new politics and mineral supply chain.",
     "“Minerals” is now called “Resources”, e.g. the Resources counter at the top and the World resources market.",
-    "Bug fixes and performance improvements.",
+    "Bug fixes and performance improvements."
   ]),
   SUB("1.5.1", "2026-10-22", [
     "เสียงพากย์ภาษาไทย อ่านเนื้อเรื่อง หน้าวิธีเล่น และเหตุการณ์ให้ฟัง ด้วยเสียงไทยของเครื่อง (ถ้าเครื่องมี)",
     "คำบรรยายบนจอตามเสียงที่อ่าน",
-    "เปิด/ปิดเสียงพากย์ คำบรรยาย และเลือกความเร็วได้ในหน้าตั้งค่า หรือกดปุ่มลำโพงฟังเฉพาะหน้านั้น",
+    "เปิด/ปิดเสียงพากย์ คำบรรยาย และเลือกความเร็วได้ในหน้าตั้งค่า หรือกดปุ่มลำโพงฟังเฉพาะหน้านั้น"
   ], [
     "Thai narration: the story, the how-to-play pages and events can be read aloud with the device's own voice.",
     "On-screen subtitles follow the voice.",
-    "Turn narration and subtitles on or off and pick a speed in the settings, or tap the speaker button to hear just that page.",
+    "Turn narration and subtitles on or off and pick a speed in the settings, or tap the speaker button to hear just that page."
   ]),
 ];
 P.VERSION_NAME = P.CHANGELOG[0].subs && P.CHANGELOG[0].subs.length ? P.CHANGELOG[0].subs[0].v : P.CHANGELOG[0].v;
@@ -6200,8 +6197,9 @@ function seasonCO2(id){
   if (id === "hot") v += -.25 * E2 - .1 * E7;   // strong sun
   if (id === "monsoon") v += (.2 * E2 + .1 * E7) * dip;   // clouds
   if (id === "storm") v += -.2 * E2;   // strong wind
-  if (id === "cool") v += -.1 * E2 + .15 * k * (has("C2") ? .5 : 1);   // wind · heating in a cold snap
-  if (id === "hot" || id === "monsoon") v += (has("E9") ? .1 : .4) * k * (id === "hot" ? 1 : .6);   // air-conditioning peak
+  if (id === "cool") v += -.1 * E2;   // wind
+  // 3.7.7: air-conditioning / heating no longer add CO₂ every month (it dragged approval down through the whole game);
+  // the summer peak now only costs a little approval (seasonsTick)
   return +v.toFixed(3);
 }
 
@@ -6212,12 +6210,12 @@ function harvest(){
   const pBad = clamp(.15 + k * .55 - (has("A3") ? .1 : 0), .05, .7);
   const r = P.rand();
   if (r < pGood){
-    const g = 25 + Math.round(10 * P.rand()); S.ep += g; if (P.ledgerTag) P.ledgerTag("harvest", g, 0);
-    P.addLog(`${L(TXT.good)} · ${P.IC.ep} +${g}`, "gd"); hook("toast", {icon:"wheat", title:L(TXT.good).replace(/\[\[[^\]]+\]\]\s*/, ""), msg:`${P.IC.ep} +${g}`});
+    const g = 25 + Math.round(10 * P.rand()); S.ep += g; S.appr = clamp(S.appr + 1, 0, 100);   // 3.7.7: a good harvest also pleases people if (P.ledgerTag) P.ledgerTag("harvest", g, 0);
+    P.addLog(`${L(TXT.good)} · ${P.IC.ep} +${g} · ${L(T("ความนิยม", "Approval"))} +1%`, "gd"); hook("toast", {icon:"wheat", title:L(TXT.good).replace(/\[\[[^\]]+\]\]\s*/, ""), msg:`${P.IC.ep} +${g}`});
     return;
   }
   if (r < pGood + pBad){
-    const flood = P.rand() < .55, a0 = S.appr; S.appr = clamp(S.appr - 3 * seasonPower(), 0, 100);
+    const flood = P.rand() < .55, a0 = S.appr; S.appr = clamp(S.appr - 1 * seasonPower(), 0, 100);   // 3.7.7: was −3
     const pool = S.countries.filter(c => !c.rest && ["SEA", "SA", "MEAF", "EA"].includes(c.reg) && P.COUNTRY[c.id] && (P.COUNTRY[c.id].tags || []).some(x => x === "farm" || x === "vul"));
     const c = pool[Math.floor(P.rand() * pool.length)];
     if (c) S.bubbles.push({id:++S.bubId, type:"red", reg:c.reg, cid:c.id, hz:flood ? "flood" : "drought", ttl:5});
@@ -6251,7 +6249,7 @@ function seasonsTick(){
   const m = S.tick % 12, sea = P.seasonOf(S.tick);
   S.seasCO2 = seasonCO2(sea.id);
   // summer peak: approval
-  if ((sea.id === "hot" || (sea.id === "monsoon" && m === 5)) && !has("E9")) S.appr = clamp(S.appr - .35 * seasonPower(), 0, 100);
+  if (sea.id === "hot" && !has("E9")) S.appr = clamp(S.appr - .06 * seasonPower(), 0, 100);   // 3.7.7: was −.35 a month (+ June): too harsh, players lost on approval
   if (m === 6) harvest();
   // a new season starts (months 2, 5, 8, 11)
   if (m % 3 === 2){

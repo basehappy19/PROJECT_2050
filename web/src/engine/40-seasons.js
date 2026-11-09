@@ -54,8 +54,9 @@ function seasonCO2(id){
   if (id === "hot") v += -.25 * E2 - .1 * E7;   // strong sun
   if (id === "monsoon") v += (.2 * E2 + .1 * E7) * dip;   // clouds
   if (id === "storm") v += -.2 * E2;   // strong wind
-  if (id === "cool") v += -.1 * E2 + .15 * k * (has("C2") ? .5 : 1);   // wind · heating in a cold snap
-  if (id === "hot" || id === "monsoon") v += (has("E9") ? .1 : .4) * k * (id === "hot" ? 1 : .6);   // air-conditioning peak
+  if (id === "cool") v += -.1 * E2;   // wind
+  // 3.7.7: air-conditioning / heating no longer add CO₂ every month (it dragged approval down through the whole game);
+  // the summer peak now only costs a little approval (seasonsTick)
   return +v.toFixed(3);
 }
 
@@ -66,12 +67,12 @@ function harvest(){
   const pBad = clamp(.15 + k * .55 - (has("A3") ? .1 : 0), .05, .7);
   const r = P.rand();
   if (r < pGood){
-    const g = 25 + Math.round(10 * P.rand()); S.ep += g; if (P.ledgerTag) P.ledgerTag("harvest", g, 0);
-    P.addLog(`${L(TXT.good)} · ${P.IC.ep} +${g}`, "gd"); hook("toast", {icon:"wheat", title:L(TXT.good).replace(/\[\[[^\]]+\]\]\s*/, ""), msg:`${P.IC.ep} +${g}`});
+    const g = 25 + Math.round(10 * P.rand()); S.ep += g; S.appr = clamp(S.appr + 1, 0, 100);   // 3.7.7: a good harvest also pleases people if (P.ledgerTag) P.ledgerTag("harvest", g, 0);
+    P.addLog(`${L(TXT.good)} · ${P.IC.ep} +${g} · ${L(T("ความนิยม", "Approval"))} +1%`, "gd"); hook("toast", {icon:"wheat", title:L(TXT.good).replace(/\[\[[^\]]+\]\]\s*/, ""), msg:`${P.IC.ep} +${g}`});
     return;
   }
   if (r < pGood + pBad){
-    const flood = P.rand() < .55, a0 = S.appr; S.appr = clamp(S.appr - 3 * seasonPower(), 0, 100);
+    const flood = P.rand() < .55, a0 = S.appr; S.appr = clamp(S.appr - 1 * seasonPower(), 0, 100);   // 3.7.7: was −3
     const pool = S.countries.filter(c => !c.rest && ["SEA", "SA", "MEAF", "EA"].includes(c.reg) && P.COUNTRY[c.id] && (P.COUNTRY[c.id].tags || []).some(x => x === "farm" || x === "vul"));
     const c = pool[Math.floor(P.rand() * pool.length)];
     if (c) S.bubbles.push({id:++S.bubId, type:"red", reg:c.reg, cid:c.id, hz:flood ? "flood" : "drought", ttl:5});
@@ -105,7 +106,7 @@ function seasonsTick(){
   const m = S.tick % 12, sea = P.seasonOf(S.tick);
   S.seasCO2 = seasonCO2(sea.id);
   // summer peak: approval
-  if ((sea.id === "hot" || (sea.id === "monsoon" && m === 5)) && !has("E9")) S.appr = clamp(S.appr - .35 * seasonPower(), 0, 100);
+  if (sea.id === "hot" && !has("E9")) S.appr = clamp(S.appr - .06 * seasonPower(), 0, 100);   // 3.7.7: was −.35 a month (+ June): too harsh, players lost on approval
   if (m === 6) harvest();
   // a new season starts (months 2, 5, 8, 11)
   if (m % 3 === 2){

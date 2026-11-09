@@ -100,7 +100,8 @@ export const GameMap = {
     this._ro = new ResizeObserver(() => this.resize()); this._ro.observe(el);
     this.resize();
     this.active = true; this.lastT = performance.now();
-    const loop = () => { if (!this.active) return; this.frame(); this.raf = requestAnimationFrame(loop); };
+    // 3.7.7: nothing is drawn while the full-screen skills page covers the map (saves battery); a full redraw on return
+    const loop = () => { if (!this.active) return; if (UIM.modal === "skills"){ this.lastT = performance.now(); this._covered = true; } else { if (this._covered){ this._covered = false; this.dirtyBase = this.fxDirty = true; } this.frame(); } this.raf = requestAnimationFrame(loop); };
     this.raf = requestAnimationFrame(loop);
   },
   /* 1.2: the bottom layer is drawn with WebGL when the device can (and the player hasn't turned it off), else Canvas 2D */

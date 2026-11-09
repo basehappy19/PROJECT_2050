@@ -44,7 +44,8 @@ function airPath(a, b){
 let MODELS = null;
 function models(){
   if (MODELS) return MODELS;
-  const mat = (c, o = {}) => new THREE.MeshLambertMaterial({color:c, transparent:true, opacity:1, ...o});   // transparent so they draw after the map planes (three.js draws opaque things first)
+  // 3.7.7: one material per colour, shared by every model (was a new material for each part of each new plane / ship)
+  const MATS = {}, mat = c => MATS[c] || (MATS[c] = new THREE.MeshLambertMaterial({color:c, transparent:true, opacity:1}));   // transparent so they draw after the map planes (three.js draws opaque things first)
   const white = mat(0xf4f7f9), grey = mat(0x7d8c96), teal = mat(0x3aa6a0), green = mat(0x3fbf86);
   const plane = clean => {
     const g = new THREE.Group();
@@ -77,11 +78,17 @@ function models(){
     if (clean) for (const x of [-2, 3]){ const sail = new THREE.Mesh(new THREE.BoxGeometry(.5, 1.6, 6), mat(0xf4fbf8)); sail.position.set(x, 0, 4.5); g.add(sail); }
     return g;
   };
-  const shadowOf = src => { const s = src.clone(true), m = new THREE.MeshBasicMaterial({color:0x00080e, transparent:true, opacity:.32, depthTest:false, depthWrite:false}); s.traverse(o => { if (o.isMesh) o.material = m; }); s.scale.z = .01; return s; };
-  MODELS = {plane, ship, shadowOf};
+  const shMat = new THREE.MeshBasicMaterial({color:0x00080e, transparent:true, opacity:.32, depthTest:false, depthWrite:false});
+  const shadowOf = src => { const s = src.clone(true); s.traverse(o => { if (o.isMesh) o.material = shMat; }); s.scale.z = .01; return s; };
+  /* 3.7.7: each kind of plane / ship is built once; every new one is a clone that shares its shapes and materials,
+     so nothing new reaches the graphics card and nothing piles up in memory as traffic comes and goes */
+  const TPL = {}, tpl = (key, make) => TPL[key] || (TPL[key] = (m => ({m, sh:shadowOf(m)}))(make()));
+  const get = (kind, clean) => { const t = tpl(kind + (clean ? "+" : ""), () => kind === "air" ? plane(clean) : ship(kind, clean)); return {obj:t.m.clone(true), shadow:t.sh.clone(true)}; };
+  MODELS = {plane, ship, shadowOf, get};
   return MODELS;
 }
 
+const TRAIL_MAT = {};
 /* ---------- the traffic itself ---------- */
 const T = {
   list:[], R:null, lights:null,
@@ -104,15 +111,15 @@ const T = {
       v = {kind, lane:id, path:lanePath(id), rev:kind === "box" && R() < .5, f:0, dur:(kind === "ore" ? 34 : 30) + R() * 14, clean:R() < tl.seaClean};
     }
     const M = models();
-    v.obj = kind === "air" ? M.plane(v.clean) : M.ship(kind, v.clean);
-    v.shadow = M.shadowOf(v.obj);
+    { const g = M.get(kind, v.clean); v.obj = g.obj; v.shadow = g.shadow; }
     const tg = new THREE.BufferGeometry(); tg.setAttribute("position", new THREE.Float32BufferAttribute(new Float32Array(14 * 3), 3));
-    v.trail = new THREE.Line(tg, new THREE.LineBasicMaterial({color:v.clean ? 0x5fd39a : kind === "air" ? 0xdce2e6 : 0xe1f0fa, transparent:true, opacity:v.clean ? .45 : .4, depthTest:false, depthWrite:false}));
+    const tk = (v.clean ? "c" : "d") + (kind === "air" ? "a" : "s");
+    v.trail = new THREE.Line(tg, TRAIL_MAT[tk] || (TRAIL_MAT[tk] = new THREE.LineBasicMaterial({color:v.clean ? 0x5fd39a : kind === "air" ? 0xdce2e6 : 0xe1f0fa, transparent:true, opacity:v.clean ? .45 : .4, depthTest:false, depthWrite:false})));
     for (const o of [v.shadow, v.trail, v.obj]){ o.frustumCulled = false; o.traverse(x => { x.frustumCulled = false; }); this.R.add3DRendererObject(o); }
     v.shadow.renderOrder = 40; v.trail.renderOrder = 41; v.obj.traverse(x => { x.renderOrder = 42; });
     return v;
   },
-  remove(v){ for (const o of [v.obj, v.shadow, v.trail]) this.R.remove3DRendererObject(o); },
+  remove(v){ for (const o of [v.obj, v.shadow, v.trail]) this.R.remove3DRendererObject(o); v.trail.geometry.dispose(); },   // 3.7.7: the trail's own shape is freed; the shared model is kept
   update(dt){
     if (!this.R || !S.regions || !P.trafficLevels || Map.mode !== "game") return;
     if (P.Gfx && P.Gfx.level === "low"){ if (this.list.length){ for (const v of this.list) this.remove(v); this.list = []; } return; }   // settings: low graphics

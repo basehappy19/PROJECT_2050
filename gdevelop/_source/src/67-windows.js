@@ -34,38 +34,55 @@ Screens.mMarket = function(l, pw){
   y += title(l, "$mat-bat", th() ? "ตลาดทรัพยากร" : "Minerals market", x, y);
   const cash = `${IC.ep} ${Math.floor(S.ep)}`, cw = k.textW(cash, {font:"monoB", size:14}) + 20;
   k.rect(l, x + w - 44 - cw, 22, cw, 26, "panel2", {r:13}); k.text(l, cash, x + w - 44 - cw + 10, 26, {font:"monoB", size:14});
-  // columns
-  const C = {name:x + 14, have:x + 240, price:x + 330, trend:x + 450, ref:x + 570, btn:x + w - 12};
-  const head = [[th() ? "แร่" : "Mineral", C.name], [th() ? "มีอยู่" : "Have", C.have], [th() ? "ราคา" : "Price", C.price], [th() ? "แนวโน้ม" : "Trend", C.trend], [th() ? "แปรรูป/เดือน" : "Refine/mo", C.ref]];
-  for (const [s, cx] of head) k.text(l, s, cx, y, {size:11.5, color:"muted"});
+  /* 3.7.6 · design 1 (same as the website): raw → refining belt → ready · price with last month's price · trend line
+     green (up) / red (down) · the two countries that sent the most · instant buy (dear, gold) / sell */
+  const C = {name:x + 14, pipe:x + 214, price:x + 452, trend:x + 572, from:x + 690, btn:x + w - 12};
+  const head = [[th() ? "แร่" : "Mineral", C.name], [th() ? "แร่ดิบ → แปรรูป → พร้อมใช้" : "Raw → refining → ready", C.pipe], [th() ? "ราคาตลาด" : "Price", C.price], [th() ? "แนวโน้ม" : "Trend", C.trend], [th() ? "ได้มาจากไหนมากสุด" : "Mostly from", C.from]];
+  for (const [s2, cx] of head) k.text(l, s2, cx, y, {size:11.5, color:"muted"});
   y += 20;
+  const now = performance.now() / 1000, UP = "#5fd39a", DOWN = "#ff6b5c";
   for (const g of P.MAT_IDS){
     const G = P.MAT[g], pr = P.mktPrice(g), hist = (S.mktHist || {})[g] || [], prev = hist.length > 1 ? hist[hist.length - 2] : pr;
-    const chg = prev ? (pr - prev) / prev * 100 : 0, k10 = P.mktLotCost(g, lot), raw = P.rawFor ? P.rawFor(g) : 0, rh = 54;
+    const chg = prev ? (pr - prev) / prev * 100 : 0, up = chg >= 0, k10 = P.mktLotCost(g, lot), raw = P.rawFor ? P.rawFor(g) : 0, rh = 58;
     W.card(l, x, y, w, rh, {r:12});
     k.rect(l, x, y + 4, 4, rh - 8, G.col, {r:2});
-    k.icon(l, G.icon, C.name - 2, y + 11, 32);
-    k.text(l, L(G.name), C.name + 38, y + 16, {font:"dispS", size:14, w:180, max:1});
-    const hv = k.text(l, String(Math.floor(S.mat[g] || 0)), C.have, y + 13, {font:"monoB", size:19});
-    if (raw) k.text(l, `+${raw} ${th() ? "รอ" : "raw"}`, C.have + hv.w + 5, y + 21, {font:"mono", size:10.5, color:"muted"});
-    const pv = k.text(l, `${IC.ep} ${pr.toFixed(1)}`, C.price, y + 17, {font:"mono", size:13.5});
-    if (Math.abs(chg) > .5) k.text(l, `${chg > 0 ? "▲" : "▼"}${Math.abs(chg).toFixed(0)}%`, C.price + pv.w + 5, y + 19, {font:"monoB", size:11, color:chg > 0 ? "bad" : "good"});
-    spark(l, C.trend, y + 14, 100, 26, hist, G.col);
+    k.icon(l, G.icon, C.name - 2, y + 12, 32);
+    k.text(l, L(G.name), C.name + 38, y + 9, {font:"dispS", size:14, w:150, max:1});
     if (P.refCap){
       const b = (S.refBuild || {})[g], max = P.refLevel(g) >= P.REF_MAX_LV, kc = P.refCost(g);
-      const rv = k.text(l, `[[factory]] ${P.refCap(g).toFixed(1)}`, C.ref, y + 17, {font:"mono", size:13.5, iconColor:"muted"});
-      if (b) k.text(l, `[[hammer]] ${b}`, C.ref + rv.w + 8, y + 18, {font:"mono", size:11.5, color:"muted", iconColor:"muted"});
-      else if (!max) W.hbtn(l, "ref-" + g, C.ref + rv.w + 8, y + 13, "plus", () => { if (P.buildRefinery(g)){ Audio.play("buy"); k.dirty(); } }, {s:26, is:14, color:"accent", disabled:!P.canBuild(g)});
-      if (!b && !max && k.isHover(l, "ref-" + g)) k.text(l, `${th() ? "สร้างโรงแปรรูป" : "Build a refinery"} · ${IC.ep} ${kc.ep} · ${IC.pc} ${kc.pc}`, C.ref - 40, y + rh - 2, {size:11, color:"accent"});
+      const rv = k.text(l, `[[factory]] ${P.refCap(g).toFixed(1)}`, C.name + 38, y + 31, {font:"mono", size:12, color:"muted", iconColor:"muted"});
+      if (b) k.text(l, `[[hammer]] ${b}`, C.name + 38 + rv.w + 8, y + 32, {font:"mono", size:11.5, color:"muted", iconColor:"muted"});
+      else if (!max) W.hbtn(l, "ref-" + g, C.name + 38 + rv.w + 6, y + 28, "plus", () => { if (P.buildRefinery(g)){ Audio.play("buy"); k.dirty(); } }, {s:24, is:13, color:"accent", disabled:!P.canBuild(g)});
+      if (!b && !max && k.isHover(l, "ref-" + g)) k.text(l, `${th() ? "สร้างโรงแปรรูป" : "Build a refinery"} · ${IC.ep} ${kc.ep} · ${IC.pc} ${kc.pc}`, C.name + 38, y + rh - 2, {size:11, color:"accent"});
     }
-    const sl = `${th() ? "ขาย" : "Sell"} ${lot} · +${P.mktSellGain(g, lot)}`, bl = `${th() ? "ซื้อ" : "Buy"} ${lot} · ${IC.ep} ${k10}`;
+    // raw · belt (ore moving into the machine while there is raw ore) · ready
+    const py = y + rh / 2;
+    k.text(l, String(raw), C.pipe, py - 10, {font:"monoB", size:15, color:raw ? "warn" : "muted", w:28, align:"right", a:raw ? 1 : .6});
+    const bx = C.pipe + 36, bw2 = 128;
+    k.rect(l, bx, py - 9, bw2, 18, "#122329", {r:6});
+    for (let i = 8; i < bw2 - 4; i += 16) k.rect(l, bx + i, py - 9, 8, 18, "#183038");
+    if (raw) for (let i = 0; i < 4; i++){ const ph = ((now / 2.2) + i / 4) % 1, fa = ph < .12 ? ph / .12 : ph > .85 ? (1 - ph) / .15 : 1; k.rect(l, bx + 2 + ph * (bw2 - 11), py - 3.5, 7, 7, G.col, {r:2, a:fa}); }
+    const mx = bx + bw2 + 6, glow = raw ? .5 + .5 * Math.sin(now * 4) : 0;
+    k.rect(l, mx, py - 14, 28, 28, "#183038", {r:8, stroke:raw ? G.col : "line", sa:raw ? .6 + .4 * glow : 1});
+    k.icon(l, "factory", mx + 6, py - 8, 16, raw ? G.col : "muted");
+    k.text(l, String(Math.floor(S.mat[g] || 0)), mx + 36, py - 13, {font:"monoB", size:20});
+    // price · last month's price and change
+    k.text(l, `${IC.ep} ${pr.toFixed(1)}`, C.price, y + 10, {font:"monoB", size:14});
+    if (Math.abs(chg) >= .5) k.text(l, `${prev.toFixed(1)} ${up ? "▲" : "▼"}${Math.abs(chg).toFixed(0)}%`, C.price, y + 32, {font:"monoB", size:12, color:up ? UP : DOWN});
+    else k.text(l, th() ? "เท่าเดิม" : "no change", C.price, y + 32, {size:11.5, color:"muted"});
+    spark(l, C.trend, y + 16, 100, 26, hist, up ? UP : DOWN);
+    // the two countries that sent the most of this mineral
+    { const all = P.matTop ? P.matTop(g, 8) : [], tot = all.reduce((s2, q) => s2 + q.n, 0), list = all.filter(q => q.id.length === 3 && P.FLAG2 && P.FLAG2[q.id]).slice(0, 2);
+      if (!list.length) k.text(l, th() ? "ในประเทศ" : "Home", C.from, py - 9, {size:12, color:"muted"});
+      let fx = C.from; for (const q of list){ k.sprite(l, "UIFlag", P.FLAG2[q.id], fx, py - 8, 21, 16); fx += 25; fx += k.text(l, `${Math.round(q.n / tot * 100)}%`, fx, py - 9, {font:"monoB", size:11.5}).w + 10; } }
+    const sl = `${th() ? "ขาย" : "Sell"} ${lot} · +${P.mktSellGain(g, lot)}`, bl = `${th() ? "ซื้อทันที" : "Buy now"} ${lot} · ${IC.ep} ${k10}`;
     const sw = W.btnW(sl, {size:12.5}), bwid = W.btnW(bl, {size:12.5});
-    W.btn(l, "sell-" + g, C.btn - sw, y + 11, sl, () => { if (P.mktSell(g, lot)){ Audio.play("buy"); k.dirty(); } }, {kind:"ghost", size:12.5, h:32, disabled:(S.mat[g] || 0) < lot, sound:false});
-    W.btn(l, "buy-" + g, C.btn - sw - 6 - bwid, y + 11, bl, () => { if (P.mktBuy(g, lot)){ Audio.play("buy"); k.dirty(); } }, {size:12.5, h:32, disabled:S.ep < k10, sound:false});
+    W.btn(l, "sell-" + g, C.btn - sw, y + 13, sl, () => { if (P.mktSell(g, lot)){ Audio.play("buy"); k.dirty(); } }, {kind:"ghost", size:12.5, h:32, disabled:(S.mat[g] || 0) < lot, sound:false});
+    W.btn(l, "buy-" + g, C.btn - sw - 6 - bwid, y + 13, bl, () => { if (P.mktBuy(g, lot)){ Audio.play("buy"); k.dirty(); } }, {kind:"goldline", size:12.5, h:32, disabled:S.ep < k10, sound:false});
     y += rh + 6;
   }
   y += 4;
-  y += k.text(l, `[[circle-help]] ${th() ? "ใช้สร้างพลังงานสะอาด · ซื้อเมื่อราคาลง (▼) ขายเมื่อราคาขึ้น (▲)" : "Used to build clean power · buy when the price drops (▼), sell when it rises (▲)"}`, x, y, {size:12, color:"muted", iconColor:"muted", w}).h;
+  y += k.text(l, `[[circle-help]] ${th() ? "ตัวเลขสีส้ม = แร่ดิบรอแปรรูป · ตัวเลขใหญ่ = พร้อมใช้ · ซื้อทันทีแพงกว่าซื้อจากประเทศราว 2–3 เท่า (แตะประเทศบนแผนที่เพื่อซื้อ)" : "Orange = raw, waiting to be refined · big number = ready · buying now costs 2–3× more than buying from a country (tap a country on the map)"}`, x, y, {size:12, color:"muted", iconColor:"muted", w}).h;
   return y + 18;
 };
 

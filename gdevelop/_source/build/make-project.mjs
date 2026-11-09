@@ -28,6 +28,9 @@ for (const n of ICONS) img(`icons/${n}.png`, `assets/icons/${n}.png`);
 // 3.x: the website's 3D icons (money, policy points, CO₂, minerals, skills…) as full-colour icons: [[$name]] in text
 const ICONS3D = fs.existsSync(`${OUT}/assets/icons3d`) ? fs.readdirSync(`${OUT}/assets/icons3d`).filter(f => f.endsWith(".png")).map(f => f.slice(0, -4)).sort() : [];
 for (const n of ICONS3D) img(`icons3d/${n}.png`, `assets/icons3d/${n}.png`);
+// 3.7.4: country flags (flag-icons, MIT; made from the website's assets/img/flags)
+const FLAGS = fs.existsSync(`${OUT}/assets/flags`) ? fs.readdirSync(`${OUT}/assets/flags`).filter(f => f.endsWith(".png")).sort() : [];
+for (const f of FLAGS) img(`flags/${f}`, `assets/flags/${f}`);
 const PORTRAITS = fs.readdirSync(`${OUT}/assets/portraits`).filter(f => f.endsWith(".png")).sort();
 for (const f of PORTRAITS) img(`portraits/${f}`, `assets/portraits/${f}`);
 const ENDS = fs.readdirSync(`${OUT}/assets/endings`).filter(f => f.endsWith(".jpg")).sort();
@@ -82,6 +85,7 @@ const globalObjects = [
   sprite("TutImage", TUTS.map(f => anim(f.replace(/\.(jpg|png)$/, ""), `tutorial/${f}`))),
   textInput("CodeInput"),
   sprite("Backdrop", [anim("Backdrop", "ui/backdrop.jpg")]),
+  sprite("UIFlag", FLAGS.map(f => anim(f.slice(0, -4), `flags/${f}`))),
   sprite("Portrait", PORTRAITS.map(f => anim(f.slice(0, -4), `portraits/${f}`))),
   sprite("EndArt", ENDS.map(f => anim(f.slice(0, -4), `endings/${f}`))),
   sprite("Logo", [anim("Logo", "ui/logo.png")]),
@@ -146,7 +150,7 @@ const guard = "const P = window.P2050; if (!P || !P.ready) return;\n";
 /* 3.x: the game rules and data come straight from the website (web/src/engine), so one change updates both versions.
    39-mp.js (multiplayer) is left out: multiplayer is switched off. */
 const ENGINE = `${REPO}/web/src/engine`;
-const ENGINE_FILES = fs.readdirSync(ENGINE).filter(f => /^[123]\d-.*\.js$/.test(f) && f !== "39-mp.js").sort();
+const ENGINE_FILES = fs.readdirSync(ENGINE).filter(f => /^[1234]\d-.*\.js$/.test(f) && f !== "39-mp.js").sort();
 const MODULES = [
   ...ENGINE_FILES.map(f => [`@engine/${f}`, `Engine · ${f.replace(/\.js$/, "")} (web/src/engine)`]),
   ["50-ui-kit.js", "UI toolkit · วาดแผง/ข้อความ/ไอคอนด้วย UIPainter, UIText, UIIcon"],

@@ -127,17 +127,20 @@ Screens.renderHUD = function(l){
   // tabs (right)
   const tabs = [["tech", "network", "nbTech", "T"], ["region", "map", "nbRegion", "R"], ["stats", "chart-line", "nbStats", "S"], ["news", "newspaper", "nbNews", "N"]];
   const readyCount = P.SKILLS.filter(n => P.nodeState(n) === "ready" && (P.canAfford ? P.canAfford(n) : true)).length;
-  const widths = tabs.map(([id, ic, key]) => { const lab = P.up(t(key)); return 14 + 16 + 6 + k.textW(lab, {font:"dispS", size:13}) + 14 + (id === "tech" && readyCount ? 26 : 0) + (keys ? 20 : 0); });
+  let widths = tabs.map(([id, ic, key]) => { const lab = P.up(t(key)); return 14 + 16 + 6 + k.textW(lab, {font:"dispS", size:13}) + 14 + (id === "tech" && readyCount ? 26 : 0) + (keys ? 20 : 0); });
+  // 3.7.3: when the Net Zero bar would be squeezed, the four tabs show icons only (the badge sits on the icon)
+  const compact = (k.W - 14 - widths.reduce((a, b) => a + b, 0) - 18) - (14 + 3 * 34 + 18) < 560;
+  if (compact) widths = tabs.map(() => 46);
   let nx = (k.W - 14) - widths.reduce((a, b) => a + b, 0) - 6 * (tabs.length - 1);
   const tabsX = nx;
   tabs.forEach(([id, ic, key, kk], i) => {
     const on = id === "tech" ? UIM.modal === "skills" : S.tab === id, hov = k.isHover(l, "tab-" + id), w = widths[i];
     k.rect(l, nx, ny, w, nh, on ? "accent" : "glass", {a:on ? 1 : .9, r:10, stroke:on ? "accent" : hov ? "accent" : "line", bg:true});
     const col = on ? "ink" : "fg";
-    k.icon(l, ic, nx + 14, ny + 12, 16, col);
-    const tx = W.runs(l, nx + 36, ny + 10, [[P.up(t(key)), {font:"dispS", size:13, color:col}]]);
-    if (keys && !on) W.key(l, tx + 6, ny + 13, kk);
-    if (id === "tech" && readyCount){ const bx2 = nx + w - 14 - 20; k.rect(l, bx2, ny + 11, 20, 18, "good", {r:9}); k.text(l, String(readyCount), bx2, ny + 12, {font:"mono", size:11, color:"#04130c", w:20, align:"center"}); }
+    k.icon(l, ic, nx + (compact ? 15 : 14), ny + 12, 16, col);
+    if (!compact){ const tx = W.runs(l, nx + 36, ny + 10, [[P.up(t(key)), {font:"dispS", size:13, color:col}]]); if (keys && !on) W.key(l, tx + 6, ny + 13, kk); }
+    if (compact && id === "tech" && readyCount){ k.circle(l, nx + w - 9, ny + 9, 8, "good"); k.text(l, String(readyCount), nx + w - 17, ny + 2, {font:"mono", size:10, color:"#04130c", w:16, align:"center"}); }
+    else if (id === "tech" && readyCount){ const bx2 = nx + w - 14 - 20; k.rect(l, bx2, ny + 11, 20, 18, "good", {r:9}); k.text(l, String(readyCount), bx2, ny + 12, {font:"mono", size:11, color:"#04130c", w:20, align:"center"}); }
     k.hit(l, "tab-" + id, nx, ny, w, nh, () => Screens.setTab(id));
     nx += w + 6;
   });
@@ -298,6 +301,7 @@ Screens.renderMapUI = function(l){
   const Map = P.Map; if (!Map || !Map.scene) return;
   this._edgeAnim = false;
   if (this.kind === "game" && this.placeGrid) this.placeGrid(l);   // Continuous World: the hex grid under everything else
+  if (this.kind === "game" && this.drawSeason) this.drawSeason(l);   // 3.7.4: snow, rain, smoke and heat haze of the season
   if (this.kind === "game" && this.drawRigs) this.drawRigs(l);   // 3.6: oil rigs and their flares
   if (this.kind === "game" && this.drawPins) this.drawPins(l);   // builds pinned on the map
   if (this.kind === "game" && this.drawTrains) this.drawTrains(l);   // 3.6: high-speed trains

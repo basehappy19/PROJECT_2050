@@ -16,7 +16,7 @@ Screens.renderModal = function(l){
   l.blocks = !!kind; const sl = k.L("ModalScroll");
   if (!kind){ k.clearSlave("ModalScroll"); return; }
   if (kind === "skills") return this.renderSkills(l);
-  const pw = WIDTH[kind] || 620;
+  const ce = kind === "event" && P.currentEvent(), pw = Math.min(k.W - 24, ce && ce.country ? 900 : kind === "market" ? 1140 : (WIDTH[kind] || 620));   // 3.7.4: dispute window is wider (VS) · 3.7.6: market too
   const px = kind === "end" ? k.W - pw - 40 : (k.W - pw) / 2;
   let ch = 0;
   k.slave("ModalScroll", s => {
@@ -79,6 +79,7 @@ Screens.mEvent = function(l, pw){
   { const ml = `[[minimize-2]] ${L(P.UI2.evMin)}`, mw = W.btnW(ml, {size:11.5}); W.btn(l, "evmin", x + w - mw, y - 6, ml, () => { UIM.evMin = true; Audio.play("close"); k.dirty(); }, {kind:"ghost", size:11.5, h:26}); }
   y += 26;
   y += h3(l, L(e.title), x, y, w).h + 6;
+  if (e.country) return vsEvent(l, pw, e, x, y, w);
   if (e.country){
     const row = (lab, ids, col) => {
       let yy = y; k.text(l, lab, x, yy + 3, {font:"bodyB", size:12, color:col}); let cx = x + 92;
@@ -142,6 +143,97 @@ Screens.mEvent = function(l, pw){
   }
   return y + 12;
 };
+
+/* 3.7.4 · dispute between countries (same as the website): the two sides face each other (VS) with their flags and
+   say one line each; no friendship numbers. Each choice says which side will be pleased or upset, then the other effects. */
+const MOOD = {up:{th:"พอใจ", en:"pleased"}, down:{th:"ไม่พอใจ", en:"upset"}};
+function vsSide(l, x, y, w, lab, ids, say, col, right, draw){
+  // returns the height; draws only when draw is true
+  let yy = y; const al = right ? "right" : "left";
+  if (draw) k.text(l, `[[message-circle]] ${lab}`, x, yy, {font:"dispS", size:15, color:col, iconColor:col, w, align:al});
+  yy += 24;
+  if (say){
+    const bw = Math.min(w, 340), bx = right ? x + w - bw : x, th = k.text(null, `“${L(say)}”`, 0, 0, {size:14.5, w:bw - 28, lh:1.4, measure:true}).h, bh = th + 20;
+    if (draw){
+      k.rect(l, bx, yy, bw, bh, col, {r:14, a:.12, stroke:col, sa:.45, bg:true});
+      const tx = right ? bx + bw - 36 : bx + 24; k.poly ? k.poly(l, [[tx, yy + bh - 1], [tx + 12, yy + bh - 1], [tx + 6, yy + bh + 7]], col, {a:.35}) : null;
+      k.text(l, `“${L(say)}”`, bx + 14, yy + 10, {size:14.5, w:bw - 28, lh:1.4});
+    }
+    yy += bh + 14;
+  }
+  const fw = 66, n = ids.length, rowN = Math.max(1, Math.floor((w + 8) / (fw + 8)));
+  ids.forEach((id, i) => {
+    const r = Math.floor(i / rowN), c = i % rowN, inRow = Math.min(rowN, n - r * rowN);
+    const fx = right ? x + w - inRow * (fw + 8) + 8 + c * (fw + 8) : x + c * (fw + 8), fy = yy + r * 62;
+    if (draw){
+      const a2 = P.FLAG2 && P.FLAG2[id];
+      if (a2) k.sprite(l, "UIFlag", a2, fx + (fw - 44) / 2, fy, 44, 33); else k.rect(l, fx + (fw - 44) / 2, fy, 44, 33, "panel2", {r:4});
+      k.rect(l, fx + (fw - 44) / 2, fy, 44, 33, null, {r:4, stroke:"#ffffff", sa:.2});
+      k.text(l, L((P.SHORT && P.SHORT[id]) || COUNTRY[id].name), fx - 4, fy + 37, {size:11.5, w:fw + 8, align:"center", max:2, lh:1.2});
+    }
+  });
+  yy += Math.ceil(n / rowN) * 62;
+  return yy - y;
+}
+function vsEvent(l, pw, e, x, y, w){
+  const say = (P.CE_SAY || {})[e.id] || {}, narrow = pw < 640, sw = narrow ? w : (w - 70) / 2;
+  if (narrow){
+    y += vsSide(l, x, y, w, t("sideA"), e.A, say.A, "good", false, true) + 4;
+    k.circle(l, x + w / 2, y + 16, 17, "#061015"); k.circle(l, x + w / 2, y + 16, 17, null, {stroke:"warn", sw:2});
+    k.text(l, "VS", x + w / 2 - 17, y + 7, {font:"disp", size:14, color:"warn", w:34, align:"center"}); y += 40;
+    y += vsSide(l, x, y, w, t("sideB"), e.B, say.B, "bad", false, true) + 8;
+  } else {
+    const ha = vsSide(l, x, y, sw, t("sideA"), e.A, say.A, "good", false, false), hb = vsSide(l, x + w - sw, y, sw, t("sideB"), e.B, say.B, "bad", true, false), h = Math.max(ha, hb);
+    vsSide(l, x, y, sw, t("sideA"), e.A, say.A, "good", false, true); vsSide(l, x + w - sw, y, sw, t("sideB"), e.B, say.B, "bad", true, true);
+    const cx = x + w / 2, cy = y + h / 2;
+    k.circle(l, cx, cy, 25, "#061015"); k.circle(l, cx, cy, 25, null, {stroke:"warn", sw:2});
+    k.text(l, "VS", cx - 25, cy - 11, {font:"disp", size:17, color:"warn", w:50, align:"center"});
+    y += h + 12;
+  }
+  const locked = UIM.eventLocked(), f = UIM.eventLockFrac();
+  const askW = k.text(l, `[[circle-help]] ${t("evAskCountry")}`, x, y, {font:"dispS", size:16, color:"fg", iconColor:"accent"}).w;
+  if (W.speakBtn) W.speakBtn(l, "ev-say", x + askW + 8, y - 3, `${L(e.title)}. ${say.A ? L(say.A) : ""} ${say.B ? L(say.B) : ""}`);
+  if (P.hasKeyboard()) k.text(l, t("evKeys"), x + w - 140, y + 4, {font:"mono", size:10.5, color:"muted", w:140, align:"right"});
+  y += 28; W.meter(l, x, y, w, 4, f, locked ? "warn" : "accent"); y += 12;
+  const hard = S.mode === "hard", opts = e.options.map((o, i) => ({o, i, ok:P.affordable(o.fx)}));
+  if (opts.every(q => !q.ok)) opts.push({o:{label:{th:UI.postpone.th, en:UI.postpone.en}, fx:P.POSTPONE}, i:-1, ok:true});
+  const cols = pw >= 700 ? Math.min(3, opts.length) : 1, gap = 10, cw = (w - gap * (cols - 1)) / cols;
+  // one card: letter + label · "side: pleased ▲▲" lines · other effects as chips · group tilt
+  const card = (q, cx, cy, draw, hgt) => {
+    const {o, i, ok} = q, id = "opt" + i, usable = ok && !locked, hov = draw && usable && k.isHover(l, id), a = !ok ? .45 : locked ? .6 : 1, iw = cw - 24;
+    let yy = cy + 12;
+    if (draw){ k.rect(l, cx + 12, yy, 26, 26, hov ? "accent" : "panel", {r:7, stroke:"accent", sa:.6}); k.text(l, i === -1 ? "!" : "ABC"[i], cx + 12, yy + 2, {font:"monoB", size:14, color:hov ? "ink" : "accent", w:26, align:"center", a}); }
+    yy += Math.max(28, (draw ? k.text(l, L(o.label), cx + 46, yy + 2, {font:"bodyB", size:14.5, w:iw - 34, a}) : k.text(null, L(o.label), 0, 0, {font:"bodyB", size:14.5, w:iw - 34, measure:true})).h + 6);
+    if (!hard){
+      const chips = P.fxChips(o.fx, e.target), side = c => c.icon === "$heart" ? (c.txt.includes(t("sideA")) ? "A" : c.txt.includes(t("sideB")) ? "B" : null) : null;
+      for (const c of chips.filter(side)){
+        if (draw){ const lw = k.text(l, side(c) === "A" ? t("sideA") : t("sideB"), cx + 12, yy, {size:12.5, color:"muted", a}).w; k.text(l, `${L(MOOD[c.good ? "up" : "down"])} ${arrows(c.up, c.mag || 1)}`, cx + 18 + lw, yy, {font:"bodyB", size:12.5, color:c.good ? "good" : "bad", a}); }
+        yy += 19;
+      }
+      let qx = cx + 12; yy += 4;
+      for (const c of chips.filter(c => !side(c))){
+        const lab = c.txt.includes(t("delayed")) ? t("later") : "", ar = arrows(c.up, c.mag || 1), w2 = 16 + 4 + (lab ? k.textW(lab, {size:11}) + 4 : 0) + k.textW(ar, {font:"mono", size:11}) + 14;
+        if (qx + w2 > cx + cw - 10){ qx = cx + 12; yy += 26; }
+        if (draw){ const col = c.good ? "good" : "bad"; k.rect(l, qx, yy, w2, 22, null, {r:11, stroke:col, sa:.45, bg:true}); k.icon(l, c.icon || "circle", qx + 7, yy + 3, 16, "fg", a); let tx = qx + 27; if (lab){ k.text(l, lab, tx, yy + 2, {size:11, color:"muted", a}); tx += k.textW(lab, {size:11}) + 4; } k.text(l, ar, tx, yy + 3, {font:"mono", size:11, color:col, a}); }
+        qx += w2 + 6;
+      }
+      yy += 28;
+      const tilt = i >= 0 && P.tiltOfOption ? P.tiltOfOption(o, e) : null;
+      if (tilt && tilt.length){ if (draw) W.groupTilt(l, cx + 12, yy, tilt, a); yy += 20; }
+    } else { yy += (draw ? k.text(l, `[[eye-off]] ${t("hardHidden")}`, cx + 12, yy, {size:11.5, color:"muted", iconColor:"muted", w:iw}) : {h:18}).h + 2; }
+    if (!ok){ if (draw) k.text(l, t("cantAfford"), cx + 12, yy, {size:12, color:"bad"}); yy += 18; }
+    yy += 8;
+    const hh = hgt || (yy - cy);
+    if (draw){ k.rect(l, cx, cy, cw, hh, "panel2", {r:12, stroke:hov ? "accent" : "line", sw:hov ? 1.5 : 1, under:true, a:ok ? 1 : .6}); k.hit(l, id, cx, cy, cw, hh, () => { if (!UIM.eventLocked()) P.chooseOption(i); }, {disabled:!usable}); }
+    return yy - cy;
+  };
+  for (let r = 0; r < opts.length; r += cols){
+    const row = opts.slice(r, r + cols), hgt = Math.max(...row.map(q => card(q, 0, 0, false)));
+    row.forEach((q, j) => card(q, x + j * (cw + gap), y, true, hgt));
+    y += hgt + gap;
+  }
+  return y + 12;
+}
 
 /* ---------------- end of game ---------------- */
 const QUOTES = {

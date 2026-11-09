@@ -194,7 +194,7 @@ void main(){
   vec3 atm = mix(vec3(0.32, 0.62, 1.0), vec3(1.0, 0.55, 0.3), heat);
   col += atm * rim * (0.15 + 0.85 * smoothstep(-0.3, 0.4, d)) * 0.55;
   col += vec3(1.0, 0.45, 0.15) * (1.0 - abs(d) * 6.0) * step(abs(d), 0.16) * 0.08;
-  gl_FragColor = vec4(col, 1.0);
+  gl_FragColor = vec4(pow(max(col, 0.0), vec3(0.4545)), 1.0);   // 3.7.3: linear → sRGB like the website (it was much darker than the loading screen's Earth)
 }`;
 const CLOUD_FS = `
 uniform sampler2D map; uniform vec3 sun; uniform float shift; varying vec2 vUv; varying vec3 vN; varying vec3 vW;
@@ -203,7 +203,7 @@ void main(){
   a = smoothstep(0.18, 0.9, a);
   float d = dot(normalize(vN), sun);
   float l = smoothstep(-0.15, 0.35, d);
-  gl_FragColor = vec4(vec3(0.95, 0.97, 1.0) * (0.12 + 0.95 * l), a * (0.18 + 0.72 * l));
+  gl_FragColor = vec4(pow(vec3(0.95, 0.97, 1.0) * (0.12 + 0.95 * l), vec3(0.4545)), a * (0.18 + 0.72 * l));
 }`;
 const ATM_VS = `varying vec3 vN; varying vec3 vW; void main(){ vN = normalize(mat3(modelMatrix) * normal); vec4 w = modelMatrix * vec4(position,1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`;
 const ATM_FS = `

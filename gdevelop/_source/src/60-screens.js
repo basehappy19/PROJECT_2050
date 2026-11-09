@@ -48,6 +48,7 @@ W.btn = (l, id, x, y, label, fn, o = {}) => {
   else if (kind === "primary"){ fill = hov ? k.mix("accent", "#ffffff", .25) : "accent"; }
   else if (kind === "ghost"){ fill = hov ? "accent" : null; a = .14; col = "accent"; }
   else if (kind === "danger"){ fill = hov ? k.mix("bad", "#ffffff", .2) : "bad"; stroke = "bad"; col = "#2b0603"; }
+  else if (kind === "goldline"){ fill = "gold"; a = hov ? .28 : .12; stroke = "gold"; col = "gold"; }   // 3.7.6: market "buy now" (dear)
   else if (kind === "gold"){ fill = hov ? k.mix("gold", "#ffffff", .25) : "gold"; stroke = "gold"; col = "#2b1d00"; }
   if (fill != null) k.rect(l, x, y, w, h, fill, {r:8, a, stroke, bg:true}); else k.rect(l, x, y, w, h, null, {r:8, stroke, bg:true});
   k.text(l, label, x, y + (h - size * 1.45) / 2, {font, size, color:col, w, align:"center", max:1, iconColor:col});
@@ -347,6 +348,8 @@ Object.assign(Screens, {
       if (S.started && !S.over){ S.realSec += dt; const sec = Math.floor(S.realSec); if (sec !== this._sec && UIM.modal === "pause"){ this._sec = sec; k.dirty("Modal"); } }
       if (S.event && UIM.evAt && UIM.eventLockFrac() < 1){ k.dirty("Modal"); this._lockDirty = true; } else if (this._lockDirty){ this._lockDirty = false; k.dirty("Modal"); }
       if (UIM.modal === "story" && performance.now() - (UIM.storyT || 0) < 700) k.dirty("Modal");
+      // 3.7.6: market belts move while raw ore is being refined (about 20 frames a second, not every frame)
+      if (UIM.modal === "market" && P.rawFor && P.MAT_IDS.some(g => P.rawFor(g) > 0)){ this._mkT = (this._mkT || 0) + dt; if (this._mkT > .05){ this._mkT = 0; k.dirty("Modal"); } }
       if (P.Net && P.Net.googleOverlay) P.Net.googleOverlay(null);
     }
     if (this.kind === "loading") this.loaderUpdate(dt);

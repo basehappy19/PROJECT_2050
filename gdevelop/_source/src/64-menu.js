@@ -54,7 +54,7 @@ const LEarth = {
       for (let y = 0; y < N; y++){ const ny = (y + .5) / N * 2 - 1;
         for (let x = 0; x < N; x++){ const nx = (x + .5) / N * 2 - 1, r2 = nx * nx + ny * ny; if (r2 > 1) continue;
           const z = Math.sqrt(1 - r2), d = (SX * nx - SY * ny + SZ * z) / SL, q = (y * N + x) * 4;
-          const day = sm(-.12, .22, d), m = ((.08 + 1.05 * Math.max(d, 0)) * day + .035 * (1 - day)) / 1.13;
+          const day = sm(-.12, .22, d), m = Math.min(1, Math.pow((.08 + 1.05 * Math.max(d, 0)) * day + .035 * (1 - day), 1 / 2.2));   // 3.7.3: in sRGB, as the menu globe now outputs
           sh.data[q + 3] = Math.round(255 * Math.max(0, Math.min(1, 1 - m)));
           const a = Math.pow(1 - z, 3) * (.15 + .85 * sm(-.3, .4, d)) * .55 * 255;
           gl.data[q] = .32 * a; gl.data[q + 1] = .62 * a; gl.data[q + 2] = a; gl.data[q + 3] = 255; } }
