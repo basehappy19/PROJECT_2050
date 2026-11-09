@@ -406,7 +406,7 @@ const _upd = Map.update; Map.update = function(dt){ _upd.call(this, dt); if (thi
 P.Map = Map; P._Mirror = Mirror; P.toWorld = toWorld; P.heatRGB = heatRGB; P.regionHeatValue = regionHeatValue; P.regionAtWorld = regionAtWorld; P.countryPoint = countryPoint; P.CGEO = CGEO; P.ZCOUNTRY = ZCOUNTRY;
 const H = P.H = P.H || {};
 H.mapRefresh = () => Map.refresh();
-H.mapFocus = reg => Map.focus(reg, false);
+H.mapFocus = () => {};   // 3.6.1: an event no longer moves the camera (like the website)
 H.floatText = (x, y, txt, color) => Map.floatText(x, y, txt, color);
 H.hazardStrike = (h, d) => {
   Map.hazardFx(h, d);

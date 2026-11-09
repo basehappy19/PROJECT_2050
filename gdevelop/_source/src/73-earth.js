@@ -125,7 +125,7 @@ const Ice = P.Ice = {
     const m = this.mesh = new THREE.Mesh(g, this.mat); m.renderOrder = 2.5; m.frustumCulled = false; R.add3DRendererObject(m);   // over the ocean / rim, under the photo
     // frost band along the edge: solid ice just outside → clear FROST px inside
     let cx = 0, cy = 0; for (const [x, y] of ep){ cx += x; cy += y; } cx /= ep.length; cy /= ep.length;
-    const n = ep.length, ring = [[18, 1], [0, .96], [-FROST * .25, .78], [-FROST * .55, .42], [-FROST * .8, .14], [-FROST, 0]], bp = [], bu = [], bc = [], idx = [];
+    const n = ep.length, ring = [[18, 1], [0, .8], [-FROST * .25, .5], [-FROST * .55, .22], [-FROST * .8, .06], [-FROST, 0]], bp = [], bu = [], bc = [], idx = [];
     for (let i = 0; i < n; i++){
       const [x, y] = ep[i], [ax, ay] = ep[(i - 1 + n) % n], [bx, by] = ep[(i + 1) % n];
       let tx = bx - ax, ty = by - ay; const l = Math.hypot(tx, ty) || 1; tx /= l; ty /= l;
@@ -139,8 +139,8 @@ const Ice = P.Ice = {
     this.frostMat = new THREE.ShaderMaterial({uniforms:{map:{value:tex}, tint:{value:new THREE.Color(0xffffff)}}, vertexShader:FROST_VS, fragmentShader:FROST_FS, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
     const f = this.frost = new THREE.Mesh(bg, this.frostMat); f.renderOrder = 9; f.frustumCulled = false; R.add3DRendererObject(f);   // over the photo, under the region tints
   },
-  /* darker ice on the night map */
-  tone(night){ if (!this.mat) return; const c = night ? 0x5b6f7d : 0xffffff; this.mat.color.setHex(c); this.frostMat.uniforms.tint.value.setHex(c); },
+  /* muted ice (3.6.1), darker on the night map */
+  tone(night){ if (!this.mat) return; const c = night ? 0x3c4a54 : 0x74889a; this.mat.color.setHex(c); this.frostMat.uniforms.tint.value.setHex(c); },
 };
 
 /* ---------------------------------------------------------------- the 3D Earth on the menu (web/src/globe.js) */

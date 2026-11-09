@@ -405,7 +405,7 @@ export const GameMap = {
     const s = this.scale(), [x0, y0] = this.stageToWorld(0, 0), [x1, y1] = this.stageToWorld(this.w, this.h);
     c.save(); c.translate(this.w / 2 - this.cam.x * s, this.h / 2 - this.cam.y * s); c.scale(s, s);
     c.fillStyle = this.icePattern(c); c.fillRect(x0, y0, x1 - x0, y1 - y0);
-    if (this.theme() === "night"){ c.fillStyle = "rgba(6,14,24,.6)"; c.fillRect(x0, y0, x1 - x0, y1 - y0); }
+    c.fillStyle = this.theme() === "night" ? "rgba(6,14,24,.68)" : "rgba(14,26,38,.42)"; c.fillRect(x0, y0, x1 - x0, y1 - y0);   // 3.6.1: muted ice
     c.restore();
   },
   /* builds the starfield picture once per screen size; returns where to put it */
@@ -440,7 +440,7 @@ export const GameMap = {
     if (this.edge){
       const night = this.theme() === "night";
       c.save(); c.clip(this.edge); c.lineJoin = "round"; c.strokeStyle = this.icePattern(c);
-      for (let i = 0; i < 18; i++){ const u = 1 - i / 18; c.globalAlpha = (night ? .04 : .085) + (i === 17 ? .2 : 0); c.lineWidth = FROST * 2 * u; c.stroke(this.edge); }   // many thin steps so no bands show
+      for (let i = 0; i < 18; i++){ const u = 1 - i / 18; c.globalAlpha = (night ? .03 : .055) + (i === 17 ? .12 : 0); c.lineWidth = FROST * 2 * u; c.stroke(this.edge); }   // many thin steps so no bands show
       c.restore();
     }
     if (!S.regions) return;
@@ -746,7 +746,7 @@ P.countryPoint = id => GameMap.countryPoint(id);
 
 /* engine hooks */
 H.mapRefresh = () => GameMap.refresh();
-H.mapFocus = reg => { if (GameMap.active) GameMap.focus(reg, false); };
+H.mapFocus = () => {};   // 3.6.1: an event no longer moves the camera; the map stays where the player left it
 H.floatText = (x, y, txt, color) => GameMap.floatText(x, y, txt, color);
 const STRIKE_SND = {hurricane:["thunder", "storm"], typhoon:["thunder", "storm"], flood:["impact", "flood"], heat:["impact", "heat"], drought:["impact", "gale"], wildfire:["impact", "fire"], saltwater:["impact", "ocean"]};
 H.hazardStrike = (h, d) => {

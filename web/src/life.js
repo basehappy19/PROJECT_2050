@@ -76,7 +76,7 @@ function initClouds(M){
 export function drawClouds(M, c, dt, now, vis, night){
   if (Gfx.level === "low" || !S.regions) return;
   if (!M.clouds) initClouds(M);
-  const z = M.cam.z, h = 34 * Math.sqrt(z), aBase = .9 * clamp(1.45 - z * .2, .45, 1) * (night ? .5 : 1);
+  const z = M.cam.z, h = 34 * Math.sqrt(z), aBase = .5 * clamp(1.45 - z * .2, .45, 1) * (night ? .5 : 1);   // 3.6.1: fainter, so they don't hide the map
   const run = P.running && P.running();
   const items = [];
   for (const q of M.clouds){
@@ -96,7 +96,7 @@ export function drawClouds(M, c, dt, now, vis, night){
       // shadow on the ground, nudged away from the sun
       const [gx, gy, gw, gh] = box(M, x, it.y, it.wu, it.hu, 0); if (!vis(gx, gy, Math.max(gw, gh))) continue;
       const [cx, cy, w, hh] = box(M, x, it.y, it.wu, it.hu, h);
-      c.globalAlpha = it.a * .8;
+      c.globalAlpha = it.a * .55;
       drawRot(c, it.sh, gx + h * .22, gy + h * .28, gw, gh, it.rot);
       c.globalAlpha = it.a;
       drawRot(c, it.img, cx, cy, w, hh, it.rot);

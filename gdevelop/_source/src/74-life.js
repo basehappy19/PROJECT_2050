@@ -102,14 +102,14 @@ const Life = {
   update(dt){
     if (!this.on || !this.R || Map.mode !== "game") return;
     const low = lowGfx(), z = Map.cam.z, run = S.started && !S.over && S.speed > 0, nt = night(), now = performance.now() / 1000;
-    const h = 46, a = (low ? 0 : .9) * clamp(1.45 - z * .2, .45, 1) * (nt ? .5 : 1);
+    const h = 46, a = (low ? 0 : .5) * clamp(1.45 - z * .2, .45, 1) * (nt ? .5 : 1);   // 3.6.1: fainter
     // clouds
     for (const cl of this.clouds || []){
       if (run) cl.x += cl.sp * dt; if (cl.x > MAPW + 180) cl.x -= MAPW + 360;
       const w = 208 * cl.s, hh = 136 * cl.s;
       cl.m.visible = cl.sh.visible = a > 0;
       cl.m.position.set(cl.x, cl.y, h); cl.m.scale.set(w, hh, 1); cl.m.material.opacity = a;
-      cl.sh.position.set(cl.x + h * .3, cl.y + h * .38, .4); cl.sh.scale.set(w, hh, 1); cl.sh.material.opacity = a * .8;
+      cl.sh.position.set(cl.x + h * .3, cl.y + h * .38, .4); cl.sh.scale.set(w, hh, 1); cl.sh.material.opacity = a * .55;
     }
     // storms: a spinning spiral over each hurricane / typhoon that is coming
     const want = new Set();

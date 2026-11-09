@@ -148,11 +148,11 @@ class MapGL {
     const all = outer.concat(hole), pos = [], uv = [];
     for (const t of THREE.ShapeUtils.triangulateShape(outer, [hole])) for (const k of t){ pos.push(all[k].x, all[k].y, 0); uv.push(all[k].x / ICE_TILE, all[k].y / ICE_TILE); }
     const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
-    this.iceMat = new THREE.MeshBasicMaterial({map:tex, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
+    this.iceMat = new THREE.MeshBasicMaterial({map:tex, color:0x8d9fac, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
     this.iceMesh = new THREE.Mesh(g, this.iceMat); this.iceMesh.renderOrder = ORDER.ice; this.iceMesh.frustumCulled = false; this.scene.add(this.iceMesh);
     // frost band: outside (ice, solid) → the edge (mostly ice) → FROST units inside (clear)
     const nrm = edgeNormals(edgePts), n = edgePts.length / 2, bp = [], bu = [], bc = [], idx = [];
-    const ring = [[18, 1], [0, .96], [-FROST * .25, .78], [-FROST * .55, .42], [-FROST * .8, .14], [-FROST, 0]];
+    const ring = [[18, 1], [0, .8], [-FROST * .25, .5], [-FROST * .55, .22], [-FROST * .8, .06], [-FROST, 0]];   // 3.6.1: softer
     for (let i = 0; i < n; i++){
       const x = edgePts[i * 2], y = edgePts[i * 2 + 1], nx = nrm[i * 2], ny = nrm[i * 2 + 1];
       for (const [d, a] of ring){ const px = x + nx * d, py = y + ny * d; bp.push(px, py, 0); bu.push(px / ICE_TILE, py / ICE_TILE); bc.push(a); }
@@ -161,11 +161,11 @@ class MapGL {
     for (let i = 0; i < n; i++){ const j = (i + 1) % n; for (let k = 0; k < R - 1; k++){ const a = i * R + k, b = j * R + k; idx.push(a, b, a + 1, b, b + 1, a + 1); } }
     const bg = new THREE.BufferGeometry(); bg.setAttribute("position", new THREE.Float32BufferAttribute(bp, 3)); bg.setAttribute("uv", new THREE.Float32BufferAttribute(bu, 2));
     bg.setAttribute("fade", new THREE.Float32BufferAttribute(bc, 1)); bg.setIndex(idx);
-    this.frostMat = new THREE.ShaderMaterial({uniforms:{map:{value:tex}, tint:{value:new THREE.Color(0xffffff)}}, vertexShader:FROST_VS, fragmentShader:FROST_FS, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
+    this.frostMat = new THREE.ShaderMaterial({uniforms:{map:{value:tex}, tint:{value:new THREE.Color(0x8d9fac)}}, vertexShader:FROST_VS, fragmentShader:FROST_FS, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
     this.frost = new THREE.Mesh(bg, this.frostMat); this.frost.renderOrder = ORDER.frost; this.frost.frustumCulled = false; this.scene.add(this.frost);
   }
-  /* darker ice on the night map, so it isn't a bright frame round a dark world */
-  setIceTone(night){ if (!this.iceMat || this.iceNight === night) return; this.iceNight = night; const c = night ? 0x5b6f7d : 0xffffff; this.iceMat.color.setHex(c); this.frostMat.uniforms.tint.value.setHex(c); }
+  /* muted ice (3.6.1), darker on the night map, so the edge never stands out */
+  setIceTone(night){ if (!this.iceMat || this.iceNight === night) return; this.iceNight = night; const c = night ? 0x46555f : 0x8d9fac; this.iceMat.color.setHex(c); this.frostMat.uniforms.tint.value.setHex(c); }
   setImage(img){
     if (!img || this.imgSrc === img.src) return;
     this.imgSrc = img.src;
