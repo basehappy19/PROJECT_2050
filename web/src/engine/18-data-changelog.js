@@ -383,4 +383,21 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
     "Turn narration and subtitles on or off and pick a speed in the settings, or tap the speaker button to hear just that page."
   ]),
 ];
+P.CHANGELOG.find(x => x.v === "2.1").subs = [
+  SUB("2.1.1", "2026-11-10", [
+    "หน้าโหลดใช้ลูกโลก 3 มิติตัวเดียวกับหน้าหลัก คมชัดและหมุนลื่น พอกดเข้าเกม ลูกโลกเลื่อนไปที่หน้าหลักพอดี หมุนต่อจากเดิม",
+    "ข้อความระหว่างโหลดสุ่มจากสิ่งต่าง ๆ ในเกม ทุกครั้งที่เปิดจะไม่ซ้ำกัน",
+    "พายุหมุนเขตร้อนเห็นบนแผนที่จริง: ก่อตัวกลางทะเล เคลื่อนเข้าหาฝั่ง และแรงขึ้นทีละขั้น ดีเปรสชันเขตร้อน → พายุโซนร้อน → ไต้ฝุ่น / เฮอริเคน / ไซโคลน (ตามมหาสมุทร)",
+    "ร้านค้าโฉมใหม่: แบ่งหมวด บอกว่าขาดอีกเท่าไร และต้องแตะยืนยันก่อนซื้อ",
+    "เปลี่ยนรหัสผ่านได้ในหน้าบัญชี (ใส่รหัสเดิม รหัสใหม่ และยืนยัน)",
+    "ซูมออกสุดแล้วแผนที่อยู่นิ่ง ไม่เลื่อนจนเห็นขอบ · ดาวเมืองหลวงขึ้นเมื่อซูมเข้าใกล้กว่าชื่อประเทศ แผนที่ไม่รก"
+  ], [
+    "The loading screen now shows the same 3D Earth as the home screen, sharp and smooth; when you enter, it glides onto the home screen and keeps turning.",
+    "Loading messages are picked at random from things in the game, so they change every time.",
+    "Tropical cyclones now show on the map: they form at sea, move toward the coast and grow stage by stage, tropical depression → tropical storm → typhoon / hurricane / cyclone (named by ocean).",
+    "A new shop: items by category, how much more you need, and a tap to confirm before buying.",
+    "Change your password on the account page (current password, new password, confirm).",
+    "Fully zoomed out, the map stays put instead of sliding to its edge · capital stars appear only once you zoom in past the country names, so the map stays tidy."
+  ]),
+];
 P.VERSION_NAME = P.CHANGELOG[0].subs && P.CHANGELOG[0].subs.length ? P.CHANGELOG[0].subs[0].v : P.CHANGELOG[0].v;

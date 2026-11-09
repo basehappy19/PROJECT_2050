@@ -39,25 +39,33 @@ function cloudSprite(v, dark){
   if (dark){ const b = document.createElement("canvas"); b.width = W; b.height = H; const bg = b.getContext("2d"); bg.filter = "blur(5px)"; bg.drawImage(cv, 0, 0); return (SPR[key] = b); }
   return (SPR[key] = cv);
 }
-function spiralSprite(dark){
-  const key = "sp" + (dark ? "d" : "");
-  if (SPR[key]) return SPR[key];
-  const N = 256, c = N / 2, cv = document.createElement("canvas"); cv.width = cv.height = N;
-  const g = cv.getContext("2d");
-  if (dark) g.filter = "blur(6px)";
-  const base = g.createRadialGradient(c, c, 8, c, c, c);
-  base.addColorStop(0, dark ? "rgba(0,10,20,.35)" : "rgba(255,255,255,.2)"); base.addColorStop(.5, dark ? "rgba(0,10,20,.25)" : "rgba(235,242,250,.55)"); base.addColorStop(1, "rgba(235,242,250,0)");
-  g.fillStyle = base; g.beginPath(); g.arc(c, c, c, 0, TAU); g.fill();
-  g.lineCap = "round";
-  for (let arm = 0; arm < 4; arm++){
-    for (let t = 0; t < 1; t += .012){
-      const a = arm * TAU / 4 + t * 4.2, rr = 10 + t * (c - 14), w = 6 + t * 26;
-      g.strokeStyle = dark ? `rgba(0,10,20,${.18 * (1 - t)})` : `rgba(255,255,255,${.5 * (1 - t * .8)})`;
-      g.lineWidth = w; g.beginPath(); g.arc(c, c, rr, a, a + .09); g.stroke();
+/* 3.8: the storms themselves: big, lifted above the map (so they lean with the camera's tilt and cast a shadow), the
+   thick core a little higher than the bands, turning the right way for their hemisphere; their stage name underneath */
+const STORM_D = [150, 230, 330];   // diameter in map units at the end of each stage
+function drawStorms(M, c, now, vis, h0){
+  if (!P.stormList) return;
+  const th = S.lang === "th";
+  for (const st of P.stormList()){
+    const [x0, y] = ll(st.lat, st.lon), D = STORM_D[st.stage] * (st.stage ? .82 + .18 * ((st.p * 3) % 1) : .7 + .3 * st.p * 3) * (.9 + .1 * st.k);
+    const rot = -now * (.35 + .2 * st.stage),   /* mirrored in the south, so the same sign turns it clockwise there */ hh = h0 * 1.6, fade = clamp(st.p * 6, 0, 1) * clamp((1 - st.p) * 30 + .2, 0, 1);
+    for (const ox of [0, -MAP.W, MAP.W]){
+      const x = x0 + ox; if (x < -400 || x > MAP.W + 400) continue;
+      const [gx, gy, gw, gh] = box(M, x, y, D, D, 0); if (!vis(gx, gy, Math.max(gw, gh))) continue;
+      const [cx, cy, w, hgt] = box(M, x, y, D, D, hh);
+      const flip = st.north ? 1 : -1;
+      c.globalAlpha = .5 * fade; drawRotF(c, P.stormSprite(st.stage, "shadow"), gx + hh * .25, gy + hh * .32, gw, gh, rot, flip);
+      c.globalAlpha = .93 * fade; drawRotF(c, P.stormSprite(st.stage, "all"), cx, cy, w, hgt, rot, flip);
+      // name under it
+      c.globalAlpha = fade; c.font = "600 11px 'IBM Plex Sans Thai', sans-serif"; c.textAlign = "center"; c.textBaseline = "top";
+      const nm = th ? st.name.th : st.name.en, ty = cy + hgt * .42;
+      c.lineWidth = 3.5; c.strokeStyle = "rgba(6,16,21,.85)"; c.strokeText(nm, cx, ty); c.fillStyle = st.stage === 2 ? "#ffd2c4" : "#e6f0ee"; c.fillText(nm, cx, ty);
+      c.textAlign = "left"; c.textBaseline = "alphabetic";
     }
   }
-  if (!dark){ g.globalCompositeOperation = "destination-out"; const eye = g.createRadialGradient(c, c, 0, c, c, 12); eye.addColorStop(0, "rgba(0,0,0,1)"); eye.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = eye; g.fillRect(0, 0, N, N); }
-  return (SPR[key] = cv);
+  c.globalAlpha = 1;
+}
+function drawRotF(c, img, x, y, w, h, rot, flip){
+  c.save(); c.translate(x, y); c.scale(flip, h / w); c.rotate(rot); c.drawImage(img, -w / 2, -w / 2, w, w); c.restore();
 }
 
 /* where a flat thing of size (wu × hu map units) at map point x, y and height h (screen px) lands on screen */
@@ -68,9 +76,10 @@ function box(M, x, y, wu, hu, h){
 }
 
 /* ---------- clouds and storms ---------- */
-const STORM = {hurricane:1, typhoon:1};
 function initClouds(M){
   M.clouds = [];
+  // 3.8: the storm pictures take a moment to draw: make them while the game is quiet, one every couple of seconds
+  [0, 1, 2].forEach(st => setTimeout(() => { const go = () => P.stormSprite(st, "shadow"); window.requestIdleCallback ? requestIdleCallback(go, {timeout:4000}) : go(); }, 1500 + st * 2000));
   for (let i = 0; i < 8; i++){   // 3.7: fewer
     // mostly over the mid-latitudes and the tropics, like real weather bands
     const band = rnd(), lat = band < .4 ? 38 + rnd() * 24 : band < .7 ? -45 + rnd() * 18 : -8 + rnd() * 20;
@@ -88,13 +97,6 @@ export function drawClouds(M, c, dt, now, vis, night){
     if (run) q.x += q.sp * dt; if (q.x > MAP.W + 220) q.x -= MAP.W + 440;
     items.push({x:q.x, y:q.y, wu:380 * q.s, hu:150 * q.s, img:cloudSprite(q.v), sh:cloudSprite(q.v, true), a:aBase, rot:0});
   }
-  for (const hz of S.haz || []){
-    if (!STORM[hz.type]) continue;
-    const pt = M.countryPoint(hz.c); if (!pt) continue;
-    const left = Math.max(0, hz.at - S.tick), north = pt[1] < ll(0, MAP.lon0)[1];
-    const size = 190 * (.7 + .3 * (hz.sev || 1));
-    items.push({x:pt[0] + 40, y:pt[1] + 10, wu:size, hu:size, img:spiralSprite(), sh:spiralSprite(true), a:.85 * clamp(1.15 - left / 6, .35, 1), rot:(north ? -1 : 1) * now * .9, storm:true});
-  }
   for (const it of items){
     for (const ox of [0, -MAP.W, MAP.W]){
       const x = it.x + ox; if (x < -300 || x > MAP.W + 300) continue;
@@ -108,6 +110,7 @@ export function drawClouds(M, c, dt, now, vis, night){
     }
   }
   c.globalAlpha = 1;
+  drawStorms(M, c, now, vis, h);
   return true;
 }
 function drawRot(c, img, x, y, w, h, rot){

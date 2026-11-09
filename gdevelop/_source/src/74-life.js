@@ -4,7 +4,8 @@ if (P.mods && P.mods.life) return;
 /* =========================================================================
    Life · 3.6 — a livelier map (like web/src/life.js)
    3D on the map layer (tips back with the camera):
-     · clouds drifting west → east above the planes, with shadows; hurricanes / typhoons spin over the country they will hit
+     · clouds drifting west → east above the planes, with shadows
+     · 3.8: tropical cyclones moving in from the sea and growing stage by stage (engine/41-storms.js), big and lifted, with shadows
      · forests growing back: countries with finished forest / mangrove builds turn greener month by month
    2D on the MapUI layer (Screens.drawRigs / drawTrains, called from 61-hud.js; wind / solar fields in 71-place.js):
      · oil rigs on the big oil fields, flaring until the country goes green (green ≥ 60)
@@ -41,26 +42,12 @@ function cloudCanvas(v, dark){
   if (dark){ const b = document.createElement("canvas"); b.width = W; b.height = H; const bg = b.getContext("2d"); bg.filter = "blur(5px)"; bg.drawImage(cv, 0, 0); return b; }
   return cv;
 }
-function spiralCanvas(dark){
-  const N = 256, c = N / 2, cv = document.createElement("canvas"); cv.width = cv.height = N;
-  const g = cv.getContext("2d");
-  if (dark) g.filter = "blur(6px)";
-  const base = g.createRadialGradient(c, c, 8, c, c, c);
-  base.addColorStop(0, dark ? "rgba(0,10,20,.35)" : "rgba(255,255,255,.2)"); base.addColorStop(.5, dark ? "rgba(0,10,20,.25)" : "rgba(235,242,250,.55)"); base.addColorStop(1, "rgba(235,242,250,0)");
-  g.fillStyle = base; g.beginPath(); g.arc(c, c, c, 0, TAU); g.fill();
-  g.lineCap = "round";
-  for (let arm = 0; arm < 4; arm++) for (let t = 0; t < 1; t += .012){
-    const a = arm * TAU / 4 + t * 4.2, rr = 10 + t * (c - 14);
-    g.strokeStyle = dark ? `rgba(0,10,20,${.18 * (1 - t)})` : `rgba(255,255,255,${.5 * (1 - t * .8)})`;
-    g.lineWidth = 6 + t * 26; g.beginPath(); g.arc(c, c, rr, a, a + .09); g.stroke();
-  }
-  if (!dark){ g.globalCompositeOperation = "destination-out"; const eye = g.createRadialGradient(c, c, 0, c, c, 12); eye.addColorStop(0, "rgba(0,0,0,1)"); eye.addColorStop(1, "rgba(0,0,0,0)"); g.fillStyle = eye; g.fillRect(0, 0, N, N); }
-  return cv;
-}
 const texCache = {};
 const texOf = (key, make) => { if (!texCache[key]){ const t = new THREE.CanvasTexture(make()); t.colorSpace = THREE.SRGBColorSpace; texCache[key] = t; } return texCache[key]; };
 const plane = (tex, order) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({map:tex, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide})); m.renderOrder = order; m.frustumCulled = false; return m; };
 
+/* 3.8: how far into the month we are (kept while paused), so storms move smoothly between monthly ticks */
+P.monthFrac = () => clamp((Life._acc || 0) / (P.secPerMonth ? P.secPerMonth(S.speed || 1) : 4), 0, 1);
 const Life = {
   R:null, on:false,
   init(R, mode){
@@ -75,6 +62,8 @@ const Life = {
         const cl = {x, y, s, sp:5 + rnd() * 5, m:plane(texOf("c" + v, () => cloudCanvas(v)), 50), sh:plane(texOf("cd" + v, () => cloudCanvas(v, true)), 39)};
         R.add3DRendererObject(cl.sh); R.add3DRendererObject(cl.m); this.clouds.push(cl);
       }
+      // 3.8: the storm pictures take a moment to draw: make them while the game is quiet, one every couple of seconds
+      [0, 1, 2].forEach(st => setTimeout(() => { if (P.stormSprite) P.stormSprite(st, "shadow"); }, 1500 + st * 2000));
     } catch(e){ console.warn("life", e); this.on = false; }
   },
   update(dt){
@@ -89,20 +78,26 @@ const Life = {
       cl.m.position.set(cl.x, cl.y, h); cl.m.scale.set(w, hh, 1); cl.m.material.opacity = a;
       cl.sh.position.set(cl.x + h * .3, cl.y + h * .38, .4); cl.sh.scale.set(w, hh, 1); cl.sh.material.opacity = a * .35;
     }
-    // storms: a spinning spiral over each hurricane / typhoon that is coming
-    const want = new Set();
-    for (const hz of S.haz || []){
-      if (hz.type !== "hurricane" && hz.type !== "typhoon") continue;
-      const pt = P.countryPoint(hz.c); if (!pt) continue;
-      want.add(hz.id);
-      let st = this.storms[hz.id];
-      if (!st){ st = this.storms[hz.id] = {m:plane(texOf("sp", () => spiralCanvas()), 51), sh:plane(texOf("spd", () => spiralCanvas(true)), 39)}; this.R.add3DRendererObject(st.sh); this.R.add3DRendererObject(st.m); }
-      const size = 152 * (.7 + .3 * (hz.sev || 1)), left = Math.max(0, hz.at - S.tick), sa = low ? 0 : .85 * clamp(1.15 - left / 6, .35, 1), north = pt[1] < toWorld(0, LON0)[1];
-      st.m.position.set(pt[0] + 32, pt[1] + 8, h + 4); st.m.scale.set(size, size, 1); st.m.rotation.z = (north ? 1 : -1) * now * .9; st.m.material.opacity = sa;
-      st.sh.position.set(pt[0] + 32 + h * .3, pt[1] + 8 + h * .38, .4); st.sh.scale.set(size, size, 1); st.sh.rotation.z = st.m.rotation.z; st.sh.material.opacity = sa * .8;
-      st.m.visible = st.sh.visible = sa > 0;
+    // 3.8: tropical cyclones (engine/41-storms.js): each storm forms out at sea, drifts to the coast and grows from a
+    // depression to a tropical storm to a typhoon / hurricane / cyclone; big, lifted above the map with its shadow below
+    if (S.tick !== this._lt){ this._lt = S.tick; this._acc = 0; } else if (run) this._acc = (this._acc || 0) + dt;
+    const want = new Set(), D0 = [136, 208, 299];   // diameter at the end of each stage (world px; the website's 150 / 230 / 330 on its wider map)
+    for (const st of (P.stormList ? P.stormList() : [])){
+      want.add(st.id);
+      let o = this.storms[st.id];
+      if (!o){ o = this.storms[st.id] = {m:plane(texOf("st" + st.stage, () => P.stormSprite(st.stage, "all")), 51), sh:plane(texOf("sd" + st.stage, () => P.stormSprite(st.stage, "shadow")), 39), stage:st.stage}; this.R.add3DRendererObject(o.sh); this.R.add3DRendererObject(o.m); }
+      if (o.stage !== st.stage){ o.stage = st.stage; o.m.material.map = texOf("st" + st.stage, () => P.stormSprite(st.stage, "all")); o.sh.material.map = texOf("sd" + st.stage, () => P.stormSprite(st.stage, "shadow")); o.m.material.needsUpdate = o.sh.material.needsUpdate = true; }
+      const [x, y] = toWorld(st.lat, st.lon), D = D0[st.stage] * (st.stage ? .82 + .18 * ((st.p * 3) % 1) : .7 + .3 * st.p * 3) * (.9 + .1 * st.k);
+      const hh = h * 1.6, fade = (low ? 0 : 1) * clamp(st.p * 6, 0, 1) * clamp((1 - st.p) * 30 + .2, 0, 1);
+      // the map layer's y flip mirrors the picture: mirror it back sideways in the north (bands wind clockwise outward,
+      // the storm turns anticlockwise), leave it mirrored in the south (the other way round); +z turns clockwise on screen here
+      const nf = st.north ? -1 : 1, rot = now * (.35 + .2 * st.stage) * nf;
+      o.m.position.set(x, y, hh); o.m.scale.set(D * nf, D, 1); o.m.rotation.z = rot; o.m.material.opacity = .93 * fade;
+      o.sh.position.set(x + hh * .25, y + hh * .32, .4); o.sh.scale.set(D * nf, D, 1); o.sh.rotation.z = rot; o.sh.material.opacity = .5 * fade;
+      o.m.visible = o.sh.visible = fade > 0;
+      o.sx = x; o.sy = y; o.D = D;
     }
-    for (const id of Object.keys(this.storms)) if (!want.has(+id)){ const st = this.storms[id]; this.R.remove3DRendererObject(st.m); this.R.remove3DRendererObject(st.sh); delete this.storms[id]; }
+    for (const id of Object.keys(this.storms)) if (!want.has(+id)){ const o = this.storms[id]; this.R.remove3DRendererObject(o.m); this.R.remove3DRendererObject(o.sh); delete this.storms[id]; }
     // forests growing back (checked twice a second)
     this._fT = (this._fT || 0) + dt; if (this._fT > .5){ this._fT = 0; this.updateForest(); }
   },

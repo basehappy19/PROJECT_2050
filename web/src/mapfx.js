@@ -410,17 +410,21 @@ export function drawDetail(M, c, now, vis, iconImg){
       M.hits.push({id:"ck-" + q.k, x:x - 10, y:y - 10, w:20, h:20, fn:() => { M.info = {x, y:y - 12, t:performance.now(), txt:`${L(P.CHOKE[q.k])}${closed ? " · " + (th ? "ปิดอยู่" : "closed") : ""}`}; }});
     }
   }
-  // capitals (country view)
-  if (capPts && z >= 1.55){
-    const names = z >= 2.5;
-    c.font = "500 10px 'IBM Plex Sans Thai', sans-serif"; c.textBaseline = "middle";
+  // capitals: 3.8 only once you are in closer than the country names (and only for countries whose name already shows),
+  // so the country view isn't cluttered with stars; the capital's own name comes in closer still
+  if (capPts && z >= 2.4){
+    const names = z >= 3.2, tier = z >= 4 ? 0 : z >= 3.2 ? 40 : 100, fade = clamp((z - 2.4) / .35, 0, 1), capNames = [];
+    c.font = "500 10px 'IBM Plex Sans Thai', sans-serif"; c.textBaseline = "middle"; c.globalAlpha = fade;
     for (const q of capPts){
+      const cc = P.COUNTRY[q.id]; if (!cc || (cc.w < tier && S.selC !== q.id)) continue;
       const [x, y] = M.toScreen(q.p[0], q.p[1]); if (!vis(x, y, 10)) continue;
       c.fillStyle = "rgba(6,16,21,.75)"; c.beginPath(); c.arc(x, y, 4.2, 0, TAU); c.fill();
       c.fillStyle = COL.gold; star(c, x, y, 3.6);
-      if (names){ const nm = th ? q.th : q.en; c.lineWidth = 3; c.strokeStyle = "rgba(6,16,21,.8)"; c.strokeText(nm, x + 7, y); c.fillStyle = "#f3e2b0"; c.fillText(nm, x + 7, y); }
+      if (names){ const nm = th ? q.th : q.en, nw = c.measureText(nm).width;
+        if (capNames.some(o => x + 7 < o[0] + o[2] && x + 7 + nw > o[0] && Math.abs(o[1] - y) < 13)) continue;   // 3.8: overlapping capital names are left out
+        capNames.push([x + 7, y, nw]); c.lineWidth = 3; c.strokeStyle = "rgba(6,16,21,.8)"; c.strokeText(nm, x + 7, y); c.fillStyle = "#f3e2b0"; c.fillText(nm, x + 7, y); }
     }
-    c.textBaseline = "alphabetic";
+    c.textBaseline = "alphabetic"; c.globalAlpha = 1;
   }
 }
 function star(c, x, y, r){ c.beginPath(); for (let i = 0; i < 10; i++){ const a = -Math.PI / 2 + i * Math.PI / 5, rr = i % 2 ? r * .45 : r; c[i ? "lineTo" : "moveTo"](x + Math.cos(a) * rr, y + Math.sin(a) * rr); } c.closePath(); c.fill(); }

@@ -130,7 +130,7 @@ const Map = {
       for (const kind of ["Ocean", "MapRim", "ArcticIce", "Region", "RegionLine", "Plume"]) for (const o of scene.getObjects(kind) || []) Mirror.add(this.R3, o, kind);
     }
     if (mode === "game") this.makePainters();
-    if (mode === "menu") this.cam = {x:690, y:500, z:0.66};
+    if (mode === "menu" || mode === "loader") this.cam = {x:690, y:500, z:0.66};   // 3.8: the loading screen shows the menu's globe, through the same camera
     else this.cam = {...HOME};
     this.target = null; this.applyCam(); this.refresh();
   },
@@ -398,14 +398,14 @@ const Map = {
         // drag to pan (only when the press started on the map)
         if (m.down && !m.onUI && !modal){
           if (!this.drag){ this.drag = {x:m.x, y:m.y, vx:0, vy:0, t:performance.now()}; this.fling = null; }
-          else if (m.moved > 6){
+          else if (m.moved > 6 && this.cam.z > ZMIN + .02){   // 3.8: zoomed all the way out the world stays put (no sliding to its edge)
             const a = this.toWorldFromScreen(this.drag.x, this.drag.y), b = this.toWorldFromScreen(m.x, m.y), dx = b[0] - a[0], dy = b[1] - a[1], tn = performance.now(), dtm = Math.max(1, tn - this.drag.t), D = this.drag;
             this.cam.x -= dx; this.cam.y -= dy; this.target = null; this.zAnim = null;
             this.drag = {x:m.x, y:m.y, did:true, t:tn, vx:D.vx * .6 + (-dx / dtm * 1000) * .4, vy:D.vy * .6 + (-dy / dtm * 1000) * .4}; this.clampCam(); this.applyCam();
           }
         } else {
           // 3.7.3: let go while moving fast → the map keeps gliding and slows down (no jump back to the middle)
-          const D = this.drag; if (D && D.did && performance.now() - D.t < 90 && Math.hypot(D.vx, D.vy) * this.cam.z > 150) this.fling = {vx:D.vx, vy:D.vy};
+          const D = this.drag; if (D && D.did && this.cam.z > ZMIN + .02 && performance.now() - D.t < 90 && Math.hypot(D.vx, D.vy) * this.cam.z > 150) this.fling = {vx:D.vx, vy:D.vy};
           this.drag = null;
         }
       }

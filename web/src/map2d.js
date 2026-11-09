@@ -291,8 +291,11 @@ export const GameMap = {
           this.setPanning(true); const D = this.drag, s = this.scale(), [ax, ay] = this.viewToLocal(D.x, D.y), [bx, by] = this.viewToLocal(lx, ly);
           const ddx = (bx - ax) / s, ddy = (by - ay) / s, tn = performance.now(), dtm = Math.max(1, tn - D.t);
           D.fx -= ddx; D.fy -= ddy; D.vx = D.vx * .6 + (-ddx / dtm * 1000) * .4; D.vy = D.vy * .6 + (-ddy / dtm * 1000) * .4; D.t = tn;
-          const [cx, cy] = this.clampXY(D.fx, D.fy, this.cam.z), rb = q => Math.sign(q) * Math.min(Math.abs(q) * .33, 70 / s);
-          this.cam.x = cx + rb(D.fx - cx); this.cam.y = cy + rb(D.fy - cy);
+          // 3.8: no rubber band past the edge any more (it showed the map's border), and zoomed all the way out on a wide
+          // screen the world stays put: the map stops exactly at its edge
+          if (this.cam.z <= ZMIN + .02 && !this.portrait()){ D.fx = this.cam.x; D.fy = this.cam.y; D.vx = D.vy = 0; }
+          const [cx, cy] = this.clampXY(D.fx, D.fy, this.cam.z);
+          D.fx = cx; D.fy = cy; this.cam.x = cx; this.cam.y = cy;
           this.target = null; this.zAnim = null; this.moved(); c.style.cursor = "grabbing";
         }
         this.drag.x = lx; this.drag.y = ly;
@@ -400,7 +403,7 @@ export const GameMap = {
     }
     if (this.target){
       const k = 1 - Math.pow(.86, dt * 60), T = this.target;
-      this.cam.x += (T.x - this.cam.x) * k; this.cam.y += (T.y - this.cam.y) * k; this.cam.z += (T.z - this.cam.z) * k;
+      this.cam.x += (T.x - this.cam.x) * k; this.cam.y += (T.y - this.cam.y) * k; this.cam.z += (T.z - this.cam.z) * k; this.clampCam();   // 3.8: the edge never shows mid-move either
       if (Math.abs(T.x - this.cam.x) < .3 && Math.abs(T.y - this.cam.y) < .3 && Math.abs(T.z - this.cam.z) < .002){ Object.assign(this.cam, T); this.target = null; this.clampCam(); }
       this.moved();
     }

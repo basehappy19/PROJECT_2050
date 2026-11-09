@@ -81,6 +81,7 @@ function glowTexture(){
 
 export class Globe {
   constructor(canvas, {small = false, onReady} = {}){
+    /* 3.8: one globe for the whole visit: built on the loading screen and handed to the menu (same canvas, same spin) */
     this.canvas = canvas; this.small = small;
     const r = this.renderer = new THREE.WebGLRenderer({canvas, antialias:true, alpha:false, powerPreference:"high-performance"});
     r.setPixelRatio(Math.min(window.devicePixelRatio || 1, small ? 1.5 : 2, Gfx.cfg.globeDpr));
@@ -171,8 +172,27 @@ export class Globe {
     const up = () => { this.drag = null; };
     c.addEventListener("pointerup", up); c.addEventListener("pointercancel", up);
   }
-  /* where the globe sits on screen: offset in fractions of the canvas size (menu panel on the left) */
-  setFrame(offsetX, offsetY, dist){ this.offsetX = offsetX; this.offsetY = offsetY; if (dist) this.camDist = dist; this.resize(); }
+  /* where the globe sits on screen: offset in fractions of the canvas size (menu panel on the left).
+     3.8: instant = jump there (no easing of the camera distance); any glide in progress stops */
+  setFrame(offsetX, offsetY, dist, instant){ this.glideT = null; this.offsetX = offsetX; this.offsetY = offsetY; if (dist) this.camDist = dist; if (instant) this.camera.position.z = this.camDist; this.resize(); }
+  /* 3.8: the screen circle (CSS px) of a frame, and the frame that puts the globe on a given circle */
+  circleOf(ox, oy, dist){
+    const c = this.canvas, w = c.clientWidth || window.innerWidth, h = c.clientHeight || window.innerHeight;
+    return {x:w / 2 + ox * w, y:h / 2 + oy * h, r:h / 2 * Math.tan(Math.asin(1 / dist)) / Math.tan(this.camera.fov * DEG / 2)};
+  }
+  frameOf(cx, cy, r){
+    const c = this.canvas, w = c.clientWidth || window.innerWidth, h = c.clientHeight || window.innerHeight;
+    const q = Math.max(.02, r * Math.tan(this.camera.fov * DEG / 2) / (h / 2));
+    return {ox:(cx - w / 2) / w, oy:(cy - h / 2) / h, dist:Math.max(1.05, 1 / Math.sin(Math.atan(q)))};
+  }
+  /* 3.8: the loading screen's Earth becomes the menu's: the same globe slides and grows/shrinks onto its menu place.
+     It moves along a straight line on screen and its size changes evenly (worked out as a screen circle each frame),
+     while it keeps turning, so nothing jumps. */
+  glideTo(ox, oy, dist, ms = 1300, done){
+    if (!(ms > 0)){ this.setFrame(ox, oy, dist, true); done && done(); return; }
+    const a = this.circleOf(this.offsetX, this.offsetY, this.camera.position.z);
+    this.glideT = {t:0, ms, a, to:{ox, oy, dist}, done};   // time counts in capped frame steps, so a slow first frame doesn't skip the glide
+  }
   resize(){
     const c = this.canvas, w = c.clientWidth || window.innerWidth, h = c.clientHeight || window.innerHeight;
     this.renderer.setSize(w, h, false);
@@ -180,19 +200,12 @@ export class Globe {
     this.camera.setViewOffset(w, h, -this.offsetX * w, -this.offsetY * h, w, h);
     this.camera.updateProjectionMatrix();
   }
-  /* 3.5: where the globe is on screen (CSS px): centre and radius, at its resting distance */
-  screenCircle(){
-    const c = this.canvas, w = c.clientWidth || window.innerWidth, h = c.clientHeight || window.innerHeight;
-    const r = h / 2 * Math.tan(Math.asin(1 / this.camDist)) / Math.tan(this.camera.fov * DEG / 2);
-    return {x:w / 2 + this.offsetX * w, y:h / 2 + this.offsetY * h, r};
-  }
-  /* 3.5: turn the globe so this longitude faces the viewer */
-  faceLon(lon){ this.spin = (-90 - lon) * DEG; this.vel = 0; }
   setHeat(v){ this.uni.heat.value = Math.max(0, Math.min(1, v)); }
   start(){ if (this.running) return; this.running = true; this.clock.getDelta(); const loop = () => { if (!this.running) return; this.frame(); this.raf = requestAnimationFrame(loop); }; this.raf = requestAnimationFrame(loop); }
   stop(){ this.running = false; cancelAnimationFrame(this.raf); }
   /* fly down to a place, then call done() */
   zoomTo(lat, lon, done, ms = 1700){
+    this.glideT = null;
     let target = -90 * DEG - lon * DEG;
     while (target - this.spin > Math.PI) target -= Math.PI * 2; while (target - this.spin < -Math.PI) target += Math.PI * 2;
     this.fly = {t0:performance.now(), ms, s0:this.spin, s1:target, x0:this.tiltX, x1:lat * DEG, d0:this.camDist, d1:1.55, o0:[this.offsetX, this.offsetY], done};
@@ -206,9 +219,15 @@ export class Globe {
       this.offsetX = f.o0[0] * (1 - e); this.offsetY = f.o0[1] * (1 - e); this.resize();
       if (p >= 1){ const d = f.done; this.fly = null; d && d(); }
     } else {
+      if (this.glideT){
+        const g = this.glideT; g.t += dt * 1000; const p = Math.min(1, g.t / g.ms), e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+        const b = this.circleOf(g.to.ox, g.to.oy, g.to.dist), f = this.frameOf(g.a.x + (b.x - g.a.x) * e, g.a.y + (b.y - g.a.y) * e, g.a.r + (b.r - g.a.r) * e);
+        this.offsetX = f.ox; this.offsetY = f.oy; this.camDist = this.camera.position.z = f.dist; this.resize();
+        if (p >= 1){ const d = g.done; this.setFrame(g.to.ox, g.to.oy, g.to.dist, true); d && d(); }
+      }
       if (!this.drag){ this.vel *= .95; this.spin += this.vel + dt * .045; }
       this.tiltX += (12 * DEG - this.tiltX) * (this.drag ? 0 : dt * .4);
-      this.camera.position.z += (this.camDist - this.camera.position.z) * Math.min(1, dt * 3);
+      if (!this.glideT) this.camera.position.z += (this.camDist - this.camera.position.z) * Math.min(1, dt * 3);
     }
     this.spinG.rotation.y = this.spin; this.tilt.rotation.x = this.tiltX;
     this.cloudU.shift.value = (now * .0016) % 1;

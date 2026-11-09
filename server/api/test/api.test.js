@@ -56,6 +56,18 @@ test("refresh tokens rotate", async () => {
   r = await call("GET", "/api/me", null, tok); assert.equal(r.body.user.username, "phukhieo");
   r = await call("GET", "/api/me", null, "garbage"); assert.equal(r.status, 401);
 });
+test("change password (3.8)", async () => {
+  let r = await call("POST", "/api/auth/register", {username:"pwuser", email:"pw@user.th", password:"secret123"}); const t0 = r.body.access, r0 = r.body.refresh;
+  assert.equal(r.body.user.hasPassword, true);
+  r = await call("POST", "/api/me/password", {current:"wrong1234", password:"newpass123"}, t0); assert.equal(r.body.error, "bad_password");
+  r = await call("POST", "/api/me/password", {current:"secret123", password:"short"}, t0); assert.equal(r.body.error, "weak_password");
+  r = await call("POST", "/api/me/password", {current:"secret123", password:"secret123"}, t0); assert.equal(r.body.error, "same_password");
+  r = await call("POST", "/api/me/password", {current:"secret123", password:"newpass123"}, t0); assert.equal(r.status, 200); assert.ok(r.body.access && r.body.refresh);
+  assert.equal((await call("POST", "/api/auth/refresh", {refresh:r0})).status, 401);   // other devices are signed out
+  assert.equal((await call("POST", "/api/auth/login", {login:"pwuser", password:"secret123"})).status, 401);
+  assert.equal((await call("POST", "/api/auth/login", {login:"pwuser", password:"newpass123"})).status, 200);
+  assert.equal((await call("POST", "/api/me/password", {current:"newpass123", password:"another123"})).status, 401);   // needs sign-in
+});
 test("a run pays Terra and XP; impossible results pay nothing", async () => {
   let r = await call("POST", "/api/runs", {mode:"normal", char:"sci", seed:1}, tok); assert.equal(r.status, 200); const id = r.body.runId;
   r = await call("POST", "/api/runs", {mode:"normal", char:"dip"}, tok); assert.equal(r.body.error, "char_locked");

@@ -30,11 +30,11 @@ export function buildApp(pool, opts = {}){
   /* ---------- helpers ---------- */
   const balance = async (db, uid) => (await db.query("SELECT COALESCE(SUM(amount), 0)::int AS b FROM wallet_ledger WHERE user_id = $1", [uid])).rows[0].b;
   async function publicUser(db, uid){
-    const u = (await db.query("SELECT id, username, email, display_name, renamed, role, flags FROM users WHERE id = $1", [uid])).rows[0];
+    const u = (await db.query("SELECT id, username, email, display_name, renamed, role, flags, password_hash IS NOT NULL AS has_pw FROM users WHERE id = $1", [uid])).rows[0];
     if (!u) return null;
     const w = (await db.query(`SELECT COUNT(*) FILTER (WHERE mode IN ('normal', 'daily')) > 0 AS normal, COUNT(*) FILTER (WHERE mode = 'hard') > 0 AS hard
       FROM game_results WHERE user_id = $1 AND ending = 'win' AND NOT flagged`, [uid])).rows[0];
-    return {username:u.username, email:u.email, displayName:u.display_name, renamed:u.renamed, terra:await balance(db, uid), role:u.role, cleared:{normal:!!w.normal, hard:!!w.hard}};
+    return {username:u.username, email:u.email, displayName:u.display_name, renamed:u.renamed, terra:await balance(db, uid), role:u.role, hasPassword:!!u.has_pw, cleared:{normal:!!w.normal, hard:!!w.hard}};
   }
   async function meBody(db, uid){
     const user = await publicUser(db, uid);
@@ -182,6 +182,26 @@ export function buildApp(pool, opts = {}){
       }
       await db.query("UPDATE users SET display_name = $1, renamed = TRUE WHERE id = $2", [name, req.uid]);
       return meBody(db, req.uid);
+    });
+  });
+
+  /* 3.8: change the password: the current one, then the new one (the game asks for it twice). An account made with
+     Google has no password yet and can set one without the "current" box. Every other signed-in device is signed out;
+     this one gets a fresh session back. */
+  app.post("/api/me/password", {config:{auth:true, rateLimit:{max:8, timeWindow:"1 minute"}}}, async (req, reply) => {
+    const b = req.body || {}, current = String(b.current || ""), password = String(b.password || "");
+    if (password.length < 8 || password.length > 200) return fail(reply, 400, "weak_password");
+    const u = (await pool.query("SELECT password_hash FROM users WHERE id = $1", [req.uid])).rows[0];
+    if (u.password_hash){
+      if (!current) return fail(reply, 400, "missing");
+      if (!(await checkPassword(u.password_hash, current))) return fail(reply, 401, "bad_password");
+      if (await checkPassword(u.password_hash, password)) return fail(reply, 400, "same_password");
+    }
+    const ph = await hashPassword(password);
+    return tx(pool, async db => {
+      await db.query("UPDATE users SET password_hash = $1 WHERE id = $2", [ph, req.uid]);
+      await db.query("DELETE FROM refresh_tokens WHERE user_id = $1", [req.uid]);
+      return session(db, req.uid);
     });
   });
 

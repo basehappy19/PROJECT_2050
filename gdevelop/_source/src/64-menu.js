@@ -29,124 +29,43 @@ Screens.loaderUpdate = function(dt){
   if (Math.abs(np - shown) > 0.001){ this._ldShown = np; k.dirty("Loader"); }
   const ready = np >= 0.999;
   if (ready !== this._ldReady){ this._ldReady = ready; k.dirty("Loader"); }
-  LEarth.frame();   // 3.5: the spinning Earth (and its glide to the menu)
+  if (P.Earth && P.Earth.Globe.leave) k.dirty("Loader");   // 3.8: the text fades while the globe glides to the menu
 };
-/* 3.5: the real Earth on the left of the loading screen (like the website's L7 loader, web/src/ui/earth.js).
-   A satellite picture wrapped on a sphere with a 2D canvas (the sphere → picture lookup is worked out once, then each
-   frame only copies pixels, 30 times a second), shown as a PIXI sprite on the scene's base layer under the loader UI.
-   After "Tap to enter" it glides to where the menu's 3D globe will be and takes its size; the menu globe then starts
-   facing the same longitude (73-earth.js), so the Earth seems to carry on into the menu. */
-const LEarth = {
-  root:null, ready:false,
-  mount(scene){
-    const PIXI = window.PIXI; if (!PIXI || this.root) return;
-    const layer = scene.getLayer(""), cont = layer && layer.getRenderer().getRendererObject(); if (!cont) return;
-    const N = this.N = 480, cv = this.cv = document.createElement("canvas"); cv.width = cv.height = N;
-    this.ctx = cv.getContext("2d");
-    // 3.7: lit exactly like the menu's 3D globe (same sun, dark side and blue atmosphere; web/src/ui/earth.js), drawn once:
-    // a blue halo behind, black shading over the picture and the atmosphere's blue added at the rim
-    const ring = document.createElement("canvas"); ring.width = ring.height = 640; const rg = ring.getContext("2d");
-    const gr = rg.createRadialGradient(306, 312, 236, 306, 312, 320); gr.addColorStop(0, "rgba(77,158,255,.5)"); gr.addColorStop(.3, "rgba(77,158,255,.16)"); gr.addColorStop(1, "rgba(77,158,255,0)");
-    rg.fillStyle = gr; rg.fillRect(0, 0, 640, 640);
-    const shade = document.createElement("canvas"), rim = document.createElement("canvas"); shade.width = shade.height = rim.width = rim.height = N;
-    { const sh = shade.getContext("2d").createImageData(N, N), gl = rim.getContext("2d").createImageData(N, N);
-      const SX = -.55, SY = .32, SZ = .78, SL = Math.hypot(SX, SY, SZ), sm = (a, b, x) => { const t = Math.max(0, Math.min(1, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
-      for (let y = 0; y < N; y++){ const ny = (y + .5) / N * 2 - 1;
-        for (let x = 0; x < N; x++){ const nx = (x + .5) / N * 2 - 1, r2 = nx * nx + ny * ny; if (r2 > 1) continue;
-          const z = Math.sqrt(1 - r2), d = (SX * nx - SY * ny + SZ * z) / SL, q = (y * N + x) * 4;
-          const day = sm(-.12, .22, d), m = Math.min(1, Math.pow((.08 + 1.05 * Math.max(d, 0)) * day + .035 * (1 - day), 1 / 2.2));   // 3.7.3: in sRGB, as the menu globe now outputs
-          sh.data[q + 3] = Math.round(255 * Math.max(0, Math.min(1, 1 - m)));
-          const a = Math.pow(1 - z, 3) * (.15 + .85 * sm(-.3, .4, d)) * .55 * 255;
-          gl.data[q] = .32 * a; gl.data[q + 1] = .62 * a; gl.data[q + 2] = a; gl.data[q + 3] = 255; } }
-      shade.getContext("2d").putImageData(sh, 0, 0); rim.getContext("2d").putImageData(gl, 0, 0); }
-    const root = this.root = new PIXI.Container();
-    const mk = c => { const s = new PIXI.Sprite(PIXI.Texture.from(c)); s.anchor.set(.5); return s; };
-    this.glow = mk(ring); this.earth = mk(cv); this.shade = mk(shade); this.rim = mk(rim); this.rim.blendMode = PIXI.BLEND_MODES.ADD; this.earth.alpha = 0;
-    root.addChild(this.glow, this.earth, this.shade, this.rim);
-    cont.addChild(root);
-    this.t0 = performance.now(); this.last = 0; this.leave = null; this.off = 0;
-    const img = new Image(); img.decoding = "async";
-    img.onload = () => this.prepare(img);
-    // the picture's real address (an export puts every file in one folder, the editor keeps the assets/ folders)
-    let url = "assets/ui/loader-earth-s.webp";
-    try { const g = scene.getGame(), res = g.getGameData().resources.resources.find(r => r.name === "ui/loader-earth-s.webp"); if (res) url = g.getResourceLoader().getFullUrl(res.file); } catch(e) {}
-    img.src = url;
-  },
-  prepare(img){
-    const W = this.iw = img.naturalWidth, H = img.naturalHeight, N = this.N;
-    const tc = document.createElement("canvas"); tc.width = W; tc.height = H; const tx = tc.getContext("2d"); tx.drawImage(img, 0, 0);
-    this.tex = new Uint32Array(tx.getImageData(0, 0, W, H).data.buffer);
-    const tilt = .21, ct = Math.cos(tilt), st = Math.sin(tilt), idx = [], uu = [], rr = [];
-    for (let y = 0; y < N; y++){ const ny = (y + .5) / N * 2 - 1;
-      for (let x = 0; x < N; x++){ const nx = (x + .5) / N * 2 - 1, r2 = nx * nx + ny * ny; if (r2 > 1) continue;
-        const z = Math.sqrt(1 - r2), y2 = ny * ct - z * st, z2 = ny * st + z * ct, lat = Math.asin(Math.max(-1, Math.min(1, -y2))), lon = Math.atan2(nx, z2);
-        idx.push(y * N + x); uu.push(Math.min(W - 1, Math.floor((lon / (2 * Math.PI) + .5) * W))); rr.push(Math.min(H - 1, Math.floor((.5 - lat / Math.PI) * H)) * W); } }
-    this.I = Int32Array.from(idx); this.U = Int32Array.from(uu); this.R = Int32Array.from(rr);
-    this.out = this.ctx.createImageData(N, N); this.dst = new Uint32Array(this.out.data.buffer);
-    this.base = Math.floor(W * .1); this.ready = true; this.draw(this.base);
-  },
-  draw(off){
-    this.off = off; const {I, U, R, tex, dst, iw:W} = this, n = I.length;
-    for (let i = 0; i < n; i++){ let u = U[i] + off; if (u >= W) u -= W; dst[I[i]] = tex[R[i] + u]; }
-    this.ctx.putImageData(this.out, 0, 0); this.earth.texture.update ? this.earth.texture.update() : this.earth.texture.baseTexture.update();
-  },
-  /* the longitude facing the player */
-  lon(){ return this.ready ? (((this.iw / 2 + this.off) % this.iw) / this.iw) * 360 - 180 : null; },
-  /* where it sits (design units): left of the loader panel, or (leaving) on its way to the menu globe */
-  place(){
-    const dw = Kit.W, H = Kit.H, home = {x:dw * .18, y:H * .53, r:H * .555};
-    let p = home;
-    if (this.leave){
-      const e0 = Math.min(1, (performance.now() - this.leave.t0) / this.leave.ms), e = e0 < .5 ? 4 * e0 * e0 * e0 : 1 - Math.pow(-2 * e0 + 2, 3) / 2, to = this.leave.to;
-      p = {x:home.x + (to.x - home.x) * e, y:home.y + (to.y - home.y) * e, r:home.r + (to.r - home.r) * e};
-      const ui = Screens.scene.getLayer("Loader"); if (ui) ui.getRenderer().getRendererObject().alpha = Math.max(0, 1 - e0 * 3);
-      if (e0 >= 1 && !this.leave.gone){ this.leave.gone = true; const go = this.leave.done; go(); if (!this.root) return; }
-    }
-    const K = Kit.K, s = this.root;
-    s.position.set(p.x * K, p.y * K);
-    this.earth.width = this.earth.height = this.shade.width = this.shade.height = this.rim.width = this.rim.height = p.r * 2 * K;
-    this.glow.width = this.glow.height = p.r * 2 * K * 640 / 482;
-  },
-  frame(){
-    if (!this.root) return;
-    const now = performance.now();
-    if (this.ready){
-      if (this.earth.alpha < 1) this.earth.alpha = Math.min(1, this.earth.alpha + .04);
-      if (now - this.last >= 33){ this.last = now; const W = this.iw; this.draw(((this.base - Math.floor(((now - this.t0) / 1000 / 110) * W)) % W + W) % W); }
-    }
-    this.place();
-  },
-  /* glide onto the menu globe, then open the menu */
-  go(done){
-    if (this.leave) return;
-    if (!this.root || (P.Gfx && P.Gfx.level === "low")){ done(); return; }
-    // the same place the menu's globe takes (73-earth.js Globe.place, menu panel right edge = 56 + 430 + 24)
-    const dw = Kit.W, H = Kit.H, wide = dw >= H * 1.25, panel = 510;
-    const to = wide ? {x:(panel + dw) / 2, y:H / 2, r:Math.min(H * .42, (dw - panel) * .44)} : {x:dw / 2, y:H * .3, r:Math.min(dw * .42, H * .26)};
-    P._loaderLon = this.lon();
-    this.leave = {t0:performance.now(), ms:1150, to, done};
-  },
-  unmount(){ this.root = null; this.ready = false; this.leave = null; },
-};
+/* 3.8: the loading screen shows the menu's own 3D globe (73-earth.js, Map mode "loader"); after "Tap to enter" it glides
+   onto its menu place and the Menu scene builds it again right there, with the same turn, so it looks like one Earth.
+   The checklist lines are picked at random from things in the game (engine/42-loading.js), one per loading step. */
+const pick = a => a[Math.floor(Math.random() * a.length)];
+let LD_LINES = null;
 Screens.loaderEnter = function(){
-  if (LEarth.leave) return;
+  const G = P.Earth && P.Earth.Globe;
+  if (G && G.leave) return;
   Audio.play("start"); try { localStorage.setItem("p2050-entered", "1"); } catch(e) {}
-  LEarth.go(() => { LEarth.unmount(); Screens.goScene("Menu"); });
+  const go = () => Screens.goScene("Menu");
+  if (!G || !G.root || (P.Gfx && P.Gfx.level === "low")){ go(); return; }
+  G.goToMenu(go); k.dirty("Loader");
 };
 Screens.renderLoader = function(l){
   if (!P._extra || P._extra.fonts < P._extra.nf) return;
-  if (!LEarth.root && this.scene) LEarth.mount(this.scene);
-  // 3.5: the panel sits right of the Earth, like the website
-  const w = Math.min(440, k.W * .38), x = k.W * .56, y = k.H / 2 - 150, p = this._ldShown || 0;
+  if (!LD_LINES && P.LD_POOL) LD_LINES = ["fonts", "data", "globe", "clouds"].map(c => pick(P.LD_POOL[c]));
+  const G = P.Earth && P.Earth.Globe, lv = G && G.leave ? Math.min(1, G.leave.t / G.leave.ms) : 0;
+  if (l.setAlpha) l.setAlpha(lv ? Math.max(0, 1 - lv * 3) : 1);   // fade out as the globe leaves
+  // the panel sits right of the Earth, like the website
+  const w = Math.min(440, k.W * .38), x = k.W * .56, y = k.H / 2 - 230, p = this._ldShown || 0;
   k.sprite(l, "Logo", "Logo", x, y - 6, 56, 56);
   k.text(l, "GLOBAL CLIMATE TASKFORCE · 2026 – 2050", x + 68, y + 14, {font:"mono", size:11, color:"accent", w:w - 68});
   k.text(l, "PROJECT", x, y + 62, {font:"logo", size:54});
   k.text(l, "ZERO", x, y + 118, {font:"logo", size:54, color:"accent"});
-  const by = y + 196;
+  k.text(l, L({th:"ภารกิจกู้วิกฤตโลก · พาโลกถึง Net Zero ก่อนสิ้นปี 2050", en:"Lead the world to Net Zero before the end of 2050"}), x, y + 194, {size:15, color:"fg", w});
+  let ly = y + 236;
+  (LD_LINES || []).forEach((ln, i) => {
+    const done = p >= (i + 1) / 4 - .001, now = !done && p >= i / 4 - .001;
+    k.text(l, `[[${done ? "circle-check" : now ? "loader" : "circle"}]] ${L(ln)}`, x, ly, {size:14, color:done || now ? "fg" : "muted", iconColor:done ? "good" : now ? "accent" : "muted", w});
+    ly += 30;
+  });
+  const by = ly + 14;
   k.rect(l, x, by, w, 8, "panel2", {r:4});
   if (p > 0.01) k.hgrad(l, x, by, Math.max(8, w * p), 8, [[0, "#1f9e78"], [1, "#4fd1c5"]], {r:4});
-  const stage = p < .15 ? t("ldFonts") : p < .35 ? t("ldGlobe") : p < .9 ? t("ldAudio") : p < .999 ? t("ldImg") : t("ldReady");
-  k.text(l, p >= .999 ? t("ldReady") : `${t("loading")} · ${stage}`, x, by + 16, {size:12.5, color:"muted"});
+  k.text(l, p >= .999 ? t("ldReady") : t("loading"), x, by + 16, {size:12.5, color:"muted"});
   const pct = `${Math.round(p * 100)}%`;
   k.text(l, pct, x + w - k.textW(pct, {font:"mono", size:12.5}), by + 16, {font:"mono", size:12.5, color:"muted"});
   if (this._ldReady){
@@ -223,12 +142,12 @@ Screens.menuCard = function(l, w){
     // logo + title
     k.sprite(l, "Logo", "Logo", 0, y, 46, 46);
     W.runs(l, 58, y + 6, [["PROJECT ", {font:"logo", size:34, lh:1}], ["ZERO", {font:"logo", size:34, color:"accent", lh:1}]]);
-    y += 46 + 12;
-    // SDG 13 tag
-    k.rect(l, 0, y, 30, 30, "#3f7e44", {r:4});
-    k.text(l, "13", 0, y + 1, {font:"monoB", size:10, color:"#ffffff", w:30, align:"center"});
-    k.icon(l, "eye", 8, y + 13, 14, "#ffffff");
-    y += Math.max(30, k.text(l, t("mTag"), 40, y + 1, {size:12, color:"muted", w:w - 40}).h) + 14;
+    y += 46 + 22;   // 3.8: a little more room above the SDG tag
+    // SDG 13 tag (3.8: a little smaller)
+    k.rect(l, 0, y, 26, 26, "#3f7e44", {r:4});
+    k.text(l, "13", 0, y + 1, {font:"monoB", size:9, color:"#ffffff", w:26, align:"center"});
+    k.icon(l, "eye", 7, y + 12, 12, "#ffffff");
+    y += Math.max(26, k.text(l, t("mTag"), 36, y + 1, {size:11, color:"muted", w:w - 36}).h) + 14;
     // what's new pill
     const c = P.CHANGELOG && P.CHANGELOG[0], fresh = seenVer() !== P.VERSION_NAME;
     if (c){
@@ -353,6 +272,8 @@ const field = (l, y, w, key, label, type = "text", ph = "") => {
   return 58;
 };
 const val = key => { const g = UIM.inputs && UIM.inputs[key]; return g && g.getString ? g.getString().trim() : ""; };
+const rawVal = key => { const g = UIM.inputs && UIM.inputs[key]; return g && g.getString ? g.getString() : ""; };   // passwords: not trimmed
+const clearVal = key => { const g = UIM.inputs && UIM.inputs[key]; if (g && g.setString) g.setString(""); };
 Screens.subAccount = function(l, y, w){
   const N = P.Net;
   if (!N.online){ y += k.text(l, t("netOfflineLong"), 0, y, {size:13, color:"muted", w}).h + 12; return y + back(l, y); }
@@ -443,6 +364,17 @@ Screens.subAccount = function(l, y, w){
   (UIM.inputs = UIM.inputs || {})["rn-name"] = k.input(l, 0, y, w - rnW - 10, 36, {type:"text", placeholder:u.displayName, key:"rn-name", fontSize:14});
   W.btn(l, "do-rename", w - rnW, y, rnLab, () => N.rename(val("rn-name")), {w:rnW, disabled:N.busy || (!free && u.terra < PRICE.rename)});
   y += 46;
+  // 3.8: change the password (current + new twice); an account made with Google can set one without the current box
+  const hasPw = u.hasPassword !== false;
+  W.h3(l, hasPw ? t("pwTitle") : t("pwSetTitle"), 0, y, {w}); y += 22;
+  if (!hasPw) y += k.text(l, t("pwGoogle"), 0, y, {size:12, color:"muted", w}).h + 6;
+  if (hasPw) y += field(l, y, w, "pw-cur", t("pwCur"), "password");
+  y += field(l, y, w, "pw-new", t("pwNew"), "password", t("fPassPh"));
+  y += field(l, y, w, "pw-new2", t("pwNew2"), "password");
+  W.btn(l, "do-pw", 0, y, `[[key-round]] ${t("pwSave")}`, async () => {
+    if (await N.changePassword(rawVal("pw-cur"), rawVal("pw-new"), rawVal("pw-new2"))){ clearVal("pw-cur"); clearVal("pw-new"); clearVal("pw-new2"); }
+  }, {w, kind:"ghost", disabled:N.busy});
+  y += 52;
   // appearance: map theme + outfit
   W.h3(l, t("appearance"), 0, y, {w}); y += 22;
   const curT = (() => { try { return localStorage.getItem("p2050-theme") || ""; } catch(e) { return ""; } })();
@@ -475,24 +407,56 @@ Screens.subShop = function(l, y, w){
     W.btn(l, "shop-login", 0, y, `[[log-in]] ${t("signIn")}`, go("account")); y += 46;
     return y + back(l, y);
   }
-  W.card(l, 0, y, w, 50, {fill:"panel2"});
-  k.text(l, t("balance"), 14, y + 15, {size:12.5, color:"muted"});
-  const amt = String(N.user.terra), aw = k.textW(amt, {font:"monoB", size:20}) + 30;
-  W.terra(l, w - 14 - aw, y + 12, amt, {size:20, color:"good"});
-  y += 60;
-  y += k.text(l, t("shopNote"), 0, y, {size:12, color:"muted", w}).h + 10;
-  for (const it of SHOP){
-    const own = N.owns(it.id), afford = N.user.terra >= it.price;
-    const desc = it.kind === "char" ? L(CHAR[it.id.slice(5)].pas) : L(it.desc);
-    const lab = own ? `[[check]] ${t("owned2")}` : `[[$credit]] ${it.price}`, bw = W.btnW(lab) + 6;
-    const h1 = k.text(l, L(it.name), 56, y + 10, {font:"dispS", size:15, w:w - 56 - bw - 20}).h;
-    const h2 = k.text(l, desc, 56, y + 10 + h1, {size:12, color:"muted", w:w - 56 - bw - 20}).h;
-    const ch = Math.max(62, h1 + h2 + 20);
-    W.card(l, 0, y, w, ch);
-    if (it.kind === "char") W.portrait(l, 10, y + (ch - 38) / 2, 38, it.id.slice(5));
-    else { k.rect(l, 10, y + (ch - 38) / 2, 38, 38, "accent", {r:9, a:.14}); k.icon(l, it.icon, 19, y + (ch - 20) / 2, 20, "accent"); }
-    W.btn(l, "buy-" + it.id, w - 12 - bw, y + (ch - 36) / 2, lab, () => N.buy(it.id), {w:bw, disabled:own || !afford || N.busy, kind:own ? "ghost" : "gold"});
-    y += ch + 7;
+  // 3.8: the shop, design "B" (like web/src/ui/shop.jsx): balance, category chips with counts, one list grouped by
+  // category with what each item does, price on the right, "need N more" when short, and a second tap to confirm
+  const CAT = it => it.kind === "char" ? "chars" : it.kind === "unlock" ? "boost" : "look", CATS = ["chars", "boost", "look"];
+  const CN = {all:{th:"ทั้งหมด", en:"All"}, chars:{th:"ตัวละคร", en:"Characters"}, boost:{th:"ปลดล็อก", en:"Unlocks"}, look:{th:"ตกแต่ง", en:"Looks"}};
+  const CC = {chars:"#c3a6ff", boost:"#8fd0ff", look:"#f2c14e"}, cur = UIM.shopCat || "all", of = c => SHOP.filter(it => c === "all" || CAT(it) === c);
+  // balance
+  k.rect(l, 0, y, w, 52, "good", {r:12, a:.1, stroke:"good", sa:.35, bg:true});
+  k.circle(l, 26, y + 26, 16, "good", {a:.16});
+  W.terra(l, 16, y + 15, "", {size:16, color:"good"});
+  k.text(l, t("balance"), 50, y + 7, {size:11, color:"muted"});
+  k.text(l, N.user.terra.toLocaleString(), 50, y + 22, {font:"monoB", size:19, color:"good"});
+  y += 64;
+  // category chips with counts
+  W.tabs(l, 0, y, ["all", ...CATS].map(c => ({id:"sc-" + c, label:L(CN[c]), on:cur === c, badge:of(c).length, fn:() => { UIM.shopCat = c; const s2 = k.L("MenuScroll"); if (s2) s2.scroll = 0; k.dirty(); }})), {size:12.5, h:30});
+  y += 42;
+  const arm = UIM.shopArm && performance.now() - UIM.shopArm.t < 3000 ? UIM.shopArm.id : null;
+  if (UIM.shopArm && !arm){ UIM.shopArm = null; }
+  else if (arm && !this._armTimer){ this._armTimer = setTimeout(() => { this._armTimer = null; k.dirty(); }, 3050); }
+  for (const g of cur === "all" ? CATS : [cur]){
+    if (cur === "all"){
+      const n = of(g).filter(it => N.owns(it.id)).length;
+      k.text(l, P.up(L(CN[g])), 0, y, {font:"dispS", size:12.5, color:CC[g]});
+      const cnt = `${n}/${of(g).length}`; k.text(l, cnt, w - k.textW(cnt, {font:"mono", size:11.5}), y, {font:"mono", size:11.5, color:"muted"});
+      y += 24;
+    }
+    for (const it of of(g)){
+      const own = N.owns(it.id), price = P.shopPrice ? P.shopPrice(it) : it.price, lack = Math.max(0, price - N.user.terra), ch = it.kind === "char" ? CHAR[it.id.slice(5)] : null;
+      const lab = own ? `[[check]] ${t("owned2")}` : lack ? `${L({th:"ขาดอีก", en:"Need"})} [[$credit]] ${lack}` : arm === it.id ? `[[check]] ${L({th:"ยืนยัน", en:"Confirm"})} · ${price}` : `[[$credit]] ${price}`;
+      const bw = W.btnW(lab) + 6, tw = w - 66 - bw - 20;
+      const name = ch ? L(ch.name) : L(it.name), desc = ch ? L(ch.pas) : L(it.desc || "");
+      const h1 = k.text(l, name, 66, y + 10, {font:"dispS", size:15, w:tw}).h;
+      const h2 = k.text(l, desc, 66, y + 10 + h1, {size:12, color:"muted", w:tw}).h;
+      let h3 = 0;
+      if (ch){   // the character's two specials as small chips
+        let ax = 66; const ay = y + 14 + h1 + h2;
+        for (const a of ch.acts){ const an = L(a.name), aw = k.textW(an, {size:11}) + 30; if (ax + aw > 66 + tw){ break; }
+          k.rect(l, ax, ay, aw, 20, ch.color, {r:10, a:.14, stroke:ch.color, sa:.35, bg:true}); k.icon(l, a.icon, ax + 7, ay + 4, 12, ch.color); k.text(l, an, ax + 23, ay + 2, {size:11}); ax += aw + 6; }
+        h3 = 26;
+      }
+      const rh = Math.max(66, h1 + h2 + h3 + 20);
+      W.card(l, 0, y, w, rh, {a:own ? .55 : 1});
+      if (ch) W.portrait(l, 10, y + (rh - 46) / 2, 46, ch.id);
+      else { k.rect(l, 10, y + (rh - 46) / 2, 46, 46, CC[CAT(it)], {r:10, a:.14, stroke:CC[CAT(it)], sa:.3}); k.icon(l, it.icon, 22, y + (rh - 22) / 2, 22, CC[CAT(it)]); }
+      W.btn(l, "buy-" + it.id, w - 12 - bw, y + (rh - 36) / 2, lab, () => {
+        if (arm !== it.id){ UIM.shopArm = {id:it.id, t:performance.now()}; Audio.play("click"); k.dirty(); return; }
+        UIM.shopArm = null; N.buy(it.id); Audio.play("coin");
+      }, {w:bw, disabled:own || lack > 0 || N.busy, kind:own || lack ? "ghost" : arm === it.id ? "primary" : "gold", sound:false});
+      y += rh + 7;
+    }
+    y += 6;
   }
   y += msgLine(l, y, w);
   return y + back(l, y);

@@ -343,6 +343,33 @@ Screens.renderMapUI = function(l){
         k.text(l, nm, x + 16, y + 1, {font:"bodyB", size:10.5, color:sel ? "accent" : "fg"});
         k.hit(l, "cl-" + c.id, x, y, w, h, () => Screens.selectCountry(c.id));
       }
+      // 3.8: capitals (gold stars, like the website): only closer in than the country names, and only for countries whose
+      // name already shows; the capital's own name comes in closer still
+      if (zz >= 2.4 && P.CAPITALS){
+        const tier = zz >= 4 ? 0 : zz >= 3.2 ? 40 : 100, names = zz >= 3.2, th = S.lang === "th", capNames = [];
+        for (const [id, cp] of Object.entries(P.CAPITALS)){
+          const cc = COUNTRY[id]; if (!cc || (cc.w < tier && S.selC !== id)) continue;
+          const [sx, sy] = Map.latlonScreen(cp[0], cp[1]);
+          if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;
+          if (placed.some(q => Math.abs(q[0] - sx) < q[2] / 2 + 5 && Math.abs(q[1] - sy) < 14)) continue;   // never under a country's name tag
+          k.circle(l, sx, sy, 6, "bg", {a:.75});
+          k.icon(l, "star", sx - 5, sy - 5, 10, "gold");
+          if (!names) continue;
+          const nm = th ? cp[2] : cp[3], nw = k.textW(nm, {size:10});
+          if (placed.some(q => sx + 9 < q[0] + q[2] / 2 && sx + 9 + nw > q[0] - q[2] / 2 && Math.abs(q[1] - sy) < 16) || capNames.some(q => sx + 9 < q[0] + q[2] && sx + 9 + nw > q[0] && Math.abs(q[1] - sy) < 13)) continue;   // names that would overlap are left out
+          capNames.push([sx + 9, sy, nw]);
+          k.text(l, nm, sx + 9, sy - 8, {size:10, color:"#f3e2b0", max:1});
+        }
+      }
+    }
+    // 3.8: the stage of each tropical cyclone under it (depression → tropical storm → typhoon / hurricane / cyclone)
+    if (P.stormList && P.Life && P.Life.storms) for (const st of P.stormList()){
+      const o = P.Life.storms[st.id]; if (!o || !o.m.visible) continue;
+      const [sx, sy] = Map.toScreen(o.sx, o.sy + o.D * .42);
+      if (sy < ry || sy > rb || sx < leftLimit || sx > rightLimit) continue;
+      const nm = L(st.name), tw = k.textW(nm, {font:"bodyB", size:11}) + 14;
+      k.rect(l, sx - tw / 2, sy - 1, tw, 19, "bg", {a:.7, r:9, bg:true});
+      k.text(l, nm, sx - tw / 2 + 7, sy, {font:"bodyB", size:11, color:st.stage === 2 ? "#ffd2c4" : "fg"});
     }
     // hazard forecasts: pulsing ring + icon + months left; tap = evacuate
     const now = performance.now() / 1000;

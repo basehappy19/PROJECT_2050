@@ -10,6 +10,7 @@ import {Btn, IconBtn, Tabs, Seg, Check, Terra, Portrait, Volume, GfxSeg, A11ySeg
 import {SlotRow, ClearSlots} from "./modals.jsx";
 import {AchList} from "./learn.jsx";
 import {SubMp, SubRoom} from "./mp.jsx";
+import {Shop} from "./shop.jsx";
 
 const N = () => P.Net;
 const goSub = sub => () => {
@@ -42,25 +43,46 @@ function SubLink(){
   </>;
 }
 
-/* the globe lives outside Preact so it survives re-renders */
+/* the globe lives outside Preact so it survives re-renders.
+   3.8: it is made on the loading screen (app.jsx) and handed over here: the same canvas moves into the menu and glides
+   from its loading-screen place to its menu place, still turning, so the two screens show one and the same Earth */
+export function ensureGlobe(){
+  if (!G.globe){
+    const cv = document.createElement("canvas"); cv.className = "globe"; cv.setAttribute("aria-label", "Earth");
+    G.globe = new Globe(cv, {small:small(), onReady:() => { cv.classList.add("ready"); bump(); }});
+  }
+  return G.globe;
+}
+/* where the globe sits in the menu: right of the panel on wide screens, top half on tall ones */
+export function menuFrame(){
+  const w = window.innerWidth, h = window.innerHeight;
+  if (w >= 900) return [.2, 0, w / h > 1.9 ? 3.6 : 4.0];
+  if (w > h) return [.22, 0, 4.4];
+  // 3.8: a tablet held upright has the panel down the left side: the globe goes in the space to its right
+  const p = document.querySelector(".menu-panel"), pr = p ? p.getBoundingClientRect().right : 0;
+  if (pr > 0 && pr < w * .7 && G.globe){ const f = G.globe.frameOf((pr + w) / 2, h * .46, Math.min((w - pr) * .5, h * .3)); return [f.ox, f.oy, f.dist]; }
+  return [0, -.2, 5.4];
+}
 function GlobeView(){
   const ref = useRef();
   useEffect(() => {
-    const cv = ref.current;
-    if (!G.globe){ G.globe = new Globe(cv, {small:small(), onReady:() => cv.classList.add("ready")}); }
-    else { cv.replaceWith(G.globe.canvas); ref.current = G.globe.canvas; G.globe.canvas.classList.add("ready"); }
-    const gl = G.globe, fit = () => { const w = window.innerWidth, h = window.innerHeight; if (w >= 900) gl.setFrame(.2, 0, w / h > 1.9 ? 3.6 : 4.0); else if (w > h) gl.setFrame(.22, 0, 4.4); else gl.setFrame(0, -.2, 5.4); };
-    fit(); window.addEventListener("resize", fit);
+    const gl = ensureGlobe(), host = ref.current;
+    if (gl.canvas.parentElement !== host) host.appendChild(gl.canvas);
+    gl.resize();
+    const fit = () => gl.setFrame(...menuFrame(), true);
+    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (UIM.leaving && gl.ready && !still) gl.glideTo(...menuFrame(), 1300); else fit();
+    window.addEventListener("resize", fit);
     gl.setHeat(0); gl.start();
     return () => { window.removeEventListener("resize", fit); gl.stop(); };
   }, []);
-  return <canvas ref={ref} class="globe" aria-label="Earth"/>;
+  return <div ref={ref} class="globe-host"/>;
 }
 
 export function Menu(){
   const sub = UIM.sub;
   const TITLES = {link:"linkTitle", mp:"mpTitle", room:"mpTitle", load:"mLoad", ach:"mAch", account:"mAccount", shop:"mShop", board:"mBoard", cert:"mCert", updates:"mUpd", season:"mSeason", settings:"mSettings"};
-  return <div class={"home " + (UIM.transition ? "leaving" : "")}>
+  return <div class={"home " + (UIM.transition ? "leaving" : UIM.leaving ? "enter" : "")}>
     <GlobeView/>
     <div class="home-vignette"/>
     <AccountChip/>
@@ -70,7 +92,7 @@ export function Menu(){
           <img src="assets/img/ui/logo.png" alt="" width="54" height="54"/>
           <div><h1>PROJECT <b>ZERO</b></h1></div>
         </div>}
-        {!sub ? <div class="sdgtag"><img src="assets/img/sdg/goal-13.svg" alt="SDG 13" width="38" height="38"/><span>{t("mTag")}</span></div> : null}
+        {!sub ? <div class="sdgtag"><img src="assets/img/sdg/goal-13.svg" alt="SDG 13" width="32" height="32"/><span>{t("mTag")}</span></div> : null}
         {!sub && N().cfg && N().cfg.announcement && L(N().cfg.announcement) ? <div class="announce card"><Icon n="megaphone" size={18} color="warn"/><span>{L(N().cfg.announcement)}</span></div> : null}
         {sub === "load" ? <SubLoad/> : sub === "ach" ? <><Btn kind="ghost" block onClick={goSub("cert")}>{`[[award]] ${t("mCert")}`}</Btn><AchList/></> : sub === "account" ? <SubAccount/> : sub === "shop" ? <SubShop/> : sub === "board" ? <SubBoard/> : sub === "cert" ? <SubCert/> : sub === "updates" ? <SubUpdates/> : sub === "season" ? <SubSeason/> : sub === "settings" ? <SubSettings/> : sub === "mp" ? <SubMp/> : sub === "room" ? <SubRoom/> : sub === "link" ? <SubLink/> : <Main/>}
         {sub ? null : <footer class="mfooter">
@@ -243,6 +265,14 @@ function SubAccount(){
       <input class="input grow" name="name" placeholder={u.displayName} maxLength={20}/>
       <Btn type="submit" disabled={n.busy || (!free && u.terra < P.PRICE.rename)}>{`${t("rename")} · ${free ? t("free") : P.PRICE.rename + " " + t("gemsWord")}`}</Btn>
     </form>
+    <H3>{u.hasPassword === false ? t("pwSetTitle") : t("pwTitle")}</H3>
+    {u.hasPassword === false ? <p class="muted small">{t("pwGoogle")}</p> : null}
+    <form class="form pwform" onSubmit={async e => { e.preventDefault(); const el = e.currentTarget, f = form(e); if (await n.changePassword(f.cur || "", f.pw1 || "", f.pw2 || "")) el.reset(); }}>
+      {u.hasPassword === false ? null : <Field label={t("pwCur")} name="cur" type="password" autocomplete="current-password"/>}
+      <Field label={t("pwNew")} name="pw1" type="password" ph={t("fPassPh")} autocomplete="new-password"/>
+      <Field label={t("pwNew2")} name="pw2" type="password" autocomplete="new-password"/>
+      <Btn type="submit" kind="ghost" block disabled={n.busy}>{`[[key-round]] ${t("pwSave")}`}</Btn>
+    </form>
     <H3>{t("appearance")}</H3>
     <div class="optrows"><div class="row gap wrap">{[["", t("themeDefault")], ["night", t("themeNight")], ["paint", t("themePaint")]].map(([id, lab]) => { const own = !id || n.owns("theme_" + id); return <Btn key={id || "def"} size="sm" kind={curT === id ? "primary" : "ghost"} disabled={!own} onClick={() => { try { localStorage.setItem("p2050-theme", id); } catch(e){} bump(); }}>{`${own ? "" : "[[lock]] "}${lab}`}</Btn>; })}</div>
     <div class="row gap wrap">{[["base", t("outfitBase"), true], ["alt", t("outfitAlt"), n.owns("outfit")], ["gold", t("outfitGold"), n.maxLevel() >= 10]].map(([id, lab, own]) => <Btn key={id} size="sm" kind={curO === id ? "primary" : "ghost"} disabled={!own} onClick={() => { try { localStorage.setItem("p2050-outfit", id); } catch(e){} bump(); }}>{`${own ? "" : "[[lock]] "}${lab}`}</Btn>)}</div></div>
@@ -256,20 +286,7 @@ function SubShop(){
   const n = N();
   if (!n.online) return <Offline/>;
   if (!n.user) return <><p class="muted">{t("shopLogin")}</p><Btn onClick={goSub("account")}>{`[[log-in]] ${t("signIn")}`}</Btn><Back/></>;
-  return <>
-    <div class="card row"><span class="muted grow">{t("balance")}</span><Terra n={n.user.terra} cls="good big"/></div>
-    <p class="muted small">{t("shopNote")}</p>
-    <div class="shop">{P.SHOP.map(it => {
-      const own = n.owns(it.id), afford = n.user.terra >= P.shopPrice(it), ch = it.kind === "char" ? it.id.slice(5) : null;
-      return <div class={"card row shopitem " + (own ? "own" : "")} key={it.id}>
-        {ch ? <Portrait id={ch} size={56}/> : <span class="sic"><Icon n={it.icon} size={22} color="accent"/></span>}
-        <div class="grow"><b>{L(it.name)}</b><span class="muted small"><Rich t={ch ? L(P.CHAR[ch].pas) : L(it.desc)}/></span></div>
-        <Btn kind={own ? "ghost" : "gold"} disabled={own || !afford || n.busy} sound={null} onClick={() => { n.buy(it.id); Audio.play("coin"); }}>{own ? `[[check]] ${t("owned2")}` : `[[terra]] ${P.shopPrice(it)}`}</Btn>
-      </div>;
-    })}</div>
-    <Msg UIM={UIM}/>
-    <Back/>
-  </>;
+  return <><Shop/><Msg UIM={UIM}/><Back/></>;   // 3.8: new shop (ui/shop.jsx)
 }
 
 /* ---------------- 1.8: weekly missions and the season pass ---------------- */

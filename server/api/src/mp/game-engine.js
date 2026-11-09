@@ -1877,6 +1877,11 @@ Object.assign(P.UI, {
   err_bad_email:T("รูปแบบอีเมลไม่ถูกต้อง","That email doesn't look right"), err_weak_password:T("รหัสผ่านต้องยาวอย่างน้อย 8 ตัวอักษร","Password must be at least 8 characters"),
   err_bad_display:T("ชื่อที่แสดงต้องยาว 2–20 ตัวอักษร","Display name must be 2–20 characters"), err_bad_word:T("มีคำที่ไม่เหมาะสม ลองชื่ออื่น","That contains a blocked word. Try another."),
   err_username_taken:T("ชื่อผู้ใช้นี้มีคนใช้แล้ว","That username is taken"), err_email_taken:T("อีเมลนี้สมัครไว้แล้ว","That email is already registered"),
+  err_bad_password:T("รหัสผ่านเดิมไม่ถูกต้อง","Your current password is wrong"), err_same_password:T("รหัสผ่านใหม่ต้องไม่ซ้ำกับรหัสเดิม","The new password must be different"),
+  err_pw_mismatch:T("รหัสผ่านใหม่ทั้งสองช่องไม่ตรงกัน","The two new passwords don't match"),
+  pwTitle:T("เปลี่ยนรหัสผ่าน","Change password"), pwSetTitle:T("ตั้งรหัสผ่าน","Set a password"), pwCur:T("รหัสผ่านเดิม","Current password"), pwNew:T("รหัสผ่านใหม่","New password"),
+  pwNew2:T("ยืนยันรหัสผ่านใหม่","Confirm new password"), pwSave:T("บันทึกรหัสผ่านใหม่","Save new password"), pwDone:T("เปลี่ยนรหัสผ่านแล้ว · เครื่องอื่นต้องเข้าสู่ระบบใหม่","Password changed · other devices must sign in again"),
+  pwGoogle:T("บัญชีนี้สมัครด้วย Google ตั้งรหัสผ่านไว้เพื่อเข้าด้วยชื่อผู้ใช้ได้ด้วย","This account uses Google. Set a password to sign in with your username too"),
   err_bad_login:T("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง","Wrong username or password"), err_not_enough_terra:T("คาร์บอนเครดิตไม่พอ","Not enough Carbon Credits"),
   err_already_owned:T("มีของชิ้นนี้แล้ว","You already own this"), err_not_eligible:T("ยังไม่ผ่านเงื่อนไขการขอประกาศนียบัตร","Not eligible yet"),
   err_rate_limited:T("ส่งคำขอถี่เกินไป รอสักครู่","Too many requests. Wait a moment."), err_google_disabled:T("ยังไม่ได้ตั้งค่า Google Sign-In ในเซิร์ฟเวอร์","Google Sign-In isn't configured on the server"),
@@ -2585,6 +2590,23 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
     "Thai narration: the story, the how-to-play pages and events can be read aloud with the device's own voice.",
     "On-screen subtitles follow the voice.",
     "Turn narration and subtitles on or off and pick a speed in the settings, or tap the speaker button to hear just that page."
+  ]),
+];
+P.CHANGELOG.find(x => x.v === "2.1").subs = [
+  SUB("2.1.1", "2026-11-10", [
+    "หน้าโหลดใช้ลูกโลก 3 มิติตัวเดียวกับหน้าหลัก คมชัดและหมุนลื่น พอกดเข้าเกม ลูกโลกเลื่อนไปที่หน้าหลักพอดี หมุนต่อจากเดิม",
+    "ข้อความระหว่างโหลดสุ่มจากสิ่งต่าง ๆ ในเกม ทุกครั้งที่เปิดจะไม่ซ้ำกัน",
+    "พายุหมุนเขตร้อนเห็นบนแผนที่จริง: ก่อตัวกลางทะเล เคลื่อนเข้าหาฝั่ง และแรงขึ้นทีละขั้น ดีเปรสชันเขตร้อน → พายุโซนร้อน → ไต้ฝุ่น / เฮอริเคน / ไซโคลน (ตามมหาสมุทร)",
+    "ร้านค้าโฉมใหม่: แบ่งหมวด บอกว่าขาดอีกเท่าไร และต้องแตะยืนยันก่อนซื้อ",
+    "เปลี่ยนรหัสผ่านได้ในหน้าบัญชี (ใส่รหัสเดิม รหัสใหม่ และยืนยัน)",
+    "ซูมออกสุดแล้วแผนที่อยู่นิ่ง ไม่เลื่อนจนเห็นขอบ · ดาวเมืองหลวงขึ้นเมื่อซูมเข้าใกล้กว่าชื่อประเทศ แผนที่ไม่รก"
+  ], [
+    "The loading screen now shows the same 3D Earth as the home screen, sharp and smooth; when you enter, it glides onto the home screen and keeps turning.",
+    "Loading messages are picked at random from things in the game, so they change every time.",
+    "Tropical cyclones now show on the map: they form at sea, move toward the coast and grow stage by stage, tropical depression → tropical storm → typhoon / hurricane / cyclone (named by ocean).",
+    "A new shop: items by category, how much more you need, and a tap to confirm before buying.",
+    "Change your password on the account page (current password, new password, confirm).",
+    "Fully zoomed out, the map stays put instead of sliding to its edge · capital stars appear only once you zoom in past the country names, so the map stays tidy."
   ]),
 ];
 P.VERSION_NAME = P.CHANGELOG[0].subs && P.CHANGELOG[0].subs.length ? P.CHANGELOG[0].subs[0].v : P.CHANGELOG[0].v;
@@ -3715,6 +3737,16 @@ const Net = {
     this.busy = true;
     try { const j = await this.req("POST", "/me/display-name", {displayName:name}); this.applyMe(j); msg(t("renamed")); }
     catch(e){ msg(errText(e), true); } finally { this.busy = false; dirty(); }
+  },
+  /* 3.8: change the password (current + new twice); accounts made with Google can set one without the current box */
+  async changePassword(current, password, again){
+    const has = !this.user || this.user.hasPassword !== false;
+    if (has && !current) return msg(t("err_missing"), true), false;
+    if ((password || "").length < 8) return msg(t("err_weak_password"), true), false;
+    if (password !== again) return msg(t("err_pw_mismatch"), true), false;
+    this.busy = true;
+    try { const j = await this.req("POST", "/me/password", {current:current || "", password}); this.setTokens(j.access, j.refresh); this.applyMe(j); msg(t("pwDone")); return true; }
+    catch(e){ msg(errText(e), true); return false; } finally { this.busy = false; dirty(); }
   },
   async buy(item){
     this.busy = true;
@@ -6282,5 +6314,130 @@ function seasonInfo(){
 const _v1 = P.v1Tick;
 P.v1Tick = () => { if (_v1) _v1(); seasonsTick(); };
 Object.assign(P, {seasonPower, seasonCO2, seasonsTick, seasonInfo, SEASON_TXT:TXT});
+
+})();
+
+/* ---- 41-storms.js ---- */
+(function(){
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.storms) return;
+(P.mods = P.mods || {}).storms = 1;
+/* =========================================================================
+   3.8 · Tropical cyclones you can watch on the map (web: life.js · GDevelop: 74-life.js)
+   A hurricane / typhoon forecast is no longer just a marker: the storm forms out at sea three months before it hits,
+   drifts toward the coast and grows through the real stages
+     tropical depression → tropical storm → typhoon (NW Pacific) / hurricane (Atlantic, NE Pacific) / cyclone (Indian
+     Ocean, South Pacific)
+   and makes landfall on the month the forecast said. Neighbouring countries hit by the same storm ("wide") share it.
+   Only the picture and the names change; the damage rules stay in 20-engine.js.
+   ========================================================================= */
+const S = P.S, T = (th, en) => ({th, en});
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+const FORECAST = 3;
+/* where storms come ashore (lat, lon) for big countries; others use their capital */
+const LANDFALL = {USA:[29.4, -90.2], MEX:[21.0, -87.2], CHN:[22.0, 114.8], JPN:[33.3, 135.6], KOR:[34.7, 127.6], PRK:[38.6, 125.0], TWN:[22.9, 121.2], IND:[19.6, 86.4],
+  VNM:[16.2, 108.4], PHL:[13.2, 124.4], BGD:[21.8, 90.6], MMR:[17.0, 94.4], HKG:[22.2, 114.3], MAC:[22.1, 113.6], CUB:[21.6, -79.6], GTM:[15.8, -88.6], NIC:[13.0, -83.6],
+  HND:[15.9, -85.0], SLV:[13.2, -88.8], AUS:[-16.8, 146.2], MUS:[-20.2, 57.6]};
+/* names of the stages; the last one depends on the ocean (WMO naming) */
+const NAMES = [T("พายุดีเปรสชันเขตร้อน", "Tropical depression"), T("พายุโซนร้อน", "Tropical storm")];
+const TOP = {typhoon:T("พายุไต้ฝุ่น", "Typhoon"), hurricane:T("พายุเฮอริเคน", "Hurricane"), cyclone:T("พายุไซโคลน", "Cyclone")};
+const basinOf = (lat, lon) => lat < 0 ? "cyclone" : lon <= -20 ? "hurricane" : lon >= 100 ? "typhoon" : "cyclone";
+P.STORM_NAMES = {stages:NAMES, top:TOP};
+/* one storm per forecast (shared by the countries a wide storm hits) */
+P.stormList = function(){
+  const out = [];
+  for (const h of S.haz || []){
+    if (h.type !== "hurricane" && h.type !== "typhoon") continue;
+    if (h.wide && (S.haz || []).some(o => !o.wide && o.type === h.type && Math.abs(o.at - h.at) <= 1)) continue;   // the main storm of the group draws it
+    const s = P.stormInfo(h); if (s) out.push(s);
+  }
+  return out;
+};
+P.stormInfo = function(h){
+  const cap = P.CAPITALS && P.CAPITALS[h.c], end = LANDFALL[h.c] || (cap ? [cap[0], cap[1]] : null);
+  if (!end) return null;
+  const north = end[0] >= 0, basin = basinOf(end[0], end[1]);
+  // it forms out at sea, east of the coast and nearer the equator (storms in the tropics drift west and poleward)
+  const bay = basin === "cyclone" && north;   // Bay of Bengal / Arabian Sea: they come up from the south
+  const start = bay ? [end[0] - 11, end[1] + 3] : [end[0] + (north ? -8 : 8), end[1] + 17];
+  const frac = P.monthFrac ? P.monthFrac() : 0;
+  const p = clamp((S.tick - (h.at - FORECAST) + frac) / FORECAST, 0, 1);
+  // a gentle curve (they bend poleward as they near land)
+  const e = p * p * (3 - 2 * p), bend = Math.sin(Math.PI * e) * 2.2 * (north ? 1 : -1);
+  const lat = start[0] + (end[0] - start[0]) * e + bend, lon = start[1] + (end[1] - start[1]) * e;
+  const stage = p < 1 / 3 ? 0 : p < 2 / 3 ? 1 : 2;
+  return {h, id:h.id, lat, lon, p, k:clamp(.25 + p * .9, 0, 1) * (.85 + .15 * (h.sev || 1)), stage, north, basin, name:stage < 2 ? NAMES[stage] : TOP[basin], months:Math.max(0, h.at - S.tick)};
+};
+
+/* ---------- the picture (shared by the website and GDevelop; drawn on a canvas, so only in a browser) ---------- */
+/* 3.8: a tropical cyclone seen from a satellite, drawn once per stage (0 depression · 1 tropical storm · 2 typhoon /
+   hurricane / cyclone): a dense core, spiral rain bands wound by the spin, ragged noisy edges, a clear eye and a bright
+   eyewall at full strength, and shading from the bumps of the cloud tops so it reads as a thick 3D mass.
+   Drawn for the northern hemisphere (turning anticlockwise); the south mirrors it. part: "all" | "shadow" */
+const SPR = {};
+P.stormSprite = function stormSprite(stage, part){
+  const key = `st${stage}${part}`;
+  if (SPR[key]) return SPR[key];
+  if (part === "shadow"){
+    const src = stormSprite(stage, "all"), N = src.width, cv = document.createElement("canvas"); cv.width = cv.height = N;
+    const g = cv.getContext("2d"); g.filter = "blur(10px) brightness(0)"; g.globalAlpha = .9; g.drawImage(src, 0, 0);
+    return (SPR[key] = cv);
+  }
+  const N = 400, cv = document.createElement("canvas"); cv.width = cv.height = N;
+  const g = cv.getContext("2d"), img = g.createImageData(N, N), d = img.data, den = new Float32Array(N * N);
+  const hash = (i, j) => { const h = Math.sin(i * 127.1 + j * 311.7 + stage * 17.3) * 43758.5453; return h - Math.floor(h); };
+  const sm = t => t * t * (3 - 2 * t), ss = (a, b, x) => sm(clamp((x - a) / (b - a), 0, 1));
+  const vn = (x, y) => { const i = Math.floor(x), j = Math.floor(y), fx = sm(x - i), fy = sm(y - j);
+    return (hash(i, j) * (1 - fx) + hash(i + 1, j) * fx) * (1 - fy) + (hash(i, j + 1) * (1 - fx) + hash(i + 1, j + 1) * fx) * fy; };
+  const fbm = (x, y) => .5 * vn(x, y) + .25 * vn(x * 2.1 + 5, y * 2.1 + 1) + .14 * vn(x * 4.3 + 9, y * 4.3 + 3) + .07 * vn(x * 8.7, y * 8.7 + 7);
+  const tw = [1.2, 2.1, 2.8][stage], core = [.22, .3, .4][stage], arms = [.4, .8, 1][stage], eye = stage === 2;
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){
+    const u = (x + .5) / N * 2 - 1, v = (y + .5) / N * 2 - 1, r = Math.hypot(u, v); if (r >= 1){ den[y * N + x] = 0; continue; }
+    const th = Math.atan2(v, u), a = tw * Math.log(r + .04);   // the swirl: points further out are turned less
+    const ha = -a * .55, ca = Math.cos(ha), sa = Math.sin(ha), su = u * ca - v * sa, sv = u * sa + v * ca;   // half-swirled position (texture follows the spin a little)
+    const n = fbm(su * 2.6 + 7, sv * 2.6 + 3), det = .55 * fbm(u * 9 + 2, v * 9 + 11) + .45 * fbm(su * 18 + 4, sv * 18 + 1);
+    const arm = .5 + .5 * Math.cos(3 * (th - a) + n * 4.5);
+    const band = ss(.34, .9, arm * (.55 + .7 * n)) * ss(1, .45, r) * ss(.06, .26, r);
+    const cdo = ss(core * 1.35, core * .4, r + (n - .5) * .22);
+    const haze = .32 * ss(1, .55, r) * ss(.35, .7, n);
+    let q = Math.max(cdo, band * arms, haze) * (.62 + .55 * det);
+    if (stage === 0) q *= .55 + .7 * fbm(u * 2.2 + 3, v * 2.2);   // a loose blob, not yet organised
+    if (eye){ q *= ss(.028, .06, r); q += .5 * Math.exp(-Math.pow((r - .075) / .028, 2)); }
+    den[y * N + x] = clamp(q, 0, 1.2);
+  }
+  // shading: light from the upper left on the bumpy cloud tops
+  for (let y = 0; y < N; y++) for (let x = 0; x < N; x++){
+    const i = y * N + x, q = den[i], k = i * 4;
+    const gx = den[y * N + Math.min(N - 1, x + 1)] - den[y * N + Math.max(0, x - 1)], gy = den[Math.min(N - 1, y + 1) * N + x] - den[Math.max(0, y - 1) * N + x];
+    const lit = clamp(.86 + (-gx * .7 - gy * .7) * 4.5, .55, 1.15), thick = clamp(q, 0, 1);
+    const l = 168 + 92 * Math.min(1, thick * 1.2);
+    d[k] = clamp(l * lit * .97, 0, 255); d[k + 1] = clamp(l * lit * .99, 0, 255); d[k + 2] = clamp(l * lit * 1.03 + 6, 0, 255);
+    const al = ss(.04, .62, q) * 255;
+    d[k + 3] = al;
+  }
+  g.putImageData(img, 0, 0);
+  return (SPR[key] = cv);
+};
+
+})();
+
+/* ---- 42-loading.js ---- */
+(function(){
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.loading) return;
+(P.mods = P.mods || {}).loading = 1;
+const T = (th, en) => ({th, en});
+/* 3.8: each line of the checklist is picked at random from things in the game, so every visit reads a little different.
+   One line per real loading step (fonts → words on screen, data → countries and trade, globe → the planet, clouds → weather) */
+P.LD_POOL = {
+  fonts:[T("เขียนป้ายชื่อประเทศทั่วโลก", "Writing every country's name tag"), T("ขัดเงาปุ่มสกิลทั้ง 6 สาย", "Polishing six branches of skills"), T("เรียงพาดหัวข่าวโลกประจำวัน", "Sorting today's world headlines"),
+    T("พิมพ์รายงานประจำปีให้ผู้นำโลก", "Printing the yearly report for world leaders"), T("ร่างญัตติสำหรับที่ประชุม COP", "Drafting motions for the COP summit"), T("ติดป้ายราคาในตลาดแร่", "Pricing the mineral market")],
+  data:[T("วาดเส้นพรมแดน 172 ประเทศ", "Drawing the borders of 172 countries"), T("จัดเส้นทางเรือสินค้าผ่านช่องแคบมะละกา", "Routing cargo ships through the Strait of Malacca"), T("ตั้งตารางเที่ยวบินข้ามทวีป", "Scheduling flights between continents"),
+    T("นับ CO₂ ที่แต่ละประเทศปล่อย", "Counting every country's CO₂"), T("ส่งทูตไปเยือนประเทศเพื่อนบ้าน", "Sending envoys to the neighbours"), T("สำรวจแหล่ง Rare Earth", "Surveying Rare Earth deposits"), T("วางรางรถไฟความเร็วสูง", "Laying high-speed rail")],
+  globe:[T("ปลูกป่าโกงกางตามชายฝั่ง", "Planting mangroves along the coasts"), T("ติดตั้งกังหันลมกลางทะเล", "Raising wind turbines out at sea"), T("ปูแผงโซลาร์กลางทะเลทราย", "Laying solar panels in the desert"),
+    T("วัดอุณหภูมิโลก: +1.2°C", "Reading the world's temperature: +1.2°C"), T("ตรวจระดับน้ำทะเลรอบเกาะแปซิฟิก", "Checking sea level round the Pacific islands"), T("ดับไฟบนแท่นขุดเจาะน้ำมัน", "Putting out flares on the oil rigs")],
+  clouds:[T("พยากรณ์พายุไต้ฝุ่นในแปซิฟิก", "Forecasting typhoons in the Pacific"), T("ปล่อยเมฆลอยจากตะวันตกไปตะวันออก", "Letting the clouds drift west to east"), T("ตั้งสถานีเตือนภัยน้ำท่วม", "Setting up flood warning stations"),
+    T("เตรียมแผนอพยพหนีคลื่นความร้อน", "Planning heatwave evacuations"), T("จัดฤดูมรสุมให้มาตรงเวลา", "Getting the monsoon to arrive on time"), T("เตรียมหิมะสำหรับฤดูหนาว", "Getting the winter snow ready")],
+};
 
 })();

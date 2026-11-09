@@ -209,7 +209,7 @@ const sceneVars = list => vars(list);
 function scene(name, layers, objects, instances, events, variables){
   return {b:16, disableInputWhenNotFocused:true, mangledName:name, name, r:5, standardSortMethod:true, stopSoundsOnStartup:true, title:"", v:11,
     uiSettings:{grid:false, gridType:"rectangular", gridWidth:32, gridHeight:32, gridOffsetX:0, gridOffsetY:0, gridColor:10401023, gridAlpha:0.8, snap:false, zoomFactor:0.5, windowMask:true},
-    objectsGroups:[], variables:sceneVars(variables), instances, objects, events, layers:layers.map(n => { const L = LAYER(n); if (n === "" && name !== "Loading"){ L.renderingType = "3d"; L.cameraType = "perspective"; L.camera3DNearPlaneDistance = 1; L.camera3DFarPlaneDistance = 20000; L.camera3DFieldOfView = 40; } return L; }), behaviorsSharedData:[]};
+    objectsGroups:[], variables:sceneVars(variables), instances, objects, events, layers:layers.map(n => { const L = LAYER(n); if (n === ""){   /* 3.8: Loading too: it shows the menu's 3D globe */  L.renderingType = "3d"; L.cameraType = "perspective"; L.camera3DNearPlaneDistance = 1; L.camera3DFarPlaneDistance = 20000; L.camera3DFieldOfView = 40; } return L; }), behaviorsSharedData:[]};
 }
 const backdrop = () => inst("Backdrop", "Backdrop", 0, 0, {w:1920, h:1080});
 const commonVars = [["GoTo", "string", ""], ["UIConsumed", "number", 0]];

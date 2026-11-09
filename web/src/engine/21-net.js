@@ -158,6 +158,16 @@ const Net = {
     try { const j = await this.req("POST", "/me/display-name", {displayName:name}); this.applyMe(j); msg(t("renamed")); }
     catch(e){ msg(errText(e), true); } finally { this.busy = false; dirty(); }
   },
+  /* 3.8: change the password (current + new twice); accounts made with Google can set one without the current box */
+  async changePassword(current, password, again){
+    const has = !this.user || this.user.hasPassword !== false;
+    if (has && !current) return msg(t("err_missing"), true), false;
+    if ((password || "").length < 8) return msg(t("err_weak_password"), true), false;
+    if (password !== again) return msg(t("err_pw_mismatch"), true), false;
+    this.busy = true;
+    try { const j = await this.req("POST", "/me/password", {current:current || "", password}); this.setTokens(j.access, j.refresh); this.applyMe(j); msg(t("pwDone")); return true; }
+    catch(e){ msg(errText(e), true); return false; } finally { this.busy = false; dirty(); }
+  },
   async buy(item){
     this.busy = true;
     try { const j = await this.req("POST", "/shop/buy", {item}); this.applyMe(j); msg(t("bought")); P.Audio.play("buy"); }

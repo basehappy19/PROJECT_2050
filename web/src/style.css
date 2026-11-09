@@ -132,15 +132,13 @@ textarea.code{height:76px;padding:8px 10px;font:500 12px/1.45 var(--mono);resize
 .loading.leaving{pointer-events:none}
 .loading.leaving::before{opacity:0}
 .loading.leaving .lpanel,.loading.leaving .disc{opacity:0;transition:opacity .35s ease}
-.loading .learth{will-change:transform}
 .loading h1,.logo h1{font:700 clamp(34px,6vw,54px)/1 var(--logo);letter-spacing:.04em}
 .loading h1 b,.logo h1 b,.brand b{color:var(--accent)}
-.learth{position:absolute;width:111vh;height:111vh;left:calc(18vw - 55.5vh);top:calc(53vh - 55.5vh);border-radius:50%;
-  box-shadow:-1.2vh -.7vh 3.2vh .4vh rgba(77,158,255,.42), -2vh -1.2vh 9vh 1.5vh rgba(77,158,255,.14);background:#02070a}
-.learth canvas{position:absolute;inset:0;width:100%;height:100%;border-radius:50%;opacity:0;transition:opacity 1.2s ease}
-.learth canvas.on{opacity:1}
-/* 3.7: the light and the atmosphere are drawn on the canvas, like the menu globe (ui/earth.js) */
-.lpanel{position:absolute;left:56vw;top:50%;transform:translateY(-50%);width:min(480px,38vw);display:flex;flex-direction:column;gap:14px;text-align:left}
+/* 3.8: the menu's own 3D Earth (three.js) fills the loading screen behind the text; it moves into the menu afterwards */
+.lglobe{position:absolute;inset:0;pointer-events:none}
+.lglobe canvas.globe{cursor:default}
+.loading.gl::before{opacity:0}
+.lpanel{position:absolute;z-index:2;left:56vw;top:50%;transform:translateY(-50%);width:min(480px,38vw);display:flex;flex-direction:column;gap:14px;text-align:left}
 .lbrand{display:flex;align-items:center;gap:14px}
 .lbrand small{font-size:12px;letter-spacing:.22em;color:var(--accent)}
 .lmark{width:64px;height:64px;flex:none;filter:drop-shadow(0 6px 18px rgba(0,0,0,.5))}
@@ -164,10 +162,11 @@ textarea.code{height:76px;padding:8px 10px;font:500 12px/1.45 var(--mono);resize
 .loading .enter{margin-top:8px;align-self:flex-start;animation:lpulse 2.2s ease-in-out infinite}
 @keyframes lpulse{50%{box-shadow:0 0 34px rgba(79,209,197,.45)}}
 .loading.ready{cursor:pointer}
-.loading .disc{position:absolute;bottom:calc(14px + var(--safe-b));left:16px;right:16px;text-align:center;margin:0}
+.loading .disc{position:absolute;z-index:2;bottom:calc(14px + var(--safe-b));left:16px;right:16px;text-align:center;margin:0}
 .l7 .disc{left:56vw;right:24px;text-align:left}
-@media (max-aspect-ratio: 1/1), (max-width: 760px){
-  .learth{width:130vw;height:130vw;left:-15vw;top:calc(-80vw + var(--safe-t))}
+@media (max-aspect-ratio: 1/1){
+  .loading::after{content:"";position:absolute;left:0;right:0;bottom:0;height:62%;pointer-events:none;background:linear-gradient(0deg,rgba(2,7,10,.92) 45%,rgba(2,7,10,0));transition:opacity .35s}
+  .loading.leaving::after{opacity:0}
   .lpanel{left:24px;right:24px;width:auto;top:auto;bottom:calc(52px + var(--safe-b));transform:none;gap:10px}
   .l7 h1{font-size:clamp(34px,10vw,52px)}
   .lmark{width:52px;height:52px}
@@ -178,13 +177,24 @@ textarea.code{height:76px;padding:8px 10px;font:500 12px/1.45 var(--mono);resize
 }
 @media (max-height: 520px) and (min-aspect-ratio: 1/1){
   .lsteps{display:none}
-  .l7 h1{font-size:40px}
+  .l7 h1{font-size:34px}
+  .lpanel{gap:8px;top:46%}
+  .lmark{width:40px;height:40px} .lbrand small{font-size:10px;letter-spacing:.14em}
+  .ltag{font-size:13px}
+  .loading .enter{margin-top:2px}
+  .l7 .disc{font-size:10px;bottom:calc(6px + var(--safe-b))}
 }
 @media (prefers-reduced-motion: reduce){ .lmark .lsun,.lsteps li.now i,.loading .enter{animation:none} }
 
 /* ---------- home ---------- */
 .home{position:fixed;inset:0;overflow:hidden;background:#02070a}
+.globe-host{position:absolute;inset:0}
 canvas.globe{position:absolute;inset:0;width:100%;height:100%;opacity:0;transition:opacity 1.2s;cursor:grab;touch-action:none}
+/* 3.8: coming from the loading screen: the Earth glides over first, then the panel and the shade come in */
+.home.enter .menu-panel,.home.enter .acct{animation:menuIn .7s cubic-bezier(.2,.7,.2,1) .75s both}
+.home.enter .home-vignette{animation:fadeIn 1s ease .45s both}
+@keyframes menuIn{from{opacity:0;transform:translateX(-30px)}to{opacity:1;transform:none}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
 canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
 .home-vignette{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(2,7,10,.88) 0%,rgba(2,7,10,.55) 28%,rgba(2,7,10,0) 52%),radial-gradient(ellipse at 70% 50%,transparent 50%,rgba(0,0,0,.45) 100%)}
 .menu-panel{position:absolute;left:calc(28px + var(--safe-l));top:calc(20px + var(--safe-t));bottom:calc(20px + var(--safe-b));width:460px;display:flex;flex-direction:column;transition:width .3s, opacity .5s, transform .6s;background:rgba(6,16,21,.72)}
@@ -216,9 +226,6 @@ canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
 .profile .disp{font-size:21px} .profile .bal{text-align:right;display:flex;flex-direction:column;align-items:flex-end}
 .lvls{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
 .lvl{align-items:center;text-align:center;padding:10px 6px;border-color:color-mix(in srgb,var(--c) 45%,transparent)} .lvl small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%} .lvl.locked{border-color:var(--line)}
-.shop{display:flex;flex-direction:column;gap:7px}
-.shopitem .sic{width:56px;height:56px;border-radius:var(--radius-md);background:var(--acc-12);display:grid;place-items:center;flex:none}
-.shopitem.own{opacity:.8}
 .board{list-style:none;margin:6px 0;padding:0;display:flex;flex-direction:column;gap:3px}
 .board li{display:flex;align-items:center;gap:10px;height:40px;padding:0 10px;border-radius:var(--radius-md);background:rgba(14,29,36,.6)}
 .board li:nth-child(odd){background:rgba(21,39,47,.7)} .board li.me{background:var(--acc-12)} .board li.frame{box-shadow:inset 0 0 0 1.5px var(--gold)} .board li.frame .nm{color:var(--gold);font-weight:600}
@@ -945,7 +952,7 @@ html.cb .bar.temp .z:nth-child(1){background:#4ea8ff} html.cb .bar.temp .z:nth-c
 .sk-cats button .sdgs img{width:22px;height:22px;border-radius:3px;display:block;flex:none}
 .dicon.d3{background:var(--acc-12)} .dicon.d3 img{width:56px;height:56px;filter:drop-shadow(0 3px 6px rgba(0,0,0,.35))}
 /* home: SDG 13 */
-.sdgtag{display:flex;align-items:center;gap:10px;margin:2px 0 14px;font-size:12px;color:var(--muted);line-height:1.4}
+.sdgtag{display:flex;align-items:center;gap:9px;margin:16px 0 14px;font-size:11px;color:var(--muted);line-height:1.4}   /* 3.8: a little apart from the logo, a little smaller */
 .sdgtag img{flex:none;border-radius:4px}
 /* end: the newspaper and real-life actions */
 .paper{margin:14px 0 4px;padding:12px 14px 10px;border-radius:var(--radius-md);background:#f3eee2;color:#1d1a14;box-shadow:0 6px 20px rgba(0,0,0,.35)}
@@ -1555,3 +1562,37 @@ details.more > summary:hover{color:var(--fg)}
 .stmore{margin-top:12px;border-top:1px solid var(--line);padding-top:8px}
 .stmore>summary{display:flex;align-items:center;gap:6px;cursor:pointer;list-style:none;color:var(--accent);font:500 13.5px var(--body);padding:6px 0}
 .stmore>summary::-webkit-details-marker{display:none} .stmore[open]>summary svg{transform:rotate(180deg)}
+
+/* ---------- 3.8: shop (ui/shop.jsx, design B) ---------- */
+.shopv{display:flex;flex-direction:column;gap:12px}
+.shopv .kick{display:block;font:600 11px/1.2 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--c,var(--accent))}
+.shopv .clamp2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.shopv .clamp3{display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.shopv b{display:block}
+.sthumb{display:grid;place-items:center;flex:none;border-radius:var(--radius-md);color:var(--c);background:color-mix(in srgb,var(--c) 14%,transparent);border:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
+.sbal{display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:var(--radius-lg);background:linear-gradient(120deg,rgba(95,211,154,.14),rgba(79,209,197,.04));border:1px solid rgba(95,211,154,.28)}
+.sbal-ic{width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:rgba(95,211,154,.16);color:var(--good)}
+.sbal b{font-size:24px;color:var(--good);line-height:1.1}
+.sbal small{display:block}
+.sbal-note{max-width:44%;text-align:right;line-height:1.35}
+.sbal.compact{padding:8px 12px}.sbal.compact .sbal-ic{width:34px;height:34px}.sbal.compact b{font-size:20px}
+.sbuy.lack{opacity:1;color:var(--muted);border-color:var(--line)}
+.sbuy.armed{animation:lpulse 1.2s ease-in-out infinite}
+.sacts{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.sact{display:inline-flex;align-items:center;gap:6px;padding:4px 9px;border-radius:var(--radius-pill);font-size:12px;background:color-mix(in srgb,var(--c) 12%,transparent);color:var(--fg);border:1px solid color-mix(in srgb,var(--c) 30%,transparent)}
+.sact svg{color:var(--c)}
+.sacts.full{flex-direction:column;gap:6px}.sacts.full .sact{border-radius:var(--radius-md);align-items:flex-start;padding:7px 10px}.sacts.full .sact svg{margin-top:3px;flex:none}.sacts.full small{display:block;line-height:1.4}
+.scats{display:flex;gap:6px;flex-wrap:wrap}
+.scats button{height:32px;padding:0 13px;border-radius:var(--radius-pill);border:1px solid var(--line);background:transparent;color:var(--muted);font:600 13px/1 var(--disp);display:inline-flex;align-items:center;gap:7px;cursor:pointer}
+.scats button.on{background:var(--accent);border-color:var(--accent);color:#06201d}
+.scats button i{font:600 11px/1 var(--mono);font-style:normal;opacity:.75}
+/* B */
+.shB section{display:flex;flex-direction:column;gap:6px}
+.shB-h{display:flex;align-items:center;gap:8px;margin:6px 0 0;font:700 13px/1 var(--disp);letter-spacing:.06em;color:var(--c)}
+.shB-h span{margin-left:auto;font-size:12px}
+.shB-row{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius-md);background:var(--panel);border:1px solid var(--line)}
+.shB-row small{display:block;line-height:1.4}.shB-row.own{opacity:.65}.shB-row .sacts{margin-top:5px}.shB-row .sact{font-size:11px;padding:2px 8px}
+@media (max-width: 560px){
+  .shB-row{flex-wrap:wrap}.shB-row .sbuy{margin-left:64px}
+  .sbal .sbal-note{display:none}
+}

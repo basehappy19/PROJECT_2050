@@ -275,17 +275,28 @@ const Globe = {
     for (let i = 0; i < (low ? 4 : 7); i++){ const a = this.mkArc(); if (a){ a.t = Math.random() * 1.4; this.arcs.push(a); } }
     root.traverse(o => { o.frustumCulled = false; });
     this.spin = (-90 - 100) * DEG; this.vel = 0; this.tiltX = 12 * DEG; this.drag = null; this.fly = null;
-    if (P._loaderLon != null){ this.spin = (-90 - P._loaderLon) * DEG; P._loaderLon = null; }   // 3.5: carry on from the loading screen's Earth
+    const cy = P._globeCarry; if (cy){ this.spin = cy.spin; this.tiltX = cy.tiltX; this.vel = cy.vel; P._globeCarry = null; }   // 3.8: the loading screen's Earth carries on, same turn
+    this.leave = null; this.panel = null;
     R.add3DRendererObject(root); this.place();
   },
-  /* where the globe sits: right of the menu panel on wide screens, centred on narrow ones (like web/src/ui/menu.jsx) */
-  place(){
+  /* where the globe sits on the menu: right of the menu panel on wide screens, centred on narrow ones (like web/src/ui/menu.jsx) */
+  menuCircle(panel){
     const dw = Kit.W || 1920, H = Kit.H || 1080, wide = dw >= H * 1.25;   // screen size in design units
-    // right edge of the menu panel (64-menu.js; wider for the shop / achievements pages), eased so the globe glides aside
-    const want = (P.Screens && P.Screens.menuPanelRight) || 530;
-    this.panel = this.panel == null ? want : this.panel + (want - this.panel) * .15; const panel = this.panel;
-    const cx = wide ? (panel + dw) / 2 : dw / 2, cy = wide ? H / 2 : H * .3;
-    let r = wide ? Math.min(H * .42, (dw - panel) * .44) : Math.min(dw * .42, H * .26);
+    return wide ? {x:(panel + dw) / 2, y:H / 2, r:Math.min(H * .42, (dw - panel) * .44)} : {x:dw / 2, y:H * .3, r:Math.min(dw * .42, H * .26)};
+  },
+  /* 3.8: on the loading screen: big, on the left of the text (like web/src/app.jsx loaderFrame) */
+  loaderCircle(){ const dw = Kit.W || 1920, H = Kit.H || 1080; return {x:dw * .18, y:H * .53, r:H * .555}; },
+  place(){
+    // right edge of the menu panel (64-menu.js = 56 + 430 + 24; wider for the shop / achievements pages), eased so the globe glides aside
+    const want = (P.Screens && P.Screens.menuPanelRight) || 510;
+    this.panel = this.panel == null ? want : this.panel + (want - this.panel) * .15;
+    let c = Map.mode === "loader" ? this.loaderCircle() : this.menuCircle(this.panel);
+    // 3.8: "Tap to enter": the same Earth slides and grows/shrinks from its loading place onto its menu place, still turning
+    if (this.leave){
+      const L = this.leave, p = Math.min(1, L.t / L.ms), e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2, b = this.menuCircle(510);
+      c = {x:c.x + (b.x - c.x) * e, y:c.y + (b.y - c.y) * e, r:c.r + (b.r - c.r) * e};
+    }
+    const cx = c.x, cy = c.y; let r = c.r;
     if (this.fly) r *= this.fly.r;
     const a = Map.toWorldFromScreen(cx, cy), b = Map.toWorldFromScreen(cx, cy + r), R = Math.max(10, Math.abs(b[1] - a[1]));
     this.root.position.set(a[0], a[1], 0); this.root.scale.set(R, -R, R);   // −R: undo the layer's y flip
@@ -297,9 +308,19 @@ const Globe = {
     while (target - this.spin > Math.PI) target -= Math.PI * 2; while (target - this.spin < -Math.PI) target += Math.PI * 2;
     this.fly = {t0:performance.now(), ms, s0:this.spin, s1:target, x0:this.tiltX, x1:lat * DEG, r:1, done};
   },
+  /* 3.8: leave the loading screen: glide onto the menu place, then call done (which opens the Menu scene, where the
+     globe is built again in exactly that place with the same turn: P._globeCarry) */
+  goToMenu(done, ms = 1150){
+    if (this.leave) return;
+    this.leave = {t:0, ms, done};
+  },
   frame(dt){
     if (!this.root) return;
     const now = performance.now() / 1000, m = Kit.mouse;
+    if (this.leave){
+      const L = this.leave; L.t += Math.min(50, dt * 1000);   // capped steps, so a slow frame doesn't skip the glide
+      if (L.t >= L.ms && !L.gone){ L.gone = true; P._globeCarry = {spin:this.spin + dt * .045, tiltX:this.tiltX, vel:this.vel}; L.done && L.done(); }
+    }
     if (this.fly){
       const f = this.fly, p = Math.min(1, (performance.now() - f.t0) / f.ms), e = p < .5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
       this.spin = f.s0 + (f.s1 - f.s0) * e; this.tiltX = f.x0 + (f.x1 - f.x0) * e; f.r = 1 + e * 1.6;
@@ -307,7 +328,7 @@ const Globe = {
     } else {
       // drag on the globe (not on the menu) to spin it
       const s = this.screen, over = s && Math.hypot(m.x - s.cx, m.y - s.cy) < s.r * 1.1;
-      if (m.down && !m.onUI && (this.drag || over)){
+      if (m.down && !m.onUI && Map.mode !== "loader" && (this.drag || over)){   // the loading screen: a tap anywhere enters, no spinning
         if (this.drag){ const k = 2.6 / Math.max(300, s.r * 2.2), dx = m.x - this.drag.x, dy = m.y - this.drag.y;
           this.spin += dx * k; this.tiltX = clamp(this.tiltX + dy * k, -50 * DEG, 50 * DEG); this.vel = dx * k * Math.min(1, dt * 60); }
         this.drag = {x:m.x, y:m.y};
@@ -334,7 +355,7 @@ Map.init = function(scene, mode){
   _init.call(this, scene, mode);
   if (!this.R3) return;
   try {
-    if (mode === "menu"){ Globe.build(this.R3); this.globe = Globe; }
+    if (mode === "menu" || mode === "loader"){ Globe.build(this.R3); this.globe = Globe; }
     else { Photo.build(this.R3); try { Ice.build(this.R3); } catch(e){ console.warn("ice", e); Ice.mesh = null; } this.globe = null; }
   } catch(e){ console.warn("earth", e); Photo.mesh = null; Globe.root = null; this.globe = null; }
   this.refresh();

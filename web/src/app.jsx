@@ -13,20 +13,16 @@ import {Narr} from "./narrator.js";
 import {EventModal, EndModal, CharSel, Story, Pause, Tutorial, Market, SlotPick} from "./ui/modals.jsx";
 import {Politics} from "./ui/politics.jsx";
 import {Learn} from "./ui/learn.jsx";
-import {Menu} from "./ui/menu.jsx";
+import {Menu, ensureGlobe} from "./ui/menu.jsx";
 import {LossFeed, EventPill} from "./ui/alerts.jsx";
 import {YearModal, Intro} from "./ui/year.jsx";
 import {Training} from "./ui/training.jsx";
-import {mountEarth} from "./ui/earth.js";
 
-/* ---------- loading (3.4: real spinning Earth + checklist of what is loading, design "L7") ---------- */
+/* ---------- loading (3.4: checklist of what is loading, design "L7"; 3.8: the menu's own 3D Earth, see LoadGlobe) ---------- */
 const LD = {
-  fonts:{th:"ฟอนต์ภาษาไทย", en:"Fonts"},
-  data:{th:"ข้อมูลประเทศและแผนที่", en:"Countries and map data"},
-  globe:{th:"ภาพผิวโลกกลางวัน / กลางคืน", en:"Earth by day and by night"},
-  clouds:{th:"ชั้นเมฆและหน้าเมนู", en:"Clouds and the menu"},
   tag:{th:"ภารกิจกู้วิกฤตโลก · พาโลกถึง Net Zero ก่อนสิ้นปี 2050", en:"Lead the world to Net Zero before the end of 2050"},
 };
+const pick = a => a[Math.floor(Math.random() * a.length)], LD_POOL = P.LD_POOL;   // 3.8: random checklist lines (engine/42-loading.js)
 const LOGO_SVG = <svg class="lmark" viewBox="22 22 156 156" aria-hidden="true">
   <defs>
     <radialGradient id="ldSun" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#fffbe0"/><stop offset=".35" stop-color="#ffd36b"/><stop offset="1" stop-color="#ff9a3c" stop-opacity="0"/></radialGradient>
@@ -43,41 +39,33 @@ const LOGO_SVG = <svg class="lmark" viewBox="22 22 156 156" aria-hidden="true">
   </g>
   <rect x="24" y="24" width="152" height="152" rx="38" fill="none" stroke="#4fd1c5" stroke-opacity=".55" stroke-width="2"/>
 </svg>;
-const lowEnd = () => (navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
-const LOAD = {earth:null};   // 3.5: the loading Earth, so the menu globe can take over where it is
-function LoadEarth(){
+/* 3.8: where the Earth sits on the loading screen: big, on the left (wide screens) or across the top (tall ones) */
+function loaderFrame(gl){
+  const w = window.innerWidth, h = window.innerHeight, tall = w / h <= 1;
+  const c = tall ? {x:w * .5, y:h * .24, r:Math.min(w * .6, h * .29)} : {x:w * .18, y:h * .53, r:h * .555};
+  const f = gl.frameOf(c.x, c.y, c.r); return [f.ox, f.oy, f.dist];
+}
+function LoadGlobe(){
   const ref = useRef(null);
   useEffect(() => {
-    const c = ref.current; if (!c) return;
-    const small = Math.min(screen.width, screen.height) < 600;
-    const css = c.getBoundingClientRect().width || 600, dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const still = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-    const stop = LOAD.earth = mountEarth(c, {src:`assets/img/ui/loader-globe${small ? "-s" : ""}.webp`, px:Math.min(css * dpr, small || lowEnd() ? 480 : 720), still});
-    return () => { stop(); if (LOAD.earth === stop) LOAD.earth = null; };
+    const gl = ensureGlobe(), host = ref.current;
+    host.appendChild(gl.canvas); gl.resize();
+    const fit = () => { if (gl.canvas.parentElement === host) gl.setFrame(...loaderFrame(gl), true); };
+    fit(); window.addEventListener("resize", fit);
+    gl.setHeat(0); gl.start();
+    return () => { window.removeEventListener("resize", fit); if (gl.canvas.parentElement === host) gl.stop(); };
   }, []);
-  return <div class="learth" aria-hidden="true"><canvas ref={ref}/></div>;
+  return <div class="lglobe" ref={ref} aria-hidden="true"/>;
 }
 function Loading({leaving}){
-  const [done, setDone] = useState({}), [ready, setReady] = useState(false);
-  /* 3.5: after "Tap to enter" the menu opens underneath and this Earth glides to where the menu's globe is,
-     grows or shrinks to its size, then fades into it */
+  const [done, setDone] = useState({}), [ready, setReady] = useState(false), [lines] = useState(() => Object.fromEntries(Object.entries(LD_POOL).map(([k, a]) => [k, pick(a)])));
+  /* 3.8: after "Tap to enter" the menu opens underneath and takes the Earth (menu.jsx GlobeView glides it onto its menu
+     place); the text fades here, then this screen goes away */
   useEffect(() => {
     if (!leaving) return;
-    let t1 = 0, t2 = 0, raf = 0;
-    const finish = () => { UIM.leaving = false; bump(); };
-    const go = () => {
-      const el = document.querySelector(".learth"), g = G.globe, c = g && g.screenCircle ? g.screenCircle() : null;
-      const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if (!el || !c || still){ finish(); return; }
-      const lon = LOAD.earth && LOAD.earth.lon(); if (lon !== null && lon !== undefined) g.faceLon(lon);
-      const r0 = el.getBoundingClientRect(), k = 2 * c.r / r0.width;
-      el.style.transition = "transform 1.3s cubic-bezier(.65,0,.25,1), opacity .5s ease 1.2s";
-      el.style.transform = `translate(${(c.x - (r0.left + r0.width / 2)).toFixed(1)}px, ${(c.y - (r0.top + r0.height / 2)).toFixed(1)}px) scale(${k.toFixed(4)})`;
-      el.style.opacity = "0";
-      t2 = setTimeout(finish, 1800);
-    };
-    raf = requestAnimationFrame(() => { raf = requestAnimationFrame(go); });   // the menu and its globe exist by then
-    return () => { cancelAnimationFrame(raf); clearTimeout(t1); clearTimeout(t2); };
+    const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const id = setTimeout(() => { UIM.leaving = false; bump(); }, still ? 400 : 1450);
+    return () => clearTimeout(id);
   }, [leaving]);
   const lang = S.lang === "en" ? "en" : "th", tx = o => o[lang];
   useEffect(() => {
@@ -95,14 +83,14 @@ function Loading({leaving}){
   const steps = ["fonts", "data", "globe", "clouds"], n = steps.filter(k => done[k]).length, active = steps.find(k => !done[k]);
   const p = ready ? 1 : n / steps.length;
   const enter = () => { if (isTouch() && document.fullscreenEnabled && !document.fullscreenElement) document.documentElement.requestFullscreen({navigationUI:"hide"}).catch(() => {}); Audio.unlock(); Audio.play("start"); Audio.setMood("menu", true); Audio.setBed("space", .8); UIM.leaving = true; UIM.screen = "menu"; bump(); };
-  return <div class={`loading l7${ready ? " ready" : ""}${leaving ? " leaving" : ""}`} onClick={ready && !leaving ? enter : undefined}>
-    <LoadEarth/>
+  return <div class={`loading l7${ready ? " ready" : ""}${leaving ? " leaving" : ""}${G.globe && G.globe.ready ? " gl" : ""}`} onClick={ready && !leaving ? enter : undefined}>
+    <LoadGlobe/>
     <div class="lpanel">
       <div class="lbrand">{LOGO_SVG}<small class="mono">GLOBAL CLIMATE TASKFORCE · 2026 – 2050</small></div>
       <h1>PROJECT <b>ZERO</b></h1>
       <p class="ltag">{tx(LD.tag)}</p>
       <ul class="lsteps" aria-live="polite">
-        {steps.map(k => <li class={done[k] ? "ok" : k === active ? "now" : ""} key={k}><i aria-hidden="true"/>{tx(LD[k])}</li>)}
+        {steps.map(k => <li class={done[k] ? "ok" : k === active ? "now" : ""} key={k}><i aria-hidden="true"/>{tx(lines[k])}</li>)}
       </ul>
       <div class="lbar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow={Math.round(p * 100)} aria-label={t("loading")}><i style={{width:`${p * 100}%`}}/></div>
       <div class="lrow mono"><span>{ready ? t("ldReady") : `${n} / ${steps.length}`}</span><span>{Math.round(p * 100)}%</span></div>

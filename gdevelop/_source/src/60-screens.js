@@ -312,7 +312,7 @@ Object.assign(Screens, {
     set("Train", l => { if (this.renderTrain) this.renderTrain(l); if (this.renderSubs) this.renderSubs(l); });   // + narration subtitles on top
     Audio.setScene(scene);
     if (kind === "menu") Audio.setMood("menu"); else if (kind === "game") setTimeout(() => Audio.setMood(S.started ? Audio.gameMood() : "calm", true), 50);   // a new piece of music for the game
-    if (kind !== "loading") P.Map.init(scene, kind);
+    P.Map.init(scene, kind === "loading" ? "loader" : kind);   // 3.8: the loading screen has the 3D globe too
     if (kind === "game"){
       if (UIM.trainPending && P.Train){ P.Train.begin(); }   // 3.x: training mode starts straight into a guided game
       else if (!S.started){
@@ -330,7 +330,7 @@ Object.assign(Screens, {
     if (scene !== this.scene) return;
     const dt = Math.min(0.25, scene.getTimeManager().getElapsedTime() / 1000);
     k.update(scene);
-    if (this.kind !== "loading") P.Map.update(dt);
+    P.Map.update(dt);
     Audio.update(dt);
     this.toastUpdate(dt);
     if (this.kind === "game" && P.Alerts && P.Alerts.busy()){ this._alT = (this._alT || 0) + dt; if (this._alT > .2){ this._alT = 0; k.dirty("Alerts"); } }   // fading lines, pulsing pill

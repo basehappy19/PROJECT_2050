@@ -4,4 +4,4 @@ Disallow: /admin/
 Disallow: /api/
 Disallow: /verify/
 
-Sitemap: https://basehappy19.github.io/PROJECT_2050/sitemap.xml
+Sitemap: https://project-zero.basehappy19.site/sitemap.xml

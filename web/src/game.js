@@ -209,6 +209,7 @@ function clock(now){
 }
 requestAnimationFrame(clock);
 P.tickProgress = () => (S.speed ? Math.min(1, acc / P.secPerMonth()) : 0);
+P.monthFrac = () => Math.min(1, acc / P.secPerMonth());   // 3.8: how far into the month we are (kept while paused), for storms moving between ticks
 
 /* quiet background soundscape: the clock in the last two years, otherwise the place you are zoomed into */
 const PLACE_BED = {NA:"highway", EU:"street", EA:"city", SA:"jungle", MEAF:"gale", SEA:"river"};
