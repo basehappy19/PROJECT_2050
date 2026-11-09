@@ -21,7 +21,7 @@ const STAT = {
   temp:{th:"อุณหภูมิ", en:"Temperature", icon:"thermometer"},
   co2:{th:"CO₂", en:"CO₂", icon:"cloud"},
   sink:{th:"ดูดซับ CO₂", en:"CO₂ capture", icon:"trees"},
-  gem:{th:"เพชร", en:"Gems", icon:"diamond"},
+  gem:{th:"คาร์บอนเครดิต", en:"Carbon Credits", icon:"leaf"},
   star:{th:"ดาว", en:"Stars", icon:"star"},
 };
 const T = (th, en) => ({th, en});

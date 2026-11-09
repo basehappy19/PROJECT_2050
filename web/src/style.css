@@ -36,7 +36,7 @@ small{font-size:.82em}
 .muted{color:var(--muted)} .acc{color:var(--accent)} .good{color:var(--good)} .warn{color:var(--warn)} .hot{color:var(--hot)} .bad{color:var(--bad)} .gold{color:var(--gold)} .sky{color:var(--sky)} .fg{color:var(--fg)} .purple{color:var(--purple)}
 .small{font-size:13px} .grow{flex:1;min-width:0} .row{display:flex;align-items:center;gap:8px} .row.gap{gap:10px} .wrap{flex-wrap:wrap}
 .ic{display:inline-block;vertical-align:middle;flex:none} .ic.inl{width:1.05em;height:1.05em;margin:-.15em .18em 0 0} img.ic{object-fit:contain}
-.ic.terra{width:1.15em;height:1.15em}
+.ic.terra{width:1.05em;height:1.05em}
 .spin{animation:spin 1.2s linear infinite} @keyframes spin{to{transform:rotate(360deg)}}
 kbd{font:500 11px var(--mono);color:var(--muted);border:1px solid var(--line);border-radius:4px;padding:0 4px;line-height:15px;display:inline-block}
 .glass{background:var(--surface-1);border:1px solid var(--border);border-radius:var(--radius-md);box-shadow:var(--elev-1)}
@@ -126,7 +126,13 @@ textarea.code{height:76px;padding:8px 10px;font:500 12px/1.45 var(--mono);resize
 .gbtn .ghit iframe{margin:0 !important}
 
 /* ---------- loading (3.4: "L7" real Earth on the left, checklist on the right) ---------- */
-.loading{position:fixed;inset:0;overflow:hidden;background:radial-gradient(ellipse at 18% 55%, #0b2230 0%, #03090d 55%, #010406 100%);color:var(--fg)}
+.loading{position:fixed;inset:0;overflow:hidden;color:var(--fg);z-index:50}
+.loading::before{content:"";position:absolute;inset:0;background:radial-gradient(ellipse at 18% 55%, #0b2230 0%, #03090d 55%, #010406 100%);transition:opacity .9s ease .25s}
+/* 3.5: leaving for the menu: the backdrop and the text fade, the Earth glides onto the menu globe */
+.loading.leaving{pointer-events:none}
+.loading.leaving::before{opacity:0}
+.loading.leaving .lpanel,.loading.leaving .disc{opacity:0;transition:opacity .35s ease}
+.loading .learth{will-change:transform}
 .loading h1,.logo h1{font:700 clamp(34px,6vw,54px)/1 var(--logo);letter-spacing:.04em}
 .loading h1 b,.logo h1 b,.brand b{color:var(--accent)}
 .learth{position:absolute;width:111vh;height:111vh;left:calc(18vw - 55.5vh);top:calc(53vh - 55.5vh);border-radius:50%;
@@ -225,7 +231,7 @@ canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
 /* ---------- game ---------- */
 .game{position:fixed;inset:0;background:var(--bg)}
 .map{position:absolute;inset:0}
-.map canvas{position:absolute;left:0;top:0;display:block}
+.map canvas{position:absolute;left:0;top:0;display:block} .map canvas.map-air{pointer-events:none}
 .hud{position:absolute;inset:0;pointer-events:none}
 .hud>*{pointer-events:auto}
 .topbar{position:absolute;left:0;right:0;top:0;display:flex;align-items:stretch;gap:8px;padding:calc(10px + var(--safe-t)) calc(14px + var(--safe-r)) 0 calc(14px + var(--safe-l));pointer-events:none}
@@ -1458,3 +1464,6 @@ details.more > summary:hover{color:var(--fg)}
   .mkr{grid-template-columns:1fr auto auto;row-gap:6px} .mkr .mbb{justify-content:flex-start} .mkr.th{display:none} .mkr .msp{display:none}
   .mkr .mref{grid-column:1} .mkr .mbb{grid-column:2/4}
 }
+
+/* 3.5: tooltips on touch screens say how to close them */
+.tapclose{display:block;margin-top:4px;font-size:12px;color:var(--muted)}

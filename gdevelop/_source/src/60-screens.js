@@ -151,11 +151,10 @@ W.portrait = (l, x, y, s, charId, o = {}) => {
   const anim = charId === "adv" || (P.NPC && P.NPC[charId]) ? charId : `${charId}-${o.outfit || (P.outfitOf ? P.outfitOf(charId) : "base")}`;
   k.sprite(l, "Portrait", anim, x + 2, y + 2, s - 4, s - 4, o.a ?? 1);
 };
-/* Gems (เพชร) amount with the gem icon, like the website */
+/* 3.5: Carbon Credits (คาร์บอนเครดิต, the shop currency) amount with its 3D coin, like the website */
 W.terra = (l, x, y, amount, o = {}) => {
-  // the website's 3D gem (Gems = เพชร). The picture has wide empty margins, so it is drawn larger and the margin is skipped
-  const size = o.size || 14, is = size * 2, gw = is * .62;
-  k.icon(l, "$gem", x - is * .19, y + (size * 1.45 - is) / 2, is, "#ffffff", o.a ?? 1);
+  const size = o.size || 14, is = size * 1.3, gw = is;
+  k.icon(l, "$credit", x, y + (size * 1.45 - is) / 2, is, "#ffffff", o.a ?? 1);
   return gw + 5 + k.text(l, String(amount), x + gw + 5, y, {font:o.font || "monoB", size, color:o.color || "fg", a:o.a ?? 1}).w;
 };
 /* volume rows. 2.3: tapping the icon turns that sound on or off at once (back on at 80% if its slider was at 0); narration has its own row */
@@ -308,7 +307,7 @@ Object.assign(Screens, {
     set("Menu", l => this.renderMenu(l)); set("MenuScroll", null, "Menu");
     set("Modal", l => this.renderModal(l)); set("ModalScroll", null, "Modal");
     set("Toast", l => this.renderToast(l));
-    set("Alerts", l => this.renderAlerts && this.renderAlerts(l));
+    set("Alerts", l => { if (this.renderAlerts) this.renderAlerts(l); if (this.drawHudTips) this.drawHudTips(l); });   // 3.5: + HUD tooltips on top
     set("Train", l => { if (this.renderTrain) this.renderTrain(l); if (this.renderSubs) this.renderSubs(l); });   // + narration subtitles on top
     Audio.setScene(scene);
     if (kind === "menu") Audio.setMood("menu"); else if (kind === "game") setTimeout(() => Audio.setMood(S.started ? Audio.gameMood() : "calm", true), 50);   // a new piece of music for the game

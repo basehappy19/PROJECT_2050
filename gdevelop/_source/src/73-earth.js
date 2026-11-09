@@ -76,6 +76,73 @@ const Photo = {
   },
 };
 
+/* ---------------------------------------------------------------- 3.5: ice round the world (like web/src/ice.js)
+   Outside the map's outline the world sits in a sheet of polar ice that frosts over the map's edge, so the picture never
+   ends in a hard line and there is no empty space beside it. The texture is drawn once in code and tiles seamlessly. */
+const FROST_VS = "attribute float fade; varying float vA; varying vec2 vUv; void main(){ vUv = uv; vA = fade; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }";
+const FROST_FS = "uniform sampler2D map; uniform vec3 tint; varying float vA; varying vec2 vUv; void main(){ vec4 c = texture2D(map, vUv); gl_FragColor = vec4(c.rgb * tint, vA);\n#include <colorspace_fragment>\n}";
+const ICE_TILE = 336, FROST = 58;   // in world px (the map is 1920 wide; the website's 2400-wide map uses 420 / 72)
+let iceTile = null;
+function iceCanvas(){
+  if (iceTile) return iceTile;
+  const N = 512, cv = document.createElement("canvas"); cv.width = cv.height = N;
+  const g = cv.getContext("2d");
+  let seed = 20250; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  const wrap = draw => { for (const dx of [-N, 0, N]) for (const dy of [-N, 0, N]){ g.save(); g.translate(dx, dy); draw(); g.restore(); } };
+  g.fillStyle = "#c9dfeb"; g.fillRect(0, 0, N, N);
+  for (let i = 0; i < 60; i++){
+    const x = rnd() * N, y = rnd() * N, r = 30 + rnd() * 140, snow = rnd() < .55;
+    const col = snow ? `rgba(246,251,255,${.18 + rnd() * .25})` : `rgba(${120 + rnd() * 40 | 0},${170 + rnd() * 30 | 0},${200 + rnd() * 25 | 0},${.12 + rnd() * .18})`;
+    wrap(() => { const gr = g.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, col); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); });
+  }
+  g.lineCap = "round"; g.lineJoin = "round";
+  for (let i = 0; i < 26; i++){
+    const pts = []; let x = rnd() * N, y = rnd() * N, a = rnd() * Math.PI * 2;
+    const n = 6 + (rnd() * 14 | 0);
+    for (let k = 0; k < n; k++){ pts.push([x, y]); a += (rnd() - .5) * 1.1; const L = 8 + rnd() * 26; x += Math.cos(a) * L; y += Math.sin(a) * L; }
+    const w = .6 + rnd() * 1.6, dark = `rgba(96,140,168,${.25 + rnd() * .3})`, lite = `rgba(255,255,255,${.35 + rnd() * .3})`;
+    wrap(() => {
+      g.beginPath(); pts.forEach(([px, py], k) => k ? g.lineTo(px, py) : g.moveTo(px, py));
+      g.strokeStyle = dark; g.lineWidth = w; g.stroke();
+      g.translate(.8, .8); g.strokeStyle = lite; g.lineWidth = w * .7; g.stroke();
+    });
+  }
+  for (let i = 0; i < 900; i++){ const x = rnd() * N, y = rnd() * N; g.fillStyle = `rgba(255,255,255,${.25 + rnd() * .55})`; g.fillRect(x, y, rnd() < .1 ? 1.6 : .9, rnd() < .1 ? 1.6 : .9); }
+  return (iceTile = cv);
+}
+const Ice = P.Ice = {
+  build(R){
+    // the map's outline: east edge top → bottom, then west edge bottom → top
+    const ep = [], N = 90;
+    for (let i = 0; i <= N; i++) ep.push(P.toWorld(LAT_TOP - (LAT_TOP - LAT_MAP_BOT) * i / N, LON0 + 179.99));
+    for (let i = 0; i <= N; i++) ep.push(P.toWorld(LAT_MAP_BOT + (LAT_TOP - LAT_MAP_BOT) * i / N, LON0 - 179.99));
+    const tex = new THREE.CanvasTexture(iceCanvas()); tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    const W = 1920, H = 900, outer = [[-3 * W, -3 * H], [4 * W, -3 * H], [4 * W, 4 * H], [-3 * W, 4 * H]].map(([x, y]) => new THREE.Vector2(x, y));
+    const hole = ep.map(([x, y]) => new THREE.Vector2(x, y)), all = outer.concat(hole), pos = [], uv = [];
+    for (const t of THREE.ShapeUtils.triangulateShape(outer, [hole])) for (const k of t){ pos.push(all[k].x, all[k].y, 0); uv.push(all[k].x / ICE_TILE, all[k].y / ICE_TILE); }
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+    this.mat = new THREE.MeshBasicMaterial({map:tex, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
+    const m = this.mesh = new THREE.Mesh(g, this.mat); m.renderOrder = 2.5; m.frustumCulled = false; R.add3DRendererObject(m);   // over the ocean / rim, under the photo
+    // frost band along the edge: solid ice just outside → clear FROST px inside
+    let cx = 0, cy = 0; for (const [x, y] of ep){ cx += x; cy += y; } cx /= ep.length; cy /= ep.length;
+    const n = ep.length, ring = [[18, 1], [0, .96], [-FROST * .25, .78], [-FROST * .55, .42], [-FROST * .8, .14], [-FROST, 0]], bp = [], bu = [], bc = [], idx = [];
+    for (let i = 0; i < n; i++){
+      const [x, y] = ep[i], [ax, ay] = ep[(i - 1 + n) % n], [bx, by] = ep[(i + 1) % n];
+      let tx = bx - ax, ty = by - ay; const l = Math.hypot(tx, ty) || 1; tx /= l; ty /= l;
+      let nx = ty, ny = -tx; if (nx * (x - cx) + ny * (y - cy) < 0){ nx = -nx; ny = -ny; }
+      for (const [d, a] of ring){ const px = x + nx * d, py = y + ny * d; bp.push(px, py, 0); bu.push(px / ICE_TILE, py / ICE_TILE); bc.push(a); }
+    }
+    const RL = ring.length;
+    for (let i = 0; i < n; i++){ const j = (i + 1) % n; for (let k = 0; k < RL - 1; k++){ const a = i * RL + k, b = j * RL + k; idx.push(a, b, a + 1, b, b + 1, a + 1); } }
+    const bg = new THREE.BufferGeometry(); bg.setAttribute("position", new THREE.Float32BufferAttribute(bp, 3)); bg.setAttribute("uv", new THREE.Float32BufferAttribute(bu, 2));
+    bg.setAttribute("fade", new THREE.Float32BufferAttribute(bc, 1)); bg.setIndex(idx);
+    this.frostMat = new THREE.ShaderMaterial({uniforms:{map:{value:tex}, tint:{value:new THREE.Color(0xffffff)}}, vertexShader:FROST_VS, fragmentShader:FROST_FS, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
+    const f = this.frost = new THREE.Mesh(bg, this.frostMat); f.renderOrder = 9; f.frustumCulled = false; R.add3DRendererObject(f);   // over the photo, under the region tints
+  },
+  /* darker ice on the night map */
+  tone(night){ if (!this.mat) return; const c = night ? 0x5b6f7d : 0xffffff; this.mat.color.setHex(c); this.frostMat.uniforms.tint.value.setHex(c); },
+};
+
 /* ---------------------------------------------------------------- the 3D Earth on the menu (web/src/globe.js) */
 const EARTH_VS = `
 varying vec2 vUv; varying vec3 vN; varying vec3 vW;
@@ -181,6 +248,7 @@ const Globe = {
     for (let i = 0; i < (low ? 4 : 7); i++){ const a = this.mkArc(); if (a){ a.t = Math.random() * 1.4; this.arcs.push(a); } }
     root.traverse(o => { o.frustumCulled = false; });
     this.spin = (-90 - 100) * DEG; this.vel = 0; this.tiltX = 12 * DEG; this.drag = null; this.fly = null;
+    if (P._loaderLon != null){ this.spin = (-90 - P._loaderLon) * DEG; P._loaderLon = null; }   // 3.5: carry on from the loading screen's Earth
     R.add3DRendererObject(root); this.place();
   },
   /* where the globe sits: right of the menu panel on wide screens, centred on narrow ones (like web/src/ui/menu.jsx) */
@@ -235,12 +303,12 @@ const Globe = {
 const MAP_KINDS = ["Ocean", "MapRim", "ArcticIce", "Region", "RegionLine", "Plume"];
 const _init = Map.init;
 Map.init = function(scene, mode){
-  Photo.mesh = null; Globe.root = null;
+  Photo.mesh = null; Globe.root = null; Ice.mesh = null;
   _init.call(this, scene, mode);
   if (!this.R3) return;
   try {
     if (mode === "menu"){ Globe.build(this.R3); this.globe = Globe; }
-    else { Photo.build(this.R3); this.globe = null; }
+    else { Photo.build(this.R3); try { Ice.build(this.R3); } catch(e){ console.warn("ice", e); Ice.mesh = null; } this.globe = null; }
   } catch(e){ console.warn("earth", e); Photo.mesh = null; Globe.root = null; this.globe = null; }
   this.refresh();
 };
@@ -263,6 +331,7 @@ Map.refresh = function(){
     if (o){ o.setColor(col.join(";")); o.setOpacity(tm ? 0 : Math.round(a * 255)); }   // the sprite stays for game logic only
   }
   if (this.ice) this.ice.hide(true);   // the photo already shows the ice
+  if (Ice.mesh){ Ice.tone(th === "night"); if (this.rim) this.rim.hide(true); }   // 3.5: the ice round the map replaces the glowing rim
 };
 const _update = Map.update;
 Map.update = function(dt){

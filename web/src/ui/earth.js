@@ -4,6 +4,8 @@
    at 30 frames a second and at most ~720×720 pixels, so it stays light on phones. Shading and the glow are CSS. */
 export function mountEarth(canvas, {src, px = 640, period = 110, tilt = 0.32, still = false} = {}){
   let stopped = false, raf = 0;
+  const api = () => { stopped = true; cancelAnimationFrame(raf); };
+  api.lon = () => null;
   const N = Math.max(160, Math.round(px));
   canvas.width = N; canvas.height = N;
   const ctx = canvas.getContext("2d", {alpha:true});
@@ -38,7 +40,9 @@ export function mountEarth(canvas, {src, px = 640, period = 110, tilt = 0.32, st
       for (let i = 0; i < n; i++){ let u = U[i] + off; if (u >= W) u -= W; dst[I[i]] = tex[R[i] + u]; }
       ctx.putImageData(out, 0, 0);
     };
-    const base = Math.floor(W * .1), t0 = performance.now(), step = 1000 / 30;   // first frame: Africa, Europe and Asia face the player
+    const base = Math.floor(W * .1), t0 = performance.now(), step = 1000 / 30;
+    let off = base;
+    api.lon = () => (((W / 2 + off) % W) / W) * 360 - 180;   // 3.5: the longitude facing the player (the menu globe starts there)   // first frame: Africa, Europe and Asia face the player
     let last = -1e9;
     draw(base);
     canvas.classList.add("on");
@@ -48,9 +52,9 @@ export function mountEarth(canvas, {src, px = 640, period = 110, tilt = 0.32, st
       raf = requestAnimationFrame(frame);
       if (document.hidden || now - last < step) return;
       last = now;
-      draw(((base - Math.floor(((now - t0) / 1000 / period) * W)) % W + W) % W);   // the surface moves west → east, like the real Earth
+      off = ((base - Math.floor(((now - t0) / 1000 / period) * W)) % W + W) % W; draw(off);   // the surface moves west → east, like the real Earth
     };
     raf = requestAnimationFrame(frame);
   }).catch(() => {});
-  return () => { stopped = true; cancelAnimationFrame(raf); };
+  return api;
 }

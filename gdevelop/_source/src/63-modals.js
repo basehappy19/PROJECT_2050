@@ -233,7 +233,7 @@ Screens.mCharSel = function(l, pw){
     W.meter(l, cx + 12, ty + 2, cw - 24, 4, nx ? (xp - pv) / (nx - pv) : 1, c.color); ty += 12;
     ty += k.text(l, L(c.pas), cx + 12, ty, {size:11.5, color:"muted", w:cw - 24, lh:1.3, a}).h + 4;
     for (const ab of c.acts) ty += k.text(l, `[[${ab.icon}]] ${L(ab.name)}${ab.lv ? ` (Lv${ab.lv})` : ""}`, cx + 12, ty, {size:11.5, w:cw - 24, max:1, a, iconColor:c.color}).h;
-    if (!owned) k.text(l, P.Net.user ? `[[$gem]] ${c.price} · ${t("buyInShop")}` : `[[$gem]] ${c.price} · ${t("loginToBuy")}`, cx + 12, y + chH - 24, {font:"mono", size:11, color:"gold", w:cw - 24, max:1, iconColor:"#ffffff"});
+    if (!owned) k.text(l, P.Net.user ? `[[$credit]] ${c.price} · ${t("buyInShop")}` : `[[$credit]] ${c.price} · ${t("loginToBuy")}`, cx + 12, y + chH - 24, {font:"mono", size:11, color:"gold", w:cw - 24, max:1, iconColor:"#ffffff"});
     k.hit(l, id, cx, y, cw, chH, () => { Audio.play(owned ? "select" : "error"); if (owned) UIM.charSel = c.id; else UIM.msg = t("charLocked"); k.dirty(); });
   });
   y += chH + 14;

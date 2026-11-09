@@ -9,8 +9,12 @@
    If the device has no WebGL 2, createMapGL returns null and map2d.js keeps drawing with Canvas 2D. */
 import * as THREE from "three";
 import {MAP} from "./geo.js";
+import {iceCanvas, edgeNormals, ICE_TILE, FROST} from "./ice.js";
 
-const ORDER = {edge:1, glow:2, photo:3, tint:4, borderDark:5, borderLight:6, selFill:7, selGlow:8, selLine:9, cFill:10, cGlow:11, cLine:12, haze:13};
+const FROST_VS = "attribute float fade; varying float vA; varying vec2 vUv; void main(){ vUv = uv; vA = fade; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }";
+const FROST_FS = "uniform sampler2D map; uniform vec3 tint; varying float vA; varying vec2 vUv; void main(){ vec4 c = texture2D(map, vUv); gl_FragColor = vec4(c.rgb * tint, vA);\n#include <colorspace_fragment>\n}";
+/* 3.5: the frost band is a small shader (texture × tint, alpha per vertex), so it matches the ice exactly on every GPU */
+const ORDER = {ice:.5, frost:6.5, edge:1, glow:2, photo:3, tint:4, borderDark:5, borderLight:6, selFill:7, selGlow:8, selLine:9, cFill:10, cGlow:11, cLine:12, haze:13};
 
 /* ---------- geometry helpers ---------- */
 function inRing(r, x, y){
@@ -111,7 +115,7 @@ class MapGL {
     // outline of the map (Robinson edge): dark fill, three soft glows, the photo inside it
     const edgePos = []; triangulate([edgePts], edgePos);
     this.edgeMesh = meshOf(edgePos, flat(0x08202a, 1), ORDER.edge); this.scene.add(this.edgeMesh);
-    for (const [w, a] of [[16, .05], [8, .08], [3, .14]]) this.scene.add(this.addLine([edgePts], 0x4fd1c5, a, w, ORDER.glow, true));
+    this.buildIce(edgePts);
     const uv = []; for (let i = 0; i < edgePos.length; i += 3) uv.push(edgePos[i] / MAP.W, 1 - edgePos[i + 1] / MAP.H);
     const pg = new THREE.BufferGeometry(); pg.setAttribute("position", new THREE.Float32BufferAttribute(edgePos, 3)); pg.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
     this.photoMat = new THREE.MeshBasicMaterial({transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});   // transparent like the rest, so renderOrder decides what is on top
@@ -133,6 +137,35 @@ class MapGL {
     this.haze = meshOf([-1e5, -1e5, 0, 1e5, -1e5, 0, 1e5, 1e5, 0, -1e5, -1e5, 0, 1e5, 1e5, 0, -1e5, 1e5, 0], flat(0xff5a28, 0), ORDER.haze); this.haze.visible = false; this.scene.add(this.haze);
     this.shapes = shapes;
   }
+  /* 3.5: a sheet of ice all round the map (a big rectangle with the map's outline cut out) and a frost band
+     that fades from the ice into the map along its edge, so the world never ends in a hard line */
+  buildIce(edgePts){
+    const tex = new THREE.CanvasTexture(iceCanvas()); tex.colorSpace = THREE.SRGBColorSpace; tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+    tex.anisotropy = Math.min(8, this.r.capabilities.getMaxAnisotropy());
+    const W = MAP.W, H = MAP.H, outer = [[-3 * W, -3 * H], [4 * W, -3 * H], [4 * W, 4 * H], [-3 * W, 4 * H]].map(([x, y]) => new THREE.Vector2(x, y));
+    const hole = []; for (let i = 0; i < edgePts.length; i += 2) hole.push(new THREE.Vector2(edgePts[i], edgePts[i + 1]));
+    if (hole.length > 2 && hole[0].equals(hole[hole.length - 1])) hole.pop();
+    const all = outer.concat(hole), pos = [], uv = [];
+    for (const t of THREE.ShapeUtils.triangulateShape(outer, [hole])) for (const k of t){ pos.push(all[k].x, all[k].y, 0); uv.push(all[k].x / ICE_TILE, all[k].y / ICE_TILE); }
+    const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("uv", new THREE.Float32BufferAttribute(uv, 2));
+    this.iceMat = new THREE.MeshBasicMaterial({map:tex, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
+    this.iceMesh = new THREE.Mesh(g, this.iceMat); this.iceMesh.renderOrder = ORDER.ice; this.iceMesh.frustumCulled = false; this.scene.add(this.iceMesh);
+    // frost band: outside (ice, solid) → the edge (mostly ice) → FROST units inside (clear)
+    const nrm = edgeNormals(edgePts), n = edgePts.length / 2, bp = [], bu = [], bc = [], idx = [];
+    const ring = [[18, 1], [0, .96], [-FROST * .25, .78], [-FROST * .55, .42], [-FROST * .8, .14], [-FROST, 0]];
+    for (let i = 0; i < n; i++){
+      const x = edgePts[i * 2], y = edgePts[i * 2 + 1], nx = nrm[i * 2], ny = nrm[i * 2 + 1];
+      for (const [d, a] of ring){ const px = x + nx * d, py = y + ny * d; bp.push(px, py, 0); bu.push(px / ICE_TILE, py / ICE_TILE); bc.push(a); }
+    }
+    const R = ring.length;
+    for (let i = 0; i < n; i++){ const j = (i + 1) % n; for (let k = 0; k < R - 1; k++){ const a = i * R + k, b = j * R + k; idx.push(a, b, a + 1, b, b + 1, a + 1); } }
+    const bg = new THREE.BufferGeometry(); bg.setAttribute("position", new THREE.Float32BufferAttribute(bp, 3)); bg.setAttribute("uv", new THREE.Float32BufferAttribute(bu, 2));
+    bg.setAttribute("fade", new THREE.Float32BufferAttribute(bc, 1)); bg.setIndex(idx);
+    this.frostMat = new THREE.ShaderMaterial({uniforms:{map:{value:tex}, tint:{value:new THREE.Color(0xffffff)}}, vertexShader:FROST_VS, fragmentShader:FROST_FS, transparent:true, depthTest:false, depthWrite:false, side:THREE.DoubleSide});
+    this.frost = new THREE.Mesh(bg, this.frostMat); this.frost.renderOrder = ORDER.frost; this.frost.frustumCulled = false; this.scene.add(this.frost);
+  }
+  /* darker ice on the night map, so it isn't a bright frame round a dark world */
+  setIceTone(night){ if (!this.iceMat || this.iceNight === night) return; this.iceNight = night; const c = night ? 0x5b6f7d : 0xffffff; this.iceMat.color.setHex(c); this.frostMat.uniforms.tint.value.setHex(c); }
   setImage(img){
     if (!img || this.imgSrc === img.src) return;
     this.imgSrc = img.src;
@@ -207,7 +240,7 @@ class MapGL {
     this.bDark.material.uniforms.opacity.value = .55 * bAlpha; this.bLight.material.uniforms.opacity.value = .16 * bAlpha;
     this.haze.visible = warm > 0; this.haze.material.opacity = warm * .12;
     this.r.clear();
-    if (this.spaceMesh){ this.spaceMesh.position.set(spaceOff[0], spaceOff[1], 0); this.r.render(this.bg, this.bgCam); }
+    if (this.spaceMesh && !this.iceMesh){ this.spaceMesh.position.set(spaceOff[0], spaceOff[1], 0); this.r.render(this.bg, this.bgCam); }
     this.r.render(this.scene, c);
   }
   dispose(){ try { this.r.dispose(); this.r.forceContextLoss(); } catch (e){} }

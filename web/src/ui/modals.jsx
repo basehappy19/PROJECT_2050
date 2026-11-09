@@ -28,7 +28,7 @@ export function EventModal(){
   const opts = e.options.map((o, i) => ({o, i, ok:P.affordable(o.fx)}));
   if (opts.every(q => !q.ok)) opts.push({o:{label:{th:P.UI.postpone.th, en:P.UI.postpone.en}, fx:P.POSTPONE}, i:-1, ok:true});
   const where = e.country ? t("evCountryTag") : e.target ? `${t("eventTag")} · ${L(P.RMETA[e.target].name)}` : `${t("eventTag")} · ${t("global")}`;
-  const side = (lab, ids, col) => <div class="side"><b class={col}>{lab}</b><div class="chips">{ids.map(id => { const c = P.C(id); return <span class="chip static" key={id} style={{borderColor:COL[col]}}><i style={{background:COL[relCol(c.rel)]}}/>{L(P.COUNTRY[id].name)}<small class={"mono relnum " + relCol(c.rel)} title={t("relation")}><Icon n="$heart" size={14}/>{Math.round(c.rel)}</small></span>; })}</div></div>;
+  const side = (lab, ids, col) => <div class="side"><b class={col}>{lab}</b><div class="chips">{ids.map(id => { const c = P.C(id); return <span class="chip static" key={id} style={{borderColor:COL[col]}}><i style={{background:COL[relCol(c.rel)]}}/>{L(P.COUNTRY[id].name)}<small class={"mono relnum " + relCol(c.rel)} aria-label={t("relation")}><Icon n="$heart" size={14}/>{Math.round(c.rel)}</small></span>; })}</div></div>;
   return <Modal kind="event">
     <div class="hero photo" style={{backgroundImage:`url(${eventImg(e.id)}), ${mapCropBg(eventPoint(e))}`, "--tint":SND_TINT[eventSnd(e)] || COL.accent}}>
       <div class="tags"><Tag color={e.country ? "accent" : "warn"}>{`[[${e.country ? "globe" : "siren"}]] ${where}`}</Tag>{e.news ? <Tag color="good">{`[[newspaper]] ${t("realNews")} ${e.news.y}`}</Tag> : null}</div>
@@ -51,7 +51,7 @@ export function EventModal(){
             <b>{L(o.label)}</b>
             {!hard ? <span class="fx">{P.fxChips(o.fx, e.target).map((c, k) => {
               const lab = (c.txt.includes(t("sideA")) ? t("sideA") : c.txt.includes(t("sideB")) ? t("sideB") : "") + (c.txt.includes(t("delayed")) ? " " + t("later") : "");
-              return <span class={"fxchip " + (c.good ? "good" : "bad")} key={k} title={plain(c.txt)}><Icon n={c.icon || "circle"} size={15}/>{lab ? <small>{lab}</small> : null}<b>{arrows(c.up, c.mag || 1)}</b></span>;
+              return <span class={"fxchip " + (c.good ? "good" : "bad")} key={k} aria-label={plain(c.txt)}><Icon n={c.icon || "circle"} size={15}/>{lab ? <small>{lab}</small> : null}<b>{arrows(c.up, c.mag || 1)}</b></span>;
             })}</span> : <span class="muted small"><Rich t={`[[eye-off]] ${t("hardHidden")}`} iconColor="inherit"/></span>}
             {!hard && i >= 0 && P.tiltOfOption ? <GroupTilt list={P.tiltOfOption(o, e)}/> : null}
             {!ok ? <span class="bad small">{t("cantAfford")}</span> : null}
@@ -138,7 +138,7 @@ export function CharSel(){
           <Meter v={nx ? (xp - pv) / (nx - pv) : 1} color={c.color} h={4}/>
           <span class="pas"><Rich t={L(c.pas)}/></span>
           <ul class="acts">{c.acts.map(ab => <li key={ab.id}><Icon n={ab.icon} size={14} color={c.color}/>{L(ab.name)}{ab.lv ? <small class="muted"> (Lv{ab.lv})</small> : null}</li>)}</ul>
-          {!owned ? <span class="price" title={P.Net.user ? t("buyInShop") : t("loginToBuy")}><Icon n="terra"/> {P.shopPrice({id:"char_" + c.id, price:c.price})}</span> : null}
+          {!owned ? <span class="price" aria-label={P.Net.user ? t("buyInShop") : t("loginToBuy")}><Icon n="terra"/> {P.shopPrice({id:"char_" + c.id, price:c.price})}</span> : null}
         </div>
       </button>;
     })}</div>
@@ -315,9 +315,9 @@ function Spark({data, color, min, max}){
 function RefCell({g}){
   const lv = (S.refLv || {})[g] || 0, b = (S.refBuild || {})[g], tl = P.tollers(g), k = P.refCost(g), max = P.refLevel(g) >= P.REF_MAX_LV;
   const tip = `${t("refOurs")} ${lv}/${P.REF_MAX_LV}${tl.length ? " · " + t("refFriends") + ": " + P.joinNames(tl.map(c => c.id)) : ""}`;
-  return <span class="mref" title={tip}><Icon n="factory" size={15}/><b class="mono">{P.refCap(g).toFixed(1)}</b>
+  return <span class="mref" aria-label={tip}><Icon n="factory" size={15}/><b class="mono">{P.refCap(g).toFixed(1)}</b>
     {max ? null : b ? <small class="muted"><Icon n="hammer" size={12}/>{b}</small>
-      : <button type="button" class="mini" disabled={!P.canBuild(g)} title={`${t("refBuild")} · ${t("ep")} ${k.ep} · ${t("pc")} ${k.pc}`} onClick={() => { if (P.buildRefinery(g)) Audio.play("buy"); }}><Icon n="plus" size={13}/></button>}
+      : <button type="button" class="mini" disabled={!P.canBuild(g)} aria-label={`${t("refBuild")} · ${t("ep")} ${k.ep} · ${t("pc")} ${k.pc}`} onClick={() => { if (P.buildRefinery(g)) Audio.play("buy"); }}><Icon n="plus" size={13}/></button>}
   </span>;
 }
 export function Market(){
@@ -331,9 +331,9 @@ export function Market(){
       {P.MAT_IDS.map(g => {
         const G = P.MAT[g], pr = P.mktPrice(g), hist = (S.mktHist || {})[g] || [], prev = hist.length > 1 ? hist[hist.length - 2] : pr;
         const chg = prev ? (pr - prev) / prev * 100 : 0, k10 = P.mktLotCost(g, lot), raw = P.rawFor ? P.rawFor(g) : 0;
-        return <div class="mkr" key={g} style={{"--rc":G.col}} title={L(G.sub)}>
+        return <div class="mkr" key={g} style={{"--rc":G.col}} aria-label={L(G.sub)}>
           <span class="rn"><Icon n={G.icon} size={34}/><b>{L(G.name)}</b></span>
-          <span class="mono mhave">{Math.floor(S.mat[g])}{raw ? <small class="muted" title={`~${P.monthsToRefine(g)} ${t("months")}`}> +{raw} {th ? "รอ" : "raw"}</small> : null}</span>
+          <span class="mono mhave">{Math.floor(S.mat[g])}{raw ? <small class="muted" aria-label={`~${P.monthsToRefine(g)} ${t("months")}`}> +{raw} {th ? "รอ" : "raw"}</small> : null}</span>
           <span class="mono mpr"><Rich t={`${ep} ${pr.toFixed(1)}`}/>{Math.abs(chg) > .5 ? <small class={chg > 0 ? "bad" : "good"}>{chg > 0 ? "▲" : "▼"}{Math.abs(chg).toFixed(0)}%</small> : null}</span>
           <span class="msp"><Spark data={hist} color={G.col}/></span>
           {P.refCap ? <RefCell g={g}/> : <span/>}

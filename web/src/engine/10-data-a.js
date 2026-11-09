@@ -124,5 +124,5 @@ const ACTIONS = [
   {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ทวีป −0.8 Gt × ทำตามแผน, ทำตามแผน −6%",en:"Regional CO₂ −0.8 Gt × on-plan, on-plan −6%"}},
 ];
 
-const IC = {ep:"[[$money]]", pc:"[[$policy]]", appr:"[[$appr]]", temp:"[[$temp]]", co2:"[[$co2]]", comp:"[[$plan]]", vuln:"[[$risk]]", rel:"[[$heart]]", ore:"[[$ore]]", gem:"[[$gem]]", sink:"[[$sink]]"};
+const IC = {ep:"[[$money]]", pc:"[[$policy]]", appr:"[[$appr]]", temp:"[[$temp]]", co2:"[[$co2]]", comp:"[[$plan]]", vuln:"[[$risk]]", rel:"[[$heart]]", ore:"[[$ore]]", gem:"[[$credit]]", sink:"[[$sink]]"};
 Object.assign(P, {UI, MONTHS, RESERVE, REGIONS, RIDS, RMETA, CITIES, ACTIONS, IC});

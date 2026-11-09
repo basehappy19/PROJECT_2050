@@ -136,7 +136,7 @@ export function SubRoom(){
       <span class="muted small">{L(W.diff)}</span><Seg items={[["normal", W.normal], ["hard", W.hard]].map(([d, l]) => ({id:d, label:L(l), on:r.diff === d, fn:() => Mp.settings({diff:d})}))}/>
       <Seg items={[{id:"pub", label:L(W.public), on:r.public, fn:() => Mp.settings({public:true})}, {id:"prv", label:L(W.private), on:!r.public, fn:() => Mp.settings({public:false})}]}/></div>
       : <p class="small"><span class="muted">{L(W.diff)}:</span> {L(r.diff === "hard" ? W.hard : W.normal)} · {r.public ? L(W.public) : L(W.private)}</p>}
-    {coop && host ? <div class="mprow wrap"><span class="muted small">{L(W.leader)}</span>{P.CHARS.filter(c => P.Net.owns("char_" + c.id)).map(c => <button type="button" key={c.id} class={"mpchar " + (r.char === c.id ? "on" : "")} title={L(c.person)} onClick={() => Mp.settings({char:c.id})}><Portrait id={c.id} size={36}/></button>)}</div> : null}
+    {coop && host ? <div class="mprow wrap"><span class="muted small">{L(W.leader)}</span>{P.CHARS.filter(c => P.Net.owns("char_" + c.id)).map(c => <button type="button" key={c.id} class={"mpchar " + (r.char === c.id ? "on" : "")} aria-label={L(c.person)} onClick={() => Mp.settings({char:c.id})}><Portrait id={c.id} size={36}/></button>)}</div> : null}
     <div class="mpplayers">{r.players.map(p => <div class={"mpplayer card " + (p.id === me.id ? "me" : "")} key={p.id}>
       <Avatar p={p} size={40}/><Bubble id={p.id}/>
       <span class="grow"><b>{p.displayName}{p.id === me.id ? <small class="muted"> ({L(W.you)})</small> : null}</b>
@@ -144,7 +144,7 @@ export function SubRoom(){
       <span class={"mpready " + (p.ready || p.host ? "good" : "muted")}><Icon n={p.ready || p.host ? "circle-check" : "circle-dashed"} size={18}/></span>
       {host && p.id !== me.id ? <IconBtn n="user-x" title={L(W.kick)} onClick={() => Mp.kick(p.id)}/> : null}
     </div>)}{Array.from({length:Math.max(0, r.max - r.players.length)}, (_, i) => <div class="mpplayer card empty" key={"e" + i}><span class="mpav empty"><Icon n="user-plus" size={16}/></span><span class="muted small">…</span></div>)}</div>
-    {coop ? <div class="mprolepeek">{P.MP.ROLES.map(ro => <span key={ro.id} title={L(ro.does)}><RoleBadge id={ro.id} size={34}/><small>{L(ro.name)}</small></span>)}</div> : null}
+    {coop ? <div class="mprolepeek">{P.MP.ROLES.map(ro => <span key={ro.id} aria-label={L(ro.does)}><RoleBadge id={ro.id} size={34}/><small>{L(ro.name)}</small></span>)}</div> : null}
     <p class="muted small"><Icon n="info" size={13}/> {L(W.pickInGame)}</p>
     <div class="mprow"><QuickBar/><Btn kind="ghost" size="sm" onClick={() => setInv(v => !v)}>{`[[user-plus]] ${L(W.invite)}`}</Btn></div>
     {inv ? <Friends inviting/> : null}
@@ -163,7 +163,7 @@ export function MpHud(){
   const me = Mp.me || {};
   return <>
     <div class="mpbar glass">
-      {(r ? r.players : []).map(p => { const roles = (g.roles || {})[p.id] || []; return <span class={"mpm " + (p.id === me.id ? "me" : "")} key={p.id} title={p.displayName}>
+      {(r ? r.players : []).map(p => { const roles = (g.roles || {})[p.id] || []; return <span class={"mpm " + (p.id === me.id ? "me" : "")} key={p.id} aria-label={p.displayName}>
         <Avatar p={p} size={30}/><Bubble id={p.id}/>
         {g.mode === "coop" ? <span class="mproleic">{roles.map(x => <RoleBadge key={x} id={x} size={18}/>)}</span> : <small class="mpblocm">{p.bloc || ""}</small>}
       </span>; })}
@@ -204,7 +204,7 @@ function Race(){
     <div class={"mprace glass " + (open ? "" : "shut")}>
       <button type="button" class="mprh" onClick={() => setOpen(o => !o)}><Icon n="trophy" size={16} color="gold"/><b>{L(W.race)}</b><span class="grow"/><small class="mono bad">{L(W.shared)} +{(g.T || 0).toFixed(2)}°C</small><Icon n={open ? "chevron-up" : "chevron-down"} size={16}/></button>
       {open ? rk.map(x => { const self = x.id === me.id; return <div class={"mprk " + (self ? "me" : "") + (x.over === "l2" ? " out" : "")} key={x.id}>
-        <b class="mono rk">{x.rank}</b><span class="grow"><b>{x.displayName}{x.biggest ? <span class="bad" title={L(W.biggest)}> <Icon n="flame" size={13}/></span> : null}</b>
+        <b class="mono rk">{x.rank}</b><span class="grow"><b>{x.displayName}{x.biggest ? <span class="bad" aria-label={L(W.biggest)}> <Icon n="flame" size={13}/></span> : null}</b>
           <small class="muted">{REGN(x.bloc)} · <span class="mono">{x.net.toFixed(1)} Gt</span> · {x.appr}%{x.tariffs ? <> · <Icon n="ban" size={11}/>{x.tariffs}</> : null}</small></span>
         {!self && x.over !== "l2" && !S.over ? <span class="mpvs">
           <IconBtn n={V.aid.icon} title={`${L(V.aid.name)} · ${L(V.aid.desc)}`} disabled={(cd.vsAid || 0) > S.tick || S.ep < V.aid.ep} onClick={() => Mp.vsAct("vsAid", x.id)}/>

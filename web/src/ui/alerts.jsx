@@ -69,7 +69,7 @@ export function LossFeed(){
   return <div class="lossfeed" aria-live="polite">{list.map(o => {
     const d = lossText(o), age = (now() - o.at) / live;
     return <button type="button" key={o.id} class={"lossline " + (age > .8 ? "fade" : "")} style={{"--lc":d.col}}
-      onClick={() => { if (o.c){ Audio.play("whoosh", {vol:.3}); GameMap.focusCountry(o.c); } }} title={o.c ? L(P.UI2.lossSee) : ""}>
+      onClick={() => { if (o.c){ Audio.play("whoosh", {vol:.3}); GameMap.focusCountry(o.c); } }}>
       <i class="lic"><Icon n={d.icon} size={18}/></i>
       <span class="ltxt"><b>{d.txt}</b>{d.sub && (o.hint || o.k === "upkeep" || o.k === "delay") ? <small>{d.sub}</small> : null}</span>
       <Chips o={o}/>
@@ -92,7 +92,7 @@ export function HazardAlerts(){
   return <div class="hzalerts">{shown.map(({a, h}) => {
     const Z = P.HAZARDS[h.type], col = HZ_COL[h.type] || COL.bad, left = Math.max(0, h.at - S.tick), cost = P.evacCost(), can = S.ep >= cost;
     return <div class="hzalert glass-strong" key={a.id} style={{"--hc":col}}>
-      <button type="button" class="hsee" title={L(T.alertSee)} onClick={() => GameMap.focusCountry(h.c)}>
+      <button type="button" class="hsee" onClick={() => GameMap.focusCountry(h.c)}>
         <i class="hic"><Icon n={Z.icon} size={24}/></i>
         <span class="htxt"><b>{L(Z.name)} → {P.cname(h.c)}</b><small>{S.lang === "th" ? `อีก ${left} เดือน` : `in ${left} mo`}</small></span>
       </button>

@@ -13,13 +13,13 @@ function Resources({c, noGreen}){
   const refs = P.refinesList ? P.refinesList(c.id) : [];
   const cr = P.CRES[c.id], imp = P.IMPORTERS.includes(c.id), src = S.oreOn && P.oreSources().find(x => x.id === c.id), ban = (S.oreBan || {})[c.id];
   return <>
-    {!noGreen ? <div class="card greencard" title={t("greenHelp")}>
+    {!noGreen ? <div class="card greencard" aria-label={t("greenHelp")}>
       <div class="row"><span class="muted"><Rich t={`[[leaf]] ${t("greenTech")}`} iconColor="good"/></span><b class="mono good">{Math.round(c.green || 0)}%</b></div>
       <Meter v={(c.green || 0) / 100} color="good" h={6}/>
     </div> : null}
     {cr || imp || refs.length ? <>
       {!noGreen ? <H3>{t("resTitle")}</H3> : null}
-      {cr ? <div class="restiles">{cr.r.map(k => { const R = P.RES[k], g = P.groupOf && P.groupOf(k), ready = g && refs.includes(g); return <div class="rt" key={k} title={L(R.fact)} style={{"--rc":R.col}}>
+      {cr ? <div class="restiles">{cr.r.map(k => { const R = P.RES[k], g = P.groupOf && P.groupOf(k), ready = g && refs.includes(g); return <div class="rt" key={k} aria-label={L(R.fact)} style={{"--rc":R.col}}>
         <Icon n={"$res-" + k} size={38}/><span>{L(R.name).replace(/\s*\(.*\)$/, "")}</span>
         {g ? <em class={"rtag " + (ready ? "ok" : "raw")}>{ready ? t("resReady") : t("resRaw")}</em> : null}
       </div>; })}</div> : null}
@@ -80,7 +80,7 @@ function fxChips(desc){
 const RichB = ({t:txt, iconColor}) => <span>{String(txt).split(/\[b\](.*?)\[\/b\]/).map((p, i) => i % 2 ? <b key={i} class="fg">{p}</b> : <Rich key={i} t={p} iconColor={iconColor}/>)}</span>;
 const Chips = ({desc}) => <div class="fxs">{fxChips(desc).map((c, i) => <span key={i} class={"fx " + (c.bad ? "bad" : "good")}><Icon n={c.icon} size={12}/>{c.t}</span>)}</div>;
 function OrderLine({icon, name, desc, cost, cd, ok, onClick, tilt, data}){
-  return <div class={"oline " + (ok ? "" : "dim")} title={plain(desc)} data-cact={data}>
+  return <div class={"oline " + (ok ? "" : "dim")} aria-label={plain(desc)} data-cact={data}>
     <Icon n={icon} size={18} cls="olic"/>
     <div class="olm"><b>{name}</b><Chips desc={desc}/>{tilt ? <GroupTilt list={tilt}/> : null}</div>
     <Btn kind={ok ? "primary" : "ghost"} disabled={!ok} sound={null} onClick={onClick}>{cd ? `${t("cooldown")} ${cd}` : costLabel(cost)}</Btn>
@@ -88,7 +88,7 @@ function OrderLine({icon, name, desc, cost, cd, ok, onClick, tilt, data}){
 }
 function RelRing({rel}){
   const col = relCol(rel);
-  return <div class={"relring " + col} style={{"--p":Math.min(100, Math.abs(rel)), "--rc":COL[col]}} title={t(rel >= 50 ? "relHigh" : rel >= 0 ? "relMid" : "relLow")}>
+  return <div class={"relring " + col} style={{"--p":Math.min(100, Math.abs(rel)), "--rc":COL[col]}} aria-label={t(rel >= 50 ? "relHigh" : rel >= 0 ? "relMid" : "relLow")}>
     <b class="mono">{rel >= 0 ? "+" : ""}{Math.round(rel)}</b><small>{t("relation")}</small>
   </div>;
 }
@@ -143,7 +143,7 @@ function BaseCard({c}){
       {!hq ? <Btn kind={P.hqOk(c) ? "primary" : "ghost"} disabled={!P.hqOk(c)} onClick={() => { if (P.moveHQ(c.id)) Audio.play("bell", {vol:.7}); }}>{S.hqCd > 0 ? `${L(W.hqWait)} ${S.hqCd} ${t("months")}` : `${L(W.hqSet)} · ${IC().ep} ${kh.ep} ${IC().pc} ${kh.pc}`}</Btn> : null}
     </div>
     {!amb && (S.amb || []).length >= P.AMB_MAX ? <small class="warn">{L(W.ambFull)}</small> : null}
-    <small class="muted helpline"><span title={L(W.ambHelp)}><Icon n="info" size={13}/> {TT("ทูตทำอะไร", "What envoys do")}</span>{!hq ? <span title={L(W.hqHelp)}><Icon n="info" size={13}/> {TT("ฐานบัญชาการ", "Home base")}</span> : null}</small>
+    <small class="muted helpline"><span aria-label={L(W.ambHelp)}><Icon n="info" size={13}/> {TT("ทูตทำอะไร", "What envoys do")}</span>{!hq ? <span aria-label={L(W.hqHelp)}><Icon n="info" size={13}/> {TT("ฐานบัญชาการ", "Home base")}</span> : null}</small>
   </div>;
 }
 
@@ -196,7 +196,7 @@ function PaneCountry(){
       <H3>{`${TT("คำสั่งเฉพาะทวีป", "Orders for the region of")} ${L(P.RMETA[c.reg].name)}`}</H3>
       <OrderCards scope="region"/>
     </> : <>
-      {c.rel < BIL ? <div class="goalbar" title={t("bilatTitle")}>
+      {c.rel < BIL ? <div class="goalbar" aria-label={t("bilatTitle")}>
         <Icon n="target" size={15}/><span><RichB t={TT(`เป้าหมายถัดไป: มิตรภาพ [b]${BIL}[/b] เพื่อปลดล็อก [b]ข้อตกลงทวิภาคี[/b]`, `Next: friendship [b]${BIL}[/b] unlocks a [b]bilateral agreement[/b]`)}/></span>
         <i class="gb"><b style={{width:`${Math.max(0, Math.min(1, c.rel / BIL)) * 100}%`}}/></i>
       </div> : null}

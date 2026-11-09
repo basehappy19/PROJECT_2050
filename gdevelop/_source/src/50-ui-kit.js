@@ -297,7 +297,7 @@ const Kit = {
       for (const it of ln.items){
         if (it.t === "i"){
           const isz = lay.iconW, ic = it.v === "terra" ? "#ffffff" : (o.iconColor || ICON_COL[it.v] || color);
-          if (it.v === "$gem"){ const g = isz * 1.6; this.icon(l, it.v, cx + (isz - g) / 2, cy + (lh - g) / 2, g, ic, alpha); }   // the gem picture has wide empty margins
+          if (it.v === "$credit"){ const g = isz * 1.12; this.icon(l, it.v, cx + (isz - g) / 2, cy + (lh - g) / 2, g, ic, alpha); }   // 3.5: the Carbon Credit coin, drawn a little larger like a coin in text
           else this.icon(l, it.v, cx, cy + (lh - isz) / 2, isz, ic, alpha);
         } else {
           const t = l.obj("UIText");
@@ -383,12 +383,22 @@ const Kit = {
     const im = scene.getGame().getInputManager();
     const mx = im.getCursorX() / K, my = im.getCursorY() / K, down = im.isMouseButtonPressed(0);
     const m = this.mouse;
+    if (!this._ptrL && typeof window !== "undefined"){   // 3.5: remember whether the last press was a finger/pen or a mouse
+      this._ptrL = true;
+      window.addEventListener("pointerdown", e => { this.touch = e.pointerType !== "mouse"; this._pd = true; }, true);
+      window.addEventListener("pointermove", e => { if (e.pointerType === "mouse") this.touch = false; }, true);
+    }
+    const pressedNow = (down && !m.down) || !!this._pd; this._pd = false;   // a very quick tap can start and end inside one frame
     if (down && !m.down){ m.sx = mx; m.sy = my; m.moved = 0; const f = this._find(mx, my); m.onUI = !!f && !(f.layer.name === "MapUI" && !f.hit); this.pressHit = f && f.hit; m.scrollL = this._scrollAt(mx, my); m.scroll0 = m.scrollL ? m.scrollL.scroll : 0; }
     if (down) m.moved = Math.max(m.moved, Math.abs(mx - m.sx) + Math.abs(my - m.sy));
     if (down && this.pressHit && this.pressHit.drag){ const h = this.pressHit, l = h.layer; h.drag(Math.max(0, Math.min(1, (mx - l.ox - h.x) / h.w))); this.dirty(l.master || l.name); }
     else if (down && m.scrollL && m.moved > 6){ this.setScroll(m.scrollL, m.scroll0 - (my - m.sy)); }
     m.x = mx; m.y = my; m.down = down;
-    const f = this._find(mx, my), hv = f && f.hit && !f.hit.dis ? f.hit.id : null, hl = f && f.hit ? f.layer.name : null;
+    const f = this._find(mx, my);
+    let hv = f && f.hit && !f.hit.dis ? f.hit.id : null, hl = f && f.hit ? f.layer.name : null;
+    // 3.5: touch screens have no hover. Once the finger lifts nothing stays "hovered", so tooltips and highlights never stick (iPad)
+    if (this.touch && !down){ hv = null; hl = null; }
+    this._tipTick(pressedNow, f);
     if (hv !== this.hover || hl !== this.hoverLayer){
       if (this.hoverLayer && this.layers[this.hoverLayer]) this.layers[this.hoverLayer].dirty = true;
       if (hl) this.layers[hl].dirty = true;
@@ -419,6 +429,21 @@ const Kit = {
     if (!l.maskG){ l.maskG = new PIXI.Graphics(); }
     if (l.maskKey !== key){ l.maskKey = key; l.maskG.clear(); l.maskG.beginFill(0xffffff, 1); l.maskG.drawRect(c.x * K, c.y * K, c.w * K, c.h * K); l.maskG.endFill(); }
     if (cont.mask !== l.maskG) cont.mask = l.maskG;
+  },
+  /* 3.5: tooltips opened by a tap (top-bar values, character, abilities) close when you press anywhere else,
+     use the mouse wheel, or after 8 seconds on a touch screen. Pressing the same thing again toggles it (its own hit does that). */
+  _tipTick(pressed, f){
+    const U = P.UIM; if (!U) return;
+    const key = (U.kpiTip || "") + "|" + (U.abTip || ""), open = key !== "|";
+    if (key !== this._tipKey){ this._tipKey = key; this._tipAt = Date.now(); }
+    if (!open) return;
+    const id = pressed && f && f.hit ? f.hit.id : null;
+    let close = false;
+    if (pressed && U.kpiTip && id !== "kpi-" + U.kpiTip){ U.kpiTip = null; close = true; }
+    if (pressed && U.abTip && id !== (U.abTip === "char" ? "charinfo" : "ab-" + U.abTip)){ U.abTip = null; close = true; }
+    const wheel = this.scene && this.scene.getGame().getInputManager().getMouseWheelDelta ? this.scene.getGame().getInputManager().getMouseWheelDelta() : 0;
+    if (wheel || (this.touch && Date.now() - this._tipAt > 8000)){ U.kpiTip = null; U.abTip = null; close = true; }
+    if (close){ this._tipKey = "|"; this.dirty("HUD"); }
   },
   /* mouse released: run the hit under the pointer. Returns true when the UI used the click. */
   release(){

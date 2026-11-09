@@ -77,8 +77,8 @@ const TUT = [
    body:{th:["เกมหยุดรอให้เลือก ปุ่มจะกดได้หลังแถบเติมเต็ม (กันกดพลาด)","▲▼ = ค่านั้นขึ้นหรือลง · สีเขียว = ดี สีแดง = เสีย · ยิ่งหลายลูกศรยิ่งแรง","ข้อพิพาทระหว่างประเทศ: ฝ่ายเสนอกับฝ่ายคัดค้านจะพอใจไม่เท่ากัน"],
          en:["The game waits for your choice; buttons unlock when the bar fills (no misclicks)","▲▼ = that value goes up or down · green = good, red = bad · more arrows = bigger","International disputes: the two sides react differently"]}},
   {img:"t8-win.jpg", title:{th:"วิธีชนะและแพ้",en:"How to win or lose"},
-   body:{th:["ชนะ: CO₂ สุทธิถึง 0 ก่อนปี 2051 (เกรด S/A/B ตามอุณหภูมิ)","แพ้: อุณหภูมิถึง 3.0°C, ความนิยมเหลือ 0% หรือหมดเวลา","ชนะครั้งแรกแล้วจะเปิดโหมดโลกต่อเนื่อง เล่นต่อได้ไม่มีวันจบ · เข้าสู่ระบบเพื่อรับเพชรและติดอันดับ"],
-         en:["Win: net CO₂ reaches 0 before 2051 (grade S/A/B by temperature)","Lose: 3.0°C warming, 0% approval, or running out of time","Your first win opens Continuous World, which never ends · Sign in to earn Gems and get ranked"]}},
+   body:{th:["ชนะ: CO₂ สุทธิถึง 0 ก่อนปี 2051 (เกรด S/A/B ตามอุณหภูมิ)","แพ้: อุณหภูมิถึง 3.0°C, ความนิยมเหลือ 0% หรือหมดเวลา","ชนะครั้งแรกแล้วจะเปิดโหมดโลกต่อเนื่อง เล่นต่อได้ไม่มีวันจบ · เข้าสู่ระบบเพื่อรับคาร์บอนเครดิตและติดอันดับ"],
+         en:["Win: net CO₂ reaches 0 before 2051 (grade S/A/B by temperature)","Lose: 3.0°C warming, 0% approval, or running out of time","Your first win opens Continuous World, which never ends · Sign in to earn Carbon Credits and get ranked"]}},
 ];
 const ACH = [
   {id:"start",     icon:"globe",           t:{th:"ก้าวแรกของ GCT",en:"First Day at GCT"},            d:{th:"เริ่มภารกิจครั้งแรก",en:"Start your first mission"}},

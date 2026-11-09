@@ -178,6 +178,14 @@ export class Globe {
     this.camera.setViewOffset(w, h, -this.offsetX * w, -this.offsetY * h, w, h);
     this.camera.updateProjectionMatrix();
   }
+  /* 3.5: where the globe is on screen (CSS px): centre and radius, at its resting distance */
+  screenCircle(){
+    const c = this.canvas, w = c.clientWidth || window.innerWidth, h = c.clientHeight || window.innerHeight;
+    const r = h / 2 * Math.tan(Math.asin(1 / this.camDist)) / Math.tan(this.camera.fov * DEG / 2);
+    return {x:w / 2 + this.offsetX * w, y:h / 2 + this.offsetY * h, r};
+  }
+  /* 3.5: turn the globe so this longitude faces the viewer */
+  faceLon(lon){ this.spin = (-90 - lon) * DEG; this.vel = 0; }
   setHeat(v){ this.uni.heat.value = Math.max(0, Math.min(1, v)); }
   start(){ if (this.running) return; this.running = true; this.clock.getDelta(); const loop = () => { if (!this.running) return; this.frame(); this.raf = requestAnimationFrame(loop); }; this.raf = requestAnimationFrame(loop); }
   stop(){ this.running = false; cancelAnimationFrame(this.raf); }

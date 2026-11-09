@@ -234,8 +234,9 @@ const Map = {
   latlonScreen(lat, lon){ const [x, y] = toWorld(lat, lon); return this.toScreen(x, y); },
   clampCam(){
     const z = this.cam.z, halfW = W / 2 / z, halfH = Hh / 2 / z;
-    this.cam.x = clamp(this.cam.x, Math.min(960, 0 + halfW - 500 / z), Math.max(960, 1920 - halfW + 500 / z));
-    this.cam.y = clamp(this.cam.y, Math.min(516, MAP_TOP + halfH - 300 / z), Math.max(516, MAP_TOP + 807 - halfH + 300 / z));
+    // 3.5: like the website, the map can't be dragged past its edge (the ice round it shows only a little)
+    this.cam.x = clamp(this.cam.x, Math.min(960, 0 + halfW - 90 / z), Math.max(960, 1920 - halfW + 90 / z));
+    this.cam.y = clamp(this.cam.y, Math.min(516, MAP_TOP + halfH - 70 / z), Math.max(516, MAP_TOP + 807 - halfH + 70 / z));
   },
   onResize(gw){ W = gw; this._ck = null; if (this.scene) this.applyCam(); },
   freeCx(){ const dw = P.Screens ? P.Screens.drawerWidth() : 0; return (Kit.W - 16 - dw - 16) / 2 * Kit.K; },

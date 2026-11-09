@@ -10,18 +10,18 @@ const snd = (fn, s = "click") => e => { if (s) Audio.play(s); fn && fn(e); };
 const hov = () => Audio.hover();
 
 export function Btn({children, onClick, kind = "primary", disabled, sound = "click", cls = "", size, title, style, type = "button", block}){
-  return <button type={type} class={`btn btn-${kind}${size ? " btn-" + size : ""}${block ? " btn-block" : ""} ${cls}`} disabled={disabled} title={title} style={style}
+  return <button type={type} class={`btn btn-${kind}${size ? " btn-" + size : ""}${block ? " btn-block" : ""} ${cls}`} disabled={disabled} style={style}
     onPointerEnter={disabled ? undefined : hov} onClick={disabled ? undefined : snd(onClick, sound)}>{typeof children === "string" ? <Rich t={children} iconColor="inherit"/> : children}</button>;
 }
 export function IconBtn({n, onClick, title, cls = "", on, disabled, sound = "click", size = 18, badge}){
-  return <button type="button" class={`ibtn ${on ? "on" : ""} ${cls}`} title={title} aria-label={title} disabled={disabled} onPointerEnter={disabled ? undefined : hov} onClick={disabled ? undefined : snd(onClick, sound)}>
+  return <button type="button" class={`ibtn ${on ? "on" : ""} ${cls}`} aria-label={title} disabled={disabled} onPointerEnter={disabled ? undefined : hov} onClick={disabled ? undefined : snd(onClick, sound)}>
     <Icon n={n} size={size}/>{badge ? <span class="badge">{badge}</span> : null}
   </button>;
 }
 /* segmented control: items [{id, label?, icon?, on, fn, dis}] */
 export function Seg({items, cls = ""}){
   return <div class={"seg " + cls}>{items.map(it =>
-    <button type="button" key={it.id} data-id={it.id} class={it.on ? "on" : ""} disabled={it.dis} onPointerEnter={hov} onClick={snd(it.fn, it.sound ?? "toggle")} title={it.title}>{it.icon ? <Icon n={it.icon} size={15}/> : it.label}</button>)}</div>;
+    <button type="button" key={it.id} data-id={it.id} class={it.on ? "on" : ""} disabled={it.dis} onPointerEnter={hov} onClick={snd(it.fn, it.sound ?? "toggle")} aria-label={it.title}>{it.icon ? <Icon n={it.icon} size={15}/> : it.label}</button>)}</div>;
 }
 /* text tabs: items [{id, label, on, fn, badge}] */
 export function Tabs({items, cls = ""}){
@@ -154,7 +154,7 @@ export function GroupTilt({list, cls = ""}){
   if (!list || !list.length) return null;
   return <span class={"gtilt " + cls}>{list.map(({g, v}) => {
     const G = P.GROUP[g], n = Math.abs(v) >= 4 ? 2 : 1;
-    return <span key={g} class={"gt " + (v > 0 ? "up" : "down")} title={`${L(G.name)} ${v > 0 ? "▲" : "▼"}`}><Icon n={G.icon} size={13}/><b>{(v > 0 ? "▲" : "▼").repeat(n)}</b></span>;
+    return <span key={g} class={"gt " + (v > 0 ? "up" : "down")} aria-label={`${L(G.name)} ${v > 0 ? "▲" : "▼"}`}><Icon n={G.icon} size={13}/><b>{(v > 0 ? "▲" : "▼").repeat(n)}</b></span>;
   })}</span>;
 }
 /* 1.6: the four groups — bar, state and (full) what they like and hate */

@@ -132,8 +132,16 @@ const T = {
       v.obj.visible = v.shadow.visible = v.trail.visible = show; if (!show) continue;
       const ang = Math.atan2(ay - by, ax - bx);
       const air = v.kind === "air", alt = air ? Math.sin(Math.PI * clamp(v.f, 0, 1)) : 0, h = air ? 3 + 26 * alt : 0;
-      v.obj.position.set(x, y, h); v.obj.rotation.set(0, 0, ang); v.obj.scale.setScalar(size);
-      if (air) v.obj.rotation.x = Math.sin(v.f * 40) * .05;   // a little roll
+      v.obj.position.set(x, y, h); v.obj.scale.setScalar(size);
+      if (air){
+        // 3.5: like the website, the plane points its nose up while it climbs and down while it lands, and banks into turns,
+        // so with the map tipped back you see its side and, at times, its belly
+        const [cx1, cy1] = at(v.path, clamp(f + dir * .03, 0, 1)), [dx1, dy1] = at(v.path, clamp(f - dir * .03, 0, 1));
+        const tr = Math.atan2(cy1 - y, cx1 - x0) - Math.atan2(y - dy1, x0 - dx1), turn = Math.atan2(Math.sin(tr), Math.cos(tr));
+        const hA = 26 * Math.sin(Math.PI * clamp(v.f + .01, 0, 1)), hB = 26 * Math.sin(Math.PI * clamp(v.f - .01, 0, 1));
+        const climb = Math.atan((hA - hB) / Math.max(1, Math.hypot(ax - bx, ay - by) * 2.5));
+        v.obj.rotation.order = "ZYX"; v.obj.rotation.set(-clamp(turn * 9, -.8, .8), -clamp(climb * 3, -.6, .6), ang);
+      } else v.obj.rotation.set(0, 0, ang);
       v.shadow.position.set(x + h * .35, y + h * .45, .05); v.shadow.rotation.set(0, 0, ang); v.shadow.scale.set(size, size, .01);
       v.shadow.traverse(o => { if (o.material) o.material.opacity = air ? .32 - .18 * alt : .3; });
       // trail: the last stretch of the route behind it

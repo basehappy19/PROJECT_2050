@@ -6,6 +6,7 @@ import {G} from "../game.js";
 import {GameMap} from "../map2d.js";
 import {Icon, Rich, plain} from "./icon.jsx";
 import {IconBtn, Seg, Portrait, Meter} from "./widgets.jsx";
+import {tipOpen, tipProps, showTip, hideTip, toggleTip, lastPointer} from "./tip.js";
 
 const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
 
@@ -24,9 +25,11 @@ function AnimNum({v, fmt = x => Math.floor(x)}){
   useEffect(() => () => cancelAnimationFrame(r.current.raf), []);
   return <>{fmt(shown)}{delta ? <i class={"kdelta " + (delta.d > 0 ? "up" : "down")} key={delta.k}>{delta.d > 0 ? "+" : "−"}{Math.abs(Math.round(delta.d))}</i> : null}</>;
 }
+/* 3.5: on touch screens a tooltip says how to close it */
+const TapClose = () => lastPointer() === "mouse" ? null : <small class="tapclose">{S.lang === "th" ? "แตะที่ไหนก็ได้เพื่อปิด" : "Tap anywhere to close"}</small>;
 /* a value in the top bar: hover (or tap) shows what it is and how to get more */
 function Kpi({label, value, fmt, sub, meter, cls = "", danger, stat, tip, onClick, badge, kid}){
-  const [open, setOpen] = useState(false), touch = isTouch();
+  const id = "kpi-" + kid, open = tipOpen(id);
   const box = <div class={`kpi ${cls} ${danger ? "danger" : ""} ${stat ? "has3d" : ""}`}>
     {stat ? <Icon n={"$" + stat} size={30} cls="k3d"/> : null}
     <span class="k">{stat ? plain(label) : <Rich t={label}/>}</span>
@@ -35,10 +38,9 @@ function Kpi({label, value, fmt, sub, meter, cls = "", danger, stat, tip, onClic
     {meter !== undefined ? <Meter v={meter.v} color={meter.c} h={4} cls="kmeter"/> : null}
     {badge ? <i class="kbadge">{badge}</i> : null}
   </div>;
-  return <div class="kpiw" data-kpi={kid} onPointerEnter={e => { if (e.pointerType === "mouse") setOpen(true); }} onPointerLeave={() => setOpen(false)}
-    onClick={() => { if (onClick) onClick(); else if (touch) setOpen(o => !o); }}>
+  return <div class="kpiw" data-kpi={kid} {...tipProps(id, onClick)}>
     {onClick ? <button type="button" class="kpibtn">{box}<Icon n="chevron-down" size={14} cls="kmore"/></button> : box}
-    {open && tip ? <div class="ktip glass-strong" role="tooltip"><b><Rich t={label}/></b>{sub ? <span class="mono acc">{sub}</span> : null}<span><Rich t={tip}/></span></div> : null}
+    {open && tip ? <div class="ktip glass-strong" role="tooltip"><b><Rich t={label}/></b>{sub ? <span class="mono acc">{sub}</span> : null}<span><Rich t={tip}/></span><TapClose/></div> : null}
   </div>;
 }
 
@@ -61,7 +63,7 @@ export function TopBar(){
     </div>
     <div class="ctrls glass">
       <div class="date">
-        <span title={L(P.seasonOf().name)}><Icon n={P.seasonOf().icon} size={14} cls="season"/> {P.dateStr()}</span>
+        <span aria-label={L(P.seasonOf().name)}><Icon n={P.seasonOf().icon} size={14} cls="season"/> {P.dateStr()}</span>
         <i class="month"><b key={S.tick + ":" + S.speed} style={{animationDuration:`${P.secPerMonth()}s`, animationPlayState:running ? "running" : "paused"}}/></i>
       </div>
       <Seg cls="speed" items={sp}/>
@@ -76,26 +78,29 @@ export function TopBar(){
 function NewsLine(){
   const lg = S.log[0], LCOL = {tc:"accent", al:"bad", gd:"good", ev:"warn", nw:"fg", in:"purple"};
   if (!lg) return null;
-  return <button type="button" class="ticker glass fadeout" onClick={() => G.setTab("news")} key={S.log.length + ":" + lg.tk} title={t("nbNews")}>
+  return <button type="button" class="ticker glass fadeout" onClick={() => G.setTab("news")} key={S.log.length + ":" + lg.tk}>
     <Icon n="newspaper" size={14} cls="tkic"/><Rich t={lg.txt} cls={"txt " + (LCOL[lg.cls] || "fg")} iconColor="inherit"/>
   </button>;
 }
 
 /* character portrait + ability buttons */
 export function AbilityBar(){
-  const [tip, setTip] = useState(null);
   const ch = P.CHAR[S.char]; if (!ch) return null;
+  const tip = tipOpen("ab-char") ? "char" : (P.abilityList().find(a => tipOpen("ab-" + a.id)) || {}).id || null;
   const list = P.abilityList();
   const xp = P.Net ? P.Net.charXp(S.char) : 0;
-  return <aside class="abar glass" onPointerLeave={() => setTip(null)}>
-    <button type="button" class="abar-char" onClick={() => { Audio.play("click"); setTip(tip === "char" ? null : "char"); }} onPointerEnter={() => setTip("char")}>
+  const charTp = tipProps("ab-char");
+  return <aside class="abar glass">
+    <button type="button" class="abar-char" {...charTp} onClick={e => { Audio.play("click"); charTp.onClick(e); }}>
       <Portrait id={S.char} size={52} lv={S.charLv}/>
     </button>
     {list.map(a => {
       const ready = P.abilityReady(a), cd = S.actCd[a.id] || 0;
       return <button type="button" key={a.id} class={`abtn ${ready ? "ready" : ""} ${a.kind}`} aria-label={L(a.name)}
-        onPointerEnter={() => { setTip(a.id); Audio.hover(); }}
-        onClick={() => { if (ready){ if (P.useAbility(a.id)){ setTip(null); Audio.play("powerup", {vol:.6}); } } else { setTip(a.id); Audio.play("error"); } }}>
+        data-tip={"ab-" + a.id}
+        onPointerEnter={e => { if (e.pointerType === "mouse"){ showTip("ab-" + a.id); Audio.hover(); } }}
+        onPointerLeave={e => { if (e.pointerType === "mouse") hideTip("ab-" + a.id); }}
+        onClick={() => { if (ready){ if (P.useAbility(a.id)){ hideTip(); Audio.play("powerup", {vol:.6}); } } else { if (lastPointer() === "mouse") showTip("ab-" + a.id); else toggleTip("ab-" + a.id); Audio.play("error"); } }}>
         <Icon n={a.lock ? "lock" : a.icon} size={20}/>
         {cd > 0 ? <><i class="cd" style={{height:`${clamp(cd / a.cd, 0, 1) * 100}%`}}/><b class="cdn">{cd}</b></> : a.lock ? <b class="lvn">Lv{a.lock}</b> : null}
       </button>;
@@ -103,11 +108,11 @@ export function AbilityBar(){
     {tip === "char" ? <div class="tip" style={{top:0}}>
       <b>{L(ch.person)} · {L(ch.name)}</b>
       <span class="mono acc">{t("level")} {S.charLv} · XP {xp}</span>
-      <span class="muted"><Rich t={`${t("passive")}: ${L(ch.pas)}`}/></span>
+      <span class="muted"><Rich t={`${t("passive")}: ${L(ch.pas)}`}/></span><TapClose/>
     </div> : null}
     {list.map((a, i) => tip === a.id ? <div class="tip" key={"t" + a.id} style={{top:66 + i * 54}}>
       <b>{L(a.name)}</b><span class="muted"><Rich t={L(a.desc)}/></span>
-      <span class={"mono " + ((S.actCd[a.id] || a.lock) ? "warn" : "acc")}>{a.lock ? `${t("unlockAtLv")} ${a.lock}` : S.actCd[a.id] ? `${t("cooldown")} ${S.actCd[a.id]} ${t("months")}` : a.target === "country" && !(S.selC && !S.selC.startsWith("R_")) ? t("needCountry") : `${t("cooldownLen")} ${a.cd} ${t("months")}`}</span>
+      <span class={"mono " + ((S.actCd[a.id] || a.lock) ? "warn" : "acc")}>{a.lock ? `${t("unlockAtLv")} ${a.lock}` : S.actCd[a.id] ? `${t("cooldown")} ${S.actCd[a.id]} ${t("months")}` : a.target === "country" && !(S.selC && !S.selC.startsWith("R_")) ? t("needCountry") : `${t("cooldownLen")} ${a.cd} ${t("months")}`}</span><TapClose/>
     </div> : null)}
   </aside>;
 }
@@ -168,15 +173,15 @@ function MeterNZ(){
   if (trend < -0.05){ const yr = 2026 + S.tick / 12 + net / -trend; proj = yr <= 2051 ? `${t("onTrack")} ${Math.floor(yr)}` : t("offTrack"); pcls = yr <= 2051 ? "good" : "bad"; }
   else { proj = t("rising"); pcls = "bad"; }
   const pos = v => clamp(v / NZ_MAX, 0, 1), cls = net <= 8 ? "good" : net <= 20 ? "warn" : "bad";
-  return <div class="mtr" title={`${plain(t("tipNZ"))}\n${plain(proj)}`}>
+  return <div class="mtr" aria-label={`${plain(t("tipNZ"))}\n${plain(proj)}`}>
     <Rich t={`[[flag]] ${t("nzTitle")}`} cls="ttl"/>
     <div class="bar nz">
       <i class="fill" style={{width:`${(1 - pos(net)) * 100}%`}}/>
       <i class="ghost" style={{left:`${(1 - pos(start)) * 100}%`}}/>
       {S.v2 && !S.world && P.yearTarget ? (() => { const tk = Math.min(P.TOTAL_TICKS, (Math.floor(S.tick / 12) + 1) * 12), v = P.yearTarget(tk), y = 2025 + tk / 12;
-        return <i class="ms next yr" style={{left:`${(1 - pos(v)) * 100}%`}} title={`${L(P.UI2.yrMeter)} ${y}: CO₂ ≤ ${v.toFixed(1)} Gt`}><b>{y}</b></i>; })() : null}
+        return <i class="ms next yr" style={{left:`${(1 - pos(v)) * 100}%`}} aria-label={`${L(P.UI2.yrMeter)} ${y}: CO₂ ≤ ${v.toFixed(1)} Gt`}><b>{y}</b></i>; })() : null}
       {!S.world && !S.v2 && P.MILESTONES ? P.MILESTONES.map((m, i) => { const st = (S.ms17 || {})[i], cur = st === undefined && P.MILESTONES.findIndex((q, k) => (S.ms17 || {})[k] === undefined) === i;
-        return <i key={m.y} class={"ms " + (st === 1 ? "hit" : st === 0 ? "miss" : cur ? "next" : "")} style={{left:`${(1 - pos(m.v)) * 100}%`}} title={`${m.y}: CO₂ ≤ ${m.v} Gt`}><b>{st === 1 ? "✓" : st === 0 ? "✕" : ""}{m.y}</b></i>; }) : null}
+        return <i key={m.y} class={"ms " + (st === 1 ? "hit" : st === 0 ? "miss" : cur ? "next" : "")} style={{left:`${(1 - pos(m.v)) * 100}%`}} aria-label={`${m.y}: CO₂ ≤ ${m.v} Gt`}><b>{st === 1 ? "✓" : st === 0 ? "✕" : ""}{m.y}</b></i>; }) : null}
       <i class={"dot " + cls} style={{left:`${(1 - pos(net)) * 100}%`}}/>
       <Icon n="trophy" size={14} cls="end good"/>
     </div>
@@ -186,7 +191,7 @@ function MeterNZ(){
 function MeterT(){
   const monthsLeft = Math.max(0, P.TOTAL_TICKS - S.tick), era = S.world && P.ERAS[S.era || "shift"], cls = S.temp >= 2.5 ? "bad" : S.temp >= 2.0 ? "hot" : S.temp >= 1.5 ? "warn" : "good";
   const foot = era ? `${L(era.name)} · ${L(era.goal)}` : `${Math.max(0, 3 - S.temp).toFixed(1)}°C ${t("toLose")} · ${t("left")} ${Math.ceil(monthsLeft / 12)} ${t("yrs")}`;
-  return <div class="mtr" title={`${plain(t("tipTemp"))}\n${plain(foot)}`}>
+  return <div class="mtr" aria-label={`${plain(t("tipTemp"))}\n${plain(foot)}`}>
     <Rich t={`[[$temp]] ${t("tTitle")}`} cls="ttl"/>
     <div class="bar temp">
       <i class="z"/><i class="z"/><i class="z"/><i class="z"/>
@@ -207,7 +212,7 @@ export function Bottom(){
       <div class="meters glass"><MeterNZ/><MeterT/></div>
       <nav class="tabbar glass">{tabs.map(([id, ic, key, kk]) => {
         const on = id === "tech" ? UIM.modal === "skills" : S.tab === id;
-        return <button type="button" key={id} data-tab={id} class={`tabbtn ${on ? "on" : ""}`} title={`${t(key)} (${kk})`} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>
+        return <button type="button" key={id} data-tab={id} class={`tabbtn ${on ? "on" : ""}`} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>
           <Icon n={ic} size={17}/><span>{t(key)}</span>{badge[id] ? <b class={"badge " + (id === "tech" ? "" : "b2")}>{badge[id]}</b> : null}
         </button>;
       })}</nav>

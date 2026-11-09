@@ -281,6 +281,10 @@ export function drawTraffic(M, c, dt, now, vis){
   for (const k of Object.keys(want)){ const have = list.filter(v => v.kind === k).length; if (have < want[k] && Math.random() < dt * .8){ const v = spawn(M, k); if (v){ v.f = list.length < 4 ? Math.random() * .6 : 0; list.push(v); } } }
   const s = M.scale(), z = M.cam.z, size = clamp(5 + 2.2 * Math.sqrt(z), 6, 11);
   const pShadow = planeShadow(), sShadow = shipShadow();
+  const A3 = M.air3d && M.air3dOn ? M.air3d : null;   // 3.5: planes as 3D models that tip back with the map
+  if (A3) A3.begin(M.tilt);
+  // height of a plane above the map (screen px at zoom z): climbs, cruises, comes down
+  const altOf = f => Math.sin(Math.PI * clamp(f, 0, 1)), hOf = f => (4 + 24 * altOf(f)) * Math.sqrt(z);
   for (const v of list){
     v.f += dt / v.dur;
     if (v.kind !== "air" && v.lane && !P.laneOpen(v.lane) && v.lane !== "asiaEuCape") v.f = 1.01;   // a closed route: the ship turns back out of sight
@@ -291,7 +295,8 @@ export function drawTraffic(M, c, dt, now, vis){
     // so planes and ships slid along when you dragged a zoomed-in map)
     for (const ox of [0, -MAP.W, MAP.W]){
       const wxc = wx + ox; if (wxc < -10 || wxc > MAP.W + 10) continue;   // only over the map itself, never in the empty space beside it
-      const [x, y] = M.toScreen(wxc, wy); if (!vis(x, y, 30)) continue;
+      const hNow = air && A3 ? hOf(v.f) : 0;
+      const [x, y] = hNow ? M.toScreenAlt(wxc, wy, hNow) : M.toScreen(wxc, wy); if (!vis(x, y, 30)) continue;
       const [hx, hy] = M.toScreen(ax0 + ox, ay0), [tx, ty] = M.toScreen(bx0 + ox, by0);
       const ang = Math.atan2(hy - ty, hx - tx);
       const k = clamp(Math.hypot(hx - tx, hy - ty) / Math.max(1e-6, Math.hypot(ax0 - bx0, ay0 - by0) * s), .6, 1.6);   // nearer = bigger when tilted
@@ -301,12 +306,21 @@ export function drawTraffic(M, c, dt, now, vis){
       const n = 10, step = (air ? .05 : .025);
       for (let i = 1; i <= n; i++){
         const fa = clamp(f - dir * step * (i - 1) / n * 2, 0, 1), fb = clamp(f - dir * step * i / n * 2, 0, 1);
-        const [pax, pay] = at(v.path, fa), [pbx, pby] = at(v.path, fb), [sax, say] = M.toScreen(pax + ox, pay), [sbx, sby] = M.toScreen(pbx + ox, pby);
+        const [pax, pay] = at(v.path, fa), [pbx, pby] = at(v.path, fb);
+        const [sax, say] = hNow ? M.toScreenAlt(pax + ox, pay, hOf(v.rev ? 1 - fa : fa)) : M.toScreen(pax + ox, pay), [sbx, sby] = hNow ? M.toScreenAlt(pbx + ox, pby, hOf(v.rev ? 1 - fb : fb)) : M.toScreen(pbx + ox, pby);
         const al = (1 - i / n) * (v.clean ? .35 : .5);
         c.strokeStyle = v.clean ? `rgba(95,211,154,${al})` : air ? `rgba(220,226,230,${al})` : `rgba(225,240,250,${al * .9})`;
         c.beginPath(); c.moveTo(sax, say); c.lineTo(sbx, sby); c.stroke();
       }
-      if (air){
+      if (air && A3){
+        // 3.5: the 3D plane: heading along the route, nose up while climbing / down while landing, banked into turns
+        const [ex, ey] = M.toStage(wxc, wy), [u, vv] = M.stageAxis(ex, ey);
+        const hd = Math.atan2(ay0 - by0, ax0 - bx0);
+        const [cx0, cy0] = at(v.path, clamp(f + dir * .03, 0, 1)), [dx0, dy0] = at(v.path, clamp(f - dir * .03, 0, 1));
+        const turn = Math.atan2(cy0 - wy, cx0 - wxc) - Math.atan2(wy - dy0, wxc - dx0), dturn = Math.atan2(Math.sin(turn), Math.cos(turn));
+        const climb = (hOf(v.f + .01) - hOf(v.f - .01)) / Math.max(1, Math.hypot(ax0 - bx0, ay0 - by0) * s * 2.5);
+        A3.plane(u, vv, hNow, hd, clamp(Math.atan(climb) * 3, -.6, .6), clamp(dturn * 9, -.8, .8), len * 1.5, !!v.clean, .22, .28);
+      } else if (air){
         // the plane climbs, cruises and comes down: its shadow drifts further away the higher it is
         const alt = Math.sin(Math.PI * clamp(v.f, 0, 1)), off = (2 + 10 * alt) * k, sc = len / 56, pc = planeSprite(v.clean);
         c.save(); c.translate(x + off * .7, y + off); c.rotate(ang); c.globalAlpha = .8 - .35 * alt; c.drawImage(pShadow, -32 * sc, -32 * sc, 64 * sc, 64 * sc); c.restore();
@@ -328,6 +342,7 @@ export function drawTraffic(M, c, dt, now, vis){
     }
   }
   M.traffic = list.filter(v => v.f < 1);
+  if (A3) A3.end(.32);
 }
 function arrive(M, v){
   const from = P.C(v.from); if (!from || from.green < 45) return;

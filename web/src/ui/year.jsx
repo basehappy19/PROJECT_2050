@@ -12,7 +12,7 @@ export function YearStrip({cur, big}){
   const ys = S.years || [], by = {}; ys.forEach(x => { by[x.y] = x; });
   return <div class={"ystrip " + (big ? "big" : "")}>{Array.from({length:25}, (_, i) => {
     const y = 2026 + i, r = by[y];
-    return <i key={y} class={(r ? (r.g ? "g" : "b") : "") + (y === cur ? " cur" : "")} title={r ? `${y}: ${r.s}/100` : String(y)}>{big && (i % 6 === 0 || y === cur) ? <small>{y}</small> : null}</i>;
+    return <i key={y} class={(r ? (r.g ? "g" : "b") : "") + (y === cur ? " cur" : "")} aria-label={r ? `${y}: ${r.s}/100` : String(y)}>{big && (i % 6 === 0 || y === cur) ? <small>{y}</small> : null}</i>;
   })}</div>;
 }
 function Ring({v, good}){

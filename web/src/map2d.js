@@ -12,6 +12,8 @@ import {Gfx} from "./gfx.js";
 import {drawPins, drawTraffic, drawInfo, img3d, drawDetail, drawStatus} from "./mapfx.js";
 import {drawHex, hexCells} from "./hexgrid.js";
 import {createMapGL} from "./mapgl.js";
+import {iceCanvas, ICE_TILE, FROST} from "./ice.js";
+import {createAir3D} from "./air3d.js";
 
 const ZMIN = 1, ZMAX = 5, ZCOUNTRY = 1.55;   // 2.0: can't zoom out past the whole world (it always fills the screen)
 /* 3.1: Plague Inc-style camera tilt. The whole world is flat; zooming in tips the map back a little at a time
@@ -96,6 +98,7 @@ export const GameMap = {
     }
     this.stage.append(this.base);
     el.append(this.stage, this.fx);
+    if (this.air3d) this.fx.before(this.air3d.canvas);
     this.loadImage();
     this._ro = new ResizeObserver(() => this.resize()); this._ro.observe(el);
     this.resize();
@@ -117,8 +120,16 @@ export const GameMap = {
     if (old){ this.resize(); this.dirtyBase = true; }
   },
   setGL(on){ ls.set("p2050-mapgl", on ? "1" : "0"); if (!!this.gl !== !!on && this.base) this.makeBase(on); bump(); return !!this.gl === !!on; },
+  /* 3.5: 3D planes need the GPU map and a graphics level above "low" */
+  airUpdate(){
+    const want = !!this.gl && Gfx.level !== "low";
+    if (want && !this.air3d){ this.air3d = createAir3D(); if (this.air3d && this.fx && this.fx.parentNode) this.fx.before(this.air3d.canvas); }
+    if (this.air3d){ this.air3d.canvas.style.display = want ? "" : "none"; if (!want) this.air3d.clear(); }
+    this.air3dOn = want && !!this.air3d;
+    if (this.air3d && this.vw) this.air3d.setSize(this.vw, this.vh, this.dpr, this.persp);
+  },
   usingGL(){ return !!this.gl; },
-  unmount(){ this.active = false; cancelAnimationFrame(this.raf); if (this._ro) this._ro.disconnect(); this.stage && this.stage.remove(); this.fx && this.fx.remove(); },
+  unmount(){ this.active = false; cancelAnimationFrame(this.raf); if (this._ro) this._ro.disconnect(); this.stage && this.stage.remove(); this.fx && this.fx.remove(); this.air3d && this.air3d.canvas.remove(); },
   resize(){
     if (!this.el) return;
     const vw = this.el.clientWidth, vh = this.el.clientHeight, dpr = Gfx.dpr();
@@ -140,6 +151,7 @@ export const GameMap = {
     if (this.gl) this.gl.setSize(w, h, dpr);
     this.s0 = Math.max(vw / MAP.W, (vh * .55) / MAP.H);   // 3.1: the whole world fits the screen, not the (larger) stage
     this.applyTilt(); this.clampCam(); this.dirtyBase = true; this.fxDirty = true;
+    this.airUpdate();
   },
   /* the camera changed: redraw the base now (fast, from the cached picture) and sharply once it stops */
   moved(){ this.dirtyBase = true; this.lastMove = performance.now(); },
@@ -179,9 +191,17 @@ export const GameMap = {
   /* world ↔ screen (the flat overlay, pointer events, HTML) */
   toScreen(x, y){ const [ex, ey] = this.toStage(x, y); return this.tilt > 0 ? this.localToView(ex, ey) : [ex - this.sx0, ey - this.sy0]; },
   toWorld(vx, vy){ return this.stageToWorld(...this.viewToLocal(vx, vy)); },
+  /* 3.5: a stage point relative to the tilt axis (what air3d.js works in) */
+  stageAxis(ex, ey){ return [ex - this.w / 2, ey + this.vTop0]; },
+  /* 3.5: world point h screen px above the map → screen point (the same perspective as the CSS tilt) */
+  toScreenAlt(x, y, h){
+    const [ex, ey] = this.toStage(x, y), u = ex - this.w / 2, v = ey + this.vTop0, a = this.tilt, Pp = this.persp;
+    const Y = v * Math.cos(a) - h * Math.sin(a), Z = v * Math.sin(a) + h * Math.cos(a), k = Pp / (Pp - Z);
+    return [this.vw / 2 + u * k, this.tcy + Y * k];
+  },
   /* 2.0: Plague Inc-style camera: the map can't be dragged off into space; its edge stops at the HUD */
   clampXY(x, y, z){
-    const s = this.s0 * z, V = this.viewRect(z, .6), hw = this.w / 2, hh = this.h / 2;
+    const s = this.s0 * z, V = this.viewRect(z, .25), hw = this.w / 2, hh = this.h / 2;   // 3.5: tighter, so the map edge stays at the screen edge
     const x0 = (hw - V.L) / s, x1 = MAP.W - (V.R - hw) / s, y0 = (hh - V.T) / s, y1 = MAP.H - (V.B - hh) / s;
     return [x0 > x1 ? MAP.W / 2 : clamp(x, x0, x1), y0 > y1 ? MAP.H / 2 : clamp(y, y0, y1)];
   },
@@ -226,6 +246,7 @@ export const GameMap = {
     c.addEventListener("pointerdown", e => {
       if (this.locked()) return;
       c.setPointerCapture(e.pointerId);
+      if (e.pointerType !== "mouse" && this.hover){ this.hover = null; this.fxDirty = true; }
       const lx = e.offsetX, ly = e.offsetY;
       this.ptrs.set(e.pointerId, {x:lx, y:ly});
       if (this.ptrs.size === 1){ this.drag = {x:lx, y:ly, sx:lx, sy:ly, moved:0}; }
@@ -236,7 +257,7 @@ export const GameMap = {
     });
     c.addEventListener("pointermove", e => {
       const p = this.ptrs.get(e.pointerId), lx = e.offsetX, ly = e.offsetY;
-      if (!p){ this.hoverAt(lx, ly); return; }
+      if (!p){ if (e.pointerType === "mouse") this.hoverAt(lx, ly); return; }   // 3.5: touch has no hover, so the map tooltip never sticks on iPad
       p.x = lx; p.y = ly;
       if (this.pinch && this.ptrs.size >= 2){
         const [a, b] = [...this.ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
@@ -366,6 +387,19 @@ export const GameMap = {
     const [ox, oy] = this.spaceCanvas();
     c.drawImage(this.space, ox, oy);
   },
+  /* 3.5: the sheet of ice round the world (the same picture as mapgl.js), fixed to the map so it moves with it */
+  icePattern(c){
+    if (!this._icePat || this._icePatCtx !== c){ this._icePat = c.createPattern(iceCanvas(), "repeat"); this._icePatCtx = c; }
+    this._icePat.setTransform(new DOMMatrix().scale(ICE_TILE / iceCanvas().width));
+    return this._icePat;
+  },
+  drawIce(c){
+    const s = this.scale(), [x0, y0] = this.stageToWorld(0, 0), [x1, y1] = this.stageToWorld(this.w, this.h);
+    c.save(); c.translate(this.w / 2 - this.cam.x * s, this.h / 2 - this.cam.y * s); c.scale(s, s);
+    c.fillStyle = this.icePattern(c); c.fillRect(x0, y0, x1 - x0, y1 - y0);
+    if (this.theme() === "night"){ c.fillStyle = "rgba(6,14,24,.6)"; c.fillRect(x0, y0, x1 - x0, y1 - y0); }
+    c.restore();
+  },
   /* builds the starfield picture once per screen size; returns where to put it */
   spaceCanvas(){
     const w = this.w, h = this.h;
@@ -392,8 +426,15 @@ export const GameMap = {
   needSharp(){ return this.cacheDensity() < .95; },
   /* photo, region heat colours and country borders, in map units (px = one screen pixel in map units) */
   paintWorld(c, px, bAlpha){
-    if (this.edge){ c.fillStyle = "#08202a"; c.fill(this.edge); c.lineJoin = "round"; for (const [w, a] of [[16, .05], [8, .08], [3, .14]]){ c.strokeStyle = `rgba(79,209,197,${a})`; c.lineWidth = w * px; c.stroke(this.edge); } }
+    if (this.edge){ c.fillStyle = "#08202a"; c.fill(this.edge); }
     if (this.img){ c.save(); if (this.edge) c.clip(this.edge); c.imageSmoothingQuality = "high"; c.drawImage(this.img, 0, 0, MAP.W, MAP.H); c.restore(); }
+    // 3.5: frost fading from the ice into the map along its edge (soft wide strokes of the ice picture, inside the outline)
+    if (this.edge){
+      const night = this.theme() === "night";
+      c.save(); c.clip(this.edge); c.lineJoin = "round"; c.strokeStyle = this.icePattern(c);
+      for (let i = 0; i < 18; i++){ const u = 1 - i / 18; c.globalAlpha = (night ? .04 : .085) + (i === 17 ? .2 : 0); c.lineWidth = FROST * 2 * u; c.stroke(this.edge); }   // many thin steps so no bands show
+      c.restore();
+    }
     if (!S.regions) return;
     const th = this.theme(), aBase = th === "night" ? .18 : th === "paint" ? .26 : .2;
     for (const r of S.regions){
@@ -411,7 +452,7 @@ export const GameMap = {
     const G = this.gl, s = this.scale();
     if (!this.glBuilt){ if (!this.shapes.length) return; G.build(this.shapes, this.edgePts, Object.keys(this.regPaths)); G.setSize(this.w, this.h, this.dpr); this.glBuilt = true; }
     if (this.img) G.setImage(this.img);
-    const off = this.spaceCanvas(); G.setSpace(this.space);
+    const off = this.spaceCanvas(); G.setSpace(this.space); G.setIceTone(this.theme() === "night");
     const th = this.theme(), aBase = th === "night" ? .18 : th === "paint" ? .26 : .2;
     const cols = {}; if (S.regions) for (const r of S.regions) cols[r.id] = heatRGB(regionHeatValue(r));
     G.setTints(cols, aBase);
@@ -425,7 +466,7 @@ export const GameMap = {
     const c = this.bctx, d = this.dpr, s = this.scale();
     if (this.shapes.length && this.cacheKey !== this.tintKey()) this.buildCache();
     c.setTransform(d, 0, 0, d, 0, 0);
-    this.drawSpace(c);
+    this.drawIce(c);
     const fast = !!this.cache && (moving || !this.needSharp());
     this.baseFast = fast;
     if (fast){

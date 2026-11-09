@@ -44,6 +44,7 @@ const LOGO_SVG = <svg class="lmark" viewBox="22 22 156 156" aria-hidden="true">
   <rect x="24" y="24" width="152" height="152" rx="38" fill="none" stroke="#4fd1c5" stroke-opacity=".55" stroke-width="2"/>
 </svg>;
 const lowEnd = () => (navigator.deviceMemory && navigator.deviceMemory <= 4) || (navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4);
+const LOAD = {earth:null};   // 3.5: the loading Earth, so the menu globe can take over where it is
 function LoadEarth(){
   const ref = useRef(null);
   useEffect(() => {
@@ -51,12 +52,33 @@ function LoadEarth(){
     const small = Math.min(screen.width, screen.height) < 600;
     const css = c.getBoundingClientRect().width || 600, dpr = Math.min(window.devicePixelRatio || 1, 2);
     const still = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
-    return mountEarth(c, {src:`assets/img/ui/loader-earth${small ? "-s" : ""}.webp`, px:Math.min(css * dpr, small || lowEnd() ? 480 : 720), still});
+    const stop = LOAD.earth = mountEarth(c, {src:`assets/img/ui/loader-earth${small ? "-s" : ""}.webp`, px:Math.min(css * dpr, small || lowEnd() ? 480 : 720), still});
+    return () => { stop(); if (LOAD.earth === stop) LOAD.earth = null; };
   }, []);
   return <div class="learth" aria-hidden="true"><canvas ref={ref}/></div>;
 }
-function Loading(){
+function Loading({leaving}){
   const [done, setDone] = useState({}), [ready, setReady] = useState(false);
+  /* 3.5: after "Tap to enter" the menu opens underneath and this Earth glides to where the menu's globe is,
+     grows or shrinks to its size, then fades into it */
+  useEffect(() => {
+    if (!leaving) return;
+    let t1 = 0, t2 = 0, raf = 0;
+    const finish = () => { UIM.leaving = false; bump(); };
+    const go = () => {
+      const el = document.querySelector(".learth"), g = G.globe, c = g && g.screenCircle ? g.screenCircle() : null;
+      const still = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      if (!el || !c || still){ finish(); return; }
+      const lon = LOAD.earth && LOAD.earth.lon(); if (lon !== null && lon !== undefined) g.faceLon(lon);
+      const r0 = el.getBoundingClientRect(), k = 2 * c.r / r0.width;
+      el.style.transition = "transform 1.3s cubic-bezier(.65,0,.25,1), opacity .5s ease 1.2s";
+      el.style.transform = `translate(${(c.x - (r0.left + r0.width / 2)).toFixed(1)}px, ${(c.y - (r0.top + r0.height / 2)).toFixed(1)}px) scale(${k.toFixed(4)})`;
+      el.style.opacity = "0";
+      t2 = setTimeout(finish, 1800);
+    };
+    raf = requestAnimationFrame(() => { raf = requestAnimationFrame(go); });   // the menu and its globe exist by then
+    return () => { cancelAnimationFrame(raf); clearTimeout(t1); clearTimeout(t2); };
+  }, [leaving]);
   const lang = S.lang === "en" ? "en" : "th", tx = o => o[lang];
   useEffect(() => {
     const sfx = Math.min(screen.width, screen.height) < 600 ? "-s" : "";
@@ -72,8 +94,8 @@ function Loading(){
   }, []);
   const steps = ["fonts", "data", "globe", "clouds"], n = steps.filter(k => done[k]).length, active = steps.find(k => !done[k]);
   const p = ready ? 1 : n / steps.length;
-  const enter = () => { if (isTouch() && document.fullscreenEnabled && !document.fullscreenElement) document.documentElement.requestFullscreen({navigationUI:"hide"}).catch(() => {}); Audio.unlock(); Audio.play("start"); Audio.setMood("menu", true); Audio.setBed("space", .8); UIM.screen = "menu"; bump(); };
-  return <div class={`loading l7${ready ? " ready" : ""}`} onClick={ready ? enter : undefined}>
+  const enter = () => { if (isTouch() && document.fullscreenEnabled && !document.fullscreenElement) document.documentElement.requestFullscreen({navigationUI:"hide"}).catch(() => {}); Audio.unlock(); Audio.play("start"); Audio.setMood("menu", true); Audio.setBed("space", .8); UIM.leaving = true; UIM.screen = "menu"; bump(); };
+  return <div class={`loading l7${ready ? " ready" : ""}${leaving ? " leaving" : ""}`} onClick={ready && !leaving ? enter : undefined}>
     <LoadEarth/>
     <div class="lpanel">
       <div class="lbrand">{LOGO_SVG}<small class="mono">GLOBAL CLIMATE TASKFORCE · 2026 – 2050</small></div>
@@ -163,7 +185,8 @@ export function App(){
   useVersion();
   const sc = UIM.screen;
   return <>
-    {sc === "loading" ? <Loading/> : sc === "menu" ? <Menu/> : <GameScreen/>}
+    {sc === "menu" ? <Menu/> : sc === "game" ? <GameScreen/> : null}
+    {sc === "loading" || UIM.leaving ? <Loading leaving={!!UIM.leaving}/> : null}
     {sc !== "loading" ? <Windows/> : null}
     {sc === "game" && UIM.train ? <Training onFinish={play => G.finishTraining(play)} onQuit={() => G.quitTraining()}/> : null}
     <Toast/>

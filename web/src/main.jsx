@@ -32,3 +32,19 @@ P.updateReady = () => {
 };
 P.updateNow = () => { try { P.autosave(); } catch(e){} setTimeout(() => location.reload(), 150); };
 window.P2050 = P;
+/* 3.5: no browser tooltips anywhere — the game draws its own. A title attribute that slips in (from any component)
+   is moved to aria-label, so screen readers still get the text but the browser shows no tooltip */
+{
+  const strip = el => {
+    const v = el.getAttribute("title"); if (v === null) return;
+    el.removeAttribute("title");
+    if (v && (!el.hasAttribute("aria-label") || el.dataset.tl)){ el.setAttribute("aria-label", v); el.dataset.tl = "1"; }
+  };
+  new MutationObserver(ms => {
+    for (const m of ms){
+      if (m.type === "attributes"){ if (m.target.nodeType === 1) strip(m.target); continue; }
+      for (const n of m.addedNodes) if (n.nodeType === 1){ strip(n); n.querySelectorAll("[title]").forEach(strip); }
+    }
+  }).observe(document.documentElement, {subtree:true, childList:true, attributes:true, attributeFilter:["title"]});
+  document.querySelectorAll("body [title]").forEach(strip);
+}

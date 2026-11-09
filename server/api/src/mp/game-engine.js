@@ -128,7 +128,7 @@ const ACTIONS = [
   {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ทวีป −0.8 Gt × ทำตามแผน, ทำตามแผน −6%",en:"Regional CO₂ −0.8 Gt × on-plan, on-plan −6%"}},
 ];
 
-const IC = {ep:"[[$money]]", pc:"[[$policy]]", appr:"[[$appr]]", temp:"[[$temp]]", co2:"[[$co2]]", comp:"[[$plan]]", vuln:"[[$risk]]", rel:"[[$heart]]", ore:"[[$ore]]", gem:"[[$gem]]", sink:"[[$sink]]"};
+const IC = {ep:"[[$money]]", pc:"[[$policy]]", appr:"[[$appr]]", temp:"[[$temp]]", co2:"[[$co2]]", comp:"[[$plan]]", vuln:"[[$risk]]", rel:"[[$heart]]", ore:"[[$ore]]", gem:"[[$credit]]", sink:"[[$sink]]"};
 Object.assign(P, {UI, MONTHS, RESERVE, REGIONS, RIDS, RMETA, CITIES, ACTIONS, IC});
 
 })();
@@ -1162,8 +1162,8 @@ const TUT = [
    body:{th:["เกมหยุดรอให้เลือก ปุ่มจะกดได้หลังแถบเติมเต็ม (กันกดพลาด)","▲▼ = ค่านั้นขึ้นหรือลง · สีเขียว = ดี สีแดง = เสีย · ยิ่งหลายลูกศรยิ่งแรง","ข้อพิพาทระหว่างประเทศ: ฝ่ายเสนอกับฝ่ายคัดค้านจะพอใจไม่เท่ากัน"],
          en:["The game waits for your choice; buttons unlock when the bar fills (no misclicks)","▲▼ = that value goes up or down · green = good, red = bad · more arrows = bigger","International disputes: the two sides react differently"]}},
   {img:"t8-win.jpg", title:{th:"วิธีชนะและแพ้",en:"How to win or lose"},
-   body:{th:["ชนะ: CO₂ สุทธิถึง 0 ก่อนปี 2051 (เกรด S/A/B ตามอุณหภูมิ)","แพ้: อุณหภูมิถึง 3.0°C, ความนิยมเหลือ 0% หรือหมดเวลา","ชนะครั้งแรกแล้วจะเปิดโหมดโลกต่อเนื่อง เล่นต่อได้ไม่มีวันจบ · เข้าสู่ระบบเพื่อรับเพชรและติดอันดับ"],
-         en:["Win: net CO₂ reaches 0 before 2051 (grade S/A/B by temperature)","Lose: 3.0°C warming, 0% approval, or running out of time","Your first win opens Continuous World, which never ends · Sign in to earn Gems and get ranked"]}},
+   body:{th:["ชนะ: CO₂ สุทธิถึง 0 ก่อนปี 2051 (เกรด S/A/B ตามอุณหภูมิ)","แพ้: อุณหภูมิถึง 3.0°C, ความนิยมเหลือ 0% หรือหมดเวลา","ชนะครั้งแรกแล้วจะเปิดโหมดโลกต่อเนื่อง เล่นต่อได้ไม่มีวันจบ · เข้าสู่ระบบเพื่อรับคาร์บอนเครดิตและติดอันดับ"],
+         en:["Win: net CO₂ reaches 0 before 2051 (grade S/A/B by temperature)","Lose: 3.0°C warming, 0% approval, or running out of time","Your first win opens Continuous World, which never ends · Sign in to earn Carbon Credits and get ranked"]}},
 ];
 const ACH = [
   {id:"start",     icon:"globe",           t:{th:"ก้าวแรกของ GCT",en:"First Day at GCT"},            d:{th:"เริ่มภารกิจครั้งแรก",en:"Start your first mission"}},
@@ -1775,10 +1775,10 @@ Object.assign(P.UI, {
   unlockAtLv:T("ปลดล็อกที่เลเวล","Unlocks at level"), needCountry:T("เลือกประเทศบนแผนที่ก่อน (ซูมแล้วแตะประเทศ)","Select a country on the map first (zoom in and tap one)"),
   cooldownLen:T("พักหลังใช้","Cooldown"), cooldown:T("พักอีก","Ready in"), level:T("เลเวล","Level"), passive:T("ติดตัว","Passive"),
   charTitle:T("เลือกบทบาทของคุณ","Choose your role"), charSub:T("แต่ละบทบาทมีจุดเด่นและสกิลพิเศษของตัวเอง เล่นจบแต่ละเกมจะได้ XP เพื่อเลื่อนเลเวล","Each role has its own strengths and special skills. Finish games to earn XP and level up."),
-  buyInShop:T("ซื้อได้ในร้านค้า","buy it in the shop"), loginToBuy:T("เข้าสู่ระบบเพื่อซื้อ","sign in to buy"), charLocked:T("ตัวละครนี้ต้องซื้อด้วยเพชรในร้านค้าก่อน (เมนูหลัก → ร้านค้า)","Buy this character with Gems in the shop first (Main menu → Shop)"),
+  buyInShop:T("ซื้อได้ในร้านค้า","buy it in the shop"), loginToBuy:T("เข้าสู่ระบบเพื่อซื้อ","sign in to buy"), charLocked:T("ตัวละครนี้ต้องซื้อด้วยคาร์บอนเครดิตในร้านค้าก่อน (เมนูหลัก → ร้านค้า)","Buy this character with Carbon Credits in the shop first (Main menu → Shop)"),
   modeTitle:T("โหมดการเล่น","Game mode"), mode_normal:T("ปกติ","Normal"), mode_hard:T("Hard Core","Hard Core"), mode_daily:T("Daily Challenge","Daily Challenge"),
   modeD_normal:T("เริ่ม 2026 · ภัยปกติ · บันทึกได้ทุกช่อง","Start 2026 · normal hazards · all save slots"),
-  modeD_hard:T("งบน้อย ภัยถี่ ไม่บอกผลกระทบ บันทึกอัตโนมัติอย่างเดียว · เพชร ×1.5","Less money, more hazards, hidden impacts, autosave only · Gems ×1.5"),
+  modeD_hard:T("งบน้อย ภัยถี่ ไม่บอกผลกระทบ บันทึกอัตโนมัติอย่างเดียว · คาร์บอนเครดิต ×1.5","Less money, more hazards, hidden impacts, autosave only · Carbon Credits ×1.5"),
   modeD_daily:T("ทุกคนเจอเหตุการณ์ชุดเดียวกันในวันนี้ แข่งอันดับรายวัน","Everyone plays the same world today; daily ranking"),
   introTag:T("คำสั่งแต่งตั้ง · มกราคม 2026","Appointment order · January 2026"),
   start:T("เริ่มภารกิจ","Begin mission"),
@@ -1800,12 +1800,12 @@ Object.assign(P.UI, {
   winBodyB:T("เป็นชัยชนะที่เฉียดฉิว โลกร้อนขึ้นกว่า 2°C แล้ว ภารกิจต่อไปคือช่วยทุกประเทศปรับตัว","A narrow win. Warming passed 2°C; the next mission is helping every country adapt."),
   yourStory:T("เรื่องราวของคุณ","Your story"), storyBest:T("ประเทศที่คุณช่วยมากที่สุด","Country you helped most"), storyWorst:T("ภัยที่หนักที่สุด","Worst disaster"),
   storyNone:T("เกมนี้ยังไม่มีเหตุการณ์สำคัญ","No major moments this game"),
-  rewardWait:T("กำลังส่งผลไปที่เซิร์ฟเวอร์...","Sending your result..."), rewardGuest:T("เล่นแบบ Guest: เข้าสู่ระบบเพื่อรับเพชรและติดอันดับ","Playing as guest: sign in to earn Gems and rank"),
-  rewardFail:T("ส่งผลไม่สำเร็จ (ออฟไลน์?)","Couldn't send the result (offline?)"), rewardNoRun:T("เริ่มเกมตอนออฟไลน์ เกมนี้จึงไม่ได้เพชร","This game started offline, so it earns no Gems"),
+  rewardWait:T("กำลังส่งผลไปที่เซิร์ฟเวอร์...","Sending your result..."), rewardGuest:T("เล่นแบบ Guest: เข้าสู่ระบบเพื่อรับคาร์บอนเครดิตและติดอันดับ","Playing as guest: sign in to earn Carbon Credits and rank"),
+  rewardFail:T("ส่งผลไม่สำเร็จ (ออฟไลน์?)","Couldn't send the result (offline?)"), rewardNoRun:T("เริ่มเกมตอนออฟไลน์ เกมนี้จึงไม่ได้คาร์บอนเครดิต","This game started offline, so it earns no Carbon Credits"),
   levelUp:T("เลื่อนเป็นเลเวล","Level up! Now level"),
-  note_daily_cap:T("ถึงเพดานรางวัลรายวันแล้ว เกมถัดไปจะได้เพชรน้อยลง","Daily reward cap reached; later games pay less"),
-  note_too_short:T("เกมสั้นกว่า 5 นาที จึงไม่ได้เพชร","Games under 5 minutes earn no Gems"),
-  note_reduced:T("เกมที่ 4 ขึ้นไปของวันได้เพชรลดลง","From the 4th game of the day, Gems is reduced"),
+  note_daily_cap:T("ถึงเพดานรางวัลรายวันแล้ว เกมถัดไปจะได้คาร์บอนเครดิตน้อยลง","Daily reward cap reached; later games pay less"),
+  note_too_short:T("เกมสั้นกว่า 5 นาที จึงไม่ได้คาร์บอนเครดิต","Games under 5 minutes earn no Carbon Credits"),
+  note_reduced:T("เกมที่ 4 ขึ้นไปของวันได้คาร์บอนเครดิตลดลง","From the 4th game of the day, Carbon Credits are reduced"),
   /* pause */
   hardSaves:T("โหมด Hard Core บันทึกอัตโนมัติได้ช่องเดียว ใช้ช่องบันทึกและรหัสเซฟไม่ได้","Hard Core keeps only the autosave: no slots or save codes"),
   cloudOk:T("ขึ้นคลาวด์แล้ว","synced to cloud"), cloudSaves:T("เซฟบนคลาวด์ (บัญชีของคุณ)","Cloud saves (your account)"),
@@ -1814,7 +1814,7 @@ Object.assign(P.UI, {
   /* menu */
   mLearn:T("หน้าเรียนรู้","Learning"), mShop:T("ร้านค้า","Shop"), mBoard:T("อันดับผู้เล่น","Leaderboard"), mCert:T("ประกาศนียบัตร","Certificate"), mAccount:T("บัญชีผู้เล่น","Account"),
   netChecking:T("กำลังเชื่อมต่อ...","Connecting..."), netOffline:T("ออฟไลน์","Offline"),
-  netOfflineLong:T("ยังเชื่อมต่อเซิร์ฟเวอร์เกมไม่ได้ ตอนนี้เล่นแบบ Guest ได้ตามปกติ แต่ยังไม่มีบัญชี เพชร ร้านค้า และอันดับ","Can't reach the game server. You can still play as a guest, but accounts, Gems, the shop and rankings are unavailable."),
+  netOfflineLong:T("ยังเชื่อมต่อเซิร์ฟเวอร์เกมไม่ได้ ตอนนี้เล่นแบบ Guest ได้ตามปกติ แต่ยังไม่มีบัญชี คาร์บอนเครดิต ร้านค้า และอันดับ","Can't reach the game server. You can still play as a guest, but accounts, Carbon Credits, the shop and rankings are unavailable."),
   signIn:T("เข้าสู่ระบบ","Sign in"), signUp:T("สมัครสมาชิก","Sign up"), signOut:T("ออกจากระบบ","Sign out"), signedOut:T("ออกจากระบบแล้ว","Signed out"),
   fUserOrEmail:T("ชื่อผู้ใช้ หรือ อีเมล","Username or email"), fPassword:T("รหัสผ่าน","Password"), fUsername:T("ชื่อผู้ใช้ (เปลี่ยนไม่ได้)","Username (permanent)"),
   fEmail:T("อีเมล","Email"), fDisplay:T("ชื่อที่แสดง (เปลี่ยนได้)","Display name (can change)"), fDisplayPh:T("ชื่อที่โชว์ในเกม","Shown in game"),
@@ -1823,15 +1823,15 @@ Object.assign(P.UI, {
   pdpaConsent:T("ฉันยินยอมให้เก็บชื่อผู้ใช้ อีเมล และผลการเล่น เพื่อใช้ในเกมนี้เท่านั้น (ตาม พ.ร.บ.คุ้มครองข้อมูลส่วนบุคคล)","I agree that my username, email and game results are stored for this game only (Thailand PDPA)"),
   needConsent:T("กรุณาติ๊กยินยอมก่อน","Please tick the consent box first"),
   or:T("หรือ","or"), googleLoading:T("กำลังโหลดปุ่ม Google...","Loading Google button..."), googlePickName:T("เกือบเสร็จแล้ว: ตั้งชื่อผู้ใช้สำหรับบัญชี Google นี้","Almost done: pick a username for this Google account"),
-  welcome:T("ยินดีต้อนรับ","Welcome,"), balance:T("ยอดเพชร","Gems balance"),
-  terraHow:T("ได้เพชรจากการเล่นจบเกมและความสำเร็จ ยิ่งเล่นดียิ่งได้มาก","Earn Gems by finishing games and achievements; better play earns more"),
-  terraGot:T("ได้รับเพชร","Gems earned"),
+  welcome:T("ยินดีต้อนรับ","Welcome,"), balance:T("ยอดคาร์บอนเครดิต","Carbon Credits balance"),
+  terraHow:T("ได้คาร์บอนเครดิตจากการเล่นจบเกมและความสำเร็จ ยิ่งเล่นดียิ่งได้มาก","Earn Carbon Credits by finishing games and achievements; better play earns more"),
+  terraGot:T("ได้รับคาร์บอนเครดิต","Carbon Credits earned"),
   charLevels:T("เลเวลตัวละคร","Character levels"), renameTitle:T("เปลี่ยนชื่อที่แสดง","Change display name"),
   free:T("ฟรี","free"), rename:T("เปลี่ยน","Change"), renamed:T("เปลี่ยนชื่อแล้ว","Name changed"),
   appearance:T("รูปลักษณ์","Appearance"), themeDefault:T("แผนที่ปกติ","Default map"), themeNight:T("กลางคืน","Night"), themePaint:T("ภาพวาด","Painted"),
   outfitBase:T("ชุดปกติ","Standard outfit"), outfitAlt:T("ชุดใหม่","New outfit"), outfitGold:T("ชุดทอง (Lv10)","Gold outfit (Lv10)"),
-  shopLogin:T("ร้านค้าใช้เพชรที่ได้จากการเล่น ต้องเข้าสู่ระบบก่อน","The shop uses Gems earned in play. Sign in first."),
-  shopNote:T("ของทุกชิ้นซื้อด้วยเพชรที่ได้จากการเล่นเท่านั้น ไม่มีการขายด้วยเงินจริง","Everything is bought with Gems earned in play. Nothing is sold for real money."),
+  shopLogin:T("ร้านค้าใช้คาร์บอนเครดิตที่ได้จากการเล่น ต้องเข้าสู่ระบบก่อน","The shop uses Carbon Credits earned in play. Sign in first."),
+  shopNote:T("ของทุกชิ้นซื้อด้วยคาร์บอนเครดิตที่ได้จากการเล่นเท่านั้น ไม่มีการขายด้วยเงินจริง","Everything is bought with Carbon Credits earned in play. Nothing is sold for real money."),
   owned2:T("มีแล้ว","Owned"), bought:T("ซื้อสำเร็จ","Purchased"),
   week:T("สัปดาห์นี้","This week"), allTime:T("ตลอดกาล","All time"), dailyToday:T("โจทย์ประจำวันที่","Today's challenge:"),
   boardFail:T("โหลดอันดับไม่สำเร็จ","Couldn't load the leaderboard"), boardEmpty:T("ยังไม่มีใครติดอันดับ เล่นเลยเพื่อเป็นคนแรก!","No scores yet. Be the first!"),
@@ -1856,7 +1856,7 @@ Object.assign(P.UI, {
   err_bad_email:T("รูปแบบอีเมลไม่ถูกต้อง","That email doesn't look right"), err_weak_password:T("รหัสผ่านต้องยาวอย่างน้อย 8 ตัวอักษร","Password must be at least 8 characters"),
   err_bad_display:T("ชื่อที่แสดงต้องยาว 2–20 ตัวอักษร","Display name must be 2–20 characters"), err_bad_word:T("มีคำที่ไม่เหมาะสม ลองชื่ออื่น","That contains a blocked word. Try another."),
   err_username_taken:T("ชื่อผู้ใช้นี้มีคนใช้แล้ว","That username is taken"), err_email_taken:T("อีเมลนี้สมัครไว้แล้ว","That email is already registered"),
-  err_bad_login:T("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง","Wrong username or password"), err_not_enough_terra:T("เพชรไม่พอ","Not enough Gems"),
+  err_bad_login:T("ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง","Wrong username or password"), err_not_enough_terra:T("คาร์บอนเครดิตไม่พอ","Not enough Carbon Credits"),
   err_already_owned:T("มีของชิ้นนี้แล้ว","You already own this"), err_not_eligible:T("ยังไม่ผ่านเงื่อนไขการขอประกาศนียบัตร","Not eligible yet"),
   err_rate_limited:T("ส่งคำขอถี่เกินไป รอสักครู่","Too many requests. Wait a moment."), err_google_disabled:T("ยังไม่ได้ตั้งค่า Google Sign-In ในเซิร์ฟเวอร์","Google Sign-In isn't configured on the server"),
   err_google_bad:T("ยืนยันบัญชี Google ไม่สำเร็จ","Couldn't verify the Google account"), err_unknown_item:T("ไม่พบสินค้านี้","Unknown item"),
@@ -1879,7 +1879,7 @@ Object.assign(P.UI, {
   gfxDropped:T("เครื่องนี้เล่นไม่ลื่น เกมลดกราฟิกเป็น “{L}” ให้แล้ว เปลี่ยนได้ที่เมนูหยุดเกม","The game wasn't running smoothly, so graphics were lowered ({L}). Change it in the pause menu."),
 });
 Object.assign(P.UI, {
-  gemsWord:T("เพชร", "Gems"),
+  gemsWord:T("คาร์บอนเครดิต", "Carbon Credits"),
   /* minerals and resources */
   oreLbl:T("[[$ore]] ทรัพยากร", "[[$ore]] Resources"), resTitle:T("ทรัพยากรของประเทศนี้", "This country's resources"),
   resImporter:T("ประเทศนี้ต้องนำเข้าทรัพยากรเกือบทั้งหมดทางเรือ", "This country imports almost all its minerals by ship"),
@@ -2209,6 +2209,11 @@ P.CHANGELOG = [
     "ย่อหน้าต่างเหตุการณ์เพื่อดูแผนที่และทรัพยากรก่อนตัดสินใจได้",
     "ปิดโหมดเล่นหลายคนไว้ก่อน เพื่อปรับให้ดีขึ้น",
     "แก้บัค: ประเทศกว่า 100 ประเทศ (เช่น โซมาเลีย ฟิจิ มัลดีฟส์) ไม่แสดงพยากรณ์ภัยและฟองช่วยเหลือบนแผนที่ · ไอคอนทรัพยากรบางเครื่องไม่ขึ้น (มีไอคอนสำรองแล้ว) · ข้อความบางจุดถูกแถบสกิลบัง",
+    "ค่าเงินในร้านค้าเปลี่ยนจากเพชรเป็นคาร์บอนเครดิต พร้อมไอคอนใหม่ (จำนวนที่มีอยู่เท่าเดิม)",
+    "คำอธิบายค่าต่าง ๆ บน iPad และมือถือ: แตะเพื่อดู แตะที่ไหนก็ได้เพื่อปิด ไม่ค้างแล้ว · ไม่มีกล่องข้อความของเบราว์เซอร์เด้งขึ้นมาแล้ว",
+    "โลกในเกมล้อมด้วยน้ำแข็งที่ค่อย ๆ กลืนไปกับขอบแผนที่ ไม่มีที่ว่างรอบโลกแล้ว และเลื่อนแผนที่ออกนอกขอบไม่ได้",
+    "เครื่องบินเป็นโมเดล 3 มิติ เงยไปพร้อมแผนที่เมื่อซูม เชิดหัวตอนขึ้น ก้มหัวตอนลง และเอียงตัวตอนเลี้ยว",
+    "กดเข้าเกมแล้วโลกในหน้าโหลดเลื่อนไปเป็นโลกในหน้าหลักอย่างนุ่มนวล",
   ], [
     "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu.",
     "Fast mode: a 15-minute game without minerals or groups and with fewer events, great for a first game.",
@@ -2229,6 +2234,11 @@ P.CHANGELOG = [
     "Events can be minimised so you can check the map and your resources before choosing.",
     "Multiplayer is switched off for now while we improve it.",
     "Bug fixes: over 100 countries (such as Somalia, Fiji and the Maldives) showed no disaster warnings or aid bubbles · mineral icons were blank on some devices (there is a fallback now) · some text was hidden behind the ability bar.",
+    "The shop currency is now Carbon Credits instead of Gems, with a new icon (your balance stays the same).",
+    "On iPad and phones, tap a value to see what it means and tap anywhere to close it; tooltips no longer get stuck, and the browser's own tooltips are gone.",
+    "The world now sits in a sheet of ice that fades into the map's edge: no empty space around it, and the map can't be dragged past its edge.",
+    "Planes are 3D models that tip back with the map when you zoom in; they lift their nose to climb, dip it to land and bank into turns.",
+    "Entering the game, the Earth on the loading screen glides over to become the globe on the home screen.",
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",
@@ -3715,7 +3725,7 @@ const Net = {
       try { const j = await this.req("POST", "/achievements", {ids}); if (j.user) this.user = j.user; if (j.awarded) this.toastTerra(j.awarded); dirty(); } catch(e) {}
     }, 800);
   },
-  toastTerra(n){ if (n > 0 && P.UIM) P.UIM.toastQ.push({icon:"terra", title:t("terraGot"), msg:`+${n} Gems`}); },
+  toastTerra(n){ if (n > 0 && P.UIM) P.UIM.toastQ.push({icon:"terra", title:t("terraGot"), msg:`+${n} ${t("gemsWord")}`}); },
   /* progress follows the account: send this device's progress, get back the merge of every device + the server's own records
      (achievements, wins). Called on sign-in, on refresh and a few seconds after anything changes. */
   async syncProgress(){
@@ -3851,7 +3861,7 @@ const STAT = {
   temp:{th:"อุณหภูมิ", en:"Temperature", icon:"thermometer"},
   co2:{th:"CO₂", en:"CO₂", icon:"cloud"},
   sink:{th:"ดูดซับ CO₂", en:"CO₂ capture", icon:"trees"},
-  gem:{th:"เพชร", en:"Gems", icon:"diamond"},
+  gem:{th:"คาร์บอนเครดิต", en:"Carbon Credits", icon:"leaf"},
   star:{th:"ดาว", en:"Stars", icon:"star"},
 };
 const T = (th, en) => ({th, en});
@@ -5690,8 +5700,8 @@ P.TUT.splice(0, P.TUT.length,
     ["เรื่องเดินเป็น 3 องก์ และมีฉากสั้นตามสิ่งที่เกิดในเกมของคุณ", "ฝน (ชายฝั่งสมุทรปราการ) และลุงทองดี (ชาวนาฉะเชิงเทรา) คือคนที่ได้รับผลกระทบ ส่วนไกรวิทย์คือฝ่ายต้าน", "ตอนจบจะบอกว่าชีวิตของพวกเขาเป็นอย่างไร ตามสิ่งที่คุณทำ"],
     ["The story runs in 3 acts, with short scenes when things happen in your game", "Fon (Samut Prakan coast) and Uncle Thongdee (a Chachoengsao rice farmer) live with the impacts; Krai pushes back", "The ending tells you what became of them, based on what you did"]),
   TU("n10-win.jpg", "วิธีชนะและแพ้", "How to win or lose",
-    ["ชนะ: CO₂ สุทธิถึง 0 ก่อนปี 2051 (เกรด S/A/B ตามอุณหภูมิ)", "แพ้: อุณหภูมิถึง +3.0°C, ความนิยมเหลือ 0% หรือหมดเวลา", "ชนะครั้งแรกเปิดโหมดโลกต่อเนื่องและ Hard Core · เข้าสู่ระบบเพื่อรับเพชรและติดอันดับ"],
-    ["Win: net CO₂ reaches 0 before 2051 (grade S/A/B by temperature)", "Lose: +3.0°C, 0% approval, or running out of time", "Your first win opens Continuous World and Hard Core · sign in to earn Gems and get ranked"]),
+    ["ชนะ: CO₂ สุทธิถึง 0 ก่อนปี 2051 (เกรด S/A/B ตามอุณหภูมิ)", "แพ้: อุณหภูมิถึง +3.0°C, ความนิยมเหลือ 0% หรือหมดเวลา", "ชนะครั้งแรกเปิดโหมดโลกต่อเนื่องและ Hard Core · เข้าสู่ระบบเพื่อรับคาร์บอนเครดิตและติดอันดับ"],
+    ["Win: net CO₂ reaches 0 before 2051 (grade S/A/B by temperature)", "Lose: +3.0°C, 0% approval, or running out of time", "Your first win opens Continuous World and Hard Core · sign in to earn Carbon Credits and get ranked"]),
 );
 
 })();

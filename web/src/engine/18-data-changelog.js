@@ -26,6 +26,11 @@ P.CHANGELOG = [
     "ย่อหน้าต่างเหตุการณ์เพื่อดูแผนที่และทรัพยากรก่อนตัดสินใจได้",
     "ปิดโหมดเล่นหลายคนไว้ก่อน เพื่อปรับให้ดีขึ้น",
     "แก้บัค: ประเทศกว่า 100 ประเทศ (เช่น โซมาเลีย ฟิจิ มัลดีฟส์) ไม่แสดงพยากรณ์ภัยและฟองช่วยเหลือบนแผนที่ · ไอคอนทรัพยากรบางเครื่องไม่ขึ้น (มีไอคอนสำรองแล้ว) · ข้อความบางจุดถูกแถบสกิลบัง",
+    "ค่าเงินในร้านค้าเปลี่ยนจากเพชรเป็นคาร์บอนเครดิต พร้อมไอคอนใหม่ (จำนวนที่มีอยู่เท่าเดิม)",
+    "คำอธิบายค่าต่าง ๆ บน iPad และมือถือ: แตะเพื่อดู แตะที่ไหนก็ได้เพื่อปิด ไม่ค้างแล้ว · ไม่มีกล่องข้อความของเบราว์เซอร์เด้งขึ้นมาแล้ว",
+    "โลกในเกมล้อมด้วยน้ำแข็งที่ค่อย ๆ กลืนไปกับขอบแผนที่ ไม่มีที่ว่างรอบโลกแล้ว และเลื่อนแผนที่ออกนอกขอบไม่ได้",
+    "เครื่องบินเป็นโมเดล 3 มิติ เงยไปพร้อมแผนที่เมื่อซูม เชิดหัวตอนขึ้น ก้มหัวตอนลง และเอียงตัวตอนเลี้ยว",
+    "กดเข้าเกมแล้วโลกในหน้าโหลดเลื่อนไปเป็นโลกในหน้าหลักอย่างนุ่มนวล",
   ], [
     "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu.",
     "Fast mode: a 15-minute game without minerals or groups and with fewer events, great for a first game.",
@@ -46,6 +51,11 @@ P.CHANGELOG = [
     "Events can be minimised so you can check the map and your resources before choosing.",
     "Multiplayer is switched off for now while we improve it.",
     "Bug fixes: over 100 countries (such as Somalia, Fiji and the Maldives) showed no disaster warnings or aid bubbles · mineral icons were blank on some devices (there is a fallback now) · some text was hidden behind the ability bar.",
+    "The shop currency is now Carbon Credits instead of Gems, with a new icon (your balance stays the same).",
+    "On iPad and phones, tap a value to see what it means and tap anywhere to close it; tooltips no longer get stuck, and the browser's own tooltips are gone.",
+    "The world now sits in a sheet of ice that fades into the map's edge: no empty space around it, and the map can't be dragged past its edge.",
+    "Planes are 3D models that tip back with the map when you zoom in; they lift their nose to climb, dip it to land and bank into turns.",
+    "Entering the game, the Earth on the loading screen glides over to become the globe on the home screen.",
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",

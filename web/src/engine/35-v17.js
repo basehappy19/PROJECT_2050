@@ -271,6 +271,6 @@ P.TUT.splice(0, P.TUT.length,
     ["เรื่องเดินเป็น 3 องก์ และมีฉากสั้นตามสิ่งที่เกิดในเกมของคุณ", "ฝน (ชายฝั่งสมุทรปราการ) และลุงทองดี (ชาวนาฉะเชิงเทรา) คือคนที่ได้รับผลกระทบ ส่วนไกรวิทย์คือฝ่ายต้าน", "ตอนจบจะบอกว่าชีวิตของพวกเขาเป็นอย่างไร ตามสิ่งที่คุณทำ"],
     ["The story runs in 3 acts, with short scenes when things happen in your game", "Fon (Samut Prakan coast) and Uncle Thongdee (a Chachoengsao rice farmer) live with the impacts; Krai pushes back", "The ending tells you what became of them, based on what you did"]),
   TU("n10-win.jpg", "วิธีชนะและแพ้", "How to win or lose",
-    ["ชนะ: CO₂ สุทธิถึง 0 ก่อนปี 2051 (เกรด S/A/B ตามอุณหภูมิ)", "แพ้: อุณหภูมิถึง +3.0°C, ความนิยมเหลือ 0% หรือหมดเวลา", "ชนะครั้งแรกเปิดโหมดโลกต่อเนื่องและ Hard Core · เข้าสู่ระบบเพื่อรับเพชรและติดอันดับ"],
-    ["Win: net CO₂ reaches 0 before 2051 (grade S/A/B by temperature)", "Lose: +3.0°C, 0% approval, or running out of time", "Your first win opens Continuous World and Hard Core · sign in to earn Gems and get ranked"]),
+    ["ชนะ: CO₂ สุทธิถึง 0 ก่อนปี 2051 (เกรด S/A/B ตามอุณหภูมิ)", "แพ้: อุณหภูมิถึง +3.0°C, ความนิยมเหลือ 0% หรือหมดเวลา", "ชนะครั้งแรกเปิดโหมดโลกต่อเนื่องและ Hard Core · เข้าสู่ระบบเพื่อรับคาร์บอนเครดิตและติดอันดับ"],
+    ["Win: net CO₂ reaches 0 before 2051 (grade S/A/B by temperature)", "Lose: +3.0°C, 0% approval, or running out of time", "Your first win opens Continuous World and Hard Core · sign in to earn Carbon Credits and get ranked"]),
 );

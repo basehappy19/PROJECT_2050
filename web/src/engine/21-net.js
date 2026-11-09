@@ -205,7 +205,7 @@ const Net = {
       try { const j = await this.req("POST", "/achievements", {ids}); if (j.user) this.user = j.user; if (j.awarded) this.toastTerra(j.awarded); dirty(); } catch(e) {}
     }, 800);
   },
-  toastTerra(n){ if (n > 0 && P.UIM) P.UIM.toastQ.push({icon:"terra", title:t("terraGot"), msg:`+${n} Gems`}); },
+  toastTerra(n){ if (n > 0 && P.UIM) P.UIM.toastQ.push({icon:"terra", title:t("terraGot"), msg:`+${n} ${t("gemsWord")}`}); },
   /* progress follows the account: send this device's progress, get back the merge of every device + the server's own records
      (achievements, wins). Called on sign-in, on refresh and a few seconds after anything changes. */
   async syncProgress(){

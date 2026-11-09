@@ -27,6 +27,7 @@ function animNum(key, v){
 }
 Screens.renderHUD = function(l){
   if (this.kind !== "game") return;
+  this._hudTips = [];
   const by = HUD_Y; this._goalsBottom = 0;
   /* ---- KPIs ---- */
   const acls = S.appr < 25 ? "bad" : S.appr < 45 ? "warn" : "good";
@@ -58,17 +59,20 @@ Screens.renderHUD = function(l){
     if (q.fn){ k.icon(l, "chevron-down", x + KPI_W - 18, by + 16, 13, "muted"); k.hit(l, "kpi-" + q.id, x, by, KPI_W, KPI_H, () => { Audio.play("open"); q.fn(); }); }
     else k.hit(l, "kpi-" + q.id, x, by, KPI_W, KPI_H, () => { UIM.kpiTip = UIM.kpiTip === q.id ? null : q.id; k.dirty("HUD"); }, {cursor:false});   // tap (touch) shows what it is
   });
-  // a value in the top bar: hover (or tap) shows what it is and how to get more
-  const tipQ = kpis.find(q => q.tip && (k.isHover(l, "kpi-" + q.id) || UIM.kpiTip === q.id));
-  if (tipQ){
-    const i = kpis.indexOf(tipQ), tw = 280, tx = Math.min(14 + i * KPI_W, k.W - tw - 14), ty = by + KPI_H + 6;
-    const th = 24 + (tipQ.s && !tipQ.meter ? 18 : 0) + k.textH(tipQ.tip, {size:12, w:tw - 24}) + 12;
-    k.rect(l, tx, ty, tw, th, "panel", {r:10, stroke:"line", a:.97, bg:true});
-    k.text(l, tipQ.k, tx + 12, ty + 8, {font:"bodyB", size:13, w:tw - 24, max:1});
-    let yy = ty + 28;
-    if (tipQ.s && !tipQ.meter){ k.text(l, tipQ.s, tx + 12, yy, {font:"mono", size:11.5, color:"accent"}); yy += 18; }
-    k.text(l, tipQ.tip, tx + 12, yy, {size:12, color:"muted", w:tw - 24, iconColor:"muted"});
-  }
+  this._hudTips.push(tl => {   // 3.5: drawn on the Alerts layer (above the HUD), so the ability bar never covers it
+    // a value in the top bar: hover (or tap) shows what it is and how to get more
+    const tipQ = kpis.find(q => q.tip && (k.isHover(l, "kpi-" + q.id) || UIM.kpiTip === q.id));
+    if (tipQ){
+      const i = kpis.indexOf(tipQ), tw = 280, tx = Math.min(14 + i * KPI_W, k.W - tw - 14), ty = by + KPI_H + 6;
+      const th = 24 + (tipQ.s && !tipQ.meter ? 18 : 0) + k.textH(tipQ.tip, {size:12, w:tw - 24}) + 12 + (k.touch ? 18 : 0);
+      k.rect(tl, tx, ty, tw, th, "panel", {r:10, stroke:"line", a:.97, bg:true});
+      k.text(tl, tipQ.k, tx + 12, ty + 8, {font:"bodyB", size:13, w:tw - 24, max:1});
+      let yy = ty + 28;
+      if (tipQ.s && !tipQ.meter){ k.text(tl, tipQ.s, tx + 12, yy, {font:"mono", size:11.5, color:"accent"}); yy += 18; }
+      k.text(tl, tipQ.tip, tx + 12, yy, {size:12, color:"muted", w:tw - 24, iconColor:"muted"});
+      if (k.touch) k.text(tl, Screens.tapClose(), tx + 12, ty + th - 22, {size:11, color:"muted", w:tw - 24, max:1});   // 3.5
+    }
+  });
   /* ---- controls (right): date · speed · menu ---- */
   const has3 = P.Net && P.Net.owns("speed3");
   const sp = [{id:"sp0", icon:"pause", on:S.speed === 0, fn:() => P.setSpeed(0)}, {id:"sp1", label:"1×", on:S.speed === 1, fn:() => P.setSpeed(1)}, {id:"sp2", label:"2×", on:S.speed === 2, fn:() => P.setSpeed(2)}];
@@ -144,8 +148,11 @@ Screens.renderHUD = function(l){
   this.meterRowNZ(l, mx + 12, ny + 11, half);
   this.meterRowT(l, mx + 12 + half + 18, ny + 11, half);
   if (S.started && this.placeBar) this.placeBar(l, (S.world && S.goals && S.goals.length ? this._goalsBottom || 104 : 98) + 8);   // Continuous World: builds waiting to be placed
+  k.dirty("Alerts");   // 3.5: the tooltips above are drawn there
 };
 /* one slim row: title · bar · value (the Net Zero bar fills toward the trophy as CO₂ falls) */
+/* 3.5: tooltips collected while drawing the HUD, drawn on the Alerts layer above it */
+Screens.drawHudTips = function(l){ if (this.kind === "game") for (const f of this._hudTips || []) f(l); };
 Screens.meterRowNZ = function(l, x, y, w){
   const NZ_MAX = 50, net = P.netCO2(), start = 36, pos = v => P.clamp(v / NZ_MAX, 0, 1);
   const cls = net <= 8 ? "good" : net <= 20 ? "warn" : "bad";
@@ -192,14 +199,16 @@ Screens.abilityBar = function(l, x, y){
     else if (lockedLv) k.text(l, `Lv${lockedLv}`, x + 7, yy + 26, {font:"mono", size:9, color:"muted", w:40, align:"center"});
     k.hit(l, id, x + 7, yy, 40, 40, () => {
       if (ready){ if (P.useAbility(a.id)) UIM.abTip = null; }
-      else { UIM.abTip = a.id; Audio.play("error"); }
+      else { UIM.abTip = UIM.abTip === a.id ? null : a.id; Audio.play("error"); }   // 3.5: a second tap closes it
       k.dirty();
     }, {cursor:true});
-    if (hov || UIM.abTip === a.id) this.abilityTip(l, x + w + 8, yy - 4, a);
+    if (hov || UIM.abTip === a.id){ const ty = yy - 4; this._hudTips.push(tl => this.abilityTip(tl, x + w + 8, ty, a)); }
     yy += 48;
   });
-  if (UIM.abTip === "char") this.charTip(l, x + w + 8, y);
+  if (UIM.abTip === "char") this._hudTips.push(tl => this.charTip(tl, x + w + 8, y));
 };
+/* 3.5: on touch screens a tooltip says how to close it */
+Screens.tapClose = () => S.lang === "th" ? "แตะที่ไหนก็ได้เพื่อปิด" : "Tap anywhere to close";
 Screens.abilityTip = function(l, x, y, a){
   const w = 270; let h = 0;
   const cd = S.actCd[a.id] || 0;
@@ -209,6 +218,7 @@ Screens.abilityTip = function(l, x, y, a){
     yy += k.text(dry ? null : l, L(a.name), x + 10, yy, {font:"dispS", size:14, w:w - 20, measure:dry}).h;
     yy += k.text(dry ? null : l, L(a.desc), x + 10, yy, {size:12, color:"muted", w:w - 20, lh:1.35, measure:dry}).h + 4;
     yy += k.text(dry ? null : l, note, x + 10, yy, {font:"mono", size:11, color:cd || a.lock ? "warn" : "accent", w:w - 20, measure:dry}).h;
+    if (k.touch) yy += 4 + k.text(dry ? null : l, Screens.tapClose(), x + 10, yy + 4, {size:11, color:"muted", w:w - 20, max:1, measure:dry}).h;
     return yy - y + 8;
   };
   h = draw(true);
@@ -221,6 +231,7 @@ Screens.charTip = function(l, x, y){
     yy += k.text(dry ? null : l, `${L(ch.person)} · ${L(ch.name)}`, x + 10, yy, {font:"dispS", size:14, w:w - 20, measure:dry}).h;
     yy += k.text(dry ? null : l, `${t("level")} ${S.charLv} · XP ${xp}`, x + 10, yy, {font:"mono", size:11, color:"accent", w:w - 20, measure:dry}).h + 2;
     yy += k.text(dry ? null : l, `${t("passive")}: ${L(ch.pas)}`, x + 10, yy, {size:12, color:"muted", w:w - 20, lh:1.35, measure:dry}).h;
+    if (k.touch) yy += 4 + k.text(dry ? null : l, Screens.tapClose(), x + 10, yy + 4, {size:11, color:"muted", w:w - 20, max:1, measure:dry}).h;
     return yy - y + 8;
   };
   const h = draw(true);

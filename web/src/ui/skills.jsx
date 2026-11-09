@@ -83,7 +83,7 @@ export function Skills(){
           const first = P.SKILLS.find(n => n.cat === c.id && !S.owned[n.id] && visible(n)) || P.SKILLS.find(n => n.cat === c.id); S.node = first.id; bump();
         }}>
           <Icon n={c.icon} size={20}/><span><b>{L(c.name)}</b><small class="mono">{own}/{list.length}</small></span>{ready ? <i class="badge">{ready}</i> : null}
-          {P.SDG_OF && P.SDG_OF[c.id] ? <span class="sdgs">{P.SDG_OF[c.id].map(g => <img key={g} src={`assets/img/sdg/goal-${g}.svg`} alt={`SDG ${g}`} title={`SDG ${g} · ${L(P.SDG_NAME[g])}`} draggable="false"/>)}</span> : null}
+          {P.SDG_OF && P.SDG_OF[c.id] ? <span class="sdgs">{P.SDG_OF[c.id].map(g => <img key={g} src={`assets/img/sdg/goal-${g}.svg`} alt={`SDG ${g}`} draggable="false"/>)}</span> : null}
         </button>;
       })}</nav>
     </section>
@@ -114,7 +114,7 @@ function Detail({cat}){
     <div class="dtop">
       <span class={"dicon d3 " + (own ? "own" : "")}><img src={`assets/img/ui/3d/sk-${n.id}.webp`} alt="" width="56" height="56" draggable="false"/></span>
       <div class="grow"><h3>{L(n.name)}</h3><div class="pills">{tags.map(tg => <Pill key={tg} t={L(P.SKILL_TYPE[tg])} kind={tg === "trade" ? "warn" : tg === "active" ? "gold" : tg === "resp" ? "acc" : ""}/>)}</div></div>
-      {P.SDG_OF && P.SDG_OF[n.cat] ? <div class="sksdg">{P.SDG_OF[n.cat].map(g => <img key={g} src={`assets/img/sdg/goal-${g}.svg`} alt={`SDG ${g}`} title={`SDG ${g} · ${L(P.SDG_NAME[g])}`} draggable="false"/>)}</div> : null}
+      {P.SDG_OF && P.SDG_OF[n.cat] ? <div class="sksdg">{P.SDG_OF[n.cat].map(g => <img key={g} src={`assets/img/sdg/goal-${g}.svg`} alt={`SDG ${g}`} draggable="false"/>)}</div> : null}
     </div>
     <Effects chips={P.skillChips(n)}/>
     <p class="desc muted"><Rich t={L(n.desc)}/></p>

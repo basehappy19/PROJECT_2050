@@ -11,7 +11,7 @@ Object.assign(P.UI, {
   gfxDropped:T("เครื่องนี้เล่นไม่ลื่น เกมลดกราฟิกเป็น “{L}” ให้แล้ว เปลี่ยนได้ที่เมนูหยุดเกม","The game wasn't running smoothly, so graphics were lowered ({L}). Change it in the pause menu."),
 });
 Object.assign(P.UI, {
-  gemsWord:T("เพชร", "Gems"),
+  gemsWord:T("คาร์บอนเครดิต", "Carbon Credits"),
   /* minerals and resources */
   oreLbl:T("[[$ore]] ทรัพยากร", "[[$ore]] Resources"), resTitle:T("ทรัพยากรของประเทศนี้", "This country's resources"),
   resImporter:T("ประเทศนี้ต้องนำเข้าทรัพยากรเกือบทั้งหมดทางเรือ", "This country imports almost all its minerals by ship"),

@@ -29,28 +29,125 @@ Screens.loaderUpdate = function(dt){
   if (Math.abs(np - shown) > 0.001){ this._ldShown = np; k.dirty("Loader"); }
   const ready = np >= 0.999;
   if (ready !== this._ldReady){ this._ldReady = ready; k.dirty("Loader"); }
+  LEarth.frame();   // 3.5: the spinning Earth (and its glide to the menu)
+};
+/* 3.5: the real Earth on the left of the loading screen (like the website's L7 loader, web/src/ui/earth.js).
+   A satellite picture wrapped on a sphere with a 2D canvas (the sphere → picture lookup is worked out once, then each
+   frame only copies pixels, 30 times a second), shown as a PIXI sprite on the scene's base layer under the loader UI.
+   After "Tap to enter" it glides to where the menu's 3D globe will be and takes its size; the menu globe then starts
+   facing the same longitude (73-earth.js), so the Earth seems to carry on into the menu. */
+const LEarth = {
+  root:null, ready:false,
+  mount(scene){
+    const PIXI = window.PIXI; if (!PIXI || this.root) return;
+    const layer = scene.getLayer(""), cont = layer && layer.getRenderer().getRendererObject(); if (!cont) return;
+    const N = this.N = 480, cv = this.cv = document.createElement("canvas"); cv.width = cv.height = N;
+    this.ctx = cv.getContext("2d");
+    // glow ring behind and shading in front (drawn once)
+    const ring = document.createElement("canvas"); ring.width = ring.height = 640; const rg = ring.getContext("2d");
+    const gr = rg.createRadialGradient(320, 320, 230, 320, 320, 320); gr.addColorStop(0, "rgba(79,209,197,.45)"); gr.addColorStop(.25, "rgba(79,209,197,.18)"); gr.addColorStop(1, "rgba(79,209,197,0)");
+    rg.fillStyle = gr; rg.fillRect(0, 0, 640, 640); rg.strokeStyle = "rgba(127,240,228,.5)"; rg.lineWidth = 3; rg.beginPath(); rg.arc(320, 320, 241, 0, Math.PI * 2); rg.stroke();
+    const shade = document.createElement("canvas"); shade.width = shade.height = N; const sg = shade.getContext("2d");
+    const sh = sg.createRadialGradient(N * .64, N * .36, 0, N * .5, N * .5, N * .5);
+    sh.addColorStop(0, "rgba(255,255,255,.10)"); sh.addColorStop(.38, "rgba(0,0,0,0)"); sh.addColorStop(.72, "rgba(0,4,10,.55)"); sh.addColorStop(1, "rgba(0,4,10,.92)");
+    sg.fillStyle = sh; sg.beginPath(); sg.arc(N / 2, N / 2, N / 2, 0, Math.PI * 2); sg.fill();
+    const root = this.root = new PIXI.Container();
+    const mk = c => { const s = new PIXI.Sprite(PIXI.Texture.from(c)); s.anchor.set(.5); return s; };
+    this.glow = mk(ring); this.earth = mk(cv); this.shade = mk(shade); this.earth.alpha = 0;
+    root.addChild(this.glow, this.earth, this.shade);
+    cont.addChild(root);
+    this.t0 = performance.now(); this.last = 0; this.leave = null; this.off = 0;
+    const img = new Image(); img.decoding = "async";
+    img.onload = () => this.prepare(img);
+    // the picture's real address (an export puts every file in one folder, the editor keeps the assets/ folders)
+    let url = "assets/ui/loader-earth-s.webp";
+    try { const g = scene.getGame(), res = g.getGameData().resources.resources.find(r => r.name === "ui/loader-earth-s.webp"); if (res) url = g.getResourceLoader().getFullUrl(res.file); } catch(e) {}
+    img.src = url;
+  },
+  prepare(img){
+    const W = this.iw = img.naturalWidth, H = img.naturalHeight, N = this.N;
+    const tc = document.createElement("canvas"); tc.width = W; tc.height = H; const tx = tc.getContext("2d"); tx.drawImage(img, 0, 0);
+    this.tex = new Uint32Array(tx.getImageData(0, 0, W, H).data.buffer);
+    const tilt = .32, ct = Math.cos(tilt), st = Math.sin(tilt), idx = [], uu = [], rr = [];
+    for (let y = 0; y < N; y++){ const ny = (y + .5) / N * 2 - 1;
+      for (let x = 0; x < N; x++){ const nx = (x + .5) / N * 2 - 1, r2 = nx * nx + ny * ny; if (r2 > 1) continue;
+        const z = Math.sqrt(1 - r2), y2 = ny * ct - z * st, z2 = ny * st + z * ct, lat = Math.asin(Math.max(-1, Math.min(1, -y2))), lon = Math.atan2(nx, z2);
+        idx.push(y * N + x); uu.push(Math.min(W - 1, Math.floor((lon / (2 * Math.PI) + .5) * W))); rr.push(Math.min(H - 1, Math.floor((.5 - lat / Math.PI) * H)) * W); } }
+    this.I = Int32Array.from(idx); this.U = Int32Array.from(uu); this.R = Int32Array.from(rr);
+    this.out = this.ctx.createImageData(N, N); this.dst = new Uint32Array(this.out.data.buffer);
+    this.base = Math.floor(W * .1); this.ready = true; this.draw(this.base);
+  },
+  draw(off){
+    this.off = off; const {I, U, R, tex, dst, iw:W} = this, n = I.length;
+    for (let i = 0; i < n; i++){ let u = U[i] + off; if (u >= W) u -= W; dst[I[i]] = tex[R[i] + u]; }
+    this.ctx.putImageData(this.out, 0, 0); this.earth.texture.update ? this.earth.texture.update() : this.earth.texture.baseTexture.update();
+  },
+  /* the longitude facing the player */
+  lon(){ return this.ready ? (((this.iw / 2 + this.off) % this.iw) / this.iw) * 360 - 180 : null; },
+  /* where it sits (design units): left of the loader panel, or (leaving) on its way to the menu globe */
+  place(){
+    const dw = Kit.W, H = Kit.H, home = {x:dw * .18, y:H * .53, r:H * .555};
+    let p = home;
+    if (this.leave){
+      const e0 = Math.min(1, (performance.now() - this.leave.t0) / this.leave.ms), e = e0 < .5 ? 4 * e0 * e0 * e0 : 1 - Math.pow(-2 * e0 + 2, 3) / 2, to = this.leave.to;
+      p = {x:home.x + (to.x - home.x) * e, y:home.y + (to.y - home.y) * e, r:home.r + (to.r - home.r) * e};
+      const ui = Screens.scene.getLayer("Loader"); if (ui) ui.getRenderer().getRendererObject().alpha = Math.max(0, 1 - e0 * 3);
+      if (e0 >= 1 && !this.leave.gone){ this.leave.gone = true; const go = this.leave.done; go(); }
+    }
+    const K = Kit.K, s = this.root;
+    s.position.set(p.x * K, p.y * K);
+    this.earth.width = this.earth.height = this.shade.width = this.shade.height = p.r * 2 * K;
+    this.glow.width = this.glow.height = p.r * 2 * K * 640 / 482;
+  },
+  frame(){
+    if (!this.root) return;
+    const now = performance.now();
+    if (this.ready){
+      if (this.earth.alpha < 1) this.earth.alpha = Math.min(1, this.earth.alpha + .04);
+      if (now - this.last >= 33){ this.last = now; const W = this.iw; this.draw(((this.base - Math.floor(((now - this.t0) / 1000 / 110) * W)) % W + W) % W); }
+    }
+    this.place();
+  },
+  /* glide onto the menu globe, then open the menu */
+  go(done){
+    if (this.leave) return;
+    if (!this.root || (P.Gfx && P.Gfx.level === "low")){ done(); return; }
+    // the same place the menu's globe takes (73-earth.js Globe.place, menu panel right edge = 56 + 430 + 24)
+    const dw = Kit.W, H = Kit.H, wide = dw >= H * 1.25, panel = 510;
+    const to = wide ? {x:(panel + dw) / 2, y:H / 2, r:Math.min(H * .42, (dw - panel) * .44)} : {x:dw / 2, y:H * .3, r:Math.min(dw * .42, H * .26)};
+    P._loaderLon = this.lon();
+    this.leave = {t0:performance.now(), ms:1150, to, done};
+  },
+  unmount(){ this.root = null; this.ready = false; this.leave = null; },
+};
+Screens.loaderEnter = function(){
+  if (LEarth.leave) return;
+  Audio.play("start"); try { localStorage.setItem("p2050-entered", "1"); } catch(e) {}
+  LEarth.go(() => { LEarth.unmount(); Screens.goScene("Menu"); });
 };
 Screens.renderLoader = function(l){
   if (!P._extra || P._extra.fonts < P._extra.nf) return;
-  const w = 440, x = (k.W - w) / 2, y = 210, p = this._ldShown || 0;
-  k.sprite(l, "Logo", "Logo", (k.W - 150) / 2, y - 120, 150, 150);
-  k.text(l, "GLOBAL CLIMATE TASKFORCE · 2026 – 2050", x, y + 40, {font:"mono", size:11, color:"accent", w, align:"center"});
-  const parts = [["PROJECT ", {font:"logo", size:52}], ["ZERO", {font:"logo", size:52, color:"accent"}]];
-  W.runs(l, x + (w - W.runsW(parts)) / 2, y + 62, parts);
-  const by = y + 148;
-  k.rect(l, x, by, w, 10, "panel2", {r:5});
-  if (p > 0.01) k.hgrad(l, x, by, Math.max(10, w * p), 10, [[0, "#1f9e78"], [1, "#4fd1c5"]], {r:5});
+  if (!LEarth.root && this.scene) LEarth.mount(this.scene);
+  // 3.5: the panel sits right of the Earth, like the website
+  const w = Math.min(440, k.W * .38), x = k.W * .56, y = k.H / 2 - 150, p = this._ldShown || 0;
+  k.sprite(l, "Logo", "Logo", x, y - 6, 56, 56);
+  k.text(l, "GLOBAL CLIMATE TASKFORCE · 2026 – 2050", x + 68, y + 14, {font:"mono", size:11, color:"accent", w:w - 68});
+  k.text(l, "PROJECT", x, y + 62, {font:"logo", size:54});
+  k.text(l, "ZERO", x, y + 118, {font:"logo", size:54, color:"accent"});
+  const by = y + 196;
+  k.rect(l, x, by, w, 8, "panel2", {r:4});
+  if (p > 0.01) k.hgrad(l, x, by, Math.max(8, w * p), 8, [[0, "#1f9e78"], [1, "#4fd1c5"]], {r:4});
   const stage = p < .15 ? t("ldFonts") : p < .35 ? t("ldGlobe") : p < .9 ? t("ldAudio") : p < .999 ? t("ldImg") : t("ldReady");
-  k.text(l, p >= .999 ? t("ldReady") : `${t("loading")} · ${stage}`, x, by + 18, {size:12.5, color:"muted"});
+  k.text(l, p >= .999 ? t("ldReady") : `${t("loading")} · ${stage}`, x, by + 16, {size:12.5, color:"muted"});
   const pct = `${Math.round(p * 100)}%`;
-  k.text(l, pct, x + w - k.textW(pct, {font:"mono", size:12.5}), by + 18, {font:"mono", size:12.5, color:"muted"});
+  k.text(l, pct, x + w - k.textW(pct, {font:"mono", size:12.5}), by + 16, {font:"mono", size:12.5, color:"muted"});
   if (this._ldReady){
     const lab = t("enter"), bw = k.textW(lab, {font:"dispS", size:15}) + 40;
-    W.btn(l, "enter", x + (w - bw) / 2, by + 52, lab, () => { Audio.play("start"); try { localStorage.setItem("p2050-entered", "1"); } catch(e) {} Screens.goScene("Menu"); }, {w:bw, h:42, size:15, sound:false});
-    k.hit(l, "enterAll", 0, 0, k.W, k.H, () => { Audio.play("start"); Screens.goScene("Menu"); }, {cursor:false});
+    W.btn(l, "enter", x, by + 50, lab, () => Screens.loaderEnter(), {w:bw, h:42, size:15, sound:false});
+    k.hit(l, "enterAll", 0, 0, k.W, k.H, () => Screens.loaderEnter(), {cursor:false});
     l.hits.unshift(l.hits.pop());
   }
-  k.text(l, t("disclaimer"), 0, k.H - 30, {size:11.5, color:"muted", w:k.W, align:"center"});
+  k.text(l, t("disclaimer"), x, k.H - 30, {size:11.5, color:"muted", w:k.W - x - 24});
 };
 
 /* ---------------- main menu ---------------- */
@@ -379,7 +476,7 @@ Screens.subShop = function(l, y, w){
   for (const it of SHOP){
     const own = N.owns(it.id), afford = N.user.terra >= it.price;
     const desc = it.kind === "char" ? L(CHAR[it.id.slice(5)].pas) : L(it.desc);
-    const lab = own ? `[[check]] ${t("owned2")}` : `[[$gem]] ${it.price}`, bw = W.btnW(lab) + 6;
+    const lab = own ? `[[check]] ${t("owned2")}` : `[[$credit]] ${it.price}`, bw = W.btnW(lab) + 6;
     const h1 = k.text(l, L(it.name), 56, y + 10, {font:"dispS", size:15, w:w - 56 - bw - 20}).h;
     const h2 = k.text(l, desc, 56, y + 10 + h1, {size:12, color:"muted", w:w - 56 - bw - 20}).h;
     const ch = Math.max(62, h1 + h2 + 20);

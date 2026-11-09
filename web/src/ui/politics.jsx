@@ -33,10 +33,10 @@ function Row({Gd}){
   const status = st === "back" ? <span class="pneed good">{L(W.backing)}</span>
     : st === "angry" ? <span class="pneed bad"><Icon n="megaphone" size={13}/> {L(W.protest)}</span>
     : <span class="pneed">{fill(W.toBack, Math.ceil(goal.toBack))}</span>;
-  return <div class={"prow2 " + st} style={{"--gc":Gd.color}} title={st === "angry" ? after(L(Gd.bad)) : after(L(Gd.good))}>
+  return <div class={"prow2 " + st} style={{"--gc":Gd.color}} aria-label={st === "angry" ? after(L(Gd.bad)) : after(L(Gd.good))}>
     <span class="pn"><Icon n={Gd.icon} size={18} color={Gd.color}/><b>{L(Gd.name)}</b></span>
     <Icon n={face} size={22} cls={"pface " + fc}/>
-    <span class="pv mono" style={{color:Gd.color}}>{v.toFixed(0)}%{Math.abs(d) >= 1 ? <small class={d > 0 ? "good" : "bad"} title={L(W.year)}>{d > 0 ? "▲" : "▼"}{Math.abs(d).toFixed(0)}</small> : null}</span>
+    <span class="pv mono" style={{color:Gd.color}}>{v.toFixed(0)}%{Math.abs(d) >= 1 ? <small class={d > 0 ? "good" : "bad"} aria-label={L(W.year)}>{d > 0 ? "▲" : "▼"}{Math.abs(d).toFixed(0)}</small> : null}</span>
     <Zone v={v} back={back} col={Gd.color}/>
     {status}
   </div>;
@@ -50,7 +50,7 @@ export function Politics(){
     <div class="appr2">
       <h2><Icon n="$appr" size={28}/> {L(W.title)} <b class={"mono " + ac}>{S.appr.toFixed(0)}%</b></h2>
       <small class="muted">{L(W.who)}</small>
-      <div class="pstack">{P.GROUPS.map(Gd => <i key={Gd.id} style={{width:`${Gd.w * 100}%`, background:Gd.color}} title={L(Gd.name)}><Icon n={Gd.icon} size={14}/> {Math.round(Gd.w * 100)}%</i>)}</div>
+      <div class="pstack">{P.GROUPS.map(Gd => <i key={Gd.id} style={{width:`${Gd.w * 100}%`, background:Gd.color}} aria-label={L(Gd.name)}><Icon n={Gd.icon} size={14}/> {Math.round(Gd.w * 100)}%</i>)}</div>
       <div class="prows2">{P.GROUPS.map(Gd => <Row key={Gd.id} Gd={Gd}/>)}</div>
       <div class="phates2"><Icon n="frown" size={15} color="bad"/><small class="muted">{L(W.hates)}:</small>
         {P.GROUPS.flatMap(Gd => L(Gd.hates).split(/\s*[·,]\s*/).filter(Boolean).map(x => <span key={Gd.id + x} style={{"--gc":Gd.color}}><Icon n={Gd.icon} size={12} color={Gd.color}/>{x}</span>))}</div>

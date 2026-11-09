@@ -165,7 +165,7 @@ async function api(method, path, body, retry = true){
   if (!r.ok) throw (j || {error:"http" + r.status});
   return j;
 }
-const ERR = {not_admin:"บัญชีนี้ไม่ใช่ผู้ดูแล", bad_login:"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", banned:"บัญชีถูกระงับ", bad_value:"ค่าที่ใส่ไม่ถูกต้อง", bad_amount:"จำนวนเพชรไม่ถูกต้อง",
+const ERR = {not_admin:"บัญชีนี้ไม่ใช่ผู้ดูแล", bad_login:"ชื่อผู้ใช้หรือรหัสผ่านไม่ถูกต้อง", banned:"บัญชีถูกระงับ", bad_value:"ค่าที่ใส่ไม่ถูกต้อง", bad_amount:"จำนวนคาร์บอนเครดิตไม่ถูกต้อง",
   cant_ban_self:"ระงับบัญชีตัวเองไม่ได้", cant_demote_self:"ลดสิทธิ์ตัวเองไม่ได้", rate_limited:"ลองบ่อยเกินไป รอสักครู่", not_found:"ไม่พบผู้เล่นนี้"};
 const err = e => ERR[e && e.error] || "เกิดข้อผิดพลาด ลองใหม่อีกครั้ง";
 
@@ -173,7 +173,7 @@ const err = e => ERR[e && e.error] || "เกิดข้อผิดพลา�
 const ROLE = {player:"ผู้เล่น", tester:"ผู้ทดสอบ", admin:"ผู้ดูแล"};
 const MODE = {normal:"ภารกิจ 2050", hard:"Hard Core", daily:"Daily Challenge"};
 const ENDING = {win:"ชนะ", l1:"แพ้: โลกร้อนเกิน 3°C", l2:"แพ้: ถูกถอดถอน", l3:"แพ้: หมดเวลา"};
-const NOTE = {too_short:"เล่นสั้นเกินไป ไม่ได้เพชร", reduced:"เกินวันละ 3 เกม ได้เพชรครึ่งเดียว", daily_cap:"เกินวันละ 6 เกม ได้เพชร 10%", too_fast:"ผลผิดปกติ: เร็วเกินจริง", bad_win:"ผลผิดปกติ: ชนะทั้งที่ CO₂ ยังไม่ถึง 0", bad_values:"ผลผิดปกติ", bad_tick:"ผลผิดปกติ", bad_ending:"ผลผิดปกติ"};
+const NOTE = {too_short:"เล่นสั้นเกินไป ไม่ได้คาร์บอนเครดิต", reduced:"เกินวันละ 3 เกม ได้คาร์บอนเครดิตครึ่งเดียว", daily_cap:"เกินวันละ 6 เกม ได้คาร์บอนเครดิต 10%", too_fast:"ผลผิดปกติ: เร็วเกินจริง", bad_win:"ผลผิดปกติ: ชนะทั้งที่ CO₂ ยังไม่ถึง 0", bad_values:"ผลผิดปกติ", bad_tick:"ผลผิดปกติ", bad_ending:"ผลผิดปกติ"};
 const LEDGER = {game:"จากการเล่น", achievement:"ความสำเร็จ", shop:"ซื้อของ", rename:"เปลี่ยนชื่อ", admin:"ผู้ดูแลปรับ", season:"รางวัลซีซั่น", weekly:"ภารกิจรายสัปดาห์"};
 const CERT = {null:"ตามกติกาปกติ", true:"ให้สิทธิ์ขอได้ 1 ครั้ง", false:"ไม่ให้สิทธิ์"};
 const RESET = {results:"ผลการเล่นและคะแนน", achievements:"ความสำเร็จ", chars:"เลเวลตัวละคร", cards:"การ์ดความรู้", saves:"เซฟบนคลาวด์", items:"ของที่ซื้อจากร้าน"};
@@ -183,7 +183,7 @@ const charName = id => (DATA.chars.find(c => c.id === id) || {name:id}).name;
 const evName = id => (DATA.events.find(e => e.id === id) || {title:id}).title;
 const KIND_DESC = {char:"ปลดล็อกตัวละครนี้ให้เลือกเล่นได้"};
 const SET_NAME = {announcement:"ประกาศหน้าเมนู", disabledEvents:"เหตุการณ์ในเกม", prices:"ราคาในร้านค้า", certMinCards:"การ์ดขั้นต่ำสำหรับประกาศนียบัตร", certIssuer:"ชื่อผู้ออกประกาศนียบัตร",
-  certPartner:"หน่วยงานร่วม", minGameSeconds:"เวลาเล่นขั้นต่ำที่ได้เพชร", googleClientId:"เข้าสู่ระบบด้วย Google", extraOrigins:"เว็บไซต์อื่นที่ใช้ API ได้", balance:"ค่าความยาก (เลิกใช้แล้ว)", season:"ซีซั่น", weekly:"ภารกิจรายสัปดาห์"};
+  certPartner:"หน่วยงานร่วม", minGameSeconds:"เวลาเล่นขั้นต่ำที่ได้คาร์บอนเครดิต", googleClientId:"เข้าสู่ระบบด้วย Google", extraOrigins:"เว็บไซต์อื่นที่ใช้ API ได้", balance:"ค่าความยาก (เลิกใช้แล้ว)", season:"ซีซั่น", weekly:"ภารกิจรายสัปดาห์"};
 
 /* ---------- shell ---------- */
 let ME = null, VIEW = "home";
@@ -246,7 +246,7 @@ async function viewHome(){
       ${card("gamepad-2", "เกมที่เริ่ม", fmt(o.games.started), `วันนี้ ${fmt(o.games.today)} เกม · โลกต่อเนื่อง ${fmt(o.games.world)}`)}
       ${card("trophy", "ชนะ", winp + "%", `${fmt(o.games.wins)} จาก ${fmt(o.games.finished)} เกมที่เล่นจบ`)}
       ${card("timer", "เวลาเล่นเฉลี่ย", (o.games.minutes ?? "—") + " นาที", "ต่อเกมที่เล่นจบ")}
-      ${card("gem", "เพชรที่ได้ / ใช้", fmt(o.gems.earned) + " / " + fmt(o.gems.spent), "รวมทุกผู้เล่น")}
+      ${card("gem", "คาร์บอนเครดิตที่ได้ / ใช้", fmt(o.gems.earned) + " / " + fmt(o.gems.spent), "รวมทุกผู้เล่น")}
       ${card("award", "ประกาศนียบัตร", fmt(o.certs.total), `เดือนนี้ ${fmt(o.certs.month)} ใบ`)}
       ${card("ban", "บัญชีที่ถูกระงับ", fmt(o.players.banned), `ผู้ดูแล ${fmt(o.players.admins)} คน`)}
     </div>
@@ -319,7 +319,7 @@ async function viewUsers(q = ""){
   let t; $("#q").oninput = e => { clearTimeout(t); t = setTimeout(() => load(e.target.value), 250); }; $("#q").focus();
   const load = async q => {
     let j; try { j = await api("GET", "/admin/users?q=" + encodeURIComponent(q)); } catch(e){ $("#list").innerHTML = `<div class="empty bad">${esc(err(e))}</div>`; return; }
-    $("#list").innerHTML = j.rows.length ? `<table><tr><th>ผู้เล่น</th><th>เพชร</th><th>ชนะ / เล่น</th><th>สิทธิ์</th><th>เข้าเล่นล่าสุด</th></tr>${j.rows.map(u => `<tr class="click" data-u="${esc(u.username)}">
+    $("#list").innerHTML = j.rows.length ? `<table><tr><th>ผู้เล่น</th><th>คาร์บอนเครดิต</th><th>ชนะ / เล่น</th><th>สิทธิ์</th><th>เข้าเล่นล่าสุด</th></tr>${j.rows.map(u => `<tr class="click" data-u="${esc(u.username)}">
       <td><div class="who"><span class="av">${esc((u.display_name || "?")[0])}</span><div><b>${esc(u.display_name)} ${u.banned ? '<span class="badge ban">ระงับ</span>' : ""}</b><small>@${esc(u.username)}${u.email ? " · " + esc(u.email) : ""}</small></div></div></td>
       <td class="mono">${ic("gem", "sky-c")} ${fmt(u.gems)}</td><td class="mono">${u.wins} / ${u.games}</td>
       <td>${u.role !== "player" ? `<span class="badge ${u.role}">${ROLE[u.role]}</span>` : `<span class="muted small">ผู้เล่น</span>`}</td><td class="muted small">${ago(u.last_login)}</td></tr>`).join("")}</table>
@@ -342,7 +342,7 @@ async function viewPlayer(name){
       <div class="row small muted" style="gap:14px"><span class="mono">@${esc(u.username)}</span>${u.email ? `<span>${ic("mail")} ${esc(u.email)}</span>` : ""}<span>สมัคร ${day(u.created_at)}</span><span>เข้าเล่นล่าสุด ${ago(u.last_login)}</span></div>
       <div class="row" style="margin-top:8px">${u.role !== "player" ? `<span class="badge ${u.role}">${ROLE[u.role]}</span>` : ""}${u.banned ? `<span class="badge ban">${ic("ban")} ถูกระงับ</span>` : `<span class="badge ok">ใช้งานได้</span>`}</div></div></div>
       <div class="stats" style="margin:18px 0 0">
-        <div class="stat"><span>${ic("gem")} เพชร</span><b>${fmt(u.gems)}</b></div>
+        <div class="stat"><span>${ic("gem")} คาร์บอนเครดิต</span><b>${fmt(u.gems)}</b></div>
         <div class="stat"><span>${ic("trophy")} ชนะ / เกมล่าสุด</span><b>${wins} / ${j.runs.length}</b></div>
         <div class="stat"><span>${ic("book-open")} การ์ดความรู้</span><b>${u.cards}</b></div>
         <div class="stat"><span>${ic("award")} ประกาศนียบัตร</span><b>${j.certs.length}</b></div>
@@ -350,7 +350,7 @@ async function viewPlayer(name){
       </div></div>
 
     <div class="grid2">
-      <div class="card"><h2>${ic("gem")} เพชร</h2><p class="lead">ให้เพิ่มหรือหักเพชร ทุกครั้งจะบันทึกในประวัติ</p>
+      <div class="card"><h2>${ic("gem")} คาร์บอนเครดิต</h2><p class="lead">ให้เพิ่มหรือหักคาร์บอนเครดิต ทุกครั้งจะบันทึกในประวัติ</p>
         <div class="quick">${[10, 50, 100, 500].map(n => `<button class="btn sm" data-g="${n}">${ic("plus")} ${n}</button>`).join("")}<button class="btn sm danger" data-g="-50">${ic("minus")} 50</button></div>
         <div class="row" style="margin-top:12px"><input class="inp" id="gm" type="number" placeholder="จำนวน (ติดลบ = หัก)" style="width:170px"><input class="inp grow" id="gn" placeholder="เหตุผล เช่น รางวัลแข่งขัน"><button class="btn pri" id="gb">บันทึก</button></div>
         <div class="sub">ล่าสุด</div>
@@ -372,7 +372,7 @@ async function viewPlayer(name){
       <div class="chars">${DATA.chars.map(c => `<div class="char" style="--c:${c.color}"><img src="/assets/img/portraits/${c.id}-base.jpg" alt="" style="${charOwned(c.id) ? "" : "filter:grayscale(1);opacity:.6"}"><div class="grow"><b>${esc(c.name)}</b><div class="small muted">${charOwned(c.id) ? `Lv ${lv(c.id)} · ${fmt(j.chars[c.id] || 0)} XP` : "ยังไม่ปลดล็อก"}</div>
         <div class="row" style="margin-top:6px"><select class="inp" data-lvsel="${c.id}" style="height:34px;padding:0 8px">${DATA.levels.map((_, i) => `<option value="${i + 1}" ${lv(c.id) === i + 1 ? "selected" : ""}>Lv ${i + 1}</option>`).join("")}</select><button class="btn sm" data-lv="${c.id}">ตั้ง</button></div></div></div>`).join("")}</div></div>
 
-    <div class="card"><h2>${ic("shopping-bag")} ของในร้าน</h2><p class="lead">เปิดสวิตช์ = ผู้เล่นมีของชิ้นนี้ (ไม่หักเพชร)</p>
+    <div class="card"><h2>${ic("shopping-bag")} ของในร้าน</h2><p class="lead">เปิดสวิตช์ = ผู้เล่นมีของชิ้นนี้ (ไม่หักคาร์บอนเครดิต)</p>
       <div class="items">${DATA.shop.map(x => `<label class="item"><div class="top"><div class="ico">${x.kind === "char" ? `<img src="/assets/img/portraits/${x.id.slice(5)}-base.jpg" alt="">` : ic(x.icon in DATA.icons ? x.icon : "gem")}</div>
         <div class="grow"><b>${esc(itemName(x.id))}</b><p>${esc(x.desc || KIND_DESC[x.kind] || "")}</p></div><span class="sw"><input type="checkbox" data-own="${x.id}" ${owned.has(x.id) ? "checked" : ""}><i></i></span></div></label>`).join("")}</div></div>
 
@@ -385,7 +385,7 @@ async function viewPlayer(name){
     </div>
 
     <div class="card"><h2>${ic("gamepad-2")} เกมล่าสุด</h2>
-      ${j.runs.length ? `<table><tr><th>เมื่อ</th><th>โหมด</th><th>ตัวละคร</th><th>ผล</th><th>อุณหภูมิ</th><th>คะแนน</th><th>เพชร</th></tr>${j.runs.map(r => `<tr>
+      ${j.runs.length ? `<table><tr><th>เมื่อ</th><th>โหมด</th><th>ตัวละคร</th><th>ผล</th><th>อุณหภูมิ</th><th>คะแนน</th><th>คาร์บอนเครดิต</th></tr>${j.runs.map(r => `<tr>
         <td class="small muted">${dt(r.started_at)}</td><td>${r.world ? "โลกต่อเนื่อง" : MODE[r.mode] || esc(r.mode)}</td><td>${esc(charName(r.char))}</td>
         <td>${r.ending ? `<span class="${r.ending === "win" ? "ok-c" : ""}">${ENDING[r.ending] || r.ending}${r.ending === "win" && r.temp != null ? " · เกรด " + (r.temp < 1.6 ? "S" : r.temp < 2 ? "A" : "B") : ""}</span>` : `<span class="muted">ยังไม่จบ</span>`}
           ${r.note ? `<div class="small ${r.flagged ? "bad-c" : "muted"}">${NOTE[r.note] || esc(r.note)}</div>` : ""}</td>
@@ -398,8 +398,8 @@ async function viewPlayer(name){
   const reload = () => viewPlayer(u.username);
   const run = async (fn, ok) => { try { await fn(); toast(ok); reload(); } catch(e){ toast(err(e), true); } };
   $("#bk").onclick = () => go("users");
-  $$("[data-g]").forEach(b => b.onclick = () => run(() => api("POST", `/admin/users/${id}/gems`, {amount:Number(b.dataset.g), note:$("#gn").value.trim()}), `${Number(b.dataset.g) > 0 ? "ให้" : "หัก"}เพชร ${Math.abs(b.dataset.g)} แล้ว`));
-  $("#gb").onclick = () => { const n = Number($("#gm").value); if (!n) return toast("ใส่จำนวนเพชรก่อน", true); run(() => api("POST", `/admin/users/${id}/gems`, {amount:n, note:$("#gn").value.trim()}), "บันทึกเพชรแล้ว"); };
+  $$("[data-g]").forEach(b => b.onclick = () => run(() => api("POST", `/admin/users/${id}/gems`, {amount:Number(b.dataset.g), note:$("#gn").value.trim()}), `${Number(b.dataset.g) > 0 ? "ให้" : "หัก"}คาร์บอนเครดิต ${Math.abs(b.dataset.g)} แล้ว`));
+  $("#gb").onclick = () => { const n = Number($("#gm").value); if (!n) return toast("ใส่จำนวนคาร์บอนเครดิตก่อน", true); run(() => api("POST", `/admin/users/${id}/gems`, {amount:n, note:$("#gn").value.trim()}), "บันทึกคาร์บอนเครดิตแล้ว"); };
   $("#cert").onclick = e => { const b = e.target.closest("button"); if (!b) return; const v = b.dataset.k === "null" ? null : b.dataset.k === "true"; run(() => api("POST", `/admin/users/${id}/flags`, {certOverride:v}), "สิทธิ์ประกาศนียบัตร: " + CERT[b.dataset.k]); };
   $("#role").onclick = async e => { const b = e.target.closest("button"); if (!b || b.disabled || b.dataset.k === u.role) return; if (b.dataset.k === "admin" && !(await ask("ตั้งเป็นผู้ดูแล?", `@${esc(u.username)} จะเข้าหน้านี้และแก้ทุกอย่างได้`, "ตั้งเป็นผู้ดูแล"))) return; run(() => api("POST", `/admin/users/${id}/flags`, {role:b.dataset.k}), "บทบาท: " + ROLE[b.dataset.k]); };
   $("#ntb").onclick = () => run(() => api("POST", `/admin/users/${id}/flags`, {note:$("#nt").value.trim()}), "บันทึกหมายเหตุแล้ว");
@@ -422,9 +422,9 @@ async function viewShop(){
   const cur = id => s.settings.prices[id] ?? item(id).price, changed = {};
   const draw = () => {
     const n = Object.keys(changed).length;
-    $("#main").innerHTML = page("ร้านค้า", "ราคาของที่ผู้เล่นซื้อด้วยเพชร มีผลทันทีโดยไม่ต้องอัปเดตเกม") + `<div class="items">${DATA.shop.map(x => { const v = changed[x.id] ?? cur(x.id); return `<div class="item ${x.id in changed ? "changed" : ""}">
+    $("#main").innerHTML = page("ร้านค้า", "ราคาของที่ผู้เล่นซื้อด้วยคาร์บอนเครดิต มีผลทันทีโดยไม่ต้องอัปเดตเกม") + `<div class="items">${DATA.shop.map(x => { const v = changed[x.id] ?? cur(x.id); return `<div class="item ${x.id in changed ? "changed" : ""}">
         <div class="top"><div class="ico">${x.kind === "char" ? `<img src="/assets/img/portraits/${x.id.slice(5)}-base.jpg" alt="">` : ic(x.icon in DATA.icons ? x.icon : "gem")}</div><div class="grow"><b>${esc(itemName(x.id))}</b><p>${esc(x.desc || KIND_DESC[x.kind] || "")}</p></div></div>
-        <div class="price">${ic("gem", "sky-c")}<input class="inp" type="number" min="0" max="100000" data-p="${x.id}" value="${v}"><span class="muted small">เพชร</span><span class="grow"></span>${v !== x.price ? `<button class="btn sm ghost" data-def="${x.id}" title="ราคาเดิม ${x.price}">${ic("rotate-ccw")} ${x.price}</button>` : `<span class="dim tiny" style="white-space:nowrap">ค่าเริ่มต้น</span>`}</div></div>`; }).join("")}</div>
+        <div class="price">${ic("gem", "sky-c")}<input class="inp" type="number" min="0" max="100000" data-p="${x.id}" value="${v}"><span class="muted small">คาร์บอนเครดิต</span><span class="grow"></span>${v !== x.price ? `<button class="btn sm ghost" data-def="${x.id}" title="ราคาเดิม ${x.price}">${ic("rotate-ccw")} ${x.price}</button>` : `<span class="dim tiny" style="white-space:nowrap">ค่าเริ่มต้น</span>`}</div></div>`; }).join("")}</div>
       ${s.updated.prices ? `<p class="updated" style="margin-top:12px">แก้ล่าสุด ${dt(s.updated.prices.at)} โดย @${esc(s.updated.prices.by || "—")}</p>` : ""}
       ${n ? `<div class="savebar">${ic("info", "warn")}<span class="grow">เปลี่ยนราคา ${n} รายการ ยังไม่ได้บันทึก</span><button class="btn ghost" id="undo">ยกเลิก</button><button class="btn pri" id="save">${ic("save")} บันทึกราคา</button></div>` : ""}`;
     $$("[data-p]").forEach(i => i.onchange = () => { const v = Math.max(0, Math.round(Number(i.value) || 0)); if (v === cur(i.dataset.p)) delete changed[i.dataset.p]; else changed[i.dataset.p] = v; draw(); });
@@ -482,7 +482,7 @@ async function viewEvents(){
 function seasonSect(s){
   const st = s.settings, cur = s.seasonNow, set = st.season, tiers = (set ? set.tiers : s.defaultTiers).map(t => t.item ? `${t.terra} ${t.item}` : String(t.terra)).join("\n");
   const d = new Date(), y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, "0");
-  return `<div class="card" data-sec="season"><h2>${ic("calendar-check")} ซีซั่น (Season Pass แบบเพชร)</h2>
+  return `<div class="card" data-sec="season"><h2>${ic("calendar-check")} ซีซั่น (Season Pass แบบคาร์บอนเครดิต)</h2>
     <p class="lead">ตอนนี้: <b>${esc(cur.name.th)}</b> ${esc(cur.start)} ถึง ${esc(cur.end)} ${cur.auto ? '<span class="muted">(อัตโนมัติ: ซีซั่นละ 1 เดือน)</span>' : '<span class="ok-c">(ตั้งเอง)</span>'} · รับรางวัลซีซั่นนี้ไปแล้ว ${s.claims.season} ครั้ง<br>
     ทุกเกมที่เล่นจบได้ XP ซีซั่น (20 + ชนะ 30 + คะแนน/300 สูงสุด 30 + Hard Core 10) ภารกิจรายสัปดาห์ที่รับแล้วได้ XP เพิ่ม · ถ้าวันนี้อยู่นอกช่วงวันที่ที่ตั้งไว้ จะกลับไปใช้ซีซั่นรายเดือนอัตโนมัติ</p>
     <div class="grid2">
@@ -493,7 +493,7 @@ function seasonSect(s){
       <label class="field"><span>วันเริ่ม</span><input class="inp" id="sst" type="date" value="${esc(set ? set.start : cur.start)}"></label>
       <label class="field"><span>วันจบ (ซีซั่นจบก่อนวันนี้)</span><input class="inp" id="sen" type="date" value="${esc(set ? set.end : cur.end)}"></label>
     </div>
-    <label class="field" style="margin-top:10px"><span>รางวัลแต่ละขั้น บรรทัดละขั้น: จำนวนเพชร และรหัสของในร้าน (ถ้ามี) เช่น <span class="mono">20 frame</span> · ของที่ผู้เล่นมีแล้วจะได้เพชร +40 แทน · รหัสของ: ${Object.keys(s.shop).map(k => `<span class="mono">${esc(k)}</span>`).join(" ")}</span>
+    <label class="field" style="margin-top:10px"><span>รางวัลแต่ละขั้น บรรทัดละขั้น: จำนวนคาร์บอนเครดิต และรหัสของในร้าน (ถ้ามี) เช่น <span class="mono">20 frame</span> · ของที่ผู้เล่นมีแล้วจะได้คาร์บอนเครดิต +40 แทน · รหัสของ: ${Object.keys(s.shop).map(k => `<span class="mono">${esc(k)}</span>`).join(" ")}</span>
       <textarea class="inp mono" id="stiers" rows="6" style="width:100%">${esc(tiers)}</textarea></label>
     <div class="row" style="margin-top:16px;border-top:1px solid var(--line2);padding-top:14px">${s.updated.season ? `<span class="updated">แก้ล่าสุด ${dt(s.updated.season.at)} โดย @${esc(s.updated.season.by || "—")}</span>` : `<span class="updated">ใช้ซีซั่นรายเดือนอัตโนมัติ</span>`}<span class="grow"></span>${s.updated.season ? `<button class="btn ghost sm" data-reset="season">${ic("rotate-ccw")} กลับไปใช้รายเดือนอัตโนมัติ</button>` : ""}<button class="btn pri" data-save="season">${ic("save")} บันทึก</button></div></div>`;
 }
@@ -502,7 +502,7 @@ function weeklySect(s){
   return `<div class="card" data-sec="weekly"><h2>${ic("target")} ภารกิจรายสัปดาห์</h2>
     <p class="lead">สัปดาห์ละ 3 ภารกิจ (ง่าย กลาง ยาก อย่างละ 1) เหมือนกันทุกคน เปลี่ยนทุกวันจันทร์ · สัปดาห์นี้: ${s.weekMissions.map(id => `<b>${esc(s.missions[id].t.th)}</b>`).join(" · ")} · รับรางวัลแล้ว ${s.claims.weekly} ครั้ง</p>
     <div class="grid2" style="grid-template-columns:repeat(4,1fr)">
-      ${[0, 1, 2].map(i => `<label class="field"><span>เพชร ภารกิจ${TIER[i]}</span><input class="inp" id="wt${i}" type="number" min="0" max="1000" value="${w.terra[i]}"></label>`).join("")}
+      ${[0, 1, 2].map(i => `<label class="field"><span>คาร์บอนเครดิต ภารกิจ${TIER[i]}</span><input class="inp" id="wt${i}" type="number" min="0" max="1000" value="${w.terra[i]}"></label>`).join("")}
       <label class="field"><span>XP ซีซั่นต่อภารกิจ</span><input class="inp" id="wxp" type="number" min="0" max="1000" value="${w.xp}"></label>
     </div>
     <p class="lead" style="margin-top:12px">ภารกิจที่เปิดให้สุ่ม (ปิดได้ แต่ต้องเหลืออย่างน้อย 3)</p>
@@ -525,7 +525,7 @@ async function viewSettings(){
     `<div class="grid2">` +
     sect("certMinCards", "award", "เงื่อนไขประกาศนียบัตร", "ผู้เล่นต้องชนะทั้งโหมดปกติและโหมด Hard Core และมีการ์ดความรู้ครบตามจำนวนนี้ (ขอได้คนละ 1 ใบ)", `
       <label class="field"><span>จำนวนการ์ดความรู้ที่ต้องมี</span><input class="inp" id="cmc" type="number" min="0" max="500" value="${st.certMinCards}" style="width:140px"></label>`) +
-    sect("minGameSeconds", "timer", "กันการเล่นเร็วเพื่อปั่นเพชร", "เกมที่จบเร็วกว่านี้ไม่ได้เพชร (ยังได้ XP)", `
+    sect("minGameSeconds", "timer", "กันการเล่นเร็วเพื่อปั่นคาร์บอนเครดิต", "เกมที่จบเร็วกว่านี้ไม่ได้คาร์บอนเครดิต (ยังได้ XP)", `
       <label class="field"><span>เวลาเล่นขั้นต่ำ (นาที)</span><input class="inp" id="mgs" type="number" min="0" max="120" step="1" value="${Math.round(st.minGameSeconds / 60)}" style="width:140px"></label>`) +
     `</div>` +
     sect("certIssuer", "award", "ชื่อบนประกาศนียบัตร", "ชื่อผู้ออกประกาศนียบัตร และหน่วยงานที่ร่วมจัด (ถ้ามี) เว้นว่าง = ใช้ค่าเดิม", `<div class="grid2">
@@ -559,7 +559,7 @@ async function viewSettings(){
 }
 
 /* ---------- log ---------- */
-const LOG_TYPE = {gems:["gem", "sky-c", "เพชร"], items:["shopping-bag", "acc-c", "ของในร้าน"], xp:["star", "gold-c", "เลเวลตัวละคร"], cards:["book-open", "acc-c", "การ์ดความรู้"],
+const LOG_TYPE = {gems:["gem", "sky-c", "คาร์บอนเครดิต"], items:["shopping-bag", "acc-c", "ของในร้าน"], xp:["star", "gold-c", "เลเวลตัวละคร"], cards:["book-open", "acc-c", "การ์ดความรู้"],
   flags:["shield", "pur-c", "สิทธิ์และสถานะ"], reset:["rotate-ccw", "bad-c", "รีเซ็ต"], setting:["settings", "acc-c", "ตั้งค่าเกม"], cert_used:["award", "gold-c", "ประกาศนียบัตร"], config:["settings", "acc-c", "ตั้งค่าเกม (รุ่นเก่า)"]};
 const who = (u, n) => u ? `<b>${esc(n || u)}</b> <span class="mono small muted">@${esc(u)}</span>` : "";
 function settingText(key, before, after){
@@ -573,12 +573,12 @@ function settingText(key, before, after){
   }
   if (key === "prices"){
     const ids = new Set([...Object.keys(before || {}), ...Object.keys(after || {})]);
-    ids.forEach(id => { const o = (before || {})[id] ?? item(id).price, n = (after || {})[id] ?? item(id).price; if (o !== n) lines.push(`${esc(itemName(id))}: ${o} → <b>${n}</b> เพชร`); });
+    ids.forEach(id => { const o = (before || {})[id] ?? item(id).price, n = (after || {})[id] ?? item(id).price; if (o !== n) lines.push(`${esc(itemName(id))}: ${o} → <b>${n}</b> คาร์บอนเครดิต`); });
     return {title:"เปลี่ยนราคาในร้านค้า", lines};
   }
   if (key === "announcement"){ const t = (after && (after.th || after.en)) || ""; return {title:t ? "แก้ประกาศหน้าเมนู" : "ลบประกาศหน้าเมนู", lines:t ? [`“${esc(t)}”`] : []}; }
   if (key === "googleClientId") return {title:after ? "เปิดเข้าสู่ระบบด้วย Google" : "ปิดเข้าสู่ระบบด้วย Google", lines:after ? [`Client ID ${esc(String(after).slice(0, 18))}…`] : []};
-  if (key === "minGameSeconds") return {title:"เปลี่ยนเวลาเล่นขั้นต่ำที่ได้เพชร", lines:[`${Math.round((before || 0) / 60)} → <b>${Math.round((after || 0) / 60)}</b> นาที`]};
+  if (key === "minGameSeconds") return {title:"เปลี่ยนเวลาเล่นขั้นต่ำที่ได้คาร์บอนเครดิต", lines:[`${Math.round((before || 0) / 60)} → <b>${Math.round((after || 0) / 60)}</b> นาที`]};
   if (key === "certMinCards") return {title:"เปลี่ยนเงื่อนไขประกาศนียบัตร", lines:[`การ์ดความรู้ที่ต้องมี ${before} → <b>${after}</b> ใบ`]};
   if (key === "balance") return {title:"แก้ค่าความยาก A/B (ระบบนี้เลิกใช้แล้ว)", lines:[]};
   if (typeof after === "string" || typeof before === "string") return {title:"เปลี่ยน" + name, lines:[`“${esc(before || "—")}” → “<b>${esc(after || "—")}</b>”`]};
@@ -589,7 +589,7 @@ function logItem(r, compact){
   const [icn, col, typeName] = LOG_TYPE[r.action] || ["info", "muted", r.action], d = r.detail || {};
   const target = r.target ? who(r.target, r.target_name) : "";
   let title = "", lines = [];
-  if (r.action === "gems"){ title = `${d.amount > 0 ? "ให้เพชร" : "หักเพชร"} <b class="${d.amount > 0 ? "ok-c" : "bad-c"}">${d.amount > 0 ? "+" : ""}${fmt(d.amount)}</b>`; if (d.note) lines.push("เหตุผล: " + esc(d.note)); }
+  if (r.action === "gems"){ title = `${d.amount > 0 ? "ให้คาร์บอนเครดิต" : "หักคาร์บอนเครดิต"} <b class="${d.amount > 0 ? "ok-c" : "bad-c"}">${d.amount > 0 ? "+" : ""}${fmt(d.amount)}</b>`; if (d.note) lines.push("เหตุผล: " + esc(d.note)); }
   else if (r.action === "items"){ title = "แก้ของในร้าน"; if ((d.add || []).length) lines.push("ให้: " + d.add.map(itemName).map(esc).join(", ")); if ((d.remove || []).length) lines.push("เอาออก: " + d.remove.map(itemName).map(esc).join(", ")); }
   else if (r.action === "xp"){ title = `ตั้งเลเวล ${esc(charName(d.char))} ${d.from ? `จาก Lv ${d.from} ` : ""}เป็น <b>Lv ${d.level}</b>`; }
   else if (r.action === "cards"){ title = `ตั้งการ์ดความรู้ ${d.from != null ? d.from + " → " : "เป็น "}<b>${d.cards}</b> ใบ`; }
