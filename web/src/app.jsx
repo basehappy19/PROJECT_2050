@@ -147,7 +147,7 @@ function GameScreen(){
     if (bt) document.documentElement.style.setProperty("--bottom-h", Math.round(Hh - bt.top) + "px");
     // 3.3: the ability bar hangs right under the money bar; goals sit under the news line
     const kp = r(q(".topbar .kpis")); if (kp) document.documentElement.style.setProperty("--kpi-b", Math.round(kp.bottom) + "px");
-    GameMap.setInsets({t:tb ? tb.bottom : 0, b:bt ? Hh - bt.top : 0, l:ab && !phone ? ab.right : 0, r:dr && !phone ? W - dr.left + 8 : 0, ...(phone && dr ? {b:Hh - dr.top} : {})});
+    GameMap.setInsets({fb:bt ? Hh - bt.top : 0, t:tb ? tb.bottom : 0, b:bt ? Hh - bt.top : 0, l:ab && !phone ? ab.right : 0, r:dr && !phone ? W - dr.left + 8 : 0, ...(phone && dr ? {b:Hh - dr.top} : {})});
   });
   return <div class={"game " + (S.tab ? "has-drawer" : "")}>
     <div class="map" ref={mapRef}/>

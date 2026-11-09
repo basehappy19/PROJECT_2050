@@ -49,7 +49,7 @@ export function mountEarth(canvas, {src, px = 640, period = 110, tilt = 0.21, st
         for (let x = 0; x < N; x++){
           const nx = (x + .5) / N * 2 - 1, r2 = nx * nx + ny * ny; if (r2 > 1) continue;
           const z = Math.sqrt(1 - r2), d = (SX * nx - SY * ny + SZ * z) / SL, k = (y * N + x) * 4;
-          const day = sm(-.12, .22, d), m = ((.08 + 1.05 * Math.max(d, 0)) * day + .035 * (1 - day)) / 1.13;
+          const day = sm(-.12, .22, d), m = Math.min(1, Math.pow((.08 + 1.05 * Math.max(d, 0)) * day + .035 * (1 - day), 1 / 2.2));   // 3.7.3: in sRGB, as globe.js now outputs
           sh.data[k + 3] = Math.round(255 * Math.max(0, Math.min(1, 1 - m)));
           const rim = Math.pow(1 - z, 3) * (.15 + .85 * sm(-.3, .4, d)) * .55 * 255;
           gl.data[k] = .32 * rim; gl.data[k + 1] = .62 * rim; gl.data[k + 2] = rim; gl.data[k + 3] = 255;

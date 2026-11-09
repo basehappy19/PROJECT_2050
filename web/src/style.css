@@ -1466,3 +1466,18 @@ details.more > summary:hover{color:var(--fg)}
 
 /* 3.5: tooltips on touch screens say how to close them */
 .tapclose{display:block;margin-top:4px;font-size:12px;color:var(--muted)}
+
+/* 3.7.3: bottom row never overlaps — the side columns are at least as wide as what's in them;
+   narrower screens show the four tabs as icons only (the name stays as aria-label) */
+.bottom .row2{grid-template-columns:minmax(max-content,1fr) minmax(0,700px) minmax(max-content,1fr)}
+@media (max-width:1360px) and (min-width:701px){
+  .bottom .row2 .tabbar .tabbtn>span{display:none}
+  .bottom .row2 .tabbar .tabbtn{width:46px;padding:0;justify-content:center;position:relative}
+  .bottom .row2 .tabbar .tabbtn .badge{position:absolute;top:1px;right:1px;margin:0;transform:scale(.85)}
+}
+@media (max-width:900px) and (min-width:701px){   /* narrow tablets (iPad upright): gauges get their own row, like phones */
+  .bottom .row2{display:flex;flex-wrap:wrap;gap:6px}
+  .bottom .row2 .meters{flex:1 1 100%;order:-1}
+  .bottom .row2 .bl{flex:none} .bottom .row2 .tabbar{margin-left:auto}
+}
+@media (max-width:820px) and (min-width:701px){ .kpis .kpi .kmeter{display:none} .kpis .kpi{min-width:0;padding-right:16px} }

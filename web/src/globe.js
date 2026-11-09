@@ -38,7 +38,8 @@ void main(){
   // golden band along the day / night line
   col += vec3(1.0, 0.45, 0.15) * (1.0 - abs(d) * 6.0) * step(abs(d), 0.16) * 0.08;
   gl_FragColor = vec4(col, 1.0);
-}`;
+  #include <colorspace_fragment>
+}`;   // 3.7.3: linear → sRGB like the rest of three.js (without it the globe came out much darker than the loader's)
 const CLOUD_FS = `
 uniform sampler2D map; uniform vec3 sun; uniform float shift; varying vec2 vUv; varying vec3 vN; varying vec3 vW;
 void main(){
@@ -47,6 +48,7 @@ void main(){
   float d = dot(normalize(vN), sun);
   float l = smoothstep(-0.15, 0.35, d);
   gl_FragColor = vec4(vec3(0.95, 0.97, 1.0) * (0.12 + 0.95 * l), a * (0.18 + 0.72 * l));
+  #include <colorspace_fragment>
 }`;
 const ATM_VS = `varying vec3 vN; varying vec3 vW; void main(){ vN = normalize(mat3(modelMatrix) * normal); vec4 w = modelMatrix * vec4(position,1.0); vW = w.xyz; gl_Position = projectionMatrix * viewMatrix * w; }`;
 const ATM_FS = `

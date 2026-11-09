@@ -212,7 +212,7 @@ export function Bottom(){
       <div class="meters glass"><MeterNZ/><MeterT/></div>
       <nav class="tabbar glass">{tabs.map(([id, ic, key, kk]) => {
         const on = id === "tech" ? UIM.modal === "skills" : S.tab === id;
-        return <button type="button" key={id} data-tab={id} class={`tabbtn ${on ? "on" : ""}`} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>
+        return <button type="button" key={id} data-tab={id} class={`tabbtn ${on ? "on" : ""}`} aria-label={t(key)} onPointerEnter={() => Audio.hover()} onClick={() => G.setTab(id)}>
           <Icon n={ic} size={17}/><span>{t(key)}</span>{badge[id] ? <b class={"badge " + (id === "tech" ? "" : "b2")}>{badge[id]}</b> : null}
         </button>;
       })}</nav>

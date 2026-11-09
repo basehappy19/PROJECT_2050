@@ -36,6 +36,7 @@ P.CHANGELOG = [
     "แผนที่เป็นสี่เหลี่ยมเต็มจอแบบ Plague Inc ไม่เป็นวงรีแล้ว ซูมออกสุดก็ยังเต็มจอ ไม่เห็นขอบ · น้ำแข็งเหลือเพียงแถบบาง ๆ จาง ๆ แตกเป็นแพตามขอบบนและล่างของแผนที่",
     "ลูกโลกหน้าโหลดและหน้าหลักเป็นแบบเดียวกัน (แสงแดด ด้านมืด เมฆ และขอบฟ้าสีฟ้า) · เมฆบนแผนที่เป็นแผ่นบาง ๆ จาง ๆ และน้อยลง · เอาแสงเหนือออก · แก้แผนที่ซ้อนกันหลังอัปเดต",
     "ป้ายชื่อประเทศเล็กขึ้นเฉพาะตอนซูมใกล้ ๆ ประเทศหลักขึ้นเสมอ และป้ายที่ทับกันจะซ่อนไว้ ไม่รกเหมือนก่อน",
+    "ลูกโลกหน้าโหลดและหน้าหลักสว่างเท่ากันแล้ว · แถบล่างไม่ทับกันในจอขนาดกลาง (จอแคบขึ้นแค่ไอคอนเมนู) · มือถือ: แผนที่เลื่อนซ้ายขวาได้อิสระ ไม่ดีดกลับกลาง ปัดแรง ๆ ให้ไหลต่อ แตะสองครั้งซูมเข้า สองนิ้วแตะซูมออก และแผนที่พอดีพื้นที่ระหว่างแถบบนกับล่าง",
   ], [
     "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu.",
     "Fast mode: a 15-minute game without minerals or groups and with fewer events, great for a first game.",
@@ -66,6 +67,7 @@ P.CHANGELOG = [
     "The map is now a full-screen rectangle like Plague Inc instead of an oval: fully zoomed out it still fills the screen and its edge never shows · the ice is just a thin, faint band of broken sea ice along the top and bottom of the map.",
     "The Earth on the loading screen and on the home screen now look the same (sunlight, dark side, clouds and a blue sky at the rim) · clouds on the map are fewer, thin and faint · no more northern lights · fixed the map pictures not lining up after an update.",
     "Names of small countries only appear when you zoom in closer; main countries always show, and labels that would overlap are hidden, so the map is no longer cluttered.",
+    "The loading-screen and home-screen Earths are now equally bright · the bottom bar no longer overlaps on mid-size screens (narrow screens show menu icons only) · phones: pan the map freely without it jumping back to the middle, flick to glide, double-tap to zoom in, two-finger tap to zoom out, and the map fits between the top and bottom bars",
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",

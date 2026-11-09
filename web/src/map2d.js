@@ -2,7 +2,8 @@
    Satellite base (NASA Blue Marble / Black Marble, reprojected to Robinson) + country shapes from Natural Earth 1:50m.
    Two canvases: "base" (image + country colours + borders, redrawn only when the camera or colours change)
    and "fx" (labels, hazards, bubbles, plumes, weather effects, floating numbers — every frame).
-   Controls: drag = pan · wheel / pinch / buttons = zoom · double-tap / H = whole world
+   Controls: drag = pan (flick to glide) · wheel / pinch / buttons = zoom · double-click / H = whole world
+   3.7.3 touch: double-tap = zoom in there (whole world when already close) · two-finger tap = zoom out
    Tap a region (zoomed out) = zoom into it · tap a country (zoomed in) = select it · tap the sea = close the drawer. */
 import {P, S, H, UIM, t, L, COL, relCol, HZ_COL, ls, bump, RSHORT} from "./core.js";
 import {MAP, ll} from "./geo.js";
@@ -145,14 +146,22 @@ export const GameMap = {
     this.base.style.width = w + "px"; this.base.style.height = h + "px";
     this.fx.width = Math.round(vw * dpr); this.fx.height = Math.round(vh * dpr); this.fx.style.width = vw + "px"; this.fx.style.height = vh + "px";
     if (this.gl) this.gl.setSize(w, h, dpr);
-    this.s0 = Math.max(vw / MAP.W, vh / MAP.H);   // 3.7: zoomed all the way out the map still fills the whole screen (Plague Inc)
+    this.fitS0();
     this.applyTilt(); this.clampCam(); this.dirtyBase = true; this.fxDirty = true;
     this.airUpdate();
   },
   /* the camera changed: redraw the base now (fast, from the cached picture) and sharply once it stops */
   moved(){ this.dirtyBase = true; this.lastMove = performance.now(); },
   /* o = parts of the SCREEN covered by the HUD (px); this.insets = the hidden parts of the STAGE at the current tilt */
-  setInsets(o){ const k = JSON.stringify(o); if (k === this._ins) return; this._ins = k; this.hud = o; this.updInsets(); },
+  setInsets(o){ const k = JSON.stringify(o); if (k === this._ins) return; this._ins = k; this.hud = o; this.updInsets(); if (this.vw && this.fitS0()){ this.clampCam(); this.dirtyBase = this.fxDirty = true; } },
+  /* 3.7: zoomed all the way out the map still fills the whole screen (Plague Inc).
+     3.7.3: on a tall phone screen it fills only the space between the top and bottom bars instead, so far more of the
+     world fits across (before, the map was a narrow slice hidden half under the bars). Returns true when it changed. */
+  portrait(){ return this.vh > this.vw * 1.15 && this.vw < 760; },
+  fitS0(){
+    const H = this.hud, free = this.portrait() ? Math.max(this.vh * .5, this.vh - (H.t || 0) - (H.fb || 0) - 8) : this.vh;
+    const s0 = Math.max(this.vw / MAP.W, free / MAP.H), old = this.s0; this.s0 = s0; return !!old && Math.abs(old - s0) > .001;
+  },
   /* ---------- 3.1 tilt ---------- */
   tiltAt(z){ if (!this.tiltMax) return 0; const k = clamp((z - TZ0) / (TZ1 - TZ0), 0, 1); return this.tiltMax * k * k * (3 - 2 * k); },
   applyTilt(){
@@ -206,9 +215,12 @@ export const GameMap = {
   clampXY(x, y, z){
     const s = this.s0 * z, V = this.viewRect(z, 0), hw = this.w / 2, hh = this.h / 2;   // 3.7: the map's edge never comes inside the screen (HUD or not)
     const a = this.tiltAt(z); if (a > 0){ V.L = this.viewToLocal(0, 0, a)[0]; V.R = this.viewToLocal(this.vw, 0, a)[0]; }   // tilted: the far (top) row is the widest
+    if (this.portrait()){ const H = this.hud; V.T = this.viewToLocal(this.vw / 2, H.t || 0, a)[1]; V.B = this.viewToLocal(this.vw / 2, this.vh - (H.fb || 0), a)[1]; }   // 3.7.3: phone, tall: top/bottom edges stop at the bars
     const x0 = (hw - V.L) / s, x1 = MAP.W - (V.R - hw) / s, y0 = (hh - V.T) / s, y1 = MAP.H - (V.B - hh) / s;
     return [x0 > x1 ? (x0 + x1) / 2 : clamp(x, x0, x1), y0 > y1 ? (y0 + y1) / 2 : clamp(y, y0, y1)];
   },
+  /* 3.7.3: how far past the edge a finger has pulled the map (shown with a soft rubber-band pull, springs back on release) */
+  overPull(){ const [x, y] = this.clampXY(this.cam.x, this.cam.y, this.cam.z); return [this.cam.x - x, this.cam.y - y]; },
   clampCam(){ const [x, y] = this.clampXY(this.cam.x, this.cam.y, this.cam.z); this.cam.x = x; this.cam.y = y; },
   /* centre of the part of the screen not covered by the HUD / drawer */
   freeCentre(z = this.cam.z){ const H = this.hud; return this.viewToLocal((H.l + this.vw - H.r) / 2, (H.t + this.vh - H.b) / 2, this.tiltAt(z)); },
@@ -220,7 +232,9 @@ export const GameMap = {
   homeView(){ const [fx, fy] = this.freeCentre(1), s = this.s0, [x, y] = this.clampXY(MAP.W / 2 - (fx - this.w / 2) / s * .5, MAP.H / 2 - (fy - this.h / 2) / s * .6, 1); return {x, y, z:1}; },
   resetView(){ this.zAnim = null; this.target = this.homeView(); },
   recenter(){ if (this.cam.z <= 1.08) this.target = this.homeView(); },
-  zoomBy(f){ this.zAnim = null; const b = this.target || this.cam, z = clamp(b.z * f, ZMIN, ZMAX); if (z <= ZMIN + .001){ this.resetView(); Audio.play("tick", {vol:.5}); return; } const [fx, fy] = this.freeCentre(); const [wx, wy] = this.stageToWorld(fx, fy); this.lookAt(wx, wy, z); Audio.play("tick", {vol:.5}); },
+  zoomBy(f){ this.zAnim = null; this.fling = null; const b = this.target || this.cam, z = clamp(b.z * f, ZMIN, ZMAX); if (z <= ZMIN + .001 && !this.portrait()){ this.resetView(); Audio.play("tick", {vol:.5}); return; } const [fx, fy] = this.freeCentre(); const [wx, wy] = this.stageToWorld(fx, fy); this.lookAt(wx, wy, z); Audio.play("tick", {vol:.5}); },
+  /* 3.7.3: smooth zoom toward/away from a screen point (double-tap, two-finger tap) */
+  zoomAt(sx, sy, f){ const [wx, wy] = this.toWorld(sx, sy); this.target = null; this.fling = null; this.zAnim = {z:clamp(this.cam.z * f, ZMIN, ZMAX), sx, sy, wx, wy}; Audio.play("tick", {vol:.4}); },
   isCountryZoom(){ return this.cam.z >= ZCOUNTRY; },
   regionPoint(reg){ const m = P.RMETA[reg]; return ll(m.lab[0], m.lab[1]); },
   countryPoint(id){ if (!id) return null; if (id.startsWith("R_")) return this.regionPoint(id.slice(2)); const s = this.byCountry[id]; return s ? s.l : null; },
@@ -253,10 +267,10 @@ export const GameMap = {
       if (e.pointerType !== "mouse" && this.hover){ this.hover = null; this.fxDirty = true; }
       const lx = e.offsetX, ly = e.offsetY;
       this.ptrs.set(e.pointerId, {x:lx, y:ly});
-      if (this.ptrs.size === 1){ this.drag = {x:lx, y:ly, sx:lx, sy:ly, moved:0}; }
+      if (this.ptrs.size === 1){ this.drag = {x:lx, y:ly, sx:lx, sy:ly, moved:0, fx:this.cam.x, fy:this.cam.y, vx:0, vy:0, t:performance.now(), touch:e.pointerType !== "mouse"}; this.fling = null; if (this.target && this.target.spring) this.target = null; }
       else if (this.ptrs.size === 2){
         const [a, b] = [...this.ptrs.values()];
-        this.pinch = {d:Math.hypot(a.x - b.x, a.y - b.y), z:this.cam.z, w:this.toWorld((a.x + b.x) / 2, (a.y + b.y) / 2)}; this.drag = null; this.target = null; this.zAnim = null;
+        this.pinch = {d:Math.hypot(a.x - b.x, a.y - b.y), d1:Math.hypot(a.x - b.x, a.y - b.y), t0:performance.now(), mx:(a.x + b.x) / 2, my:(a.y + b.y) / 2, z:this.cam.z, w:this.toWorld((a.x + b.x) / 2, (a.y + b.y) / 2)}; this.drag = null; this.target = null; this.zAnim = null; this.fling = null;
       }
     });
     c.addEventListener("pointermove", e => {
@@ -265,12 +279,21 @@ export const GameMap = {
       p.x = lx; p.y = ly;
       if (this.pinch && this.ptrs.size >= 2){
         const [a, b] = [...this.ptrs.values()], d = Math.hypot(a.x - b.x, a.y - b.y), mx = (a.x + b.x) / 2, my = (a.y + b.y) / 2;
-        const z = clamp(this.pinch.z * d / Math.max(20, this.pinch.d), ZMIN, ZMAX), s = this.s0 * z, [ex, ey] = this.viewToLocal(mx, my, this.tiltAt(z));
+        this.pinch.d1 = d; const z = clamp(this.pinch.z * d / Math.max(20, this.pinch.d), ZMIN, ZMAX), s = this.s0 * z, [ex, ey] = this.viewToLocal(mx, my, this.tiltAt(z));
         this.setPanning(true); this.cam.z = z; this.cam.x = this.pinch.w[0] - (ex - this.w / 2) / s; this.cam.y = this.pinch.w[1] - (ey - this.h / 2) / s; this.clampCam(); this.applyTilt(); this.moved();
       } else if (this.drag){
         const dx = lx - this.drag.x, dy = ly - this.drag.y;
         this.drag.moved += Math.abs(dx) + Math.abs(dy);
-        if (this.drag.moved > 6){ this.setPanning(true); const s = this.scale(), [ax, ay] = this.viewToLocal(this.drag.x, this.drag.y), [bx, by] = this.viewToLocal(lx, ly); this.cam.x -= (bx - ax) / s; this.cam.y -= (by - ay) / s; this.target = null; this.zAnim = null; this.clampCam(); this.moved(); c.style.cursor = "grabbing"; }
+        if (this.drag.moved > 6){
+          // 3.7.3: the finger's own (unclamped) position is kept; past the edge the map follows at a third of the
+          // distance (rubber band) and springs back on release. The speed is kept for a flick.
+          this.setPanning(true); const D = this.drag, s = this.scale(), [ax, ay] = this.viewToLocal(D.x, D.y), [bx, by] = this.viewToLocal(lx, ly);
+          const ddx = (bx - ax) / s, ddy = (by - ay) / s, tn = performance.now(), dtm = Math.max(1, tn - D.t);
+          D.fx -= ddx; D.fy -= ddy; D.vx = D.vx * .6 + (-ddx / dtm * 1000) * .4; D.vy = D.vy * .6 + (-ddy / dtm * 1000) * .4; D.t = tn;
+          const [cx, cy] = this.clampXY(D.fx, D.fy, this.cam.z), rb = q => Math.sign(q) * Math.min(Math.abs(q) * .33, 70 / s);
+          this.cam.x = cx + rb(D.fx - cx); this.cam.y = cy + rb(D.fy - cy);
+          this.target = null; this.zAnim = null; this.moved(); c.style.cursor = "grabbing";
+        }
         this.drag.x = lx; this.drag.y = ly;
       }
     });
@@ -278,10 +301,30 @@ export const GameMap = {
       const had = this.ptrs.has(e.pointerId); this.ptrs.delete(e.pointerId);
       if (!this.ptrs.size) this.setPanning(false);
       if (!had) return;
-      if (this.pinch){ if (this.ptrs.size < 2){ this.pinch = null; this.pinchEnd = performance.now(); this.drag = null; if (this.cam.z <= ZMIN + .02) this.resetView(); } return; }
+      if (this.pinch){
+        if (this.ptrs.size < 2){
+          const Pn = this.pinch, now2 = performance.now(); this.pinch = null; this.pinchEnd = now2; this.drag = null;
+          // 3.7.3: a quick two-finger tap zooms out one step (as in Google Maps)
+          if (now2 - Pn.t0 < 260 && Math.abs(Pn.d1 - Pn.d) < 14) this.zoomAt(Pn.mx, Pn.my, 1 / 2);
+          else if (this.cam.z <= ZMIN + .02 && !this.portrait()) this.resetView();
+        }
+        return;
+      }
       const d = this.drag; this.drag = null; c.style.cursor = "";
-      if (d && d.moved > 8 && this.cam.z <= ZMIN + .02) this.resetView();   // 3.3: fully zoomed out → always back to the centre
-      if (d && d.moved <= 8 && e.type === "pointerup" && performance.now() - (this.pinchEnd || 0) > 250) this.click(e.offsetX, e.offsetY);
+      if (d && d.moved > 8){
+        // 3.7.3: let go → pulled past the edge: spring back; moving fast: keep gliding (flick). On a tall phone it no longer
+        // jumps back to the middle when zoomed all the way out, so the whole width of the world can be looked at.
+        const [ox, oy] = this.overPull(), sp = Math.hypot(d.vx, d.vy) * this.scale();
+        if (Math.abs(ox) + Math.abs(oy) > .5){ const [x, y] = this.clampXY(this.cam.x, this.cam.y, this.cam.z); this.target = {x, y, z:this.cam.z, spring:1}; }
+        else if (sp > 120 && performance.now() - d.t < 90) this.fling = {vx:d.vx, vy:d.vy};
+        else if (this.cam.z <= ZMIN + .02 && !this.portrait()) this.resetView();   // 3.3: fully zoomed out → back to the centre (wide screens)
+      }
+      if (d && d.moved <= 8 && e.type === "pointerup" && performance.now() - (this.pinchEnd || 0) > 250){
+        // 3.7.3: double-tap (touch) zooms in two steps at that spot; the first tap has already selected the country
+        const tn = performance.now(), L0 = this.tap2;
+        if (d.touch && L0 && tn - L0.t < 320 && Math.hypot(L0.x - e.offsetX, L0.y - e.offsetY) < 36){ this.tap2 = null; this.lastTap = 0; if (this.cam.z >= ZMAX * .9) this.resetView(); else this.zoomAt(e.offsetX, e.offsetY, 2); }
+        else { this.tap2 = d.touch ? {t:tn, x:e.offsetX, y:e.offsetY} : null; if (d.touch) this.lastTap = 0; this.click(e.offsetX, e.offsetY); }
+      }
     };
     c.addEventListener("pointerup", end); c.addEventListener("pointercancel", end);
     c.addEventListener("pointerleave", () => { if (this.hover){ this.hover = null; } c.style.cursor = ""; });
@@ -346,7 +389,13 @@ export const GameMap = {
       let z = Math.exp(Math.log(this.cam.z) + (Math.log(A.z) - Math.log(this.cam.z)) * k); if (Math.abs(A.z - z) < .002) z = A.z;
       const s = this.s0 * z, [ex, ey] = this.viewToLocal(A.sx, A.sy, this.tiltAt(z));
       this.cam.z = z; this.cam.x = A.wx - (ex - this.w / 2) / s; this.cam.y = A.wy - (ey - this.h / 2) / s; this.clampCam(); this.moved();
-      if (z === A.z){ this.zAnim = null; if (z <= ZMIN + .001) this.resetView(); }
+      if (z === A.z){ this.zAnim = null; if (z <= ZMIN + .001 && !this.portrait()) this.resetView(); }
+    }
+    if (this.fling){   // 3.7.3: a flicked map keeps gliding and slows down; it stops at the edge
+      const F = this.fling, ox = this.cam.x, oy = this.cam.y; this.cam.x += F.vx * dt; this.cam.y += F.vy * dt; this.clampCam();
+      if (Math.abs(this.cam.x - (ox + F.vx * dt)) > 1e-6) F.vx = 0; if (Math.abs(this.cam.y - (oy + F.vy * dt)) > 1e-6) F.vy = 0;
+      const k = Math.pow(.93, dt * 60); F.vx *= k; F.vy *= k; this.moved();
+      if (Math.hypot(F.vx, F.vy) * this.scale() < 20) this.fling = null;
     }
     if (this.target){
       const k = 1 - Math.pow(.86, dt * 60), T = this.target;
