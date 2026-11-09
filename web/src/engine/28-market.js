@@ -46,10 +46,12 @@ function marketInit(){
   if ((S.ore || 0) >= 1){ const k = S.ore / GIDS.length; GIDS.forEach(g => S.mat[g] += k); S.ore = 0; }
   // 1.5.4: the chart starts with two years of (made-up but realistic) ups and downs instead of a flat line
   const hist = S.mktHist = S.mktHist || {};
+  // 3.7.5: a save from before the ×1.4 market price: lift its chart once so it doesn't jump
+  if (S.mktK !== BUY_K){ GIDS.forEach(g => { if (hist[g]) hist[g] = hist[g].map(v => Math.round(v * BUY_K / (S.mktK || 1) * 10) / 10); }); S.mktK = BUY_K; }
   GIDS.forEach(g => {
     if (hist[g] && hist[g].length >= 6) return;
     let v = S.mkt[g], d = 0; const back = [];
-    for (let i = 0; i < 24; i++){ d = d * .7 + (Math.random() - .5) * .12; if (Math.random() < .1) d += (Math.random() < .5 ? -1 : 1) * .2; v = clamp(v - d, .6, 1.8); back.push(Math.max(1, Math.round(GROUPS[g].base * v * (P.bal ? P.bal().cost : 1) * 10) / 10)); }
+    for (let i = 0; i < 24; i++){ d = d * .7 + (Math.random() - .5) * .12; if (Math.random() < .1) d += (Math.random() < .5 ? -1 : 1) * .2; v = clamp(v - d, .6, 1.8); back.push(Math.max(1, Math.round(GROUPS[g].base * BUY_K * v * (P.bal ? P.bal().cost : 1) * 10) / 10)); }
     const old = hist[g] || [], need = 23 - old.length; hist[g] = back.reverse().slice(-need).concat(old.length ? old : [price(g)]);
   });
 }

@@ -2244,6 +2244,7 @@ P.CHANGELOG = [
     "หน้าข้อพิพาทระหว่างประเทศแบบใหม่: สองฝ่ายเผชิญหน้ากัน (VS) พร้อมธงชาติและคำพูดของแต่ละฝ่าย ทางเลือกบอกสั้น ๆ ว่าฝ่ายไหนพอใจหรือไม่พอใจ",
     "ฤดูกาลสำคัญขึ้น: โซลาร์ผลิตไฟได้มากหน้าร้อนแต่น้อยหน้าฝน กังหันลมแรงช่วงพายุและหน้าหนาว · ไฟฟ้าพีคหน้าร้อนทำให้ไฟดับ (สกิลลดการใช้ไฟช่วงพีกช่วยได้) · ผลผลิตเกษตรขึ้นกับมรสุม · แผนที่มีหิมะ ฝน หมอกควัน และไอร้อนตามฤดู · ยิ่งโลกร้อน ฤดูยิ่งรุนแรง · จบฤดูได้เกรด A–F และรางวัล",
     "แท็บประเทศมีธงชาติของประเทศนั้น · ประเทศส่งทรัพยากรให้มากขึ้น 50% ซื้อจากประเทศได้ +12 ถึง +20 ฟองสีส้มให้ +8 ถึง +12 ส่วนการซื้อทันทีในตลาดแพงขึ้น 40% (ขายได้ครึ่งราคา)",
+    "ตลาดทรัพยากรแบบใหม่: เห็นแร่ดิบรอแปรรูปไหลบนสายพานเข้าเครื่องแปรรูป · ราคาบอกราคาเดือนก่อนและขึ้นลงกี่ % (เขียว = ขึ้น แดง = ลง) · ธงประเทศที่ส่งแร่ให้มากสุด · หน้าสถิติใหม่อ่านต่อกันเป็นเรื่องเดียว พร้อมบอกว่าทรัพยากรได้มาจากประเทศไหนเท่าไหร่",
   ], [
     "Training mode: learn step by step by really playing, about 8 minutes. New players start here, and it can be replayed from the menu.",
     "Fast mode: a 15-minute game without minerals or groups and with fewer events, great for a first game.",
@@ -2278,6 +2279,7 @@ P.CHANGELOG = [
     "A new screen for disputes between countries: the two sides face each other (VS) with their flags and say one line each; each choice simply says which side will be pleased or upset.",
     "Seasons matter more: solar makes more in the hot season and less under monsoon clouds, wind farms do best in storm season and winter · a summer power peak causes blackouts (Demand Response helps) · the harvest depends on the monsoon · snow, rain, smoke and heat haze show on the map · seasons get harsher as the world warms · each season ends with a grade A–F and a reward.",
     "The country tab shows the country's flag · countries send 50% more minerals, buying from a country gives +12 to +20 and orange bubbles +8 to +12, while instant buying on the market costs 40% more (selling pays half the price).",
+    "A new resources market: raw minerals flow along a belt into the refinery · each price shows last month's price and the % change (green = up, red = down) · flags of the countries that sent the most · a new statistics panel you read top to bottom, including where each mineral came from.",
   ]),
   V("1.7", "2026-10-23", {th:"เรื่องราวของผู้คน", en:"A Story With People In It"}, [
     "ตัวละครทุกตัวมีประวัติและบทพูดของตัวเองในเนื้อเรื่องทั้ง 3 องก์",
@@ -4577,10 +4579,12 @@ function marketInit(){
   if ((S.ore || 0) >= 1){ const k = S.ore / GIDS.length; GIDS.forEach(g => S.mat[g] += k); S.ore = 0; }
   // 1.5.4: the chart starts with two years of (made-up but realistic) ups and downs instead of a flat line
   const hist = S.mktHist = S.mktHist || {};
+  // 3.7.5: a save from before the ×1.4 market price: lift its chart once so it doesn't jump
+  if (S.mktK !== BUY_K){ GIDS.forEach(g => { if (hist[g]) hist[g] = hist[g].map(v => Math.round(v * BUY_K / (S.mktK || 1) * 10) / 10); }); S.mktK = BUY_K; }
   GIDS.forEach(g => {
     if (hist[g] && hist[g].length >= 6) return;
     let v = S.mkt[g], d = 0; const back = [];
-    for (let i = 0; i < 24; i++){ d = d * .7 + (Math.random() - .5) * .12; if (Math.random() < .1) d += (Math.random() < .5 ? -1 : 1) * .2; v = clamp(v - d, .6, 1.8); back.push(Math.max(1, Math.round(GROUPS[g].base * v * (P.bal ? P.bal().cost : 1) * 10) / 10)); }
+    for (let i = 0; i < 24; i++){ d = d * .7 + (Math.random() - .5) * .12; if (Math.random() < .1) d += (Math.random() < .5 ? -1 : 1) * .2; v = clamp(v - d, .6, 1.8); back.push(Math.max(1, Math.round(GROUPS[g].base * BUY_K * v * (P.bal ? P.bal().cost : 1) * 10) / 10)); }
     const old = hist[g] || [], need = 23 - old.length; hist[g] = back.reverse().slice(-need).concat(old.length ? old : [price(g)]);
   });
 }

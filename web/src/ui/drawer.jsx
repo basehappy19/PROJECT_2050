@@ -254,28 +254,70 @@ function Impact(){
 /* 1.6: statistics in four short tabs instead of one long page */
 const ST_TABS = [["sum", "chart-line", T2("ภาพรวม", "Overview")], ["money", "wallet", T2("การเงิน", "Money")], ["people", "users", T2("ประชาชน", "People")], ["world", "globe", T2("โลก", "World")]];
 function T2(th, en){ return {th, en}; }
+/* 3.7.5 · statistics, design 2: one story to scroll down (no tabs) — the year in one sentence · four numbers ·
+   CO₂ chart · what cut CO₂ · where money came from and went · where our minerals came from · more details folded */
+function YearLine(){
+  const th = S.lang === "th", h = S.hist, a = h.length > 12 ? h[h.length - 13].net : (h[0] ? h[0].net : P.netCO2()), d = P.netCO2() - a;
+  const friends = S.countries.filter(c => !c.rest && c.rel >= 40).length, raw = P.MAT_IDS ? P.MAT_IDS.reduce((s, g) => s + (P.rawFor ? P.rawFor(g) : 0), 0) : 0;
+  const head = th ? `CO₂ ${d <= 0 ? "ลดลง" : "เพิ่มขึ้น"} ${Math.abs(d).toFixed(1)} Gt ในรอบ 12 เดือน · ความนิยม ${Math.round(S.appr)}%` : `CO₂ ${d <= 0 ? "fell" : "rose"} ${Math.abs(d).toFixed(1)} Gt in 12 months · approval ${Math.round(S.appr)}%`;
+  const tips = [];
+  if (d > 0) tips.push(th ? "ปลดล็อกสกิลพลังงานสะอาดเพิ่ม" : "unlock more clean-energy skills");
+  if (friends < 3) tips.push(th ? "ทำข้อตกลงกับมิตรอีกสักประเทศ" : "make a deal with one more friend");
+  if (S.appr < 50) tips.push(th ? "ดูแลความนิยมก่อนออกนโยบายแรง ๆ" : "win back approval before tough policies");
+  if (raw > 12) tips.push(th ? "ขยายโรงแปรรูป แร่ดิบค้างเยอะ" : "grow the refinery, raw minerals are piling up");
+  return <div class="card stline"><small>{th ? `ปี ${2026 + Math.floor(S.tick / 12)} ในประโยคเดียว` : `${2026 + Math.floor(S.tick / 12)} in one line`}</small><b>{head}</b>{tips.length ? <span class="muted">{(th ? "ลอง: " : "Try: ") + tips.slice(0, 2).join(" · ")}</span> : null}</div>;
+}
+function StNums(){
+  const th = S.lang === "th", friends = S.countries.filter(c => !c.rest && c.rel >= 40).length, net = P.netCO2();
+  const it = [["$co2", net.toFixed(1), "Gt CO₂", net > 20 ? "bad" : net > 8 ? "warn" : "good"], ["$temp", `+${S.temp.toFixed(2)}`, th ? "°C โลก" : "°C warming", S.temp >= 2 ? "bad" : S.temp >= 1.5 ? "warn" : "good"],
+    ["$appr", `${Math.round(S.appr)}%`, th ? "ความนิยม" : "approval", S.appr < 35 ? "bad" : "good"], ["$heart", friends, th ? "ประเทศมิตร" : "friends", "accent"]];
+  return <div class="stnums">{it.map(([ic, v, l, c], i) => <div key={i}><Icon n={ic} size={18}/><b class={"mono " + c}>{v}</b><small>{l}</small></div>)}</div>;
+}
+function MoneyBar(){
+  const th = S.lang === "th"; if (!P.ledgerSum) return null;
+  const d = P.ledgerSum("year", "ep"), tot = d.tIn + d.tOut || 1, COLS = ["#5fd39a", "#8fd0ff", "#4fd1c5", "#c3a6ff", "#f2c14e"];
+  const top = d.inc.slice(0, 4), big = d.out[0], nm = x => L((P.LEDGER_CATS[x.cat] || P.LEDGER_CATS.other).t);
+  return <div class="stmoney">
+    <div class="row"><b class="good mono">{th ? "เข้า" : "In"} +{d.tIn.toLocaleString()}</b><span class="grow"/><b class="bad mono">{th ? "ออก" : "Out"} −{d.tOut.toLocaleString()}</b></div>
+    <div class="stbar">{top.map((x, i) => <i key={x.cat} style={{flex:x.v, background:COLS[i]}}/>)}{d.inc.length > 4 ? <i style={{flex:d.inc.slice(4).reduce((s, x) => s + x.v, 0), background:"#36606b"}}/> : null}{d.tOut ? <i style={{flex:d.tOut, background:"#ff6b5c"}}/> : null}</div>
+    <small class="muted">{top.map((x, i) => `${nm(x)} ${Math.round(x.v / (d.tIn || 1) * 100)}%`).join(" · ")}{big ? ` · ${th ? "รายจ่ายใหญ่สุด" : "biggest cost"}: ${nm(big)}` : ""}</small>
+  </div>;
+}
+function MatFrom(){
+  const th = S.lang === "th"; if (!P.matTop) return null;
+  const list = P.matTop(null, 6);
+  if (!list.length) return <p class="muted small">{th ? "ยังไม่ได้รับทรัพยากรจากประเทศไหน" : "No minerals received yet"}</p>;
+  const name = id => id === "home" ? (th ? "เหมืองในประเทศ" : "Our own mines") : id === "MKT" ? (th ? "ซื้อจากตลาด" : "Bought on the market") : P.cname(id);
+  const pic = id => id === "home" ? <span class="stfi"><Icon n="pickaxe" size={16}/></span> : id === "MKT" ? <span class="stfi gold"><Icon n="store" size={16}/></span> : P.FLAG2 && P.FLAG2[id] ? <img class="stflag" src={`assets/img/flags/${P.FLAG2[id]}.webp`} alt=""/> : <span class="stfi"/>;
+  return <div class="stfrom">{list.map(x => <button type="button" key={x.id} class="stfr" disabled={x.id.length !== 3} onClick={() => { if (x.id.length === 3){ Audio.play("click"); G.selectCountry(x.id); } }}>
+    {pic(x.id)}<span class="grow"><b>{name(x.id)}</b><span class="stg">{P.MAT_IDS.filter(g => (x.by[g] || 0) >= .5).map(g => <span key={g}><Icon n={P.MAT[g].icon} size={15}/>{Math.round(x.by[g])}</span>)}</span></span><b class="mono">{Math.round(x.n)}</b>
+  </button>)}</div>;
+}
 function PaneStats(){
-  const g = P.grossCO2() || 1, tab = S.stTab || "sum", th = S.lang === "th";
+  const g = P.grossCO2() || 1, th = S.lang === "th";
   return <>
     {S.report && !S.report.read ? <Report/> : null}
-    <div class="chips stabs">{ST_TABS.map(([id, ic, name]) => <button type="button" key={id} class={"chip " + (tab === id ? "on" : "")} onClick={() => { S.stTab = id; Audio.play("click"); P.changed(); }}><Icon n={ic} size={14}/>{L(name)}</button>)}</div>
-    {tab === "sum" ? <>
-      <Impact/>
-      <H3>{t("chartCo2")}</H3>
-      <p class="muted small legend"><i class="lg solid"/>{th ? "โลกของคุณ" : "Your world"} <i class="lg dash"/>{th ? "ถ้าไม่ทำอะไรเลย" : "If nothing was done"}</p>
-      <LineChart data={S.hist.map(h => h.net)} data2={S.bau ? S.bau.hist : null} min={-5} max={60} ticks={[0, 15, 30, 45, 60]} color="hot" refs={[{v:0, c:"good"}]}/>
+    <YearLine/>
+    <StNums/>
+    <H3>{t("chartCo2")}</H3>
+    <p class="muted small legend"><i class="lg solid"/>{th ? "โลกของคุณ" : "Your world"} <i class="lg dash"/>{th ? "ถ้าไม่ทำอะไรเลย" : "If nothing was done"}</p>
+    <LineChart data={S.hist.map(h => h.net)} data2={S.bau ? S.bau.hist : null} min={-5} max={60} ticks={[0, 15, 30, 45, 60]} color="hot" refs={[{v:0, c:"good"}]}/>
+    <div class="stripes">{S.hist.map((h, i) => <i key={i} style={{background:tempColor(h.temp), width:`${100 / (Math.max(P.TOTAL_TICKS, S.hist.length - 1) + 1)}%`}}/>)}</div>
+    <Impact/>
+    <H3>{th ? "เงินมาจากไหน ไปไหน (ปีนี้)" : "Where money came from and went (this year)"}</H3>
+    <MoneyBar/>
+    {S.oreOn ? <><H3>{th ? "ทรัพยากรได้มาจากประเทศไหน (ทั้งเกม)" : "Where our minerals came from (whole game)"}</H3><MatFrom/></> : null}
+    <details class="stmore"><summary><Icon n="chevron-down" size={16}/>{th ? "ดูรายละเอียดเพิ่ม: เงิน · ประชาชน · โลก · อุณหภูมิ" : "More: money · people · world · temperature"}</summary>
+      <H3>{th ? "การเงิน" : "Money"}</H3><Money/>
+      {S.groups ? <><H3>{th ? "ประชาชน" : "People"}</H3><div class="glist mini" onClick={() => { Audio.play("open"); UIM.modal = "politics"; bump(); }}><GroupList/></div></> : null}
       <H3>{t("chartTemp")}</H3>
       <LineChart data={S.hist.map(h => h.temp)} min={1} max={3} ticks={[1, 1.5, 2, 2.5, 3]} color="accent" refs={[{v:1.5, c:"warn"}, {v:2, c:"bad"}]}/>
-      <div class="stripes">{S.hist.map((h, i) => <i key={i} style={{background:tempColor(h.temp), width:`${100 / (Math.max(P.TOTAL_TICKS, S.hist.length - 1) + 1)}%`}}/>)}</div>
-      <p class="mono muted small"><Icon n="timer" size={12}/> {P.fmtTime(S.realSec)}</p>
-    </> : tab === "money" ? <Money/>
-    : tab === "people" ? (S.groups ? <div class="glist mini" onClick={() => { Audio.play("open"); UIM.modal = "politics"; bump(); }}><GroupList/></div> : null)
-    : <>
       <H3>{t("shares")}</H3>
       {S.regions.map(r => <div class="barrow wide" key={r.id}><span>{L(RSHORT[r.id])}</span><Meter v={r.co2 / g} color="hot" h={8}/><span class="mono">{r.co2.toFixed(2)}</span></div>)}
       <H3>{t("topEmitters")}</H3>
       {S.countries.filter(x => !x.rest).sort((a, b) => b.co2 - a.co2).slice(0, 8).map(c => <div class="barrow wide" key={c.id}><span>{L(P.COUNTRY[c.id].name)}</span><Meter v={c.co2 / g} color="warn" h={8}/><span class="mono">{c.co2.toFixed(2)}</span></div>)}
-    </>}
+      <p class="mono muted small"><Icon n="timer" size={12}/> {P.fmtTime(S.realSec)}</p>
+    </details>
   </>;
 }
 /* 1.6: where money (or policy points) came from and went, for this year, last year or the whole game */
