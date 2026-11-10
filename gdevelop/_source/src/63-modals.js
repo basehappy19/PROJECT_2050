@@ -9,14 +9,15 @@ if (P.mods && P.mods.modals) return;
 const TUT_SIZES = /*TUTSIZES*/{};
 const {Kit, S, t, L, UI, Audio, W, UIM, Screens, TUT, CHARS, CHAR, STORY, ADVISOR, ENDINGS, HAZARDS, COUNTRY, IC} = P;
 const k = Kit;
-const WIDTH = {intro:640, slotpick:620, tutorial:720, charsel:1150, story:800, learn:980, end:640, event:660, pause:680, market:940, politics:860, year:600, keys:860};
+// widths of the website's windows (style.css --modal-sm 640 · --modal-md 820 · --modal-lg 1160, keys 860)
+const WIDTH = {intro:640, slotpick:640, tutorial:820, charsel:1160, story:820, learn:1160, end:640, event:640, pause:1160, market:1160, politics:1160, year:640, keys:860};
 
 Screens.renderModal = function(l){
   const kind = UIM.kind();
   l.blocks = !!kind; const sl = k.L("ModalScroll");
   if (!kind){ k.clearSlave("ModalScroll"); return; }
   if (kind === "skills") return this.renderSkills(l);
-  const ce = kind === "event" && P.currentEvent(), pw = Math.min(k.W - 24, ce && ce.country ? 900 : kind === "market" ? 1140 : (WIDTH[kind] || 620));   // 3.7.4: dispute window is wider (VS) · 3.7.6: market too
+  const ce = kind === "event" && P.currentEvent(), pw = Math.min(k.W - 24, ce && ce.country ? 900 : (WIDTH[kind] || 620));   // 3.7.4: dispute window is wider (VS) · 3.7.6: market too
   const px = kind === "end" ? k.W - pw - 40 : (k.W - pw) / 2;
   let ch = 0;
   k.slave("ModalScroll", s => {
@@ -45,13 +46,13 @@ Screens.renderModal = function(l){
     k.hgrad(l, 0, 0, k.W, k.H, [[0, "#020609"], [.35, "#020609"], [1, "#020609"]], {a:.0, bg:true});
     k.rect(l, px - 40, 0, pw + 80, k.H, "#020609", {a:.55, bg:true});
   } else k.rect(l, 0, 0, k.W, k.H, "#020609", {a:kind === "story" || kind === "intro" ? .8 : .62, bg:true});
-  const closer = {keys:() => Screens.closeKeys(), pause:() => Screens.resume(), learn:() => Screens.closeLearn(), market:() => Screens.closeWin(), politics:() => Screens.closeWin(), year:() => Screens.closeWin(), slotpick:() => { UIM.modal = "charsel"; k.dirty(); }}[kind];
+  const closer = {keys:() => Screens.closeKeys(), pause:() => Screens.resume(), learn:() => Screens.closeLearn(), market:() => Screens.closeWin(), politics:() => Screens.closeWin(), year:() => Screens.closeWin(), charsel:() => Screens.toMenu(), slotpick:() => { UIM.modal = "charsel"; k.dirty(); }}[kind];
   if (closer){ k.hit(l, "veil", 0, 0, k.W, k.H, () => { Audio.play("close"); closer(); }, {cursor:false}); }
   k.hit(l, "mbox", px, py, pw, ph, () => {}, {cursor:false});
-  const border = kind === "end" ? (S.over === "win" ? "good" : "bad") : "line";
+  const border = kind === "end" ? (S.over === "win" ? "good" : "bad") : kind === "year" && UIM.yearRec ? (UIM.yearRec.g ? "good" : "bad") : "line";
   k.rect(l, px + 4, py + 10, pw, ph, "#000000", {a:.35, r:14, bg:true});
   k.rect(l, px, py, pw, ph, "panel", {r:14, stroke:border, sw:kind === "end" ? 1.5 : 1, bg:true, a:kind === "end" ? .94 : 1});
-  if (closer){ W.hbtn(l, "mclose", px + pw - 40, py + 10, "x", () => { Audio.play("close"); closer(); }, {color:"muted"}); }
+  if (closer && kind !== "year"){ W.hbtn(l, "mclose", px + pw - 40, py + 10, "x", () => { Audio.play("close"); closer(); }, {color:"muted"}); }
   if (sl && sl.content > sl.clip.h){
     const th = Math.max(30, sl.clip.h * sl.clip.h / sl.content), ty = sl.clip.y + (sl.clip.h - th) * (sl.scroll / (sl.content - sl.clip.h));
     k.rect(l, px + pw - 7, ty, 3, th, "line", {r:1.5});
@@ -72,14 +73,35 @@ const bullets = (l, list, x, y, w, size = 14, gap = 4) => {
    question on top · short situation · each choice as a card with impact arrows (no exact numbers)
    choices unlock after a 1.5 s countdown so a stray tap can't pick one */
 const arrows = (up, mag) => { const n = mag < 1 ? 1 : mag < 2.5 ? 2 : 3; return (up ? "▲" : "▼").repeat(n); };
+/* 2.1.3: the event's picture at the top of the window, like the website (.event .hero: 210 px, dark fade at the bottom).
+   The pictures are packed in sheets (gen-assets.mjs --events); the sheet's sprite shows just this picture's cell. */
+const EVART = /*EVENTART*/null;
+Screens.eventArt = function(l, id, x, y, w, h){
+  const A = EVART && EVART.map && EVART.map[id]; if (!A) return false;
+  let go; try { go = k.sprite(l, "EventArt", `events-${A[0]}`, x, y, w, h); } catch(e){ return false; }
+  const spr = go.getRendererObject && go.getRendererObject(); if (!spr || !spr.texture || !spr.texture.baseTexture) return false;
+  const cache = this._evTex || (this._evTex = {}), base = spr.texture.baseTexture;
+  let tex = cache[id]; if (!tex || tex.baseTexture !== base) tex = cache[id] = new PIXI.Texture(base, new PIXI.Rectangle(A[1] * EVART.w, A[2] * EVART.h, EVART.w, EVART.h));
+  if (spr.texture !== tex){ spr.texture = tex; go.setWidth(w * k.K); go.setHeight(h * k.K); }
+  return true;
+};
 Screens.mEvent = function(l, pw){
   const e = P.currentEvent(); if (!e) return 100;
   const x = 22, w = pw - 44; let y = 18;
   const where = e.country ? t("evCountryTag") : e.target ? `${t("eventTag")} · ${L(P.RMETA[e.target].name)}` : `${t("eventTag")} · ${t("global")}`;
-  tag(l, `[[${e.country ? "globe" : "siren"}]] ${where}`, x, y, e.country ? "accent" : "warn");
-  { const ml = `[[minimize-2]] ${L(P.UI2.evMin)}`, mw = W.btnW(ml, {size:11.5}); W.btn(l, "evmin", x + w - mw, y - 6, ml, () => { UIM.evMin = true; Audio.play("close"); k.dirty(); }, {kind:"ghost", size:11.5, h:26}); }
-  y += 26;
-  y += h3(l, L(e.title), x, y, w).h + 6;
+  const heroH = k.H < 560 ? 150 : 210, titleH = k.textH(L(e.title), {font:"disp", size:heroH < 200 ? 21 : 26, lh:1.25, w});
+  if (this.eventArt(l, e.id, 1, 1, pw - 2, heroH)){
+    // tags + title sit at the bottom of the picture
+    let hy = heroH - 16 - titleH - 26;
+    tag(l, `[[${e.country ? "globe" : "siren"}]] ${where}`, x, hy, e.country ? "accent" : "warn");
+    if (e.news) tag(l, `[[newspaper]] ${t("realNews")} ${e.news.y}`, x + k.textW(P.up(`[[siren]] ${where}`), {font:"mono", size:11}) + 18, hy, "good");
+    k.text(l, L(e.title), x, heroH - 16 - titleH, {font:"disp", size:heroH < 200 ? 21 : 26, lh:1.25, w});
+    y = heroH + 4;
+  } else {
+    tag(l, `[[${e.country ? "globe" : "siren"}]] ${where}`, x, y, e.country ? "accent" : "warn");
+    y += 26;
+    y += h3(l, L(e.title), x, y, w).h + 6;
+  }
   if (e.country) return vsEvent(l, pw, e, x, y, w);
   if (e.country){
     const row = (lab, ids, col) => {
@@ -102,8 +124,8 @@ Screens.mEvent = function(l, pw){
   const locked = UIM.eventLocked(), f = UIM.eventLockFrac();
   const askW = k.text(l, `[[circle-help]] ${t(e.country ? "evAskCountry" : "evAsk")}`, x, y, {font:"dispS", size:16, color:"fg", iconColor:"accent"}).w;
   if (W.speakBtn) W.speakBtn(l, "ev-say", x + askW + 8, y - 3, `${L(e.title)}. ${L(e.desc)}`);
-  if (P.hasKeyboard()) k.text(l, t("evKeys"), x + w - 140, y + 4, {font:"mono", size:10.5, color:"muted", w:140, align:"right"});
-  y += 28;
+  { const ml = `[[minimize-2]] ${L(P.UI2.evMin)}`, mw = W.btnW(ml, {size:11.5}); W.btn(l, "evmin", x + w - mw, y - 4, ml, () => { UIM.evMin = true; Audio.play("close"); k.dirty(); }, {kind:"ghost", size:11.5, h:28}); }
+  y += 30;
   W.meter(l, x, y, w, 4, f, locked ? "warn" : "accent"); y += 12;
   const hard = S.mode === "hard";
   const opts = e.options.map((o, i) => ({o, i, ok:P.affordable(o.fx)}));
@@ -194,8 +216,8 @@ function vsEvent(l, pw, e, x, y, w){
   const locked = UIM.eventLocked(), f = UIM.eventLockFrac();
   const askW = k.text(l, `[[circle-help]] ${t("evAskCountry")}`, x, y, {font:"dispS", size:16, color:"fg", iconColor:"accent"}).w;
   if (W.speakBtn) W.speakBtn(l, "ev-say", x + askW + 8, y - 3, `${L(e.title)}. ${say.A ? L(say.A) : ""} ${say.B ? L(say.B) : ""}`);
-  if (P.hasKeyboard()) k.text(l, t("evKeys"), x + w - 140, y + 4, {font:"mono", size:10.5, color:"muted", w:140, align:"right"});
-  y += 28; W.meter(l, x, y, w, 4, f, locked ? "warn" : "accent"); y += 12;
+  { const ml = `[[minimize-2]] ${L(P.UI2.evMin)}`, mw = W.btnW(ml, {size:11.5}); W.btn(l, "evmin", x + w - mw, y - 4, ml, () => { UIM.evMin = true; Audio.play("close"); k.dirty(); }, {kind:"ghost", size:11.5, h:28}); }
+  y += 30; W.meter(l, x, y, w, 4, f, locked ? "warn" : "accent"); y += 12;
   const hard = S.mode === "hard", opts = e.options.map((o, i) => ({o, i, ok:P.affordable(o.fx)}));
   if (opts.every(q => !q.ok)) opts.push({o:{label:{th:UI.postpone.th, en:UI.postpone.en}, fx:P.POSTPONE}, i:-1, ok:true});
   const cols = pw >= 700 ? Math.min(3, opts.length) : 1, gap = 10, cw = (w - gap * (cols - 1)) / cols;
@@ -248,13 +270,21 @@ Screens.mEnd = function(l, pw){
   tag(l, `${P.dateStr()} · ${t("mode_" + S.mode)}`, x, y, win ? "good" : "bad"); y += 18;
   y += h3(l, t(win ? "winTitle" : o + "Title"), x, y, w, 28).h + 2;
   if (win) y += k.text(l, L(ENDINGS.win.grades[S.grade || "A"]), x, y, {font:"dispS", size:16, color:"gold"}).h + 4;
-  y += k.text(l, t(win ? "winBody" + (S.grade || "A") : o + "Body"), x, y, {size:14, w}).h + 10;
+  // 2.1.3: like the website: the 2.0 ending (title + text + the 25 years) when there is one, then the character's line
+  if (S.v2 && P.ending2){
+    const e2 = P.ending2(), ng = P.goodYears ? P.goodYears() : (S.years || []).filter(q => q.g).length;
+    y += 4 + k.text(l, L(e2.title), x, y + 4, {font:"dispS", size:16, color:win ? "good" : "bad", w}).h + 4;
+    y += k.text(l, L(e2.body), x, y, {size:14, w, lh:1.45}).h + 10;
+    W.runs(l, x, y, [[`${L(P.UI2.yrGoodYears)} `, {size:12, color:"muted"}], [String(ng), {font:"monoB", size:12, color:"good"}], [` / ${(S.years || []).length}`, {size:12, color:"muted"}]]); y += 20;
+    y += W.yearStrip(l, x, y, w, {big:true}) + 12;
+  } else y += k.text(l, t(win ? "winBody" + (S.grade || "A") : o + "Body"), x, y, {size:14, w}).h + 10;
   // character quote
-  const qh = Math.max(56, k.text(null, L(QUOTES[o]), 0, 0, {size:13, w:w - 90, measure:true}).h + 28);
+  const quote = L(P.endQuote ? P.endQuote() : QUOTES[o]);
+  const qh = Math.max(64, k.text(null, `“${quote}”`, 0, 0, {size:13, w:w - 96, measure:true}).h + 32);
   W.card(l, x, y, w, qh, {fill:"panel2"});
-  W.portrait(l, x + 10, y + (qh - 48) / 2, 48, S.char);
-  k.text(l, L(CHAR[S.char].person), x + 70, y + 6, {font:"bodyB", size:12, color:CHAR[S.char].color});
-  k.text(l, `“${L(QUOTES[o])}”`, x + 70, y + 24, {size:13, w:w - 90, color:"fg"});
+  W.portrait(l, x + 12, y + (qh - 56) / 2, 56, S.char);
+  k.text(l, L(CHAR[S.char].person), x + 80, y + 8, {font:"bodyB", size:12.5, color:CHAR[S.char].color});
+  k.text(l, `“${quote}”`, x + 80, y + 26, {size:13, w:w - 96, color:"fg"});
   y += qh + 10;
   const net = P.netCO2();
   const stats = [[t("temp"), `+${S.temp.toFixed(2)}°C`], [t("co2"), `${net.toFixed(1)} Gt`], [t("appr"), `${S.appr.toFixed(0)}%`],
@@ -267,17 +297,47 @@ Screens.mEnd = function(l, pw){
     k.text(l, b, cx + 10, cy + 24, {font:"monoB", size:17});
   });
   y += 2 * (chh + 8) + 6;
+  // the newspaper of the last day (web .paper: THE WORLD TIMES, a headline, what three people say)
+  if (P.endPaper){
+    const np = P.endPaper(), px2 = x + 14, pw2 = w - 28, y0 = y;
+    let py = y + 12;
+    k.text(l, "THE WORLD TIMES", px2, py, {font:"logo", size:15, color:"#1d1a14"});
+    k.text(l, np.date, px2, py + 2, {font:"mono", size:11, color:"#5a5346", w:pw2, align:"right"});
+    py += 22; k.rect(l, px2, py, pw2, 2, "#1d1a14"); py += 8;
+    py += k.text(l, L(np.head), px2, py, {font:"dispS", size:18, color:"#111111", w:pw2, lh:1.35}).h + 8;
+    for (const q of np.people){
+      const th2 = k.textH(L(q.t), {size:13, w:pw2 - 46, lh:1.4}), rh2 = Math.max(34, th2);
+      W.portrait(l, px2, py + (rh2 - 34) / 2, 34, q.who);
+      k.text(l, L(q.t), px2 + 44, py + (rh2 - th2) / 2, {size:13, color:"#2a261d", w:pw2 - 46, lh:1.4});
+      py += rh2 + 7;
+    }
+    k.rect(l, x, y0, w, py + 3 - y0, "#f3eee2", {r:10, under:true});
+    y = py + 3 + 14;
+  }
   // your story
   const st = P.endStory();
-  { const ng = (S.years || []).filter(q => q.g).length; if ((S.years || []).length){ k.text(l, `${L(P.UI2.yrGoodYears)} ${ng} / ${(S.years || []).length}`, x, y, {size:12, color:"muted"}); y += 20; y += W.yearStrip(l, x, y, w, {big:true}) + 10; } }
   W.h3(l, t("yourStory"), x, y, {w}); y += 20;
   const lines = [];
   if (st.best) lines.push(`[[heart-handshake]] ${t("storyBest")}: ${P.cname(st.best)}`);
   if (st.worst) lines.push(`[[${HAZARDS[st.worst.type].icon}]] ${t("storyWorst")}: ${L(HAZARDS[st.worst.type].name)} · ${P.cname(st.worst.c)} · ${P.dateStr(st.worst.tick)}`);
   st.dec.forEach(d => lines.push(`[[git-branch]] ${L(d.title)} → ${L(d.label)}`));
+  { const os = P.oreSummary ? P.oreSummary() : null; if (os && os.used) lines.push(`[[$ore]] ${t("oreUsed")} ${os.used}${os.top ? ` · ${t("oreMostFrom")} ${P.cname(os.top)} ${os.share}%` : ""}`); }
+  { const im = P.impactSummary && P.impactSummary(); if (im && im.saved > .1) lines.unshift(S.lang === "th" ? `[[leaf]] เทียบกับถ้าไม่ทำอะไรเลย คุณช่วยลด CO₂ ได้ ${im.saved.toFixed(1)} Gt ต่อปี และโลกเย็นกว่า ${Math.max(0, im.bauTemp - S.temp).toFixed(2)}°C` : `[[leaf]] Compared with doing nothing, you cut CO₂ by ${im.saved.toFixed(1)} Gt a year and the world is ${Math.max(0, im.bauTemp - S.temp).toFixed(2)}°C cooler`); }
   if (!lines.length) lines.push(t("storyNone"));
-  for (const s of lines) y += k.text(l, s, x, y, {size:12.5, w, color:"fg", iconColor:"accent"}).h + 3;
+  for (const s of lines) y += k.text(l, s, x, y, {size:13, w, color:"fg", iconColor:"accent"}).h + 3;
   y += 10;
+  // what you can do in real life today (web .reallife)
+  if (P.realActions){
+    W.h3(l, S.lang === "th" ? "สิ่งที่คุณทำได้จริงวันนี้" : "What you can do in real life today", x, y, {w}); y += 22;
+    for (const a of P.realActions()){
+      const th2 = k.textH(L(a.t), {size:13, w:w - 54, lh:1.45}), rh2 = th2 + 18;
+      k.rect(l, x, y, w, rh2, "good", {r:10, a:.1, stroke:"good", sa:.3});
+      k.icon(l, a.icon, x + 11, y + 9, 20, "good");
+      k.text(l, L(a.t), x + 40, y + 9, {size:13, w:w - 54, lh:1.45});
+      y += rh2 + 7;
+    }
+    y += 6;
+  }
   // reward
   const rw = UIM.reward;
   let rtxt;
@@ -300,62 +360,86 @@ Screens.mEnd = function(l, pw){
   k.text(l, P.score().toLocaleString(), x, y + 16, {font:"disp", size:38, color:"accent", lh:1.1});
   let bx = x + w;
   const wR = W.btnW(t("restart")), wM = W.btnW(t("mainMenu"));
-  bx -= wR; W.btn(l, "restart", bx, y + 22, t("restart"), () => { Audio.stopAmb(300); UIM.reward = null; UIM.modal = "charsel"; S.over = null; S.started = false; P.newGame(S.lang, {mode:S.mode, char:S.char}); P.Map.refresh(); k.dirty(); });
+  // a win can go on as the same world with no end year (web G.continueWorld)
+  if (win){ const pl = `[[infinity]] ${t("playOn")}`, wP = W.btnW(pl); bx -= wP; W.btn(l, "playon", bx, y + 22, pl, () => Screens.continueWorld(), {kind:"gold"}); bx -= 8; }
+  bx -= wR; W.btn(l, "restart", bx, y + 22, t("restart"), () => { Audio.stopAmb(300); UIM.worldSel = !!S.world; UIM.reward = null; UIM.modal = "charsel"; S.over = null; S.started = false; P.newGame(S.lang, {mode:S.mode, char:S.char}); P.Map.refresh(); k.dirty(); });
   bx -= wM + 8; W.btn(l, "tomenu", bx, y + 22, t("mainMenu"), () => Screens.toMenu(), {kind:"ghost"});
   return y + 22 + 36 + 22;
 };
 
 /* ---------------- character select + mode ---------------- */
 Screens.mCharSel = function(l, pw){
-  const x = 24, w = pw - 48; let y = 18;
+  // 2.1.3: laid out like the website's CharSel (ui/modals.jsx): six photo cards in one row, four modes, footer
+  const x = 22, w = pw - 44; let y = 20;
   tag(l, t("introTag"), x, y, "accent"); y += 18;
-  y += h3(l, t("charTitle"), x, y, w).h + 2;
-  y += k.text(l, t("charSub"), x, y, {size:13.5, color:"muted", w}).h + 12;
-  const sel = UIM.charSel || "sci", cw = (w - 3 * 12) / 4, chH = 330;
+  y += h3(l, t("charTitle"), x, y, w - 50).h + 2;
+  y += k.text(l, t("charSub"), x, y, {size:13.5, color:"muted", w}).h + 14;
+  const sel = UIM.charSel || "sci", n = CHARS.length, cols = w >= 900 ? n : w >= 560 ? 3 : 2, gap = cols === n ? 10 : 12;
+  const cw = (w - gap * (cols - 1)) / cols, ph = Math.round(cw * 4.6 / 4), iw = cw - 20;
+  // the cards in a row are the same height (the tallest one)
+  const info = c => {
+    let h = 26 + 18;   // name + person
+    if (c.bio) h += k.textH(L(c.bio), {size:12, w:iw, lh:1.45}) + 6;
+    h += 4 + 6 + k.textH(L(c.pas), {size:12, w:iw, lh:1.35}) + 6 + c.acts.length * 18;
+    if (!P.Net.owns("char_" + c.id)) h += 20;
+    return h + 12;
+  };
+  const rows = []; for (let i = 0; i < n; i += cols) rows.push(Math.max(...CHARS.slice(i, i + cols).map(info)));
+  let ry = y;
   CHARS.forEach((c, i) => {
-    const cx = x + i * (cw + 12), owned = P.Net.owns("char_" + c.id), on = sel === c.id, id = "ch-" + c.id, hov = k.isHover(l, id);
-    const xp = P.Net.charXp(c.id), lv = P.levelOf(xp), a = owned ? 1 : .55;
-    k.rect(l, cx, y, cw, chH, on ? "panel2" : "bg", {r:12, stroke:on ? c.color : hov ? "accent" : "line", sw:on ? 2 : 1, bg:true});
-    k.rect(l, cx + 10, y + 10, cw - 20, 150, c.color, {r:10, a:.12});
-    k.sprite(l, "Portrait", `${c.id}-${P.outfitOf(c.id)}`, cx + (cw - 150) / 2, y + 10, 150, 150, a);
-    if (!owned){ k.rect(l, cx + cw - 46, y + 16, 30, 30, "bg", {r:15, stroke:"line"}); k.icon(l, "lock", cx + cw - 39, y + 23, 16, "muted"); }
-    let ty = y + 168;
-    ty += k.text(l, L(c.name), cx + 12, ty, {font:"dispS", size:16, w:cw - 24, max:1, a}).h;
-    ty += k.text(l, `${L(c.person)} · ${t("level")} ${lv}`, cx + 12, ty, {font:"mono", size:11, color:c.color, w:cw - 24, max:1, a}).h + 2;
+    const col = i % cols, row = Math.floor(i / cols); if (col === 0 && row) ry += ph - 28 + rows[row - 1] + gap;
+    const cx = x + col * (cw + gap), cy = ry, chH = ph - 28 + rows[row];
+    const owned = P.Net.owns("char_" + c.id), on = sel === c.id, id = "ch-" + c.id, hov = k.isHover(l, id);
+    const xp = P.Net.charXp(c.id), lv = P.levelOf(xp), lift = hov && !on ? -3 : 0, Y = cy + lift;
+    k.rect(l, cx, Y, cw, chH, "#061015", {r:14, a:.6, bg:true});
+    if (on) k.rect(l, cx - 2, Y - 2, cw + 4, chH + 4, null, {r:16, stroke:c.color, sw:2});
+    k.sprite(l, "Portrait", owned ? `card-${c.id}-${P.outfitOf(c.id)}` : `card-${c.id}-locked`, cx + 1, Y + 1, cw - 2, ph);
+    k.rect(l, cx, Y, cw, chH, null, {r:14, stroke:on ? c.color : hov ? c.color : "line", sw:on ? 2 : 1});
+    // level tag (top left) · lock (top right)
+    const lt = `Lv ${lv}`, lw = k.textW(lt, {font:"mono", size:11}) + 14;
+    k.rect(l, cx + 10, Y + 10, lw, 20, "#061015", {r:6, a:.85}); k.text(l, lt, cx + 17, Y + 12, {font:"mono", size:11, color:c.color});
+    if (!owned){ k.circle(l, cx + cw - 27, Y + 27, 17, "#061015", {a:.85, stroke:"line"}); k.icon(l, "lock", cx + cw - 36, Y + 18, 18, "fg"); }
+    let ty = Y + ph - 28;
+    ty += k.text(l, L(c.name), cx + 10, ty, {font:"dispS", size:18, w:iw, max:1}).h + 2;
+    ty += k.text(l, L(c.person), cx + 10, ty, {font:"mono", size:12, color:c.color, w:iw, max:1}).h + 4;
+    if (c.bio) ty += k.text(l, L(c.bio), cx + 10, ty, {size:12, color:"muted", w:iw, lh:1.45}).h + 6;
     const nx = P.LEVELS[lv] ?? null, pv = P.LEVELS[lv - 1];
-    W.meter(l, cx + 12, ty + 2, cw - 24, 4, nx ? (xp - pv) / (nx - pv) : 1, c.color); ty += 12;
-    ty += k.text(l, L(c.pas), cx + 12, ty, {size:11.5, color:"muted", w:cw - 24, lh:1.3, a}).h + 4;
-    for (const ab of c.acts) ty += k.text(l, `[[${ab.icon}]] ${L(ab.name)}${ab.lv ? ` (Lv${ab.lv})` : ""}`, cx + 12, ty, {size:11.5, w:cw - 24, max:1, a, iconColor:c.color}).h;
-    if (!owned) k.text(l, P.Net.user ? `[[$credit]] ${c.price} · ${t("buyInShop")}` : `[[$credit]] ${c.price} · ${t("loginToBuy")}`, cx + 12, y + chH - 24, {font:"mono", size:11, color:"gold", w:cw - 24, max:1, iconColor:"#ffffff"});
-    k.hit(l, id, cx, y, cw, chH, () => { Audio.play(owned ? "select" : "error"); if (owned) UIM.charSel = c.id; else UIM.msg = t("charLocked"); k.dirty(); });
+    W.meter(l, cx + 10, ty, iw, 4, nx ? (xp - pv) / (nx - pv) : 1, c.color); ty += 10;
+    ty += k.text(l, L(c.pas), cx + 10, ty, {size:12, color:"muted", w:iw, lh:1.35}).h + 6;
+    for (const ab of c.acts) ty += Math.max(18, k.text(l, `[[${ab.icon}]] ${L(ab.name)}${ab.lv ? ` (Lv${ab.lv})` : ""}`, cx + 10, ty, {size:12, w:iw, max:1, iconColor:c.color}).h);
+    if (!owned) k.text(l, `[[$credit]] ${P.shopPrice ? P.shopPrice({id:"char_" + c.id, price:c.price}) : c.price}`, cx + 10, ty + 2, {font:"mono", size:12, color:"gold", w:iw, max:1, iconColor:"#ffffff"});
+    k.hit(l, id, cx, cy, cw, chH, () => { Audio.play(owned ? "select" : "error"); if (owned){ UIM.charSel = c.id; UIM.msg = ""; } else UIM.msg = t("charLocked"); k.dirty(); });
+    if (i === n - 1) y = ry + chH + 16;
   });
-  y += chH + 14;
   // mode
-  W.h3(l, t("modeTitle"), x, y, {w}); y += 22;
+  W.h3(l, t("modeTitle"), x, y, {w}); y += 24;
   const modes = UIM.worldSel ? [["normal", "infinity"]] : [["fast", "zap"], ["normal", "globe"], ["hard", "skull"], ["daily", "calendar-check"]];   // 3.x: Fast mode (shared engine)
-  const mw = (w - (modes.length - 1) * 10) / modes.length;
+  const mc = w >= 700 ? modes.length : 2, mw = (w - (mc - 1) * 10) / mc, mh = 62;
   modes.forEach(([m, ic], i) => {
-    const mx = x + i * (mw + 10), on = UIM.modeSel === m, id = "md-" + m, hov = k.isHover(l, id);
-    const dis = m === "daily" && false;
-    k.rect(l, mx, y, mw, 64, on ? "panel2" : "bg", {r:10, stroke:on ? (m === "hard" ? "bad" : "accent") : hov ? "accent" : "line", sw:on ? 2 : 1, bg:true});
-    k.icon(l, ic, mx + 12, y + 12, 20, on ? (m === "hard" ? "bad" : "accent") : "muted");
-    k.text(l, t("mode_" + m), mx + 42, y + 9, {font:"dispS", size:15});
-    k.text(l, t("modeD_" + m), mx + 42, y + 32, {size:11, color:"muted", w:mw - 52, max:2, lh:1.3});
-    k.hit(l, id, mx, y, mw, 64, () => { Audio.play("click"); UIM.modeSel = m; k.dirty(); }, {disabled:dis});
+    const mx = x + (i % mc) * (mw + 10), my = y + Math.floor(i / mc) * (mh + 10), on = UIM.modeSel === m, id = "md-" + m, hov = k.isHover(l, id);
+    const locked = m === "hard" && !UIM.worldSel && P.hardUnlocked && !P.hardUnlocked();
+    const oc = !on ? "muted" : m === "hard" ? "bad" : m === "fast" ? "gold" : "accent";
+    k.rect(l, mx, my, mw, mh, on ? "panel2" : "#061015", {r:10, a:on ? 1 : .6, stroke:on ? oc : hov && !locked ? "accent" : "line", sw:on ? 2 : 1, bg:true});
+    k.icon(l, locked ? "lock" : ic, mx + 14, my + (mh - 22) / 2, 22, oc, locked ? .55 : 1);
+    k.text(l, t("mode_" + m), mx + 48, my + 10, {font:"dispS", size:15, a:locked ? .55 : 1});
+    k.text(l, locked ? t("hardLocked") : t("modeD_" + m), mx + 48, my + 32, {size:12, color:on ? oc : "muted", w:mw - 58, max:2, lh:1.3, a:locked ? .55 : 1});
+    k.hit(l, id, mx, my, mw, mh, () => {
+      if (locked){ Audio.play("error"); UIM.msg = t("hardLockedMsg"); UIM.err = true; k.dirty(); return; }
+      Audio.play("click"); UIM.modeSel = m; k.dirty(); });
   });
-  y += 76;
-  if (UIM.msg){ k.text(l, UIM.msg, x, y, {size:12.5, color:"warn", w}); }
+  y += Math.ceil(modes.length / mc) * (mh + 10) + 6;
+  if (UIM.msg){ y += k.text(l, UIM.msg, x, y, {size:12.5, color:"warn", w}).h + 6; }
   const go = () => {
     const ch = UIM.charSel || "sci"; if (!P.Net.owns("char_" + ch)) return;
+    if (UIM.modeSel === "hard" && !UIM.worldSel && P.hardUnlocked && !P.hardUnlocked()){ UIM.msg = t("hardLockedMsg"); UIM.err = true; Audio.play("error"); k.dirty(); return; }
     UIM.msg = ""; UIM.modal = null;
     Screens.startOrPick({mode:UIM.worldSel ? "normal" : UIM.modeSel, char:ch, charLv:P.levelOf(P.Net.charXp(ch)), seed:UIM.modeSel === "daily" ? P.dailySeed() : undefined, world:!!UIM.worldSel});
   };
-  const sl = t("start"), sw = W.btnW(sl, {size:15}) + 20;
-  W.btn(l, "start", x + w - sw, y, sl, go, {size:15, w:sw, h:40});
-  let bx = x + w - sw - 8;
-  const tl = `[[graduation-cap]] ${L(P.UI2.trainMenu)}`, tw2 = W.btnW(tl); bx -= tw2; W.btn(l, "csTut", bx, y + 2, tl, () => P.Train.start(), {kind:"ghost"});
-  const ml = t("mainMenu"), mw2 = W.btnW(ml); bx -= mw2 + 8; W.btn(l, "csMenu", bx, y + 2, ml, () => Screens.toMenu(), {kind:"ghost"});
-  return y + 40 + 22;
+  // footer like the website: "How to play" (ghost) on the left, "Start" on the right
+  const sl = `${t("start")} [[play]]`, sw = W.btnW(sl, {size:15}) + 24;
+  W.btn(l, "start", x + w - sw, y, sl, go, {size:15, w:sw, h:42});
+  W.btn(l, "csTut", x, y + 3, `[[graduation-cap]] ${t("tutMenu")}`, () => Screens.openTutorial ? Screens.openTutorial(0, true) : P.Train.start(), {kind:"ghost"});
+  return y + 42 + 20;
 };
 
 /* ---------------- story (comic panels) ---------------- */
@@ -434,44 +518,62 @@ Screens.slotRow = function(l, x, y, w, slot, saves, inGame){
 
 /* ---------------- pause ---------------- */
 Screens.mPause = function(l, pw){
-  const x = 20, w = pw - 40; let y = 18;
-  tag(l, `${P.dateStr()} · ${t("mode_" + S.mode)}`, x, y); y += 18;
-  y += h3(l, t("pTitle"), x, y, w - 40).h + 4;
-  y += k.text(l, `[[timer]] ${t("timePlayed")} ${P.fmtTime(S.realSec)}`, x, y, {font:"mono", size:12, color:"muted", iconColor:"muted"}).h + 10;
-  W.btn(l, "resume", x, y, t("pResume"), () => Screens.resume());
-  W.langSeg(l, x + w - 80, y + 3);
-  y += 36 + 14;
-  y += W.vol(l, x, y, w) + 12;
-  { const th = S.lang === "th", G = P.Gfx; k.icon(l, "monitor", x, y + 7, 18, "accent"); k.text(l, t("gfxLbl"), x + 28, y + 6, {size:13.5, w:120, max:1});
-    W.seg(l, x + w - 180, y + 1, [["low", "gfxLow"], ["high", "gfxHigh"]].map(([id, key]) => ({id:"pgfx-" + id, label:t(key), on:G.level === id, fn:() => { Audio.play("click"); G.set(id); k.dirty(); }})), {w:90, h:30, font:"body", fontOn:"bodyB", size:12.5}); y += 40; }
-  if (W.a11yRows) y += W.a11yRows(l, x, y, w) + 10;
-  const saves = P.readSaves();
-  if (S.mode === "hard") y += k.text(l, `[[skull]] ${t("hardSaves")}`, x, y, {size:12.5, color:"warn", w, iconColor:"warn"}).h + 8;
-  if (saves === null){ y += k.text(l, t("noStore"), x, y, {size:12.5, color:"bad", w}).h + 10; }
-  else {
-    for (const slot of P.SLOTS) y += this.slotRow(l, x, y, w, slot, saves, true) + 7;
-    // 1.5.4: delete every save slot at once (asks first)
-    const n = P.SLOTS.filter(q => saves[q] && saves[q].meta).length;
-    if (n){
-      if (UIM.askClear){
-        k.text(l, t("slotClearSure").replace("{N}", n), x, y + 8, {size:12.5, color:"bad", w:w - 220, max:2});
-        const dl = `[[trash-2]] ${t("slotDelSure")}`, dw = W.btnW(dl, {size:12.5}), cl = t("cancel"), cw2 = W.btnW(cl, {size:12.5});
-        W.btn(l, "clr-yes", x + w - dw - cw2 - 8, y, dl, () => { P.SLOTS.forEach(q => { if (saves[q] && saves[q].meta) P.deleteSlot(q); }); UIM.askClear = false; UIM.msg = t("slotCleared"); UIM.err = false; k.dirty(); }, {kind:"danger", size:12.5, h:32});
-        W.btn(l, "clr-no", x + w - cw2, y, cl, () => { UIM.askClear = false; k.dirty(); }, {kind:"ghost", size:12.5, h:32});
-      } else W.btn(l, "clr", x, y, `[[trash-2]] ${t("slotClear")}`, () => { UIM.askClear = true; k.dirty(); }, {kind:"ghost", size:12.5, h:32});
-      y += 40;
+  // 2.1.3: two columns like the website's Pause (ui/modals.jsx): left = date, title, time, Resume and the action tiles;
+  // right = the save slots or the settings
+  const th = S.lang === "th", tab = UIM.pzTab || "saves", narrow = pw < 760;
+  const x = 22, w = pw - 44, sw = narrow ? w : 250, mx = narrow ? x : x + sw + 22, mw = narrow ? w : w - sw - 22;
+  let y = 20;
+  tag(l, `${P.dateStr()} · ${t("mode_" + S.mode)}`, x, y); y += 20;
+  y += h3(l, t("pTitle"), x, y, sw - (narrow ? 40 : 0)).h + 4;
+  y += k.text(l, `[[timer]] ${P.fmtTime(S.realSec)}`, x, y, {font:"mono", size:12, color:"muted", iconColor:"muted"}).h + 10;
+  W.btn(l, "resume", x, y, `[[play]] ${t("pResume")}`, () => Screens.resume(), {w:sw, h:44, size:15}); y += 44 + 12;
+  const acts = [];
+  acts.push(["save", th ? "บันทึก" : "Saves", () => { UIM.pzTab = "saves"; k.dirty(); }, tab === "saves"]);
+  acts.push(["settings", th ? "ตั้งค่า" : "Settings", () => { UIM.pzTab = "settings"; k.dirty(); }, tab === "settings"]);
+  acts.push(["graduation-cap", th ? "วิธีเล่น" : "How to", () => Screens.openTutorial(0, false)]);
+  acts.push(["book-open", th ? "เรียนรู้" : "Learn", () => Screens.openLearn()]);
+  if (P.hasKeyboard()) acts.push(["keyboard", th ? "ปุ่มลัด" : "Keys", () => Screens.openKeys()]);
+  if (Screens.fsOK()) acts.push([Screens.isFull() ? "minimize" : "maximize", th ? "เต็มจอ" : "Full", () => Screens.fullscreen()]);
+  acts.push(["log-out", th ? "เมนูหลัก" : "Menu", () => Screens.toMenu()]);
+  const cols = narrow ? 3 : 2, aw = (sw - (cols - 1) * 8) / cols, ah = 64;
+  acts.forEach(([ic, lab, fn, on], i) => {
+    const ax = x + (i % cols) * (aw + 8), ay = y + Math.floor(i / cols) * (ah + 8), id = "pz-" + ic, hov = k.isHover(l, id);
+    k.rect(l, ax, ay, aw, ah, on ? "accent" : "panel", {r:10, a:on ? .12 : .7, stroke:on || hov ? "accent" : "line", bg:true});
+    k.icon(l, ic, ax + aw / 2 - 10, ay + 12, 20, on ? "accent" : "fg");
+    k.text(l, lab, ax, ay + 37, {font:"dispS", size:13, color:on ? "accent" : "fg", w:aw, align:"center", max:1});
+    k.hit(l, id, ax, ay, aw, ah, () => { Audio.play("click"); fn(); });
+  });
+  const sideBottom = y + Math.ceil(acts.length / cols) * (ah + 8);
+  // right column
+  let my = narrow ? sideBottom + 10 : 50;
+  if (tab === "settings"){
+    k.icon(l, "languages", mx, my + 6, 18, "accent"); k.text(l, th ? "ภาษา" : "Language", mx + 28, my + 5, {size:13.5});
+    W.langSeg(l, mx + mw - 80, my + 2); my += 40;
+    my += W.vol(l, mx, my, mw) + 12;
+    { const G = P.Gfx; k.icon(l, "monitor", mx, my + 7, 18, "accent"); k.text(l, t("gfxLbl"), mx + 28, my + 6, {size:13.5, w:120, max:1});
+      W.seg(l, mx + mw - 180, my + 1, [["low", "gfxLow"], ["high", "gfxHigh"]].map(([id, key]) => ({id:"pgfx-" + id, label:t(key), on:G.level === id, fn:() => { Audio.play("click"); G.set(id); k.dirty(); }})), {w:90, h:30, font:"body", fontOn:"bodyB", size:12.5}); my += 40; }
+    if (W.a11yRows) my += W.a11yRows(l, mx, my, mw) + 10;
+  } else {
+    const saves = P.readSaves();
+    if (S.mode === "hard") my += k.text(l, `[[skull]] ${t("hardSaves")}`, mx, my, {size:12.5, color:"warn", w:mw, iconColor:"warn"}).h + 8;
+    if (saves === null){ my += k.text(l, t("noStore"), mx, my, {size:12.5, color:"bad", w:mw}).h + 10; }
+    else {
+      for (const slot of P.SLOTS) my += this.slotRow(l, mx, my, mw, slot, saves, true) + 10;
+      // 1.5.4: delete every save slot at once (asks first) — on the right, like the website
+      const n = P.SLOTS.filter(q => saves[q] && saves[q].meta).length;
+      if (n){
+        if (UIM.askClear){
+          k.text(l, t("slotClearSure").replace("{N}", n), mx, my + 8, {size:12.5, color:"bad", w:mw - 220, max:2});
+          const dl = `[[trash-2]] ${t("slotDelSure")}`, dw = W.btnW(dl, {size:12.5}), cl = t("cancel"), cw2 = W.btnW(cl, {size:12.5});
+          W.btn(l, "clr-yes", mx + mw - dw - cw2 - 8, my, dl, () => { P.SLOTS.forEach(q => { if (saves[q] && saves[q].meta) P.deleteSlot(q); }); UIM.askClear = false; UIM.msg = t("slotCleared"); UIM.err = false; k.dirty(); }, {kind:"danger", size:12.5, h:32});
+          W.btn(l, "clr-no", mx + mw - cw2, my, cl, () => { UIM.askClear = false; k.dirty(); }, {kind:"ghost", size:12.5, h:32});
+        } else { const cl = `[[trash-2]] ${t("slotClear")}`; W.btn(l, "clr", mx + mw - W.btnW(cl, {size:12.5}), my, cl, () => { UIM.askClear = true; k.dirty(); }, {kind:"ghost", size:12.5, h:32}); }
+        my += 40;
+      }
     }
   }
-  y += 8;
-  if (UIM.msg){ k.text(l, UIM.msg, x, y, {size:12.5, color:UIM.err ? "bad" : "good", w}); y += 24; }
-  let bx = x;
-  bx += W.btn(l, "ptut", bx, y, `[[graduation-cap]] ${t("tutMenu")}`, () => Screens.openTutorial(0, false), {kind:"ghost"}) + 8;
-  bx += W.btn(l, "plearn", bx, y, `[[book-open]] ${t("mLearn")}`, () => Screens.openLearn(), {kind:"ghost"}) + 8;
-  if (!k.touch) bx += W.btn(l, "pkeys", bx, y, `[[keyboard]] ${S.lang === "th" ? "ปุ่มลัด" : "Shortcuts"}`, () => Screens.openKeys(), {kind:"ghost"}) + 8;   // 3.9
-  y += 44;
-  W.btn(l, "pmain", x, y, t("pMain"), () => Screens.toMenu(), {kind:"ghost"});
-  if (P.hasKeyboard()) k.text(l, t("keysHelp"), x, y + 46, {font:"mono", size:10.5, color:"muted", w});
-  return y + 36 + (P.hasKeyboard() ? 50 : 20);
+  if (UIM.msg){ my += k.text(l, UIM.msg, mx, my, {size:12.5, color:UIM.err ? "bad" : "good", w:mw}).h + 8; }
+  return Math.max(sideBottom, my) + 14;
 };
 
 /* ---------------- tutorial (real screenshots) ---------------- */
@@ -529,4 +631,13 @@ Screens.mKeys = function(l, pw){
     y += rowH + 10;
   }
   return y + 10;
+};
+
+/* 2.1.3: after a win, keep playing the same world with no end year (like web G.continueWorld) */
+Screens.continueWorld = function(){
+  if (S.over !== "win") return;
+  S.world = true; S.worldStart = S.tick; S.over = null; S.era = "heal"; S.firstNZ = S.firstNZ || S.tick; UIM.reward = null; UIM.modal = null;
+  if (P.addLog) P.addLog(`[[sprout]] ${t("worldCont")}`, "gd");
+  P.autosave(); Audio.stopAmb(400); if (Audio.setMood) Audio.setMood("calm", true); if (P.Ach) P.Ach.unlock("world1");
+  P.Map.refresh && P.Map.refresh(); k.dirty();
 };

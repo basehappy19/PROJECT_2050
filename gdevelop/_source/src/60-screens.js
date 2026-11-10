@@ -265,6 +265,7 @@ Object.assign(Screens, {
   /* ---- keyboard (PC) ---- T = skills · Esc = close · Space = pause · 1/2/3 = speed · H = whole world · +/− = zoom · R = regions · S = stats · N = news */
   key(name){
     if (this.kind !== "game"){
+      if (name === "f" && this.kind === "menu" && !UIM.sub){ this.fullscreen(); return; }
       if (name === "esc"){ if (UIM.modal === "tutorial") this.tutAct("skip"); else if (UIM.modal === "learn") this.closeLearn(); else if (UIM.sub){ UIM.sub = null; UIM.msg = ""; k.dirty(); } }
       return;
     }
@@ -292,6 +293,7 @@ Object.assign(Screens, {
     if (name === "p" && S.started && !S.over && !S.event && !S.simple && (!m || m === "politics" || m === "skills")){ if (m === "politics") this.closeWin(); else { Audio.play("open"); this.openWin("politics"); } return; }
     if (name === "m" && S.started && !S.over && !S.event && S.oreOn && (!m || m === "market" || m === "skills")){ if (m === "market") this.closeWin(); else { Audio.play("open"); this.openWin("market"); } return; }
     if (name === "v"){ this.muteAll(); return; }
+    if (name === "f"){ this.fullscreen(); return; }   // 2.1.3: like the website (F = full screen)
     if (m && m !== "skills") return;
     if (name === "space"){ if (S.started && !S.over && !S.event) P.setSpeed(S.speed === 0 ? (UIM.prevSpeed || 1) : (UIM.prevSpeed = S.speed, 0)); }
     else if (name === "1" || name === "2" || name === "3"){ if (S.started && !S.over) P.setSpeed(+name); }
@@ -316,6 +318,16 @@ Object.assign(Screens, {
       if (a && P.abilityReady(a) && P.useAbility(a.id)) Audio.play("powerup"); else Audio.play("error");
     }
     k.dirty();
+  },
+  /* 2.1.3: full screen (browser / itch.io page / desktop app), like the website's G.fullscreen */
+  fsOK(){ return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled); },
+  isFull(){ return !!(document.fullscreenElement || document.webkitFullscreenElement); },
+  fullscreen(){
+    try {
+      if (this.isFull()) (document.exitFullscreen || document.webkitExitFullscreen).call(document);
+      else { const el = document.documentElement; (el.requestFullscreen || el.webkitRequestFullscreen).call(el); }
+    } catch(e){}
+    setTimeout(() => k.dirty(), 300);
   },
   openKeys(){ UIM.keysFrom = UIM.modal; UIM.modal = "keys"; Audio.play("open"); const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); },
   closeKeys(){ UIM.modal = UIM.keysFrom || null; UIM.keysFrom = null; Audio.play("close"); k.dirty(); },
@@ -376,7 +388,7 @@ Object.assign(Screens, {
     if (this.kind === "game"){
       const v = scene.getVariables();
       v.get("Running").setNumber(P.running() ? 1 : 0);
-      v.get("TickSeconds").setNumber(P.SPEEDS[S.speed] || 4);
+      v.get("TickSeconds").setNumber((P.secPerMonth ? P.secPerMonth(S.speed) : P.SPEEDS[S.speed]) || 4);   // 2.1.3: Fast mode runs faster (like the website)
       if (S.started && !S.over){ S.realSec += dt; const sec = Math.floor(S.realSec); if (sec !== this._sec && UIM.modal === "pause"){ this._sec = sec; k.dirty("Modal"); } }
       if (S.event && UIM.evAt && UIM.eventLockFrac() < 1){ k.dirty("Modal"); this._lockDirty = true; } else if (this._lockDirty){ this._lockDirty = false; k.dirty("Modal"); }
       if (UIM.modal === "story" && performance.now() - (UIM.storyT || 0) < 700) k.dirty("Modal");

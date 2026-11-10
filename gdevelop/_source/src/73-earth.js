@@ -282,6 +282,9 @@ const Globe = {
   /* where the globe sits on the menu: right of the menu panel on wide screens, centred on narrow ones (like web/src/ui/menu.jsx) */
   menuCircle(panel){
     const dw = Kit.W || 1920, H = Kit.H || 1080, wide = dw >= H * 1.25;   // screen size in design units
+    // 2.1.3: like web menuFrame() on screens ≥ 900 px: centre at 70 % of the width, camera distance 4.0 (3.6 on very wide
+    // screens) = a circle of 0.45 (0.50) × the height; the menu panel overlaps its left edge
+    if (wide && dw >= 900) return {x:dw * .7, y:H / 2, r:H * (dw / H > 1.9 ? .5 : .45)};
     return wide ? {x:(panel + dw) / 2, y:H / 2, r:Math.min(H * .42, (dw - panel) * .44)} : {x:dw / 2, y:H * .3, r:Math.min(dw * .42, H * .26)};
   },
   /* 3.8: on the loading screen: big, on the left of the text (like web/src/app.jsx loaderFrame) */
@@ -318,7 +321,7 @@ const Globe = {
     if (!this.root) return;
     const now = performance.now() / 1000, m = Kit.mouse;
     if (this.leave){
-      const L = this.leave; L.t += Math.min(50, dt * 1000);   // capped steps, so a slow frame doesn't skip the glide
+      const L = this.leave; L.t += Math.min(120, dt * 1000);   // capped steps, so a slow frame doesn't skip the glide
       if (L.t >= L.ms && !L.gone){ L.gone = true; P._globeCarry = {spin:this.spin + dt * .045, tiltX:this.tiltX, vel:this.vel}; L.done && L.done(); }
     }
     if (this.fly){

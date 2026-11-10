@@ -49,11 +49,11 @@ Screens.renderHUD = function(l){
     if (i) k.rect(l, x, by + 9, 1, KPI_H - 18, "line");
     if (hov) k.rect(l, x + 3, by + 3, KPI_W - 6, KPI_H - 6, "accent", {r:9, a:.1});
     if (danger) k.rect(l, x + 3, by + 3, KPI_W - 6, KPI_H - 6, null, {r:9, stroke:"bad"});
-    k.icon(l, q.ic, x + 9, by + 11, 24);
-    k.text(l, q.k, x + 40, by + 4, {size:10.5, color:"muted", w:KPI_W - 60, max:1});
-    const vr = k.text(l, q.v, x + 40, by + 18, {font:"monoB", size:18, color:q.c});
+    k.icon(l, q.ic, x + 8, by + 9, 28);
+    k.text(l, String(q.k).replace(/\[\[[^\]]*\]\]\s*/g, ""), x + 42, by + 4, {size:10.5, color:"muted", w:KPI_W - 60, max:1});
+    const vr = k.text(l, q.v, x + 42, by + 16, {font:"monoB", size:20, color:q.c});
     if (q.meter !== undefined) W.meter(l, x + 44 + vr.w, by + 29, Math.max(18, KPI_W - 66 - vr.w), 4, q.meter, acls);
-    else if (q.s) k.text(l, q.s, x + 46 + vr.w, by + 24, {font:"mono", size:10, color:q.sc || "muted", w:KPI_W - 52 - vr.w, max:1});
+    else if (q.s && q.id === "ep" && sanct) k.text(l, q.s, x + 48 + vr.w, by + 24, {font:"mono", size:10, color:q.sc || "muted", w:KPI_W - 52 - vr.w, max:1});
     if (q.an && q.an.d){ const dd = q.an.d, lab = `${dd > 0 ? "+" : "−"}${Math.abs(Math.round(dd))}`; k.text(l, lab, x + 40 + vr.w + 2, by + 6 - q.an.rise, {font:"monoB", size:11, color:dd > 0 ? "good" : "bad", a:q.an.fa}); }
     if (q.badge){ k.circle(l, x + 32, by + 12, 7, "bad"); k.text(l, q.badge, x + 25, by + 4, {font:"monoB", size:10, color:"#ffffff", w:14, align:"center"}); }
     if (q.fn){ k.icon(l, "chevron-down", x + KPI_W - 18, by + 16, 13, "muted"); k.hit(l, "kpi-" + q.id, x, by, KPI_W, KPI_H, () => { Audio.play("open"); q.fn(); }); }
@@ -138,25 +138,29 @@ Screens.renderHUD = function(l){
   // tabs (right)
   const tabs = [["tech", "network", "nbTech", "T"], ["region", "map", "nbRegion", "R"], ["stats", "chart-line", "nbStats", "S"], ["news", "newspaper", "nbNews", "N"]];
   const readyCount = P.SKILLS.filter(n => P.nodeState(n) === "ready" && (P.canAfford ? P.canAfford(n) : true)).length;
-  let widths = tabs.map(([id, ic, key]) => { const lab = P.up(t(key)); return 14 + 16 + 6 + k.textW(lab, {font:"dispS", size:13}) + 14 + (id === "tech" && readyCount ? 26 : 0) + (keys ? 20 : 0); });
+  // web Bottom(): green = skills ready to buy, purple = unread news / a new yearly report
+  const badges = {tech:readyCount, news:S.unread || 0, stats:S.report && !S.report.read ? "!" : 0};
+  let widths = tabs.map(([id, ic, key]) => { const lab = P.up(t(key)); return 14 + 16 + 6 + k.textW(lab, {font:"dispS", size:13}) + 14 + (badges[id] ? 26 : 0); });
   // 3.7.3: when the Net Zero bar would be squeezed, the four tabs show icons only (the badge sits on the icon)
   const compact = (k.W - 14 - widths.reduce((a, b) => a + b, 0) - 18) - (14 + 3 * 34 + 18) < 560;
   if (compact) widths = tabs.map(() => 46);
-  let nx = (k.W - 14) - widths.reduce((a, b) => a + b, 0) - 6 * (tabs.length - 1);
-  const tabsX = nx;
+  let nx = (k.W - 14 - 3) - widths.reduce((a, b) => a + b, 0) - 2 * (tabs.length - 1);
+  const tabsX = nx - 3;
+  W.glass(l, tabsX, ny, k.W - 14 - tabsX, nh, 10);
   tabs.forEach(([id, ic, key, kk], i) => {
     const on = id === "tech" ? UIM.modal === "skills" : S.tab === id, hov = k.isHover(l, "tab-" + id), w = widths[i];
-    k.rect(l, nx, ny, w, nh, on ? "accent" : "glass", {a:on ? 1 : .9, r:10, stroke:on ? "accent" : hov ? "accent" : "line", bg:true});
+    if (on || hov) k.rect(l, nx, ny + 3, w, nh - 6, on ? "accent" : "#ffffff", {a:on ? 1 : .06, r:8});
     const col = on ? "ink" : "fg";
     k.icon(l, ic, nx + (compact ? 15 : 14), ny + 12, 16, col);
-    if (!compact){ const tx = W.runs(l, nx + 36, ny + 10, [[P.up(t(key)), {font:"dispS", size:13, color:col}]]); if (keys && !on) W.key(l, tx + 6, ny + 13, kk); }
-    if (compact && id === "tech" && readyCount){ k.circle(l, nx + w - 9, ny + 9, 8, "good"); k.text(l, String(readyCount), nx + w - 17, ny + 2, {font:"mono", size:10, color:"#04130c", w:16, align:"center"}); }
-    else if (id === "tech" && readyCount){ const bx2 = nx + w - 14 - 20; k.rect(l, bx2, ny + 11, 20, 18, "good", {r:9}); k.text(l, String(readyCount), bx2, ny + 12, {font:"mono", size:11, color:"#04130c", w:20, align:"center"}); }
+    if (!compact){ const tx = W.runs(l, nx + 36, ny + 10, [[P.up(t(key)), {font:"dispS", size:13, color:col}]]); }
+    const bg = badges[id], bcol = id === "tech" ? "good" : "purple", bink = id === "tech" ? "#04130c" : "#1a1030";
+    if (compact && bg){ k.circle(l, nx + w - 9, ny + 9, 8, bcol); k.text(l, String(bg), nx + w - 17, ny + 2, {font:"mono", size:10, color:bink, w:16, align:"center"}); }
+    else if (bg){ const bx2 = nx + w - 14 - 20; k.rect(l, bx2, ny + 11, 20, 18, bcol, {r:9}); k.text(l, String(bg), bx2, ny + 12, {font:"mono", size:11, color:bink, w:20, align:"center"}); }
     k.hit(l, "tab-" + id, nx, ny, w, nh, () => Screens.setTab(id));
-    nx += w + 6;
+    nx += w + 2;
   });
   // Net Zero + warming (centre, between zoom and tabs)
-  const left = 14 + 3 * 34 + 8 + 10, room = tabsX - 10 - left, mw = Math.min(600, room), mx = Math.max(left, k.W / 2 - mw / 2 + Math.min(0, (tabsX - 10) - (k.W / 2 + mw / 2)));
+  const left = 14 + 3 * 34 + 8 + 10, room = tabsX - 10 - left, mw = Math.min(700, room), mx = Math.max(left, k.W / 2 - mw / 2 + Math.min(0, (tabsX - 10) - (k.W / 2 + mw / 2)));
   W.glass(l, mx, ny, mw, nh, 10); this._metersRect = {x:mx, y:ny, w:mw, h:nh};
   const half = (mw - 24 - 18) / 2;
   this.meterRowNZ(l, mx + 12, ny + 11, half);
@@ -200,8 +204,8 @@ Screens.abilityBar = function(l, x, y){
   const w = 54, h = 62 + list.length * 48;
   W.glass(l, x, y, w, h, 12);
   W.portrait(l, x + 5, y + 5, 44, S.char);
-  k.rect(l, x + 30, y + 37, 22, 15, "bg", {r:4, stroke:ch.color, bg:true});
-  k.text(l, String(S.charLv), x + 30, y + 37, {font:"monoB", size:10, color:ch.color, w:22, align:"center"});
+  // level tag at the portrait's lower right like the website (drawn on the Alerts layer, above the portrait picture)
+  (this._hudTips = this._hudTips || []).unshift(tl => { k.circle(tl, x + 47, y + 46, 8, "good", {stroke:"bg", sw:2}); k.text(tl, String(S.charLv), x + 39, y + 39, {font:"monoB", size:10, color:"#04130c", w:16, align:"center"}); });
   k.hit(l, "charinfo", x, y, w, 54, () => { UIM.abTip = UIM.abTip === "char" ? null : "char"; k.dirty("HUD"); }, {cursor:true});
   let yy = y + 60;
   list.forEach(a => {
@@ -313,6 +317,7 @@ Screens.renderMapUI = function(l){
   this._edgeAnim = false;
   if (this.kind === "game" && this.placeGrid) this.placeGrid(l);   // Continuous World: the hex grid under everything else
   if (this.kind === "game" && this.drawSeason) this.drawSeason(l);   // 3.7.4: snow, rain, smoke and heat haze of the season
+  if (this.kind === "game" && this.drawDetail) this.drawDetail(l);   // 2.1.3: smokestacks and sea chokepoints (web drawDetail)
   if (this.kind === "game" && this.drawRigs) this.drawRigs(l);   // 3.6: oil rigs and their flares
   if (this.kind === "game" && this.drawPins) this.drawPins(l);   // builds pinned on the map
   if (this.kind === "game" && this.drawTrains) this.drawTrains(l);   // 3.6: high-speed trains

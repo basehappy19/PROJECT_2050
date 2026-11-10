@@ -147,14 +147,14 @@ Screens.mYear = function(l, pw){
   const r = UIM.yearRec; if (!r) return 80;
   const T2 = P.UI2, good = !!r.g, x = 20, w = pw - 40, col = good ? "good" : "bad"; let y = 18;
   k.text(l, P.up(`[[${good ? "trending-up" : "trending-down"}]] ${L(T2.yrTitle)} ${r.y}`), x, y, {font:"mono", size:11.5, color:col, iconColor:col}); y += 20;
-  const hh = k.text(l, good ? L(T2.yrGood) : L(T2.yrBad), x, y, {font:"disp", size:22, w:w - 130, lh:1.25}).h;
-  // score ring
-  const cx = x + w - 52, cy = 64, R = 40;
-  k.circle(l, cx, cy, R, "panel2");
-  for (let i = 0; i < 60; i++){ if (i / 60 > r.s / 100) break; const a = -Math.PI / 2 + i / 60 * Math.PI * 2; k.circle(l, cx + Math.cos(a) * (R - 5), cy + Math.sin(a) * (R - 5), 4, col); }
-  k.circle(l, cx, cy, R - 11, "panel");
-  k.text(l, String(r.s), cx - 30, cy - 15, {font:"disp", size:24, w:60, align:"center", color:col});
-  k.text(l, "/100", cx - 30, cy + 12, {font:"mono", size:10, w:60, align:"center", color:"muted"});
+  const hh = k.text(l, good ? L(T2.yrGood) : L(T2.yrBad), x, y, {font:"disp", size:26, w:w - 150, lh:1.25, color:col}).h;
+  // score ring (web Ring: 132 px)
+  const cx = x + w - 62, cy = 72, R = 54;
+  const arc = (f0, f1) => { const pts = []; for (let i = 0, n = Math.max(2, Math.ceil(72 * (f1 - f0))); i <= n; i++){ const a = -Math.PI / 2 + (f0 + (f1 - f0) * i / n) * Math.PI * 2; pts.push(cx + Math.cos(a) * (R - 6), cy + Math.sin(a) * (R - 6)); } return pts; };
+  k.path(l, arc(0, 1), "#ffffff", {w:11, a:.08});
+  if (r.s > 0) k.path(l, arc(0, Math.min(1, r.s / 100)), col, {w:11});
+  k.text(l, String(r.s), cx - 40, cy - 24, {font:"monoB", size:32, w:80, align:"center", color:"#ffffff"});
+  k.text(l, "/ 100", cx - 30, cy + 14, {font:"dispS", size:11, w:60, align:"center", color:col});
   y += Math.max(hh, 30) + 12;
   // numbers
   const nums = [[t("co2"), `${r.net.toFixed(1)} Gt`, "fg"], [L(T2.yrTarget), `≤ ${r.tgt.toFixed(1)} Gt`, "fg"], [L(T2.yrCut), `${r.cut > 0 ? "−" : "+"}${Math.abs(r.cut).toFixed(1)} Gt`, r.cut > 0 ? "good" : "bad"]];
@@ -166,9 +166,14 @@ Screens.mYear = function(l, pw){
   if (st){
     const sy = y;
     const who = st.who, npc = P.NPC && P.NPC[who], name = who === "news" ? "THE WORLD TIMES" : npc ? L(npc.name) : who === "adv" ? L(P.ADVISOR.name) : "";
-    const nh = k.text(l, name, x + 16, y + 12, {font:"dispS", size:13, color:npc ? npc.color : "purple"}).h;
-    const th2 = k.text(l, `“${L(st)}”`, x + 16, y + 14 + nh, {size:14, w:w - 32, lh:1.45}).h;
-    const ch = nh + th2 + 26; k.rect(l, x, sy, w, ch, "panel2", {r:12, stroke:"line", under:true});
+    // web .ystory: a newspaper tile (THE WORLD TIMES) or the speaker's portrait on the left
+    const scol = who === "news" ? "fg" : npc ? npc.color : "purple", ix = x + 14, tx2 = x + 14 + 64 + 14, tw2 = w - (tx2 - x) - 16;
+    const nh = k.text(l, name, tx2, y + 12, {font:"dispS", size:13, color:scol}).h;
+    const th2 = k.text(l, `“${L(st)}”`, tx2, y + 14 + nh, {size:14, w:tw2, lh:1.45}).h;
+    const ch = Math.max(92, nh + th2 + 26), iy = sy + (ch - 64) / 2;
+    k.rect(l, x, sy, w, ch, "panel2", {r:12, stroke:scol, sa:.45, under:true});
+    if (who === "news"){ k.rect(l, ix, iy, 64, 64, "#f1ece0", {r:10}); k.icon(l, "newspaper", ix + 15, iy + 15, 34, "#2a2a2a"); }
+    else W.portrait(l, ix, iy, 64, who);
     y += ch + 12;
   }
   // reward / cost
@@ -182,8 +187,9 @@ Screens.mYear = function(l, pw){
   k.text(l, pt, x + w - 12 - pw2, y + 11, {font:"monoB", size:13, color:col});
   y += 52;
   const ng = (S.years || []).filter(q => q.g).length;
-  k.text(l, `${L(T2.yrGoodYears)} ${ng} / ${(S.years || []).length}`, x, y + 9, {size:12, color:"muted"});
   const nl = `${L(T2.yrNext)} [[chevron-right]]`, nw = W.btnW(nl);
+  W.runs(l, x, y - 2, [[`${L(T2.yrGoodYears)} `, {size:12, color:"muted"}], [String(ng), {font:"monoB", size:12, color:"good"}], [` / ${(S.years || []).length}`, {size:12, color:"muted"}]]);
+  W.yearStrip(l, x, y + 18, w - nw - 18, {cur:r.y});   // web YearStrip: 25 squares, 2026 … 2050
   W.btn(l, "yearnext", x + w - nw, y, nl, () => Screens.closeWin());
   y += 46;
   y += k.text(l, L(T2.yrHow), x, y, {size:11, color:"muted", w, lh:1.35}).h;

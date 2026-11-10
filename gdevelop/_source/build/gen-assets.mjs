@@ -195,8 +195,46 @@ function countryGeo(){
 
 /* ---------------- render everything ---------------- */
 countryGeo();
+const ART_ALL = () => !process.argv.includes("--icons-geo") && !process.argv.includes("--portraits");
 const browser = await chromium.launch({executablePath:CHROME || "/opt/pw-browsers/chromium-1243/chrome-linux64/chrome"});
 const page = await browser.newPage();
+/* 2.1.3: the event pictures (the website's assets/img/events/<id>.webp, shown at the top of an event window) packed into a
+   few sheets: the web window shows the middle band (640 × 210) under a dark fade, so only that band is kept, 480 × 158.
+   Sheets keep the export under itch.io's file count; 63-modals.js (Screens.eventArt) cuts a picture out. */
+const EVS = path.resolve(HERE, "../../../assets/img/events");
+if (fs.existsSync(EVS) && (process.argv.includes("--events") || ART_ALL())){
+  const ids = fs.readdirSync(EVS).filter(f => f.endsWith(".webp")).map(f => f.slice(0, -5)).sort();
+  const FW = 480, FH = 158, COLS = 4, ROWS = 12, PER = COLS * ROWS, map = {};
+  fs.mkdirSync(`${OUT}/events`, {recursive:true});
+  for (const f of fs.readdirSync(`${OUT}/events`)) fs.unlinkSync(`${OUT}/events/${f}`);
+  for (let s = 0; s * PER < ids.length; s++){
+    const part = ids.slice(s * PER, (s + 1) * PER), urls = part.map(id => "data:image/webp;base64," + fs.readFileSync(`${EVS}/${id}.webp`).toString("base64"));
+    const data = await page.evaluate(async ([urls, FW, FH, COLS]) => {
+      const rows = Math.ceil(urls.length / COLS), c = document.createElement("canvas"); c.width = FW * COLS; c.height = FH * rows; const g = c.getContext("2d");
+      for (let i = 0; i < urls.length; i++){
+        const im = new Image(); im.src = urls[i]; await im.decode();
+        const x = (i % COLS) * FW, y = Math.floor(i / COLS) * FH, sh = im.width * FH / FW;   // cover: the middle band
+        g.drawImage(im, 0, (im.height - sh) / 2, im.width, sh, x, y, FW, FH);
+        const gr = g.createLinearGradient(0, y, 0, y + FH); gr.addColorStop(.25, "rgba(10,24,30,0)"); gr.addColorStop(.7, "rgba(10,24,30,.75)"); gr.addColorStop(1, "rgba(10,24,30,1)");
+        g.fillStyle = gr; g.fillRect(x, y, FW, FH);
+      }
+      return c.toDataURL("image/jpeg", .82);
+    }, [urls, FW, FH, COLS]);
+    fs.writeFileSync(`${OUT}/events/events-${s}.jpg`, Buffer.from(data.split(",")[1], "base64"));
+    part.forEach((id, i) => { map[id] = [s, i % COLS, Math.floor(i / COLS)]; });
+  }
+  fs.writeFileSync(`${ROOT}/assetgen/eventart.json`, JSON.stringify({w:FW, h:FH, map}));
+  console.log("event art:", ids.length, "pictures in", Math.ceil(ids.length / PER), "sheets");
+  // the UN SDG tiles (web assets/img/sdg/goal-N.svg) as full-colour icons: [[$sdg-N]]
+  const SDG = path.resolve(HERE, "../../../assets/img/sdg");
+  if (fs.existsSync(SDG)) for (const f of fs.readdirSync(SDG).filter(f => /^goal-\d+\.svg$/.test(f))){
+    const svg = fs.readFileSync(`${SDG}/${f}`, "utf8"), url = "data:image/svg+xml;base64," + Buffer.from(svg).toString("base64");
+    const data = await page.evaluate(async url => { const im = new Image(); im.src = url; await im.decode(); const c = document.createElement("canvas"); c.width = c.height = 96; const g = c.getContext("2d");
+      g.beginPath(); g.roundRect(0, 0, 96, 96, 11); g.clip(); g.drawImage(im, 0, 0, 96, 96); return c.toDataURL("image/png"); }, url);
+    fs.writeFileSync(`${OUT}/icons3d/sdg-${f.match(/\d+/)[0]}.png`, Buffer.from(data.split(",")[1], "base64"));
+  }
+  if (process.argv.includes("--events")){ await browser.close(); process.exit(0); }
+}
 await page.setContent("<html><body></body></html>");
 async function render(svg, w, h, file, type = "png", quality = .9){
   const data = await page.evaluate(async ([svg, w, h, type, quality]) => {
@@ -227,7 +265,24 @@ async function webPortrait(src, file){
   }, url);
   fs.writeFileSync(file, Buffer.from(data.split(",")[1], "base64"));
 }
+/* 2.1.3: the character cards' photos (web .charcard .photo: 4 : 4.6, dark fade at the bottom; "-locked" = grey and dim) */
+async function webCard(src, file, locked){
+  const url = "data:image/jpeg;base64," + fs.readFileSync(src).toString("base64");
+  const data = await page.evaluate(async ([url, locked]) => {
+    const im = new Image(); im.src = url; await im.decode();
+    const W = 232, H = 267, c = document.createElement("canvas"); c.width = W; c.height = H; const g = c.getContext("2d");
+    if (locked) g.filter = "grayscale(.85) brightness(.55)";
+    const cw = im.height * 4 / 4.6; g.drawImage(im, (im.width - cw) / 2, 0, cw, im.height, 0, 0, W, H); g.filter = "none";
+    const gr = g.createLinearGradient(0, 0, 0, H); gr.addColorStop(.55, "rgba(6,16,21,0)"); gr.addColorStop(1, "rgba(6,16,21,.95)"); g.fillStyle = gr; g.fillRect(0, 0, W, H);
+    return c.toDataURL("image/jpeg", .86);
+  }, [url, locked]);
+  fs.writeFileSync(file, Buffer.from(data.split(",")[1], "base64"));
+}
 const PORTRAITS_ONLY = process.argv.includes("--portraits");
+if ((ART || PORTRAITS_ONLY) && fs.existsSync(WEBP)) for (const f of fs.readdirSync(WEBP).filter(f => /-(base|alt|gold)\.jpg$/.test(f))){
+  await webCard(`${WEBP}/${f}`, `${OUT}/portraits/card-${f}`, false);
+  if (f.endsWith("-base.jpg")) await webCard(`${WEBP}/${f}`, `${OUT}/portraits/card-${f.replace("-base.jpg", "-locked.jpg")}`, true);
+}
 if ((ART || PORTRAITS_ONLY) && fs.existsSync(WEBP)) for (const f of fs.readdirSync(WEBP).filter(f => f.endsWith(".jpg"))) await webPortrait(`${WEBP}/${f}`, `${OUT}/portraits/${f.replace(/\.jpg$/, ".png")}`);
 else if (ART){ for (const id of ["sci", "dip", "eco", "act"]) for (const o of ["base", "alt", "gold"]) await render(portrait(id, o), 256, 256, `${OUT}/portraits/${id}-${o}.png`); await render(portrait("adv", "base"), 256, 256, `${OUT}/portraits/adv.png`); }
 if (ART) for (const [k, f] of [["S", "end-win-S"], ["A", "end-win-A"], ["B", "end-win-B"], ["heat", "end-heat"], ["vote", "end-vote"], ["time", "end-time"]]) await render(ending(k), 1280, 720, `${OUT}/endings/${f}.jpg`, "jpg", .86);

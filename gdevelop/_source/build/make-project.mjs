@@ -31,10 +31,13 @@ for (const n of ICONS3D) img(`icons3d/${n}.png`, `assets/icons3d/${n}.png`);
 // 3.7.4: country flags (flag-icons, MIT; made from the website's assets/img/flags)
 const FLAGS = fs.existsSync(`${OUT}/assets/flags`) ? fs.readdirSync(`${OUT}/assets/flags`).filter(f => f.endsWith(".png")).sort() : [];
 for (const f of FLAGS) img(`flags/${f}`, `assets/flags/${f}`);
-const PORTRAITS = fs.readdirSync(`${OUT}/assets/portraits`).filter(f => f.endsWith(".png")).sort();
+const PORTRAITS = fs.readdirSync(`${OUT}/assets/portraits`).filter(f => /\.(png|jpg)$/.test(f)).sort();   // + card-*.jpg (character cards)
 for (const f of PORTRAITS) img(`portraits/${f}`, `assets/portraits/${f}`);
 const ENDS = fs.readdirSync(`${OUT}/assets/endings`).filter(f => f.endsWith(".jpg")).sort();
 for (const f of ENDS) img(`endings/${f}`, `assets/endings/${f}`);
+// 2.1.3: event pictures, packed in sheets by gen-assets.mjs --events (only the Game scene uses them)
+const EVSHEETS = fs.existsSync(`${OUT}/assets/events`) ? fs.readdirSync(`${OUT}/assets/events`).filter(f => f.endsWith(".jpg")).sort() : [];
+for (const f of EVSHEETS) img(`events/${f}`, `assets/events/${f}`);
 const TUTS = fs.readdirSync(`${OUT}/assets/tutorial`).filter(f => /\.(jpg|png)$/.test(f)).sort();
 for (const f of TUTS) img(`tutorial/${f}`, `assets/tutorial/${f}`);
 for (const f of fs.readdirSync(`${OUT}/assets/fonts`).filter(f => f.endsWith(".ttf")).sort()) font(f.slice(0, -4), `assets/fonts/${f}`);
@@ -176,6 +179,7 @@ const MODULES = [
 const srcOf = f => (f.startsWith("@engine/") ? `${ENGINE}/${f.slice(8)}` : `${SRC}/${f}`);
 const COUNTRYGEO = fs.readFileSync(`${SOURCE}/assetgen/countrygeo.json`, "utf8");
 /* 2.3: the list of recorded narration lines, shared with the website (web/src/narr-files.js) */
+const EVENTART = (() => { try { return fs.readFileSync(`${SOURCE}/assetgen/eventart.json`, "utf8"); } catch(e){ return "null"; } })();
 const NARRFILES = (() => { try { const m = fs.readFileSync(`${REPO}/web/src/narr-files.js`, "utf8").match(/NARR_FILES\s*=\s*(\{[\s\S]*?\});/); return m ? JSON.stringify(JSON.parse(m[1])) : "{}"; } catch(e){ return "{}"; } })();
 const HEXCELLS = fs.existsSync(`${SOURCE}/assetgen/hexcells.json`) ? fs.readFileSync(`${SOURCE}/assetgen/hexcells.json`, "utf8") : "[]";
 const tutSizes = {};
@@ -196,7 +200,7 @@ const coreEvents = [
     js(`if (!window.P2050_API) window.P2050_API = ${JSON.stringify(API)};`),
     ...MODULES.map(([f, title]) => {
       let code = fs.readFileSync(srcOf(f), "utf8");
-      code = code.replace("/*MAPMETA*/null", JSON.stringify(mapMetaSmall)).replace("/*TUTSIZES*/{}", JSON.stringify(tutSizes)).replace("/*COUNTRYGEO*/null", COUNTRYGEO).replace("/*HEXCELLS*/null", HEXCELLS).replace("/*NARRFILES*/{}", NARRFILES);
+      code = code.replace("/*MAPMETA*/null", JSON.stringify(mapMetaSmall)).replace("/*TUTSIZES*/{}", JSON.stringify(tutSizes)).replace("/*COUNTRYGEO*/null", COUNTRYGEO).replace("/*HEXCELLS*/null", HEXCELLS).replace("/*NARRFILES*/{}", NARRFILES).replace("/*EVENTART*/null", EVENTART);
       return js(`/* ${title} */\n` + code);
     }),
   ]),
@@ -239,7 +243,7 @@ const menuScene = scene("Menu", ["Backdrop", "", "MapUI", "Menu", "MenuScroll", 
   group("เปลี่ยนฉาก", goEvents(["Game", "Loading"])),
 ], commonVars);
 
-const gameScene = scene("Game", ["Backdrop", "", "MapUI", "HUD", "Drawer", "DrawerScroll", "Alerts", "Modal", "ModalScroll", "Toast", "Train"], mapObjects(), [backdrop(), ...mapInstances()], [
+const gameScene = scene("Game", ["Backdrop", "", "MapUI", "HUD", "Drawer", "DrawerScroll", "Alerts", "Modal", "ModalScroll", "Toast", "Train"], [...mapObjects(), sprite("EventArt", EVSHEETS.map(f => anim(f.slice(0, -4), `events/${f}`)))], [backdrop(), ...mapInstances()], [
   comment("ฉากเล่นเกม: 1 tick = 1 เดือนในเกม (ความเร็ว 1× = 4 วินาที, 2× = 2 วินาที, 3× = 1.33 วินาที) รวม 300 เดือน ม.ค. 2026 → ธ.ค. 2050\nตัวแปรฉาก Running = 1 เมื่อเวลาควรเดิน (ไม่ได้หยุด และไม่มีหน้าต่างตัดสินใจเปิดอยู่)"),
   std([atStart], [A("ResetTimer", ["", "\"tick\""])], [js("if (!window.P2050 || !window.P2050.ready) { runtimeScene.getVariables().get(\"GoTo\").setString(\"Loading\"); return; }\nwindow.P2050.Screens.setup(runtimeScene, \"game\");")]),
   frameJs,
@@ -271,7 +275,7 @@ const project = {
     packageName:"com.project2050.climategame", pixelsRounding:false, projectUuid:"",   /* empty: no GDevelop analytics calls from the game */ scaleMode:"linear", sizeOnStartupMode:"", templateSlug:"", version:"2.0.0",
     name:"Project Zero", description:"เกมวางแผนกลยุทธ์ นำโลกสู่ Net Zero ก่อนสิ้นปี 2050 (SDG 13) — Garena Academy Game Maker",
     author:"ทีมส่งงานวินาทีสุดท้ายเพราะไส้กรอกในสะดวกซื้อหมดแล้วหมดกำลังใจในการปั่นโปรเจกต์",
-    windowWidth:1920, windowHeight:1080, latestCompilationDirectory:"", maxFPS:60, minFPS:20, verticalSync:false, platformSpecificAssets:{},
+    windowWidth:1920, windowHeight:1080, latestCompilationDirectory:"", maxFPS:60, minFPS:10, verticalSync:false, platformSpecificAssets:{},
     loadingScreen:{backgroundColor:0x050b10, backgroundFadeInDuration:0.2, backgroundImageResourceName:"", gdevelopLogoStyle:"light", logoAndProgressFadeInDuration:0.2, logoAndProgressLogoFadeInDelay:0, minDuration:1, progressBarColor:0x8fd0ff, progressBarHeight:12, progressBarMaxWidth:300, progressBarMinWidth:40, progressBarWidthPercent:30, showGDevelopSplash:true, showProgressBar:true},
     watermark:{placement:"bottom-left", showWatermark:false},
     authorIds:[], authorUsernames:[], categories:["strategy", "simulation", "educational"], playableDevices:["keyboard", "mobile"], extensionProperties:[],

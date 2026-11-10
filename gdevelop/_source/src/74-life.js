@@ -220,9 +220,9 @@ Screens.drawSeason = function(l){
     const a0 = toWorld(la1, lo0), a1 = toWorld(la0, lo1), [x0, y0] = M.toScreen(a0[0], a0[1]), [x1, y1] = M.toScreen(a1[0], a1[1]);
     const cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, rx = Math.abs(x1 - x0) / 2, ry = Math.abs(y1 - y0) / 2;
     if (cx + rx < 0 || cx - rx > k.W || cy + ry < 0 || cy - ry > k.H || rx < 4) return;
-    const col = SEA_COL[kind], a = (kind === "heat" ? .07 + .02 * Math.sin(t * 1.3 + ai) : kind === "snow" ? .06 : .09) * kk * fade;
-    // a soft oval: a few overlapping circles, fainter toward the edge
-    const n0 = Math.max(1, Math.round(rx / ry)); for (let i = 0; i < n0; i++){ const px = cx - rx + ry + (n0 > 1 ? i * (2 * rx - 2 * ry) / (n0 - 1) : rx - ry); k.circle(l, px, cy, ry, col, {a}); k.circle(l, px, cy, ry * .6, col, {a:a * .8}); }
+    const col = SEA_COL[kind], a = (kind === "heat" ? .22 + .06 * Math.sin(t * 1.3 + ai) : kind === "smoke" ? .28 : kind === "rain" ? .3 : .22) * kk * fade;
+    // a soft oval that fades out toward its edge (web: radial gradient), no hard circle edges
+    k.glow(l, cx, cy, rx, ry, col, Math.min(.6, a * 1.15));
     if (kind === "heat") return;
     moving = true;
     const n = Math.round((kind === "smoke" ? 12 : kind === "snow" ? 50 : 40) * kk), sc = clamp(Math.sqrt(rx * ry) / 90, .7, 1.6);
@@ -236,4 +236,46 @@ Screens.drawSeason = function(l){
     }
   });
   if (moving && run) this._edgeAnim = true;   // redraw the map layer a few times a second while it rains / snows
+};
+
+/* ---------- 2.1.3: a more lived-in map, like the website's drawDetail (web/src/mapfx.js) ----------
+   · smokestacks at the big industrial hubs (from continent view): they smoke as much as their continent still emits and
+     turn green with a leaf when it is clean · the sea chokepoints ships use, red when an event closes them */
+const CHOKE_PT = {suez:[30.6, 32.35], redsea:[12.6, 43.4], panama:[9.1, -79.7], hormuz:[26.6, 56.3], malacca:[2.6, 101.2]};
+let hubPts = null;
+Screens.drawDetail = function(l){
+  if (!S.regions || lowGfx()) return;
+  const M = Map, z = M.cam.z, rr0 = (k.W - 16) - (this.drawerWidth ? this.drawerWidth() : 0);
+  const vis = (x, y, m) => x > -m && x < rr0 + m && y > 50 - m && y < k.H - 56 + m;
+  if (!hubPts && P.CITIES) hubPts = Object.entries(P.CITIES).flatMap(([reg, list]) => list.map(([lat, lon, w], i) => ({reg, lat, lon, w, ph:i * 1.7})));
+  const now = performance.now() / 1000, run = S.speed > 0 && !S.event;
+  if (hubPts && z >= 1.25){
+    const regs = {}; for (const r of S.regions) regs[r.id] = r;
+    const s = clamp(10 + 6 * Math.sqrt(z), 18, 32);
+    let smoke = false;
+    for (const h of hubPts){
+      const [x, y] = M.latlonScreen(h.lat, h.lon); if (!vis(x, y, 30)) continue;
+      const r = regs[h.reg]; if (!r) continue;
+      const kk = clamp(r.co2 / r.co2_0, 0, 1.3), on = kk > .22, sx = x + 12, sy = y + 8;
+      const st = on ? "#e6ecf0" : "#c8ffdc", fill = on ? "#3c4349" : "#1f5a3c";
+      // a small factory: hall + two chimneys, dark outline so it reads on any ground
+      k.rect(l, sx - s * .45, sy - s * .32, s * .7, s * .32, fill, {stroke:st, sw:1.4, sa:.85});
+      k.rect(l, sx - s * .05, sy - s * .95, s * .16, s * .63, fill, {stroke:st, sw:1.4, sa:.85});
+      k.rect(l, sx + s * .2, sy - s * .75, s * .13, s * .43, fill, {stroke:st, sw:1.4, sa:.85});
+      k.rect(l, sx - s * .05, sy - s * .95, s * .16, s * .1, on ? "#c8402e" : "#3fae6a");
+      if (on){ smoke = true; for (let i = 0; i < 4; i++){ const q = (now * .3 + i / 4 + h.ph) % 1, rq = s * (.12 + q * .38) * (.6 + Math.min(1, kk) * .5);
+        k.circle(l, sx + .03 * s + q * s * .8, sy - s * .98 - q * s * 1.5, rq, "#787470", {a:(1 - q) * .6 * Math.min(1, kk + .2)}); } }
+      else k.icon(l, "leaf", sx - 2, sy - s * 1.45, 12, "good");
+    }
+    if (smoke && run) this._edgeAnim = true;
+  }
+  if (z >= 1.1 && P.CHOKE){
+    for (const [key, [lat, lon]] of Object.entries(CHOKE_PT)){
+      const [x, y] = M.latlonScreen(lat, lon); if (!vis(x, y, 20)) continue;
+      const closed = ((S.closed || {})[key] || 0) > 0, col = closed ? "bad" : "sky";
+      k.circle(l, x, y, 8, "#061015", {a:.8, stroke:col, sw:1.5});
+      k.icon(l, closed ? "x" : "anchor", x - 6, y - 6, 12, col);
+      if (closed || z >= 2.2) k.text(l, L(P.CHOKE[key]), x - 60, y + 12, {font:"bodyB", size:10, color:col, w:120, align:"center", max:1});
+    }
+  }
 };

@@ -78,19 +78,21 @@ Screens.renderLoader = function(l){
 };
 
 /* ---------------- main menu ---------------- */
-const SUBW = {load:430, ach:640, account:480, shop:640, board:640, cert:540};
+// 2.1.3: like the website's .menu-panel: 28 px from the left, 20 px from the top and bottom, 460 wide (600 on a sub-page),
+// 26 px inside; every sub-page is the same width
+const SUBW = {};
 Screens.renderMenu = function(l){
   if (this.kind !== "menu"){ k.clearSlave("MenuScroll"); return; }
-  const sub = UIM.sub, w = SUBW[sub] || 430, x = 56;
+  const sub = UIM.sub, w = SUBW[sub] || (sub ? 548 : 408), x = 54;
   const shade = (this.scene.getObjects("MenuShade") || [])[0];
   if (shade) shade.setWidth((w + (w > 430 ? 420 : 200)) * k.K);
   let ch = 0; UIM._googleRect = null;
-  k.rect(l, x - 24, 16, w + 48, k.H - 32, "glass", {r:18, a:.9, stroke:"line", bg:true});
+  k.rect(l, x - 26, 20, w + 52, k.H - 40, "#061015", {r:18, a:.72, stroke:"line", bg:true});
   k.slave("MenuScroll", s => {
     ch = this.menuCard(s, w);
-    const top = 40;   // 3.x: content starts at the top of the panel, like the website
-    // scroll inside the panel only (it runs from y 16 to H − 16), so long pages never draw over its border
-    s.frame(x, top, {x:0, y:24, w:x + w + 40, h:k.H - 48}, ch + (top - 24) + 16);
+    const top = sub ? 38 : 46;   // 3.x: content starts at the top of the panel, like the website (26 px padding)
+    // scroll inside the panel only (it runs from y 20 to H − 20), so long pages never draw over its border
+    s.frame(x, top, {x:0, y:28, w:x + w + 40, h:k.H - 56}, ch + (top - 28) + 18);
   });
   Screens.menuPanelRight = x + w + 24;   // where the globe may start (73-earth.js)
   if (P.Net) P.Net.googleOverlay(UIM._googleRect);
@@ -130,13 +132,13 @@ const seenVer = () => { try { return localStorage.getItem(SEEN_KEY); } catch(e){
 Screens.menuCard = function(l, w){
   const sub = UIM.sub; let y = 0;
   if (sub){
-    // back arrow + page title (close / back always at the top)
+    // page title on the left, close ✕ on the right (web SubHead, 3.2)
     const hov = k.isHover(l, "subback");
-    k.rect(l, 0, y, 36, 36, "panel", {r:10, a:.92, stroke:hov ? "accent" : "line", bg:true});
-    k.icon(l, "chevron-left", 8, y + 8, 20, hov ? "accent" : "fg");
-    k.hit(l, "subback", 0, y, 36, 36, () => { Audio.play("click"); UIM.sub = sub === "cert" ? "ach" : null; UIM.msg = ""; k.dirty(); const s = k.L("MenuScroll"); if (s) s.scroll = 0; });
-    k.text(l, t(SUB_TITLES[sub]), 48, y + 5, {font:"dispS", size:20, w:w - 48, max:1});
-    y += 36 + 18;
+    k.text(l, t(SUB_TITLES[sub]), 0, y + 5, {font:"dispS", size:21, w:w - 48, max:1});
+    k.rect(l, w - 34, y + 2, 34, 34, "panel", {r:9, a:.92, stroke:hov ? "accent" : "line", bg:true});
+    k.icon(l, "x", w - 26, y + 10, 18, hov ? "accent" : "muted");
+    k.hit(l, "subback", w - 34, y + 2, 34, 34, () => { Audio.play("close"); UIM.sub = sub === "cert" ? "ach" : null; UIM.msg = ""; k.dirty(); const s = k.L("MenuScroll"); if (s) s.scroll = 0; });
+    y += 36 + 14;
     if (sub === "updates") try { localStorage.setItem(SEEN_KEY, P.VERSION_NAME); } catch(e){}
   } else {
     // logo + title

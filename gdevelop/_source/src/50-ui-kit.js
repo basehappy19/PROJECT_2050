@@ -222,6 +222,11 @@ const Kit = {
     if (fill != null) g.beginFill(hexNum(fill), o.a ?? 1); else g.beginFill(0, 0);
     g.drawCircle(x * K, y * K, r * K); g.endFill(); g.lineStyle(0);
   },
+  /* soft oval (like a canvas radial gradient: full in the middle, nothing at the edge), made of thin rings */
+  glow(l, x, y, rx, ry, fill, a = 1, n = 12){
+    const g = l.g, c = hexNum(fill), s = a / n; g.lineStyle(0);
+    for (let i = 0; i < n; i++){ const f = 1 - i / n; g.beginFill(c, s); g.drawEllipse(x * K, y * K, rx * f * K, ry * f * K); g.endFill(); }
+  },
   line(l, x1, y1, x2, y2, color, o = {}){
     const g = l.g; g.lineStyle({width:(o.w || 1) * K, color:hexNum(color), alpha:o.a ?? 1, cap:"round"});
     if (o.dash){
@@ -315,7 +320,9 @@ const Kit = {
   icon(l, name, x, y, size, color = "fg", alpha = 1){
     if (name && name[0] === "$"){ name = "3d-" + name.slice(1); color = "#ffffff"; }   // 3.x: full-colour 3D icon, never tinted
     const o = l.obj("UIIcon"), go = o.go, c = o.c;
-    if (c.name !== name){ go.setAnimationName(name); c.name = name; }
+    // a pooled icon that switches between a line icon (64 px) and a 3D icon (another size) must be sized again,
+    // or it shows too big and off its place (2.1.3 fix: chips in event choices, lists)
+    if (c.name !== name){ go.setAnimationName(name); c.name = name; c.s = null; }
     const s = size * K; if (c.s !== s){ go.setWidth(s); go.setHeight(s); c.s = s; }
     const col = hexNum(ICON_COL[color] ? COL[ICON_COL[color]] : color); if (c.col !== col){ go.setColor(`${(col >> 16) & 255};${(col >> 8) & 255};${col & 255}`); c.col = col; }
     const a = Math.round(alpha * 255); if (c.a !== a){ go.setOpacity(a); c.a = a; }
@@ -325,7 +332,7 @@ const Kit = {
   },
   sprite(l, type, anim, x, y, w, h, alpha = 1){
     const o = l.obj(type), go = o.go, c = o.c;
-    if (c.anim !== anim){ go.setAnimationName(anim); c.anim = anim; }
+    if (c.anim !== anim){ go.setAnimationName(anim); c.anim = anim; c.w = null; }   // pictures of another size: size again
     if (c.w !== w || c.h !== h){ go.setWidth(w * K); go.setHeight(h * K); c.w = w; c.h = h; }
     const a = Math.round(alpha * 255); if (c.a !== a){ go.setOpacity(a); c.a = a; }
     this._pos(o, x * K, y * K);
@@ -360,7 +367,10 @@ const Kit = {
   fit(game){
     const vw = window.innerWidth || 1280, vh = window.innerHeight || 720, a = vw / Math.max(1, vh);
     const gw = Math.round(Math.max(1920, Math.min(1080 * a, 1080 * 2.4)) / 2) * 2;
-    const k2 = Math.max(1.5, Math.min(1.5 * this.uiScale, gw / 1200)), key = gw + "|" + k2;
+    // 2.1.3: like the website, one design unit is one CSS pixel on computer/tablet screens (720–1080 px tall),
+    // so panels and text are the same size as on the web; shorter screens (phones) shrink the 720-unit layout as before
+    const kb = 1080 / Math.max(720, Math.min(1080, vh));
+    const k2 = Math.max(kb, Math.min(kb * this.uiScale, gw / 1200)), key = gw + "|" + k2;
     if (key === this._fitKey) return false;
     this._fitKey = key;
     const kChanged = k2 !== K;

@@ -20,7 +20,6 @@ Screens.renderDrawer = function(l){
   let tx = x + 14;
   if (S.tab === "region" && S.selC){ W.hbtn(l, "dback", x + 10, y + 7, "arrow-left", () => { Audio.play("click"); S.selC = null; P.Map.focus(S.sel, false); P.changed(); }, {color:"muted"}); tx = x + 48; }
   k.text(l, P.up(title), tx, y + 11, {font:"dispS", size:14});
-  if (P.hasKeyboard()) W.key(l, x + dw - 14 - 30 - 34, y + 15, "Esc");
   W.hbtn(l, "dclose", x + dw - 14 - 30, y + 7, "x", () => Screens.closeTab(), {color:"muted"});
   k.line(l, x, y + 44, x + dw, y + 44, "line");
   const clip = {x:x + 1, y:y + 45, w:dw - 2, h:h - 46};
@@ -40,16 +39,50 @@ Screens.renderDrawer = function(l){
 };
 
 /* region switcher (6 buttons) */
+/* 2.1.3: the regions as a row of chips with their short names, like the website (RegionButtons, rowscroll); they wrap
+   onto a second line instead of scrolling sideways */
+const RSHORT = {NA:{th:"อเมริกาเหนือ", en:"N. America"}, EU:{th:"สหภาพยุโรป", en:"EU"}, EA:{th:"เอเชียตะวันออก", en:"East Asia"},
+  SA:{th:"อเมริกาใต้", en:"S. America"}, MEAF:{th:"ตะวันออกกลาง-แอฟริกา", en:"Mid-East & Africa"}, SEA:{th:"เอเชียตะวันออกเฉียงใต้", en:"SE Asia"}};
 Screens.regionButtons = function(l, y, cw){
-  const bw = (cw - 10) / 3, bh = 32;
-  S.regions.forEach((x, i) => {
-    const bx = (i % 3) * (bw + 5), by = y + Math.floor(i / 3) * (bh + 5), on = x.id === S.sel && !S.selC, hov = k.isHover(l, "reg-" + x.id);
-    k.rect(l, bx, by, bw, bh, "panel2", {r:7, stroke:on || hov ? "accent" : "line", bg:true});
-    k.text(l, x.id, bx + 9, by + 7, {font:"mono", size:12, color:x.id === S.sel ? "accent" : "fg"});
-    const c = P.heatRGB(P.regionHeatValue(x)); k.circle(l, bx + bw - 13, by + bh / 2, 4.5, (c[0] << 16) | (c[1] << 8) | c[2]);
+  const bh = 30; let bx = 0, by = y;
+  S.regions.forEach(x => {
+    const on = x.id === S.sel && !S.selC, hov = k.isHover(l, "reg-" + x.id), nm = L(RSHORT[x.id] || RMETA[x.id].name);
+    const bw = k.textW(nm, {size:12.5}) + 20 + 17;
+    if (bx > 0 && bx + bw > cw){ bx = 0; by += bh + 6; }
+    k.rect(l, bx, by, bw, bh, "panel2", {r:6, stroke:on || hov ? "accent" : "line", bg:true});
+    k.text(l, nm, bx + 10, by + 6, {size:12.5, color:on ? "accent" : "fg"});
+    const c = P.heatRGB(P.regionHeatValue(x)); k.circle(l, bx + bw - 14, by + bh / 2, 4.5, (c[0] << 16) | (c[1] << 8) | c[2]);
     k.hit(l, "reg-" + x.id, bx, by, bw, bh, () => Screens.selectRegion(x.id, true));
+    bx += bw + 6;
   });
-  return 2 * (bh + 5) + 8;
+  return by - y + bh + 12;
+};
+/* web fxChips: an order's own description cut into short effect chips (so they always match the game data) */
+const FX_IC = [[/มิตรภาพ|friendship/i, "$heart"], [/CO₂/, "$co2"], [/ปรับตัว|adaptation|เสียหาย|damage/i, "shield"], [/ทรัพยากร|mineral/i, "gem"],
+  [/ทำตามแผน|on-plan/i, "clipboard-check"], [/ความนิยม|approval/i, "$appr"], [/เปราะบาง|vulnerab/i, "shield"], [/คว่ำบาตร|sanction/i, "ban"]];
+const plainT = s2 => String(s2).replace(/\[\[[^\]]*\]\]\s*/g, "");
+function fxChips(desc){
+  const txt = plainT(desc).replace(/\s*\([^)]*\)/g, "")
+    .replace(/ทรัพยากรที่ประเทศนี้มี/g, "ทรัพยากร").replace(/ภัยในประเทศนี้/g, "ภัย").replace(/มิตรภาพกับประเทศนี้/g, "มิตรภาพ")
+    .replace(/this country's minerals/gi, "Minerals").replace(/ with this country/gi, "").replace(/this country's\s*/gi, "").replace(/\s+/g, " ").trim();
+  const parts = txt.split(/\s*(?:,|;|และ|\sand\s|\sbut\s)\s*|(?<=[\d%])\s(?=มิตรภาพ|ความนิยม|ทำตามแผน|CO₂)|\s(?=แต่)/i).map(x => x.replace(/^(แต่|but|and)\s+|^แต่/i, "").trim()).filter(Boolean);
+  return parts.slice(0, 5).map(x => {
+    const bad = /คว่ำบาตร|sanction|ตอบโต้/i.test(x) || (/CO₂/.test(x) ? /\+\d/.test(x) : (/−|-\d/.test(x) && /มิตรภาพ|ทำตามแผน|ความนิยม|friendship|on-plan|approval/i.test(x)));
+    const icon = (FX_IC.find(([re]) => re.test(x)) || [0, "sparkles"])[1];
+    return {t:x, bad, icon};
+  });
+}
+/* chips in rows; returns the height (draw = false only measures) */
+W.fxChips = (l, x, y, w, desc, a = 1, draw = true) => {
+  let cx = x, cy = y;
+  for (const c of fxChips(desc)){
+    const col = c.bad ? "bad" : "good", tw = k.textW(c.t, {size:11.5}), cw2 = 7 + 13 + 3 + tw + 8;
+    if (cx > x && cx + cw2 > x + w){ cx = x; cy += 23; }
+    if (draw){ k.rect(l, cx, cy, Math.min(cw2, w), 19, col, {r:10, a:.08 * a, stroke:col, sa:.4 * a});
+      k.icon(l, c.icon, cx + 7, cy + 3, 13, col, a); k.text(l, c.t, cx + 23, cy + 1, {size:11.5, color:col, a, w:Math.min(tw + 2, w - 30), max:1}); }
+    cx += cw2 + 4;
+  }
+  return cy - y + 19;
 };
 const statGrid = (l, y, cw, stats) => {
   const sw = (cw - 6) / 2, sh = 52;
@@ -62,25 +95,27 @@ const statGrid = (l, y, cw, stats) => {
   return Math.ceil(stats.length / 2) * (sh + 6);
 };
 /* regional orders; scope = "region" | "country" */
+const ACT_IC = {fund:"zap", diplo:"globe", adapt:"shield-plus", tariff:"landmark"};
 Screens.orderCards = function(l, y, cw, scope){
   const r = P.R(S.sel);
   for (const a of ACTIONS){
     const cc = scope === "country";
-    const c = P.actionCost(a, r, cc), cd = r.cd[a.id] || 0, ok = !cd && S.ep >= c.ep && S.pc >= c.pc;
-    const btnW = 96, tw = cw - 22 - btnW - 10;
-    const h1 = k.text(l, L(a.name), 11, y + 9, {font:"bodyB", size:13.5, w:tw}).h;
-    const h2 = k.text(l, cc ? L(UI["cact_" + a.id]) : L(a.desc), 11, y + 9 + h1, {size:11.5, color:"muted", w:tw, max:1}).h;   // 3.3: one line each
-    const tilt = P.tiltOfAction ? P.tiltOfAction(a.id) : null, h3 = tilt && tilt.length ? 18 : 0;
-    if (h3) W.groupTilt(l, 11, y + 9 + h1 + h2 + 2, tilt);
-    const ch = Math.max(8 + h1 + h2 + h3 + 8, 50);
-    W.card(l, 0, y, cw, ch);
-    W.buyBtn(l, "act-" + a.id, cw - 11 - btnW, y + (ch - 40) / 2, c, cd, ok, () => P.doAction(a.id, scope));
-    y += ch + 7;
+    const c = P.actionCost(a, r, cc), cd = r.cd[a.id] || 0, ok = !cd && S.ep >= c.ep && S.pc >= c.pc, al = ok ? 1 : .7;
+    const btnW = 96, tx = 2 + 18 + 9, tw = cw - tx - btnW - 9, desc = cc ? L(UI["cact_" + a.id]) : L(a.desc);
+    const h1 = k.textH(L(a.name), {font:"dispS", size:13.5, w:tw});
+    const h2 = W.fxChips(null, tx, 0, tw, desc, 1, false);
+    const tilt = P.tiltOfAction ? P.tiltOfAction(a.id) : null, h3 = tilt && tilt.length ? 20 : 0;
+    const ch = Math.max(8 + h1 + 4 + h2 + (h3 ? 4 + h3 : 0) + 8, 52);
+    k.icon(l, a.icon || ACT_IC[a.id] || "megaphone", 2, y + ch / 2 - 9, 18, ok ? "accent" : "muted");
+    k.text(l, L(a.name), tx, y + 8, {font:"dispS", size:13.5, w:tw, a:al});
+    W.fxChips(l, tx, y + 8 + h1 + 4, tw, desc, al);
+    if (h3) W.groupTilt(l, tx, y + 8 + h1 + 4 + h2 + 4, tilt, al);
+    W.buyBtn(l, "act-" + a.id, cw - btnW, y + (ch - 40) / 2, c, cd, ok, () => P.doAction(a.id, scope));
+    k.line(l, 0, y + ch, cw, y + ch, "line", {a:.6});
+    y += ch + 1;
   }
   return y;
 };
-
-/* 3.9: one size for every buy button (one price, two prices, short of money, waiting) */
 W.buyBtn = (l, id, x, y, cost, cd, ok, fn) => {
   const w = 96, h = 40, hov = ok && !cd && k.isHover(l, id);
   const price = [cost.ep ? `[[$money]]${cost.ep}` : "", cost.pc ? `[[$policy]]${cost.pc}` : "", cost.ore ? `[[$ore]]${cost.ore}` : ""].filter(Boolean).join(" ");
@@ -152,8 +187,14 @@ const COL_FALLBACK = "#4fd1c5";
 Screens.paneRegion = function(l, cw){
   const meta = RMETA[S.sel], r = P.R(S.sel);
   let y = this.regionButtons(l, 0, cw);
-  y += k.text(l, L(meta.name), 0, y, {font:"dispS", size:17, w:cw}).h + 8;
-  y += statGrid(l, y, cw, [[t("co2Now"), `${r.co2.toFixed(2)} Gt`], [t("co2Start"), `${r.co2_0.toFixed(1)} Gt`], [t("compliance"), `${r.comp.toFixed(0)}%`], [t("vuln"), `${r.vuln.toFixed(0)}%`]]) + 6;
+  y += k.text(l, L(meta.name), 0, y, {font:"disp", size:21, w:cw}).h + 4;
+  { const B = {font:"monoB", size:12.5, color:"fg"}, M = {size:12.5, color:"muted"};
+    const parts = [[`${t("co2Now")} `, M], [`${r.co2.toFixed(2)} Gt`, B], [` · ${t("compliance")} `, M], [`${r.comp.toFixed(0)}%`, B], [` · ${t("vuln")} `, M], [`${r.vuln.toFixed(0)}%`, B]];
+    const tot = parts.reduce((a2, [tx, o]) => a2 + k.textW(tx, o), 0);
+    if (tot <= cw){ W.runs(l, 0, y, parts); y += 22; }
+    else { W.runs(l, 0, y, parts.slice(0, 4)); W.runs(l, 0, y + 19, [[`${t("vuln")} `, M], parts[5]]); y += 41; }
+  }
+  y += 6;
   // alliance
   const al = S.alli[S.sel];
   if (al){
@@ -169,9 +210,11 @@ Screens.paneRegion = function(l, cw){
     W.btn(l, "ally", cw - 11 - bw, y + (ch - 36) / 2, lab, () => P.formAlliance(S.sel), {disabled:!ok, kind:ok ? "primary" : "ghost", w:bw});
     y += ch + 8;
   }
-  // countries in the region
-  W.h3(l, t("countriesIn"), 0, y, {w:cw}); y += 22;
+  // orders for the whole region first, then the countries (like the website)
+  W.h3(l, th3() ? `คำสั่งเฉพาะทวีป${L(meta.name)}` : `Orders for the region of ${L(meta.name)}`, 0, y, {w:cw}); y += 24;
+  y = this.orderCards(l, y, cw, "region") + 10;
   const list = P.regCountries(S.sel).slice().sort((a, b) => b.co2 - a.co2);
+  W.h3(l, `${th3() ? "ประเทศในทวีป" : "Countries"} (${list.length})`, 0, y, {w:cw}); y += 24;
   const tot = r.co2 || 1;
   for (const c of list){
     const id = "cr-" + c.id, hov = k.isHover(l, id), rh = 38;
@@ -186,9 +229,7 @@ Screens.paneRegion = function(l, cw){
     k.hit(l, id, 0, y, cw, rh, () => Screens.selectCountry(c.id));
     y += rh + 4;
   }
-  y += 10;
-  W.h3(l, th3() ? `คำสั่งเฉพาะทวีป${L(meta.name)}` : `Orders for ${L(meta.name)}`, 0, y, {w:cw}); y += 22;
-  return this.orderCards(l, y, cw, "region");
+  return y;
 };
 
 /* ---------------- Country ---------------- */
