@@ -171,6 +171,34 @@ function Windows(){
   return null;
 }
 
+/* 2.1.3: phones are played upright. A phone turned sideways gets a full-screen notice with a phone that turns
+   back to portrait; the game pauses under it. "Keep landscape" hides it for this visit. Tablets and computers never
+   see it (only touch screens whose short side is under 500 px). */
+const isPhoneLandscape = () => {
+  if (typeof window === "undefined" || !isTouch()) return false;
+  const w = window.innerWidth, h = window.innerHeight;
+  return w > h && Math.min(w, h, screen.width || 9999, screen.height || 9999) < 500;
+};
+function RotateHint(){
+  const [on, setOn] = useState(isPhoneLandscape());
+  const [skip, setSkip] = useState(() => { try { return sessionStorage.getItem("p2050-land") === "1"; } catch(e){ return false; } });
+  useEffect(() => {
+    const f = () => setOn(isPhoneLandscape());
+    window.addEventListener("resize", f); window.addEventListener("orientationchange", f);
+    return () => { window.removeEventListener("resize", f); window.removeEventListener("orientationchange", f); };
+  }, []);
+  const show = on && !skip && UIM.screen !== "loading";
+  useEffect(() => { if (show && UIM.screen === "game" && S.started && !S.over && S.speed > 0){ UIM.prevSpeed = S.speed; P.setSpeed(0); bump(); } }, [show]);
+  if (!show) return null;
+  const th = S.lang !== "en";
+  return <div class="rotate-hint" role="alertdialog" aria-live="assertive">
+    <div class="rh-phone" aria-hidden="true"><i class="rh-notch"/><i class="rh-screen"/></div>
+    <b>{th ? "หมุนมือถือเป็นแนวตั้ง" : "Turn your phone upright"}</b>
+    <p>{th ? "Project Zero บนมือถือออกแบบมาให้เล่นแนวตั้ง ปุ่มและแถบต่าง ๆ จะแสดงครบกว่า" : "On a phone, Project Zero is made to be played upright: every bar and button fits."}</p>
+    <button type="button" class="btn ghost" onClick={() => { try { sessionStorage.setItem("p2050-land", "1"); } catch(e){} setSkip(true); }}>{th ? "เล่นแนวนอนต่อ" : "Keep landscape"}</button>
+  </div>;
+}
+
 export function App(){
   useVersion();
   const sc = UIM.screen;
@@ -184,5 +212,6 @@ export function App(){
     {Narr.subs && Narr.line ? <div class="subline" aria-live="polite"><span>{Narr.line}</span></div> : null}
     {UIM.transition === "in" ? <div class="flash in"/> : UIM.transition === "reveal" ? <div class="flash out"/> : null}
     {UIM.fade ? <div class="flash fade"/> : null}
+    <RotateHint/>
   </>;
 }
