@@ -113,7 +113,7 @@ function Toast(){
   if (!cur) return null;
   return <div class={"toast glass-strong " + (kind === "end" ? "tl" : "")} role="status" key={cur.id || cur.title || cur.msg}>
     <span class="ticon"><Icon n={cur.icon} size={26}/></span>
-    <div><small class="warn">{up(cur.msg ? cur.title : t("achUnlocked"))}</small><b>{cur.msg ? cur.msg : L(cur.t)}</b>{!cur.msg ? <span class="muted small">{L(cur.d)}</span> : null}</div>
+    <div><small class="warn">{up(cur.msg ? cur.title : t("achUnlocked"))}</small><b>{cur.msg ? <Rich t={cur.msg}/> : L(cur.t)}</b>{!cur.msg ? <span class="muted small">{L(cur.d)}</span> : null}</div>
   </div>;
 }
 
