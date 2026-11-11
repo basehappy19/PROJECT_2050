@@ -120,11 +120,14 @@ function Toast(){
 /* ---------- 3.9: people of the story talk while you play (45-voices.js) ---------- */
 function Voice(){
   const v = UIM.voice, kind = UIM.kind(), show = v && UIM.screen === "game" && !kind && !UIM.train;
+  // the timer belongs to this line: other redraws must not cancel it (before, any redraw did, and the faded bubble stayed
+  // on screen invisible, catching taps meant for the map)
   useEffect(() => {
-    if (!show || v.at) return;
-    v.at = performance.now(); Audio.play("data", {vol:.3});
-    const id = setTimeout(() => { if (UIM.voice === v){ UIM.voice = null; bump(); } }, 9000); return () => clearTimeout(id);
-  });
+    if (!show) return;
+    if (!v.at){ v.at = performance.now(); Audio.play("data", {vol:.3}); }
+    const id = setTimeout(() => { if (UIM.voice === v){ UIM.voice = null; bump(); } }, Math.max(0, 9000 - (performance.now() - v.at)));
+    return () => clearTimeout(id);
+  }, [v && v.id, show]);
   if (!show) return null;
   const th = S.lang === "th";
   return <button type="button" class="voice glass-strong" key={v.id} style={{"--vc":v.color}} onClick={() => { UIM.voice = null; bump(); }} aria-live="polite">

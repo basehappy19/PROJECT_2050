@@ -95,7 +95,9 @@ function buildModels(){
   const mine = clean => merge([
     lathe([[.48, 0], [.44, .03], [.36, .03], [.33, .06], [.24, .06], [.21, .08], [.12, .08], [.1, .09], [0, .09]], 0, 0, 0, clean ? "#8a8a5e" : "#8f6a4a", 20),
     lathe([[.3, .09], [.29, .1], [0, .1]], 0, 0, 0, clean ? "#4d7a52" : "#5c4330", 20),
-    box(.06, .06, .38, .38, .32, 0, "#4a4f55"), box(.12, .06, .04, .38, .32, .38, "#c8402e"),
+    ...[-1, 1].map(k => { const g = new THREE.BoxGeometry(.03, .03, .3); g.rotateY(k * .32); g.translate(.38 + k * .05, .32, .14); return paint(g, "#4a4f55"); }),
+    (() => { const g = new THREE.TorusGeometry(.045, .012, 6, 14); g.rotateX(Math.PI / 2); g.translate(.38, .32, .29); return paint(g, "#c8402e"); })(),
+    box(.16, .12, .08, .3, .2, 0, "#6a5040"),
     box(.22, .1, .1, -.3, .38, 0, "#d9a13b"), box(.06, .1, .06, -.42, .38, .02, "#3a3f45")]);
   site.mine = [mine(false), mine(true)];
   const ev = () => merge([
@@ -131,7 +133,7 @@ function mat(x, y, z, heading, sx, sy, sz, rx = 0, ry = 0){ _e.set(rx, ry, -head
 
 /* ---------------- particles: smoke, flames, dust, snow, rain ---------------- */
 function puffTex(kind){
-  const N = 64, cv = document.createElement("canvas"); cv.width = cv.height = N; const g = cv.getContext("2d");
+  const N = 128, cv = document.createElement("canvas"); cv.width = cv.height = N; const g = cv.getContext("2d");
   if (kind === "streak"){ const gr = g.createLinearGradient(0, 0, 0, N); gr.addColorStop(0, "rgba(255,255,255,0)"); gr.addColorStop(.5, "rgba(255,255,255,1)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.fillRect(N * .46, 0, N * .08, N); }
   else if (kind === "flame"){ const gr = g.createRadialGradient(N / 2, N * .6, 0, N / 2, N * .55, N / 2); gr.addColorStop(0, "rgba(255,255,255,1)"); gr.addColorStop(.35, "rgba(255,255,255,.7)"); gr.addColorStop(1, "rgba(255,255,255,0)"); g.fillStyle = gr; g.beginPath(); g.ellipse(N / 2, N * .55, N * .32, N * .45, 0, 0, TAU); g.fill(); }
   else {   // a soft, slightly lumpy puff
@@ -165,7 +167,7 @@ class Parts {
       p.x += p.vx * dt; p.y += p.vy * dt; p.z = Math.max(0, p.z + p.vz * dt);
       const f = p.age / p.life, a = f < .15 ? f / .15 : 1;
       this.pos[n * 3] = p.x; this.pos[n * 3 + 1] = -p.y; this.pos[n * 3 + 2] = p.z;
-      this.size[n] = p.s0 + (p.s1 - p.s0) * f;
+      this.size[n] = Math.min(220, p.s0 + (p.s1 - p.s0) * f);
       for (let k = 0; k < 3; k++) this.col[n * 4 + k] = p.c0[k] + (p.c1[k] - p.c0[k]) * f;
       this.col[n * 4 + 3] = (p.c0[3] + (p.c1[3] - p.c0[3]) * f) * a;
       n++;
@@ -179,14 +181,17 @@ class Parts {
 }
 
 /* ---------------- ground pictures (flood water, burn scars, cracked ground, heat, salt water, snow) ---------------- */
+/* vW: local coordinates (map units from the picture's centre, plus a small per-picture offset). Kept small on purpose:
+   the hash below loses precision on big numbers (world coordinates run to 2400) and the noise turned into blocks. */
 const DECAL_VS = `varying vec2 vUv; varying vec2 vW; void main(){ vUv = uv; vW = position.xy + uOff; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
-const DECAL_FS = `uniform sampler2D uMask; uniform int uType; uniform float uL, uB, uT, uA, uFront, uScar;
+const DECAL_FS = `uniform sampler2D uMask, uNoise; uniform int uType; uniform float uL, uB, uT, uA, uFront, uScar;
 varying vec2 vUv; varying vec2 vW;
-float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float h(vec2 p){ p = fract(p * vec2(.1031, .1030)); p += dot(p, p.yx + 33.33); return fract((p.x + p.y) * p.x); }   // sin-free hash (stable on mobile GPUs)
 float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
   return mix(mix(h(i), h(i + vec2(1., 0.)), f.x), mix(h(i + vec2(0., 1.)), h(i + vec2(1., 1.)), f.x), f.y); }
 void main(){
-  vec4 m = texture2D(uMask, vUv); float land = m.r, inner = m.g, n = m.b;
+  vec4 m = texture2D(uMask, vUv); float land = m.r, inner = m.g;
+  float n = texture2D(uNoise, vUv).r + (vn(vW * 1.7) - .5) * .035 + (vn(vW * 4.1) - .5) * .015;   // smooth large shapes + fine ragged detail up close
   float r = length(vUv - .5) * 2.;
   float fall = uType == 5 ? 1. : smoothstep(1., .62, r + (n - .5) * .4);
   float k = land * fall; if (k < .01) discard;
@@ -230,30 +235,43 @@ void main(){
   gl_FragColor = vec4(c, a * k * uA);
 }`;
 
-/* a mask over a square around (cx, cy) of half-size R (map units): R = this country's land, G = how far inland, B = noise */
-function makeMask(M, shapes, cx, cy, Rx, Ry, sd, N = 256){
-  const NX = Rx >= Ry ? N : Math.max(64, Math.round(N * Rx / Ry)), NY = Ry >= Rx ? N : Math.max(64, Math.round(N * Ry / Rx));
+/* the ground picture's data over a box around (cx, cy), half-size Rx × Ry (map units):
+   uMask (sharp, up to 1024–2048 px): R = this country's land, G = how far inland (blurred land)
+   uNoise (256 px, smooth): the shapes floods, fires and drought follow; the CPU keeps a copy to find the fire front */
+function makeMask(M, shapes, cx, cy, Rx, Ry, sd, N = 1024, allLand = shapes){
+  const fit = n => Rx >= Ry ? [n, Math.max(32, Math.round(n * Ry / Rx))] : [Math.max(32, Math.round(n * Rx / Ry)), n];
+  const [NX, NY] = fit(N), [nx, ny] = fit(256);
   const cv = document.createElement("canvas"); cv.width = NX; cv.height = NY; const g = cv.getContext("2d");
   const kx = NX / (2 * Rx), ky = NY / (2 * Ry);
   g.setTransform(kx, 0, 0, ky, -(cx - Rx) * kx, -(cy - Ry) * ky); g.fillStyle = "#fff";
   for (const sh of shapes) g.fill(sh.path, "evenodd");
   const land = g.getImageData(0, 0, NX, NY).data;
+  // G: distance from the SEA (all land around, any country), so a land border never looks like a coast
+  const al = document.createElement("canvas"); al.width = NX; al.height = NY; const ag = al.getContext("2d");
+  ag.setTransform(kx, 0, 0, ky, -(cx - Rx) * kx, -(cy - Ry) * ky); ag.fillStyle = "#fff"; for (const sh of allLand) ag.fill(sh.path, "evenodd");
   const bl = document.createElement("canvas"); bl.width = NX; bl.height = NY; const b = bl.getContext("2d");
-  b.filter = `blur(${Math.round(Math.min(NX, NY) * .045)}px)`; b.drawImage(cv, 0, 0);
+  b.filter = `blur(${Math.round(Math.min(NX, NY) * .045)}px)`; b.drawImage(al, 0, 0);
   const blur = b.getImageData(0, 0, NX, NY).data;
-  // value noise (baked, so the CPU knows where the fire front and the water are too)
+  const data = new Uint8Array(NX * NY * 4);
+  for (let y = 0; y < NY; y++){ const row = (NY - 1 - y) * NX; for (let x = 0; x < NX; x++){   // a texture's first row is the bottom (south)
+    const i = (y * NX + x) * 4, o = (row + x) * 4;
+    data[o] = land[i + 3]; data[o + 1] = blur[i + 3]; data[o + 3] = 255;
+  } }
+  const tex = new THREE.DataTexture(data, NX, NY, THREE.RGBAFormat); tex.magFilter = tex.minFilter = THREE.LinearFilter; tex.needsUpdate = true;
+  // value noise, smooth (bilinear between 256 samples is plenty: the shader adds the fine detail)
   const r = mrng(sd), H = new Float32Array(17 * 17 * 4); for (let i = 0; i < H.length; i++) H[i] = r();
   const vn = (x, y, o) => { const i = Math.floor(x), j = Math.floor(y), fx = sm(x - i), fy = sm(y - j), a = (u, v) => H[((((u % 17) + 17) % 17) * 17 + (((v % 17) + 17) % 17)) * 4 + o];
     return (a(i, j) * (1 - fx) + a(i + 1, j) * fx) * (1 - fy) + (a(i, j + 1) * (1 - fx) + a(i + 1, j + 1) * fx) * fy; };
-  const data = new Uint8Array(NX * NY * 4), noise = new Float32Array(NX * NY), landA = new Float32Array(NX * NY);
-  for (let y = 0; y < NY; y++) for (let x = 0; x < NX; x++){
-    const u = x / NX * 4, v = y / NY * 4, n = clamp((.52 * vn(u, v, 0) + .28 * vn(u * 2.1 + 3, v * 2.1, 1) + .14 * vn(u * 4.3, v * 4.3 + 5, 2) + .06 * vn(u * 9, v * 9, 3) - .5) * 1.6 + .5, 0, 1);
-    const i = y * NX + x, o = ((NY - 1 - y) * NX + x) * 4;   // the texture's first row is the bottom (south)
-    data[o] = land[i * 4 + 3] > 0 ? land[i * 4] : 0; data[o + 1] = blur[i * 4 + 3] ? blur[i * 4] * blur[i * 4 + 3] / 255 : 0; data[o + 2] = n * 255; data[o + 3] = 255;
-    noise[i] = n; landA[i] = data[o] / 255;
+  const nd = new Uint8Array(nx * ny * 4), noise = new Float32Array(nx * ny), landA = new Float32Array(nx * ny);
+  for (let y = 0; y < ny; y++) for (let x = 0; x < nx; x++){
+    const u = x / nx * 4, v = y / ny * 4, n = clamp((.52 * vn(u, v, 0) + .28 * vn(u * 2.1 + 3, v * 2.1, 1) + .14 * vn(u * 4.3, v * 4.3 + 5, 2) + .06 * vn(u * 9, v * 9, 3) - .5) * 1.6 + .5, 0, 1);
+    const i = y * nx + x, o = ((ny - 1 - y) * nx + x) * 4;
+    nd[o] = nd[o + 1] = nd[o + 2] = n * 255; nd[o + 3] = 255; noise[i] = n;
+    const lx = Math.min(NX - 1, Math.round((x + .5) / nx * NX)), ly = Math.min(NY - 1, Math.round((y + .5) / ny * NY));
+    landA[i] = land[(ly * NX + lx) * 4 + 3] / 255;
   }
-  const tex = new THREE.DataTexture(data, NX, NY, THREE.RGBAFormat); tex.magFilter = tex.minFilter = THREE.LinearFilter; tex.needsUpdate = true;
-  return {tex, noise, land:landA, NX, NY, cx, cy, Rx, Ry};
+  const ntex = new THREE.DataTexture(nd, nx, ny, THREE.RGBAFormat); ntex.magFilter = ntex.minFilter = THREE.LinearFilter; ntex.needsUpdate = true;
+  return {tex, ntex, noise, land:landA, NX:nx, NY:ny, cx, cy, Rx, Ry};
 }
 
 /* ---------------- data: rail corridors and industrial sites (lat, lon) ---------------- */
@@ -397,6 +415,7 @@ export class World3D {
     this.sites = []; this.siteHits = [];
     this.groves = new Map();
     this.decals = new Map();   // key → {mesh, mask, ...}
+    this.noDecal = new Set();
     this.smoke = new Parts(root, 2600, puffTex("puff"), false, 6);
     this.fire = new Parts(root, 1600, puffTex("flame"), true, 7);
     this.snow = new Parts(root, 1400, puffTex("puff"), false, 8);
@@ -549,7 +568,8 @@ export class World3D {
 
   /* ---------- trees ---------- */
   grove(M, p, pos){
-    if (this.groves.has(p.id)) return this.groves.get(p.id);
+    const gk = `${p.id}:${p.c}:${p.sd}`;   // a new game starts pin ids again at 1
+    if (this.groves.has(gk)) return this.groves.get(gk);
     const r = mrng(((p.sd % 9973) + 1) / 9974), mangrove = p.k === "mangrove", N = mangrove ? 16 : 24, R = mangrove ? 7 : 10;
     const shapes = M.shapes.filter(sh => sh.c === p.c), ctx = M.bctx, list = [];
     ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -562,7 +582,8 @@ export class World3D {
     }
     ctx.restore();
     if (!list.length) list.push({x:pos[0], y:pos[1], kind:mangrove ? "mangrove" : "leaf", h:1, ph:0, col:new THREE.Color(1, 1, 1)});
-    this.groves.set(p.id, list); return list;
+    if (this.groves.size > 400) this.groves.clear();
+    this.groves.set(gk, list); return list;
   }
   drawTrees(M, s, z){
     for (const k in this.trees) this.trees[k].begin(); this.treeSh.begin();
@@ -591,11 +612,12 @@ export class World3D {
   }
   decal(M, key, type, cid){
     let d = this.decals.get(key); if (d) return d;
-    const pos = this.hzPlace(type, cid, M); if (!pos) return null;
+    if (this.noDecal.has(key)) return null;   // a country too small to draw (or not on the map): don't look again every frame
+    const pos = this.hzPlace(type, cid, M); if (!pos){ this.noDecal.add(key); return null; }
     const [R, , ty] = HZ_R[type];
-    const shapes = M.shapes.filter(sh => sh.c === cid && sh.b[2] > pos[0] - R && sh.b[0] < pos[0] + R && sh.b[3] > pos[1] - R && sh.b[1] < pos[1] + R);
-    if (!shapes.length) return null;
-    const mask = makeMask(M, shapes, pos[0], pos[1], R, R, hashStr(key));
+    const near = M.shapes.filter(sh => sh.b[2] > pos[0] - R && sh.b[0] < pos[0] + R && sh.b[3] > pos[1] - R && sh.b[1] < pos[1] + R), shapes = near.filter(sh => sh.c === cid);
+    if (!shapes.length){ this.noDecal.add(key); return null; }
+    const mask = makeMask(M, shapes, pos[0], pos[1], R, R, hashStr(key), 1024, near);
     const mesh = this.decalMesh(mask, ty, pos[0], pos[1], R, R);
     // land cells for the fire front / dust (CPU side)
     const cells = []; for (let i = 0; i < mask.NX * mask.NY; i += 3) if (mask.land[i] > .5){ const x = i % mask.NX, y = (i / mask.NX) | 0, u = x / mask.NX * 2 - 1, v = y / mask.NY * 2 - 1; if (u * u + v * v < .55) cells.push(i); }
@@ -603,12 +625,12 @@ export class World3D {
     this.decals.set(key, d); return d;
   }
   decalMesh(mask, ty, cx, cy, Rx, Ry){
-    const mt = new THREE.ShaderMaterial({uniforms:{uMask:{value:mask.tex}, uType:{value:ty}, uL:{value:0}, uB:{value:0}, uT:{value:0}, uA:{value:1}, uFront:{value:0}, uScar:{value:1}, uOff:{value:new THREE.Vector2(cx, -cy)}},
+    const mt = new THREE.ShaderMaterial({uniforms:{uMask:{value:mask.tex}, uNoise:{value:mask.ntex}, uType:{value:ty}, uL:{value:0}, uB:{value:0}, uT:{value:0}, uA:{value:1}, uFront:{value:0}, uScar:{value:1}, uOff:{value:new THREE.Vector2((hashStr(cx + "," + cy) - .5) * 60, (hashStr(cy + "," + cx) - .5) * 60)}},
       vertexShader:"uniform vec2 uOff; " + DECAL_VS, fragmentShader:DECAL_FS, transparent:true, depthWrite:false});
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2 * Rx, 2 * Ry), mt); mesh.position.set(cx, -cy, .005); mesh.renderOrder = 1; mesh.frustumCulled = false;
     this.g.add(mesh); return mesh;
   }
-  dropDecal(key){ const d = this.decals.get(key); if (!d) return; this.g.remove(d.mesh); d.mesh.geometry.dispose(); d.mesh.material.dispose(); d.mask.tex.dispose(); this.decals.delete(key); }
+  dropDecal(key){ const d = this.decals.get(key); if (!d) return; this.g.remove(d.mesh); d.mesh.geometry.dispose(); d.mesh.material.dispose(); d.mask.tex.dispose(); d.mask.ntex.dispose(); this.decals.delete(key); }
   hazList(){
     const out = [], now = S.tick + (P.monthFrac ? P.monthFrac() : 0);
     for (const h of S.haz || []) if (HZ_R[h.type] && h.at - now <= 1.05) out.push({key:`${h.type}:${h.c}:${h.at}`, type:h.type, c:h.c, t:now - h.at, sev:h.sev || 1});
@@ -672,7 +694,7 @@ export class World3D {
       if (!d){
         const [x0, y0] = ll(la1, lo0), [x1, y1] = ll(la0, lo1), cx = (x0 + x1) / 2, cy = (y0 + y1) / 2, Rx = (x1 - x0) / 2, Ry = (y1 - y0) / 2;
         const shapes = M.shapes.filter(sh => sh.b[2] > x0 && sh.b[0] < x1 && sh.b[3] > y0 && sh.b[1] < y1);
-        const mask = makeMask(M, shapes, cx, cy, Rx, Ry, .37 + i, 384);
+        const mask = makeMask(M, shapes, cx, cy, Rx, Ry, .37 + i, 1536);
         d = {mesh:this.decalMesh(mask, 5, cx, cy, Rx, Ry), mask, type:"snow", x:cx, y:cy, Rx, Ry}; this.decals.set(key, d);
       }
       d.mesh.visible = true; d.mesh.material.uniforms.uL.value = L0; d.mesh.material.uniforms.uT.value = this.t; any = true;
