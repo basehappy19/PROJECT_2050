@@ -1,6 +1,9 @@
 /* 3.9 · The map in 3D — on the same three.js layer as the planes (air3d.js), tipped back with the map's tilt:
-   · trains: high-speed trains on the real corridors that run today, more corridors as the rail skill (I2) rolls out,
-     and freight trains on the big cargo lines (diesel with smoke until the line is electrified)
+   · trains: high-speed trains (and Shinkansen-style bullet trains in Japan, Taiwan, Beijing–Shanghai and Mumbai) on the
+     real corridors that run today, more corridors as the rail skill (I2) rolls out, freight trains on the big cargo
+     lines (diesel with smoke until the line is electrified) and passenger trains on the long ones (electric trains
+     where the line is electrified, diesel-hauled coaches where it isn't). Each line is double track: trains going
+     opposite ways keep to their own side. Where a train is depends only on the clock, never on the zoom.
    · industry: coal plants, steelworks, cement works, refineries, mines and EV factories at real sites; they smoke as
      much as their continent still emits and turn clean when it does
    · trees: forest and mangrove builds grow into groves of 3D trees over four years
@@ -55,6 +58,22 @@ function buildModels(){
     box(.72, .245, .035, -.12, 0, .1, TEAL), box(.6, .246, .05, -.16, 0, .19, GLASS),
     profile([[.2, .2], [.36, .2], [.29, .25], [.2, .27]], .2, GLASS), box(.9, .2, .02, 0, 0, 0, DARK)]);
   car.hsrMid = merge([box(.96, .24, .28, 0, 0, .02, W), box(.96, .245, .035, 0, 0, .1, TEAL), box(.86, .246, .05, 0, 0, .19, GLASS), box(.9, .2, .02, 0, 0, 0, DARK)]);
+  // bullet train (Shinkansen style): a very long, low duck-bill nose, white with a deep blue stripe
+  const BLUE = "#1f5fbf";
+  car.bulletHead = merge([
+    profile([[-.5, .02], [.5, .02], [.5, .045], [.42, .07], [.28, .12], [.1, .2], [-.08, .25], [-.5, .265]], .23, W),
+    profile([[-.5, .085], [.36, .085], [.44, .065], [.47, .06], [.36, .105], [-.5, .115]], .234, BLUE),
+    box(.42, .236, .045, -.28, 0, .175, GLASS), profile([[-.02, .215], [.1, .19], [.04, .225], [-.06, .245]], .19, GLASS),
+    box(.9, .19, .02, 0, 0, 0, DARK)]);
+  car.bulletMid = merge([box(.97, .23, .245, 0, 0, .02, W), box(.97, .234, .03, 0, 0, .085, BLUE), box(.86, .236, .045, 0, 0, .175, GLASS), box(.9, .19, .02, 0, 0, 0, DARK)]);
+  // electric train (EMU): silver with a red stripe, a flat cab front and a pantograph on the roof
+  const SIL = "#cfd6db", RED = "#d8443a";
+  car.emuHead = merge([profile([[-.5, .02], [.5, .02], [.5, .2], [.45, .28], [-.5, .28]], .24, SIL),
+    box(.96, .245, .03, 0, 0, .09, RED), box(.7, .246, .06, -.12, 0, .17, GLASS), profile([[.46, .17], [.5, .17], [.5, .2], [.455, .27], [.44, .27]], .2, GLASS),
+    box(.24, .02, .02, -.1, 0, .33, DARK), box(.02, .14, .02, -.18, 0, .31, DARK), box(.9, .2, .02, 0, 0, 0, DARK)]);
+  car.emuMid = merge([box(.97, .24, .26, 0, 0, .02, SIL), box(.97, .245, .03, 0, 0, .09, RED), box(.86, .246, .06, 0, 0, .17, GLASS), box(.9, .2, .02, 0, 0, 0, DARK)]);
+  // passenger coach for a diesel-hauled train
+  car.coach = merge([box(.96, .24, .25, 0, 0, .03, "#2f6e4f"), box(.96, .245, .025, 0, 0, .19, "#e9d9a8"), box(.84, .246, .05, 0, 0, .13, "#cfe3ea"), box(.9, .2, .03, 0, 0, 0, DARK)]);
   // freight: a diesel locomotive (with an exhaust stack), an electric one (pantograph), and wagons
   car.diesel = merge([box(.94, .26, .24, 0, 0, .04, "#d9622b"), box(.26, .262, .1, .3, 0, .28, "#b44c1f"), box(.2, .263, .06, .3, 0, .3, GLASS),
     cyl(.025, .025, .08, -.1, 0, .28, DARK, 6), box(.94, .22, .04, 0, 0, 0, DARK), box(.94, .265, .02, 0, 0, .12, "#f2c14e")]);
@@ -184,7 +203,7 @@ class Parts {
 /* vW: local coordinates (map units from the picture's centre, plus a small per-picture offset). Kept small on purpose:
    the hash below loses precision on big numbers (world coordinates run to 2400) and the noise turned into blocks. */
 const DECAL_VS = `varying vec2 vUv; varying vec2 vW; void main(){ vUv = uv; vW = position.xy + uOff; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`;
-const DECAL_FS = `uniform sampler2D uMask, uNoise; uniform int uType; uniform float uL, uB, uT, uA, uFront, uScar;
+const DECAL_FS = `uniform sampler2D uMask, uNoise; uniform int uType; uniform float uL, uB, uT, uA, uFront, uScar; uniform vec4 uFade;
 varying vec2 vUv; varying vec2 vW;
 float h(vec2 p){ p = fract(p * vec2(.1031, .1030)); p += dot(p, p.yx + 33.33); return fract((p.x + p.y) * p.x); }   // sin-free hash (stable on mobile GPUs)
 float vn(vec2 p){ vec2 i = floor(p), f = fract(p); f = f * f * (3. - 2. * f);
@@ -228,9 +247,14 @@ void main(){
     a = max(w * .78, edge * .9);
   } else {   // snow cover
     float pat = vn(vW * .07) * .55 + vn(vW * .3) * .3 + vn(vW * 1.1) * .15;
-    float lat = smoothstep(.0, .75, vUv.y + (pat - .5) * .5), side = smoothstep(0., .18, min(vUv.x, 1. - vUv.x) + (pat - .5) * .1);
+    // every edge of the box fades out raggedly (uFade = how far in, per side: left, right, top, bottom), so no straight
+    // line shows; neighbouring boxes overlap where one fades out and the next fades in
+    float e = (pat - .5) * .16;
+    float lat = smoothstep(.0, .75, vUv.y + (pat - .5) * .5);
+    float side = smoothstep(0., uFade.x, vUv.x + e * uFade.x * 4.) * smoothstep(0., uFade.y, 1. - vUv.x + e * uFade.y * 4.);
+    float top = smoothstep(0., uFade.z, 1. - vUv.y + e * uFade.z * 3.);
     c = mix(vec3(.80, .86, .94), vec3(.98, .99, 1.), pat);
-    a = uL * smoothstep(.3, .7, pat * .8 + lat * .55 + inner * .25) * lat * side * .7;
+    a = uL * smoothstep(.3, .7, pat * .8 + lat * .55 + inner * .25) * lat * side * top * .55;
   }
   gl_FragColor = vec4(c, a * k * uA);
 }`;
@@ -278,16 +302,16 @@ function makeMask(M, shapes, cx, cy, Rx, Ry, sd, N = 1024, allLand = shapes){
 /* base = runs today (2026). Others open as the rail skill I2 rolls out (or when that country's rail build is done). */
 const RAIL = [
   // high-speed lines running today
-  {c:"CHN", base:1, k:"hsr", p:[[39.9, 116.4], [36.67, 117.0], [34.26, 117.18], [32.06, 118.8], [31.23, 121.47]]},
+  {c:"CHN", base:1, k:"hsr", t:"bullet", p:[[39.9, 116.4], [36.67, 117.0], [34.26, 117.18], [32.06, 118.8], [31.23, 121.47]]},
   {c:"CHN", base:1, k:"hsr", p:[[39.9, 116.4], [38.04, 114.5], [34.75, 113.62], [30.59, 114.3], [28.23, 112.94], [23.13, 113.26], [22.54, 114.06]]},
   {c:"CHN", base:1, k:"hsr", p:[[31.23, 121.47], [30.27, 120.15], [28.68, 115.86], [28.23, 112.94], [26.65, 106.63], [25.04, 102.71]]},
   {c:"CHN", base:1, k:"hsr", p:[[34.26, 117.18], [34.75, 113.62], [34.34, 108.94], [36.06, 103.83], [43.83, 87.62]]},
   {c:"CHN", base:1, k:"hsr", p:[[39.9, 116.4], [41.8, 123.43], [43.88, 125.32], [45.8, 126.53]]},
   {c:"CHN", base:1, k:"hsr", p:[[30.66, 104.07], [29.56, 106.55], [30.59, 114.3], [31.82, 117.23], [32.06, 118.8]]},
-  {c:"JPN", base:1, k:"hsr", p:[[35.68, 139.77], [35.17, 136.88], [34.69, 135.5], [34.39, 132.46], [33.59, 130.4]]},
-  {c:"JPN", base:1, k:"hsr", p:[[35.68, 139.77], [37.4, 140.38], [38.26, 140.87], [40.82, 140.74]]},
+  {c:"JPN", base:1, k:"hsr", t:"bullet", p:[[35.68, 139.77], [35.17, 136.88], [34.69, 135.5], [34.39, 132.46], [33.59, 130.4]]},
+  {c:"JPN", base:1, k:"hsr", t:"bullet", p:[[35.68, 139.77], [37.4, 140.38], [38.26, 140.87], [40.82, 140.74]]},
   {c:"KOR", base:1, k:"hsr", p:[[37.55, 126.97], [36.35, 127.38], [35.87, 128.6], [35.11, 129.04]]},
-  {c:"TWN", base:1, k:"hsr", p:[[25.05, 121.52], [24.15, 120.67], [23.0, 120.21], [22.63, 120.3]]},
+  {c:"TWN", base:1, k:"hsr", t:"bullet", p:[[25.05, 121.52], [24.15, 120.67], [23.0, 120.21], [22.63, 120.3]]},
   {c:"FRA", base:1, k:"hsr", p:[[48.85, 2.35], [46.8, 4.4], [45.76, 4.84], [43.3, 5.37]]},
   {c:"FRA", base:1, k:"hsr", p:[[48.85, 2.35], [47.39, .69], [44.84, -.58]]},
   {c:"FRA", base:1, k:"hsr", p:[[51.5, -.12], [51.0, 1.85], [50.63, 3.06], [48.85, 2.35], [48.58, 7.75]]},
@@ -308,7 +332,7 @@ const RAIL = [
   {c:"THA", k:"hsr", p:[[13.75, 100.5], [14.35, 100.57], [14.97, 102.1], [16.43, 102.83], [17.41, 102.79], [17.88, 102.74], [17.97, 102.6]]},
   {c:"THA", k:"hsr", p:[[13.75, 100.5], [15.7, 100.12], [16.82, 100.26], [18.79, 98.98]]},
   {c:"THA", k:"hsr", p:[[13.75, 100.5], [13.36, 100.98], [12.68, 101.27]]},
-  {c:"IND", k:"hsr", p:[[19.08, 72.88], [21.17, 72.83], [22.31, 73.18], [23.02, 72.57]]},
+  {c:"IND", k:"hsr", t:"bullet", p:[[19.08, 72.88], [21.17, 72.83], [22.31, 73.18], [23.02, 72.57]]},
   {c:"IND", k:"hsr", p:[[28.61, 77.21], [27.18, 78.01], [26.45, 80.33], [25.32, 82.97]]},
   {c:"IND", k:"hsr", p:[[13.08, 80.27], [12.97, 77.59], [12.3, 76.64]]},
   {c:"USA", k:"hsr", p:[[37.77, -122.42], [37.34, -121.89], [36.74, -119.79], [35.37, -119.02], [34.05, -118.24]]},
@@ -335,23 +359,23 @@ const RAIL = [
   {c:"USA", base:1, k:"fr", ore:1, p:[[43.66, -105.4], [41.14, -104.82], [40.81, -96.7], [41.26, -95.94], [41.88, -87.63]]},
   {c:"CAN", base:1, k:"fr", p:[[49.28, -123.12], [50.67, -120.33], [51.05, -114.07], [50.45, -104.61], [49.9, -97.14], [48.38, -89.25], [46.49, -80.99], [43.65, -79.38]]},
   {c:"MEX", base:1, k:"fr", p:[[19.43, -99.13], [22.15, -100.98], [25.67, -100.31], [27.48, -99.51]]},
-  {c:"RUS", base:1, k:"fr", p:[[55.75, 37.62], [56.33, 44.0], [58.0, 56.25], [56.84, 60.6], [55.0, 73.37], [55.03, 82.92], [56.01, 92.87], [52.29, 104.3], [51.83, 107.58], [52.03, 113.5], [50.29, 127.53], [48.48, 135.08], [43.12, 131.9]]},
+  {c:"RUS", base:1, k:"fr", el:1, p:[[55.75, 37.62], [56.33, 44.0], [58.0, 56.25], [56.84, 60.6], [55.0, 73.37], [55.03, 82.92], [56.01, 92.87], [52.29, 104.3], [51.83, 107.58], [52.03, 113.5], [50.29, 127.53], [48.48, 135.08], [43.12, 131.9]]},
   {c:"MNG", base:1, k:"fr", p:[[51.83, 107.58], [47.92, 106.92], [43.65, 111.98], [40.82, 111.65], [39.9, 116.4]]},
   {c:"KAZ", base:1, k:"fr", p:[[34.34, 108.94], [36.06, 103.83], [43.83, 87.62], [44.2, 80.4], [43.24, 76.89], [43.3, 68.27], [51.18, 71.43], [53.2, 50.15], [55.75, 37.62]]},
-  {c:"POL", base:1, k:"fr", p:[[55.75, 37.62], [54.78, 32.05], [53.9, 27.56], [52.1, 23.66], [52.23, 21.0], [52.41, 16.93], [52.52, 13.4], [52.37, 9.73], [51.43, 6.76]]},
-  {c:"NLD", base:1, k:"fr", p:[[51.92, 4.48], [51.43, 6.76], [50.94, 6.96], [50.0, 8.27], [47.56, 7.59], [46.0, 8.95], [45.46, 9.19], [44.41, 8.93]]},
-  {c:"CHN", base:1, k:"fr", ore:1, p:[[40.09, 113.3], [40.0, 115.5], [39.67, 118.18], [39.93, 119.6]]},
-  {c:"CHN", base:1, k:"fr", p:[[29.56, 106.55], [34.34, 108.94], [38.47, 106.27], [40.65, 109.84]]},
-  {c:"IND", base:1, k:"fr", p:[[28.61, 77.21], [27.18, 78.01], [25.44, 81.85], [24.79, 84.99], [23.8, 86.43], [22.57, 88.36]]},
-  {c:"IND", base:1, k:"fr", p:[[28.61, 77.21], [26.91, 75.79], [24.58, 73.71], [23.02, 72.57], [21.17, 72.83], [19.08, 72.88]]},
+  {c:"POL", base:1, k:"fr", el:1, p:[[55.75, 37.62], [54.78, 32.05], [53.9, 27.56], [52.1, 23.66], [52.23, 21.0], [52.41, 16.93], [52.52, 13.4], [52.37, 9.73], [51.43, 6.76]]},
+  {c:"NLD", base:1, k:"fr", el:1, p:[[51.92, 4.48], [51.43, 6.76], [50.94, 6.96], [50.0, 8.27], [47.56, 7.59], [46.0, 8.95], [45.46, 9.19], [44.41, 8.93]]},
+  {c:"CHN", base:1, k:"fr", el:1, ore:1, p:[[40.09, 113.3], [40.0, 115.5], [39.67, 118.18], [39.93, 119.6]]},
+  {c:"CHN", base:1, k:"fr", el:1, p:[[29.56, 106.55], [34.34, 108.94], [38.47, 106.27], [40.65, 109.84]]},
+  {c:"IND", base:1, k:"fr", el:1, p:[[28.61, 77.21], [27.18, 78.01], [25.44, 81.85], [24.79, 84.99], [23.8, 86.43], [22.57, 88.36]]},
+  {c:"IND", base:1, k:"fr", el:1, p:[[28.61, 77.21], [26.91, 75.79], [24.58, 73.71], [23.02, 72.57], [21.17, 72.83], [19.08, 72.88]]},
   {c:"AUS", base:1, k:"fr", ore:1, p:[[-22.7, 117.8], [-21.7, 118.4], [-20.31, 118.58]]},
   {c:"AUS", base:1, k:"fr", p:[[-31.95, 115.86], [-30.75, 121.47], [-31.2, 131.0], [-32.49, 137.77], [-34.93, 138.6], [-32.24, 148.6], [-33.87, 151.2]]},
   {c:"BRA", base:1, k:"fr", ore:1, p:[[-6.07, -50.2], [-5.53, -47.48], [-4.86, -46.0], [-3.75, -45.0], [-2.53, -44.3]]},
   {c:"BRA", base:1, k:"fr", ore:1, p:[[-19.92, -43.94], [-19.47, -42.53], [-19.86, -41.0], [-20.32, -40.29]]},
-  {c:"ZAF", base:1, k:"fr", ore:1, p:[[-26.2, 28.05], [-26.5, 29.2], [-27.75, 30.0], [-28.78, 32.04]]},
+  {c:"ZAF", base:1, k:"fr", el:1, ore:1, p:[[-26.2, 28.05], [-26.5, 29.2], [-27.75, 30.0], [-28.78, 32.04]]},
   {c:"TZA", base:1, k:"fr", ore:1, p:[[-12.97, 28.64], [-11.2, 31.0], [-9.3, 33.7], [-7.77, 35.69], [-6.8, 39.28]]},
   {c:"KEN", base:1, k:"fr", p:[[-4.04, 39.67], [-3.4, 38.56], [-1.29, 36.82]]},
-  {c:"ETH", base:1, k:"fr", p:[[9.03, 38.74], [9.59, 41.86], [11.59, 43.15]]},
+  {c:"ETH", base:1, k:"fr", el:1, p:[[9.03, 38.74], [9.59, 41.86], [11.59, 43.15]]},
   {c:"CHL", base:1, k:"fr", ore:1, p:[[-22.3, -68.9], [-23.0, -69.2], [-23.65, -70.4]]},
   {c:"ARG", base:1, k:"fr", p:[[-34.6, -58.38], [-32.95, -60.64], [-31.42, -64.18]]},
   {c:"THA", base:1, k:"fr", p:[[13.75, 100.5], [13.08, 100.92], [12.68, 101.15]]},
@@ -404,14 +428,16 @@ export class World3D {
     this.lam = lam;
     this.shMat = new THREE.MeshBasicMaterial({color:0x000a12, transparent:true, opacity:.28, depthWrite:false});
     const C = this.mod.car, root = this.g;
-    this.cars = {}; for (const k of ["hsrHead", "hsrMid", "diesel", "electric", "box", "ore", "tank"]) this.cars[k] = new Inst(root, C[k], lam, k === "hsrMid" || k === "box" ? 900 : 300, k === "box");
-    this.carSh = new Inst(root, C.shadow, this.shMat, 1600);
+    const CAP = {hsrMid:400, bulletMid:200, emuMid:200, coach:200, box:500, ore:200, tank:160};
+    this.cars = {}; for (const k of ["hsrHead", "hsrMid", "bulletHead", "bulletMid", "emuHead", "emuMid", "coach", "diesel", "electric", "box", "ore", "tank"]) this.cars[k] = new Inst(root, C[k], lam, CAP[k] || 120, k === "box");
+    this.carSh = new Inst(root, C.shadow, this.shMat, 1400);
     this.trees = {}; for (const k of ["pine", "leaf", "mangrove"]) this.trees[k] = new Inst(root, this.mod.tree[k], lam, 1400, true);
     this.treeSh = new Inst(root, new THREE.CircleGeometry(.3, 10), this.shMat, 4200);
     this.carSh.m.renderOrder = this.treeSh.m.renderOrder = 3;
-    // tracks: ribbons widened in the vertex shader (so their width stays the same on screen at any zoom)
-    this.trackMat = {bed:this.ribbonMat(0x14181c, .75), hsr:this.ribbonMat(0xf2c14e, .9), fr:this.ribbonMat(0xb9b2a6, .85)};
-    this.tracks = null; this.trackKey = "";
+    // tracks: ribbons widened in the vertex shader (so their width stays the same on screen at any zoom); a double track,
+    // one line for each direction, so trains going opposite ways pass side by side instead of through each other
+    this.trackMat = {bedH:this.ribbonMat(0x14181c, .7), bedF:this.ribbonMat(0x14181c, .7), hsr:this.ribbonMat(0xf2c14e, .9), fr:this.ribbonMat(0xb9b2a6, .85)};
+    this.tracks = null; this.trackKey = ""; this.openKey = ""; this.open = [];
     this.sites = []; this.siteHits = [];
     this.groves = new Map();
     this.decals = new Map();   // key → {mesh, mask, ...}
@@ -423,8 +449,9 @@ export class World3D {
     this.t = 0;
   }
   ribbonMat(col, op){
-    return new THREE.ShaderMaterial({uniforms:{uW:{value:1}, uCol:{value:new THREE.Color(col)}, uOp:{value:op}},
-      vertexShader:`attribute vec2 dir; attribute float side; uniform float uW; void main(){ vec3 p = position; p.xy += vec2(-dir.y, dir.x) * side * uW; gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0); }`,
+    // uW: half width, uO: one car length (lane offsets are given in car lengths), both in map units
+    return new THREE.ShaderMaterial({uniforms:{uW:{value:1}, uO:{value:1}, uCol:{value:new THREE.Color(col)}, uOp:{value:op}},
+      vertexShader:`attribute vec2 dir; attribute float side; attribute float lane; uniform float uW, uO; void main(){ vec3 p = position; p.xy += vec2(-dir.y, dir.x) * (side * uW + lane * uO); gl_Position = projectionMatrix * modelViewMatrix * vec4(p, 1.0); }`,
       fragmentShader:`uniform vec3 uCol; uniform float uOp; void main(){ gl_FragColor = vec4(uCol, uOp); }`, transparent:true, depthWrite:false});
   }
 
@@ -448,19 +475,31 @@ export class World3D {
   }
 
   /* ---------- trains ---------- */
-  railOpen(r, i){
+  railOpen(r, i, pins){
     if (r.base) return true;
     if (!S.owned || !S.owned.I2) return false;
-    const pins = (S.pins || []).filter(p => p.k === "rail");
     if (pins.some(p => p.done && p.c === r.c)) return true;
     const t0 = pins.length ? Math.min(...pins.map(p => p.t ?? S.tick)) : S.tick;
     return S.tick - t0 >= 4 + (i % 23) * 2;   // the other lines open one by one, every two months
+  }
+  /* the open lines change at most once a month: worked out again only then */
+  openLines(){
+    const pins = (S.pins || []).filter(p => p.k === "rail"), key = `${S.tick}|${S.owned && S.owned.I2 ? 1 : 0}|${pins.length}|${pins.filter(p => p.done).length}`;
+    if (key !== this.openKey){ this.openKey = key; this.open = []; RAIL.forEach((r, i) => { if (this.railOpen(r, i, pins)) this.open.push(this.route(r)); }); }
+    return this.open;
   }
   route(r){
     if (r.pts) return r;
     r.pts = r.p.map(([la, lo]) => ll(la, lo)); r.seg = [0];
     for (let i = 1; i < r.pts.length; i++) r.seg.push(r.seg[i - 1] + Math.hypot(r.pts[i][0] - r.pts[i - 1][0], r.pts[i][1] - r.pts[i - 1][1]));
-    r.len = r.seg[r.seg.length - 1] || 1; r.ph = hashStr(r.p.join()); return r;
+    r.len = r.seg[r.seg.length - 1] || 1; r.ph = hashStr(r.p.join());
+    // the trains on this line: high-speed lines get one train (two on long lines, running opposite ways);
+    // freight lines a freight train, and on long lines a passenger train as well (electric where the line is)
+    const T = r.t || "hsr";
+    const hs = {kind:T, n:5, v:T === "bullet" ? 8 : 7, lane:.15};
+    r.trains = r.k === "hsr" ? [hs].concat(r.len > 380 ? [{...hs, half:1}] : [])
+      : [{kind:"fr", n:7, v:2.6, lane:.37}].concat(r.len > 300 ? [{kind:"pax", n:4, v:4.4, lane:.13, half:1}] : []);
+    return r;
   }
   at(r, d){
     d = clamp(d, 0, r.len); let i = 1; while (i < r.seg.length - 1 && r.seg[i] < d) i++;
@@ -469,57 +508,66 @@ export class World3D {
   }
   buildTracks(open){
     if (this.tracks){ for (const m of this.tracks) { this.g.remove(m); m.geometry.dispose(); } }
-    const mk = (list, mat, order) => {
-      const pos = [], dir = [], side = [], idx = []; let v = 0;
-      for (const r of list){
+    const mk = (list, lanes, mat, order) => {
+      const pos = [], dir = [], side = [], lane = [], idx = []; let v = 0;
+      for (const r of list) for (const ln of lanes(r)){
         const P0 = r.pts;
         for (let i = 0; i < P0.length; i++){
           const a = P0[Math.max(0, i - 1)], b = P0[Math.min(P0.length - 1, i + 1)];
           let dx = b[0] - a[0], dy = -(b[1] - a[1]); const l = Math.hypot(dx, dy) || 1; dx /= l; dy /= l;
-          for (const sd of [-1, 1]){ pos.push(P0[i][0], -P0[i][1], .01); dir.push(dx, dy); side.push(sd); }
+          for (const sd of [-1, 1]){ pos.push(P0[i][0], -P0[i][1], .01); dir.push(dx, dy); side.push(sd); lane.push(ln); }
           if (i){ idx.push(v - 2, v - 1, v, v - 1, v + 1, v); }
           v += 2;
         }
       }
       const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute("dir", new THREE.Float32BufferAttribute(dir, 2));
-      g.setAttribute("side", new THREE.Float32BufferAttribute(side, 1)); g.setIndex(idx);
+      g.setAttribute("side", new THREE.Float32BufferAttribute(side, 1)); g.setAttribute("lane", new THREE.Float32BufferAttribute(lane, 1)); g.setIndex(idx);
       const m = new THREE.Mesh(g, mat); m.frustumCulled = false; m.renderOrder = order; this.g.add(m); return m;
     };
-    this.tracks = [mk(open, this.trackMat.bed, 2), mk(open.filter(r => r.k === "hsr"), this.trackMat.hsr, 2), mk(open.filter(r => r.k === "fr"), this.trackMat.fr, 2)];
+    const hsr = open.filter(r => r.k === "hsr"), fr = open.filter(r => r.k === "fr");
+    const rails = r => [...new Set(r.trains.map(t => t.lane))].flatMap(l => [l, -l]);
+    this.tracks = [mk(hsr, () => [0], this.trackMat.bedH, 2), mk(fr, () => [0], this.trackMat.bedF, 2), mk(hsr, rails, this.trackMat.hsr, 2), mk(fr, rails, this.trackMat.fr, 2)];
   }
   drawTrains(M, s, z, dt){
     for (const k in this.cars) this.cars[k].begin(); this.carSh.begin();
     const show = z >= 1.1;
-    const open = []; RAIL.forEach((r, i) => { if (this.railOpen(r, i)) open.push(this.route(r)); });
+    const open = this.openLines();
     const key = open.map(r => r.ph).join(",");
     if (key !== this.trackKey){ this.trackKey = key; this.buildTracks(open); }
     for (const m of this.tracks) m.visible = show;
     if (show){
-      this.trackMat.bed.uniforms.uW.value = 1.7 / s; this.trackMat.hsr.uniforms.uW.value = .55 / s; this.trackMat.fr.uniforms.uW.value = .5 / s;
-      const fade = clamp((z - 1.1) / .3, 0, 1); for (const k in this.trackMat) this.trackMat[k].uniforms.uOp.value = (k === "bed" ? .7 : .85) * fade;
       const carPx = clamp(5.6 * Math.sqrt(z), 7, 17), Lc = carPx / s, regs = {}; for (const r of S.regions || []) regs[r.id] = r;
-      const elec = !!(S.owned && S.owned.I2);
+      const TM = this.trackMat; for (const k in TM) TM[k].uniforms.uO.value = Lc;
+      TM.bedH.uniforms.uW.value = .3 * Lc + .6 / s; TM.bedF.uniforms.uW.value = .52 * Lc + .6 / s; TM.hsr.uniforms.uW.value = .5 / s; TM.fr.uniforms.uW.value = .45 / s;
+      const fade = clamp((z - 1.1) / .3, 0, 1); for (const k in TM) TM[k].uniforms.uOp.value = (k.startsWith("bed") ? .6 : .85) * fade;
+      const elec = !!(S.owned && S.owned.I2), gap = Lc * 1.03;
       for (const r of open){
-        const hsr = r.k === "hsr", ncar = hsr ? 6 : 10, speed = hsr ? 7 : 2.6, trainLen = ncar * Lc * 1.04;
-        const nTrains = clamp(Math.round(r.len / 150), 1, 3);
-        const cc = P.C && P.C(r.c), reg = cc ? regs[cc.reg] : null, green = elec || (reg && reg.co2 / reg.co2_0 < .45);
-        for (let j = 0; j < nTrains; j++){
-          // each train runs to the end of the line and back
-          const cyc = (r.len + trainLen) * 2, u = ((this.t * speed + r.ph * cyc + j * cyc / nTrains) % cyc + cyc) % cyc;
-          const fwd = u < cyc / 2, d0 = fwd ? u : cyc - u;   // head position along the line (0 … len + trainLen)
-          for (let c = 0; c < ncar; c++){
-            const d = fwd ? d0 - c * Lc * 1.04 - Lc / 2 : d0 - trainLen + c * Lc * 1.04 + Lc / 2;
+        const cc = P.C && P.C(r.c), reg = cc ? regs[cc.reg] : null, green = elec || r.el || (reg && reg.co2 / reg.co2_0 < .45);
+        for (const tr of r.trains){
+          // where the train is depends only on the clock and the line (never on the zoom), so zooming cannot move it:
+          // f runs 0 → 1 → 0, the rear of the train goes from one end of the line to the other and back
+          const per = 2 * r.len / tr.v, u = ((this.t + r.ph * per + (tr.half ? per / 2 : 0)) % per) / per;
+          // (eased, so it slows into each end station and pulls away again). The middle of the train is placed in map units
+          // (the margin m does not depend on the zoom either); the cars are drawn around it at their on-screen size
+          const fwd = u < .5, f = sm(fwd ? u * 2 : 2 - u * 2), n = tr.n, tLen = n * gap, m = Math.min(r.len * .2, 10), mid = m + f * (r.len - 2 * m), rear = mid - tLen / 2;
+          const pax = tr.kind === "pax" ? (green ? "emu" : "coach") : tr.kind, lane = (fwd ? 1 : -1) * tr.lane * Lc;
+          for (let c = 0; c < n; c++){
+            // car 0 is the front in the direction of travel
+            const d = fwd ? rear + tLen - c * gap - Lc / 2 : rear + c * gap + Lc / 2;
             if (d < 0 || d > r.len) continue;
-            const [x, y, a] = this.at(r, d), hd = fwd ? a : a + Math.PI;
-            let kind;
-            if (hsr) kind = c === 0 || c === ncar - 1 ? "hsrHead" : "hsrMid";
+            let [x, y, a] = this.at(r, d); const hd = fwd ? a : a + Math.PI;
+            // the lane: beside the middle of the line, on the side for this direction (matches the rail lines)
+            x += Math.sin(a) * lane; y -= Math.cos(a) * lane;
+            let kind, flip = 0;
+            if (pax === "hsr" || pax === "bullet"){ const end = c === 0 || c === n - 1; kind = pax + (end ? "Head" : "Mid"); if (c === n - 1) flip = Math.PI; }
+            else if (pax === "emu"){ const end = c === 0 || c === n - 1; kind = end ? "emuHead" : "emuMid"; if (c === n - 1) flip = Math.PI; }
+            else if (pax === "coach") kind = c === 0 ? "diesel" : "coach";
             else kind = c === 0 ? (green ? "electric" : "diesel") : r.ore ? "ore" : c % 4 === 2 ? "tank" : "box";
-            const flip = hsr && c === ncar - 1 ? Math.PI : 0;
-            this.cars[kind].add(mat(x, y, 0, hd + flip, Lc, Lc, Lc), kind === "box" ? _c.setHSL((hashStr(r.ph + "" + c + j) * 6 | 0) / 6 * .9, .55, .5) : null);
-            this.carSh.add(mat(x + .12 * Lc, y + .18 * Lc, .002, hd, Lc, Lc, Lc));
+            this.cars[kind].add(mat(x, y, 0, hd + flip, Lc, Lc * .92, Lc), kind === "box" ? _c.setHSL((hashStr(r.ph + "" + c) * 6 | 0) / 6 * .9, .55, .5) : null);
+            this.carSh.add(mat(x + .12 * Lc, y + .18 * Lc, .002, hd, Lc, Lc * .92, Lc));
             // diesel smoke
-            if (!hsr && c === 0 && !green && dt && Math.random() < dt * 3){
-              const [hx, hy] = [x - Math.cos(hd) * Lc * .1, y - Math.sin(hd) * Lc * .1];
+            if (kind === "diesel" && dt && Math.random() < dt * 3){
+              const hx = x - Math.cos(hd) * Lc * .1, hy = y - Math.sin(hd) * Lc * .1;
               this.smoke.emit({x:hx, y:hy, z:Lc * .4, vx:.4 / s, vy:-.2 / s, vz:5 / s, life:1.6, s0:carPx * .35, s1:carPx * 1.1, c0:[.32, .31, .3, .55], c1:[.55, .54, .52, 0]});
             }
           }
@@ -534,8 +582,8 @@ export class World3D {
   drawSites(M, s, z, dt, q){
     if (!this.sites.length){
       for (const [k, la, lo, reg] of SITES){
-        const [x, y] = ll(la, lo), m = new THREE.Mesh(this.mod.site[k][0], this.lam); m.frustumCulled = false; m.renderOrder = 4;
-        const sh = new THREE.Mesh(new THREE.CircleGeometry(.7, 16), this.shMat); sh.renderOrder = 3; sh.frustumCulled = false;
+        const [x, y] = ll(la, lo), m = new THREE.Mesh(this.mod.site[k][0], this.lam); m.renderOrder = 4;   // off-screen sites are skipped by three
+        const sh = new THREE.Mesh(this.siteShGeo || (this.siteShGeo = new THREE.CircleGeometry(.7, 16)), this.shMat); sh.renderOrder = 3;
         this.g.add(sh, m); this.sites.push({k, x, y, reg, m, sh, clean:false, ph:hashStr(k + la + lo)});
       }
     }
@@ -559,9 +607,10 @@ export class World3D {
       }
       // tap → what it is
       const [px, py] = M.toScreenAlt(st.x, st.y, sz * .3); if (px < -40 || py < -40 || px > M.vw + 40 || py > M.vh + 40) continue;
-      const nm = L(SITE_NAME[st.k]), regName = r ? L(P.RMETA[st.reg].name) : "";
-      const txt = th ? `${nm} · ${regName} · ${clean ? "สะอาดแล้ว" : `ยังปล่อยคาร์บอน ${Math.round(k * 100)}% ของปีเริ่มต้น`}` : `${nm} · ${regName} · ${clean ? "clean now" : `still emitting ${Math.round(k * 100)}% of the start`}`;
-      M.hits.push({id:"site-" + st.ph, x:px - sz * .5, y:py - sz * .6, w:sz, h:sz, fn:() => { M.info = {x:px, y:py - sz * .6, t:performance.now(), txt}; }});
+      M.hits.push({id:"site-" + st.ph, x:px - sz * .5, y:py - sz * .6, w:sz, h:sz, fn:() => {
+        const nm = L(SITE_NAME[st.k]), regName = r ? L(P.RMETA[st.reg].name) : "";
+        const txt = th ? `${nm} · ${regName} · ${clean ? "สะอาดแล้ว" : `ยังปล่อยคาร์บอน ${Math.round(k * 100)}% ของปีเริ่มต้น`}` : `${nm} · ${regName} · ${clean ? "clean now" : `still emitting ${Math.round(k * 100)}% of the start`}`;
+        M.info = {x:px, y:py - sz * .6, t:performance.now(), txt}; }});
     }
     return show;
   }
@@ -625,7 +674,7 @@ export class World3D {
     this.decals.set(key, d); return d;
   }
   decalMesh(mask, ty, cx, cy, Rx, Ry){
-    const mt = new THREE.ShaderMaterial({uniforms:{uMask:{value:mask.tex}, uNoise:{value:mask.ntex}, uType:{value:ty}, uL:{value:0}, uB:{value:0}, uT:{value:0}, uA:{value:1}, uFront:{value:0}, uScar:{value:1}, uOff:{value:new THREE.Vector2((hashStr(cx + "," + cy) - .5) * 60, (hashStr(cy + "," + cx) - .5) * 60)}},
+    const mt = new THREE.ShaderMaterial({uniforms:{uMask:{value:mask.tex}, uNoise:{value:mask.ntex}, uType:{value:ty}, uL:{value:0}, uB:{value:0}, uT:{value:0}, uA:{value:1}, uFront:{value:0}, uScar:{value:1}, uFade:{value:new THREE.Vector4(.1, .1, .1, .1)}, uOff:{value:new THREE.Vector2((hashStr(cx + "," + cy) - .5) * 60, (hashStr(cy + "," + cx) - .5) * 60)}},
       vertexShader:"uniform vec2 uOff; " + DECAL_VS, fragmentShader:DECAL_FS, transparent:true, depthWrite:false});
     const mesh = new THREE.Mesh(new THREE.PlaneGeometry(2 * Rx, 2 * Ry), mt); mesh.position.set(cx, -cy, .005); mesh.renderOrder = 1; mesh.frustumCulled = false;
     this.g.add(mesh); return mesh;
@@ -681,13 +730,15 @@ export class World3D {
 
   /* ---------- snow in the northern winter ---------- */
   drawSnow(M, s, z, dt, q){
-    const SNOW = [[44, 72, -132, -58], [44, 72, -12, 62], [40, 72, 58, 142]];
+    // [south, north, west, east, fade left, fade right, fade top]: up to 80°N so no edge cuts across the land; Europe and
+    // Asia overlap by 10° and cross-fade there
+    const SNOW = [[44, 80, -168, -50, .03, .06, .1], [44, 80, -15, 65, .1, .125, .1], [40, 80, 55, 190, .074, .03, .1]];
     const sea = P.seasonOf ? P.seasonOf(S.tick) : null, m = S.tick % 12, frac = P.monthFrac ? P.monthFrac() : 0;
     // 0 in autumn … 1 in deep winter … 0 by spring (Dec · Jan · Feb), a little warmer world = less snow
     const into = m === 11 ? frac : m === 0 ? 1 : m === 1 ? 1 - ss(.3, 1, frac) : 0;
     const L0 = sea && sea.id === "cool" ? into * clamp(1.15 - (S.temp - 1.2) * .35, .45, 1) : 0;
     let any = false;
-    SNOW.forEach(([la0, la1, lo0, lo1], i) => {
+    SNOW.forEach(([la0, la1, lo0, lo1, fl, fr, ft], i) => {
       const key = "snow:" + i;
       if (L0 <= .01){ const d = this.decals.get(key); if (d) d.mesh.visible = false; return; }
       let d = this.decals.get(key);
@@ -696,15 +747,17 @@ export class World3D {
         const shapes = M.shapes.filter(sh => sh.b[2] > x0 && sh.b[0] < x1 && sh.b[3] > y0 && sh.b[1] < y1);
         const mask = makeMask(M, shapes, cx, cy, Rx, Ry, .37 + i, 1536);
         d = {mesh:this.decalMesh(mask, 5, cx, cy, Rx, Ry), mask, type:"snow", x:cx, y:cy, Rx, Ry}; this.decals.set(key, d);
+        d.mesh.material.uniforms.uFade.value.set(fl, fr, ft, .1);
       }
       d.mesh.visible = true; d.mesh.material.uniforms.uL.value = L0; d.mesh.material.uniforms.uT.value = this.t; any = true;
       // falling snow over the part of the area on screen
       if (dt){
-        const n = Math.round(10 * q * dt * 60 * L0), px = clamp(3 * Math.sqrt(z), 3, 7);
+        const n = Math.round(6 * q * dt * 60 * L0), px = clamp(3 * Math.sqrt(z), 3, 7);
         for (let k = 0; k < n; k++){
-          const x = d.x + (Math.random() * 2 - 1) * d.Rx, y = d.y + (Math.random() * 2 - 1) * d.Ry;
+          const u = Math.random() * 2 - 1, v = Math.random() * 2 - 1, x = d.x + u * d.Rx, y = d.y + v * d.Ry;
+          if (Math.random() > clamp((1 - Math.abs(u)) / .14, 0, 1) * clamp((1 - Math.abs(v)) / .2, 0, 1)) continue;   // thins out toward the edges of the area
           const [sx, sy] = M.toScreen(x, y); if (sx < -20 || sy < -20 || sx > M.vw + 20 || sy > M.vh + 20) continue;
-          this.snow.emit({x, y, z:px * 14 / s, vx:(1.5 + Math.random()) / s, vy:0, vz:-px * 3 / s, life:4.2, s0:px, s1:px * .8, c0:[1, 1, 1, .9], c1:[1, 1, 1, .7]});
+          this.snow.emit({x, y, z:px * 14 / s, vx:(1.5 + Math.random()) / s, vy:0, vz:-px * 3 / s, life:4.2, s0:px, s1:px * .8, c0:[1, 1, 1, .75], c1:[1, 1, 1, .55]});
         }
       }
     });

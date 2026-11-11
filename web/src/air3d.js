@@ -48,7 +48,8 @@ function buildModels(){
 export function createAir3D(){
   try {
     const canvas = document.createElement("canvas"); canvas.className = "map-air";
-    const r = new THREE.WebGLRenderer({canvas, antialias:true, alpha:true, powerPreference:"high-performance", stencil:false});
+    // on sharp screens (2× and up) the pixels are small enough without multisampling, which costs a lot on phones
+    const r = new THREE.WebGLRenderer({canvas, antialias:(window.devicePixelRatio || 1) < 1.5, alpha:true, powerPreference:"high-performance", stencil:false});
     r.setClearColor(0x000000, 0); r.outputColorSpace = THREE.SRGBColorSpace;
     return new Air3D(r, canvas);
   } catch (e){ return null; }
@@ -67,7 +68,7 @@ class Air3D {
   }
   setSize(w, h, dpr, persp){
     this.w = w; this.h = h; this.persp = persp;
-    this.r.setPixelRatio(dpr); this.r.setSize(w, h, false);
+    this.r.setPixelRatio(Math.min(dpr, 2)); this.r.setSize(w, h, false);   // the 3D layer never needs more than 2× (phones are 3×)
     this.canvas.style.width = w + "px"; this.canvas.style.height = h + "px";
     const c = this.cam; c.fov = 2 * Math.atan(h / 2 / persp) * 180 / Math.PI; c.aspect = w / h; c.near = Math.max(1, persp * .02); c.far = persp * 6;
     c.position.set(0, 0, persp); c.lookAt(0, 0, 0); c.updateProjectionMatrix();

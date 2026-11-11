@@ -394,6 +394,9 @@ P.CHANGELOG.find(x => x.v === "2.1").subs = [
     "บนมือถือแนวนอนมีหน้าบอกให้หมุนจอเป็นแนวตั้ง",
     "ภาพบนแผนที่คมขึ้นเมื่อซูมใกล้: น้ำท่วม รอยไหม้ ดินแห้ง และหิมะไม่แตกเป็นช่องสี่เหลี่ยมอีกแล้ว น้ำเค็มรุกเข้าจากทะเลจริง ๆ ไม่ใช่จากชายแดน เหมืองมีหอโครงเหล็กกับล้อกว้าน",
     "แก้: กล่องคำพูดที่จางหายไปแล้วไม่บังการแตะแผนที่อีก ป่าที่ปลูกในเกมใหม่ไม่ใช้ตำแหน่งต้นไม้ของเกมเก่า",
+    "รถไฟหลายแบบ: รถไฟหัวกระสุนในญี่ปุ่น ไต้หวัน ปักกิ่ง–เซี่ยงไฮ้ และมุมไบ รถไฟฟ้าความเร็วสูง รถไฟฟ้าโดยสาร (หรือรถโดยสารลากด้วยหัวดีเซลบนเส้นที่ยังไม่มีไฟฟ้า) และรถไฟขนส่งสินค้า",
+    "รถไฟน้อยลงและสั้นลง ทุกเส้นเป็นทางคู่ ขบวนที่สวนกันวิ่งคนละราง ไม่ทับกันแล้ว และตำแหน่งรถไฟไม่กระโดดเวลาซูมเข้าออก",
+    "หิมะจางลงเล็กน้อย ขอบค่อย ๆ จางหาย ไม่มีเส้นตัดตรงทางเหนือแล้ว · ภาพ 3 มิติเบาลงบนมือถือ",
   ], [
     "Disasters you can see in 3D: floods spread over the land and drain away, wildfires burn across the country with flames, tall smoke and a black scar, drought cracks the ground, heatwaves glow, salt water creeps in from the coast.",
     "Northern winters cover the land with snow, with snow falling.",
@@ -404,6 +407,9 @@ P.CHANGELOG.find(x => x.v === "2.1").subs = [
     "Phones held sideways show a hint to turn them upright.",
     "Sharper map pictures up close: floods, burn scars, dry ground and snow no longer break into squares; salt water now comes in from the sea, not from a land border; mines have a steel headframe with its wheel.",
     "Fixed: a faded speech bubble no longer blocks taps on the map; forests planted in a new game no longer reuse the old game's tree spots.",
+    "More kinds of trains: bullet trains in Japan, Taiwan, Beijing–Shanghai and Mumbai, high-speed electric trains, electric passenger trains (or diesel-hauled coaches on lines not yet electrified) and freight trains.",
+    "Fewer, shorter trains on double track: trains going opposite ways keep to their own side instead of overlapping, and trains no longer jump when you zoom.",
+    "Snow is a little fainter and fades out at its edges, with no straight line across the north · the 3D layer is lighter on phones.",
   ]),
   SUB("2.1.2", "2026-11-10", [
     "แผงประเทศอ่านง่ายขึ้น: CO₂ ตัวใหญ่ (หน่วย Gt) ความเสี่ยงภัย ป้องกันภัย และเทคโนโลยีสีเขียวเป็นช่องของตัวเอง แร่ที่ประเทศนั้นมีขึ้นให้เห็นเลย และบอกว่าแร่ไหนต้องแปรรูปก่อน",
