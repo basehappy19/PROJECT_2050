@@ -5,6 +5,7 @@
    side and, as it climbs out or banks into a turn, its belly. Each plane has a shadow on the ground.
    Only used when the map itself is drawn with WebGL (mapgl.js); otherwise mapfx.js keeps the flat plane pictures. */
 import * as THREE from "three";
+import {World3D} from "./world3d.js";
 
 function buildModels(){
   const white = new THREE.MeshLambertMaterial({color:0xf3f6f8}), belly = new THREE.MeshLambertMaterial({color:0xbcc8d0});
@@ -73,6 +74,13 @@ class Air3D {
   }
   /* start a frame: the map's tilt (radians) */
   begin(tilt){ this.ground.rotation.x = -tilt; this.n = 0; }
+  /* 3.9: trains, industry, trees, disasters and snow (world3d.js) */
+  world3d(M, dt, now){
+    if (!this.world){ try { this.world = new World3D(this); } catch (e){ console.error(e); this.world = false; } }
+    if (!this.world) return;
+    this.world.g.visible = true;
+    try { this.worldOn = this.world.frame(M, dt, now); } catch (e){ console.error(e); this.worldOn = false; }
+  }
   /* one plane. u, v: stage point relative to the tilt axis (px, v down); h: height above the map (px);
      heading: radians in the map (x right, y down); pitch: nose up (+); roll: right wing down (+); len: length in px */
   plane(u, v, h, heading, pitch, roll, len, clean, sx, sy){
@@ -92,10 +100,10 @@ class Air3D {
   end(alt){
     if (this.lost) return;
     for (let i = this.n; i < this.pool.length; i++){ this.pool[i].obj.visible = this.pool[i].sh.visible = false; }
-    if (!this.n && !this.drawn) return;   // nothing now and nothing left on the canvas
+    if (!this.n && !this.worldOn && !this.drawn) return;   // nothing now and nothing left on the canvas
     this.M.shadowMat.opacity = alt;
-    this.r.render(this.scene, this.cam); this.drawn = this.n > 0;
+    this.r.render(this.scene, this.cam); this.drawn = this.n > 0 || !!this.worldOn;
   }
-  clear(){ if (this.drawn){ this.n = 0; this.end(.3); } }
+  clear(){ if (this.world) this.world.g.visible = false; this.worldOn = false; if (this.drawn){ this.n = 0; this.end(.3); } }
   dispose(){ try { this.r.dispose(); this.r.forceContextLoss(); } catch (e){} }
 }

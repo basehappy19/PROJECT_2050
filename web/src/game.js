@@ -274,6 +274,8 @@ H.showEnd = () => {
 };
 H.closeModal = () => { if (UIM.modal === "charsel") UIM.modal = null; bump(); };
 H.toast = a => { UIM.toastQ.push(a); bump(); };
+/* 3.9: a person of the story says something (45-voices.js) — the newest line replaces one still waiting */
+H.voice = v => { UIM.voice = {...v, id:(UIM.voice ? UIM.voice.id : 0) + 1, at:0}; bump(); };
 /* 2.0: losses with their reasons, disaster forecast cards, the yearly review */
 H.loss = o => addLoss(o);
 H.hazardWarn = h => { Audio.play("data", {vol:.5, delay:.25}); addAlert(h); };

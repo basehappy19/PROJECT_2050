@@ -1677,3 +1677,13 @@ details.more > summary:hover{color:var(--fg)}
 .rh-phone .rh-screen{position:absolute;inset:12px 5px;border-radius:3px;background:linear-gradient(160deg,rgba(79,209,197,.35),rgba(95,211,154,.12))}
 @keyframes rhTurn{0%,20%{transform:rotate(-90deg)}55%,100%{transform:rotate(0deg)}}
 @media (prefers-reduced-motion: reduce){ .rh-phone{animation:none} }
+
+/* 3.9: a person of the story speaks (app.jsx Voice) */
+.voice{position:fixed;left:calc(14px + var(--safe-l));top:calc(262px + var(--safe-t));z-index:30;width:min(390px, calc(100vw - 28px));display:flex;gap:12px;align-items:flex-start;padding:10px 12px;text-align:left;border:1px solid var(--border-strong);border-left:3px solid var(--vc, var(--accent));border-radius:var(--radius-md);color:var(--fg);cursor:pointer;animation:voice 9s cubic-bezier(.2,.8,.2,1) forwards;box-shadow:var(--elev-2)}
+.voice .portrait{flex:none}
+.voice .vtxt{display:flex;flex-direction:column;gap:3px;min-width:0}
+.voice .vtxt small{color:var(--vc, var(--accent));font-size:var(--text-xs);font-weight:600}
+.voice .vtxt span{font-size:var(--text-sm);line-height:1.5}
+@keyframes voice{0%{transform:translateX(-24px);opacity:0}5%{transform:none;opacity:1}92%{transform:none;opacity:1}100%{transform:translateX(-12px);opacity:0}}
+@media (max-width:700px), (max-height:520px){ .voice{left:10px;right:10px;width:auto;top:auto;bottom:calc(var(--bottom-h, 150px) + 70px + var(--safe-b));padding:8px 10px} .voice .portrait{width:40px!important;height:40px!important} }
+@media (prefers-reduced-motion:reduce){ .voice{animation:none} }

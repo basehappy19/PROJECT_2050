@@ -47,9 +47,9 @@ export const Key = ({k}) => P.hasKeyboard() ? <kbd>{k}</kbd> : null;
 export const H3 = ({children, cls = ""}) => <h3 class={"h3 " + cls}><Rich t={up(children)} iconColor="inherit"/></h3>;
 
 /* character portrait (photo) — round or card */
-const NPC = ["opp", "fon", "lung"];   // 1.7: story people
+const NPC = ["opp", "fon", "lung"];   // 1.7: story people (3.9: and everyone in P.NPC)
 export function portraitSrc(id, outfit){
-  if (id === "adv" || NPC.includes(id)) return `assets/img/portraits/${id}.jpg`;
+  if (id === "adv" || NPC.includes(id) || (P.NPC && P.NPC[id])) return `assets/img/portraits/${id}.jpg`;
   return `assets/img/portraits/${id}-${outfit || (P.outfitOf ? P.outfitOf(id) : "base")}.jpg`;
 }
 export function Portrait({id, size = 48, ring, cls = "", outfit, dim, lv}){

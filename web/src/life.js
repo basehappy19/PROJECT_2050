@@ -177,6 +177,7 @@ function along(r, d){
   return [a[0] + (b[0] - a[0]) * k, a[1] + (b[1] - a[1]) * k];
 }
 export function drawTrains(M, c, now, vis, pinPos){
+  if (M.w3d) return false;   // 3.9: 3D trains on the rail network (world3d.js)
   const pins = (S.pins || []).filter(p => p.k === "rail" && p.done); if (!pins.length) return false;
   const z = M.cam.z; if (z < 1.15) return false;
   for (const p of pins){
@@ -232,6 +233,7 @@ export function drawSeason(M, c, now, vis){
     const gr = c.createRadialGradient(0, 0, 0, 0, 0, rx); gr.addColorStop(0, `rgba(${r},${g},${b},${a})`); gr.addColorStop(.65, `rgba(${r},${g},${b},${a * .55})`); gr.addColorStop(1, `rgba(${r},${g},${b},0)`);
     c.fillStyle = gr; c.beginPath(); c.arc(0, 0, rx, 0, TAU); c.fill(); c.restore();
     if (kind === "heat") return;
+    if (kind === "snow" && M.w3d) return;   // 3.9: 3D snow (world3d.js)
     // particles inside the oval
     const n = Math.round((kind === "smoke" ? 14 : kind === "snow" ? 60 : 48) * k), sc = Math.sqrt(rx * ry) / 90;
     c.lineCap = "round";

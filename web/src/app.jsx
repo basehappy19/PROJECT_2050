@@ -5,7 +5,7 @@ import {Audio} from "./audio.js";
 import {G} from "./game.js";
 import {GameMap} from "./map2d.js";
 import {Icon, Rich} from "./ui/icon.jsx";
-import {Btn} from "./ui/widgets.jsx";
+import {Btn, Portrait} from "./ui/widgets.jsx";
 import {TopBar, AbilityBar, Bottom, WorldGoals} from "./ui/hud.jsx";
 import {Drawer} from "./ui/drawer.jsx";
 import {Skills} from "./ui/skills.jsx";
@@ -117,6 +117,22 @@ function Toast(){
   </div>;
 }
 
+/* ---------- 3.9: people of the story talk while you play (45-voices.js) ---------- */
+function Voice(){
+  const v = UIM.voice, kind = UIM.kind(), show = v && UIM.screen === "game" && !kind && !UIM.train;
+  useEffect(() => {
+    if (!show || v.at) return;
+    v.at = performance.now(); Audio.play("data", {vol:.3});
+    const id = setTimeout(() => { if (UIM.voice === v){ UIM.voice = null; bump(); } }, 9000); return () => clearTimeout(id);
+  });
+  if (!show) return null;
+  const th = S.lang === "th";
+  return <button type="button" class="voice glass-strong" key={v.id} style={{"--vc":v.color}} onClick={() => { UIM.voice = null; bump(); }} aria-live="polite">
+    <Portrait id={v.who} size={52} ring={v.color}/>
+    <span class="vtxt"><small>{L(v.name)}</small><span>“{th ? v.th : v.en}”</span></span>
+  </button>;
+}
+
 /* ---------- 1.1.5: a new version arrived while a game is running ---------- */
 function UpdateBar(){
   if (!UIM.updateReady) return null;
@@ -208,6 +224,7 @@ export function App(){
     {sc !== "loading" ? <Windows/> : null}
     {sc === "game" && UIM.train ? <Training onFinish={play => G.finishTraining(play)} onQuit={() => G.quitTraining()}/> : null}
     <Toast/>
+    <Voice/>
     <UpdateBar/>
     {Narr.subs && Narr.line ? <div class="subline" aria-live="polite"><span>{Narr.line}</span></div> : null}
     {UIM.transition === "in" ? <div class="flash in"/> : UIM.transition === "reveal" ? <div class="flash out"/> : null}

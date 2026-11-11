@@ -1,6 +1,7 @@
 /* 2.0 · Characters drawn by hand in code (SVG shapes, no AI): the six leaders, the advisor and the three people of the story.
    Each one has their own face shape, eyes, brows, hair, age, clothes and a background that says what they do.
    Output: assets/img/portraits/{sci,dip,eco,act,oce,eng}-{base,alt,gold}.jpg, adv.jpg, fon.jpg, lung.jpg, opp.jpg (600×640)
+   3.9: + the people who speak during the game: ali, tala, ravi, jonas, rahima, lekuta, maria, kaue, mei, sofia, hiro, amina, nils, khalid, elena, noi
    Usage: node tools/make-people.mjs [--out dir] [--sheet sheet.png] [--only sci,fon] */
 import {chromium} from "playwright";
 import fs from "node:fs";
@@ -345,9 +346,220 @@ function opp(){
   });
 }
 
+/* ---------------- 3.9: sixteen more people of the story (they speak during the game, 45-voices.js) ---------------- */
+const hairShort = (col, top = 150) => ({hairBack:`<path d="M182,300 C172,220 214,${top + 8} 300,${top} C386,${top + 8} 428,220 418,300 Z" fill="${col}"/>`,
+  hairFront:`<path d="M184,262 C182,196 234,${top + 8} 300,${top + 4} C366,${top + 8} 418,196 416,262 C400,226 360,206 300,204 C250,206 206,222 184,262 Z" fill="${col}"/>`});
+const hairLong = (col, len = 460) => ({hairBack:`<path d="M170,${len} C146,320 160,150 300,136 C440,150 454,320 430,${len} C414,${len + 16} 398,${len - 6} 392,${len - 30} C410,370 402,316 386,284 L214,284 C198,316 190,370 208,${len - 30} C202,${len - 6} 186,${len + 16} 170,${len} Z" fill="${col}"/>`,
+  hairFront:`<path d="M186,268 C178,190 232,150 300,150 C368,150 422,190 414,268 C398,228 364,206 316,200 C290,214 254,218 226,216 C206,226 192,244 186,268 Z" fill="${col}"/>`});
+const glasses = (col = "#2a2a33", y = 288) => `<g fill="none" stroke="${col}" stroke-width="6"><rect x="212" y="${y - 26}" width="72" height="52" rx="16"/><rect x="316" y="${y - 26}" width="72" height="52" rx="16"/><path d="M284,${y - 6} h32 M212,${y - 10} l-26,-6 M388,${y - 10} l26,-6"/></g>`;
+const tee = (c, cs, y = 474) => `${shoulders(c, y, 268)}${sideShade(cs, y)}<path d="M248,${y} C262,${y + 30} 282,${y + 40} 300,${y + 40} C318,${y + 40} 338,${y + 30} 352,${y}" stroke="${cs}" stroke-width="8" fill="none"/>`;
+const collar = (c, cs, inner = "#f2f2ee", y = 470) => `${shoulders(c, y, 274)}${sideShade(cs, y)}<path d="M268,${y} L300,${y + 70} L332,${y} Z" fill="${inner}"/><path d="M262,${y} L240,${y + 44} L290,${y + 60} Z M338,${y} L360,${y + 44} L310,${y + 60} Z" fill="${cs}"/>`;
+const waves = `${[140, 230, 320, 410, 500].map(y => `<path d="M0,${y} C70,${y - 24} 130,${y + 24} 200,${y} S330,${y - 24} 400,${y} S530,${y + 24} 600,${y}" stroke-width="4"/>`).join("")}`;
+const sunMotif = `<circle cx="470" cy="150" r="60" stroke-width="5"/>${Array.from({length:12}, (_, i) => { const a = i / 12 * Math.PI * 2; return `<path d="M${470 + Math.cos(a) * 78},${150 + Math.sin(a) * 78} L${470 + Math.cos(a) * 104},${150 + Math.sin(a) * 104}" stroke-width="5"/>`; }).join("")}`;
+
+/* Bang Ali · small-boat fisher, Pattani: white kopiah cap, trimmed beard, checked sarong-cloth shirt, the sea behind */
+function ali(){
+  const hc = "#16110e";
+  return person({id:"ali", skin:"brown", bg:["#2f7fa8", "#164a68", "#061826"], rim:"#8fd0ff", motif:waves,
+    fw:228, fh:286, jaw:.86, chin:.28, hairCol:hc, eye:{open:.38, tilt:-.04, eyeCol:"#24150c", crow:true}, browTh:10, browAng:.08, browArch:6, mouth:"smile", mouthW:.21, blush:.2, cy:298, noseKind:"wide", noseW:.15,
+    beard:`<path d="M222,370 C230,436 266,468 300,470 C334,468 370,436 378,370 C364,412 338,440 300,442 C262,440 236,412 222,370 Z" fill="${hc}" opacity=".85"/><path d="M262,402 C282,394 318,394 338,402 C320,398 280,398 262,402 Z" fill="${hc}"/>`,
+    clothes:`${shoulders("#3a5f8a", 474, 272)}${sideShade("#26446a")}${[0, 1, 2, 3, 4, 5, 6, 7].map(i => `<path d="M${40 + i * 70},480 V640" stroke="#7fb2d9" stroke-width="10" opacity=".35"/><path d="M30,${520 + i * 18} H570" stroke="#7fb2d9" stroke-width="6" opacity=".2"/>`).join("")}<path d="M266,474 L300,530 L334,474" fill="none" stroke="#26446a" stroke-width="7"/>`,
+    ...hairShort(hc, 168),
+    top:`<path d="M196,226 C196,168 240,140 300,140 C360,140 404,168 404,226 Z" fill="#f4f2ec"/><path d="M196,226 C196,168 240,140 300,140 C360,140 404,168 404,226" fill="none" stroke="#c9c4b6" stroke-width="3"/>${[214, 244, 274, 304, 334, 364].map(x => `<path d="M${x},${208} l10,-14 10,14" stroke="#c9c4b6" stroke-width="2.5" fill="none"/>`).join("")}`,
+  });
+}
+/* Tala · a student from Tuvalu: curly hair, a frangipani flower, school polo, the lagoon and palms behind */
+function tala(){
+  const hc = "#1c120e";
+  return person({id:"tala", skin:"brown", bg:["#2bb3a6", "#136a74", "#062530"], rim:"#9be8dc",
+    motif:`${waves}<path d="M480,640 C470,520 490,420 520,330" stroke-width="10"/><path d="M520,330 c-60,-10 -90,10 -110,40 M520,330 c40,-40 80,-40 100,-20 M520,330 c-10,-50 10,-80 40,-90 M520,330 c-40,-30 -80,-30 -100,-10" stroke-width="8"/>`,
+    fw:212, fh:276, jaw:.74, chin:.26, hairCol:hc, eye:{open:.56, tilt:.04, lash:true, crease:true, eyeCol:"#1f130b", iris:.27}, browTh:7, browAng:.1, browArch:8, mouth:"grin", mouthW:.22, blush:.5, cy:300,
+    clothes:`${collar("#2c6fb0", "#1d5088", "#2c6fb0", 480)}<rect x="356" y="540" width="26" height="30" rx="4" fill="#f2c14e"/>`,
+    hairBack:`<path d="M160,430 C120,330 150,160 300,140 C450,160 480,330 440,430 C430,456 404,450 398,430 C420,370 410,320 392,290 L208,290 C190,320 180,370 202,430 C196,450 170,456 160,430 Z" fill="${hc}"/>${[[170, 330], [176, 380], [430, 330], [424, 380], [186, 420], [414, 420]].map(([x, y]) => `<circle cx="${x}" cy="${y}" r="22" fill="${hc}"/>`).join("")}`,
+    hairFront:`<path d="M182,262 C176,196 230,150 300,150 C370,150 424,196 418,262 C396,222 352,204 300,204 C248,204 204,222 182,262 Z" fill="${hc}"/>${[200, 236, 272, 308, 344, 380].map((x, i) => `<circle cx="${x + 12}" cy="${178 - (i % 2) * 10}" r="18" fill="${hc}"/>`).join("")}`,
+    extra:`<g transform="translate(410 224)">${[0, 72, 144, 216, 288].map(a => `<ellipse cx="0" cy="-18" rx="13" ry="20" fill="#fff8ee" transform="rotate(${a})"/>`).join("")}<circle r="8" fill="#f2c14e"/></g>`,
+  });
+}
+/* Ravi · textile worker, Kanpur: moustache, short side-parted hair, sweat on the brow, khaki work shirt, threads behind */
+function ravi(){
+  const hc = "#140f0c";
+  return person({id:"ravi", skin:"brown", bg:["#c06a2a", "#6a3210", "#200c04"], rim:"#ffb877",
+    motif:`${Array.from({length:14}, (_, i) => `<path d="M${i * 46},0 V640"/>`).join("")}${Array.from({length:7}, (_, i) => `<path d="M0,${80 + i * 90} C150,${60 + i * 90} 450,${100 + i * 90} 600,${80 + i * 90}" stroke-width="3"/>`).join("")}`,
+    fw:222, fh:288, jaw:.8, chin:.26, hairCol:hc, eye:{open:.4, tilt:-.06, eyeCol:"#20120a", bags:true}, browTh:11, browAng:.18, browArch:5, mouth:"smile", mouthW:.2, blush:.15, cy:296, noseW:.15,
+    beard:`<path d="M248,384 C266,370 288,372 300,378 C312,372 334,370 352,384 C336,392 316,388 300,386 C284,388 264,392 248,384 Z" fill="${hc}"/>`,
+    faceExtra:`<circle cx="236" cy="226" r="5" fill="#bfe6ff" opacity=".8"/><circle cx="352" cy="214" r="4" fill="#bfe6ff" opacity=".8"/><circle cx="380" cy="300" r="4.5" fill="#bfe6ff" opacity=".7"/>`,
+    clothes:collar("#a8925c", "#7f6c40", "#8e7a4a"),
+    hairBack:`<path d="M184,290 C176,214 222,152 300,148 C378,152 424,214 416,290 Z" fill="${hc}"/>`,
+    hairFront:`<path d="M186,250 C190,186 240,152 300,152 C360,152 412,186 414,250 C398,216 364,196 320,192 L260,206 C230,210 204,226 186,250 Z" fill="${hc}"/><path d="M262,170 C280,188 300,194 324,192" stroke="#3a2e28" stroke-width="4" fill="none"/>`,
+  });
+}
+/* Jonas · lignite miner, Lusatia: fair stubble, hard hat with a lamp, orange coveralls, the open pit and its excavator behind */
+function jonas(){
+  const hc = "#b88a4a";
+  return person({id:"jonas", skin:"fair", bg:["#5c6670", "#30383f", "#0f1316"], rim:"#ffd27a",
+    motif:`<path d="M0,500 L120,430 L260,470 L400,410 L600,460" stroke-width="5"/><path d="M0,560 L160,500 L320,540 L460,490 L600,530" stroke-width="5"/><g transform="translate(440 250)"><circle r="70" stroke-width="5"/>${Array.from({length:10}, (_, i) => `<path d="M0,0 L${Math.cos(i * .63) * 70},${Math.sin(i * .63) * 70}" stroke-width="3"/>`).join("")}</g><path d="M440,320 L360,430 h160 z" stroke-width="5"/>`,
+    fw:236, fh:288, jaw:.9, chin:.3, hairCol:hc, eye:{open:.4, tilt:-.04, eyeCol:"#3d6a8a", crow:true}, browTh:10, browAng:.04, browArch:5, browCol:"#9a7038", mouth:"smile", mouthW:.21, blush:.35, cy:298,
+    beard:`<path d="M218,360 C224,424 262,458 300,460 C338,458 376,424 382,360 C372,404 344,432 300,434 C256,432 228,404 218,360 Z" fill="#a8813f" opacity=".45"/>`,
+    clothes:`${shoulders("#e0702a", 472, 280)}${sideShade("#b85418")}<path d="M220,560 H380" stroke="#e8eef0" stroke-width="14"/><path d="M220,560 H380" stroke="#a9b3b8" stroke-width="2" stroke-dasharray="6 6"/><path d="M266,472 L300,520 L334,472" fill="none" stroke="#b85418" stroke-width="8"/>`,
+    ...hairShort(hc, 176),
+    top:`<g><path d="M172,234 C172,152 230,108 300,108 C370,108 428,152 428,234 Z" fill="#f4f4f0"/><path d="M154,238 C214,222 386,222 446,238 L448,254 C386,242 214,242 152,254 Z" fill="#d9d9d2"/><rect x="276" y="140" width="48" height="34" rx="8" fill="#3a3f45"/><circle cx="300" cy="157" r="12" fill="#fff6c8"/><path d="M210,150 C230,130 260,120 290,118" stroke="#fff" stroke-width="7" fill="none" opacity=".5" stroke-linecap="round"/></g>`,
+  });
+}
+/* Rahima · market trader, Khulna: a bright orange-and-green orna headscarf, nose stud, green kameez, river boats behind */
+function rahima(){
+  const hc = "#120c0a";
+  return person({id:"rahima", skin:"tan", bg:["#2a8a6a", "#14503c", "#061a12"], rim:"#ffd27a",
+    motif:`${waves}${[[120, 300], [420, 360]].map(([x, y]) => `<path d="M${x - 70},${y} Q${x},${y + 40} ${x + 70},${y} Z" stroke-width="5"/><path d="M${x},${y} V${y - 70} L${x + 40},${y - 10}" stroke-width="4"/>`).join("")}`,
+    fw:212, fh:282, jaw:.74, chin:.24, hairCol:hc, eye:{open:.5, tilt:.08, lash:true, crease:true, eyeCol:"#1f130b"}, browTh:7, browAng:.1, browArch:8, mouth:"smile", mouthW:.2, blush:.45, cy:300,
+    clothes:`${shoulders("#1f8a5a", 476, 266)}${sideShade("#136a42", 476)}<path d="M150,640 C170,540 230,470 300,470 C370,470 430,540 450,640 Z" fill="#ff8a2a" opacity=".92"/><path d="M180,640 C200,560 250,500 300,500" stroke="#ffd27a" stroke-width="5" fill="none" stroke-dasharray="10 8"/>`,
+    hairBack:`<path d="M166,470 C140,330 158,140 300,126 C442,140 460,330 434,470 Z" fill="#ff8a2a"/><path d="M190,300 C186,220 230,170 300,166 C370,170 414,220 410,300 Z" fill="${hc}"/>`,
+    hairFront:`<path d="M182,262 C186,200 236,174 300,174 C364,174 414,200 418,262 C398,236 356,224 300,224 C244,224 202,236 182,262 Z" fill="${hc}"/>`,
+    top:`<path d="M168,330 C152,210 210,130 300,124 C390,130 448,210 432,330 C424,250 380,180 300,176 C220,180 176,250 168,330 Z" fill="#ff8a2a"/><path d="M178,300 C176,214 228,150 300,146 C372,150 424,214 422,300" stroke="#ffd27a" stroke-width="5" fill="none" stroke-dasharray="10 8"/>`,
+    extra:`<circle cx="324" cy="364" r="4.5" fill="#f2c14e" stroke="#9c7419" stroke-width="1.5"/>`,
+  });
+}
+/* Lekuta · Samburu herder: close-cropped hair, layers of bright bead necklaces, red shuka over the shoulder, acacia and cattle */
+function lekuta(){
+  const hc = "#0f0a08";
+  return person({id:"lekuta", skin:"brown", bg:["#c0822a", "#6a420e", "#201204"], rim:"#ffd27a",
+    motif:`<path d="M80,420 C120,360 220,340 300,350 C380,340 480,360 520,420" stroke-width="6"/><path d="M300,350 V560" stroke-width="10"/><path d="M60,560 H600" stroke-width="4"/>${[[120, 590], [420, 600]].map(([x, y]) => `<path d="M${x},${y} h70 v-24 h-70 z M${x + 70},${y - 24} l14,-12" stroke-width="5"/>`).join("")}`,
+    fw:214, fh:296, jaw:.78, chin:.26, hairCol:hc, eye:{open:.42, tilt:.02, eyeCol:"#1a0f08"}, browTh:8, browAng:.06, browArch:6, mouth:"smile", mouthW:.2, blush:.15, cy:296, noseKind:"wide", noseW:.15,
+    clothes:`${shoulders("#c8202a", 476, 270)}${sideShade("#9a141e", 476)}<path d="M200,476 L400,640 L340,640 L180,500 Z" fill="#2a3a8a" opacity=".85"/>${["#e8e2d0", "#c8202a", "#2a6ad0", "#f2c14e", "#3fae6a"].map((c, i) => `<path d="M${226 - i * 8},${470 + i * 4} C${250 - i * 4},${512 + i * 12} ${350 + i * 4},${512 + i * 12} ${374 + i * 8},${470 + i * 4}" stroke="${c}" stroke-width="9" fill="none"/>`).join("")}`,
+    hairBack:`<path d="M188,280 C182,200 230,150 300,148 C370,150 418,200 412,280 Z" fill="${hc}"/>`,
+    hairFront:`<path d="M190,236 C200,180 246,156 300,156 C354,156 400,180 410,236 C390,204 350,192 300,192 C250,192 210,204 190,236 Z" fill="${hc}"/>`,
+    earrings:`<circle cx="186" cy="338" r="9" fill="none" stroke="#f2c14e" stroke-width="4"/><circle cx="414" cy="338" r="9" fill="none" stroke="#f2c14e" stroke-width="4"/>`,
+  });
+}
+/* María · wildland firefighter, California: yellow fire helmet with goggles, soot on the cheek, yellow Nomex shirt, flames and pines */
+function maria(){
+  const hc = "#2a1610";
+  return person({id:"maria", skin:"warm", bg:["#c0441e", "#6a1e0a", "#1c0602"], rim:"#ffb877",
+    motif:`${[60, 150, 460, 540].map(x => `<path d="M${x},640 V420 M${x - 40},500 L${x},400 L${x + 40},500 Z M${x - 30},440 L${x},370 L${x + 30},440 Z" stroke-width="4"/>`).join("")}<path d="M180,640 C160,560 220,540 210,480 C250,520 260,560 250,640 M380,640 C360,580 410,560 400,500 C440,540 440,590 430,640" stroke-width="5"/>`,
+    fw:216, fh:284, jaw:.76, chin:.24, hairCol:hc, eye:{open:.46, tilt:.06, lash:true, crease:true, eyeCol:"#3a2414"}, browTh:8, browAng:.12, browArch:7, mouth:"smile", mouthW:.2, blush:.35, cy:300,
+    faceExtra:`<ellipse cx="236" cy="350" rx="26" ry="12" fill="#3a2a22" opacity=".28"/><path d="M350,330 l24,6" stroke="#3a2a22" stroke-width="5" opacity=".25" stroke-linecap="round"/>`,
+    clothes:collar("#e8c22a", "#c09a12", "#2a3a4a"),
+    hairBack:`<path d="M186,300 C178,230 222,186 300,184 C378,186 422,230 414,300 Z" fill="${hc}"/><path d="M398,300 C430,330 440,380 420,430 C410,400 404,360 392,330 Z" fill="${hc}"/>`,
+    hairFront:`<path d="M188,268 C190,226 236,206 300,206 C364,206 410,226 412,268 C392,248 352,240 300,240 C248,240 208,248 188,268 Z" fill="${hc}"/>`,
+    top:`<g><path d="M166,244 C166,154 226,108 300,108 C374,108 434,154 434,244 Z" fill="#f2c12a"/><path d="M144,246 C214,226 386,226 456,246 L458,264 C386,250 214,250 142,264 Z" fill="#d9a612"/><path d="M296,112 V240 M304,112 V240" stroke="#c09a12" stroke-width="5"/>
+      <rect x="212" y="200" width="78" height="34" rx="14" fill="#3a4a58" stroke="#1a2228" stroke-width="5"/><rect x="310" y="200" width="78" height="34" rx="14" fill="#3a4a58" stroke="#1a2228" stroke-width="5"/><path d="M226,206 l14,-4 M324,206 l14,-4" stroke="#bfe6ff" stroke-width="4" stroke-linecap="round"/></g>`,
+  });
+}
+/* Kauê · Amazon forest guardian: black hair with a fringe, red urucum paint lines, a feather, seed necklace, forest behind */
+function kaue(){
+  const hc = "#0c0806";
+  return person({id:"kaue", skin:"tan", bg:["#2a8a4a", "#124a24", "#04180a"], rim:"#9be3a8",
+    motif:`${Array.from({length:10}, (_, i) => `<path d="M${30 + i * 62},640 C${20 + i * 62},520 ${60 + i * 62},420 ${40 + i * 62},300"/><path d="M${40 + i * 62},${360 + (i % 3) * 30} c-40,-6 -56,-30 -44,-56 c30,8 46,30 44,56z M${40 + i * 62},${330 + (i % 2) * 40} c38,-14 60,-4 64,20 c-30,10 -54,0 -64,-20z" fill="#fff" stroke="none"/>`).join("")}`,
+    fw:222, fh:282, jaw:.82, chin:.26, hairCol:hc, eye:{open:.38, tilt:.04, eyeCol:"#1a0f08"}, browTh:9, browAng:.08, browArch:5, mouth:"smile", mouthW:.2, blush:.15, cy:300, noseKind:"wide",
+    faceExtra:`<path d="M214,322 h52 M214,336 h52 M334,322 h52 M334,336 h52" stroke="#c8302a" stroke-width="5" stroke-linecap="round" opacity=".85"/><path d="M290,180 h20" stroke="#c8302a" stroke-width="6"/>`,
+    clothes:`${shoulders("#6a4a2a", 478, 266)}${sideShade("#4a321a", 478)}${Array.from({length:15}, (_, i) => { const a = Math.PI * (.15 + .7 * i / 14); return `<circle cx="${300 - Math.cos(a) * 92}" cy="${470 + Math.sin(a) * 64}" r="${i % 3 ? 7 : 10}" fill="${i % 3 ? "#8a2a1a" : "#f2e6c8"}"/>`; }).join("")}`,
+    hairBack:`<path d="M180,330 C168,230 214,150 300,146 C386,150 432,230 420,330 Z" fill="${hc}"/>`,
+    hairFront:`<path d="M182,248 C186,184 236,152 300,152 C364,152 414,184 418,248 L182,248 Z" fill="${hc}"/><path d="M190,248 H410" stroke="#000" stroke-width="3" opacity=".3"/>`,
+    extra:`<g transform="translate(410 200) rotate(24)"><path d="M0,0 C-10,-50 -6,-100 8,-130 C22,-100 24,-50 12,0 Z" fill="#e8b23a"/><path d="M6,-128 V4" stroke="#8a5a1a" stroke-width="3"/><path d="M8,-130 C16,-110 18,-96 14,-84" stroke="#2a6ad0" stroke-width="8" fill="none"/></g>`,
+  });
+}
+/* Mei Lin · battery engineer, Hefei: short bob, safety glasses, white lab jacket with an ID badge, battery cells behind */
+function mei(){
+  const hc = "#100c0c";
+  return person({id:"mei", skin:"fair", bg:["#5a4aa8", "#2c2266", "#0c0824"], rim:"#c3a6ff",
+    motif:`${Array.from({length:6}, (_, i) => `<rect x="${40 + i * 92}" y="${380 + (i % 2) * 40}" width="58" height="150" rx="10"/><rect x="${58 + i * 92}" y="${364 + (i % 2) * 40}" width="22" height="16" rx="3"/><path d="M${69 + i * 92},${430 + (i % 2) * 40} l-10,24 h18 l-10,24" stroke-width="4"/>`).join("")}`,
+    fw:210, fh:282, jaw:.72, chin:.22, hairCol:hc, eye:{open:.42, tilt:.12, lash:true, eyeCol:"#1f140f"}, browTh:7, browAng:.06, browArch:7, mouth:"smile", mouthW:.19, blush:.4, cy:298,
+    clothes:`${collar("#f2f4f6", "#c9d0d6", "#5a4aa8")}<rect x="346" y="530" width="44" height="56" rx="5" fill="#fff" stroke="#8a93a0" stroke-width="2"/><rect x="354" y="540" width="28" height="16" rx="2" fill="#c3a6ff"/><path d="M368,530 V500" stroke="#5a4aa8" stroke-width="4"/>`,
+    hairBack:`<path d="M176,400 C160,300 170,150 300,140 C430,150 440,300 424,400 C410,410 396,404 392,388 C404,330 396,290 384,270 L216,270 C204,290 196,330 208,388 C204,404 190,410 176,400 Z" fill="${hc}"/>`,
+    hairFront:`<path d="M184,280 C176,190 232,148 300,148 C368,148 424,190 416,280 C410,244 394,226 380,220 L380,238 C340,224 260,224 220,238 L220,220 C206,226 190,244 184,280 Z" fill="${hc}"/>`,
+    extra:glasses("#5a6470", 290) + `<path d="M216,268 H284 M316,268 H384" stroke="#bfe6ff" stroke-width="3" opacity=".7"/>`,
+  });
+}
+/* Sofía · community leader, Atacama: two long braids, a felt hat, a woven aguayo shawl, salt flats and flamingos behind */
+function sofia(){
+  const hc = "#18100c";
+  return person({id:"sofia", skin:"tan", bg:["#c08a5a", "#6a4226", "#1c0e06"], rim:"#ffd2a8",
+    motif:`<path d="M0,430 L120,360 L200,400 L320,300 L420,380 L520,330 L600,370" stroke-width="5"/><path d="M0,500 H600" stroke-width="3"/>${[140, 470].map(x => `<path d="M${x},560 V500 C${x},470 ${x + 30},460 ${x + 30},440 C${x + 30},420 ${x + 10},420 ${x + 6},436" stroke-width="5" fill="none"/><ellipse cx="${x + 6}" cy="${500}" rx="26" ry="14" stroke-width="5"/>`).join("")}`,
+    fw:216, fh:284, jaw:.8, chin:.26, hairCol:hc, eye:{open:.44, tilt:.04, lash:true, crease:true, eyeCol:"#24150c", crow:true}, browTh:8, browAng:.1, browArch:6, mouth:"smile", mouthW:.2, blush:.45, cy:302, noseKind:"wide",
+    clothes:`${shoulders("#7a3a5a", 476, 272)}${sideShade("#5a2442", 476)}${["#e0433e", "#f2c14e", "#2a8a6a", "#2a6ad0", "#e0433e"].map((c, i) => `<path d="M160,${520 + i * 22} C230,${500 + i * 22} 370,${500 + i * 22} 440,${520 + i * 22}" stroke="${c}" stroke-width="12" fill="none"/>`).join("")}`,
+    hairBack:`<path d="M184,300 C176,230 222,180 300,178 C378,180 424,230 416,300 Z" fill="${hc}"/><path d="M198,320 C188,420 196,520 212,600 M402,320 C412,420 404,520 388,600" stroke="${hc}" stroke-width="26" stroke-linecap="round" fill="none"/>${[380, 430, 480, 530].map(y => `<path d="M188,${y} l20,8 M412,${y} l-20,8" stroke="#3a2a22" stroke-width="3"/>`).join("")}<circle cx="212" cy="606" r="12" fill="#e0433e"/><circle cx="388" cy="606" r="12" fill="#e0433e"/>`,
+    hairFront:`<path d="M188,270 C192,226 240,206 300,206 C360,206 408,226 412,270 C394,250 352,240 300,240 C248,240 206,250 188,270 Z" fill="${hc}"/>`,
+    top:`<g><path d="M150,232 C210,214 390,214 450,232 C440,250 160,250 150,232 Z" fill="#4a3428"/><path d="M206,226 C210,160 240,126 300,126 C360,126 390,160 394,226 Z" fill="#5a4032"/><path d="M208,206 C260,196 340,196 392,206 L392,222 C340,212 260,212 208,222 Z" fill="#e0433e"/></g>`,
+  });
+}
+/* Hiroshi · retired Shinkansen engineer: grey swept hair, round glasses, a navy cardigan with a rail pin, a bullet train behind */
+function hiro(){
+  const hc = "#c9c7c2";
+  return person({id:"hiro", skin:"fair", bg:["#2a5a8a", "#14304e", "#061220"], rim:"#8fd0ff",
+    motif:`<path d="M-20,470 H460 C520,470 560,440 600,400 V520 H-20 Z" stroke-width="5"/><path d="M0,452 H430" stroke-width="10"/>${Array.from({length:8}, (_, i) => `<rect x="${20 + i * 52}" y="${482}" width="34" height="18" rx="4"/>`).join("")}<path d="M-20,540 H620 M-20,560 H620" stroke-width="3"/>`,
+    fw:226, fh:288, jaw:.82, chin:.26, hairCol:hc, eye:{open:.36, tilt:-.04, eyeCol:"#2a1e16", crow:true, bags:true}, browTh:9, browAng:.04, browArch:5, browCol:"#a9a6a0", mouth:"smile", mouthW:.2, blush:.3, cy:298,
+    lines:`<path d="M244,236 C272,228 328,228 356,236" stroke="#c08466" stroke-width="2.2" fill="none" opacity=".45"/>`,
+    clothes:`${collar("#1f2f4a", "#14203a", "#e8ecef")}<path d="M300,530 V640" stroke="#14203a" stroke-width="3"/>${[560, 600].map(y => `<circle cx="292" cy="${y}" r="5" fill="#c9c7c2"/>`).join("")}<g transform="translate(372 556)"><rect x="-18" y="-8" width="36" height="16" rx="8" fill="#e8ecef"/><rect x="-18" y="-2" width="36" height="4" fill="#2a6ad0"/></g>`,
+    hairBack:`<path d="M184,300 C176,226 222,170 300,166 C378,170 424,226 416,300 Z" fill="${hc}"/>`,
+    hairFront:`<path d="M186,262 C188,206 236,172 300,170 C352,170 396,186 414,230 C380,206 330,204 290,214 C250,222 210,236 186,262 Z" fill="${hc}"/><path d="M240,196 C280,184 330,186 372,200" stroke="#9c9a95" stroke-width="3" fill="none"/>`,
+    extra:`<g fill="none" stroke="#5a4a3a" stroke-width="5"><circle cx="246" cy="292" r="34"/><circle cx="354" cy="292" r="34"/><path d="M280,290 h40 M212,288 l-24,-6 M388,288 l24,-6"/></g>`,
+  });
+}
+/* Aminata · solar co-op founder, Dakar: a tall patterned head wrap, gold hoops, a wax-print top, solar panels and the sun */
+function amina(){
+  const hc = "#0c0806";
+  return person({id:"amina", skin:"brown", bg:["#d08a1e", "#7a4a0a", "#241402"], rim:"#ffd27a",
+    motif:`${sunMotif}${Array.from({length:4}, (_, i) => `<path d="M${30 + i * 100},560 l40,-80 h90 l-40,80 z M${50 + i * 100},520 h90 M${75 + i * 100},480 l-20,80 M${110 + i * 100},480 l-20,80" stroke-width="4"/>`).join("")}`,
+    fw:212, fh:288, jaw:.74, chin:.24, hairCol:hc, eye:{open:.48, tilt:.1, lash:true, crease:true, eyeCol:"#1a0f08"}, browTh:7, browAng:.1, browArch:8, mouth:"grin", mouthW:.21, blush:.3, cy:304, noseKind:"wide",
+    clothes:`${shoulders("#2a6ad0", 478, 266)}${sideShade("#1a4a9a", 478)}${Array.from({length:7}, (_, i) => `<circle cx="${200 + i * 34}" cy="${560 + (i % 2) * 30}" r="14" fill="#f2c14e" opacity=".9"/><circle cx="${200 + i * 34}" cy="${560 + (i % 2) * 30}" r="6" fill="#e0433e"/>`).join("")}`,
+    hairBack:`<path d="M190,300 C184,230 230,190 300,188 C370,190 416,230 410,300 Z" fill="${hc}"/>`,
+    top:`<g><path d="M180,262 C164,180 200,70 300,60 C400,70 436,180 420,262 C390,232 350,222 300,222 C250,222 210,232 180,262 Z" fill="#e0433e"/>${[0, 1, 2, 3].map(i => `<path d="M${196 + i * 10},${236 - i * 46} C${250},${210 - i * 50} ${350},${210 - i * 50} ${404 - i * 10},${236 - i * 46}" stroke="#f2c14e" stroke-width="10" fill="none"/>`).join("")}<path d="M300,64 C340,90 360,130 350,170" stroke="#9a141e" stroke-width="6" fill="none"/></g>`,
+    earrings:`<circle cx="188" cy="352" r="16" fill="none" stroke="#f2c14e" stroke-width="5"/><circle cx="412" cy="352" r="16" fill="none" stroke="#f2c14e" stroke-width="5"/>`,
+  });
+}
+/* Nils · Sámi reindeer herder: the four-winds hat (blue with red and yellow), a gákti collar with ribbon bands, snow and antlers */
+function nils(){
+  const hc = "#8a6a4a";
+  return person({id:"nils", skin:"fair", bg:["#5a7aa8", "#2a3e60", "#0a1222"], rim:"#d8ecff",
+    motif:`${Array.from({length:40}, (_, i) => `<circle cx="${(i * 97) % 600}" cy="${(i * 53) % 640}" r="${2 + (i % 3)}" fill="#fff" stroke="none"/>`).join("")}<g transform="translate(470 420)"><path d="M0,0 C-20,-60 -60,-90 -80,-140 M-40,-70 l-40,-10 M-60,-110 l-30,0 M0,0 C20,-60 60,-90 80,-140 M40,-70 l40,-10 M60,-110 l30,0" stroke-width="6"/></g>`,
+    fw:228, fh:290, jaw:.86, chin:.28, hairCol:hc, eye:{open:.38, tilt:-.06, eyeCol:"#3a6a8a", crow:true}, browTh:10, browAng:.04, browArch:5, browCol:"#8a6a4a", mouth:"smile", mouthW:.2, blush:.5, cy:304,
+    beard:`<path d="M220,370 C228,432 264,464 300,466 C336,464 372,432 380,370 C366,410 338,438 300,440 C262,438 234,410 220,370 Z" fill="${hc}" opacity=".8"/>`,
+    clothes:`${shoulders("#2a4ab0", 480, 276)}${sideShade("#1a3088", 480)}<path d="M236,480 C256,516 280,526 300,526 C320,526 344,516 364,480" stroke="#e0433e" stroke-width="16" fill="none"/><path d="M236,480 C256,516 280,526 300,526 C320,526 344,516 364,480" stroke="#f2c14e" stroke-width="5" fill="none" transform="translate(0 12)"/><path d="M180,600 H420" stroke="#e0433e" stroke-width="14"/><path d="M180,616 H420" stroke="#f2c14e" stroke-width="5"/>`,
+    ...hairShort(hc, 190),
+    top:`<g><path d="M178,244 C178,170 230,140 300,140 C370,140 422,170 422,244 Z" fill="#2a4ab0"/><path d="M174,232 H426 V256 H174 Z" fill="#e0433e"/><path d="M174,244 H426" stroke="#f2c14e" stroke-width="5"/>${[[230, 100], [300, 80], [370, 100], [300, 120]].map(([x, y], i) => `<path d="M${300 + (i - 1.5) * 30},142 L${x},${y} L${x + 30},${y + 8} L${300 + (i - 1.5) * 30 + 26},146 Z" fill="#2a4ab0" stroke="#e0433e" stroke-width="4"/>`).join("")}</g>`,
+  });
+}
+/* Khalid · oil engineer turned hydrogen, Abu Dhabi: white ghutra with a black agal, trimmed beard, white kandura, a refinery and solar towers */
+function khalid(){
+  const hc = "#16100c";
+  return person({id:"khalid", skin:"warm", bg:["#c89a4a", "#7a5420", "#241606"], rim:"#fff0c8",
+    motif:`${sunMotif}<path d="M40,640 V440 h30 V640 M90,640 V480 h24 V640 M130,640 V400 h16 V640" stroke-width="5"/><path d="M400,640 V470 M380,470 h40 M520,640 V450 M500,450 h40" stroke-width="5"/>`,
+    fw:226, fh:288, jaw:.86, chin:.3, hairCol:hc, eye:{open:.4, tilt:-.02, eyeCol:"#2a1a10"}, browTh:11, browAng:.1, browArch:5, mouth:"smile", mouthW:.2, blush:.2, cy:304, noseW:.15,
+    beard:`<path d="M220,360 C228,434 264,470 300,472 C336,470 372,434 380,360 C366,410 338,440 300,442 C262,440 234,410 220,360 Z" fill="${hc}"/><path d="M260,402 C280,392 320,392 340,402 C320,398 280,398 260,402 Z" fill="${hc}"/>`,
+    clothes:`${shoulders("#f4f2ec", 478, 276)}${sideShade("#d6d2c6", 478)}<path d="M300,486 V600" stroke="#d6d2c6" stroke-width="4"/><path d="M300,600 C296,610 304,616 300,626" stroke="#c9c4b6" stroke-width="5" fill="none"/>`,
+    hairBack:`<path d="M152,620 C130,420 150,200 300,170 C450,200 470,420 448,620 L400,640 C410,520 404,380 390,300 L210,300 C196,380 190,520 200,640 Z" fill="#f4f2ec"/><path d="M152,620 C130,420 150,200 300,170" stroke="#d6d2c6" stroke-width="4" fill="none"/>`,
+    top:`<g><path d="M184,282 C176,200 226,150 300,146 C374,150 424,200 416,282 C400,240 360,222 300,222 C240,222 200,240 184,282 Z" fill="#f4f2ec"/><path d="M186,214 C230,190 370,190 414,214 L414,234 C370,212 230,212 186,234 Z" fill="#1a1a1e"/><path d="M188,236 C232,214 368,214 412,236 L412,252 C368,232 232,232 188,252 Z" fill="#2a2a30"/></g>`,
+  });
+}
+/* Elena · permafrost researcher, Yakutsk: fur ushanka, rosy cold cheeks, a parka with a fur hood, the tundra and a borehole sensor */
+function elena(){
+  const hc = "#c8a070";
+  return person({id:"elena", skin:"fair", bg:["#6a8aa8", "#34485e", "#0e161e"], rim:"#e0f0ff",
+    motif:`<path d="M0,470 C100,450 200,490 300,470 S500,450 600,480" stroke-width="5"/>${Array.from({length:9}, (_, i) => `<path d="M${20 + i * 68},470 V${400 + (i % 3) * 20} M${10 + i * 68},${420 + (i % 3) * 20} l10,-16 l10,16" stroke-width="4"/>`).join("")}<path d="M480,640 V360 M470,360 h20 M480,400 h30 M480,440 h30" stroke-width="5"/>`,
+    fw:214, fh:282, jaw:.74, chin:.24, hairCol:hc, eye:{open:.46, tilt:.06, lash:true, crease:true, eyeCol:"#4a7a9a"}, browTh:7, browAng:.08, browArch:7, browCol:"#a8804a", mouth:"smile", mouthW:.19, blush:.75, cy:306,
+    clothes:`${shoulders("#c8402e", 480, 280)}${sideShade("#9a2a1e", 480)}<path d="M170,500 C200,460 250,450 300,450 C350,450 400,460 430,500 C410,540 380,550 300,550 C220,550 190,540 170,500 Z" fill="#d8ccb8"/>${Array.from({length:18}, (_, i) => `<path d="M${180 + i * 14},${500 + Math.sin(i) * 20} l6,-10" stroke="#b8a888" stroke-width="3"/>`).join("")}<path d="M300,550 V640" stroke="#9a2a1e" stroke-width="5"/>`,
+    hairBack:`<path d="M190,330 C182,250 226,200 300,198 C374,200 418,250 410,330 Z" fill="${hc}"/>`,
+    hairFront:`<path d="M190,280 C196,240 240,222 300,222 C360,222 404,240 410,280 C390,262 350,254 300,254 C250,254 210,262 190,280 Z" fill="${hc}"/>`,
+    top:`<g><path d="M176,250 C176,160 230,120 300,120 C370,120 424,160 424,250 Z" fill="#7a5a3a"/><path d="M164,262 C164,220 200,200 300,200 C400,200 436,220 436,262 L436,280 C400,252 200,252 164,280 Z" fill="#a88a68"/>${Array.from({length:24}, (_, i) => `<path d="M${170 + i * 11},${236 + (i % 2) * 6} l4,-12" stroke="#c8ac88" stroke-width="3"/>`).join("")}<path d="M150,262 C130,320 140,380 168,420 C186,400 190,340 180,270 Z M450,262 C470,320 460,380 432,420 C414,400 410,340 420,270 Z" fill="#a88a68"/></g>`,
+  });
+}
+
+/* Auntie Noi · curry-rice vendor, Bangkok: hair in a bun with a pin, plump cheeks, a pink blouse and a checked apron, a ladle, pots of curry behind */
+function noi(){
+  const hc = "#1a1210";
+  return person({id:"noi", skin:"warm", bg:["#d0507a", "#7a2440", "#240812"], rim:"#ffc8d8",
+    motif:`${[90, 250, 410].map(x => `<path d="M${x - 60},470 h120 v-20 h-120 z M${x - 54},470 C${x - 54},540 ${x + 54},540 ${x + 54},470" stroke-width="5"/><path d="M${x - 20},430 c0,-20 16,-20 16,-40 M${x + 14},430 c0,-20 16,-20 16,-40" stroke-width="4"/>`).join("")}`,
+    fw:236, fh:280, jaw:.86, chin:.32, hairCol:hc, eye:{open:.36, tilt:.02, lash:true, eyeCol:"#22140c", crow:true}, browTh:7, browAng:.1, browArch:8, mouth:"grin", mouthW:.23, blush:.6, cy:302,
+    clothes:`${shoulders("#ff8fb0", 476, 272)}${sideShade("#d8688c", 476)}<path d="M220,500 L380,500 L396,640 L204,640 Z" fill="#f4f2ec"/>${[0, 1, 2, 3, 4].map(i => `<path d="M${220 + i * 40},500 V640" stroke="#3a7ad0" stroke-width="4" opacity=".5"/><path d="M210,${520 + i * 28} H390" stroke="#3a7ad0" stroke-width="4" opacity=".5"/>`).join("")}<path d="M220,500 C240,470 260,470 270,476 M380,500 C360,470 340,470 330,476" stroke="#f4f2ec" stroke-width="10" fill="none"/>
+      <g transform="translate(420 560) rotate(-30)"><rect x="-6" y="-100" width="12" height="110" rx="5" fill="#a87a4a"/><ellipse cx="0" cy="20" rx="30" ry="18" fill="#c9c7c2" stroke="#8a8780" stroke-width="3"/></g>`,
+    hairBack:`<path d="M184,310 C176,232 222,178 300,174 C378,178 424,232 416,310 Z" fill="${hc}"/><circle cx="300" cy="150" r="46" fill="${hc}"/><path d="M250,140 L352,118" stroke="#f2c14e" stroke-width="6" stroke-linecap="round"/><circle cx="352" cy="118" r="8" fill="#e0433e"/>`,
+    hairFront:`<path d="M186,266 C188,206 238,180 300,180 C362,180 412,206 414,266 C394,232 352,214 300,214 C248,214 206,232 186,266 Z" fill="${hc}"/><path d="M232,200 C260,190 290,188 320,190" stroke="#4a3a34" stroke-width="3" fill="none"/>`,
+  });
+}
+
 let LIST = [];
 for (const o of ["base", "alt", "gold"]) LIST.push([`sci-${o}`, sci(o)], [`dip-${o}`, dip(o)], [`eco-${o}`, eco(o)], [`act-${o}`, act(o)], [`oce-${o}`, oce(o)], [`eng-${o}`, eng(o)]);
 LIST.push(["adv", adv()], ["opp", opp()], ["fon", fon()], ["lung", lung()]);
+for (const [n, f] of Object.entries({ali, tala, ravi, jonas, rahima, lekuta, maria, kaue, mei, sofia, hiro, amina, nils, khalid, elena, noi})) LIST.push([n, f()]);
 const only = arg("--only"); if (only){ const k = only.split(","); LIST = LIST.filter(([n]) => k.includes(n.split("-")[0])); }
 fs.mkdirSync(OUT, {recursive:true});
 const browser = await chromium.launch({executablePath:process.env.CHROME || "/opt/pw-browsers/chromium"});

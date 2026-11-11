@@ -618,6 +618,8 @@ export const GameMap = {
     }
     // builds on the map and the traffic between countries
     const night = this.theme() === "night";
+    const A3 = this.air3d && this.air3dOn ? this.air3d : null;   // 3.5 planes · 3.9 trains, industry, trees, disasters, snow
+    this.w3d = !!A3; if (A3) A3.begin(this.tilt);
     drawDetail(this, c, now, vis, iconImg);   // 1.7: capitals, smokestacks, sea chokepoints
     drawRigs(this, c, now, vis);   // 3.6: oil rigs, flaring until the country goes green
     drawPins(this, c, now, vis);
@@ -625,6 +627,7 @@ export const GameMap = {
     drawTraffic(this, c, dt, now, vis);
     drawSeason(this, c, now, vis);   // 3.7.3: snow, heat haze, smoke and rain of the current season
     drawClouds(this, c, dt, now, vis, night);   // 3.6: clouds and spinning storms, above the planes
+    if (A3){ A3.world3d(this, dt, now); A3.end(.32); }
     const hexHit = drawHex(this, c, vis);
     c.globalAlpha = 1; c.lineCap = "butt";
     // labels

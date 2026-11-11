@@ -384,6 +384,23 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
   ]),
 ];
 P.CHANGELOG.find(x => x.v === "2.1").subs = [
+  SUB("2.1.3", "2026-11-11", [
+    "ภัยพิบัติเห็นบนแผนที่เป็น 3 มิติ: น้ำท่วมแผ่ไปบนพื้นดินแล้วค่อย ๆ ลด ไฟป่าลามเป็นแนวมีเปลวไฟกับควันลอยสูงและทิ้งรอยไหม้ ภัยแล้งดินแตกระแหง คลื่นความร้อนเรืองแสง น้ำเค็มรุกเข้ามาจากชายฝั่ง",
+    "หน้าหนาวมีหิมะปกคลุมพื้นดินทางเหนือพร้อมหิมะตก",
+    "รถไฟ 3 มิติ: รถไฟความเร็วสูงบนเส้นทางจริงที่วิ่งอยู่วันนี้ เส้นทางใหม่เปิดเพิ่มเมื่อสร้างรถไฟความเร็วสูง และรถไฟสินค้าบนเส้นทางขนส่งหลัก (ดีเซลมีควัน จนกว่าจะเปลี่ยนเป็นไฟฟ้า)",
+    "โรงงาน 3 มิติตามประเภท: โรงไฟฟ้าถ่านหิน โรงเหล็ก โรงปูน โรงกลั่น เหมือง และโรงงานรถ EV ปล่อยควันตามคาร์บอนของทวีป และเปลี่ยนเป็นโรงงานสะอาด",
+    "ป่าที่ปลูกเป็นต้นไม้ 3 มิติที่โตขึ้นทุกปี",
+    "คนในเรื่องพูดระหว่างเล่น: ลุงทองดีมีบทพูดกว่าร้อยประโยค และมีคนใหม่อีก 16 คนจากทั่วโลก พูดเมื่อเกิดภัยในบ้านเขา เมื่อคุณซื้อสกิล หรือเมื่อโลกเปลี่ยน",
+    "บนมือถือแนวนอนมีหน้าบอกให้หมุนจอเป็นแนวตั้ง",
+  ], [
+    "Disasters you can see in 3D: floods spread over the land and drain away, wildfires burn across the country with flames, tall smoke and a black scar, drought cracks the ground, heatwaves glow, salt water creeps in from the coast.",
+    "Northern winters cover the land with snow, with snow falling.",
+    "3D trains: high-speed trains on the real lines running today, new lines as you build high-speed rail, and freight trains on the big cargo routes (diesel with smoke until they go electric).",
+    "3D industry by type: coal plants, steelworks, cement works, refineries, mines and EV factories smoke as much as their continent emits, and turn clean.",
+    "Planted forests are 3D trees that grow every year.",
+    "People of the story talk while you play: Uncle Thongdee has over a hundred lines, and 16 new people from around the world speak when a disaster hits their home, when you buy a skill, or when the world changes.",
+    "Phones held sideways show a hint to turn them upright.",
+  ]),
   SUB("2.1.2", "2026-11-10", [
     "แผงประเทศอ่านง่ายขึ้น: CO₂ ตัวใหญ่ (หน่วย Gt) ความเสี่ยงภัย ป้องกันภัย และเทคโนโลยีสีเขียวเป็นช่องของตัวเอง แร่ที่ประเทศนั้นมีขึ้นให้เห็นเลย และบอกว่าแร่ไหนต้องแปรรูปก่อน",
     "คำสั่งกับประเทศรวมเป็นรายการเดียว แบ่งตามเป้าหมาย (ลด CO₂ · มิตรภาพ · ป้องกันภัย · ทรัพยากร) ผลของแต่ละคำสั่งเป็นไอคอนกับตัวเลขที่คิดจากสถานะจริงตอนนี้ ปุ่มซื้อขนาดเท่ากันทุกปุ่ม",

@@ -2593,6 +2593,23 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
   ]),
 ];
 P.CHANGELOG.find(x => x.v === "2.1").subs = [
+  SUB("2.1.3", "2026-11-11", [
+    "ภัยพิบัติเห็นบนแผนที่เป็น 3 มิติ: น้ำท่วมแผ่ไปบนพื้นดินแล้วค่อย ๆ ลด ไฟป่าลามเป็นแนวมีเปลวไฟกับควันลอยสูงและทิ้งรอยไหม้ ภัยแล้งดินแตกระแหง คลื่นความร้อนเรืองแสง น้ำเค็มรุกเข้ามาจากชายฝั่ง",
+    "หน้าหนาวมีหิมะปกคลุมพื้นดินทางเหนือพร้อมหิมะตก",
+    "รถไฟ 3 มิติ: รถไฟความเร็วสูงบนเส้นทางจริงที่วิ่งอยู่วันนี้ เส้นทางใหม่เปิดเพิ่มเมื่อสร้างรถไฟความเร็วสูง และรถไฟสินค้าบนเส้นทางขนส่งหลัก (ดีเซลมีควัน จนกว่าจะเปลี่ยนเป็นไฟฟ้า)",
+    "โรงงาน 3 มิติตามประเภท: โรงไฟฟ้าถ่านหิน โรงเหล็ก โรงปูน โรงกลั่น เหมือง และโรงงานรถ EV ปล่อยควันตามคาร์บอนของทวีป และเปลี่ยนเป็นโรงงานสะอาด",
+    "ป่าที่ปลูกเป็นต้นไม้ 3 มิติที่โตขึ้นทุกปี",
+    "คนในเรื่องพูดระหว่างเล่น: ลุงทองดีมีบทพูดกว่าร้อยประโยค และมีคนใหม่อีก 16 คนจากทั่วโลก พูดเมื่อเกิดภัยในบ้านเขา เมื่อคุณซื้อสกิล หรือเมื่อโลกเปลี่ยน",
+    "บนมือถือแนวนอนมีหน้าบอกให้หมุนจอเป็นแนวตั้ง",
+  ], [
+    "Disasters you can see in 3D: floods spread over the land and drain away, wildfires burn across the country with flames, tall smoke and a black scar, drought cracks the ground, heatwaves glow, salt water creeps in from the coast.",
+    "Northern winters cover the land with snow, with snow falling.",
+    "3D trains: high-speed trains on the real lines running today, new lines as you build high-speed rail, and freight trains on the big cargo routes (diesel with smoke until they go electric).",
+    "3D industry by type: coal plants, steelworks, cement works, refineries, mines and EV factories smoke as much as their continent emits, and turn clean.",
+    "Planted forests are 3D trees that grow every year.",
+    "People of the story talk while you play: Uncle Thongdee has over a hundred lines, and 16 new people from around the world speak when a disaster hits their home, when you buy a skill, or when the world changes.",
+    "Phones held sideways show a hint to turn them upright.",
+  ]),
   SUB("2.1.2", "2026-11-10", [
     "แผงประเทศอ่านง่ายขึ้น: CO₂ ตัวใหญ่ (หน่วย Gt) ความเสี่ยงภัย ป้องกันภัย และเทคโนโลยีสีเขียวเป็นช่องของตัวเอง แร่ที่ประเทศนั้นมีขึ้นให้เห็นเลย และบอกว่าแร่ไหนต้องแปรรูปก่อน",
     "คำสั่งกับประเทศรวมเป็นรายการเดียว แบ่งตามเป้าหมาย (ลด CO₂ · มิตรภาพ · ป้องกันภัย · ทรัพยากร) ผลของแต่ละคำสั่งเป็นไอคอนกับตัวเลขที่คิดจากสถานะจริงตอนนี้ ปุ่มซื้อขนาดเท่ากันทุกปุ่ม",
@@ -6619,5 +6636,946 @@ P.KEYS = [
 ];
 /* keys shown on a training step (computer only) */
 P.TRAIN_KEYS = {time:["Space"], skills:["T"], skclose:["Esc"], hazard:["A"], event:["1", "2", "3"], appr:["P"], apprclose:["Esc"], ore:["M"], oreclose:["Esc"], ability:["Z", "X", "C"], year:["Enter"], edge:["A", "←↑↓→"], done:["?"]};
+
+})();
+
+/* ---- 45-voices.js ---- */
+(function(){
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.voices) return;
+(P.mods = P.mods || {}).voices = 1;
+/* =========================================================================
+   3.9 · People talk while you play
+   The people of the story (Uncle Thongdee, Fon, Krai and 16 more from around the world) say something when a moment
+   touches their lives: a disaster where they live, a skill you bought, approval falling, the world passing 1.5°C, a
+   new season, a quiet month. A line shows for a few seconds beside the map (the game does not stop).
+   Lines live in 46-…49-voice-*.js as P.VOICE_LINES[who] = [[key, th, en], …]. Keys:
+     idle · start (first year) · late (from 2042) · haz:<type> (a disaster anywhere) · home:<type> (in their country)
+     buy:<energy|industry|nature|city|policy> · apprLow · apprHigh · t15 · t2 (warming passes 1.5 / 2.0°C)
+     down · up (world CO₂ fell / rose over the last year, said in January) · cool · hot · monsoon · storm (season starts)
+   Picking is a hash of the month, so it never touches the game's random numbers (balance and the bot tests stay the same).
+   Visual / story only: nothing here changes a number in the game.
+   ========================================================================= */
+const S = P.S, T = (th, en) => ({th, en});
+const hook = (name, ...a) => (P.H && P.H[name] ? P.H[name](...a) : undefined);
+
+/* the people (Krai, Fon and Uncle Thongdee were already in the story; home = their country, reg = their region) */
+P.NPC = Object.assign(P.NPC || {}, {
+  ali:{name:T("บังอาลี · ชาวประมงพื้นบ้าน ปัตตานี", "Bang Ali · small-boat fisher, Pattani"), color:"#4fb3d9", home:"THA", reg:"SEA"},
+  tala:{name:T("ตาลา · นักเรียนจากตูวาลู", "Tala · a student from Tuvalu"), color:"#5ad1c9", reg:"SEA"},
+  ravi:{name:T("ราวี · คนงานโรงงานทอผ้า กานปูร์", "Ravi · textile worker, Kanpur"), color:"#ff9a3c", home:"IND", reg:"SA"},
+  jonas:{name:T("โยนัส · คนงานเหมืองลิกไนต์ ลูซาเทีย", "Jonas · lignite miner, Lusatia"), color:"#9aa7b3", home:"DEU", reg:"EU"},
+  rahima:{name:T("ราฮิมา · แม่ค้าในตลาด คุลนา", "Rahima · market trader, Khulna"), color:"#e86f9a", home:"BGD", reg:"SA"},
+  lekuta:{name:T("เลกูตา · คนเลี้ยงวัวชาวซัมบูรู เคนยา", "Lekuta · Samburu herder, Kenya"), color:"#d9a13b", home:"KEN", reg:"MEAF"},
+  maria:{name:T("มาเรีย · นักดับไฟป่า แคลิฟอร์เนีย", "María · wildland firefighter, California"), color:"#ff6b4a", home:"USA", reg:"NA"},
+  kaue:{name:T("คาวเอ · ผู้พิทักษ์ป่าแอมะซอน", "Kauê · Amazon forest guardian"), color:"#3fae6a", home:"BRA", reg:"SA"},
+  mei:{name:T("เหม่ยหลิน · วิศวกรแบตเตอรี่ เหอเฝย", "Mei Lin · battery engineer, Hefei"), color:"#c3a6ff", home:"CHN", reg:"EA"},
+  sofia:{name:T("โซเฟีย · ผู้นำชุมชนทะเลทรายอาตากามา", "Sofía · community leader, Atacama"), color:"#e0b070", home:"CHL", reg:"SA"},
+  hiro:{name:T("ฮิโรชิ · อดีตวิศวกรรถไฟชินคันเซ็น", "Hiroshi · retired Shinkansen engineer"), color:"#8fd0ff", home:"JPN", reg:"EA"},
+  amina:{name:T("อามีนา · ผู้ก่อตั้งสหกรณ์โซลาร์ ดาการ์", "Aminata · solar co-op founder, Dakar"), color:"#f2c14e", home:"SEN", reg:"MEAF"},
+  nils:{name:T("นิลส์ · คนเลี้ยงกวางเรนเดียร์ชาวซามี", "Nils · Sámi reindeer herder"), color:"#b8d8ff", home:"SWE", reg:"EU"},
+  khalid:{name:T("คาลิด · วิศวกรน้ำมันที่หันมาทำไฮโดรเจน", "Khalid · oil engineer turned hydrogen"), color:"#e8c27a", home:"ARE", reg:"MEAF"},
+  elena:{name:T("เอเลนา · นักวิจัยชั้นดินเยือกแข็ง ยาคุตสค์", "Elena · permafrost researcher, Yakutsk"), color:"#a8c8e8", home:"RUS", reg:"EU"},
+  noi:{name:T("ป้าน้อย · แม่ค้าข้าวแกง กรุงเทพฯ", "Auntie Noi · curry-rice vendor, Bangkok"), color:"#ff8fb0", home:"THA", reg:"SEA"},
+});
+Object.assign(P.NPC.lung, {home:"THA", reg:"SEA"});
+Object.assign(P.NPC.fon, {home:"THA", reg:"SEA"});
+Object.assign(P.NPC.opp, {reg:"*"});
+P.VOICE_LINES = P.VOICE_LINES || {};
+
+const hsh = (...a) => { let h = 2166136261; for (const v of a){ const s = String(v); for (let i = 0; i < s.length; i++){ h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } } return (h >>> 0) / 4294967296; };
+const COOL = 2, IDLE = 4, KEEP = 4;   // at most one line every 2 months; a quiet line after 4 quiet months; a moment waits up to 4 months for its turn
+
+function state(){
+  // a new game (or an older save without it): start fresh, counting only what happens from now on
+  if (!S.vo || S.vo.tk > S.tick) S.vo = {t:-99, tk:S.tick, used:{}, last:{}, pend:[], appr:0, temp:(S.temp >= 1.5 ? 1 : 0) | (S.temp >= 2 ? 2 : 0), owned:null, dmg:((S.stats && S.stats.dmg) || []).length, co2:[]};
+  S.vo.tk = S.tick;
+  return S.vo;
+}
+/* which moments happened this month (most important first) */
+function moments(V){
+  const out = [];
+  // disasters that struck this month
+  const dmg = (S.stats && S.stats.dmg) || [];
+  for (let i = V.dmg; i < dmg.length; i++){ const d = dmg[i]; out.push({k:"home:" + d.type, c:d.c, pr:9}); out.push({k:"haz:" + d.type, c:d.c, pr:6}); }
+  V.dmg = dmg.length;
+  // warming milestones
+  if (S.temp >= 1.5 && !(V.temp & 1)){ V.temp |= 1; out.push({k:"t15", pr:10}); }
+  if (S.temp >= 2.0 && !(V.temp & 2)){ V.temp |= 2; out.push({k:"t2", pr:10}); }
+  // skills bought since last month
+  const owned = Object.keys(S.owned || {}).filter(k => S.owned[k]);
+  if (V.owned){ for (const id of owned) if (!V.owned.includes(id) && P.SKILL && P.SKILL[id]) out.push({k:"buy:" + P.SKILL[id].cat, pr:7}); }
+  V.owned = owned;
+  // approval crossing a line (once until it comes back)
+  if (S.appr < 35 && V.appr !== -1){ V.appr = -1; out.push({k:"apprLow", pr:8}); }
+  else if (S.appr > 75 && V.appr !== 1){ V.appr = 1; out.push({k:"apprHigh", pr:5}); }
+  else if (S.appr >= 40 && S.appr <= 70) V.appr = 0;
+  // the year in CO₂, said in January
+  const net = (S.regions || []).reduce((a, r) => a + r.co2, 0);
+  V.co2.push(+net.toFixed(2)); if (V.co2.length > 13) V.co2.shift();
+  if (S.tick % 12 === 0 && V.co2.length >= 13){ const d = V.co2[V.co2.length - 1] - V.co2[0]; if (d < -.4) out.push({k:"down", pr:6}); else if (d > .2) out.push({k:"up", pr:6}); }
+  // a new season (every other one, so the seasons don't take every turn)
+  if (P.seasonOf){ const s0 = P.seasonOf(S.tick - 1).id, s1 = P.seasonOf(S.tick).id; if (s0 !== s1 && hsh(S.tick, "sea") < .5) out.push({k:s1, pr:3}); }
+  const year = 2026 + Math.floor(S.tick / 12);
+  if (S.tick <= 12 && !V.pend.some(o => o.k === "start")) out.push({k:"start", pr:2});
+  if (year >= 2042 && !V.pend.some(o => o.k === "late")) out.push({k:"late", pr:2});
+  // moments wait a few months for their turn (otherwise a disaster in a quiet-down month was never mentioned)
+  V.pend = (V.pend || []).filter(m => S.tick - m.t <= KEEP);
+  for (const m of out) if (!V.pend.some(o => o.k === m.k && o.c === m.c)) V.pend.push({...m, t:S.tick});
+  const now = V.pend.slice();
+  now.push({k:"idle", pr:1, t:S.tick});
+  return now.sort((a, b) => b.pr - a.pr || b.t - a.t);
+}
+/* who can say this: home lines only for people who live there (or in that region if they have no country) */
+function speakers(m){
+  const L = P.VOICE_LINES, out = [];
+  for (const who of Object.keys(L)){
+    const n = P.NPC[who]; if (!n) continue;
+    if (!L[who].some(l => l[0] === m.k)) continue;
+    if (m.k.startsWith("home:")){
+      const cc = P.C ? P.C(m.c) : null;
+      if (n.home ? n.home !== m.c : !(cc && n.reg && cc.reg === n.reg)) continue;
+    }
+    out.push(who);
+  }
+  return out;
+}
+function say(){
+  if (!S.started || S.over || S.simple || S.mp || S.training) return;
+  const V = state(), list = moments(V);
+  const quiet = S.tick - V.t;
+  if (quiet < COOL) return;
+  for (const m of list){
+    if (m.k === "idle" && quiet < IDLE) continue;
+    if ((m.k === "start" || m.k === "late") && quiet < IDLE - 1) continue;
+    if (m.k.startsWith("haz:") && list.some(x => x.k === "home:" + m.k.slice(4) && speakers(x).length)) continue;   // someone who lives there speaks instead
+    const who = speakers(m); if (!who.length) continue;
+    // the person who spoke least lately, then a line they haven't said yet
+    who.sort((a, b) => (V.last[a] ?? -99) - (V.last[b] ?? -99) || hsh(S.tick, a) - hsh(S.tick, b));
+    const w = who[0], lines = P.VOICE_LINES[w].map((l, i) => [l, i]).filter(([l]) => l[0] === m.k);
+    const fresh = lines.filter(([, i]) => !V.used[w + i]), pool = fresh.length ? fresh : lines;
+    const [line, i] = pool[Math.floor(hsh(S.tick, w, m.k) * pool.length)];
+    if (!fresh.length) for (const [, j] of lines) delete V.used[w + j];   // all said: start the set again
+    V.used[w + i] = 1; V.last[w] = S.tick; V.t = S.tick;
+    V.pend = V.pend.filter(o => o.k !== m.k && !(m.k.startsWith("home:") && o.k === "haz:" + m.k.slice(5) && o.c === m.c) && !(m.k.startsWith("haz:") && o.k === "home:" + m.k.slice(4) && o.c === m.c));
+    hook("voice", {who:w, name:P.NPC[w].name, color:P.NPC[w].color, th:line[1], en:line[2], k:m.k, c:m.c || null});
+    return;
+  }
+}
+const _tick = P.tick;
+P.tick = () => { _tick(); try { say(); } catch (e){ if (typeof console !== "undefined") console.error(e); } };
+P.voiceCount = () => Object.fromEntries(Object.entries(P.VOICE_LINES).map(([k, v]) => [k, v.length]));
+
+})();
+
+/* ---- 46-voice-thai.js ---- */
+(function(){
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.voiceThai) return;
+(P.mods = P.mods || {}).voiceThai = 1;
+/* 3.9 · Lines of the Thai people in the story: Uncle Thongdee (rice farmer, Chachoengsao), Fon (mangrove volunteer,
+   Samut Prakan), Auntie Noi (curry-rice vendor, Bangkok), Bang Ali (small-boat fisher, Pattani). See 45-voices.js. */
+const V = P.VOICE_LINES = P.VOICE_LINES || {};
+
+V.lung = [
+  // a quiet month
+  ["idle", "ลุงตื่นตีห้าทุกวันมาสี่สิบปี เพิ่งปีนี้แหละที่ต้องดูพยากรณ์อากาศก่อนดูนา", "I've been up at five every day for forty years. Only lately do I check the forecast before I check the field."],
+  ["idle", "สมัยพ่อลุง ฝนมาตรงเดือน ทุกวันนี้ฝนมาตามใจ จะหว่านข้าวก็ต้องเดาเอา", "In my father's day the rain came on time. Now it comes when it likes, and sowing is a guessing game."],
+  ["idle", "ลูกชายลุงไปทำงานโรงงานที่ชลบุรี บอกว่านาไม่มีอนาคต ลุงก็ยังอยากให้มันมีนะ", "My son works at a factory in Chonburi. He says farming has no future. I still want it to have one."],
+  ["idle", "ข้าวหอมมะลิไม่ชอบร้อน ดอกข้าวบานตอนอากาศเกิน 35 องศา เมล็ดลีบหมด", "Jasmine rice hates the heat. When it flowers above 35 degrees, the grains come out empty."],
+  ["idle", "ลุงปลูกต้นมะพร้าวไว้คันนาสิบต้น เผื่อวันไหนข้าวไม่ได้ ยังมีมะพร้าวขาย", "I planted ten coconut palms along the dike. If the rice fails one year, there's still coconuts to sell."],
+  ["idle", "เมื่อก่อนน้ำในคลองใส ปลาช่อนว่ายให้เห็น ตอนนี้ต้องเติมน้ำจืดจากสระให้นาแทน", "The canal used to be clear enough to see the snakehead fish. Now I top up the field from my own pond."],
+  ["idle", "หลานถามลุงว่าทำไมไม่เผาตอซังแล้ว ลุงบอกว่าไถกลบดีกว่า ดินได้ปุ๋ย อากาศก็ไม่เหม็น", "My grandson asked why I stopped burning the stubble. Ploughing it in is better: the soil gets fed and the air stays clean."],
+  ["idle", "ผู้ใหญ่บ้านเอาเครื่องวัดความเค็มมาแจก ลุงจุ่มทุกเช้าเหมือนวัดไข้ลูก", "The village head handed out salt meters. I dip mine every morning, like taking a child's temperature."],
+  ["idle", "ค่าปุ๋ยขึ้นทุกปี ลุงเลยหันมาทำปุ๋ยหมักเอง ขี้วัวบ้านลุงก็มีค่าขึ้นมาเลย", "Fertiliser costs more every year, so I make my own compost. Even my cow's dung has a price now."],
+  ["idle", "นาเปียกสลับแห้งนี่ลุงลองแล้ว ใช้น้ำน้อยลง ข้าวก็ไม่ได้น้อยลงนะ", "I tried alternate wetting and drying. Less water, and no less rice."],
+  ["idle", "คนกรุงเทพฯ อาจไม่รู้ว่าข้าวจานที่กินมาจากนาที่กำลังแข่งกับน้ำทะเล", "People in Bangkok may not know their plate of rice comes from fields racing the sea."],
+  ["idle", "ลุงไม่รู้เรื่องคาร์บอนเครดิตหรอก แต่ถ้าใครจ่ายให้ลุงปลูกต้นไม้ ลุงปลูกให้ได้ทั้งตำบล", "I don't know about carbon credits, but if someone pays me to plant trees, I'll plant the whole district."],
+  ["idle", "วันนี้ฝนตกนิดหน่อย กบร้องทั้งคืน ลุงนอนหลับสบายที่สุดในรอบเดือน", "A little rain today. The frogs sang all night. Best sleep I've had all month."],
+  ["idle", "แผงโซลาร์ที่ปั๊มน้ำ ลุงลงทุนไปแล้วไม่เสียดาย ไม่ต้องซื้อน้ำมันดีเซลอีกเลย", "The solar panel on my water pump was worth every baht. No more diesel to buy."],
+  ["idle", "สหกรณ์เพิ่งได้รถเกี่ยวข้าวไฟฟ้าคันแรก เสียงเงียบจนนกยังไม่บินหนี", "The co-op just got its first electric harvester. So quiet the birds don't even fly off."],
+  ["idle", "ลุงเห็นนกกระยางน้อยลง เห็นหอยเชอรี่มากขึ้น ธรรมชาติมันก็เปลี่ยนตามอากาศ", "Fewer egrets, more golden apple snails. Nature changes with the weather too."],
+  ["idle", "ข้าวพันธุ์ใหม่ทนเค็มได้ แต่หุงแล้วไม่หอมเท่าเดิม ลุงก็ต้องเลือกระหว่างหอมกับรอด", "The new variety handles salt, but it isn't as fragrant. Now I choose between fragrance and survival."],
+  ["idle", "ป้าแกบอกให้ลุงพักบ้าง ลุงบอกว่านามันไม่รู้จักวันหยุด", "My wife tells me to rest. I tell her the field doesn't know about weekends."],
+  ["idle", "มีนักศึกษามาเก็บตัวอย่างดินที่นาลุง บอกว่าดินลุงเก็บคาร์บอนได้ดี ลุงก็ภูมิใจนะ", "Students came to sample my soil. They said it stores carbon well. I'm proud of that."],
+  ["idle", "ทุกวันนี้ลุงฟังวิทยุพยากรณ์อากาศทุกเช้า เหมือนฟังข่าวจากญาติที่อยู่ไกล", "Every morning I listen to the weather on the radio, like news from a relative far away."],
+  ["idle", "เพื่อนบ้านขายนาให้บ่อกุ้ง ลุงไม่ว่าเขาหรอก น้ำเค็มมาถึงแล้วจะให้ทำยังไง", "My neighbour sold his field for a shrimp pond. I don't blame him. When the salt arrives, what can you do?"],
+  ["idle", "ลุงเก็บเมล็ดพันธุ์ไว้สามพันธุ์ ปีไหนแล้ง ปีไหนน้ำมาก จะได้มีพันธุ์ที่เหมาะ", "I keep seed of three varieties, so I have the right one for a dry year or a wet one."],
+  ["idle", "ถ้าผู้นำโลกมาดำนาสักวัน จะรู้ว่าอากาศร้อนขึ้นองศาเดียวมันหนักแค่ไหน", "If world leaders planted rice for one day, they'd know how heavy one more degree is."],
+  ["idle", "ลุงไม่ได้ขอให้ใครมาช่วยปลูกข้าว ขอแค่อย่าให้โลกร้อนจนปลูกไม่ได้", "I'm not asking anyone to plant my rice. Just don't let the world get too hot to plant it."],
+  ["idle", "ทุกเย็นลุงนั่งดูนาจากเถียงนา ฟ้าสีส้มสวยทุกวัน แต่ลุงรู้ว่าบางวันมันคือควันไฟ", "Every evening I watch the field from the hut. The sky is a lovely orange, but some days I know it's smoke."],
+  ["idle", "ธนาคารเพิ่งให้กู้ดอกเบี้ยต่ำสำหรับคนทำนาลดโลกร้อน ลุงไปยื่นแล้ว", "The bank offers cheap loans for climate-friendly farming now. I've applied."],
+  ["idle", "ลุงสอนหลานดำนาตั้งแต่เจ็ดขวบ ไม่ใช่ให้มันเป็นชาวนา แต่ให้มันรู้ว่าข้าวมาจากไหน", "I taught my grandson to plant rice at seven. Not to make him a farmer, but so he knows where rice comes from."],
+  ["idle", "ฝนปีนี้มาเร็ว ลุงหว่านข้าวเร็วตาม แต่ใจก็หวั่นว่าเดี๋ยวจะทิ้งช่วง", "The rain came early this year, so I sowed early. But I worry it'll stop halfway."],
+  ["idle", "มีคนบอกว่าข้าวปล่อยก๊าซมีเทน ลุงก็ไม่เถียง แต่ลุงอยากรู้ว่าจะทำนาแบบไหนให้มันน้อยลง", "They say rice gives off methane. I won't argue. I just want to know how to farm so it gives off less."],
+  ["idle", "หนี้ ธ.ก.ส. ลุงยังไม่หมด แต่ปีนี้ได้ข้าวดี ลุงก็ยิ้มได้", "I still owe the farmers' bank, but the harvest was good this year, so I can smile."],
+  ["idle", "สิ่งที่ลุงกลัวไม่ใช่น้ำท่วมครั้งเดียว แต่เป็นน้ำท่วมทุกปีจนชิน", "What I fear isn't one flood. It's floods every year until we get used to them."],
+  // the first year
+  ["start", "มีผู้นำโลกคนใหม่แล้วเหรอ ลุงขอให้มาดูนาลุงสักครั้งก่อนตัดสินใจอะไร", "A new world leader? I'd ask you to come and see my field once before you decide anything."],
+  ["start", "ลุงไม่รู้ว่า Net Zero คืออะไร แต่ถ้าแปลว่าน้ำเค็มจะไม่ขึ้นมาอีก ลุงเอาด้วย", "I don't know what Net Zero means, but if it means the salt stops coming up, I'm for it."],
+  ["start", "ยี่สิบห้าปีนะ ลุงก็อายุเจ็ดสิบแปดพอดี อยากเห็นวันนั้นจริง ๆ", "Twenty-five years. I'll be seventy-eight. I really want to see that day."],
+  ["start", "ช่วงแรกคนจะบ่นเยอะ ลุงรู้ เพราะลุงก็บ่น แต่ลุงจะรอดู", "People will grumble at first. I know, because I grumble too. But I'll wait and see."],
+  ["start", "ปีแรกของผู้นำคนใหม่ ลุงขอแค่ฟังคนตัวเล็กบ้าง", "In your first year, just listen to the small people now and then."],
+  // late game
+  ["late", "ลุงแก่แล้ว แต่ยังได้เห็นทุ่งนาเขียวอยู่ ขอบใจที่ไม่ปล่อยให้มันกลายเป็นทะเล", "I'm old now, but the fields are still green. Thank you for not letting them become sea."],
+  ["late", "หลานลุงเรียนจบเกษตรแล้ว กลับมาทำนาที่บ้าน ลุงไม่เคยคิดว่าจะได้เห็น", "My grandson graduated in agriculture and came home to farm. I never thought I'd see that."],
+  ["late", "อีกไม่กี่ปีก็ 2050 แล้ว ลุงอยากให้วันนั้นเป็นวันที่บอกหลานได้ว่าเราทำได้", "2050 is only a few years off. I want it to be the day I tell my grandson we made it."],
+  ["late", "ทุกวันนี้ลุงไม่ต้องจุ่มเครื่องวัดเค็มทุกเช้าแล้ว จุ่มอาทิตย์ละครั้งพอ", "These days I don't dip the salt meter every morning. Once a week is enough."],
+  ["late", "นาข้างบ้านที่เคยเป็นบ่อกุ้ง กลับมาปลูกข้าวได้แล้ว ลุงดีใจแทนเพื่อน", "The shrimp pond next door is a rice field again. I'm happy for my neighbour."],
+  // disasters at home
+  ["home:flood", "น้ำท่วมนาลุงมิดหัวเข่าแล้ว ข้าวเพิ่งตั้งท้อง ปีนี้คงได้ไม่ถึงครึ่ง", "The water's knee-deep in my field. The rice had just set grain. I'll be lucky to get half."],
+  ["home:flood", "ลุงย้ายวัวขึ้นถนนแล้ว ที่บ้านยังพอนอนได้ แต่ใจมันนอนไม่หลับ", "I've moved the cow up to the road. The house is still dry enough to sleep in, but I can't sleep."],
+  ["home:flood", "น้ำปีนี้มาเร็วกว่าที่กรมชลประทานบอก ฝนตกหนักทีเดียวเท่าตกทั้งเดือน", "The water came faster than irrigation said. One downpour was a month's rain."],
+  ["home:flood", "น้ำท่วมนาไม่ได้แย่เสมอไปนะ มันพาตะกอนมา แต่ถ้ามันไม่ลดสักที ข้าวก็เน่า", "A flood isn't always bad. It brings silt. But if it never drains, the rice rots."],
+  ["home:flood", "ลุงต่อเรือไว้ลำหนึ่งตั้งแต่ปี 54 ไม่คิดว่าจะได้ใช้บ่อยขนาดนี้", "I built a boat after the 2011 flood. Never thought I'd use it this often."],
+  ["home:flood", "เพื่อนบ้านมาช่วยกันกั้นกระสอบทราย ลุงว่าน้ำท่วมทำให้คนรักกันมากขึ้นนะ", "The neighbours came to stack sandbags. Floods make people closer, I think."],
+  ["home:flood", "ถ้าเมืองใหญ่ระบายน้ำมาทางทุ่งเรา ก็ขอให้จ่ายค่าเสียหายให้ชาวนาด้วย", "If the big city drains its water through our fields, at least pay the farmers for it."],
+  ["home:flood", "ข้าวลอยน้ำพันธุ์เก่าของปู่ยังมีอยู่ในยุ้ง ปีหน้าลุงจะปลูกแปลงหนึ่ง เผื่อไว้", "Grandpa's old floating rice is still in the barn. Next year I'll plant a plot, just in case."],
+  ["home:saltwater", "เครื่องวัดขึ้นสองกรัมต่อลิตรแล้ว ข้าวทนได้ไม่เกินนี้ ลุงต้องปิดประตูน้ำ", "The meter reads two grams per litre. Rice can't take more. I have to shut the sluice."],
+  ["home:saltwater", "น้ำเค็มขึ้นมาถึงนาแล้ว ข้าวตายทั้งแปลง ลุงทำนามาสี่สิบปีไม่เคยเห็น", "The salt water reached the field. The whole plot died. Forty years farming and I've never seen it."],
+  ["home:saltwater", "ใบข้าวเหลืองจากปลายเข้ามา นั่นแหละอาการโดนเค็ม ลุงดูออกแล้วตอนนี้", "Leaves yellowing from the tip inward. That's salt. I can spot it now."],
+  ["home:saltwater", "แม่น้ำบางปะกงน้ำน้อย ทะเลก็ดันเข้ามาลึกขึ้นทุกปี มันเกินกว่าที่คนรุ่นลุงจะรับไหว", "The Bang Pakong runs low and the sea pushes further up each year. It's more than my generation can bear."],
+  ["home:saltwater", "ลุงขุดสระเก็บน้ำฝนไว้ใช้ตอนน้ำในคลองเค็ม ใครมีที่ ลุงแนะนำให้ขุด", "I dug a pond to store rainwater for when the canal turns salty. If you have land, dig one."],
+  ["home:saltwater", "น้ำเค็มไม่ได้แค่ฆ่าข้าว มันฆ่าต้นมะม่วง ฆ่าสวนผัก ลามไปทั้งหมู่บ้าน", "Salt doesn't just kill rice. It kills the mango trees and the vegetable plots. The whole village."],
+  ["home:saltwater", "ลูกชายลุงโทรมาบอกให้ขายนา ลุงยังไม่ยอม นาผืนนี้ปู่ลุงเปิดมากับมือ", "My son called to say sell. I won't yet. My grandfather cleared this field with his own hands."],
+  ["home:saltwater", "ถ้ามีประตูกั้นน้ำเค็มที่ปากแม่น้ำ ลุงว่าคุ้มกว่าแจกเงินชดเชยทุกปีนะ", "A salt barrier at the river mouth would be worth more than paying compensation every year."],
+  ["home:saltwater", "ดินเค็มไปแล้วต้องใช้เวลาล้างหลายปี เหมือนแผลที่หายช้า", "Once soil turns salty it takes years to wash out. Like a wound that heals slowly."],
+  ["home:saltwater", "ลุงลองปลูกข้าวพันธุ์ กข ทนเค็มแปลงหนึ่งแล้ว ขึ้นได้ ยังมีหวัง", "I tried the salt-tolerant RD variety on one plot. It grew. There's still hope."],
+  ["home:drought", "ปีนี้แล้ง ลุงต้องสูบน้ำบาดาลมาใช้ ค่าไฟขึ้นเท่าตัว", "A dry year. I'm pumping groundwater and my electricity bill has doubled."],
+  ["home:drought", "ดินแตกระแหงจนเอามือสอดได้ ลุงเลยยังไม่หว่าน รอฝนก่อน", "The ground's cracked wide enough to put your hand in. I'm not sowing until it rains."],
+  ["home:drought", "แล้งปีนี้ทำให้น้ำทะเลรุกเข้ามาอีก แล้งกับเค็มมาคู่กันเสมอ", "This drought lets the sea come further in. Drought and salt always come together."],
+  ["home:drought", "ทางการขอให้งดทำนาปรัง ลุงเข้าใจ แต่ไม่ทำนาแล้วลุงจะกินอะไร", "They've asked us to skip the dry-season crop. I understand, but what do I eat?"],
+  ["home:drought", "ลุงปลูกถั่วแทนข้าวในหน้าแล้ง ใช้น้ำน้อยกว่า ดินก็ได้ไนโตรเจนด้วย", "I grow beans instead of rice in the dry season. Less water, and the soil gets nitrogen."],
+  ["home:drought", "เขื่อนเหลือน้ำไม่ถึงยี่สิบเปอร์เซ็นต์ ลุงไม่เคยเห็นตัวเลขนี้มาก่อน", "The dam is under twenty percent. I've never seen that number before."],
+  ["home:drought", "ลุงตักน้ำรดต้นกล้าทีละถัง หลังจะหักแล้ว แต่ต้นกล้าต้องรอด", "I water the seedlings bucket by bucket. My back is breaking, but the seedlings must live."],
+  ["home:drought", "ฝนทิ้งช่วงสามสัปดาห์ ข้าวที่ปลูกไปเริ่มเหลือง ลุงได้แต่ภาวนา", "Three weeks without rain. The rice is yellowing. All I can do is pray."],
+  ["home:heat", "ร้อนจนลุงต้องออกนาตอนตีสี่ พอสิบโมงก็ต้องกลับ ไม่งั้นเป็นลม", "So hot I go out at four in the morning and come back by ten, or I'll faint."],
+  ["home:heat", "คนงานรับจ้างดำนาขอขึ้นค่าแรง เพราะร้อนจนทำได้ไม่ถึงครึ่งวัน ลุงก็เห็นใจ", "The day labourers want more pay. It's too hot to work half a day. I understand."],
+  ["home:heat", "วัวลุงหอบทั้งวัน ลุงต้องราดน้ำให้มันทุกชั่วโมง", "My cow pants all day. I pour water on her every hour."],
+  ["home:heat", "ปลาในบ่อลอยตายเพราะน้ำร้อน ปีก่อนไม่เคยเป็นแบบนี้", "The fish in my pond floated up dead. The water got too hot. That never used to happen."],
+  ["home:heat", "ร้อนแบบนี้ ดอกข้าวไม่ผสมเกสร ข้าวทั้งรวงจะลีบ ลุงกลัวที่สุดก็ตรงนี้", "In heat like this the rice flowers don't pollinate and whole heads come out empty. That's my biggest fear."],
+  ["home:heat", "ลุงสร้างเพิงมุงจากไว้กลางนา ให้คนงานได้หลบแดด ไม่ต้องใช้แอร์ก็เย็น", "I built a thatched shelter in the field so the workers can rest out of the sun. Cool without air-con."],
+  // disasters elsewhere
+  ["haz:typhoon", "เห็นข่าวพายุที่ฟิลิปปินส์แล้วใจหาย ชาวนาที่นั่นก็เหมือนลุงนี่แหละ", "Seeing the storm in the Philippines broke my heart. The farmers there are just like me."],
+  ["haz:flood", "น้ำท่วมที่อื่นก็ทำให้ข้าวแพงขึ้นทั่วโลกนะ ลุงขายได้ราคาดี แต่ไม่ดีใจเลย", "Floods elsewhere push rice prices up everywhere. I sell at a good price, but I'm not glad."],
+  ["haz:drought", "แล้งที่อินเดียทีไร ราคาข้าวขึ้นทุกที แต่คนจนทั่วโลกต้องกินแพงขึ้น", "Whenever India has a drought, rice prices jump. And poor people everywhere pay more to eat."],
+  ["haz:heat", "ฟังข่าวว่าที่อื่นร้อนถึงห้าสิบองศา ลุงว่าที่นี่สี่สิบก็จะแย่แล้ว", "They say it reached fifty degrees somewhere. Forty here already feels like too much."],
+  ["haz:wildfire", "ไฟป่าที่ไหนก็ตาม ควันมันลอยมาถึงนาลุงได้นะ ฟ้าเป็นสีส้มทั้งวัน", "Wherever the fires are, the smoke can reach my field. The sky's orange all day."],
+  ["haz:saltwater", "ได้ข่าวว่าที่เวียดนามก็โดนน้ำเค็มเหมือนกัน ลุงอยากคุยกับชาวนาที่นั่นจัง", "I hear Vietnam has the salt problem too. I'd love to talk to the farmers there."],
+  // skills
+  ["buy:nature", "ข้าวทนเค็มกับทุนให้ชาวนาปรับตัว แบบนี้แหละที่ลุงรอมานาน", "Salt-tolerant rice and money for farmers to adapt. This is what I've been waiting for."],
+  ["buy:nature", "เกษตรฟื้นฟูดินเหรอ ลุงทำอยู่แล้ว แค่ไม่มีใครให้ชื่อมันเท่านั้นเอง", "Regenerative farming? I've done it for years. Nobody had given it a name, that's all."],
+  ["buy:nature", "ปลูกป่าชายเลนเพิ่มดีนะ มันเป็นกำแพงกันน้ำเค็มที่ราคาถูกที่สุด", "More mangroves are good. They're the cheapest wall against salt water there is."],
+  ["buy:nature", "ทำนาแบบปล่อยมีเทนน้อย ถ้ามีคนมาสอน ลุงยินดีลองทั้งหมู่บ้าน", "Low-methane rice farming? If someone comes to teach us, the whole village will try."],
+  ["buy:nature", "พืชทนแล้งมาแล้ว ปีหน้าลุงจะได้ไม่ต้องลุ้นฝนจนนอนไม่หลับ", "Drought-proof crops! Next year I won't lie awake hoping for rain."],
+  ["buy:nature", "ปลูกต้นไม้ทั่วโลกก็ดี แต่อย่าลืมว่าคนปลูกส่วนใหญ่คือชาวบ้านอย่างลุง", "Planting trees around the world is good. Don't forget most of the planting is done by people like me."],
+  ["buy:nature", "ไบโอชาร์จากฟางข้าว ลุงเผาถ่านแบบปิดได้ ดีกว่าเผาฟางทิ้งกลางนาเยอะ", "Biochar from rice straw? I can char it in a closed kiln. Much better than burning it in the field."],
+  ["buy:nature", "ชลประทานแบบใหม่ส่งน้ำถึงปลายคลองได้ ลุงอยู่ปลายคลองพอดี", "The new irrigation reaches the far end of the canal. That's exactly where I am."],
+  ["buy:energy", "ไฟฟ้าสะอาดดีนะ แต่อย่าให้ค่าไฟแพงจนชาวนาสูบน้ำไม่ไหว", "Clean power is good, but don't let the bill get so high that farmers can't pump water."],
+  ["buy:energy", "ถ้ามีโซลาร์ฟาร์มมาตั้งข้างนา ลุงขอให้จ้างคนในหมู่บ้านด้วยนะ", "If a solar farm goes up next to the fields, hire people from the village."],
+  ["buy:energy", "ลมแรงทุ่งนี้ทั้งปี ถ้ามีกังหันลมสักต้น ลุงยกมือเอาด้วย", "The wind blows across this plain all year. Put up a turbine and I'll vote for it."],
+  ["buy:energy", "ลุงอ่านข่าวว่าไฟฟ้าจากแดดถูกกว่าถ่านหินแล้ว ทำไมไม่รีบใช้กันล่ะ", "I read that solar power is cheaper than coal now. Why aren't we hurrying?"],
+  ["buy:energy", "แบตเตอรี่เก็บไฟไว้ใช้กลางคืน ลุงจะได้สูบน้ำตอนเย็นที่ไม่ร้อน", "Batteries to store power for the night. I can pump water in the cool of the evening."],
+  ["buy:city", "เมืองฟองน้ำเหรอ ดีนะ ถ้าเมืองเก็บน้ำเองได้ จะได้ไม่ระบายมาท่วมนาลุง", "Sponge cities? Good. If the city keeps its own water, it won't drain it onto my field."],
+  ["buy:city", "เตือนภัยล่วงหน้าดีมาก ปีที่แล้วลุงรู้ก่อนสามวัน ย้ายวัวทันพอดี", "Early warnings are great. Last year I knew three days ahead and moved the cow in time."],
+  ["buy:city", "กำแพงกันทะเลช่วยเมืองได้ แต่น้ำมันจะไปไหนล่ะ อย่ามาท่วมนาแทนก็แล้วกัน", "Sea walls protect the city. But where does the water go then? Not onto the fields, I hope."],
+  ["buy:city", "ทุนช่วยคนทิ้งบ้านหนีน้ำเค็ม ลุงยังไม่ไปหรอก แต่รู้ว่ามีทางเลือกก็อุ่นใจ", "Help for people who have to leave the salt behind. I'm not going yet, but it's good to know."],
+  ["buy:city", "ถนนในหมู่บ้านยกสูงแล้ว น้ำท่วมทีหน้าลูกหลานยังขี่มอเตอร์ไซค์ไปโรงเรียนได้", "The village road's been raised. Next flood, the kids can still ride to school."],
+  ["buy:industry", "ปุ๋ยจากไฮโดรเจนสีเขียว ถ้าราคาถูกลง ลุงเปลี่ยนทันที", "Fertiliser made with green hydrogen? If it gets cheaper, I'll switch at once."],
+  ["buy:industry", "รถไฟความเร็วสูงผ่านฉะเชิงเทรา ลูกลุงจะได้กลับบ้านบ่อยขึ้น", "High-speed rail through Chachoengsao. My son can come home more often."],
+  ["buy:industry", "รถไถไฟฟ้าราคายังแพงอยู่ ถ้ารัฐช่วยครึ่งหนึ่ง ลุงซื้อแน่", "Electric tractors are still pricey. If the state pays half, I'll buy one."],
+  ["buy:industry", "โรงงานใกล้บ้านเลิกปล่อยควันดำแล้ว ผ้าที่ป้าตากไว้ไม่เป็นคราบอีก", "The factory nearby stopped pumping black smoke. My wife's washing doesn't get stained anymore."],
+  ["buy:policy", "ภาษีคาร์บอนนี่ ใครปล่อยมากก็จ่ายมาก ฟังแล้วยุติธรรมดีนะ", "A carbon tax: the more you pollute, the more you pay. Sounds fair to me."],
+  ["buy:policy", "ข้อตกลงระหว่างประเทศดีแล้ว ขอแค่มีบรรทัดหนึ่งพูดถึงชาวนาด้วย", "International agreements are fine. Just put one line in about farmers."],
+  ["buy:policy", "กองทุนความสูญเสียเหรอ ลุงขอให้เงินมาถึงคนที่เสียจริง ไม่ใช่ติดอยู่ข้างบน", "A loss and damage fund? Let the money reach the people who lost, not get stuck at the top."],
+  ["buy:policy", "ถ้าทุกประเทศตกลงกันได้ น้ำเค็มก็ไม่ต้องรอใครตกลงหรอก มันมาของมันเอง ต้องรีบ", "Even if every country agrees, the salt won't wait for the signatures. Hurry."],
+  // approval, warming, the year
+  ["apprLow", "คนในหมู่บ้านเริ่มบ่นว่าผู้นำไม่ฟังชาวบ้าน ลุงบอกเขาว่ารอดูอีกหน่อย", "People in the village say the leader doesn't listen. I told them to wait a little longer."],
+  ["apprLow", "ลุงไม่ได้โกรธนะ แค่เหนื่อย เหนื่อยที่ต้องรอข่าวดีมานาน", "I'm not angry. Just tired. Tired of waiting so long for good news."],
+  ["apprLow", "ถ้าจะให้ชาวบ้านเชื่อ ต้องให้เขาเห็นอะไรเปลี่ยนในนาของเขาเองก่อน", "If you want villagers to believe, let them see something change in their own fields first."],
+  ["apprHigh", "ทั้งตำบลพูดถึงผู้นำคนนี้ ว่าเป็นคนแรกที่พูดถึงน้ำเค็มเหมือนรู้จริง", "The whole district talks about you, the first leader who speaks about salt water like you know it."],
+  ["apprHigh", "ป้าแกเอารูปผู้นำไปแปะไว้ข้างปฏิทิน ลุงยังแซวแกอยู่เลย", "My wife stuck your picture next to the calendar. I still tease her about it."],
+  ["apprHigh", "ปีนี้ชาวนาเริ่มมีกำลังใจ ลุงเห็นคนหนุ่มกลับมาทำนามากขึ้น", "Farmers have heart again. I see more young people coming back to the fields."],
+  ["t15", "เขาว่าโลกร้อนเกินหนึ่งจุดห้าองศาแล้ว ลุงไม่ต้องดูตัวเลข ลุงรู้จากนา", "They say the world passed one point five degrees. I didn't need the number. My field told me."],
+  ["t15", "หนึ่งจุดห้าองศาฟังแล้วน้อย แต่ข้าวลุงรู้สึกถึงทุกจุดทศนิยม", "One point five sounds small. My rice feels every decimal."],
+  ["t2", "สององศาแล้วเหรอ ลุงขอร้องล่ะ อย่าให้มันไปถึงสาม", "Two degrees already? I'm begging you. Don't let it reach three."],
+  ["t2", "ลุงเห็นแล้วว่าสององศาหน้าตาเป็นยังไง มันคือนาที่ปลูกได้ปีเว้นปี", "I've seen what two degrees looks like. It's a field you can plant every other year."],
+  ["down", "ปีที่แล้วโลกปล่อยคาร์บอนน้อยลง ลุงอาจไม่เห็นผลทันที แต่หลานลุงจะเห็น", "The world emitted less last year. I may not see it straight away, but my grandson will."],
+  ["down", "ข่าวดีแบบนี้ลุงเล่าให้คนที่ร้านกาแฟฟังทั้งเช้า", "I spent the whole morning at the coffee shop telling everyone the good news."],
+  ["down", "คาร์บอนลดลงแล้วจริง ๆ แฮะ ลุงนึกว่าจะเป็นแค่คำสัญญา", "Carbon really did come down. I thought it would just be a promise."],
+  ["up", "ปีที่แล้วโลกยังปล่อยเพิ่มขึ้นอีก ลุงไม่โทษใครนะ แต่ปีนี้ต้องดีกว่านี้", "The world emitted even more last year. I'm not blaming anyone, but this year must be better."],
+  ["up", "ตัวเลขขึ้นอีกแล้ว ลุงว่าคนข้างบนต้องคิดเร็วกว่านี้ ทะเลมันไม่รอ", "The numbers went up again. The people at the top need to move faster. The sea won't wait."],
+  ["up", "ทุกปีที่คาร์บอนเพิ่ม ลุงรู้สึกเหมือนน้ำทะเลขยับเข้ามาอีกหนึ่งก้าว", "Every year carbon goes up, I feel the sea take another step inland."],
+  // seasons
+  ["cool", "หน้าหนาวปีนี้ไม่หนาวเลย ลุงยังไม่ได้หยิบผ้าห่มออกมาสักคืน", "This winter isn't cold at all. I haven't needed the blanket once."],
+  ["cool", "ลมหนาวมาทีไรฟางข้าวแห้งพอดีอัดก้อนขาย ปีนี้ลุงไม่เผาแม้แต่กองเดียว", "When the cool wind comes, the straw dries just right for baling. I didn't burn a single pile this year."],
+  ["hot", "หน้าร้อนมาแล้ว ลุงขุดลอกสระไว้เก็บน้ำ ปีนี้คงร้อนกว่าทุกปี", "Hot season's here. I've dredged the pond. This year will be hotter than ever."],
+  ["hot", "เมษายนนี้สงกรานต์ใช้น้ำน้อยหน่อยนะลูกหลาน น้ำในคลองเหลือนิดเดียว", "Go easy on the water at Songkran this April, kids. There's not much left in the canal."],
+  ["hot", "แดดหน้าร้อนแรงจนแผงโซลาร์ที่ปั๊มน้ำทำงานเต็มที่ อย่างน้อยก็มีอะไรดีบ้าง", "The hot-season sun runs my solar pump at full power. At least something's good."],
+  ["monsoon", "ฝนมาแล้ว ลุงเตรียมไถนา ขอให้มาพอดี ไม่มากไม่น้อย", "The rain's here. I'm ready to plough. Let it be just right, not too much, not too little."],
+  ["monsoon", "หน้าฝนนี้ลุงลอกท่อระบายน้ำหน้าบ้านแล้ว กันไว้ก่อนดีกว่าแก้", "I've cleared the drain in front of the house this monsoon. Better safe than sorry."],
+  ["monsoon", "มรสุมปีนี้มาแรง ลุงขอแค่ให้ฝนตกในนา อย่าตกทีเดียวทั้งเดือน", "The monsoon's strong this year. Just let it fall on the fields, not all in one day."],
+  ["monsoon", "ข้าวนาปีลงแล้ว ลุงดูฟ้าทุกเช้าเหมือนดูหน้าคนที่เรารัก", "The main crop is in. I watch the sky every morning like the face of someone I love."],
+  ["storm", "ฤดูพายุมาแล้ว ลุงผูกหลังคายุ้งข้าวให้แน่น เผื่อพายุหลงมาทางนี้", "Storm season. I've tied down the barn roof in case one strays this way."],
+  ["storm", "ปีนี้พายุเข้าเวียดนามบ่อย ฝนตกหนักมาถึงอีสาน ลุงต้องคอยดูน้ำ", "Storms keep hitting Vietnam this year and the heavy rain reaches Isan. I have to watch the water."],
+];
+
+V.fon = [
+  ["idle", "วันนี้ปลูกโกงกางไปสามร้อยต้นกับนักเรียน ป.5 พวกเขาตั้งชื่อให้ทุกต้นเลยค่ะ", "Planted three hundred mangroves with a fifth-grade class today. They named every single one."],
+  ["idle", "ป่าชายเลนหนึ่งไร่เก็บคาร์บอนได้มากกว่าป่าบกหลายเท่า แต่หลายคนยังเห็นเป็นแค่ป่ารก", "An acre of mangrove stores many times more carbon than forest on land, but people still see it as scrub."],
+  ["idle", "เสาไฟหน้าบ้านเกิดฉันยังยืนอยู่กลางทะเล ทุกครั้งที่นั่งเรือผ่าน ฉันโบกมือให้มัน", "The power pole from my old home still stands out at sea. I wave to it every time the boat goes by."],
+  ["idle", "แนวไม้ไผ่ชะลอคลื่นที่เราปักไว้ ตะกอนเริ่มทับถมแล้วค่ะ อีกไม่นานต้นกล้าจะขึ้นเองได้", "The bamboo fences we set up are catching silt. Soon seedlings will take root on their own."],
+  ["idle", "อาสารุ่นใหม่มาเยอะมาก บางคนมาจากเชียงใหม่ ไม่เคยเห็นทะเลมาก่อนด้วยซ้ำ", "So many new volunteers. Some came from Chiang Mai and had never seen the sea."],
+  ["idle", "ปูก้ามดาบกลับมาแล้วค่ะ แปลว่าป่ามันกลับมามีชีวิตจริง ๆ", "The fiddler crabs are back. That means the forest is really alive again."],
+  ["idle", "ฉันเคยโกรธทะเลที่กินบ้าน ตอนนี้ฉันอยากคืนดีกับมัน ด้วยการปลูกป่าให้มันโอบไว้", "I used to be angry at the sea for taking my home. Now I want to make peace with it by planting a forest for it to hold."],
+  ["idle", "ป้าข้างบ้านทำแกงส้มมาให้อาสาทุกวันเสาร์ เป็นเหตุผลที่ทุกคนกลับมา", "The auntie next door makes sour curry for the volunteers every Saturday. That's why everyone comes back."],
+  ["idle", "นักวิจัยมาวัดคาร์บอนในดินโคลนของเรา บอกว่าลึกกว่าที่คิด ฉันดีใจจนพูดไม่ออก", "Researchers measured the carbon in our mud. Deeper than they thought. I was speechless."],
+  ["idle", "ขยะพลาสติกติดรากโกงกางทุกวัน เราเก็บได้วันละเป็นสิบกระสอบ", "Plastic snags on the mangrove roots every day. We pull out ten sacks a day."],
+  ["idle", "คนบอกว่าปลูกต้นไม้ช่วยโลกได้นิดเดียว แต่สำหรับหมู่บ้านฉัน มันคือทั้งหมด", "People say planting trees helps the world only a little. For my village it's everything."],
+  ["idle", "ฉันเรียนภาษาอังกฤษตอนกลางคืน จะได้ไปเล่าเรื่องป่าชายเลนในเวทีโลก", "I study English at night so I can tell the world about mangroves."],
+  ["start", "สวัสดีค่ะท่านผู้นำ ถ้าว่าง มาปลูกต้นไม้กับเราสักต้นนะคะ", "Hello, leader. If you're ever free, come and plant a tree with us."],
+  ["start", "ฉันจะคอยดูนะคะว่าคำสัญญาจะกลายเป็นต้นไม้กี่ต้น", "I'll be watching how many trees your promises turn into."],
+  ["late", "ป่าที่ฉันปลูกตอนอายุยี่สิบ ตอนนี้สูงกว่าบ้านแล้วค่ะ", "The forest I planted at twenty is taller than a house now."],
+  ["late", "หมู่บ้านของฉันไม่ได้หายไปอีกแล้ว เพราะป่าทำงานแทนกำแพง", "My village stopped disappearing. The forest does the work of a wall."],
+  ["late", "นกกาบบัวกลับมาทำรังที่บางขุนเทียนแล้วค่ะ ฉันร้องไห้เลย", "The painted storks are nesting at Bang Khun Thian again. I cried."],
+  ["home:flood", "น้ำทะเลหนุนบวกฝนหนัก ถนนเข้าหมู่บ้านจมหมด แต่หลังแนวป่า บ้านยังแห้งอยู่ค่ะ", "High tide plus heavy rain sank the road in. But behind the mangroves, houses stayed dry."],
+  ["home:flood", "ต้นกล้าที่เพิ่งปลูกโดนน้ำซัดไปครึ่งหนึ่ง พรุ่งนี้เราจะปลูกใหม่", "Half the new seedlings washed away. Tomorrow we plant again."],
+  ["home:flood", "น้ำท่วมทีไร ขยะจากเมืองลอยมาติดป่าเรา ป่าก็เหมือนตะแกรงกรองให้ทะเล", "Every flood brings the city's rubbish to our forest. It's like a filter for the sea."],
+  ["home:saltwater", "น้ำเค็มรุกเข้าไปไกลถึงสวนส้มโอแล้วค่ะ คนสวนเริ่มมาถามวิธีปลูกป่าชายเลน", "The salt has reached the pomelo orchards. The growers are asking how to plant mangroves."],
+  ["home:saltwater", "ป่าชายเลนชอบน้ำกร่อย แต่คนไม่ชอบ เราต้องหาทางให้ทั้งสองอยู่ด้วยกันได้", "Mangroves like brackish water. People don't. We have to find a way for both."],
+  ["home:heat", "ร้อนจนต้องย้ายเวลาปลูกไปตอนหกโมงเช้า ไม่งั้นอาสาเป็นลม", "So hot we moved planting to six in the morning, or the volunteers would faint."],
+  ["home:heat", "น้ำทะเลร้อนจนกุ้งหอยในป่าตายเยอะ ป่ายังอยู่ แต่คนหาเลี้ยงชีพลำบาก", "The sea got so warm that shellfish died in the forest. The forest lives on, but the fishers struggle."],
+  ["home:drought", "แล้งทำให้น้ำทะเลดันเข้ามาลึก ต้นกล้าที่อยู่ด้านในเริ่มเค็มเกินไปแล้วค่ะ", "Drought lets the sea push further in. The seedlings further inland are getting too salty."],
+  ["haz:typhoon", "เคยมีงานวิจัยว่าหมู่บ้านหลังป่าชายเลนเสียหายจากพายุน้อยกว่ามาก ฉันอยากให้ทุกชายฝั่งมีป่า", "Studies found villages behind mangroves suffered far less from storms. I want every coast to have a forest."],
+  ["haz:hurricane", "พายุใหญ่ที่อเมริกา ชายฝั่งที่เสียป่าชายเลนไปโดนหนักที่สุด ป่ามันช่วยได้จริง ๆ ค่ะ", "The big storm in America hit hardest where the mangroves had been cleared. Forests really help."],
+  ["haz:saltwater", "เห็นข่าวน้ำเค็มที่สามเหลี่ยมปากแม่น้ำโขง ใจเดียวกับบ้านเราเลยค่ะ", "Saw the news of salt in the Mekong Delta. Same heartbreak as ours."],
+  ["haz:wildfire", "ไฟป่าเผาต้นไม้ที่คนปลูกมาหลายสิบปีในไม่กี่ชั่วโมง ฉันนึกภาพแล้วใจสลาย", "Wildfire burns trees people planted over decades in a few hours. It breaks my heart to imagine."],
+  ["buy:nature", "ฟื้นฟูป่าชายเลนทั่วโลก! วันนี้ฉันจะเลี้ยงข้าวอาสาทุกคนเลยค่ะ", "Mangrove restoration worldwide! I'm buying lunch for every volunteer today."],
+  ["buy:nature", "ปลูกป่าใหม่ดีมากค่ะ ขอแค่เลือกพันธุ์ไม้ท้องถิ่น อย่าปลูกต้นเดียวกันทั้งภูเขา", "Reforestation is wonderful. Just choose local species, not one kind of tree on a whole mountain."],
+  ["buy:nature", "ปกป้องทะเลด้วยเหรอคะ ปะการัง หญ้าทะเล ป่าชายเลน ทั้งหมดคือบ้านเดียวกัน", "Protecting the ocean too? Coral, seagrass, mangroves: they're all one home."],
+  ["buy:nature", "เกษตรฟื้นฟูดิน ป้าข้างบ้านฉันเริ่มทำแล้ว ผักแกงามขึ้นทุกเดือน", "Regenerative farming. The auntie next door started and her vegetables get better every month."],
+  ["buy:city", "กำแพงกันคลื่นอาจจำเป็นในบางที่ แต่ถ้าปลูกป่าไว้ข้างหน้าด้วย กำแพงจะอยู่ได้นานกว่า", "Sea walls may be needed in places. Plant a forest in front and the wall lasts longer."],
+  ["buy:city", "ระบบเตือนภัยทางทะเลช่วยชาวประมงได้มาก ปีนี้ไม่มีเรือในหมู่บ้านออกไปเจอพายุเลย", "The sea warning system helps the fishers. No boat from our village got caught in a storm this year."],
+  ["buy:energy", "กังหันลมนอกชายฝั่ง ฉันขอแค่ให้ดูเส้นทางนกอพยพด้วยนะคะ", "Offshore wind turbines. Just please check the migratory bird routes."],
+  ["buy:energy", "ไฟฟ้าสะอาดดีค่ะ บ้านอาสาเราติดโซลาร์แล้ว ค่าไฟลดครึ่งหนึ่ง", "Clean power is great. Our volunteer house has solar now, and the bill is halved."],
+  ["buy:industry", "เรือประมงไฟฟ้าลำแรกของหมู่บ้านมาแล้วค่ะ ไม่มีคราบน้ำมันในน้ำอีก", "The village's first electric fishing boat is here. No more oil slicks on the water."],
+  ["buy:policy", "กองทุนช่วยประเทศที่เสียหาย ขอให้ชุมชนชายฝั่งได้มีเสียงในการใช้เงินด้วยนะคะ", "A fund for countries that suffer losses. Let coastal communities have a say in how it's spent."],
+  ["buy:policy", "ถ้าทุกประเทศตกลงลดคาร์บอนพร้อมกัน ป่าที่เราปลูกจะไม่ต้องสู้คนเดียว", "If every country cuts carbon together, the forests we plant won't fight alone."],
+  ["apprLow", "คนเริ่มไม่เชื่อแล้วว่าโลกจะดีขึ้น ฉันเลยชวนเขามาปลูกต้นไม้ ความหวังมันโตตามต้นไม้ค่ะ", "People are losing faith that things will improve. So I invite them to plant trees. Hope grows with them."],
+  ["apprLow", "ฉันเข้าใจคนที่โกรธนะคะ แต่โกรธแล้วอยู่เฉย ๆ ทะเลก็ยังขึ้นอยู่ดี", "I understand people who are angry. But if we're angry and do nothing, the sea still rises."],
+  ["apprHigh", "อาสาสมัครปีนี้เพิ่มเป็นสามเท่า ทุกคนบอกว่ามีความหวังขึ้นมาค่ะ", "Volunteers tripled this year. Everyone says they feel hope again."],
+  ["apprHigh", "มีคนเขียนจดหมายมาขอบคุณป่าชายเลน ฉันจะเอาไปติดไว้ที่ศาลาเลยค่ะ", "Someone wrote a letter to thank the mangroves. I'm pinning it up in the pavilion."],
+  ["t15", "หนึ่งจุดห้าองศา ฉันเคยถือป้ายตัวเลขนี้ในการประท้วง ไม่อยากเชื่อว่ามันมาถึงแล้ว", "One point five. I held that number on a sign at a protest. I can't believe it's here."],
+  ["t2", "สององศาแปลว่าปะการังส่วนใหญ่ของโลกจะหายไป ฉันขอร้อง อย่าหยุดตอนนี้นะคะ", "Two degrees means most of the world's coral is gone. Please don't stop now."],
+  ["down", "คาร์บอนลดลงแล้วค่ะ! ป่าของเราช่วยด้วยนิดหนึ่งนะ", "Carbon went down! Our forest helped a little."],
+  ["down", "ปีนี้เป็นปีแรกที่ฉันรู้สึกว่าเรากำลังชนะ", "This is the first year I feel we're winning."],
+  ["up", "คาร์บอนยังเพิ่มขึ้นอยู่ ป่าปลูกเร็วแค่ไหนก็ตามไม่ทัน ถ้าโรงงานไม่ลดด้วย", "Carbon is still rising. No forest grows fast enough if the factories don't cut too."],
+  ["up", "ตัวเลขขึ้นอีกแล้วค่ะ แต่ฉันจะปลูกต่อไป เพราะหยุดปลูกไม่ได้ช่วยอะไร", "The numbers went up again. I'll keep planting, because stopping won't help."],
+  ["cool", "หน้าหนาวน้ำทะเลลดต่ำสุด เราเดินลงไปปลูกต้นกล้าได้ไกลที่สุดในปี", "In the cool season the tide is lowest. We can walk out and plant further than any time of year."],
+  ["hot", "หน้าร้อนนี้ต้องรดน้ำต้นกล้าในเรือนเพาะชำวันละสองรอบค่ะ", "This hot season we water the nursery seedlings twice a day."],
+  ["monsoon", "ฤดูฝนคือฤดูปลูกค่ะ ฝนช่วยให้ต้นกล้าตั้งตัวได้เร็ว", "Rainy season is planting season. The rain helps seedlings settle in quickly."],
+  ["monsoon", "มรสุมปีนี้คลื่นแรง แนวไผ่ด้านนอกพังไปหนึ่งช่วง อาทิตย์นี้ไปซ่อมกัน", "Big waves this monsoon broke a stretch of the outer bamboo fence. We'll fix it this week."],
+  ["storm", "ฤดูพายุ เราผูกต้นกล้าไว้กับหลักทุกต้น หวังว่าจะรอดสักครึ่ง", "Storm season. We tie every seedling to a stake. Hope half of them make it."],
+];
+
+V.noi = [
+  ["idle", "ข้าวแกงป้าขายมาสามสิบปี ไม่เคยปิดร้านเพราะร้อนเลย จนปีที่แล้ว", "I've sold curry and rice for thirty years and never closed for the heat. Until last year."],
+  ["idle", "พริกขึ้นราคา มะพร้าวขึ้นราคา แกงเขียวหวานถ้วยละสี่สิบ ป้าก็เกรงใจลูกค้า", "Chillies are up, coconuts are up. Green curry at forty baht a bowl, and I feel bad for my customers."],
+  ["idle", "ลูกค้าประจำป้าเป็นวินมอเตอร์ไซค์ ร้อนแบบนี้เขาขี่ทั้งวัน ป้าแถมน้ำแข็งให้ตลอด", "My regulars are motorbike-taxi riders. They ride all day in this heat, so I give them free ice."],
+  ["idle", "ป้าเปลี่ยนมาใช้เตาแม่เหล็กไฟฟ้าแล้ว ร้านไม่ร้อนเหมือนเตาแก๊ส ค่าไฟก็พอรับได้", "I switched to an induction stove. The stall's cooler than with gas, and the power bill is fine."],
+  ["idle", "ฝุ่นพีเอ็มสองจุดห้ามาทีไร คนไม่ออกมากินข้าวนอกบ้าน ป้าขายไม่ได้ทั้งอาทิตย์", "When the PM2.5 smog comes, people stay in. I sell nothing all week."],
+  ["idle", "หลานป้าบอกให้เลิกใช้ถุงพลาสติก ป้าเลยให้ส่วนลดห้าบาทถ้าเอาปิ่นโตมาเอง", "My grandkid told me to stop using plastic bags. Now it's five baht off if you bring your own tiffin."],
+  ["idle", "ซอยหน้าบ้านป้าปลูกต้นไม้ใหม่สิบต้น อีกห้าปีป้าจะได้ขายข้าวใต้ร่มไม้", "They planted ten trees in my soi. In five years I'll be selling rice in the shade."],
+  ["idle", "รถเมล์ไฟฟ้าผ่านหน้าร้านแล้ว เงียบดี ควันไม่เข้าแกงป้าแล้ว", "Electric buses pass the stall now. Quiet, and no exhaust in my curry."],
+  ["idle", "คนกรุงเทพฯ ไม่ค่อยคิดเรื่องโลกร้อนหรอก จนน้ำท่วมถึงหน้าบ้านนั่นแหละ", "Bangkok people don't think much about climate. Until the water reaches the front door."],
+  ["idle", "ป้าเก็บน้ำมันพืชใช้แล้วขายให้คนทำไบโอดีเซล ได้เงินมาซื้อขนมให้หลาน", "I sell my used cooking oil for biodiesel. It buys snacks for my grandkid."],
+  ["start", "ผู้นำโลกคนใหม่เหรอ ถ้าแวะมากรุงเทพฯ มากินข้าวแกงป้าฟรีนะ แลกกับทำให้อากาศเย็นลงหน่อย", "A new world leader? Stop by in Bangkok and the curry's free. In return, cool things down a bit."],
+  ["late", "ร้อนน้อยลงแล้วนะปีนี้ ต้นไม้ในซอยโตเป็นร่มแล้ว ลูกค้ากลับมานั่งกินที่ร้านเหมือนเดิม", "It's less hot this year. The soi trees give shade now, and customers sit and eat at the stall again."],
+  ["late", "ป้าจะเกษียณแล้ว ลูกสาวจะรับช่วงร้าน ขอให้เขาได้ขายในโลกที่ไม่ร้อนเกินไป", "I'm retiring. My daughter will take over. I hope she gets to sell in a world that isn't too hot."],
+  ["home:heat", "ร้อนจนแกงบูดตั้งแต่สิบเอ็ดโมง ป้าต้องทำทีละน้อยแล้วทำบ่อย ๆ", "So hot the curry spoils by eleven. I have to cook small batches, often."],
+  ["home:heat", "ค่าดัชนีความร้อนเกินห้าสิบ ทางเขตประกาศให้หลบแดด แต่ป้าหลบไม่ได้ ป้าต้องขาย", "The heat index passed fifty and the district told people to stay out of the sun. I can't. I have to sell."],
+  ["home:heat", "แอร์ทั้งเมืองเปิดพร้อมกัน ไฟดับทั้งซอยสองชั่วโมง ตู้เย็นป้าละลายหมด", "The whole city ran its air-con at once. The soi lost power for two hours and my fridge thawed."],
+  ["home:heat", "ป้าเห็นคนงานก่อสร้างนั่งพักใต้สะพานกันเป็นแถว ร้อนแบบนี้ไม่ใช่เรื่องเล่น", "I see construction workers sitting in rows under the bridge. Heat like this is no joke."],
+  ["home:flood", "น้ำท่วมซอยถึงหน้าแข้ง ป้ายกหม้อแกงขึ้นโต๊ะแล้วขายต่อ คนยังต้องกินข้าว", "The soi's flooded shin-deep. I lifted the curry pots onto the table and kept selling. People still need to eat."],
+  ["home:flood", "ฝนตกชั่วโมงเดียวน้ำท่วมถนนใหญ่ กรุงเทพฯ ต้องมีที่ให้น้ำไปบ้าง", "One hour of rain and the main road floods. Bangkok needs somewhere for the water to go."],
+  ["home:flood", "ลูกค้าเดินลุยน้ำมากินข้าว ป้าเลยแจกถุงพลาสติกใส่เท้า ทั้งที่เพิ่งเลิกใช้ถุงไป", "Customers wade in to eat, so I hand out plastic bags for their feet. Right after I'd quit plastic."],
+  ["home:drought", "ข่าวว่าเขื่อนน้ำน้อย ราคาผักขึ้นอีกแล้ว คะน้ากำละสามสิบ", "The dams are low, they say. Vegetables are up again: thirty baht for a bunch of kale."],
+  ["home:saltwater", "น้ำประปามีรสเค็มนิด ๆ ป้าต้องซื้อน้ำดื่มมาหุงข้าวแทน", "The tap water tastes a little salty. I've started buying drinking water to cook the rice."],
+  ["haz:flood", "เห็นข่าวน้ำท่วมที่อื่นแล้วนึกถึงปี 54 ป้ายังจำได้ทุกอย่าง", "News of floods elsewhere takes me back to 2011. I still remember everything."],
+  ["buy:city", "สวนสาธารณะรับน้ำใกล้บ้านป้าเสร็จแล้ว ฝนตกหนักซอยไม่ท่วมแล้ว", "The flood park near me is finished. Heavy rain, and the soi stays dry."],
+  ["buy:city", "อาคารประหยัดพลังงาน ตลาดสดแห่งใหม่หลังคาสูง ลมผ่าน ไม่ต้องเปิดพัดลมเลย", "Energy-saving buildings. The new market has a high roof and the breeze goes through. No fans needed."],
+  ["buy:energy", "ระบบลดไฟพีค ไฟไม่ดับแล้วตอนบ่ายสอง ตู้เย็นป้ารอดแล้ว", "Peak demand control. No more blackouts at 2 p.m. My fridge survives."],
+  ["buy:energy", "ถ้าไฟฟ้าสะอาดแล้วค่าไฟถูกลง ป้าจะลดราคาข้าวแกงให้ห้าบาทเลย", "If clean power brings the bill down, I'll knock five baht off the curry."],
+  ["buy:industry", "รถไฟฟ้าสายใหม่มาถึงตลาดแล้ว ลูกค้าเยอะขึ้นเท่าตัว", "The new train line reached the market. Twice the customers."],
+  ["buy:policy", "ภาษีคาร์บอนจะทำให้ของแพงขึ้นไหม ป้าถามจริง ป้าขายของคนจนนะ", "Will a carbon tax make things dearer? I'm serious. My customers are poor."],
+  ["apprLow", "ลูกค้าบ่นกันทั้งร้านว่าค่าครองชีพแพง โลกร้อนก็ส่วนหนึ่ง แต่ท้องก็ต้องอิ่ม", "Everyone at the stall complains about the cost of living. Climate matters, but bellies need filling."],
+  ["apprLow", "ถ้าจะให้คนช่วยลดโลกร้อน ต้องช่วยให้เขามีกินก่อนนะคุณ", "If you want people to help with the climate, help them put food on the table first."],
+  ["apprHigh", "วินมอเตอร์ไซค์หน้าร้านเชียร์ผู้นำกันใหญ่ ตั้งแต่มีมอเตอร์ไซค์ไฟฟ้าให้ผ่อนถูก", "The bike-taxi guys are big fans since cheap electric motorbikes came in."],
+  ["t15", "ข่าวบอกว่าโลกร้อนเกินหนึ่งจุดห้าองศา ป้าว่าร้านป้าร้อนเกินมานานแล้ว", "The news says the world passed one point five. My stall passed it ages ago."],
+  ["down", "ปีนี้อากาศดีขึ้นนะ ฝุ่นน้อยลง ลูกค้ามานั่งกินที่ร้านมากขึ้น", "The air's better this year. Less smog, and more people eating at the stall."],
+  ["up", "คาร์บอนยังขึ้นเหรอ ป้าไม่เข้าใจตัวเลขหรอก แต่รู้ว่าร้อนขึ้นทุกปี", "Carbon still rising? I don't understand the numbers, but I know it's hotter every year."],
+  ["hot", "เมษายนมาแล้ว ป้าเปลี่ยนเมนูเป็นข้าวแช่กับแกงจืด ของร้อน ๆ ไม่มีใครกิน", "April's here. I've switched to khao chae and clear soup. Nobody wants hot food."],
+  ["monsoon", "หน้าฝนมาแล้ว ป้าซื้อผ้าใบผืนใหม่ ปีที่แล้วฝนตกแรงจนผ้าใบขาด", "Rainy season. I bought a new tarp. Last year's tore in the downpours."],
+  ["cool", "หน้าหนาวกรุงเทพฯ หนาวอยู่สามวัน ป้าใส่เสื้อกันหนาวได้วันเดียว", "Bangkok's winter lasted three days. I got to wear my jacket once."],
+];
+
+V.ali = [
+  ["idle", "สมัยพ่อผม ออกเรือห้าไมล์ก็ได้ปลาเต็มลำ ทุกวันนี้ต้องออกไปยี่สิบไมล์", "In my father's time, five miles out filled the boat. Now I go twenty."],
+  ["idle", "ปลาทูตัวเล็กลงทุกปี น้ำทะเลอุ่นขึ้น ปลาก็หนีลงไปลึก", "The mackerel get smaller every year. The water's warmer and the fish go deeper."],
+  ["idle", "ผมเป็นชาวประมงเรือเล็ก ไม่ได้ทำให้โลกร้อน แต่ผมรับผลมันเต็ม ๆ", "I fish from a small boat. I didn't heat the planet, but I take the full hit."],
+  ["idle", "เรือผมเปลี่ยนเป็นเครื่องยนต์ไฟฟ้าแล้ว ชาร์จจากแผงโซลาร์บนหลังคาบ้าน", "My boat has an electric motor now, charged from the solar panels on my roof."],
+  ["idle", "ลูกชายผมเรียนดำน้ำ อยากเป็นคนปลูกปะการัง ผมว่ามันเป็นงานที่ดี", "My son is learning to dive. He wants to replant coral. Good work, I think."],
+  ["idle", "อ่าวปัตตานีมีป่าชายเลนกลับมาเยอะขึ้น ปูดำก็กลับมา ราคาดีด้วย", "More mangroves have come back in Pattani Bay. The mud crabs too, and they fetch a good price."],
+  ["idle", "ทุกเช้าผมดูสีน้ำทะเลก่อนออกเรือ ถ้าเขียวขุ่น แปลว่าแพลงก์ตอนบูม ปลาจะตาย", "Every morning I check the water's colour. If it's murky green, there's a plankton bloom and fish will die."],
+  ["start", "ผู้นำคนใหม่ อย่าลืมคนทะเลนะครับ เราอยู่ปลายทางของทุกอย่าง", "New leader, don't forget the sea people. We're at the end of everything."],
+  ["late", "ปะการังที่ลูกผมปลูกไว้ เริ่มมีปลาการ์ตูนมาอยู่แล้วครับ", "The coral my son planted has clownfish living in it now."],
+  ["home:heat", "น้ำทะเลร้อนจนปะการังฟอกขาวทั้งแนว ผมดำลงไปดู เหมือนป่าที่ถูกเผา", "The sea got so hot the whole reef bleached. I dived to look. It was like a burnt forest."],
+  ["home:heat", "ปลาตายลอยเต็มกระชัง น้ำอุ่นเกินไป ออกซิเจนไม่พอ", "Dead fish filled the cages. The water's too warm; there's not enough oxygen."],
+  ["home:flood", "น้ำจืดจากน้ำท่วมไหลลงทะเลเยอะ ปลาหนีหมด ผมไม่ได้ออกเรือเป็นสัปดาห์", "So much floodwater poured into the sea that the fish fled. I haven't gone out in a week."],
+  ["home:flood", "น้ำป่าพัดซุงลงมาเต็มอ่าว เรือเล็กออกไม่ได้เลยครับ", "Flash floods washed logs all over the bay. Small boats can't go out."],
+  ["home:saltwater", "น้ำเค็มเข้าบ่อน้ำในหมู่บ้าน ต้องซื้อน้ำดื่มกันทุกบ้านแล้ว", "Salt got into the village wells. Every house buys drinking water now."],
+  ["haz:typhoon", "พายุเข้าอ่าวไทยทีไร ชาวประมงเรือเล็กอย่างผมต้องนั่งรอบนฝั่ง ไม่มีรายได้", "When a storm enters the Gulf, small-boat fishers like me sit on shore with no income."],
+  ["haz:heat", "ข่าวปะการังฟอกขาวทั่วโลก ผมเห็นกับตาที่นี่แล้วครับ มันเป็นเรื่องจริง", "The news says coral is bleaching worldwide. I've seen it here with my own eyes. It's real."],
+  ["buy:nature", "ปกป้องทะเลและปลูกป่าชายเลน ปลาจะมีที่วางไข่ ลูกหลานผมจะมีปลากิน", "Protecting the sea and planting mangroves. The fish get a place to spawn, my grandchildren get fish to eat."],
+  ["buy:nature", "เขตห้ามจับปลาช่วงวางไข่ ผมยอมหยุดสามเดือน ถ้าแลกกับทะเลที่ฟื้น", "No fishing during spawning season. I'll stop for three months if the sea recovers."],
+  ["buy:city", "ระบบเตือนภัยทางทะเลดีมากครับ ปีนี้เรือในหมู่บ้านกลับเข้าฝั่งทันทุกลำ", "The marine warnings are great. Every boat in the village made it back in time this year."],
+  ["buy:energy", "เครื่องยนต์เรือไฟฟ้าราคาถูกลงแล้ว ผมจะชวนเพื่อนในท่าเรือเปลี่ยนกัน", "Electric boat motors are cheaper now. I'll get the others at the pier to switch."],
+  ["buy:policy", "ข้อตกลงห้ามเรืออวนลากจากต่างประเทศ เรือเล็กอย่างเรารอดแล้วครับ", "The deal on foreign trawlers saves small boats like ours."],
+  ["apprLow", "คนในท่าเรือบ่นกันว่าไม่มีใครมาดูชาวประมงเลย", "People at the pier say nobody ever comes to see the fishers."],
+  ["apprHigh", "ปีนี้ปลากลับมาบ้างแล้ว คนในท่าเรือยิ้มกันทุกเช้า", "Some fish came back this year. Everyone at the pier smiles in the morning."],
+  ["t15", "หนึ่งจุดห้าองศา คือเส้นที่นักวิทยาศาสตร์บอกว่าปะการังส่วนใหญ่จะทนไม่ไหว", "One point five is the line scientists said most coral can't survive past."],
+  ["down", "ปีนี้น้ำทะเลไม่ร้อนเท่าปีก่อน ปะการังบางส่วนเริ่มกลับมามีสีแล้วครับ", "The sea wasn't as hot this year. Some coral is getting its colour back."],
+  ["monsoon", "มรสุมตะวันตกเฉียงใต้มาแล้ว ฝั่งอันดามันคลื่นแรง เพื่อนที่สตูลจอดเรือกันหมด ฝั่งผมยังพอออกได้", "The southwest monsoon is here. The Andaman side is rough and my friends in Satun are tied up; on my side I can still go out."],
+  ["cool", "ปลายปีมรสุมตะวันออกเฉียงเหนือพัดเข้าฝั่งปัตตานี ผมจอดเรือซ่อมอวนรอคลื่นลง", "At the end of the year the northeast monsoon hits Pattani. I tie up the boat and mend nets until the waves drop."],
+  ["storm", "ฤดูพายุ ผมฟังวิทยุกรมอุตุฯ ทุกชั่วโมง ทะเลไม่เคยให้อภัยคนประมาท", "Storm season. I listen to the weather radio every hour. The sea never forgives carelessness."],
+];
+
+})();
+
+/* ---- 47-voice-world-a.js ---- */
+(function(){
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.voiceWorldA) return;
+(P.mods = P.mods || {}).voiceWorldA = 1;
+/* 3.9 · Lines: Krai (the opposition), Tala (Tuvalu), Ravi (Kanpur), Jonas (Lusatia), Rahima (Khulna), Lekuta (Samburu). See 45-voices.js. */
+const V = P.VOICE_LINES = P.VOICE_LINES || {};
+
+V.opp = [
+  ["idle", "ผมไม่ได้ต่อต้านโลกสะอาด ผมต่อต้านการรีบจนคนตกงาน", "I'm not against a clean world. I'm against rushing until people lose their jobs."],
+  ["idle", "โรงไฟฟ้าถ่านหินหนึ่งโรงจ้างคนพันคน คุณมีงานให้พวกเขาหรือยัง", "One coal plant employs a thousand people. Do you have jobs for them yet?"],
+  ["idle", "ทุกครั้งที่ไฟดับ คนจะนึกถึงผม เพราะผมบอกแล้วว่าพลังงานลมไม่เสถียร", "Every blackout, people remember me. I told them wind isn't reliable."],
+  ["idle", "นโยบายสวยบนกระดาษ แต่คนจ่ายคือคนขับรถบรรทุก ชาวนา และแม่ค้า", "Policies look pretty on paper. The truck drivers, farmers and vendors pay for them."],
+  ["idle", "ผมยอมรับว่าโลกร้อนจริง แต่ผมไม่ยอมรับว่าวิธีของคุณคือวิธีเดียว", "I accept that warming is real. I don't accept that your way is the only way."],
+  ["idle", "นักลงทุนถามผมทุกวันว่าจะเอาเงินไปไว้ที่ไหน ตลาดกำลังสับสนเพราะคุณ", "Investors ask me every day where to put their money. You've confused the markets."],
+  ["idle", "ประเทศกำลังพัฒนาอยากมีไฟฟ้าใช้ก่อนจะสนใจว่าไฟมาจากไหน", "Developing countries want power first. Where it comes from comes later."],
+  ["idle", "ผมพาลูกไปดูโรงไฟฟ้าเก่าของพ่อ ที่นั่นสร้างเมืองทั้งเมืองขึ้นมา อย่าลืมเรื่องนั้น", "I took my son to see his grandfather's old power plant. It built an entire town. Don't forget that."],
+  ["idle", "คุณจะบอกให้คนเปลี่ยนรถเป็นไฟฟ้า แต่สถานีชาร์จอยู่ไหน", "You tell people to switch to electric cars. Where are the chargers?"],
+  ["idle", "ผมไม่ได้เกลียดคุณ ผมแค่คิดว่าต้องมีคนคอยถามคำถามที่ยาก", "I don't hate you. Someone just has to keep asking the hard questions."],
+  ["idle", "ก๊าซธรรมชาติคือสะพานเชื่อม ปิดสะพานก่อนสร้างฝั่งเสร็จ คนจะตกน้ำ", "Gas is the bridge. Close the bridge before the other side is built and people fall in."],
+  ["idle", "ผู้นำประเทศหลายคนแอบโทรหาผม บอกว่าเห็นด้วยแต่พูดออกไปไม่ได้", "Plenty of national leaders call me privately to say they agree but can't say so."],
+  ["start", "ยินดีต้อนรับสู่เก้าอี้ร้อน ผมจะอยู่ตรงนี้ คอยดูทุกการตัดสินใจของคุณ", "Welcome to the hot seat. I'll be right here, watching every decision you make."],
+  ["start", "ยี่สิบห้าปีไม่นานหรอก แต่มันนานพอจะทำเศรษฐกิจพังได้ถ้าเดินผิดทาง", "Twenty-five years isn't long. But it's long enough to wreck an economy if you go the wrong way."],
+  ["late", "ผมยอมรับ เมืองที่โรงไฟฟ้าของพ่อผมเคยตั้งอยู่ ตอนนี้มีโรงงานแบตเตอรี่ คนมีงานทำ", "I'll admit it. The town where my father's plant stood has a battery factory now. People have work."],
+  ["late", "ผมยังไม่ชอบวิธีของคุณนะ แต่ตัวเลขมันฟ้องว่าคุณมาถูกทาง", "I still don't like your methods. But the numbers say you're on the right track."],
+  ["late", "ลูกผมทำงานบริษัทพลังงานลม ผมแพ้ในบ้านตัวเองไปแล้ว", "My son works for a wind company. I've already lost in my own house."],
+  ["haz:heat", "คลื่นความร้อนแบบนี้ ไฟฟ้าพีคทั้งประเทศ ถ้าไม่มีโรงไฟฟ้าเดินเครื่องตลอด จะเอาไฟจากไหน", "A heatwave like this, the whole country peaks. Without plants that run around the clock, where's the power?"],
+  ["haz:flood", "น้ำท่วมแล้วคนเรียกร้องเขื่อนกับกำแพง นั่นต้องใช้ปูนกับเหล็ก ซึ่งคุณอยากให้ลด", "After a flood people want dams and walls. That takes cement and steel, which you want cut."],
+  ["haz:wildfire", "ไฟป่าครั้งนี้ปล่อยคาร์บอนมากกว่าโรงไฟฟ้าทั้งปี แต่คนชี้นิ้วมาที่ผม", "This fire released more carbon than a power plant does all year. Yet they point at me."],
+  ["haz:drought", "แล้งจนเขื่อนผลิตไฟฟ้าไม่ได้ พลังน้ำก็ไม่ใช่คำตอบเสมอไปหรอก", "So dry the dams can't make power. Hydro isn't always the answer either."],
+  ["haz:typhoon", "พายุพัดกังหันลมหักไปสามต้น ผมไม่ได้ดีใจนะ แค่อยากให้คนรู้ว่ามันมีจุดอ่อน", "The storm snapped three turbines. I'm not glad. I just want people to know they have weak points."],
+  ["buy:energy", "ซื้อพลังงานหมุนเวียนอีกแล้ว ใครจะจ่ายค่าสายส่งที่ต้องสร้างใหม่", "More renewables. Who pays for all the new transmission lines?"],
+  ["buy:energy", "เลิกถ่านหินเร็วแบบนี้ คนพวกนั้นจะตกงาน คุณจะไปบอกครอบครัวเขาเองไหม", "Quitting coal this fast puts those men out of work. Will you tell their families yourself?"],
+  ["buy:energy", "นิวเคลียร์เหรอ อย่างน้อยก็เดินเครื่องได้ทั้งคืน ผมไม่ค้านตัวนี้", "Nuclear? At least it runs all night. I won't fight that one."],
+  ["buy:energy", "แบตเตอรี่ต้องใช้แร่ที่ขุดจากที่ไหน ใช้แรงงานใคร คุณถามหรือยัง", "Batteries need minerals. Mined where, by whom? Have you asked?"],
+  ["buy:industry", "เหล็กสีเขียวแพงกว่าเหล็กปกติสามสิบเปอร์เซ็นต์ บ้านทุกหลังจะแพงขึ้น", "Green steel costs thirty percent more. Every house gets dearer."],
+  ["buy:industry", "รถยนต์ไฟฟ้าสำหรับคนรวย รถกระบะสำหรับคนทำงาน คุณช่วยใครก่อน", "Electric cars for the rich, pickups for working people. Who are you helping first?"],
+  ["buy:industry", "ดักจับคาร์บอน ในที่สุดคุณก็ยอมรับว่าเราไม่ต้องเลิกทุกอย่างในคืนเดียว", "Carbon capture. You finally admit we don't have to give up everything overnight."],
+  ["buy:policy", "ภาษีคาร์บอนคือภาษีคนจน ใครขับรถไกลจ่ายมากที่สุด", "A carbon tax is a tax on the poor. Whoever drives the furthest pays the most."],
+  ["buy:policy", "ข้อตกลงระหว่างประเทศ ประเทศที่ไม่ทำตามก็ไม่มีใครลงโทษ เราผูกมือตัวเองอยู่ฝ่ายเดียว", "International deals. Nobody punishes the ones who cheat. We tie only our own hands."],
+  ["buy:policy", "กำแพงภาษีคาร์บอนที่ชายแดน ดีสำหรับยุโรป แย่สำหรับคนส่งออกจากเอเชีย", "A carbon border tax. Good for Europe, bad for exporters in Asia."],
+  ["buy:nature", "ปลูกป่าน่ะดี ผมไม่ค้าน แต่ต้นไม้ไม่ได้ผลิตไฟฟ้านะ", "Planting forests is fine. I won't object. But trees don't make electricity."],
+  ["buy:city", "เมืองแบบใหม่ ใครจะมีเงินย้ายเข้าไปอยู่ล่ะ", "New-style cities. Who can afford to move into them?"],
+  ["apprLow", "ความนิยมคุณตกแล้ว ประชาชนเริ่มเห็นแล้วว่าใครพูดความจริง", "Your approval is falling. People are starting to see who's telling the truth."],
+  ["apprLow", "ผมรวบรวมรายชื่อได้ครึ่งทางแล้ว อีกนิดเดียวก็ยื่นถอดถอนได้", "I'm halfway to the signatures. A little more and we can file for your removal."],
+  ["apprLow", "คนไม่ได้เกลียดโลกสะอาด เขาเกลียดค่าไฟที่แพงขึ้นทุกเดือน", "People don't hate a clean world. They hate a power bill that rises every month."],
+  ["apprHigh", "ความนิยมสูงตอนนี้ แต่รอดูหน้าหนาวที่ไฟไม่พอใช้ก่อนเถอะ", "Popular now. Wait for a winter when the power runs short."],
+  ["apprHigh", "ผมต้องยอมรับว่าคุณพูดเก่ง คนชอบคุณจริง ๆ", "I have to admit you're a good talker. People really like you."],
+  ["t15", "หนึ่งจุดห้าองศา เป้าที่ทุกคนบอกห้ามเกิน ตอนนี้เกินแล้ว คุณจะโทษใคร", "One point five, the line nobody would cross. It's crossed. Who will you blame?"],
+  ["t2", "สององศาแล้ว ผมไม่ได้อยากให้มันเป็นแบบนี้ ผมก็มีหลานเหมือนกัน", "Two degrees. I never wanted this. I have grandchildren too."],
+  ["down", "คาร์บอนลดลงจริง แต่เศรษฐกิจโตช้าลงด้วย อย่าลืมดูตัวเลขอีกด้าน", "Carbon fell, sure. So did growth. Don't forget the other column."],
+  ["down", "ผมไม่ได้บอกว่าคุณทำไม่ได้ ผมบอกว่ามันจะแพง และมันก็แพงจริง", "I never said you couldn't. I said it would be expensive, and it is."],
+  ["up", "เห็นไหม คาร์บอนยังขึ้น ทั้งที่คุณใช้เงินไปมหาศาล", "See? Carbon's still rising after all that money you spent."],
+  ["up", "ตัวเลขขึ้นอีก ผมไม่ได้ดีใจหรอก ผมแค่บอกแล้วว่ามันไม่ง่าย", "Up again. I'm not pleased. I just said it wouldn't be easy."],
+  ["cool", "หน้าหนาวในยุโรป ความต้องการก๊าซพุ่ง คุณจะให้คนหนาวตายเพื่อตัวเลขเหรอ", "Winter in Europe and gas demand soars. Will you let people freeze for a number?"],
+  ["hot", "หน้าร้อนในเอเชีย แอร์ทั้งทวีปเปิด ไฟฟ้ามาจากถ่านหินอยู่ดี", "Hot season in Asia. A whole continent's air-con runs, and the power still comes from coal."],
+  ["storm", "ฤดูพายุ ท่อส่งน้ำมันในอ่าวเม็กซิโกหยุดผลิต ราคาน้ำมันพุ่ง คุณเตรียมรับมือหรือยัง", "Storm season. The Gulf of Mexico rigs shut in, oil prices jump. Are you ready?"],
+];
+
+V.tala = [
+  ["idle", "บ้านฉันอยู่สูงกว่าน้ำทะเลแค่สองเมตร ตอนน้ำขึ้นสูงสุด ทะเลมาถึงสนามหลังบ้าน", "My home is two metres above the sea. At king tide, the sea comes into the back yard."],
+  ["idle", "ตูวาลูมีคนหมื่นกว่าคน เราไม่ได้ปล่อยคาร์บอนเลย แต่เราจะเป็นประเทศแรกที่จมหาย", "Tuvalu has about eleven thousand people. We barely emit, yet we may be the first country to drown."],
+  ["idle", "คุณยายสอนฉันจับปลาด้วยหอก ฉันอยากสอนลูกฉันแบบนี้บนเกาะเดียวกัน", "Grandma taught me to fish with a spear. I want to teach my children on the same island."],
+  ["idle", "ประเทศเราทำแผนที่ดิจิทัลของทุกเกาะไว้ เผื่อวันหนึ่งเหลือแค่ในคอมพิวเตอร์", "We made a digital copy of every island, in case one day it exists only on a computer."],
+  ["idle", "ทุกครั้งที่ฝนตก เราเก็บน้ำใส่ถังหมด เพราะน้ำใต้ดินเค็มไปแล้ว", "Every time it rains we catch all of it. The groundwater has turned salty."],
+  ["idle", "ฉันอายุสิบสี่ แต่ฉันพูดในการประชุมที่ฟิจิมาแล้ว ผู้ใหญ่ฟังเด็กบ้างก็ได้นะ", "I'm fourteen, but I've spoken at a meeting in Fiji. Grown-ups can listen to kids sometimes."],
+  ["idle", "ปลูกต้นเตยทะเลรอบบ้าน รากมันยึดทรายไว้ได้ เป็นวิธีที่บรรพบุรุษใช้", "We plant pandanus around the house. The roots hold the sand. Our ancestors did the same."],
+  ["idle", "ทีมฟุตบอลโรงเรียนเราซ้อมบนลานบินแห่งเดียวของเกาะ เพราะไม่มีพื้นที่อื่นแล้ว", "Our school football team trains on the island's only airstrip. There's nowhere else."],
+  ["start", "สวัสดีค่ะ ฉันมาจากประเทศที่คุณอาจหาไม่เจอในแผนที่ ช่วยจำพวกเราไว้ด้วย", "Hello. I'm from a country you might not find on the map. Please remember us."],
+  ["late", "เกาะของฉันยังอยู่ค่ะ น้ำทะเลยังขึ้นช้า ๆ แต่ไม่เร็วเท่าที่เคยกลัว", "My island is still here. The sea still creeps up, but not as fast as we feared."],
+  ["late", "ฉันจบมหาวิทยาลัยแล้ว จะกลับไปเป็นวิศวกรชายฝั่งที่บ้าน", "I've graduated. I'm going home to be a coastal engineer."],
+  ["home:typhoon", "ไซโคลนผ่านเกาะไปเมื่อคืน หลังคาบ้านปลิวไปครึ่งหนึ่ง แต่ทุกคนปลอดภัยค่ะ", "A cyclone passed last night. Half our roof blew off, but everyone's safe."],
+  ["home:saltwater", "ไร่เผือกปูลากาของเราเค็มหมดแล้ว อาหารที่บรรพบุรุษกินมาพันปีกำลังจะหายไป", "Our pulaka taro pits have gone salty. A food our ancestors ate for a thousand years is vanishing."],
+  ["home:flood", "น้ำทะเลซัดข้ามถนนเส้นเดียวของเกาะ เด็ก ๆ ไปโรงเรียนไม่ได้สามวัน", "The sea washed over the island's only road. Kids couldn't get to school for three days."],
+  ["haz:typhoon", "พายุในแปซิฟิกแรงขึ้นทุกปี เกาะเล็ก ๆ อย่างเราไม่มีภูเขาให้หนี", "Pacific storms get stronger every year. Small islands like ours have no hills to run to."],
+  ["haz:saltwater", "ได้ข่าวน้ำเค็มรุกที่อื่นด้วย ฉันอยากบอกพวกเขาว่าพวกเขาไม่ได้อยู่คนเดียว", "I hear salt water is creeping in elsewhere too. I want to tell them they're not alone."],
+  ["buy:city", "กำแพงกันคลื่นกับการถมที่ให้สูงขึ้น ที่ฟูนะฟูตีเริ่มทำแล้ว ฉันมีความหวังขึ้นมานิดหนึ่ง", "Sea walls and raising the land. Funafuti has started. I have a little hope."],
+  ["buy:city", "ทุนช่วยคนย้ายถิ่นเพราะโลกร้อน ขอให้เป็นทางเลือก ไม่ใช่คำสั่งนะคะ", "Support for climate migration. Let it be a choice, not an order."],
+  ["buy:policy", "กองทุนความสูญเสียและความเสียหาย ประเทศเล็ก ๆ รอเงินนี้มาสามสิบปีแล้ว", "The loss and damage fund. Small islands have waited thirty years for this."],
+  ["buy:policy", "ข้อตกลงที่ยอมรับว่าประเทศยังเป็นประเทศ แม้แผ่นดินจะจมหาย สำคัญกับเรามากค่ะ", "A deal saying a country stays a country even if its land goes under. That matters so much to us."],
+  ["buy:energy", "ทุกประเทศที่เลิกถ่านหิน คือเวลาที่เกาะเราได้เพิ่มขึ้นอีกนิด", "Every country that quits coal buys our island a little more time."],
+  ["buy:nature", "ปกป้องทะเลคือปกป้องบ้านเรา ปลาคืออาหารหลักของคนแปซิฟิก", "Protecting the ocean is protecting our home. Fish is what Pacific people live on."],
+  ["apprLow", "ถ้าผู้นำโลกหมดแรง ประเทศเล็ก ๆ อย่างเราจะไม่มีใครพูดแทนเลย", "If the world's leader gives up, no one will speak for countries as small as ours."],
+  ["apprHigh", "คนในหมู่บ้านเปิดข่าวดูผู้นำคนนี้ทุกคืน เขาบอกว่าเป็นครั้งแรกที่มีคนพูดถึงตูวาลู", "My village watches you on the news every night. They say it's the first time anyone mentioned Tuvalu."],
+  ["t15", "หนึ่งจุดห้าเพื่ออยู่รอด นั่นคือคำที่ผู้นำแปซิฟิกพูดมาตลอด วันนี้เราเกินมาแล้ว", "1.5 to stay alive. That's what Pacific leaders always said. Today we've passed it."],
+  ["t2", "สององศา บางเกาะของเราอาจอยู่ไม่ถึงตอนที่ฉันมีลูก", "Two degrees. Some of our islands may not last until I have children."],
+  ["down", "คาร์บอนลดลงแล้วค่ะ ฉันเขียนในสมุดบันทึกว่าวันนี้คือวันที่โลกได้ยินเรา", "Carbon fell. I wrote in my diary that today the world heard us."],
+  ["up", "คาร์บอนยังเพิ่ม ฉันไม่โกรธนะ แต่ฉันกลัว", "Carbon is still going up. I'm not angry. I'm scared."],
+  ["storm", "ฤดูไซโคลนในแปซิฟิกใต้ ทุกบ้านมัดหลังคาแล้วเตรียมน้ำดื่มไว้", "Cyclone season in the South Pacific. Every house has its roof tied down and water stored."],
+];
+
+V.ravi = [
+  ["idle", "โรงงานผมไม่มีแอร์ มีแต่พัดลมเพดาน ร้อนแบบนี้ทอผ้าได้ครึ่งเดียวของปกติ", "My factory has no air-con, only ceiling fans. In this heat we weave half our normal."],
+  ["idle", "ผมส่งเงินกลับบ้านที่พิหารทุกเดือน ที่นั่นแล้งจนพ่อปลูกอะไรไม่ได้", "I send money home to Bihar every month. It's so dry there my father can't grow anything."],
+  ["idle", "ตอนกลางคืนก็ยังร้อนสามสิบห้าองศา คนในห้องเช่านอนบนหลังคากันหมด", "Even at night it's thirty-five degrees. Everyone in our rooms sleeps on the roof."],
+  ["idle", "หัวหน้าเปลี่ยนเวลาทำงานเป็นตีห้าถึงบ่ายโมง เลี่ยงชั่วโมงร้อนที่สุด", "The supervisor moved our shift to 5 a.m. till 1 p.m., to dodge the worst hours."],
+  ["idle", "โรงงานติดโซลาร์บนหลังคาแล้ว ค่าไฟลดลง เจ้าของบอกจะเอาเงินไปซื้อพัดลมไอน้ำ", "The factory put solar on the roof. The power bill dropped, and the owner says he'll buy misting fans."],
+  ["idle", "ฝ้ายแพงขึ้นเพราะไร่ฝ้ายแล้ง ค่าแรงผมไม่ขึ้น แต่ทุกอย่างขึ้น", "Cotton costs more because the farms are dry. My wage doesn't rise, but everything else does."],
+  ["idle", "อากาศในกานปูร์หนักจนมองไม่เห็นตึกฝั่งตรงข้าม ลูกสาวผมไอทุกคืน", "Kanpur's air is so thick you can't see across the road. My daughter coughs every night."],
+  ["idle", "ผมไม่ได้อ่านข่าวโลกร้อนหรอก ผมรู้สึกมันทุกวันบนผิวหนัง", "I don't read climate news. I feel it on my skin every day."],
+  ["start", "ผู้นำคนใหม่ ผมไม่ขออะไรมาก ขอแค่ที่ทำงานที่ไม่ร้อนจนคนเป็นลม", "New leader, I don't ask much. Just a workplace that isn't hot enough to faint in."],
+  ["late", "โรงงานเราติดหลังคาสะท้อนแสงกับระบบระบายอากาศแล้ว ไม่มีใครเป็นลมมาสองปีแล้ว", "Our factory has a reflective roof and proper ventilation now. Nobody's fainted in two years."],
+  ["home:heat", "สี่สิบเจ็ดองศาวันนี้ เพื่อนร่วมงานล้มลงตรงหน้าเครื่องทอ ผมพาส่งโรงพยาบาลทัน", "Forty-seven degrees today. A co-worker collapsed at his loom. I got him to hospital in time."],
+  ["home:heat", "ไฟดับทั้งเขต โรงงานหยุด ไม่ทำงานก็ไม่ได้เงิน ร้อนก็ร้อน", "The power's out across the district. The factory stopped. No work, no pay, and still the heat."],
+  ["home:heat", "รัฐเปิดศูนย์หลบร้อนแล้ว มีน้ำเย็นกับพัดลม ผมพาแม่ไปนั่งทั้งบ่าย", "The state opened cooling centres with cold water and fans. I took my mother there all afternoon."],
+  ["home:heat", "คนงานก่อสร้างหยุดตอนเที่ยงตามกฎใหม่ ดีแล้ว แต่ค่าแรงต้องไม่หายนะ", "Construction workers stop at noon under the new rule. Good, but their pay mustn't vanish."],
+  ["home:flood", "มรสุมปีนี้ท่วมสลัมริมแม่น้ำคงคา บ้านเพื่อนผมหายไปทั้งหลัง", "This monsoon flooded the slums by the Ganges. My friend's whole house is gone."],
+  ["home:drought", "บ่อน้ำในหมู่บ้านพ่อผมแห้ง ผู้หญิงต้องเดินสามกิโลไปตักน้ำ", "The well in my father's village dried up. The women walk three kilometres for water."],
+  ["haz:heat", "ร้อนที่ไหนก็ตาม คนจนโดนก่อน เพราะไม่มีแอร์ ไม่มีวันหยุด", "Wherever the heat strikes, the poor get it first. No air-con, no days off."],
+  ["buy:city", "ศูนย์หลบร้อนกับระบบเตือนภัยคลื่นความร้อน อาเมดาบัดทำแล้วคนตายลดลงจริง ๆ", "Cooling centres and heat warnings. Ahmedabad did it and deaths really fell."],
+  ["buy:city", "หลังคาสีขาวทั้งชุมชน บ้านผมเย็นลงสี่ห้าองศา ไม่ต้องจ่ายค่าไฟเพิ่มด้วย", "White roofs across the neighbourhood. My house is four or five degrees cooler, at no extra cost."],
+  ["buy:energy", "ไฟฟ้าแสงอาทิตย์ราคาถูก ถ้าไฟไม่ดับตอนบ่าย โรงงานก็ไม่ต้องหยุด", "Cheap solar. If the power doesn't cut out in the afternoon, the factory doesn't stop."],
+  ["buy:energy", "ระบบจัดการไฟพีค ไฟไม่ดับตอนร้อนที่สุดแล้ว พัดลมหมุนทั้งวัน", "Peak power management. No blackouts in the hottest hours now. The fans run all day."],
+  ["buy:industry", "โรงงานสะอาดกว่าเดิม แต่อย่าลืมคนงาน ถ้าเปลี่ยนเครื่องจักร ต้องสอนเราใช้ด้วย", "Cleaner factories, fine. But if you change the machines, train us to use them."],
+  ["buy:policy", "ข้อตกลงเรื่องการค้าคาร์บอน ขอให้มีเรื่องสิทธิคนงานด้วยนะครับ", "A carbon trade deal. Put workers' rights in it too."],
+  ["apprLow", "คนงานในโรงงานบอกว่าผู้นำโลกไม่เคยเหยียบโรงทอผ้า เลยไม่รู้ว่ามันร้อนแค่ไหน", "The workers say world leaders have never set foot in a weaving shed, so they don't know the heat."],
+  ["apprHigh", "ปีนี้มีกฎหยุดงานตอนร้อนจัด คนงานทั้งโรงงานเชียร์ผู้นำคนนี้", "This year there's a rule to stop work in extreme heat. The whole factory cheers for you."],
+  ["t15", "หนึ่งจุดห้าองศาเหรอ ในโรงงานผมมันห้าองศามานานแล้ว", "One point five? In my factory it's been five for years."],
+  ["down", "ท้องฟ้ากานปูร์ปีนี้สีฟ้าขึ้นนิดหนึ่ง ลูกสาวผมไอน้อยลง", "Kanpur's sky is a little bluer this year. My daughter coughs less."],
+  ["up", "คาร์บอนเพิ่มอีกแล้ว ปีหน้าคงร้อนกว่านี้ ผมจะทนได้อีกกี่ปี", "Carbon up again. Next year will be hotter. How many more years can I take?"],
+  ["hot", "เมษายนถึงมิถุนายนคือฤดูที่ผมกลัวที่สุด ไม่ใช่พายุ ไม่ใช่น้ำท่วม แต่เป็นความร้อน", "April to June is the season I fear most. Not storms, not floods. Heat."],
+  ["monsoon", "มรสุมมาแล้ว อากาศเย็นลง แต่ห้องเช่าผมรั่วทุกที่", "The monsoon's here and it's cooler, but my room leaks everywhere."],
+];
+
+V.jonas = [
+  ["idle", "ผมขุดลิกไนต์มายี่สิบสองปี พ่อผมก็ขุด ปู่ผมก็ขุด ผมเป็นรุ่นสุดท้าย", "I've dug lignite for twenty-two years. So did my father and grandfather. I'm the last."],
+  ["idle", "เหมืองเปิดหน้าดินที่นี่ใหญ่จนกลืนหมู่บ้านไปสิบกว่าแห่ง ผมรู้ว่ามันไม่ยั่งยืน", "The open pit here swallowed more than a dozen villages. I know it isn't sustainable."],
+  ["idle", "เยอรมนีจะเลิกถ่านหินภายในปี 2038 ผมมีเวลาเตรียมตัวอีกไม่กี่ปี", "Germany will quit coal by 2038. I have a few years to get ready."],
+  ["idle", "บริษัทส่งผมไปอบรมซ่อมกังหันลม เครื่องมือคล้ายกัน แต่ต้องปีนสูงกว่าเยอะ", "The company sent me to train as a wind turbine technician. Similar tools, but a lot more climbing."],
+  ["idle", "เหมืองเก่าทางใต้กลายเป็นทะเลสาบแล้ว คนมาพายเรือคายัค ผมยังไม่ชินเลย", "The old mine to the south is a lake now. People go kayaking. I'm still not used to it."],
+  ["idle", "สหภาพแรงงานบอกว่าต้องเปลี่ยนผ่านอย่างเป็นธรรม ผมขอแค่ไม่มีใครถูกทิ้งไว้ข้างหลัง", "The union says the transition must be just. I only ask that nobody gets left behind."],
+  ["idle", "คนในเมืองใหญ่ไม่รู้ว่าเมืองเล็กแบบเราอยู่ได้เพราะเหมือง ถ้าเหมืองปิด ร้านเบเกอรี่ก็ปิด", "City people don't know towns like ours live off the mine. If it closes, the bakery closes too."],
+  ["idle", "ลูกสาวผมอยากเป็นนักวิทยาศาสตร์ด้านแบตเตอรี่ อนาคตของบ้านนี้คงเปลี่ยนจากถ่านเป็นลิเธียม", "My daughter wants to be a battery scientist. This family's future may switch from coal to lithium."],
+  ["start", "ผู้นำโลกคนใหม่ ผมไม่ได้ขอให้ช้าลง ผมขอให้มีแผนสำหรับคนอย่างผม", "New world leader, I'm not asking you to slow down. I'm asking for a plan for people like me."],
+  ["late", "ผมเป็นช่างกังหันลมมาสิบปีแล้ว ปีนขึ้นไปบนนั้น มองเห็นเหมืองเก่ากลายเป็นป่า", "I've been a wind technician for ten years. From up there I can see the old mine turning into forest."],
+  ["late", "โรงไฟฟ้าถ่านหินปิดตัวไปแล้ว ผมไปงานพิธีปิด ร้องไห้กับเพื่อนเก่า แต่ก็ภูมิใจ", "The coal plant has closed. I went to the ceremony and cried with old friends. But I'm proud."],
+  ["home:heat", "หน้าร้อนในเยอรมนีร้อนขึ้นทุกปี แม่น้ำเอลเบแห้งจนเรือขนสินค้าวิ่งไม่ได้", "German summers get hotter every year. The Elbe ran so low the barges couldn't sail."],
+  ["home:flood", "น้ำท่วมในหุบเขาอาร์เมื่อปี 2021 ยังอยู่ในความทรงจำทุกคน ปีนี้มาอีกแล้ว", "Everyone remembers the Ahr valley flood of 2021. Now it's happened again."],
+  ["home:drought", "ป่าสนรอบเหมืองแห้งตายเพราะแล้งกับด้วงเปลือกไม้ เราต้องปลูกป่าผสมแทน", "The pine forests around the mine died from drought and bark beetles. We have to plant mixed forest instead."],
+  ["buy:energy", "เลิกถ่านหินเร็วขึ้นอีกเหรอ ผมเข้าใจ แต่ช่วยบอกบริษัทให้จ่ายค่าอบรมเราด้วย", "Coal out even faster? I understand. Just make the company pay for our retraining."],
+  ["buy:energy", "ฟาร์มกังหันลมใหม่จ้างคนจากเหมืองหกสิบคน ผมเป็นหนึ่งในนั้น", "The new wind farm hired sixty people from the mine. I'm one of them."],
+  ["buy:energy", "แบตเตอรี่ขนาดใหญ่มาตั้งที่โรงไฟฟ้าเก่า ใช้สายส่งเดิมได้เลย ฉลาดดีนะ", "A big battery is going in at the old power plant, using the same grid connection. Clever."],
+  ["buy:energy", "ไฮโดรเจนสีเขียวจะทำที่ลูซาเทีย ผมได้ยินว่าเขาอยากได้คนที่เคยทำงานกับเครื่องจักรหนัก", "Green hydrogen will be made in Lusatia. They want people who've worked heavy machinery, I hear."],
+  ["buy:industry", "เหล็กสีเขียวต้องใช้ไฟฟ้ามหาศาล ภูมิภาคเราเคยผลิตไฟให้ทั้งประเทศ ทำต่อได้", "Green steel needs huge amounts of power. Our region powered the whole country once. We can do it again."],
+  ["buy:policy", "ภาษีคาร์บอนที่ชายแดนยุโรป อย่างน้อยโรงงานที่นี่จะไม่ย้ายไปที่ที่สกปรกกว่า", "Europe's carbon border tax. At least the factories here won't move somewhere dirtier."],
+  ["buy:policy", "กองทุนเปลี่ยนผ่านอย่างเป็นธรรม เงินนี้แหละที่ทำให้เมืองผมยังมีโรงเรียน", "The just transition fund. That money is why my town still has a school."],
+  ["apprLow", "ที่ร้านเหล้าทุกคนด่าผู้นำ ผมนั่งฟังเฉย ๆ เพราะผมเข้าใจทั้งสองฝ่าย", "At the pub everyone curses the leader. I just listen. I understand both sides."],
+  ["apprHigh", "ปีนี้คนในเมืองเริ่มยอมรับ เพราะเห็นงานใหม่เกิดขึ้นจริง ไม่ใช่แค่คำพูด", "People in town are coming round this year. They see real new jobs, not just words."],
+  ["t15", "หนึ่งจุดห้าองศาแล้ว ผมรู้ว่าถ่านที่ผมขุดมีส่วนด้วย ผมไม่ได้ปฏิเสธ", "One point five. I know the coal I dug played a part. I don't deny it."],
+  ["down", "คาร์บอนลดลง ส่วนหนึ่งมาจากโรงไฟฟ้าที่ผมเคยส่งถ่านให้ปิดตัว มันขมปนหวาน", "Carbon fell, partly because the plant I used to supply shut down. Bittersweet."],
+  ["up", "คาร์บอนเพิ่ม ทั้งที่เราปิดเหมืองไปแล้ว แปลว่าที่อื่นยังเปิดเพิ่ม มันไม่ยุติธรรมกับเรา", "Carbon is up even though we closed our mines. Others are opening more. That isn't fair on us."],
+  ["cool", "หน้าหนาวนี้ไม่มีหิมะในลูซาเทียเลย เด็ก ๆ ไม่ได้เล่นเลื่อนหิมะ", "No snow in Lusatia this winter. The kids never got to go sledging."],
+  ["cool", "หนาวแบบนี้ปั๊มความร้อนที่บ้านทำงานดีกว่าที่คิด ผมยอมรับเลยว่าคิดผิด", "In this cold the heat pump at home works better than I expected. I'll admit I was wrong."],
+];
+
+V.rahima = [
+  ["idle", "ฉันขายผักในตลาดคุลนามาสิบห้าปี ทุกปีแผงฉันต้องยกสูงขึ้นอีกนิด", "I've sold vegetables in Khulna market for fifteen years. Every year my stall goes up a bit higher."],
+  ["idle", "หมู่บ้านเดิมของฉันอยู่ริมป่าซุนดาร์บันส์ น้ำเค็มเข้ามาจนปลูกข้าวไม่ได้ เราเลยย้ายเข้าเมือง", "My old village was by the Sundarbans. The salt came in until rice wouldn't grow, so we moved to the city."],
+  ["idle", "ผู้หญิงบังกลาเทศต้องเดินไกลขึ้นทุกปีเพื่อหาน้ำจืด ส่วนใหญ่คนไม่พูดถึงเรื่องนี้", "Bangladeshi women walk further every year for fresh water. Mostly nobody talks about it."],
+  ["idle", "เราปลูกผักบนแพลอยน้ำแล้ว ถ้าน้ำท่วม แปลงผักก็ลอยขึ้นตาม", "We grow vegetables on floating rafts now. When the flood comes, the garden rises with it."],
+  ["idle", "ศูนย์หลบภัยพายุในหมู่บ้านช่วยชีวิตคนมาเยอะ ตอนเด็ก ๆ ฉันเคยไปนอนที่นั่น", "The village cyclone shelter has saved so many lives. I slept there as a child."],
+  ["idle", "ลูกสาวฉันได้ทุนเรียนพยาบาล ฉันจะให้เธอเรียนให้จบ ไม่ต้องแต่งงานเร็วแบบฉัน", "My daughter got a nursing scholarship. She'll finish, and not marry young like I did."],
+  ["idle", "สหกรณ์ผู้หญิงในตลาดซื้อแผงโซลาร์ร่วมกัน ไฟสว่างตอนกลางคืน ขายได้ถึงสามทุ่ม", "The women's co-op in the market bought solar panels together. With light at night we sell till nine."],
+  ["start", "ผู้นำคนใหม่ บังกลาเทศชินกับการเอาตัวรอด แต่เราไม่ควรต้องรอดอย่างเดียว", "New leader, Bangladesh is used to surviving. But surviving shouldn't be all we get."],
+  ["late", "หมู่บ้านเก่าของฉันกลับมาปลูกข้าวทนเค็มได้แล้ว ญาติฉันบางคนย้ายกลับไป", "My old village grows salt-tolerant rice now. Some of my relatives moved back."],
+  ["home:flood", "น้ำท่วมตลาดถึงเอว ฉันลอยผักไว้ในกะละมังแล้วเข็นขายต่อ", "The market's flooded waist-deep. I float the vegetables in a basin and keep selling."],
+  ["home:flood", "แม่น้ำพรหมบุตรล้นตลิ่ง หมู่บ้านต้นน้ำหายไปสามแห่ง ญาติฉันมาพักที่บ้าน", "The Brahmaputra burst its banks and three upstream villages are gone. My relatives are staying with me."],
+  ["home:flood", "น้ำท่วมปีนี้นานสามสัปดาห์ ผักในตลาดแพงขึ้นสามเท่า คนจนกินแค่ข้าวกับเกลือ", "This flood lasted three weeks. Vegetables tripled in price. The poor eat rice and salt."],
+  ["home:saltwater", "น้ำในบ่อที่บ้านแม่เค็มจนดื่มไม่ได้ ผู้หญิงที่นั่นเป็นความดันสูงกันเยอะ", "The pond at my mother's place is too salty to drink. Many women there have high blood pressure."],
+  ["home:saltwater", "นาข้าวรอบบ้านเกิดฉันกลายเป็นบ่อกุ้งหมดแล้ว เงินดีขึ้น แต่ไม่มีข้าวกิน", "The rice fields round my birthplace are all shrimp ponds now. More money, but no rice to eat."],
+  ["home:heat", "ร้อนจนผักเหี่ยวตั้งแต่สิบโมง ขายไม่ทันก็ต้องทิ้ง", "So hot the vegetables wilt by ten. What doesn't sell gets thrown away."],
+  ["haz:typhoon", "พายุไซโคลนเข้าอ่าวเบงกอล ทุกคนในตลาดเก็บของกลับบ้าน ฉันโทรหาแม่ทันที", "A cyclone's heading into the Bay of Bengal. Everyone in the market packed up. I called my mother right away."],
+  ["haz:flood", "ได้ข่าวน้ำท่วมที่อื่น ฉันรู้ว่ามันเป็นยังไง ขอให้เขาได้ที่แห้งนอนคืนนี้", "News of floods elsewhere. I know what it's like. I hope they have somewhere dry to sleep tonight."],
+  ["buy:city", "กำแพงกันน้ำกับศูนย์หลบภัยใหม่ คุลนาปลอดภัยขึ้นจริง ๆ", "New embankments and shelters. Khulna really is safer."],
+  ["buy:city", "ระบบเตือนภัยส่งข้อความเข้ามือถือ แม่ฉันได้รับก่อนพายุมาสองวัน", "The warning system texts our phones. My mother got it two days before the storm."],
+  ["buy:nature", "ข้าวทนเค็มกับเกษตรลอยน้ำ คือสิ่งที่คนสามเหลี่ยมปากแม่น้ำต้องการที่สุด", "Salt-tolerant rice and floating farms are what delta people need most."],
+  ["buy:nature", "ปลูกป่าชายเลนเพิ่มที่ซุนดาร์บันส์ ป่านี้ช่วยกันพายุให้เรามาหลายร้อยปีแล้ว", "More mangroves in the Sundarbans. That forest has shielded us from storms for centuries."],
+  ["buy:policy", "กองทุนความสูญเสีย ขอให้ถึงมือผู้หญิงที่เสียบ้านด้วยนะคะ", "The loss fund. Let it reach the women who lost their homes too."],
+  ["buy:energy", "โซลาร์บ้านละแผงทั่วชนบทบังกลาเทศ เป็นเรื่องที่ประเทศเราทำได้ดีที่สุดเรื่องหนึ่ง", "A solar panel for every rural home. One of the best things my country has done."],
+  ["apprLow", "คนในตลาดบอกว่าผู้นำโลกคุยแต่กับประเทศรวย ไม่มีใครมาถามเราเลย", "People in the market say the world's leader only talks to rich countries. Nobody asks us."],
+  ["apprHigh", "ทุกคนในตลาดพูดถึงกองทุนช่วยเหลือ บางคนได้เงินไปซ่อมบ้านแล้ว", "Everyone in the market talks about the relief fund. Some have already rebuilt their homes with it."],
+  ["t15", "เกินหนึ่งจุดห้าองศาแล้ว คนสามเหลี่ยมปากแม่น้ำคือคนแรกที่จ่ายราคา", "Past one point five. Delta people are the first to pay the price."],
+  ["down", "คาร์บอนลดลงแล้วเหรอคะ ฉันจะบอกแม่ แม่คงไม่เชื่อ", "Carbon went down? I'll tell my mother. She won't believe it."],
+  ["up", "คาร์บอนเพิ่มอีกแล้ว ทุกเศษองศาคือน้ำทะเลที่ขึ้นมาถึงบ้านใครสักคน", "Carbon is up again. Every fraction of a degree is sea water reaching somebody's door."],
+  ["monsoon", "มรสุมมาแล้ว ฉันยกแผงผักสูงขึ้นอีกหนึ่งชั้น เตรียมรับน้ำ", "Monsoon's here. I've raised my stall another level, ready for the water."],
+  ["storm", "ฤดูไซโคลนเริ่มแล้ว ฉันเก็บเอกสารสำคัญใส่ถุงพลาสติกไว้ใกล้ประตู", "Cyclone season has started. I keep the important papers in a plastic bag by the door."],
+];
+
+V.lekuta = [
+  ["idle", "วัวคือธนาคารของคนซัมบูรู เมื่อแล้ง ธนาคารเราก็ล้มละลาย", "For the Samburu, cattle are the bank. In a drought, the bank goes bust."],
+  ["idle", "ปู่ผมจำได้ว่าแล้งใหญ่มาสิบปีครั้ง ตอนนี้มาเกือบทุกสองปี", "My grandfather remembers a big drought every ten years. Now it's nearly every two."],
+  ["idle", "ผมเดินต้อนวัวไปไกลขึ้นทุกปีเพื่อหาหญ้า บางทีก็ไปทะเลาะกับเผ่าอื่นเรื่องบ่อน้ำ", "I walk the herd further every year for grass. Sometimes we fight other clans over wells."],
+  ["idle", "เราเริ่มเลี้ยงอูฐแทนวัวบางส่วน อูฐทนแล้งกว่า แต่ใจผมยังรักวัว", "We've started keeping some camels instead of cows. Camels handle drought better, but my heart is with the cattle."],
+  ["idle", "ลูกชายผมเรียนพยากรณ์อากาศจากแอปในมือถือ เขาบอกผมว่าฝนจะมาเมื่อไหร่", "My son reads the forecast on a phone app. He tells me when the rain will come."],
+  ["idle", "ผู้หญิงในหมู่บ้านทำกลุ่มเก็บน้ำฝนบนหลังคาสังกะสี ช่วยได้มากเลย", "The village women formed a group to catch rain off tin roofs. It helps a lot."],
+  ["idle", "นักท่องเที่ยวมาดูสิงโตกับช้าง แต่ไม่เคยเห็นว่าแล้งทำอะไรกับคนที่นี่", "Tourists come for the lions and elephants. They never see what drought does to the people here."],
+  ["start", "ผู้นำคนใหม่ ที่นี่เราวัดเวลาด้วยฝน ไม่ใช่ปฏิทิน ช่วยทำให้ฝนกลับมาตรงเวลาได้ไหม", "New leader, here we measure time by rain, not calendars. Can you bring the rain back on time?"],
+  ["late", "ฝนสองฤดูกลับมาตรงขึ้นแล้ว หญ้างอกพอให้วัวกิน ผมเห็นเด็ก ๆ ยิ้มอีกครั้ง", "Both rainy seasons come closer to time now. There's grass for the cattle. I see the children smile again."],
+  ["home:drought", "ฝนไม่ตกมาห้าฤดูแล้ว วัวผมตายไปสามสิบตัว เหลือเจ็ดตัว", "Five rainy seasons have failed. Thirty of my cattle died. Seven are left."],
+  ["home:drought", "บ่อน้ำแห้งหมด ช้างเดินเข้าหมู่บ้านมาหาน้ำ เราไม่โทษมัน มันก็หิวเหมือนเรา", "The wells are dry. Elephants walk into the village looking for water. We don't blame them; they're thirsty too."],
+  ["home:drought", "ผมขายวัวได้ราคาครึ่งเดียว เพราะทุกคนต้องขายพร้อมกัน", "I sold my cattle for half price. Everyone has to sell at once."],
+  ["home:drought", "เด็ก ๆ ไม่ได้ไปโรงเรียนเพราะต้องช่วยหาน้ำ แล้งขโมยอนาคตของเขา", "The kids skip school to help find water. Drought steals their future."],
+  ["home:drought", "รัฐบาลส่งรถน้ำมาแล้ว แต่ไม่พอ คนต่อแถวกันตั้งแต่เช้ามืด", "The government sent water trucks, but not enough. People queue from before dawn."],
+  ["home:flood", "ฝนมาทีเดียวหนักจนน้ำป่าพัดสะพานไป ดินแห้งแข็งจนน้ำซึมไม่ได้", "When the rain finally came, it was so heavy the flash flood took the bridge. The dry ground couldn't drink it."],
+  ["home:heat", "ร้อนจนวัวไม่ยอมเดินกลางวัน เราต้องต้อนวัวตอนกลางคืนแทน", "So hot the cattle won't walk by day. We herd them at night instead."],
+  ["haz:drought", "ได้ข่าวแล้งที่อื่น ผมรู้ว่าตอนนี้มีคนกำลังนั่งดูสัตว์ของเขาตาย ใจผมอยู่กับเขา", "I hear of drought elsewhere. I know someone is watching their animals die right now. My heart is with them."],
+  ["buy:nature", "พืชทนแล้งกับหญ้าอาหารสัตว์พันธุ์ใหม่ ผมอยากให้มีคนมาสอนที่หมู่บ้าน", "Drought-hardy crops and new fodder grass. I'd like someone to come and teach the village."],
+  ["buy:nature", "ฟื้นฟูทุ่งหญ้าด้วยการเลี้ยงสัตว์แบบหมุนเวียน เป็นวิธีที่บรรพบุรุษเราใช้มาก่อน", "Restoring the rangeland with rotational grazing. Our ancestors did it before."],
+  ["buy:city", "ระบบเตือนภัยแล้งล่วงหน้า เราจะได้ขายวัวก่อนมันผอม ได้ราคาดีกว่า", "Early drought warnings. We can sell cattle before they get thin, at a better price."],
+  ["buy:policy", "กองทุนช่วยเหลือ ขอให้เป็นประกันภัยปศุสัตว์ จ่ายเงินตอนแล้ง ไม่ต้องรอให้วัวตาย", "The relief fund. Make it livestock insurance that pays when the drought starts, not after the cattle die."],
+  ["buy:energy", "ปั๊มน้ำโซลาร์ที่บ่อในหมู่บ้าน ไม่ต้องซื้อดีเซลอีกแล้ว", "A solar pump at the village well. No more buying diesel."],
+  ["apprLow", "ผู้เฒ่าในหมู่บ้านบอกว่าคำสัญญาของคนเมืองเหมือนเมฆไม่มีฝน", "The elders say promises from city people are like clouds without rain."],
+  ["apprHigh", "ปีนี้มีคนมาขุดบ่อลึกให้หมู่บ้าน ผู้เฒ่ายกมือขอบคุณผู้นำ", "This year someone came to dig a deep well for the village. The elders raised their hands in thanks."],
+  ["t15", "เกินหนึ่งจุดห้าองศา คนเลี้ยงสัตว์ในแอฟริกาตะวันออกรู้มานานแล้ว ฝนบอกเราก่อนตัวเลข", "Past one point five. East African herders knew long ago. The rain told us before the numbers did."],
+  ["down", "คาร์บอนลดลงเหรอ ผู้เฒ่าบอกว่าถ้าจริง ฝนจะจำทางกลับบ้านได้", "Carbon fell? The elders say if it's true, the rain will remember the way home."],
+  ["up", "คาร์บอนเพิ่ม ผมไม่รู้ว่ามันคืออะไรแน่ แต่รู้ว่ามันทำให้ฝนหาย", "Carbon is up. I don't know exactly what it is, but I know it makes the rain go away."],
+  ["monsoon", "ฝนยาวควรมาเดือนนี้ ผมมองฟ้าทางทิศตะวันออกทุกเช้า", "The long rains should come this month. I watch the eastern sky every morning."],
+  ["storm", "ฝนสั้นปลายปีมาแล้ว ขอให้มาพอดี อย่าน้อยเกิน อย่ามากจนน้ำป่า", "The short rains at the end of the year are here. Let them be enough, but not a flash flood."],
+];
+
+})();
+
+/* ---- 48-voice-world-b.js ---- */
+(function(){
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.voiceWorldB) return;
+(P.mods = P.mods || {}).voiceWorldB = 1;
+/* 3.9 · Lines: María (California), Kauê (Amazon), Mei Lin (Hefei), Sofía (Atacama), Hiroshi (Japan). See 45-voices.js. */
+const V = P.VOICE_LINES = P.VOICE_LINES || {};
+
+V.maria = [
+  ["idle", "ฤดูไฟป่าที่แคลิฟอร์เนียเคยมีสี่เดือน ตอนนี้แทบจะทั้งปี", "California's fire season used to be four months. Now it's almost all year."],
+  ["idle", "ฉันเป็นนักดับไฟป่ามาสิบสองปี ไฟทุกวันนี้วิ่งเร็วกว่าที่คู่มือเขียนไว้", "Twelve years fighting wildfires. Fires today run faster than the manuals say."],
+  ["idle", "เราจุดไฟควบคุมในหน้าหนาวเพื่อเผาเชื้อเพลิงก่อน ชนพื้นเมืองทำแบบนี้มาเป็นพันปี", "We set controlled burns in winter to clear the fuel. Native tribes did this for thousands of years."],
+  ["idle", "ทีมฉันครึ่งหนึ่งเป็นนักโทษที่มาฝึกดับไฟ พวกเขากล้าหาญที่สุดเท่าที่ฉันเคยเห็น", "Half my crew are inmates trained as firefighters. Bravest people I've ever seen."],
+  ["idle", "ลูกชายฉันถามว่าทำไมฟ้าเป็นสีส้มตอนเที่ยง ฉันยังหาคำตอบดี ๆ ให้เขาไม่ได้", "My son asked why the sky was orange at noon. I still don't have a good answer for him."],
+  ["idle", "ประกันบ้านในเขตป่าแพงจนหลายบริษัทเลิกขาย คนต้องเลือกระหว่างบ้านกับความปลอดภัย", "Home insurance near the forest is so expensive many firms have stopped selling it."],
+  ["idle", "หลังดับไฟ ฉันกลับบ้านแล้วนอนสิบสี่ชั่วโมง ร่างกายยังมีกลิ่นควันอยู่เป็นอาทิตย์", "After a fire I go home and sleep fourteen hours. I smell of smoke for a week."],
+  ["start", "ผู้นำคนใหม่ ถ้าอยากรู้ว่าโลกร้อนหน้าตาเป็นยังไง มายืนแนวไฟกับเราสักคืน", "New leader, if you want to see what warming looks like, stand on a fire line with us one night."],
+  ["late", "ฤดูไฟปีนี้สั้นลง ทีมฉันได้หยุดคริสต์มาสกับครอบครัวเป็นครั้งแรกในรอบสิบปี", "Fire season was shorter this year. My crew got Christmas with their families for the first time in ten years."],
+  ["home:wildfire", "ไฟวิ่งข้ามหุบเขาในชั่วโมงเดียว เราอพยพทั้งเมืองทันก่อนเที่ยงคืน", "The fire crossed the valley in an hour. We got the whole town out before midnight."],
+  ["home:wildfire", "ลมซานตาแอนาพัดแรง ไฟกระโดดข้ามทางหลวงแปดเลน เราสู้ไม่ได้ ได้แต่ช่วยคนออกมา", "The Santa Ana winds blew the fire across an eight-lane highway. We couldn't fight it, only get people out."],
+  ["home:wildfire", "ควันไฟลอยไปถึงนิวยอร์ก ทั้งประเทศได้กลิ่นแคลิฟอร์เนียที่กำลังไหม้", "The smoke reached New York. The whole country smelled California burning."],
+  ["home:wildfire", "เรารักษาโรงเรียนกับโรงพยาบาลไว้ได้ แต่บ้านสองพันหลังไม่รอด", "We saved the school and the hospital. Two thousand homes didn't make it."],
+  ["home:wildfire", "เครื่องบินดับเพลิงบินไม่ได้เพราะลมแรง เราต้องสู้ด้วยมือกับพลั่ว", "The tankers couldn't fly in that wind. We fought with hand tools and shovels."],
+  ["home:heat", "ร้อนสี่สิบห้าองศาที่ฟีนิกซ์ เพื่อนนักดับเพลิงที่นั่นรับสายคนเป็นลมแดดทั้งวัน", "Forty-five degrees in Phoenix. My firefighter friends there answered heatstroke calls all day."],
+  ["home:drought", "แล้งปีที่สามติดกัน ป่าทั้งเทือกกลายเป็นเชื้อเพลิงรอวันติดไฟ", "Third dry year in a row. Whole mountain ranges are fuel waiting for a spark."],
+  ["home:flood", "ไฟไหม้ป่าปีก่อน ปีนี้ฝนตกหนักบนดินที่ไม่มีราก โคลนถล่มลงมาที่เมือง", "Last year's fire, this year's heavy rain on soil with no roots. Mudslides into town."],
+  ["haz:wildfire", "เห็นข่าวไฟป่าที่อื่น ฉันรู้สึกเหมือนครอบครัวเดียวกัน นักดับไฟทั่วโลกคือพี่น้องกัน", "News of fires elsewhere. Firefighters everywhere are family."],
+  ["haz:heat", "คลื่นความร้อนคือเพื่อนสนิทของไฟป่า ฉันรู้ว่าอีกไม่นานจะได้ข่าวไฟที่นั่น", "Heatwaves are wildfire's best friend. I'll be hearing of fires there soon."],
+  ["buy:city", "ระบบเตือนภัยกับแผนอพยพที่ดีขึ้น ช่วยให้คนออกจากเมืองทัน ขอบคุณนะ", "Better warnings and evacuation plans get people out in time. Thank you."],
+  ["buy:nature", "ปลูกป่าใหม่ ขอให้เว้นแนวกันไฟ และปลูกพันธุ์ที่ทนไฟด้วยนะ", "Replanting forests. Leave firebreaks and plant fire-resistant species, please."],
+  ["buy:nature", "ฟื้นฟูป่าแบบเผาควบคุมตามภูมิปัญญาชนพื้นเมือง นี่แหละที่เราต้องการ", "Restoring forests with Indigenous cultural burning. That's what we need."],
+  ["buy:energy", "ไฟฟ้าสะอาดดี แต่สายไฟฟ้าเก่าเคยจุดไฟป่าที่นี่มาแล้ว ต้องฝังสายลงดินด้วย", "Clean power's good, but old power lines have started fires here. Bury them too."],
+  ["buy:policy", "ข้อตกลงลดคาร์บอน ทุกตันที่ลดได้คือไฟป่าที่เล็กลงในอนาคต", "A carbon deal. Every tonne cut is a smaller fire in the future."],
+  ["apprLow", "ทีมฉันเหนื่อยจนหมดแรง บางคนลาออก ไม่มีใครอยากเป็นนักดับไฟในโลกที่ไหม้ไม่หยุด", "My crew is burnt out. Some quit. Nobody wants to fight fires in a world that won't stop burning."],
+  ["apprHigh", "ปีนี้ได้งบซื้ออุปกรณ์ใหม่ ทีมฉันมีขวัญกำลังใจขึ้นเยอะเลย", "We got funding for new equipment this year. My crew's spirits are way up."],
+  ["t15", "หนึ่งจุดห้าองศา ฉันเห็นมันในตัวเลขพื้นที่ป่าที่ไหม้ ซึ่งเพิ่มเป็นเท่าตัวในยี่สิบปี", "One point five. I see it in the burned acreage, which doubled in twenty years."],
+  ["t2", "สององศา นักวิทยาศาสตร์บอกว่าพื้นที่ไฟป่าจะเพิ่มอีกหลายเท่า ฉันกลัวจริง ๆ", "Two degrees. Scientists say burned area multiplies again. I'm truly afraid."],
+  ["down", "คาร์บอนลดลงแล้ว ฉันจะเล่าให้ทีมฟังตอนเช้า พวกเขาต้องการข่าวดีมาก", "Carbon fell. I'll tell the crew at morning briefing. They need good news."],
+  ["up", "คาร์บอนยังขึ้น ฉันขอแค่ให้คนที่ตัดสินใจมาสูดควันกับเราสักวัน", "Carbon still rising. I just wish the decision-makers would breathe the smoke with us for a day."],
+  ["hot", "ฤดูไฟเริ่มเร็วขึ้นทุกปี ทีมฉันเข้าประจำการตั้งแต่เดือนเมษายนแล้ว", "Fire season starts earlier every year. My crew was on duty from April."],
+  ["monsoon", "หน้าร้อนในแคลิฟอร์เนีย ทุกคนรู้ว่าเดือนสิงหาถึงตุลาคือเดือนอันตราย", "Summer in California. Everyone knows August to October are the dangerous months."],
+];
+
+V.kaue = [
+  ["idle", "ผมเดินลาดตระเวนป่ากับเพื่อนชนพื้นเมืองทุกสัปดาห์ เราจับคนตัดไม้เถื่อนได้เดือนละหลายครั้ง", "I patrol the forest with my people every week. We catch illegal loggers several times a month."],
+  ["idle", "ป่าแอมะซอนสร้างฝนให้ตัวเอง ถ้าตัดมากเกินไป ป่าจะกลายเป็นทุ่งหญ้า", "The Amazon makes its own rain. Cut too much and it turns into savanna."],
+  ["idle", "ยายผมรู้จักต้นไม้ทุกต้นด้วยชื่อ ผมกำลังจดบันทึกไว้ก่อนที่ความรู้นี้จะหายไป", "My grandmother knows every tree by name. I'm writing it down before the knowledge is lost."],
+  ["idle", "ที่ดินของชนพื้นเมืองถูกตัดป่าน้อยที่สุดในแอมะซอน เพราะเราอยู่ที่นี่และรักษามันไว้", "Indigenous lands have the least deforestation in the Amazon, because we live here and protect it."],
+  ["idle", "เราใช้โดรนกับดาวเทียมตามดูการตัดไม้แล้ว ภูมิปัญญาเก่ากับเทคโนโลยีใหม่ไปด้วยกันได้", "We track logging with drones and satellites now. Old knowledge and new tech work together."],
+  ["idle", "ถั่วบราซิล อาซาอี ยางพารา ป่าที่ยืนอยู่ให้รายได้มากกว่าป่าที่ถูกตัด ถ้าคนรู้", "Brazil nuts, açaí, rubber. A standing forest pays more than a cut one, if people only knew."],
+  ["idle", "ตอนกลางคืนในป่าเสียงดังกว่าในเมือง แต่เป็นเสียงที่ทำให้ผมหลับสบาย", "The forest at night is louder than a city, but it's the sound that helps me sleep."],
+  ["start", "ผู้นำคนใหม่ ป่านี้อยู่มาก่อนประเทศใดในโลก ช่วยให้มันอยู่ต่อหลังจากเราด้วย", "New leader, this forest was here before any country. Help it outlast us."],
+  ["late", "แม่น้ำกลับมาเต็มตลิ่งแล้ว ปลากลับมา เด็ก ๆ ว่ายน้ำได้อีกครั้ง", "The river is full to its banks again. The fish are back and the children can swim."],
+  ["home:wildfire", "ไฟที่คนจุดเพื่อเปิดทุ่งเลี้ยงวัวลามเข้าป่า ป่าฝนไม่เคยถูกออกแบบมาให้ไหม้", "Fires set to clear cattle pasture spread into the forest. Rainforest was never meant to burn."],
+  ["home:wildfire", "ควันไฟปกคลุมหมู่บ้านทั้งเดือน เด็ก ๆ ป่วยเป็นโรคทางเดินหายใจกันหมด", "Smoke covered the village for a month. All the children are sick with breathing problems."],
+  ["home:drought", "แม่น้ำเนโกรลดต่ำที่สุดในประวัติศาสตร์ เรือขนอาหารเข้าหมู่บ้านไม่ได้", "The Rio Negro hit its lowest level on record. Boats couldn't bring food to the villages."],
+  ["home:drought", "โลมาสีชมพูตายในทะเลสาบเพราะน้ำร้อนเกินไป ผมไม่เคยเห็นภาพแบบนี้", "Pink river dolphins died in the lake because the water got too hot. I'd never seen that."],
+  ["home:flood", "ฝนตกหนักทางใต้ของบราซิล เมืองทั้งเมืองจม ป่าที่หายไปทำให้น้ำไม่มีที่ไป", "Heavy rain in southern Brazil sank whole cities. Without the forest, the water had nowhere to go."],
+  ["home:heat", "ป่าร้อนจนต้นไม้บางชนิดเริ่มตายยืนต้น ผมกลัวว่าป่ากำลังเข้าใกล้จุดเปลี่ยน", "So hot some trees are dying where they stand. I fear the forest is nearing its tipping point."],
+  ["haz:wildfire", "ไฟป่าที่ไหนในโลก ผมก็นึกถึงต้นไม้ที่ใช้เวลาร้อยปีเติบโต แต่ไหม้ในชั่วโมงเดียว", "Any fire anywhere, I think of trees that took a century to grow and burned in an hour."],
+  ["haz:drought", "แล้งที่อื่นก็เกี่ยวกับเรา ถ้าแอมะซอนแห้ง ฝนในอเมริกาใต้ครึ่งทวีปก็หายตาม", "Drought elsewhere concerns us. If the Amazon dries, rain over half of South America goes too."],
+  ["buy:nature", "ปลูกป่าใหม่และคุ้มครองป่าเดิม ขอให้ฟังคนที่อยู่ในป่าด้วยนะครับ", "Reforestation and protecting old forest. Please listen to the people who live in it."],
+  ["buy:nature", "จ่ายเงินให้ชุมชนที่รักษาป่า แบบนี้แหละที่ได้ผลจริง", "Paying communities who protect the forest. That's what really works."],
+  ["buy:nature", "เกษตรวนเกษตร ปลูกโกโก้ใต้ร่มไม้ใหญ่ ได้ทั้งเงินและป่า", "Agroforestry: cocoa under the big trees. Money and forest both."],
+  ["buy:policy", "ข้อตกลงห้ามนำเข้าสินค้าจากการตัดป่า ยุโรปทำแล้ว ขอให้ทั้งโลกทำตาม", "A ban on goods from deforestation. Europe did it. Let the whole world follow."],
+  ["buy:policy", "กองทุนป่าเขตร้อน ขอให้เงินถึงหมู่บ้าน ไม่ใช่ถึงแค่สำนักงานในเมือง", "A tropical forest fund. Let the money reach the villages, not just city offices."],
+  ["buy:industry", "เลิกใช้ถั่วเหลืองจากการถางป่าเลี้ยงวัว แค่นี้ป่าก็รอดได้เป็นล้านไร่", "Stop using soy from cleared forest for cattle feed and millions of acres survive."],
+  ["buy:energy", "พลังงานสะอาดดี แต่อย่าสร้างเขื่อนท่วมป่าอีกนะครับ เขื่อนเบโลมอนชีเตทำร้ายเรามากพอแล้ว", "Clean energy's good, but no more dams flooding the forest. Belo Monte hurt us enough."],
+  ["apprLow", "ผู้เฒ่าบอกว่าคนข้างนอกพูดเรื่องป่ามาหลายสิบปี แต่ป่ายังหายไปทุกวัน", "The elders say outsiders have talked about the forest for decades, and it still disappears every day."],
+  ["apprHigh", "การตัดป่าปีนี้ลดลงมาก ผู้เฒ่าจัดพิธีขอบคุณที่หมู่บ้าน", "Deforestation fell sharply this year. The elders held a thanksgiving ceremony."],
+  ["t15", "หนึ่งจุดห้าองศา นักวิทยาศาสตร์บอกว่าแอมะซอนอาจถึงจุดที่กลับไม่ได้ ผมไม่ยอมให้มันเป็นแบบนั้น", "One point five. Scientists say the Amazon could pass the point of no return. I won't let it."],
+  ["t2", "สององศา ป่าฝนครึ่งหนึ่งอาจกลายเป็นทุ่งหญ้า ช่วยหยุดมันที", "Two degrees. Half the rainforest could become grassland. Help us stop it."],
+  ["down", "คาร์บอนลดลง ป่าของเราช่วยดูดซับมันไว้ด้วยนะครับ", "Carbon fell. Our forest helped soak it up."],
+  ["up", "คาร์บอนยังขึ้นอยู่ ป่าจะดูดได้อีกนานแค่ไหน ถ้ามันร้อนจนเริ่มปล่อยออกมาเอง", "Carbon's still rising. How long can the forest absorb it, if it gets hot enough to start releasing it?"],
+  ["hot", "ฤดูแล้งในแอมะซอนมาถึง ผมเตรียมทีมเฝ้าระวังไฟทุกหมู่บ้าน", "Dry season in the Amazon. I'm setting up fire watch teams in every village."],
+  ["storm", "ฤดูไฟในแอมะซอนกำลังพีค เดือนกันยายนคือเดือนที่ผมนอนน้อยที่สุด", "Amazon fire season is peaking. September is when I sleep least."],
+];
+
+V.mei = [
+  ["idle", "แบตเตอรี่ที่ฉันออกแบบเล็กลงทุกปี ถูกลงทุกปี รถไฟฟ้าราคาเท่ารถน้ำมันแล้ว", "The batteries I design get smaller and cheaper every year. EVs cost the same as petrol cars now."],
+  ["idle", "เหอเฝยเคยเป็นเมืองธรรมดา ตอนนี้เป็นเมืองหลวงรถยนต์ไฟฟ้าของโลก", "Hefei used to be an ordinary city. Now it's an electric-car capital of the world."],
+  ["idle", "แบตเตอรี่โซเดียมไม่ต้องใช้ลิเธียมกับโคบอลต์ ฉันว่ามันจะเปลี่ยนเกมทั้งหมด", "Sodium batteries need no lithium or cobalt. I think they'll change the whole game."],
+  ["idle", "ทุกเซลล์ที่ฉันรีไซเคิลได้ คือแร่ที่ไม่ต้องขุดใหม่", "Every cell I recycle is ore nobody has to dig up."],
+  ["idle", "พ่อฉันทำงานโรงงานถ่านหินที่ซานซี ตอนนี้เขาบอกเพื่อนว่าลูกสาวทำแบตเตอรี่ ภูมิใจมาก", "My father worked at a coal plant in Shanxi. Now he tells his friends his daughter makes batteries."],
+  ["idle", "ทีมฉันทำงานถึงสี่ทุ่มทุกวัน แต่ทุกคนรู้ว่ากำลังทำสิ่งที่สำคัญ", "My team works till ten every night, but everyone knows it matters."],
+  ["idle", "จีนติดตั้งโซลาร์ปีเดียวมากกว่าที่สหรัฐฯ มีทั้งประเทศ ตัวเลขนี้ยังทำให้ฉันตกใจ", "China installed more solar in one year than the US has in total. That still stuns me."],
+  ["start", "ผู้นำคนใหม่ เทคโนโลยีพร้อมแล้ว สิ่งที่ขาดคือความกล้าที่จะใช้มันเร็ว ๆ", "New leader, the technology's ready. What's missing is the nerve to use it fast."],
+  ["late", "รถทุกคันบนถนนในเหอเฝยเงียบแล้ว ฉันจำเสียงเครื่องยนต์ไม่ได้ด้วยซ้ำ", "Every car on Hefei's streets is quiet now. I can't even remember the sound of engines."],
+  ["home:heat", "คลื่นความร้อนทำให้ไฟฟ้าไม่พอ โรงงานต้องลดกำลังผลิต แบตเตอรี่สำรองช่วยได้ครึ่งหนึ่ง", "The heatwave left power short and factories cut output. Storage batteries covered half the gap."],
+  ["home:flood", "ฝนตกหนักที่เจิ้งโจว รถไฟใต้ดินจมน้ำ ฉันยังจำภาพนั้นได้ เมืองต้องออกแบบใหม่", "Heavy rain in Zhengzhou flooded the subway. I still remember. Cities have to be redesigned."],
+  ["home:drought", "แม่น้ำแยงซีแห้ง เขื่อนผลิตไฟไม่ได้ เสฉวนต้องปิดโรงงาน แบตเตอรี่ช่วยได้แต่ไม่พอ", "The Yangtze ran dry, the dams stopped, and Sichuan shut factories. Batteries helped, but not enough."],
+  ["buy:energy", "แบตเตอรี่เก็บพลังงานขนาดใหญ่! ทีมฉันเปิดแชมเปญ เอ้ย ชาเขียวฉลองกันแล้ว", "Grid-scale storage! My team popped the champagne. Well, the green tea."],
+  ["buy:energy", "ไฟฟ้าจากแดดกับลมถูกที่สุดในประวัติศาสตร์ ที่เหลือคือเก็บมันไว้ใช้ตอนกลางคืน", "Solar and wind are the cheapest power in history. The rest is storing it for the night."],
+  ["buy:energy", "ไฮโดรเจนสีเขียวเหมาะกับเหล็กและเรือ ส่วนรถ แบตเตอรี่ชนะไปแล้ว", "Green hydrogen suits steel and ships. For cars, batteries have already won."],
+  ["buy:industry", "รถยนต์ไฟฟ้าทั่วโลก โรงงานเราจะขยายอีกสองเท่า", "EVs worldwide. Our factory will double in size."],
+  ["buy:industry", "รีไซเคิลแร่จากแบตเตอรี่เก่า ทีมฉันทำได้ถึงเก้าสิบห้าเปอร์เซ็นต์แล้ว", "Recycling minerals from old batteries. My team recovers ninety-five percent now."],
+  ["buy:industry", "รถไฟความเร็วสูงจีนยาวกว่าทั้งโลกรวมกัน ถ้าประเทศอื่นสร้างบ้าง ฉันช่วยออกแบบแบตให้ได้", "China's high-speed rail is longer than the rest of the world's combined. If others build too, I'll help with the batteries."],
+  ["buy:policy", "ตลาดคาร์บอนทำให้ทุกตันมีราคา โรงงานที่สะอาดก็ได้เปรียบ", "A carbon market puts a price on every tonne. Clean factories gain the edge."],
+  ["apprLow", "คนเริ่มกลัวว่ารถไฟฟ้าจะแพง แต่ราคาลดลงทุกเดือน ต้องมีคนอธิบายให้เขาฟัง", "People fear EVs are expensive, but prices fall every month. Someone has to explain it."],
+  ["apprHigh", "ยอดขายรถไฟฟ้าทั่วโลกทำสถิติใหม่ ทีมฉันได้โบนัสด้วย", "Global EV sales hit a new record. My team got bonuses too."],
+  ["t15", "หนึ่งจุดห้าองศา เทคโนโลยีมาช้าไปนิด แต่ยังไม่สาย", "One point five. Technology came a bit late, but not too late."],
+  ["down", "คาร์บอนลดลงแล้ว รถไฟฟ้ามีส่วนช่วยเยอะนะ ฉันภูมิใจ", "Carbon fell. EVs played a big part. I'm proud."],
+  ["up", "คาร์บอนยังขึ้น เพราะโรงไฟฟ้าถ่านหินยังสร้างใหม่อยู่ รถไฟฟ้าต้องชาร์จไฟสะอาดด้วยถึงจะสุด", "Carbon's still up. New coal plants are still being built. EVs need clean power to count fully."],
+  ["cool", "หน้าหนาวทางเหนือ แบตเตอรี่รถทำงานได้น้อยลง ทีมฉันแก้ปัญหานี้อยู่ทุกวัน", "Northern winter cuts battery range. My team works on that every day."],
+  ["hot", "หน้าร้อนนี้ระบบแบตเตอรี่ในโครงข่ายรับไฟพีคไว้ได้ ไม่มีเมืองไหนไฟดับเลย", "This summer the grid batteries took the peak. Not a single city lost power."],
+];
+
+V.sofia = [
+  ["idle", "ทะเลทรายอาตากามาแห้งที่สุดในโลก แต่ใต้ดินเรามีลิเธียมที่ทั้งโลกต้องการ", "The Atacama is the driest desert on earth, but under it is the lithium the whole world wants."],
+  ["idle", "บ่อระเหยลิเธียมใช้น้ำใต้ดินมหาศาล ทะเลสาบที่นกฟลามิงโกเคยอยู่กำลังแห้ง", "Lithium evaporation ponds use huge amounts of groundwater. The lakes where flamingos lived are drying."],
+  ["idle", "เราไม่ได้ค้านรถไฟฟ้า เราขอแค่ให้คนที่อยู่ที่นี่มีส่วนตัดสินใจ", "We're not against electric cars. We just want the people who live here to have a say."],
+  ["idle", "บริษัทเหมืองเริ่มทดลองสกัดลิเธียมโดยไม่ระเหยน้ำแล้ว ถ้าได้ผล ทุกคนชนะ", "The miners are trying lithium extraction without evaporation. If it works, everyone wins."],
+  ["idle", "ชุมชนอะตากาเมโญของฉันอยู่ที่นี่มาหลายพันปี เรารู้จักน้ำทุกหยดในทะเลทราย", "My Atacameño people have lived here for thousands of years. We know every drop of water in this desert."],
+  ["idle", "เหมืองทองแดงที่ชูกีกามาตาใหญ่จนมองเห็นจากอวกาศ ทั้งโลกต้องใช้ทองแดงทำสายไฟสะอาด", "The Chuquicamata copper mine is visible from space. The world needs copper for clean power lines."],
+  ["idle", "เรามีแดดแรงที่สุดในโลก ทำไมเหมืองยังใช้ไฟจากดีเซล", "We have the strongest sun on earth. Why do the mines still run on diesel?"],
+  ["start", "ผู้นำคนใหม่ พลังงานสะอาดต้องสะอาดตั้งแต่เหมือง ไม่ใช่แค่ตอนเสียบปลั๊ก", "New leader, clean energy must be clean from the mine, not just at the plug."],
+  ["late", "เหมืองในอาตากามาใช้ไฟฟ้าจากแดดทั้งหมดแล้ว และคืนน้ำให้ทะเลสาบบางส่วน นกฟลามิงโกกลับมา", "The Atacama mines run on solar now and return some water to the lakes. The flamingos came back."],
+  ["home:drought", "แล้งยาวสิบปี ชิลีตอนกลางขาดน้ำ ซานติอาโกต้องปันส่วนน้ำประปา", "A ten-year megadrought. Central Chile is short of water and Santiago is rationing."],
+  ["home:drought", "บ่อน้ำในหมู่บ้านลดลงอีกสองเมตร ผู้เฒ่าบอกว่าไม่เคยลึกขนาดนี้", "The village well dropped another two metres. The elders say it's never been this deep."],
+  ["home:wildfire", "ไฟป่าที่บัลปาราอีโซเผาบ้านไปหลายพันหลัง ลมร้อนกับแล้งทำให้มันลามเร็วมาก", "The fire at Valparaíso burned thousands of homes. Hot wind and drought spread it so fast."],
+  ["home:heat", "อุณหภูมิในทะเลทรายตอนกลางวันสูงขึ้น คนงานเหมืองต้องหยุดพักบ่อยขึ้น", "Desert daytime temperatures are rising. Mine workers need more breaks."],
+  ["home:flood", "ฝนตกในทะเลทรายครั้งหนึ่งในสิบปี น้ำป่าพัดถนนหายไปทั้งเส้น", "Rain in the desert once in ten years, and a flash flood took the whole road."],
+  ["haz:drought", "แล้งที่ไหนก็ตาม ฉันเข้าใจหัวอกคนที่นั่น น้ำคือชีวิต", "Drought anywhere, I understand those people. Water is life."],
+  ["buy:energy", "แบตเตอรี่ต้องใช้ลิเธียมจากบ้านเรา ขอให้จ่ายราคาที่ยุติธรรม และรักษาน้ำไว้ด้วย", "Batteries need lithium from our home. Pay a fair price and protect the water."],
+  ["buy:energy", "ไฟฟ้าแสงอาทิตย์ในอาตากามาถูกที่สุดในโลก ส่งไปทั้งประเทศได้", "Solar power in the Atacama is the cheapest in the world. It could supply the whole country."],
+  ["buy:industry", "รีไซเคิลแร่จากแบตเตอรี่เก่า ทุกตันที่รีไซเคิลคือน้ำที่ไม่ต้องสูบจากใต้ทะเลทราย", "Recycling battery minerals. Every recycled tonne is water not pumped from under the desert."],
+  ["buy:industry", "เหมืองสะอาดขึ้น ใช้ไฟฟ้าแทนดีเซล ฝุ่นในหมู่บ้านน้อยลงแล้ว", "Cleaner mines, electric instead of diesel. Less dust in the village now."],
+  ["buy:policy", "ข้อตกลงเรื่องแร่สะอาด ต้องมีสิทธิของชนพื้นเมืองเขียนไว้ด้วยนะคะ", "A clean minerals deal must spell out Indigenous rights."],
+  ["buy:nature", "ปกป้องทะเลสาบเกลือและนกฟลามิงโก ระบบนิเวศในทะเลทรายเปราะบางกว่าที่คิด", "Protecting the salt lakes and flamingos. Desert ecosystems are more fragile than people think."],
+  ["apprLow", "คนในหมู่บ้านรู้สึกว่าโลกสีเขียวแค่ย้ายความสกปรกมาไว้ที่บ้านเรา", "The village feels the green world just moved the dirt to our home."],
+  ["apprHigh", "ปีนี้บริษัทเหมืองแบ่งรายได้ให้ชุมชน มีโรงเรียนกับคลินิกใหม่", "This year the miners shared revenue with the community. A new school and clinic."],
+  ["t15", "หนึ่งจุดห้าองศา ธารน้ำแข็งบนเทือกแอนดีสที่ให้น้ำเราละลายเร็วขึ้นทุกปี", "One point five. The Andean glaciers that feed our water melt faster every year."],
+  ["down", "คาร์บอนลดลง ส่วนหนึ่งมาจากแร่ในทะเลทรายเรา ขอให้โลกจำเรื่องนี้ไว้", "Carbon fell, partly thanks to minerals from our desert. Let the world remember that."],
+  ["up", "คาร์บอนยังเพิ่ม แต่เหมืองยังขุดมากขึ้น เรากำลังจ่ายทั้งสองทาง", "Carbon still rising and mining still growing. We pay both ways."],
+  ["storm", "หน้าใบไม้ผลิในซีกโลกใต้ ลมแห้งพัดแรง ฝุ่นจากบ่อระเหยปลิวเข้าหมู่บ้าน", "Spring in the south. Dry winds blow dust from the ponds into the village."],
+];
+
+V.hiro = [
+  ["idle", "ชินคันเซ็นวิ่งมาหกสิบปีโดยไม่มีผู้โดยสารเสียชีวิตจากอุบัติเหตุรถไฟเลย ผมภูมิใจที่เป็นส่วนหนึ่ง", "The Shinkansen has run sixty years without a passenger dying in a train accident. I'm proud to have been part of it."],
+  ["idle", "นั่งรถไฟความเร็วสูงจากโตเกียวไปโอซาก้า ปล่อยคาร์บอนต่อคนน้อยกว่าเครื่องบินราวสิบเท่า", "Tokyo to Osaka by high-speed rail emits roughly a tenth of the flight's carbon per passenger."],
+  ["idle", "ผมเกษียณแล้ว แต่ยังไปสอนวิศวกรรถไฟรุ่นใหม่ที่อินเดียกับไทย", "I've retired, but I still go to teach young rail engineers in India and Thailand."],
+  ["idle", "ระบบตรวจจับแผ่นดินไหวหยุดรถไฟได้ก่อนคลื่นแรงจะมาถึง เราใช้หลักเดียวกันกับพายุได้", "Our quake detectors stop trains before the strong shaking arrives. The same idea works for storms."],
+  ["idle", "ผมนั่งรถไฟไปทำงานทุกวันสี่สิบปี ไม่เคยรู้สึกว่าต้องมีรถยนต์เลย", "I rode the train to work every day for forty years. Never felt I needed a car."],
+  ["idle", "ประเทศญี่ปุ่นแก่ลง หมู่บ้านชนบทว่างเปล่า รถไฟคือเส้นเลือดที่ทำให้เมืองเล็กยังมีชีวิต", "Japan is ageing and villages are emptying. The railway is the artery that keeps small towns alive."],
+  ["idle", "ซากุระบานเร็วขึ้นทุกปี ปีนี้บานก่อนพิธีจบการศึกษาของหลานผม", "The cherry blossoms come earlier every year. This year they bloomed before my grandson's graduation."],
+  ["start", "ผู้นำคนใหม่ ถ้าเส้นทางไหนเครื่องบินบินไม่ถึงสามชั่วโมง รถไฟชนะได้เสมอ", "New leader, on any route under three hours by air, the train can win."],
+  ["late", "ลูกศิษย์ผมที่ไทยส่งรูปรถไฟความเร็วสูงขบวนแรกมาให้ ผมดูแล้วน้ำตาซึม", "My students in Thailand sent me a photo of their first high-speed train. I teared up."],
+  ["home:typhoon", "ไต้ฝุ่นเข้าญี่ปุ่น ชินคันเซ็นหยุดวิ่งก่อนพายุมาครึ่งวัน ไม่มีใครติดอยู่บนรถ", "A typhoon hit Japan. The Shinkansen stopped half a day ahead, and nobody was stranded."],
+  ["home:typhoon", "ไต้ฝุ่นปีนี้แรงผิดปกติ ลานจอดชินคันเซ็นที่นางาโนะเคยจมน้ำมาแล้ว เราย้ายขึ้นที่สูงแล้ว", "This year's typhoon was unusually strong. The Shinkansen depot in Nagano flooded once; we've moved it higher."],
+  ["home:heat", "ร้อนจนรางรถไฟขยายตัว เราต้องลดความเร็วบางช่วง วิศวกรรุ่นใหม่ต้องออกแบบรางให้ทนร้อนขึ้น", "So hot the rails expand and we slow down in places. New engineers must design for more heat."],
+  ["home:flood", "ฝนตกหนักที่คิวชู ทางรถไฟสายท้องถิ่นพังหลายจุด บางสายอาจไม่ได้สร้างใหม่", "Heavy rain in Kyushu wrecked local lines in many places. Some may never be rebuilt."],
+  ["haz:typhoon", "พายุที่อื่นก็เหมือนที่บ้าน เตือนเร็ว อพยพเร็ว ชีวิตคนรอดได้", "Storms elsewhere are like home: warn early, evacuate early, and lives are saved."],
+  ["buy:industry", "รถไฟความเร็วสูงทั่วโลก! ผมรอวันนี้มาทั้งชีวิตการทำงาน", "High-speed rail worldwide! I've waited my whole career for this."],
+  ["buy:industry", "เส้นทางใหม่ทุกสายต้องคิดเรื่องแผ่นดินไหวกับน้ำท่วมตั้งแต่วันแรก อย่ารอแก้ทีหลัง", "Every new line must plan for earthquakes and floods from day one. Don't fix it later."],
+  ["buy:industry", "เชื้อเพลิงอากาศยานยั่งยืนก็ดี แต่ถ้ารถไฟไปถึง คนจะเลือกรถไฟเอง", "Sustainable jet fuel is fine. But where the train goes, people choose the train."],
+  ["buy:city", "เมืองที่ออกแบบรอบสถานีรถไฟ คนเดินมากขึ้น ขับรถน้อยลง เหมือนโตเกียว", "Cities built around stations: more walking, less driving. Like Tokyo."],
+  ["buy:city", "ระบบเตือนภัยล่วงหน้า ญี่ปุ่นเรียนรู้มาจากความสูญเสีย ขอให้โลกไม่ต้องเรียนแบบเดียวกัน", "Early warning systems. Japan learned from loss. May the world not have to learn the same way."],
+  ["buy:energy", "รถไฟใช้ไฟฟ้าอยู่แล้ว ถ้าไฟฟ้าสะอาด รถไฟก็สะอาดทั้งขบวน", "Trains already run on electricity. Clean power makes the whole train clean."],
+  ["buy:policy", "ข้อตกลงระหว่างประเทศเรื่องรถไฟข้ามพรมแดน ยุโรปทำได้ เอเชียก็ทำได้", "Cross-border rail agreements. Europe managed it; Asia can too."],
+  ["apprLow", "คนเริ่มหมดหวัง แต่ผมเคยเห็นญี่ปุ่นสร้างชินคันเซ็นใหม่หลังสงครามแค่สิบเก้าปี อะไรก็เป็นไปได้", "People are losing hope. But I've seen Japan build the Shinkansen nineteen years after the war. Anything's possible."],
+  ["apprHigh", "ทั่วโลกพูดถึงรถไฟกันอีกครั้ง ผมรู้สึกเหมือนหนุ่มขึ้นสิบปี", "The world is talking about trains again. I feel ten years younger."],
+  ["t15", "หนึ่งจุดห้าองศา ซากุระบานเร็วที่สุดในรอบพันปีตามบันทึกของเกียวโต", "One point five. Kyoto's records show the earliest blossoms in a thousand years."],
+  ["down", "คาร์บอนลดลง คนเปลี่ยนจากเครื่องบินมานั่งรถไฟมากขึ้น ผมเห็นจากสถิติผู้โดยสาร", "Carbon fell. People are switching from planes to trains. I see it in the ridership figures."],
+  ["up", "คาร์บอนยังขึ้น เส้นทางบินสั้น ๆ ยังเต็มทุกเที่ยว เราต้องสร้างรถไฟเร็วกว่านี้", "Carbon's still rising and short-haul flights are still full. We need to build rail faster."],
+  ["cool", "หน้าหนาว หิมะที่นีงาตะน้อยลง แต่บางปีตกทีเดียวหนักจนรถไฟติด", "Winter: less snow in Niigata overall, but some years it dumps all at once and the trains get stuck."],
+  ["storm", "ฤดูไต้ฝุ่น ศูนย์ควบคุมรถไฟเปิดตลอดยี่สิบสี่ชั่วโมง ผมยังจำเสียงลมในคืนนั้นได้", "Typhoon season. The rail control centre runs around the clock. I still remember the sound of the wind those nights."],
+];
+
+})();
+
+/* ---- 49-voice-world-c.js ---- */
+(function(){
+const P = window.P2050 = window.P2050 || {};
+if (P.mods && P.mods.voiceWorldC) return;
+(P.mods = P.mods || {}).voiceWorldC = 1;
+/* 3.9 · Lines: Aminata (Dakar), Nils (Sápmi), Khalid (Abu Dhabi), Elena (Yakutsk). See 45-voices.js. */
+const V = P.VOICE_LINES = P.VOICE_LINES || {};
+
+V.amina = [
+  ["idle", "แอฟริกามีแดดดีที่สุดในโลก แต่คนหกร้อยล้านคนยังไม่มีไฟฟ้าใช้", "Africa has the best sunshine in the world, yet six hundred million people still have no electricity."],
+  ["idle", "สหกรณ์ของเราติดโซลาร์ให้ร้านค้าในตลาดสามร้อยร้าน ไม่มีใครต้องใช้เครื่องปั่นไฟดีเซลอีก", "Our co-op put solar on three hundred market stalls. Nobody needs a diesel generator anymore."],
+  ["idle", "ผู้หญิงในหมู่บ้านผ่อนแผงโซลาร์ผ่านมือถือ วันละไม่กี่บาท ไม่ต้องกู้ธนาคาร", "Village women pay off solar panels by mobile phone, a little each day. No bank loan needed."],
+  ["idle", "ดอกเบี้ยเงินกู้ทำโซลาร์ในแอฟริกาสูงกว่าในยุโรปสามเท่า ทั้งที่แดดเราแรงกว่า", "Interest on solar loans in Africa is three times higher than in Europe, though our sun is stronger."],
+  ["idle", "ตู้เย็นโซลาร์ในคลินิกเก็บวัคซีนได้แล้ว เด็ก ๆ ในหมู่บ้านไกลได้ฉีดครบ", "Solar fridges in the clinics keep vaccines cold now. Children in remote villages get every shot."],
+  ["idle", "ฉันเป็นวิศวกรหญิงคนเดียวในรุ่น ตอนนี้ในสหกรณ์มีช่างหญิงสี่สิบคน", "I was the only woman engineer in my class. Now our co-op has forty women technicians."],
+  ["idle", "ทะเลกัดชายฝั่งเซนต์หลุยส์ไปหลายร้อยเมตร ชาวประมงต้องย้ายหมู่บ้านทั้งหมู่บ้าน", "The sea has eaten hundreds of metres of coast at Saint-Louis. Whole fishing villages have had to move."],
+  ["start", "ผู้นำคนใหม่ ประเทศเราไม่ได้ขอความช่วยเหลือ เราขอการลงทุนที่ยุติธรรม", "New leader, we're not asking for charity. We're asking for fair investment."],
+  ["late", "หมู่บ้านทุกแห่งในภูมิภาคของฉันมีไฟฟ้าแล้ว ส่วนใหญ่มาจากแสงแดด", "Every village in my region has power now, most of it from the sun."],
+  ["home:heat", "ร้อนจนแบตเตอรี่ในตู้ควบคุมโซลาร์เสื่อมเร็ว เราต้องออกแบบร่มเงาให้มันใหม่", "So hot the batteries in our solar cabinets wear out fast. We're redesigning the shade for them."],
+  ["home:heat", "คลื่นความร้อนในซาเฮล คนแก่และเด็กเล็กเสี่ยงที่สุด พัดลมโซลาร์ช่วยได้จริง", "A heatwave in the Sahel. The old and the very young are most at risk. Solar fans really help."],
+  ["home:drought", "แล้งทำให้คนหนุ่มสาวจากชนบททิ้งไร่มาหางานในดาการ์ บางคนลงเรือข้ามทะเลไปยุโรป", "Drought sends young people from the countryside to Dakar for work. Some take boats across the sea to Europe."],
+  ["home:drought", "ปั๊มน้ำโซลาร์ช่วยให้ชาวนาปลูกผักหน้าแล้งได้ แต่ถ้าน้ำใต้ดินหมดก็ไม่มีประโยชน์", "Solar pumps let farmers grow vegetables in the dry season, but not if the groundwater runs out."],
+  ["home:flood", "ฝนตกหนักผิดฤดู ดาการ์ไม่มีท่อระบายน้ำพอ บ้านในชานเมืองจมน้ำ", "Out-of-season downpours, and Dakar's drains can't cope. Suburban homes flooded."],
+  ["haz:heat", "ร้อนที่ไหน ก็คือคนที่ไม่มีไฟฟ้าใช้พัดลมที่ลำบากที่สุด", "Wherever the heat hits, those without power for a fan suffer most."],
+  ["buy:energy", "พลังงานแสงอาทิตย์ทั่วโลก! ขอให้แอฟริกาได้ส่วนแบ่งที่ยุติธรรมนะคะ", "Solar worldwide! Make sure Africa gets a fair share."],
+  ["buy:energy", "แบตเตอรี่ราคาถูกลง ไมโครกริดในหมู่บ้านจะมีไฟใช้ทั้งคืน", "Cheaper batteries mean village mini-grids with power all night."],
+  ["buy:energy", "ไฮโดรเจนสีเขียวจากแดดแอฟริกาส่งออกไปยุโรปได้ แต่ขอให้คนที่นี่ได้ใช้ไฟก่อน", "Green hydrogen from African sun could go to Europe. But let people here have power first."],
+  ["buy:policy", "การเงินเพื่อสภาพอากาศ ขอให้เป็นเงินลงทุน ไม่ใช่เงินกู้ที่ประเทศเราต้องใช้หนี้ไปอีกห้าสิบปี", "Climate finance: let it be investment, not loans my country repays for fifty years."],
+  ["buy:policy", "กองทุนความสูญเสีย ประเทศที่ปล่อยน้อยแต่โดนหนัก ควรได้รับก่อน", "The loss fund. Countries that emitted little but suffer most should come first."],
+  ["buy:city", "ระบบเตือนภัยถึงทุกมือถือในแอฟริกาตะวันตก ชาวประมงกลับฝั่งทันก่อนพายุ", "Warnings reach every phone in West Africa. Fishers got home before the storm."],
+  ["buy:nature", "กำแพงต้นไม้สีเขียวข้ามทะเลทรายซาฮารา ถ้าทำได้จริง จะหยุดทะเลทรายไม่ให้รุกลงใต้", "The Great Green Wall across the Sahel. If it works, it stops the desert creeping south."],
+  ["apprLow", "คนหนุ่มสาวที่นี่บอกว่าการประชุมโลกร้อนเป็นเรื่องของคนรวย", "Young people here say climate summits are for the rich."],
+  ["apprHigh", "ปีนี้เงินลงทุนโซลาร์ในแอฟริกาเพิ่มเป็นเท่าตัว สหกรณ์ฉันรับคนเพิ่มอีกร้อยคน", "Solar investment in Africa doubled this year. My co-op is hiring a hundred more."],
+  ["t15", "หนึ่งจุดห้าองศา ทวีปที่ปล่อยน้อยที่สุดกำลังร้อนเร็วที่สุด", "One point five. The continent that emitted least is warming fastest."],
+  ["down", "คาร์บอนลดลงแล้ว แอฟริกาข้ามยุคถ่านหินไปใช้แดดเลย เหมือนที่เราข้ามโทรศัพท์บ้านไปใช้มือถือ", "Carbon fell. Africa is leapfrogging coal straight to solar, like we skipped landlines for mobiles."],
+  ["up", "คาร์บอนยังขึ้น แต่ไม่ใช่จากที่นี่ เราจ่ายราคาของคนอื่น", "Carbon's still rising, but not from here. We pay for others' emissions."],
+  ["hot", "หน้าร้อนในซาเฮล ไฟฟ้าโซลาร์ผลิตได้มากที่สุด แต่คนก็ต้องการพัดลมมากที่สุดเช่นกัน", "Hot season in the Sahel: solar output peaks, and so does the need for fans."],
+  ["monsoon", "ฤดูฝนในแอฟริกาตะวันตก ฝนมาไม่แน่นอน ชาวนาดูแอปพยากรณ์ที่สหกรณ์ทำให้", "Rainy season in West Africa. The rain is fickle, so farmers check the forecast app our co-op built."],
+];
+
+V.nils = [
+  ["idle", "ครอบครัวผมต้อนกวางเรนเดียร์มาหลายร้อยปี กวางกินไลเคนใต้หิมะ ถ้าหิมะเปลี่ยน ทุกอย่างเปลี่ยน", "My family has herded reindeer for centuries. They eat lichen under the snow. If the snow changes, everything changes."],
+  ["idle", "ฝนตกบนหิมะแล้วแข็งเป็นน้ำแข็ง กวางขุดหาไลเคนไม่ได้ ผมต้องซื้ออาหารเม็ดมาให้", "Rain falls on the snow and freezes into ice. The reindeer can't dig through to the lichen, so I buy feed pellets."],
+  ["idle", "เหมืองแร่เหล็กที่คีรูนาขยายจนต้องย้ายทั้งเมือง เส้นทางต้อนกวางของเราถูกตัดขาด", "The Kiruna iron mine grew so big the whole town had to move. Our herding routes were cut."],
+  ["idle", "เราไม่ได้ค้านพลังงานสะอาด แต่โลกสีเขียวต้องไม่สร้างบนที่ดินของชาวซามีโดยไม่ถามเรา", "We're not against clean energy, but a green world mustn't be built on Sámi land without asking us."],
+  ["idle", "ผมติดจีพีเอสที่คอกวางหัวหน้าฝูง ดูตำแหน่งได้จากมือถือ ปู่ผมคงหัวเราะ", "I put GPS collars on the lead reindeer and track them by phone. My grandfather would laugh."],
+  ["idle", "ทะเลสาบแข็งช้าขึ้นทุกปี บางปีเราข้ามน้ำแข็งพาฝูงไปไม่ได้ ต้องอ้อมไกลมาก", "The lakes freeze later every year. Some years we can't cross the ice with the herd and must go the long way."],
+  ["idle", "ลูกสาวผมร้องเพลงโยอิกให้กวางฟัง เพลงของบรรพบุรุษยังอยู่ แม้หิมะจะน้อยลง", "My daughter sings joik to the reindeer. Our ancestors' songs live on, even with less snow."],
+  ["start", "ผู้นำคนใหม่ อาร์กติกร้อนขึ้นเร็วกว่าที่อื่นเกือบสี่เท่า ช่วยมองขึ้นมาทางเหนือบ้าง", "New leader, the Arctic is warming nearly four times faster than elsewhere. Look north sometimes."],
+  ["late", "หน้าหนาวปีนี้หิมะดีที่สุดในรอบสิบปี กวางอ้วนท้วน ผมดีใจจนพูดไม่ออก", "Best snow in ten years this winter. The reindeer are fat. I'm lost for words."],
+  ["home:wildfire", "ไฟป่าในสวีเดนเหนือเส้นอาร์กติก ไม่ควรมีอยู่ในโลกนี้ แต่มันก็เกิดขึ้น", "Wildfires above the Arctic Circle in Sweden shouldn't exist. But they do."],
+  ["home:heat", "สามสิบองศาในแลปแลนด์ กวางหนีขึ้นภูเขาไปหาหิมะที่เหลือ ยุงก็เยอะจนกวางผอม", "Thirty degrees in Lapland. The reindeer flee uphill to what snow is left, and the mosquitoes are so bad they lose weight."],
+  ["home:drought", "ฤดูร้อนแห้งจนไลเคนกรอบ กวางกินแล้วไม่อิ่ม", "A summer so dry the lichen turns brittle. The reindeer eat and stay hungry."],
+  ["home:flood", "หิมะละลายเร็วผิดปกติ แม่น้ำล้น สะพานไม้ที่เราใช้ข้ามพาฝูงพังไปหมด", "The snow melted unusually fast. The rivers overflowed and took the wooden bridges we herd across."],
+  ["haz:wildfire", "ไฟป่าในไซบีเรียกับแคนาดา ควันลอยมาถึงฟ้าแลปแลนด์ อาร์กติกทั้งหมดเชื่อมกัน", "Fires in Siberia and Canada, smoke over Lapland's sky. The whole Arctic is connected."],
+  ["buy:industry", "เหล็กสีเขียวที่ลูเลโอ ใช้ไฮโดรเจนแทนถ่านหิน ดีสำหรับโลก แต่ต้องการไฟฟ้าและเหมืองเพิ่ม ขอให้คุยกับเราก่อน", "Green steel at Luleå uses hydrogen instead of coal. Good for the world, but it needs more power and mines. Talk to us first."],
+  ["buy:energy", "ฟาร์มกังหันลมบนทุ่งเลี้ยงกวาง ศาลในนอร์เวย์เคยตัดสินว่าละเมิดสิทธิชาวซามี อย่าทำผิดซ้ำนะครับ", "Wind farms on reindeer pasture. A Norwegian court ruled one violated Sámi rights. Don't repeat that mistake."],
+  ["buy:energy", "ไฟฟ้าสะอาดดี ถ้าสร้างในที่ที่ไม่ตัดเส้นทางอพยพของกวาง ผมยินดีช่วยชี้ที่ให้", "Clean power is fine if it doesn't cut the migration routes. I'll gladly show you where."],
+  ["buy:nature", "ปกป้องป่าทางเหนือ ไลเคนในป่าเก่าคืออาหารหน้าหนาวที่ดีที่สุดของกวาง", "Protecting the northern forests. Old-forest lichen is the reindeer's best winter food."],
+  ["buy:policy", "ข้อตกลงที่ยอมรับสิทธิชนพื้นเมือง ชาวซามีรอสิ่งนี้มานานแล้ว", "An agreement recognising Indigenous rights. The Sámi have waited a long time."],
+  ["apprLow", "ผู้คนในเมืองทางใต้ไม่ค่อยรู้ว่าอาร์กติกกำลังเปลี่ยนเร็วแค่ไหน", "People in the southern cities hardly know how fast the Arctic is changing."],
+  ["apprHigh", "รัฐบาลเริ่มเชิญชาวซามีเข้าร่วมวางแผนพลังงาน ผมรู้สึกว่าเสียงเราดังขึ้น", "The government has started inviting the Sámi into energy planning. Our voice feels louder."],
+  ["t15", "โลกเฉลี่ยหนึ่งจุดห้าองศา แต่ที่นี่ร้อนขึ้นไปแล้วเกือบห้าองศาในหน้าหนาว", "The world averages one point five. Here, winters have warmed by nearly five."],
+  ["t2", "สององศา หิมะในแลปแลนด์อาจเหลือแค่ครึ่งฤดู วิถีชีวิตเราจะอยู่ได้อย่างไร", "Two degrees. Lapland's snow season could halve. How will our way of life survive?"],
+  ["down", "คาร์บอนลดลง ปีนี้ทะเลสาบแข็งตรงเวลา เราข้ามน้ำแข็งพาฝูงไปได้ทัน", "Carbon fell. The lakes froze on time this year and we crossed the ice with the herd."],
+  ["up", "คาร์บอนเพิ่ม อาร์กติกจะเป็นที่แรกที่รู้สึกถึงมัน เหมือนทุกครั้ง", "Carbon up. The Arctic will feel it first, as always."],
+  ["cool", "หน้าหนาวมาแล้ว ผมดูหิมะทุกวัน หิมะนุ่มคือข่าวดี หิมะเป็นน้ำแข็งคือข่าวร้าย", "Winter's here. I check the snow daily. Soft snow is good news; ice crust is bad."],
+  ["cool", "คืนขั้วโลก แสงเหนือเต้นบนฟ้า ช่วงเวลาแบบนี้ผมยังรู้สึกว่าโลกสวยงาม", "Polar night, northern lights dancing. Moments like this, I still feel the world is beautiful."],
+  ["monsoon", "หน้าร้อนในแลปแลนด์ ดวงอาทิตย์ไม่ตกดิน เราต้อนกวางไปทุ่งหญ้าบนภูเขา", "Summer in Lapland: the sun never sets, and we move the herd to the mountain pastures."],
+];
+
+V.khalid = [
+  ["idle", "ผมทำงานบนแท่นขุดเจาะน้ำมันมายี่สิบปี วันนี้ผมออกแบบโรงงานไฮโดรเจนสีเขียว", "I worked on oil rigs for twenty years. Today I design green hydrogen plants."],
+  ["idle", "คนคิดว่าคนตะวันออกกลางรักน้ำมัน เรารักการมีงานทำ น้ำมันเป็นแค่เครื่องมือ", "People think the Gulf loves oil. We love having work. Oil is just a tool."],
+  ["idle", "แดดที่นี่แรงจนโซลาร์ผลิตไฟได้ถูกที่สุดในโลก ทำไมเราจะไม่ใช้", "The sun here makes some of the cheapest solar power on earth. Why wouldn't we use it?"],
+  ["idle", "โรงงานกลั่นน้ำทะเลกินไฟมหาศาล ถ้าใช้ไฟจากแดด น้ำดื่มทั้งเมืองจะสะอาดตั้งแต่ต้น", "Desalination eats huge amounts of power. Run it on sunlight and the city's water is clean from the start."],
+  ["idle", "ลูกชายผมถามว่าเมื่อน้ำมันหมด เราจะทำอะไร ผมบอกเขาว่าเราจะขายแสงแดด", "My son asked what we'll do when the oil runs out. I told him we'll sell sunshine."],
+  ["idle", "เพื่อนที่ทำงานแท่นเจาะด้วยกันบางคนยังไม่เชื่อ ผมไม่เถียง ผมพาเขามาดูโรงงานเลย", "Some of my old rig mates don't believe it yet. I don't argue. I bring them to see the plant."],
+  ["idle", "ทักษะคนทำน้ำมัน ท่อ แรงดัน ความปลอดภัย ใช้กับไฮโดรเจนได้เกือบทั้งหมด", "Oil skills, pipes, pressure, safety, carry over to hydrogen almost entirely."],
+  ["start", "ผู้นำคนใหม่ อย่ามองประเทศผู้ผลิตน้ำมันเป็นศัตรู ช่วยให้เราเปลี่ยนผ่านได้ แล้วเราจะไปเร็วกว่าที่คุณคิด", "New leader, don't see oil producers as enemies. Help us transition and we'll move faster than you think."],
+  ["late", "ท่าเรือที่เคยส่งออกน้ำมัน ตอนนี้ส่งออกแอมโมเนียสีเขียวไปญี่ปุ่นกับเกาหลี", "The port that once shipped oil now ships green ammonia to Japan and Korea."],
+  ["home:heat", "ห้าสิบองศาที่อาบูดาบี ไม่มีใครทำงานกลางแจ้งตอนเที่ยงได้ เรามีกฎหยุดงานกลางวันมาหลายปีแล้ว", "Fifty degrees in Abu Dhabi. Nobody can work outdoors at noon. We've had a midday work ban for years."],
+  ["home:heat", "แอร์ทั้งเมืองทำงานเต็มกำลัง ไฟฟ้าจากแดดช่วยรับพีคตอนบ่ายได้พอดี", "Every air-con in the city at full blast. Solar covers the afternoon peak exactly."],
+  ["home:heat", "น้ำทะเลอ่าวเปอร์เซียร้อนจนโรงกลั่นน้ำทะเลทำงานหนักขึ้น ปลาในอ่าวก็ตายเป็นแพ", "The Gulf's water got so warm the desalination plants strained and fish died in rafts."],
+  ["home:flood", "ฝนตกที่ดูไบในวันเดียวเท่าปีครึ่ง สนามบินจมน้ำ เมืองทะเลทรายไม่เคยเตรียมรับน้ำ", "A year and a half of rain fell on Dubai in a day and the airport flooded. Desert cities never prepared for water."],
+  ["haz:heat", "คลื่นความร้อนที่อื่น ผมเข้าใจดี ความร้อนสุดขั้วกำลังกลายเป็นเรื่องปกติของหลายประเทศ", "Heatwaves elsewhere; I understand. Extreme heat is becoming normal in many countries."],
+  ["buy:energy", "ไฮโดรเจนสีเขียว! นี่คืองานใหม่ของคนทำน้ำมันอย่างผม", "Green hydrogen! This is the new job for oil people like me."],
+  ["buy:energy", "โซลาร์ฟาร์มใหญ่ในทะเลทราย พื้นที่เรามีเหลือเฟือ แดดก็ฟรี", "Huge desert solar farms. We have plenty of land, and the sun is free."],
+  ["buy:energy", "ถ้าทั่วโลกเลิกถ่านหิน ก๊าซยังพอเป็นตัวช่วยช่วงเปลี่ยนผ่าน แต่ต้องดักจับคาร์บอนด้วย", "If the world quits coal, gas can help during the transition. But only with carbon capture."],
+  ["buy:industry", "ดักจับคาร์บอนแล้วอัดกลับลงบ่อน้ำมันเก่า เราเชี่ยวชาญใต้ดินอยู่แล้ว", "Capture carbon and pump it back into old oil wells. We already know the underground."],
+  ["buy:industry", "เชื้อเพลิงอากาศยานยั่งยืนจากไฮโดรเจนกับคาร์บอนที่ดักจับได้ สายการบินในอ่าวเริ่มสั่งแล้ว", "Sustainable jet fuel from hydrogen and captured carbon. Gulf airlines have started ordering."],
+  ["buy:industry", "เหล็กสีเขียวต้องใช้ไฮโดรเจน เราผลิตได้ราคาถูกที่สุดในโลก", "Green steel needs hydrogen, and we can make it cheaper than anyone."],
+  ["buy:policy", "ภาษีคาร์บอนชายแดน บริษัทน้ำมันเก่าในประเทศผมเริ่มขยับเร็วขึ้นเพราะกลัวเสียลูกค้า", "A carbon border tax. The old oil firms here moved faster once they feared losing customers."],
+  ["buy:city", "อาคารประหยัดพลังงาน ในเมืองที่ร้อนห้าสิบองศา ทุกองศาที่ไม่ต้องทำความเย็นคือเงิน", "Energy-efficient buildings. In a fifty-degree city, every degree you don't cool is money."],
+  ["apprLow", "เพื่อนในบริษัทน้ำมันบอกว่าผู้นำโลกทำเร็วเกินไป ผมว่าเขากลัวการเปลี่ยนแปลงมากกว่า", "Friends in oil say the world's leader is going too fast. I think they fear change more."],
+  ["apprHigh", "ปีนี้มีนักลงทุนจากทั่วโลกมาดูโรงงานไฮโดรเจน ผมไม่เคยยุ่งขนาดนี้", "Investors from all over came to see our hydrogen plant this year. I've never been so busy."],
+  ["t15", "หนึ่งจุดห้าองศา ที่นี่บางวันร้อนจนอยู่กลางแจ้งไม่ได้แล้ว", "One point five. Some days here it's already too hot to be outside."],
+  ["down", "คาร์บอนลดลง ประเทศน้ำมันก็ช่วยได้ ถ้าโลกให้โอกาส", "Carbon fell. Oil countries can help too, if the world gives us the chance."],
+  ["up", "คาร์บอนเพิ่ม ความต้องการน้ำมันยังสูง ตราบใดที่โลกยังซื้อ ก็จะมีคนขาย", "Carbon up. Oil demand's still high. As long as the world buys, someone will sell."],
+  ["hot", "หน้าร้อนในอ่าว ทุกคนอยู่แต่ในห้องแอร์ ไฟฟ้าตอนกลางวันมาจากแดดที่เราหนีมานั่นแหละ", "Summer in the Gulf. Everyone stays in air-conditioning, powered by the very sun we're hiding from."],
+];
+
+V.elena = [
+  ["idle", "ชั้นดินเยือกแข็งใต้ยาคุตสค์เก็บคาร์บอนไว้มากกว่าในอากาศทั้งหมด ถ้ามันละลาย เราควบคุมไม่ได้อีก", "The permafrost under Yakutsk holds more carbon than the whole atmosphere. If it thaws, we lose control."],
+  ["idle", "บ้านในเมืองเราสร้างบนเสาเข็มที่ตอกลงในดินเยือกแข็ง ดินละลาย บ้านก็เอียง", "Our houses stand on piles driven into permafrost. When the ground thaws, they lean."],
+  ["idle", "หลุมบาตาไกกาขยายใหญ่ขึ้นทุกปี ชาวบ้านเรียกมันว่าประตูสู่ใต้พิภพ", "The Batagaika crater grows every year. Locals call it the gateway to the underworld."],
+  ["idle", "ฉันวัดอุณหภูมิในหลุมเจาะลึกสิบห้าเมตร ข้อมูลยี่สิบปีบอกว่ามันอุ่นขึ้นไม่หยุด", "I measure temperature in a fifteen-metre borehole. Twenty years of data say it never stops warming."],
+  ["idle", "ทะเลสาบผุดขึ้นมาใหม่ทั่วทุ่งทุนดรา มีฟองก๊าซมีเทนขึ้นมา ถ้าจุดไฟก็ติด", "New lakes keep appearing across the tundra, bubbling methane. Hold a match to it and it burns."],
+  ["idle", "ซากแมมมอธโผล่ออกมาจากดินที่ละลาย นักล่างาช้างมาเต็มไปหมด", "Mammoth remains are emerging from the thawing ground. Ivory hunters swarm in."],
+  ["idle", "ชาวยาคุตเลี้ยงม้าที่ทนหนาวลบหกสิบองศา แต่ฤดูหนาวที่อุ่นผิดปกติกลับทำให้ม้าป่วย", "The Yakut horses survive minus sixty, yet unusually warm winters make them sick."],
+  ["start", "ผู้นำคนใหม่ ทุกครั้งที่โลกร้อนขึ้น ดินเยือกแข็งจะปล่อยคาร์บอนเพิ่มอีก มันคือวงจรที่ต้องหยุดให้ได้", "New leader, every bit of warming makes the permafrost release more carbon. That loop has to be broken."],
+  ["late", "หลุมเจาะของฉันอุ่นขึ้นช้าลงแล้ว ข้อมูลไม่โกหก โลกกำลังเปลี่ยนทิศ", "My borehole is warming more slowly now. The data doesn't lie. The world is turning."],
+  ["home:wildfire", "ไฟป่าในไซบีเรียปีนี้กินพื้นที่ใหญ่กว่าบางประเทศในยุโรป ควันลอยไปถึงขั้วโลกเหนือ", "Siberia's fires this year cover more ground than some European countries. The smoke reached the North Pole."],
+  ["home:wildfire", "ไฟซอมบี้ที่คุอยู่ใต้ดินพรุตลอดหน้าหนาว แล้วลุกขึ้นมาใหม่ตอนหิมะละลาย", "Zombie fires smoulder in the peat all winter and flare up again when the snow melts."],
+  ["home:wildfire", "ไฟเผาชั้นดินพรุที่เก็บคาร์บอนมาหลายพันปี ปล่อยออกมาหมดในฤดูเดียว", "The fire burns peat that stored carbon for thousands of years and releases it in one season."],
+  ["home:heat", "สามสิบแปดองศาที่แวร์โฮยันสค์ เมืองที่หนาวที่สุดในโลก ฉันอ่านตัวเลขซ้ำสามรอบ", "Thirty-eight degrees in Verkhoyansk, the coldest town on earth. I read the number three times."],
+  ["home:flood", "ดินละลายทำให้แม่น้ำลีนาเปลี่ยนเส้นทาง หมู่บ้านริมตลิ่งพังลงน้ำ", "Thawing ground shifted the Lena's course. Riverside villages collapsed into the water."],
+  ["haz:wildfire", "ไฟป่าที่ไหนก็ส่งเขม่าดำมาตกบนหิมะอาร์กติก หิมะดำดูดแสงแดด ละลายเร็วขึ้น", "Fires anywhere send black soot onto Arctic snow. Darkened snow absorbs sunlight and melts faster."],
+  ["haz:heat", "คลื่นความร้อนที่อื่นก็เกี่ยวกับอาร์กติก กระแสลมกรดที่อ่อนแรงทำให้อากาศค้างนานขึ้น", "Heatwaves elsewhere are linked to the Arctic. A weaker jet stream makes weather stall longer."],
+  ["buy:industry", "ดักจับคาร์บอนจากอากาศดีนะ แต่ต้องดักให้ทันกับที่ดินเยือกแข็งปล่อยออกมาด้วย", "Direct air capture is good, but it has to keep up with what the permafrost lets out."],
+  ["buy:nature", "ฟื้นฟูทุ่งหญ้าทางเหนือ บางทีมม้าป่ากับวัวไบซันอาจช่วยให้ดินเย็นได้ ฟังดูแปลกแต่มีงานวิจัยจริง", "Restoring northern grasslands. Grazing animals may help keep the ground cold. Odd, but there's real research."],
+  ["buy:nature", "ปกป้องพื้นที่พรุ ดินพรุทั่วโลกเก็บคาร์บอนมากกว่าป่าทั้งหมดรวมกัน", "Protecting peatlands. The world's peat holds more carbon than all its forests combined."],
+  ["buy:energy", "เลิกเผาถ่านหิน ทุกเศษองศาที่ไม่ร้อนขึ้นคือดินเยือกแข็งที่ไม่ละลาย", "Quit coal. Every fraction of a degree avoided is permafrost that stays frozen."],
+  ["buy:policy", "ข้อตกลงระหว่างประเทศเรื่องมีเทน มีเทนร้อนกว่าคาร์บอนไดออกไซด์หลายสิบเท่า ลดได้เร็วด้วย", "An international methane pledge. Methane traps dozens of times more heat than CO₂, and it can be cut fast."],
+  ["apprLow", "ข้อมูลของฉันชัดเจน แต่คนไม่อยากฟังข่าวร้าย", "My data is clear, but people don't want bad news."],
+  ["apprHigh", "ปีนี้งบวิจัยอาร์กติกเพิ่มขึ้น ฉันได้ติดตั้งสถานีวัดเพิ่มอีกสิบแห่ง", "Arctic research funding rose this year. I've installed ten new measuring stations."],
+  ["t15", "หนึ่งจุดห้าองศา แบบจำลองบอกว่าดินเยือกแข็งชั้นบนจะหายไปราวหนึ่งในสี่ ฉันหวังว่าแบบจำลองจะผิด", "One point five. Models say about a quarter of the top permafrost goes. I hope the models are wrong."],
+  ["t2", "สององศา จุดเปลี่ยนของดินเยือกแข็งอาจผ่านไปแล้ว ฉันขอให้ทุกคนลดเร็วกว่าเดิมอีก", "Two degrees. The permafrost tipping point may be behind us. Cut faster still, everyone."],
+  ["down", "คาร์บอนลดลง ฉันจะเขียนเรื่องนี้ในรายงานด้วยตัวหนา เผื่อมีคนอ่านแค่บรรทัดเดียว", "Carbon fell. I'll put it in bold in my report, in case people read only one line."],
+  ["up", "คาร์บอนเพิ่ม ทุกตันที่เพิ่มคือดินที่ละลายเพิ่ม และดินที่ละลายก็ปล่อยคาร์บอนเพิ่มอีก", "Carbon up. Every extra tonne thaws more ground, and thawing ground releases still more."],
+  ["cool", "ลบห้าสิบองศาในยาคุตสค์ ปกติดี แต่ฤดูหนาวสั้นลงสองสัปดาห์เมื่อเทียบกับสมัยแม่ฉัน", "Minus fifty in Yakutsk, normal. But winter is two weeks shorter than in my mother's day."],
+  ["monsoon", "ฤดูร้อนสั้นในไซบีเรีย ฉันออกภาคสนามทุกวัน ก่อนที่ดินจะกลับมาแข็ง", "Siberia's short summer. I'm out in the field every day before the ground freezes again."],
+];
 
 })();

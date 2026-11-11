@@ -152,7 +152,7 @@ export function drawPins(M, c, now, vis){
     else if (p.k === "wind"){ if (far) drawWind(c, x, y, s, now, sd); else for (const [dx, dy, k] of WIND_FIELD) drawWind(c, x + dx * s, y + dy * s, s * k, now, sd + dx * 2.3 + dy); }
     else if (p.k === "solar" || p.k === "floatsolar"){ if (far) drawSolar(c, x, y, s, now, p.k === "floatsolar"); else for (const [dx, dy] of SOLAR_FIELD) drawSolar(c, x + dx * s, y + dy * s, s * .62, now + dx * .4, p.k === "floatsolar"); }
     else if (p.k === "nuclear" || p.k === "fusion") drawNuclear(c, x, y, s, now, p.k === "fusion");
-    else if (p.k === "forest" || p.k === "mangrove") drawTrees(c, x, y, s, p.k === "mangrove");
+    else if (p.k === "forest" || p.k === "mangrove"){ if (!M.w3d) drawTrees(c, x, y, s, p.k === "mangrove"); }   // 3.9: 3D groves (world3d.js)
     else if (p.k === "battery") drawBattery(c, x, y, s, now);
     else drawBadge(M, c, x, y, s, p.k);
     M.hits.push({id:"pin-" + p.id, x:x - s * .5, y:y - s * .5, w:s, h:s, fn:() => { M.info = {x, y:y - s * .6, t:performance.now(), txt:`${kindName(p.k)} · ${P.cname(p.c)}${p.done ? "" : " · " + t("building")}`}; }});
@@ -286,8 +286,7 @@ export function drawTraffic(M, c, dt, now, vis){
   for (const k of Object.keys(want)){ const have = list.filter(v => v.kind === k).length; if (have < want[k] && Math.random() < dt * .8){ const v = spawn(M, k); if (v){ v.f = list.length < 4 ? Math.random() * .6 : 0; list.push(v); } } }
   const s = M.scale(), z = M.cam.z, size = clamp(5 + 2.2 * Math.sqrt(z), 6, 11);
   const pShadow = planeShadow(), sShadow = shipShadow();
-  const A3 = M.air3d && M.air3dOn ? M.air3d : null;   // 3.5: planes as 3D models that tip back with the map
-  if (A3) A3.begin(M.tilt);
+  const A3 = M.air3d && M.air3dOn ? M.air3d : null;   // 3.5: planes as 3D models that tip back with the map (begin/end: map2d.js)
   // height of a plane above the map (screen px at zoom z): climbs, cruises, comes down
   const altOf = f => Math.sin(Math.PI * clamp(f, 0, 1)), hOf = f => (4 + 24 * altOf(f)) * Math.sqrt(z);
   for (const v of list){
@@ -347,7 +346,6 @@ export function drawTraffic(M, c, dt, now, vis){
     }
   }
   M.traffic = list.filter(v => v.f < 1);
-  if (A3) A3.end(.32);
 }
 function arrive(M, v){
   const from = P.C(v.from); if (!from || from.green < 45) return;
@@ -382,7 +380,7 @@ export function drawDetail(M, c, now, vis, iconImg){
   if (!hubPts) hubPts = Object.entries(P.CITIES).flatMap(([reg, list]) => list.map(([lat, lon, w, name], i) => ({reg, w, p:ll(lat, lon), ph:i * 1.7})));
   if (!chokePts) chokePts = Object.entries(CHOKE_PT).map(([k, v]) => ({k, p:ll(v[0], v[1])}));
   // smokestacks (from continent view)
-  if (!low && z >= 1.25){
+  if (!low && z >= 1.25 && !M.w3d){   // 3.9: drawn in 3D (world3d.js) when the 3D layer is on
     const regs = {}; for (const r of S.regions) regs[r.id] = r;
     const s = clamp(10 + 6 * Math.sqrt(z), 18, 32);
     for (const h of hubPts){
