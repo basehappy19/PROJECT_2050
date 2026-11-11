@@ -3603,6 +3603,7 @@ if (P.mods && P.mods.net) return;
    ========================================================================= */
 const {S, t, L} = P;
 const H = P.H = P.H || {};
+const OWNER = "p2050-saves-owner", GUEST = "p2050-saves-guest";   // who the slots on this device belong to · the guest set put aside while signed in
 const ls = {get:k => { try { return localStorage.getItem(k); } catch(e) { return null; } }, set:(k, v) => { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch(e) {} }};
 const dirty = () => P.Kit && P.Kit.dirty();
 const msg = (m, err) => { if (P.UIM){ P.UIM.msg = m; P.UIM.err = !!err; } dirty(); };
@@ -3665,6 +3666,10 @@ const Net = {
       this.checking = false;
       if (this.online && this.access){ await this.me(); if (this.user){ this.syncAch(); this.syncProgress(); this.loadCloud(); this.loadSeason(); } }   // 1.1: opening the game already signed in syncs progress and save slots right away
       if (this.online && this.cfg.googleClientId) this.loadGoogle();
+      if (!this.online){
+        const p = this._init; setTimeout(() => { if (this._init === p) this._init = null; }, 0);   // next refresh() looks for the server again
+        if (this.access && (this._initTries = (this._initTries || 0) + 1) <= 6){ clearTimeout(this._initT); this._initT = setTimeout(() => this.refresh(), 15000); }
+      } else this._initTries = 0;
       dirty();
     })();
     return this._init;
@@ -3744,7 +3749,19 @@ const Net = {
     catch(e){ msg(errText(e), true); return false; }
     finally { this.busy = false; dirty(); }
   },
-  async logout(){ try { await this.req("POST", "/auth/logout", {refresh:this.refreshTok}, false); } catch(e) {} this.setTokens(null, null); this.user = null; this.owned = new Set(); this.chars = {}; this.cloud = null; msg(t("signedOut")); },
+  async logout(){ try { await this.req("POST", "/auth/logout", {refresh:this.refreshTok}, false); } catch(e) {} this.setTokens(null, null); this.user = null; this.owned = new Set(); this.chars = {}; this.cloud = null; this.guestSaves(); msg(t("signedOut")); },
+  /* signed out: put the guest's own slots back (the account's slots are in the cloud) */
+  guestSaves(){
+    if (ls.get(OWNER) === null) return;
+    let g = {}; try { g = JSON.parse(ls.get(GUEST) || "{}") || {}; } catch(e) {}
+    P.putSaves(g); ls.set(GUEST, null); ls.set(OWNER, null); this.fixSlot(g);
+  },
+  /* the game in memory keeps pointing at its own slot, wherever it is now */
+  fixSlot(all){
+    if (!S.started || !S.saveSlot) return;
+    const k = P.SLOTS.find(x => all[x] && all[x].meta && all[x].meta.id && all[x].meta.id === S.saveId);
+    S.saveSlot = k || null;
+  },
   async rename(name){
     name = (name || "").trim(); if (name.length < 2 || name.length > 20) return msg(t("err_bad_display"), true);
     this.busy = true;
@@ -3820,35 +3837,66 @@ const Net = {
     } catch(e) {}
   },
   progressChanged(){ if (!this.user) return; clearTimeout(this._progT); this._progT = setTimeout(() => this.syncProgress(), 4000); },
-  /* ---- cloud saves: the 3 slots follow the account. Each write here is sent up a few seconds later;
-     on sign-in / back at the menu the newer copy of each slot wins (a deleted slot is kept as a "deleted at" marker). ---- */
+  /* ---- cloud saves: the 3 slots follow the account. Each write here is sent up a few seconds later.
+     The slots on this device are tagged with their account (p2050-saves-owner; none = guest):
+     - same account → per slot the newer copy wins, both ways (one account on several devices)
+     - guest or another account's slots → the account's cloud slots win. Guest games only move into slots the
+       account has free (and are sent up); the guest set is kept aside (p2050-saves-guest) and comes back on sign-out.
+     A deleted slot is kept as a "deleted at" marker. A failed sync changes nothing and is tried again. ---- */
   cloudQueue(slot){
-    if (!this.user) return;
+    if (!this.user || ls.get(OWNER) !== this.user.username) return;   // not merged with this account yet: loadCloud sends it
     (this._sq = this._sq || {})[slot] = 1; clearTimeout(this._sqT);
     this._sqT = setTimeout(() => { const q = Object.keys(this._sq); this._sq = {}; q.forEach(k => this.cloudPush(k)); }, 6000);
   },
   async cloudPush(slot){
     if (!this.user) return false;
     const all = P.rawSaves(), s = all && all[slot]; if (!s || !s.meta) return false;
-    try { await this.req("PUT", `/saves/${slot}`, {meta:s.meta, state:s.S || {}}); return true; } catch(e) { return false; }
+    try { await this.req("PUT", `/saves/${slot}`, {meta:s.meta, state:s.S || {}}); return true; }
+    catch(e){ if (e.error !== "unauthorized"){ clearTimeout(this._pushT); this._pushT = setTimeout(() => this.cloudPush(slot), 20000); } return false; }
   },
-  async loadCloud(){
-    if (!this.user || this._syncing) return; this._syncing = true;
+  /* one sync at a time; a call during a sync runs it once more afterwards (was dropped before) */
+  loadCloud(){
+    if (!this.user) return Promise.resolve();
+    if (this._syncing){ this._again = true; return this._syncing; }
+    this._syncing = (async () => { do { this._again = false; await this.syncSaves(); } while (this._again && this.user); })()
+      .finally(() => { this._syncing = null; dirty(); });
+    return this._syncing;
+  },
+  async syncSaves(){
+    const me = this.user && this.user.username; if (!me) return;
+    const retry = () => { clearTimeout(this._cloudT); this._cloudT = setTimeout(() => this.loadCloud(), 15000); };
+    const playing = S.started && !S.over && P.UIM && P.UIM.screen === "game";
+    const owner = ls.get(OWNER), mine = owner === me;
+    if (!mine && playing) return;   // takes over the slots: wait until back at the menu (game.js refreshes there)
+    let cloud; try { cloud = await this.req("GET", "/saves") || {}; } catch(e){ if (e.error !== "unauthorized") retry(); return; }
+    const all = P.rawSaves() || {}, out = {}, push = [];
+    const fetchSlot = async slot => { const j = await this.req("GET", `/saves/${slot}`); return j && j.state && P.validSave(j.state) ? {meta:j.meta, S:j.state} : null; };
     try {
-      const cloud = await this.req("GET", "/saves"), all = P.rawSaves() || {};
-      let changed = false;
       for (const slot of P.SLOTS){
         const c = cloud[slot] && cloud[slot].meta, l = all[slot] && all[slot].meta;
-        if (c && (!l || (c.at || 0) > (l.at || 0))){
-          if (S.started && !S.over && S.saveSlot === slot && P.Game && P.UIM && P.UIM.screen === "game") continue;   // never swap the game being played
-          if (c.del){ all[slot] = {meta:c, S:null}; changed = true; continue; }
-          try { const j = await this.req("GET", `/saves/${slot}`); if (j && j.state && P.validSave(j.state)){ all[slot] = {meta:j.meta, S:j.state}; changed = true; } } catch(e) {}
-        } else if (l && (!c || (l.at || 0) > (c.at || 0))) this.cloudPush(slot);
+        const newerC = c && (!l || (c.at || 0) > (l.at || 0)), sameGame = c && l && c.id && c.id === l.id;
+        if (mine || sameGame){
+          if (newerC){
+            if (playing && S.saveSlot === slot){ out[slot] = all[slot]; continue; }   // never swap the game being played
+            out[slot] = c.del ? {meta:c, S:null} : (await fetchSlot(slot)) || all[slot] || null;
+          } else { out[slot] = all[slot] || null; if (l && (!c || (l.at || 0) > (c.at || 0))) push.push(slot); }
+        } else out[slot] = c && !c.del ? await fetchSlot(slot) : null;   // the account's slot wins
       }
-      if (changed) P.putSaves(all);
-      this.cloud = cloud;
-    } catch(e) {}
-    finally { this._syncing = false; dirty(); }
+    } catch(e){ if (e.error !== "unauthorized") retry(); return; }   // nothing changed yet
+    if (!mine){
+      const live = sv => sv && sv.meta && !sv.meta.del && sv.S && P.validSave(sv.S);
+      const placed = new Set(P.SLOTS.map(k => out[k] && out[k].meta && out[k].meta.id).filter(Boolean));
+      if (owner === null){
+        if (P.SLOTS.some(k => live(all[k]))) ls.set(GUEST, JSON.stringify(all));   // put the guest set aside
+        // guest games move into the account's free slots, newest first
+        const left = P.SLOTS.filter(k => live(all[k]) && !placed.has(all[k].meta.id)).sort((x, y) => (all[y].meta.at || 0) - (all[x].meta.at || 0));
+        for (const k of left){ const free = P.SLOTS.find(x => !live(out[x])); if (!free) break; out[free] = all[k]; push.push(free); }
+      }
+      // another account's slots stay in that account's cloud
+    }
+    P.putSaves(out); ls.set(OWNER, me); this.fixSlot(out);
+    this.cloud = cloud;
+    for (const k of push) this.cloudPush(k);
   },
   /* ---- leaderboard ---- */
   async loadBoard(){
