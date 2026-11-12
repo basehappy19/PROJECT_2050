@@ -1,8 +1,9 @@
 /* 3.9 · The map in 3D — on the same three.js layer as the planes (air3d.js), tipped back with the map's tilt:
-   · trains: high-speed trains (and Shinkansen-style bullet trains in Japan, Taiwan, Beijing–Shanghai and Mumbai) on the
-     real corridors that run today, more corridors as the rail skill (I2) rolls out, freight trains on the big cargo
-     lines (diesel with smoke until the line is electrified) and passenger trains on the long ones (electric trains
-     where the line is electrified, diesel-hauled coaches where it isn't). Each line is double track: trains going
+   · trains (2.1.5: none at the start; they come with the skills): buying High-Speed Rail (I2) puts high-speed trains
+     (and Shinkansen-style bullet trains in Japan, Taiwan, Beijing–Shanghai and Mumbai) on the real corridors that run
+     today, freight trains on the big cargo lines and passenger trains on the long ones, then opens more high-speed
+     corridors one by one. Freight is diesel with smoke until the line is electrified (lines that already are, a
+     continent that has cut most of its CO₂, or the Zero-Emission Transport Law P4 for every line). Each line is double track: trains going
      opposite ways keep to their own side. Where a train is depends only on the clock, never on the zoom.
    · industry: coal plants, steelworks, cement works, refineries, mines and EV factories at real sites; they smoke as
      much as their continent still emits and turn clean when it does
@@ -299,7 +300,7 @@ function makeMask(M, shapes, cx, cy, Rx, Ry, sd, N = 1024, allLand = shapes){
 }
 
 /* ---------------- data: rail corridors and industrial sites (lat, lon) ---------------- */
-/* base = runs today (2026). Others open as the rail skill I2 rolls out (or when that country's rail build is done). */
+/* base = runs today (2026): shown once the rail skill I2 is bought. Others open one by one after that (or when that country's rail build is done). */
 const RAIL = [
   // high-speed lines running today
   {c:"CHN", base:1, k:"hsr", t:"bullet", p:[[39.9, 116.4], [36.67, 117.0], [34.26, 117.18], [32.06, 118.8], [31.23, 121.47]]},
@@ -476,8 +477,8 @@ export class World3D {
 
   /* ---------- trains ---------- */
   railOpen(r, i, pins){
+    if (!S.owned || !S.owned.I2) return false;   // 2.1.5: no trains on the map until the rail skill
     if (r.base) return true;
-    if (!S.owned || !S.owned.I2) return false;
     if (pins.some(p => p.done && p.c === r.c)) return true;
     const t0 = pins.length ? Math.min(...pins.map(p => p.t ?? S.tick)) : S.tick;
     return S.tick - t0 >= 4 + (i % 23) * 2;   // the other lines open one by one, every two months
@@ -540,7 +541,7 @@ export class World3D {
       const TM = this.trackMat; for (const k in TM) TM[k].uniforms.uO.value = Lc;
       TM.bedH.uniforms.uW.value = .3 * Lc + .6 / s; TM.bedF.uniforms.uW.value = .52 * Lc + .6 / s; TM.hsr.uniforms.uW.value = .5 / s; TM.fr.uniforms.uW.value = .45 / s;
       const fade = clamp((z - 1.1) / .3, 0, 1); for (const k in TM) TM[k].uniforms.uOp.value = (k.startsWith("bed") ? .6 : .85) * fade;
-      const elec = !!(S.owned && S.owned.I2), gap = Lc * 1.03;
+      const elec = !!(S.owned && S.owned.P4), gap = Lc * 1.03;   // 2.1.5: the Zero-Emission Transport Law electrifies every line
       for (const r of open){
         const cc = P.C && P.C(r.c), reg = cc ? regs[cc.reg] : null, green = elec || r.el || (reg && reg.co2 / reg.co2_0 < .45);
         for (const tr of r.trains){
