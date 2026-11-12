@@ -4439,6 +4439,228 @@
         "userAdded": true
       },
       {
+        "file": "assets/endings/news-l1_0.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-l1_0.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l1_1.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-l1_1.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l1_2.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-l1_2.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l2_0.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-l2_0.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l2_1.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-l2_1.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l2_2.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-l2_2.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l3_0.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-l3_0.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l3_1.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-l3_1.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l3_2.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-l3_2.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-win0.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-win0.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-win1.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-win1.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-win2.jpg",
+        "kind": "image",
+        "metadata": "",
+        "name": "endings/news-win2.jpg",
+        "smoothed": true,
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l1_0.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l1_0.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l1_1.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l1_1.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l1_2.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l1_2.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l2_0-en.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l2_0-en.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l2_0.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l2_0.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l2_1-en.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l2_1-en.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l2_1.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l2_1.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l2_2-en.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l2_2-en.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l2_2.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l2_2.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l3_0-en.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l3_0-en.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l3_0.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l3_0.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l3_1-en.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l3_1-en.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l3_1.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l3_1.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-l3_2.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-l3_2.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-win0-en.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-win0-en.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-win0.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-win0.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-win1.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-win1.mp4",
+        "userAdded": true
+      },
+      {
+        "file": "assets/endings/news-win2.mp4",
+        "kind": "video",
+        "metadata": "",
+        "name": "assets/endings/news-win2.mp4",
+        "userAdded": true
+      },
+      {
         "file": "assets/endings/end-heat.jpg",
         "kind": "image",
         "metadata": "",
@@ -22113,7 +22335,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "d76b2879-08f7-47ca-b641-16416194eaea",
+          "persistentUuid": "15ccd84e-530f-412a-af7f-315e881d8520",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -22442,7 +22664,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "0b1c8365-3379-48a9-94c7-f41f986e242b",
+          "persistentUuid": "12fcd15a-5b42-4edc-a77f-538fc7df6bb5",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -22458,7 +22680,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Ocean",
-          "persistentUuid": "3ff8bffc-0b13-442e-97ea-ca47d9d0ad7a",
+          "persistentUuid": "08d6b1d3-5c15-4d99-abf3-3cd6ef8127da",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -22474,7 +22696,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "MapRim",
-          "persistentUuid": "e794cd3d-af01-4056-ac7e-afbad1abf103",
+          "persistentUuid": "4499ce6c-0414-4275-85a8-1f3bb0208cf1",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -22490,7 +22712,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "ArcticIce",
-          "persistentUuid": "e95d329a-c80d-4637-adc4-cc07c337b930",
+          "persistentUuid": "bee41f48-d5af-48d1-af2e-aa47bbf2d6c0",
           "width": 1920,
           "x": 0,
           "y": 84,
@@ -22506,7 +22728,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "33f0e95e-5cc7-44d0-88cc-389ad67ece81",
+          "persistentUuid": "1fdb68f4-5860-4b06-b370-934c4a4962aa",
           "width": 1636.6666666666667,
           "x": 67.33333333333333,
           "y": 84.66666666666667,
@@ -22533,7 +22755,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "88811c3c-c841-4a95-bf08-616e801c7df4",
+          "persistentUuid": "83b60ffb-acde-4b56-b26a-faf3d4ebf102",
           "width": 1069.3333333333333,
           "x": 610,
           "y": 92.66666666666667,
@@ -22560,7 +22782,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "1bc258fe-23d9-4590-9fc8-965df9b2db84",
+          "persistentUuid": "ec0c1cb5-ba40-476e-8448-db04d8a1e718",
           "width": 486,
           "x": 1125.3333333333333,
           "y": 222.66666666666666,
@@ -22587,7 +22809,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "9efe184f-3c44-4cbf-a176-6c771253f74d",
+          "persistentUuid": "e3ef31e3-3d24-43e3-b103-05441f00c397",
           "width": 251.33333333333334,
           "x": 466.6666666666667,
           "y": 480,
@@ -22614,7 +22836,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "29c37957-1790-4c49-9cf8-5bfd8078b716",
+          "persistentUuid": "b9cb4e54-9dc1-4f61-9889-cf944079f4b3",
           "width": 474,
           "x": 807.3333333333334,
           "y": 315.33333333333337,
@@ -22641,7 +22863,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "d351c4b7-1dcf-4319-93bf-553419ae8052",
+          "persistentUuid": "7b7a2aca-9228-4361-93ae-fd9dc9c73d9a",
           "width": 640,
           "x": 1213.3333333333333,
           "y": 330.66666666666663,
@@ -22668,7 +22890,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "78b33e0d-7208-4eba-9aee-ea564545e4e1",
+          "persistentUuid": "ef4ddd6a-1281-43c9-a9e5-c8a8853bff0b",
           "width": 1638,
           "x": 66.66666666666667,
           "y": 84,
@@ -22695,7 +22917,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "3f9907b3-7cc5-485c-9ccc-e019362a52ca",
+          "persistentUuid": "8017aeb8-5c0a-4c8f-898f-c59d0d8c68b1",
           "width": 1070.6666666666667,
           "x": 609.3333333333334,
           "y": 92,
@@ -22722,7 +22944,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "f0d60693-383a-4d88-b80e-23d550b2b9f3",
+          "persistentUuid": "9a85e108-f9bf-4564-ac02-624d3c620769",
           "width": 488,
           "x": 1124,
           "y": 222,
@@ -22749,7 +22971,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "47867adf-5260-4b48-8ea9-3f6976c5b01b",
+          "persistentUuid": "ec25b5f7-adca-4c17-858b-3d0d9ac6cfb1",
           "width": 252.66666666666666,
           "x": 466,
           "y": 479.3333333333333,
@@ -22776,7 +22998,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "64b33197-99dd-46b2-bab3-4b33689d6bba",
+          "persistentUuid": "22926689-94b9-4781-8416-fac63120b997",
           "width": 474,
           "x": 807.3333333333334,
           "y": 314,
@@ -22803,7 +23025,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "95e0bf7c-1ba4-4358-833c-5de468f21efe",
+          "persistentUuid": "0c958b1d-5292-4a5a-bf28-25de5d293700",
           "width": 640,
           "x": 1214,
           "y": 330,
@@ -22830,7 +23052,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "20397f19-bec9-4a09-be52-ba22e5fdb98d",
+          "persistentUuid": "1318d718-c65d-473c-b69d-3daaf9682711",
           "width": 0,
           "x": 573.7,
           "y": 516.4,
@@ -22851,7 +23073,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.15
+              "value": 0.22
             }
           ]
         },
@@ -22862,7 +23084,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "35565a09-c01f-4802-bff3-7394e998b8cc",
+          "persistentUuid": "4e301522-4923-44fd-ab0b-eb203bdbae7e",
           "width": 0,
           "x": 444.5,
           "y": 591.2,
@@ -22883,7 +23105,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.47
+              "value": 3.82
             }
           ]
         },
@@ -22894,7 +23116,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "6c2ee889-af3c-48e0-87fb-a9a0150827e6",
+          "persistentUuid": "e82d108f-89a8-433a-a443-cc0b6fca3c22",
           "width": 0,
           "x": 306.8,
           "y": 563.1,
@@ -22915,7 +23137,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.19
+              "value": 4.72
             }
           ]
         },
@@ -22926,7 +23148,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "3ad21475-9b50-444b-b782-6908360d5c58",
+          "persistentUuid": "0c51e544-a755-45d0-bb35-6352930d0fdf",
           "width": 0,
           "x": 491.6,
           "y": 507.7,
@@ -22947,7 +23169,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.2
+              "value": 4.84
             }
           ]
         },
@@ -22958,7 +23180,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "3c164c27-2bb6-4fa5-8db7-4138c4033a44",
+          "persistentUuid": "49f1818c-b6f7-48f9-8032-1cb5db68597c",
           "width": 0,
           "x": 541.1,
           "y": 494.6,
@@ -22979,7 +23201,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.52
+              "value": 1.16
             }
           ]
         },
@@ -22990,7 +23212,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "375d32c2-521d-4c70-a1f9-d0ffda39139b",
+          "persistentUuid": "e444cfa1-438d-4ddd-a326-eff273df45f1",
           "width": 0,
           "x": 422.1,
           "y": 658,
@@ -23011,7 +23233,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.15
+              "value": 2.4
             }
           ]
         },
@@ -23022,7 +23244,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "146a2ad0-4e12-484e-aeaa-78f665eb9f0a",
+          "persistentUuid": "1ff762a4-9286-4ff6-8b30-67e45e59d729",
           "width": 0,
           "x": 335.2,
           "y": 418.4,
@@ -23043,7 +23265,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.94
+              "value": 5.84
             }
           ]
         },
@@ -23054,7 +23276,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "43de4c61-07b8-4cd4-8be9-94bdc153703b",
+          "persistentUuid": "7957bd16-1d3b-4750-aad9-9536c2dcb987",
           "width": 0,
           "x": 1020,
           "y": 434.7,
@@ -23075,7 +23297,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.84
+              "value": 2.26
             }
           ]
         },
@@ -23086,7 +23308,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a3a162fa-c273-4863-a90e-8d2407aede05",
+          "persistentUuid": "40629a8e-0952-42da-8839-047fb3befc87",
           "width": 0,
           "x": 1034.8,
           "y": 455.2,
@@ -23107,7 +23329,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.74
+              "value": 2.19
             }
           ]
         },
@@ -23118,7 +23340,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ae61ce1d-a6a8-486d-b777-d8836fa244c7",
+          "persistentUuid": "99683952-4e76-4252-a331-76bf0de54d92",
           "width": 0,
           "x": 1101.5,
           "y": 426.6,
@@ -23139,7 +23361,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.57
+              "value": 2.41
             }
           ]
         },
@@ -23150,7 +23372,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8e800d75-f09a-486c-b121-f343e6646cd1",
+          "persistentUuid": "db2371fa-7a5f-4ab1-be6a-be38a4ff1f46",
           "width": 0,
           "x": 1247.6,
           "y": 399.2,
@@ -23171,7 +23393,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.21
+              "value": 2
             }
           ]
         },
@@ -23182,7 +23404,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "157a64e8-9ee6-43cd-a869-d81e96667331",
+          "persistentUuid": "4e1bae8b-4250-4d03-85c3-8ccaf1867a2c",
           "width": 0,
           "x": 1147.4,
           "y": 429,
@@ -23203,7 +23425,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.12
+              "value": 1.93
             }
           ]
         },
@@ -23214,7 +23436,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b4d5a52a-333b-4907-8438-36c5cde932c6",
+          "persistentUuid": "443d9753-5604-47e3-bfff-9dca939328ff",
           "width": 0,
           "x": 998.2,
           "y": 518.5,
@@ -23235,7 +23457,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.07
+              "value": 0.04
             }
           ]
         },
@@ -23246,7 +23468,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "90bc9554-3b55-4ec5-a170-62d45274b610",
+          "persistentUuid": "5a9a74e0-279f-4a4c-b220-ed873a14fde3",
           "width": 0,
           "x": 1195.7,
           "y": 514.2,
@@ -23267,7 +23489,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.9
+              "value": 5.6
             }
           ]
         },
@@ -23278,7 +23500,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f6e935e3-b7b6-4f3f-97a2-b621146530d1",
+          "persistentUuid": "f217f433-40d4-4d67-956d-6ebcdbb79fce",
           "width": 0,
           "x": 1203.6,
           "y": 363.4,
@@ -23299,7 +23521,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.23
+              "value": 1.9
             }
           ]
         },
@@ -23310,7 +23532,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f4a2d8e6-fe79-4c5b-8d03-c9139b06cf47",
+          "persistentUuid": "2d0c394d-9476-4326-91cd-ffe1d5996936",
           "width": 0,
           "x": 1723.5,
           "y": 522.1,
@@ -23331,7 +23553,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.36
+              "value": 0.23
             }
           ]
         },
@@ -23342,7 +23564,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "80bde9b1-8c46-4a60-95b8-98ee430ac606",
+          "persistentUuid": "440816a6-1b61-4ee0-9d40-298f0e19d32f",
           "width": 0,
           "x": 1754.3,
           "y": 581.9,
@@ -23363,7 +23585,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.81
+              "value": 4.31
             }
           ]
         },
@@ -23374,7 +23596,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "54f5767f-bd4d-4618-b646-6a5682d43a3d",
+          "persistentUuid": "d93d9a19-c0b6-4ebb-8f14-d26d0655fe41",
           "width": 0,
           "x": 1864.2,
           "y": 551.5,
@@ -23395,7 +23617,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.3
+              "value": 1.22
             }
           ]
         },
@@ -23406,7 +23628,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "82385978-222f-4306-a142-0e5b6f8b72c7",
+          "persistentUuid": "f1b98d06-f6a4-44a0-9696-6c709a12f2f2",
           "width": 0,
           "x": 1787.5,
           "y": 538.3,
@@ -23427,7 +23649,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.64
+              "value": 4.83
             }
           ]
         },
@@ -23438,7 +23660,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "40c189a1-306f-4261-8c3d-4e6a26f2272b",
+          "persistentUuid": "9d8c9351-d519-4293-bdf9-98a5304a14b1",
           "width": 0,
           "x": 1704.8,
           "y": 634.6,
@@ -23459,7 +23681,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.39
+              "value": 3.18
             }
           ]
         },
@@ -23470,7 +23692,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "1d39f8e8-3b48-4a21-ba18-973b5e15c8c6",
+          "persistentUuid": "a425c6d2-a29c-4ad0-a69b-813836fdbc1e",
           "width": 0,
           "x": 1663.7,
           "y": 592.5,
@@ -23491,7 +23713,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.26
+              "value": 2.29
             }
           ]
         },
@@ -23502,7 +23724,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d006efc0-58c6-45c2-b7a1-8d2a102c82a4",
+          "persistentUuid": "ef98f93a-fbc8-4f2a-b9a3-0101d8a74fe5",
           "width": 0,
           "x": 1485,
           "y": 498.3,
@@ -23523,7 +23745,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.31
+              "value": 5.39
             }
           ]
         },
@@ -23534,7 +23756,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "7848dc15-b080-40fd-bc66-425d7c8441c8",
+          "persistentUuid": "65fb8989-1938-400f-bb4d-4ca9e330ebfc",
           "width": 0,
           "x": 1765.8,
           "y": 508.5,
@@ -23555,7 +23777,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.01
+              "value": 3.2
             }
           ]
         },
@@ -23566,7 +23788,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "7f161f2f-bab4-4b61-b6de-1a9cf08b81d3",
+          "persistentUuid": "a087e254-792e-48c5-af63-f63399f263b0",
           "width": 0,
           "x": 1627.5,
           "y": 693,
@@ -23587,7 +23809,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.24
+              "value": 0.32
             }
           ]
         },
@@ -23598,7 +23820,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "dd73a493-eb23-49d3-a4e0-3b00df082fb8",
+          "persistentUuid": "ff4999f2-3031-442e-9c54-d7b98efd8a6a",
           "width": 0,
           "x": 1665.5,
           "y": 814.1,
@@ -23619,7 +23841,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.1
+              "value": 3.98
             }
           ]
         },
@@ -23630,7 +23852,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ef35049a-99be-4e92-8d7e-23e79cf88e46",
+          "persistentUuid": "a865d35d-c818-4922-9e06-bac343b544bb",
           "width": 0,
           "x": 1751.3,
           "y": 687.8,
@@ -23651,7 +23873,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.28
+              "value": 2.74
             }
           ]
         },
@@ -23662,7 +23884,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "81877226-d082-44b1-96be-e6dd8d7e775e",
+          "persistentUuid": "878c0132-9b8f-4bba-a246-49016911a656",
           "width": 0,
           "x": 1486.8,
           "y": 599.1,
@@ -23683,7 +23905,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.17
+              "value": 2
             }
           ]
         },
@@ -23694,7 +23916,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "069dcfd9-c232-4da4-8c4d-ac9443dead4b",
+          "persistentUuid": "f3f91ea6-d6ec-439d-921f-56248f8d1504",
           "width": 0,
           "x": 1460.8,
           "y": 659.8,
@@ -23715,7 +23937,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.93
+              "value": 4.1
             }
           ]
         },
@@ -23726,7 +23948,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "103bab4e-44f3-42e9-9499-29a41e22820c",
+          "persistentUuid": "6028c10a-66ba-4b4d-8bd6-ed102bc70ecd",
           "width": 0,
           "x": 1566.5,
           "y": 630.1,
@@ -23747,7 +23969,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.3
+              "value": 3.07
             }
           ]
         },
@@ -23758,7 +23980,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "94e02189-5997-4bde-b353-bbdf18950b53",
+          "persistentUuid": "d77be14b-7d12-4cfb-83dc-3a012828b61a",
           "width": 0,
           "x": 1933.7,
           "y": 989.4,
@@ -23779,7 +24001,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.25
+              "value": 1.35
             }
           ]
         },
@@ -23790,7 +24012,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "4a4b18ab-901a-44c6-8406-7f0d4f0ff9a0",
+          "persistentUuid": "f4b4b8fd-e1a1-45c1-8370-60350298563b",
           "width": 0,
           "x": 1664.9,
           "y": 711.1,
@@ -23811,7 +24033,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.29
+              "value": 2.08
             }
           ]
         },
@@ -23822,7 +24044,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "dd71d158-9335-4c1e-87d6-074c8393b0e5",
+          "persistentUuid": "13aa55ee-e4c4-4d4e-bd06-69d1edf23d0f",
           "width": 0,
           "x": 1425.2,
           "y": 623.1,
@@ -23843,7 +24065,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.92
+              "value": 3.07
             }
           ]
         },
@@ -23854,7 +24076,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "644876ba-8dae-447b-b410-0063ed095d10",
+          "persistentUuid": "42ee3283-5e5d-4a90-9a45-7076d0a312f5",
           "width": 0,
           "x": 739.2,
           "y": 921.1,
@@ -23875,7 +24097,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.26
+              "value": 0.14
             }
           ]
         },
@@ -23886,7 +24108,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "456acf8d-917b-4810-a824-937486ae22de",
+          "persistentUuid": "cc66cfe1-4590-43e7-bc03-2a253c4c59e9",
           "width": 0,
           "x": 667.9,
           "y": 994.1,
@@ -23907,7 +24129,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.64
+              "value": 3.72
             }
           ]
         },
@@ -23918,7 +24140,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "757b50be-eed5-49a0-bb5b-3d18ca6dd197",
+          "persistentUuid": "cb68b4e3-b22d-4e9e-8794-829e12164a5b",
           "width": 0,
           "x": 555.6,
           "y": 849.4,
@@ -23939,7 +24161,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.2
+              "value": 3.24
             }
           ]
         },
@@ -23950,7 +24172,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "62968d02-604c-4f98-a888-bb0bb1ded592",
+          "persistentUuid": "ebf65eaf-c631-41b6-bcb5-b9b8a3322371",
           "width": 0,
           "x": 573.1,
           "y": 748.2,
@@ -23971,7 +24193,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.05
+              "value": 0.94
             }
           ]
         },
@@ -23982,7 +24204,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "2a98544d-f7a2-422c-9dd1-af7912ca1d84",
+          "persistentUuid": "40adbe78-20e5-43cf-9767-d63948147173",
           "width": 0,
           "x": 594.2,
           "y": 986,
@@ -24003,7 +24225,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.1
+              "value": 3.64
             }
           ]
         },
@@ -24014,7 +24236,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f0fa7d86-ab56-4385-917f-50e63ca1ebf7",
+          "persistentUuid": "683f60da-ba60-468f-913f-2b42ffa7eacd",
           "width": 0,
           "x": 658.2,
           "y": 795.3,
@@ -24035,7 +24257,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.69
+              "value": 2.74
             }
           ]
         },
@@ -24046,7 +24268,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "9ace24af-e818-41da-8e37-2d5fd5fd0290",
+          "persistentUuid": "5ff80464-1095-4c7f-aefe-e6bfca750e56",
           "width": 0,
           "x": 1302.6,
           "y": 624.4,
@@ -24067,7 +24289,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.66
+              "value": 1.56
             }
           ]
         },
@@ -24078,7 +24300,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "99624714-b1f3-4cea-be77-c396d6cbeea2",
+          "persistentUuid": "7d3ba9ab-7ebc-4d24-a57c-d689f2298029",
           "width": 0,
           "x": 1331,
           "y": 551.5,
@@ -24099,7 +24321,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.76
+              "value": 6.08
             }
           ]
         },
@@ -24110,7 +24332,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "97cb473d-f268-4489-8014-8c6b664d8fdb",
+          "persistentUuid": "5e0c3c2c-804e-47ea-86cb-d5b3a827e500",
           "width": 0,
           "x": 1209,
           "y": 589.9,
@@ -24131,7 +24353,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.13
+              "value": 1.98
             }
           ]
         },
@@ -24142,7 +24364,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "e81058aa-ba12-4073-bca3-79fa992ed891",
+          "persistentUuid": "87ee99bf-a84c-4878-be81-0a7f51c48e87",
           "width": 0,
           "x": 1041.1,
           "y": 737.3,
@@ -24163,7 +24385,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.27
+              "value": 4.27
             }
           ]
         },
@@ -24174,7 +24396,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "0d2b192e-b608-47ad-8c30-4bf5bb56fa0d",
+          "persistentUuid": "ea2be8a8-8e1f-4e2e-a570-938f5a6683f4",
           "width": 0,
           "x": 1189.7,
           "y": 938.4,
@@ -24195,7 +24417,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.97
+              "value": 6.17
             }
           ]
         },
@@ -24206,7 +24428,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "9cd6664a-0071-46da-9f33-207def1e1ba4",
+          "persistentUuid": "2c249a91-2589-43e6-a36c-3a80281da154",
           "width": 0,
           "x": 1354.5,
           "y": 621.1,
@@ -24227,7 +24449,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.27
+              "value": 0.29
             }
           ]
         },
@@ -24238,7 +24460,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "bbd03846-fd7e-4a1c-bf23-1efee27c10d5",
+          "persistentUuid": "dc4c39dd-d17b-43e7-8131-47d03ca35341",
           "width": 0,
           "x": 1242.8,
           "y": 784.4,
@@ -24259,7 +24481,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.67
+              "value": 0.35
             }
           ]
         },
@@ -24270,7 +24492,7 @@
           "keepRatio": true,
           "layer": "Menu",
           "name": "MenuShade",
-          "persistentUuid": "9020014f-9dfe-4a8c-8d89-2d855e778bd7",
+          "persistentUuid": "21158051-e362-4262-a341-957a76bf70a4",
           "width": 900,
           "x": 0,
           "y": 0,
@@ -25580,7 +25802,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "bece7f79-fb50-4084-bc96-32433fb123d8",
+          "persistentUuid": "5f42d36c-8ecd-47b0-83d4-7071dad1c33f",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -25596,7 +25818,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Ocean",
-          "persistentUuid": "8219360e-44a3-4dd8-bf68-d1cb4a1d1a2e",
+          "persistentUuid": "37d2aeff-4aca-4b4e-b97f-da0422af93e1",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -25612,7 +25834,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "MapRim",
-          "persistentUuid": "afbbeb46-c27b-4187-9a94-88787784089b",
+          "persistentUuid": "2daab846-d85c-4332-b919-f9889b536ebd",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -25628,7 +25850,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "ArcticIce",
-          "persistentUuid": "dc1f15a0-5cf0-4fed-b403-aa0b2ed55791",
+          "persistentUuid": "93cdfdf0-5472-4421-97c0-c0e3260db206",
           "width": 1920,
           "x": 0,
           "y": 84,
@@ -25644,7 +25866,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "d612ad27-4c87-482d-9696-32bf8bc58328",
+          "persistentUuid": "95c3b120-d9d7-4334-856c-e7132254008d",
           "width": 1636.6666666666667,
           "x": 67.33333333333333,
           "y": 84.66666666666667,
@@ -25671,7 +25893,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "ffad3175-d8f5-4c22-9009-9aee2fc7c8e9",
+          "persistentUuid": "fa5f8b93-77c9-479f-b01d-0eb208dded6f",
           "width": 1069.3333333333333,
           "x": 610,
           "y": 92.66666666666667,
@@ -25698,7 +25920,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "9d82c973-32b9-42f3-b03c-17341af7719f",
+          "persistentUuid": "18a4c281-95f4-4d88-a518-ae11ab2cede1",
           "width": 486,
           "x": 1125.3333333333333,
           "y": 222.66666666666666,
@@ -25725,7 +25947,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "2d240c6d-4f16-4f6c-baf6-49f34dbade8b",
+          "persistentUuid": "4e140d88-9f74-4caa-b57c-0fce4a1caad6",
           "width": 251.33333333333334,
           "x": 466.6666666666667,
           "y": 480,
@@ -25752,7 +25974,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "15609ba9-b53d-4380-b7b4-cf3267595fe3",
+          "persistentUuid": "a743b655-2b27-47e8-8b57-e84ee1d71607",
           "width": 474,
           "x": 807.3333333333334,
           "y": 315.33333333333337,
@@ -25779,7 +26001,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "dc2dc8b9-9073-4f33-ae93-4ae5fe8824a0",
+          "persistentUuid": "5f964c2f-6859-4ce8-b3bb-d4dabcb812da",
           "width": 640,
           "x": 1213.3333333333333,
           "y": 330.66666666666663,
@@ -25806,7 +26028,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "099646df-8a49-4ea7-b54a-7967be9f9adb",
+          "persistentUuid": "0d35eb62-e499-4015-ad33-b32ce6d568c6",
           "width": 1638,
           "x": 66.66666666666667,
           "y": 84,
@@ -25833,7 +26055,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "067b408e-8066-43e3-b41e-bd46f8ac0f8c",
+          "persistentUuid": "83980589-8ff6-43da-875a-844a55bb871f",
           "width": 1070.6666666666667,
           "x": 609.3333333333334,
           "y": 92,
@@ -25860,7 +26082,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "a891df8b-0023-4ba6-add1-140d612dcf55",
+          "persistentUuid": "a706c7d9-73da-455d-a3e9-de1af4090abd",
           "width": 488,
           "x": 1124,
           "y": 222,
@@ -25887,7 +26109,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "120848af-7c5a-4f36-b6c3-9853250e2e10",
+          "persistentUuid": "0d61d6a6-c5a6-4b26-8c6a-0ce453e26f5f",
           "width": 252.66666666666666,
           "x": 466,
           "y": 479.3333333333333,
@@ -25914,7 +26136,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "d148a69f-e9fe-47e0-87ad-97a8bf59053b",
+          "persistentUuid": "a142dc2c-3e7c-4326-8ffd-8d53821474c7",
           "width": 474,
           "x": 807.3333333333334,
           "y": 314,
@@ -25941,7 +26163,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "666d48c9-ed1f-4f21-bea3-f297ce61d004",
+          "persistentUuid": "1cc660fe-526c-447d-8be7-e429a019d3a9",
           "width": 640,
           "x": 1214,
           "y": 330,
@@ -25968,7 +26190,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "6bf1525a-fb32-47ac-b6f9-4f1471fec2e2",
+          "persistentUuid": "46ffdc3b-af26-493c-b70b-0ec3bcfbf7e1",
           "width": 0,
           "x": 573.7,
           "y": 516.4,
@@ -25989,7 +26211,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.03
+              "value": 1.28
             }
           ]
         },
@@ -26000,7 +26222,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "74c0c80c-bc2b-4b3a-9398-bf8f965140b6",
+          "persistentUuid": "56abcba9-7545-4704-bed0-5a8925c74363",
           "width": 0,
           "x": 444.5,
           "y": 591.2,
@@ -26021,7 +26243,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.64
+              "value": 3.06
             }
           ]
         },
@@ -26032,7 +26254,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "2da19e86-8628-478f-926f-d50b51b47e51",
+          "persistentUuid": "06dd84b6-3598-4663-8084-ea5f6a96267c",
           "width": 0,
           "x": 306.8,
           "y": 563.1,
@@ -26053,7 +26275,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.93
+              "value": 5.59
             }
           ]
         },
@@ -26064,7 +26286,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "97638a7b-134d-45f5-855d-5516b9acdafc",
+          "persistentUuid": "70d34d2b-b64f-4048-86db-9d9a4b09d3d9",
           "width": 0,
           "x": 491.6,
           "y": 507.7,
@@ -26085,7 +26307,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.91
+              "value": 2.62
             }
           ]
         },
@@ -26096,7 +26318,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "1e92737f-cc0f-46cb-9e0e-b03a9fbc4140",
+          "persistentUuid": "a6b0983e-0f71-4f56-a56f-ed6adf9a392a",
           "width": 0,
           "x": 541.1,
           "y": 494.6,
@@ -26117,7 +26339,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.98
+              "value": 4.92
             }
           ]
         },
@@ -26128,7 +26350,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d4d316ff-9963-4c2b-b821-a8b7d3eaf481",
+          "persistentUuid": "f7790f8d-4f38-4d28-be0a-79825b457659",
           "width": 0,
           "x": 422.1,
           "y": 658,
@@ -26149,7 +26371,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.75
+              "value": 5.43
             }
           ]
         },
@@ -26160,7 +26382,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f086507c-0123-408e-ac48-1d0397e9be4e",
+          "persistentUuid": "68868540-fe8e-4b5b-95be-86a767c57d97",
           "width": 0,
           "x": 335.2,
           "y": 418.4,
@@ -26181,7 +26403,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.84
+              "value": 0.79
             }
           ]
         },
@@ -26192,7 +26414,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "70b9998c-9169-4200-bc61-554f4888d6e4",
+          "persistentUuid": "79c7b394-b9a4-4556-a55a-4a41dfab7d9f",
           "width": 0,
           "x": 1020,
           "y": 434.7,
@@ -26213,7 +26435,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.35
+              "value": 0.77
             }
           ]
         },
@@ -26224,7 +26446,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "acddd041-5684-408a-af24-31fce548cec6",
+          "persistentUuid": "df28abcf-d91e-4898-ad04-5fdd333ffb81",
           "width": 0,
           "x": 1034.8,
           "y": 455.2,
@@ -26245,7 +26467,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.46
+              "value": 1.86
             }
           ]
         },
@@ -26256,7 +26478,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b7f8ba86-384f-4d8a-893e-65107ef275c0",
+          "persistentUuid": "059ccba7-a8ae-4eb9-918f-99240107f4e9",
           "width": 0,
           "x": 1101.5,
           "y": 426.6,
@@ -26277,7 +26499,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.04
+              "value": 4.55
             }
           ]
         },
@@ -26288,7 +26510,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "3be8f932-b5bc-42a9-af32-a65ce08f37c8",
+          "persistentUuid": "4a1cd3b8-89b7-4820-b122-0a4cee603541",
           "width": 0,
           "x": 1247.6,
           "y": 399.2,
@@ -26309,7 +26531,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.91
+              "value": 3.64
             }
           ]
         },
@@ -26320,7 +26542,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "bada6cfb-5179-4400-bb1d-85f05791b0fc",
+          "persistentUuid": "a5785765-ba5b-4260-8d21-9c8ba8613b8a",
           "width": 0,
           "x": 1147.4,
           "y": 429,
@@ -26341,7 +26563,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.19
+              "value": 5.97
             }
           ]
         },
@@ -26352,7 +26574,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d6d17fe4-914b-4e28-93c1-b7d18bb67a20",
+          "persistentUuid": "8d4b0348-0049-43ee-8a8b-79f9040b8e47",
           "width": 0,
           "x": 998.2,
           "y": 518.5,
@@ -26373,7 +26595,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.39
+              "value": 3.11
             }
           ]
         },
@@ -26384,7 +26606,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "60ae75cc-5b42-4448-832d-55ed3d04eb23",
+          "persistentUuid": "20e42d51-b98f-4be0-b01b-a5c4b7eebd80",
           "width": 0,
           "x": 1195.7,
           "y": 514.2,
@@ -26405,7 +26627,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.46
+              "value": 5.91
             }
           ]
         },
@@ -26416,7 +26638,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "58ee341d-91a6-4155-bc55-3223eaaa3aae",
+          "persistentUuid": "89d48f39-982d-4457-9f81-8b7a8041000c",
           "width": 0,
           "x": 1203.6,
           "y": 363.4,
@@ -26437,7 +26659,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.85
+              "value": 2.26
             }
           ]
         },
@@ -26448,7 +26670,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "c7f12ca5-e0ca-4939-9f55-521eceb323cd",
+          "persistentUuid": "fe1e4d21-82ca-4d6d-881b-c023def214e2",
           "width": 0,
           "x": 1723.5,
           "y": 522.1,
@@ -26469,7 +26691,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.64
+              "value": 5.18
             }
           ]
         },
@@ -26480,7 +26702,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "7e0db05b-c3aa-4ad0-9edb-37b9e030b53d",
+          "persistentUuid": "6c305fe6-cbe7-4df0-b61e-4efb0f33b363",
           "width": 0,
           "x": 1754.3,
           "y": 581.9,
@@ -26501,7 +26723,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.32
+              "value": 2.19
             }
           ]
         },
@@ -26512,7 +26734,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "72dc1be5-2950-4e78-ada8-3f49664a7dd9",
+          "persistentUuid": "69dcbba1-5560-4f8e-87d1-9beb939d7720",
           "width": 0,
           "x": 1864.2,
           "y": 551.5,
@@ -26533,7 +26755,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.15
+              "value": 1.82
             }
           ]
         },
@@ -26544,7 +26766,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a7adfa30-b3fc-40dd-93b9-a551c2d3907b",
+          "persistentUuid": "f434ac3d-29fe-46ad-a7dd-984cee921ca0",
           "width": 0,
           "x": 1787.5,
           "y": 538.3,
@@ -26565,7 +26787,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.16
+              "value": 3.71
             }
           ]
         },
@@ -26576,7 +26798,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "9bc2b3f0-45de-49a4-a441-4349e5e80051",
+          "persistentUuid": "af74a5f7-428a-49c8-8f26-5328cc2513a1",
           "width": 0,
           "x": 1704.8,
           "y": 634.6,
@@ -26597,7 +26819,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.52
+              "value": 4.12
             }
           ]
         },
@@ -26608,7 +26830,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8e975b00-af86-4a81-b6cc-a39fbb4076f4",
+          "persistentUuid": "f9aa20f8-8188-47e3-93f9-bdcd146b5fbd",
           "width": 0,
           "x": 1663.7,
           "y": 592.5,
@@ -26629,7 +26851,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.58
+              "value": 2.19
             }
           ]
         },
@@ -26640,7 +26862,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "153f01a8-77c8-4ecf-ae3c-e3015d6e64f8",
+          "persistentUuid": "9f2ba54d-c347-4421-9b5a-d31565a6c1f2",
           "width": 0,
           "x": 1485,
           "y": 498.3,
@@ -26661,7 +26883,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.95
+              "value": 5.82
             }
           ]
         },
@@ -26672,7 +26894,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "66961470-e002-44e7-be84-5e6f9904cc77",
+          "persistentUuid": "39d121fb-f842-4424-ba0b-7545402d58b6",
           "width": 0,
           "x": 1765.8,
           "y": 508.5,
@@ -26693,7 +26915,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.27
+              "value": 2.63
             }
           ]
         },
@@ -26704,7 +26926,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "2d9634cd-af00-4147-8079-60a2f8a8163c",
+          "persistentUuid": "4c560fbf-f328-4a36-b11c-71fa6b89a7a2",
           "width": 0,
           "x": 1627.5,
           "y": 693,
@@ -26725,7 +26947,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.38
+              "value": 4.71
             }
           ]
         },
@@ -26736,7 +26958,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "3bf9af63-d6f2-463f-bb52-e3b6e6eb1339",
+          "persistentUuid": "b00a127f-3b6f-40c6-8fda-945152fb094f",
           "width": 0,
           "x": 1665.5,
           "y": 814.1,
@@ -26757,7 +26979,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.36
+              "value": 5.29
             }
           ]
         },
@@ -26768,7 +26990,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "096ee7d9-8722-43f2-8c5e-fc4098fea59f",
+          "persistentUuid": "61a17aff-4810-4d0d-978f-04d781ebefe1",
           "width": 0,
           "x": 1751.3,
           "y": 687.8,
@@ -26789,7 +27011,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.02
+              "value": 3.17
             }
           ]
         },
@@ -26800,7 +27022,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "9ef35c4c-fba9-4026-aea8-71794f833275",
+          "persistentUuid": "d86af9b2-5516-46ac-b82f-adb75b4c1021",
           "width": 0,
           "x": 1486.8,
           "y": 599.1,
@@ -26821,7 +27043,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.41
+              "value": 0.95
             }
           ]
         },
@@ -26832,7 +27054,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "7ac77b34-1321-4274-afd6-c397d0f70f82",
+          "persistentUuid": "b42b4ca2-f071-4933-b3cd-e24fe2a85e6f",
           "width": 0,
           "x": 1460.8,
           "y": 659.8,
@@ -26853,7 +27075,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.35
+              "value": 0.04
             }
           ]
         },
@@ -26864,7 +27086,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "93f0ce2b-fedd-46ea-a69a-ba67e4530881",
+          "persistentUuid": "8dafe4cd-298d-47a3-bf0b-6864ec67a70c",
           "width": 0,
           "x": 1566.5,
           "y": 630.1,
@@ -26885,7 +27107,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.39
+              "value": 5.24
             }
           ]
         },
@@ -26896,7 +27118,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "3eeba595-a650-4072-821a-91d5db079207",
+          "persistentUuid": "b4acb6a5-4d43-422c-b39d-1ae89d897e46",
           "width": 0,
           "x": 1933.7,
           "y": 989.4,
@@ -26917,7 +27139,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.18
+              "value": 3.87
             }
           ]
         },
@@ -26928,7 +27150,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ddf083c6-7fd4-404f-bfc2-3832de236832",
+          "persistentUuid": "d647a35e-561b-40db-a2db-bd7457795759",
           "width": 0,
           "x": 1664.9,
           "y": 711.1,
@@ -26949,7 +27171,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.85
+              "value": 1.81
             }
           ]
         },
@@ -26960,7 +27182,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "6b9685a5-5d9b-4a0d-8c70-1167ff0978b3",
+          "persistentUuid": "8262365b-f1d9-4028-8252-b0b3409c4fd2",
           "width": 0,
           "x": 1425.2,
           "y": 623.1,
@@ -26981,7 +27203,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.12
+              "value": 0.37
             }
           ]
         },
@@ -26992,7 +27214,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "4e01d82c-9c5e-450c-9580-5e2dd3599f05",
+          "persistentUuid": "ba527948-531f-40a2-8df3-0fcdb8063540",
           "width": 0,
           "x": 739.2,
           "y": 921.1,
@@ -27013,7 +27235,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.38
+              "value": 4.37
             }
           ]
         },
@@ -27024,7 +27246,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "efb8f97b-2d12-4c48-a457-5bc97ed6e1a1",
+          "persistentUuid": "6498ec9e-88fe-4f35-925d-40dc2960b736",
           "width": 0,
           "x": 667.9,
           "y": 994.1,
@@ -27045,7 +27267,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.28
+              "value": 4.77
             }
           ]
         },
@@ -27056,7 +27278,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "64ce30aa-cb8d-4c4a-911c-6dede2cb7d30",
+          "persistentUuid": "cff753cc-e28f-451e-8679-5eab9b1be69d",
           "width": 0,
           "x": 555.6,
           "y": 849.4,
@@ -27077,7 +27299,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.56
+              "value": 1.44
             }
           ]
         },
@@ -27088,7 +27310,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d9f13aa3-cc8d-40fb-8a43-820f2b82cb83",
+          "persistentUuid": "627fad38-d995-475a-8887-21850cd74684",
           "width": 0,
           "x": 573.1,
           "y": 748.2,
@@ -27109,7 +27331,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.41
+              "value": 4.52
             }
           ]
         },
@@ -27120,7 +27342,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "c65d3cee-14a0-4118-aaa7-5df7cd30251a",
+          "persistentUuid": "4845b9a4-1952-4c89-85b0-2d4e6bc2d0e3",
           "width": 0,
           "x": 594.2,
           "y": 986,
@@ -27141,7 +27363,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.33
+              "value": 4.5
             }
           ]
         },
@@ -27152,7 +27374,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "dae3ad70-50dc-4363-8e5b-feb6b829c10c",
+          "persistentUuid": "28fefafd-706e-48d7-91dd-8a038be3bbc4",
           "width": 0,
           "x": 658.2,
           "y": 795.3,
@@ -27173,7 +27395,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.78
+              "value": 6.07
             }
           ]
         },
@@ -27184,7 +27406,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "22b7bcc9-3b00-44bb-b628-4be2b3766778",
+          "persistentUuid": "c5e34d3c-1dc4-4084-b648-c2936758ed3c",
           "width": 0,
           "x": 1302.6,
           "y": 624.4,
@@ -27205,7 +27427,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.23
+              "value": 3.36
             }
           ]
         },
@@ -27216,7 +27438,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d0063ac2-b6bd-4dcb-834f-fe1636175d98",
+          "persistentUuid": "0fb68234-0bd9-4dc3-a63c-ed817fae05e9",
           "width": 0,
           "x": 1331,
           "y": 551.5,
@@ -27237,7 +27459,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.47
+              "value": 4.23
             }
           ]
         },
@@ -27248,7 +27470,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "0e0ecb3e-d5f4-4ef5-9191-649f20aa8570",
+          "persistentUuid": "f51933b4-86a5-4537-89ba-0174f9a06b3a",
           "width": 0,
           "x": 1209,
           "y": 589.9,
@@ -27269,7 +27491,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.19
+              "value": 4.61
             }
           ]
         },
@@ -27280,7 +27502,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "76a5bbc2-673f-4422-969b-7ff4cde2cebf",
+          "persistentUuid": "381b24fe-fcf0-4770-b3a3-0dfd9cf8073c",
           "width": 0,
           "x": 1041.1,
           "y": 737.3,
@@ -27301,7 +27523,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.11
+              "value": 2.85
             }
           ]
         },
@@ -27312,7 +27534,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f28fdb81-aebe-4112-b024-dd4afbbe649b",
+          "persistentUuid": "017c0006-a054-4792-91d6-9b8852918709",
           "width": 0,
           "x": 1189.7,
           "y": 938.4,
@@ -27333,7 +27555,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.16
+              "value": 5.08
             }
           ]
         },
@@ -27344,7 +27566,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "5ee76629-47df-4307-897a-fc05c1b53567",
+          "persistentUuid": "ae219119-8a03-4c69-a667-6d17e0e6d078",
           "width": 0,
           "x": 1354.5,
           "y": 621.1,
@@ -27365,7 +27587,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.15
+              "value": 5.96
             }
           ]
         },
@@ -27376,7 +27598,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "300953d1-7f37-4c9b-b05e-d43601408930",
+          "persistentUuid": "3d378f1e-6691-4c29-afe8-8fc5200587ae",
           "width": 0,
           "x": 1242.8,
           "y": 784.4,
@@ -27397,7 +27619,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.83
+              "value": 0.8
             }
           ]
         }
@@ -28214,6 +28436,366 @@
               ]
             }
           ]
+        },
+        {
+          "adaptCollisionMaskAutomatically": false,
+          "assetStoreId": "",
+          "name": "NewsArt",
+          "type": "Sprite",
+          "updateIfNotVisible": false,
+          "variables": [],
+          "effects": [],
+          "behaviors": [],
+          "animations": [
+            {
+              "name": "news-l1_0",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-l1_0.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "news-l1_1",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-l1_1.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "news-l1_2",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-l1_2.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "news-l2_0",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-l2_0.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "news-l2_1",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-l2_1.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "news-l2_2",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-l2_2.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "news-l3_0",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-l3_0.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "news-l3_1",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-l3_1.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "news-l3_2",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-l3_2.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "news-win0",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-win0.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "news-win1",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-win1.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "news-win2",
+              "useMultipleDirections": false,
+              "directions": [
+                {
+                  "looping": false,
+                  "timeBetweenFrames": 0.08,
+                  "sprites": [
+                    {
+                      "hasCustomCollisionMask": false,
+                      "image": "endings/news-win2.jpg",
+                      "points": [],
+                      "originPoint": {
+                        "name": "origine",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "centerPoint": {
+                        "automatic": true,
+                        "name": "centre",
+                        "x": 0,
+                        "y": 0
+                      },
+                      "customCollisionMask": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         }
       ],
       "objectsFolderStructure": {
@@ -28242,6 +28824,9 @@
           },
           {
             "objectName": "EventArt"
+          },
+          {
+            "objectName": "NewsArt"
           }
         ]
       },
@@ -31725,6 +32310,17 @@
                 "  ]),",
                 "];",
                 "P.CHANGELOG.find(x => x.v === \"2.1\").subs = [",
+                "  SUB(\"2.1.4\", \"2026-11-12\", [",
+                "    \"ฉากจบแบบใหม่เป็นรายการข่าวด่วน: ภาพข่าวเคลื่อนไหวของฉากจบทั้ง 12 แบบ แถบข่าวด่วน สัมภาษณ์สดตัวละคร พาดหัวจากหนังสือพิมพ์ทั่วโลก และตัววิ่งข่าวของคนในเรื่อง\",",
+                "    \"ทุกอย่างอยู่ในจอเดียวทั้งคอมพิวเตอร์และมือถือ ไม่ต้องเลื่อนอ่าน เรื่องของคุณกับสิ่งที่ทำได้จริงเปิดดูได้จากปุ่ม\",",
+                "    \"ชนะแล้วไม่แสดง Net Zero 100% อีก แต่บอกว่าถึงเป้าเร็วกว่ากำหนดเท่าไร ส่วนตอนแพ้บอกว่าไปถึง Net Zero กี่เปอร์เซ็นต์และ CO₂ ยังเหลือเท่าไร\",",
+                "    \"เสียงเปิดข่าวด่วน แตรตอนชนะ แล้วตามด้วยเพลงฉากจบ\",",
+                "  ], [",
+                "    \"A new ending as a breaking-news broadcast: animated news footage for all 12 endings, the breaking-news bar, a live interview with your character, headlines from papers around the world and a ticker with what happened to the people of the story.\",",
+                "    \"Everything fits on one screen on computers and phones, no scrolling; your story and what you can do in real life open from a button.\",",
+                "    \"A win no longer shows \\\"Net Zero 100%\\\": it shows how early you got there. A loss shows how far you got and how much CO₂ is still left.\",",
+                "    \"A news stinger, a fanfare when you win, then the ending music.\",",
+                "  ]),",
                 "  SUB(\"2.1.3\", \"2026-11-11\", [",
                 "    \"ภัยพิบัติเห็นบนแผนที่เป็น 3 มิติ: น้ำท่วมแผ่ไปบนพื้นดินแล้วค่อย ๆ ลด ไฟป่าลามเป็นแนวมีเปลวไฟกับควันลอยสูงและทิ้งรอยไหม้ ภัยแล้งดินแตกระแหง คลื่นความร้อนเรืองแสง น้ำเค็มรุกเข้ามาจากชายฝั่ง\",",
                 "    \"หน้าหนาวมีหิมะปกคลุมพื้นดินทางเหนือพร้อมหิมะตก\",",
@@ -35037,6 +35633,23 @@
                 "      : T(\"ไกรวิทย์ยังขายถ่านหินต่อไป และบอกว่าตัวเองเตือนแล้ว\", \"Krai keeps selling coal, and says he warned everyone\")},",
                 "  ];",
                 "  return {head:HEAD[key] || HEAD.l3, people, date:P.dateStr()};",
+                "};",
+                "/* 4.0: the news end screen — three papers from around the world (each with a line in the player's language), the",
+                "   news ticker, and how early (or how far short) the world got there. Data only: ui/modals.jsx (web) and the GDevelop",
+                "   end screen draw it. */",
+                "const JP_OPP = {win:\"クライ氏、自社グループをクリーンエネルギーに転換「市場は変わった」\", l2:\"クライ氏、世界のエネルギー政策の新トップに\",",
+                "  other:\"クライ氏は石炭販売を続行「警告はした」\"};",
+                "P.endNews = () => {",
+                "  const np = P.endPaper(), o = S.over, win = o === \"win\", th = S.lang === \"th\";",
+                "  const [fon, lung, opp] = np.people;",
+                "  const papers = [",
+                "    {id:\"wt\", name:\"THE WORLD TIMES\", head:np.head.en, gloss:th ? np.head.th : null},",
+                "    {id:\"th\", name:th ? \"ข่าวไทยรายวัน\" : \"Thai Daily News\", head:lung.t.th, gloss:th ? null : lung.t.en, who:\"lung\"},",
+                "    {id:\"jp\", name:\"地球新聞\", head:JP_OPP[win ? \"win\" : o === \"l2\" ? \"l2\" : \"other\"], gloss:L(opp.t), who:\"opp\"},",
+                "  ];",
+                "  const left = Math.max(0, P.TOTAL_TICKS - S.tick);   // months before the end of 2050",
+                "  const nz = Math.round(Math.max(0, Math.min(1, (36 - P.netCO2()) / 36)) * 100);",
+                "  return {papers, ticker:[L(fon.t), L(lung.t), L(opp.t)], early:win ? left : 0, nz, net:Math.max(0, P.netCO2()), date:np.date};",
                 "};",
                 "/* three things you can do in real life, from the branches you used most */",
                 "const ACTS = {",
@@ -38440,7 +39053,7 @@
                 "    set(\"Modal\", l => this.renderModal(l)); set(\"ModalScroll\", null, \"Modal\");",
                 "    set(\"Toast\", l => this.renderToast(l));",
                 "    set(\"Alerts\", l => { if (this.renderAlerts) this.renderAlerts(l); if (this.drawHudTips) this.drawHudTips(l); });   // 3.5: + HUD tooltips on top",
-                "    set(\"Train\", l => { if (this.renderTrain) this.renderTrain(l); if (this.renderSubs) this.renderSubs(l); });   // + narration subtitles on top",
+                "    set(\"Train\", l => { if (this.renderTrain) this.renderTrain(l); if (this.renderSubs) this.renderSubs(l); if (this.renderNewsTicker) this.renderNewsTicker(l); });   // + narration subtitles on top",
                 "    Audio.setScene(scene);",
                 "    if (kind === \"menu\") Audio.setMood(\"menu\"); else if (kind === \"game\") setTimeout(() => Audio.setMood(S.started ? Audio.gameMood() : \"calm\", true), 50);   // a new piece of music for the game",
                 "    P.Map.init(scene, kind === \"loading\" ? \"loader\" : kind);   // 3.8: the loading screen has the 3D globe too",
@@ -38467,6 +39080,7 @@
                 "    if (this.kind === \"game\" && P.Alerts && P.Alerts.busy()){ this._alT = (this._alT || 0) + dt; if (this._alT > .2){ this._alT = 0; k.dirty(\"Alerts\"); } }   // fading lines, pulsing pill",
                 "    if (this.kind === \"game\" && UIM.modal === \"intro\" && this.introTick) this.introTick();",
                 "    if (this.narrTick) this.narrTick();",
+                "    if (this.kind === \"game\" && this.newsTick && (S.over || this._newsVid)) this.newsTick();   // 4.0: news end screen (video, opening animation, ticker)",
                 "    if (this.kind === \"game\" && this._hudAnim) k.dirty(\"HUD\");   // numbers sliding to their new value",
                 "    if (this.kind === \"game\"){ const m = k.mouse; if (m.x !== this._mx || m.y !== this._my){ this._mx = m.x; this._my = m.y; if (P.hasKeyboard()) k.dirty(\"MapUI\"); }   // country name under the pointer",
                 "      if (this._edgeAnim){ this._eaT = (this._eaT || 0) + dt; if (this._eaT > .1){ this._eaT = 0; k.dirty(\"MapUI\"); } } }",
@@ -38510,6 +39124,12 @@
                 "  if (UIM.modal === \"skills\" || UIM.modal === \"charsel\") UIM.modal = null; UIM.evMin = false; UIM.evAt = performance.now(); const ml = k.L(\"ModalScroll\"); if (ml) ml.scroll = 0; k.dirty(); };",
                 "H.showEnd = () => {",
                 "  if (UIM.modal === \"skills\") UIM.modal = null; UIM.reward = null; const ml = k.L(\"ModalScroll\"); if (ml) ml.scroll = 0;",
+                "  UIM.endAt = performance.now(); UIM.newsSheet = false;   // 4.0: the news end screen's opening animation starts now",
+                "  // 4.0: the broadcast stinger, a fanfare (or a low hit) as the headline lands, then the ending music",
+                "  if (Audio.stopMusic) Audio.stopMusic();",
+                "  Audio.play(\"news\", {vol:.9});",
+                "  if (S.over === \"win\") Audio.play(\"fanfare\", {vol:.85, delay:1.3}); else Audio.play(\"impact\", {vol:.6, delay:1.1});",
+                "  setTimeout(() => { if (S.over && Audio.setMood) Audio.setMood(S.over === \"win\" ? \"win\" : \"lose\", true); }, 2300);",
                 "  const e = P.ENDINGS[S.over]; if (e && e.amb) setTimeout(() => { if (S.over) Audio.ambience(e.amb); }, 1200);   // each ending has its own soundscape",
                 "  k.dirty();",
                 "};",
@@ -39637,6 +40257,7 @@
                 "  l.blocks = !!kind; const sl = k.L(\"ModalScroll\");",
                 "  if (!kind){ k.clearSlave(\"ModalScroll\"); return; }",
                 "  if (kind === \"skills\") return this.renderSkills(l);",
+                "  if (kind === \"end\" && !S.mp && this.renderNews) return this.renderNews(l);   // 4.0: the breaking-news end screen (75-news.js)",
                 "  const ce = kind === \"event\" && P.currentEvent(), pw = Math.min(k.W - 24, ce && ce.country ? 900 : (WIDTH[kind] || 620));   // 3.7.4: dispute window is wider (VS) · 3.7.6: market too",
                 "  const px = kind === \"end\" ? k.W - pw - 40 : (k.W - pw) / 2;",
                 "  let ch = 0;",
@@ -42797,6 +43418,250 @@
                 "  };",
                 "}",
                 "P.Earth = {Photo, Globe};",
+                ""
+              ],
+              "parameterObjects": "",
+              "useStrict": true,
+              "eventsSheetExpanded": false
+            },
+            {
+              "type": "BuiltinCommonInstructions::JsCode",
+              "inlineCode": [
+                "/* Screens · 4.0 ฉากจบแบบข่าวด่วน: ภาพข่าวเคลื่อนไหว, แถบข่าวด่วน, หนังสือพิมพ์ทั่วโลก, ตัววิ่ง */",
+                "const P = window.P2050 = window.P2050 || {};",
+                "if (P.mods && P.mods.news) return;",
+                "(P.mods = P.mods || {}).news = 1;",
+                "/* =========================================================================",
+                "   Screens · 4.0 the end of the game as a breaking-news broadcast (like the website's EndModal, ui/modals.jsx)",
+                "   · the \"TV\": live footage of the ending — a looping video per ending (assets/endings/news-<kind>.mp4, recorded from",
+                "     the website's animated scenes in ui/endscene.jsx; the first frame is the NewsArt sprite, shown until the video plays)",
+                "   · lower third (BREAKING + headline), the grade or how far you got, the character's line typed out",
+                "   · headlines from three papers, four numbers, the ending's own story, a news ticker (layer \"Train\", every frame)",
+                "   · \"Your story\" opens a sheet on ModalScroll (story lines, papers on tall screens, what you can do in real life)",
+                "   Laid out on a fixed stage (1280×720 wide, 400×860 tall) scaled to the screen, so nothing ever scrolls.",
+                "   A win shows how early you got there (not \"Net Zero 100%\"); a loss shows how far you got and what is left.",
+                "   ========================================================================= */",
+                "const {Kit, S, t, L, W, UIM, Screens, Audio, CHAR, ENDINGS} = P;",
+                "const k = Kit;",
+                "const T = (th, en) => ({th, en});",
+                "const NT = {",
+                "  live:T(\"สด\", \"LIVE\"), breaking:T(\"ข่าวด่วน\", \"BREAKING\"), interview:T(\"สัมภาษณ์สด\", \"Live interview\"), world:T(\"พาดหัวจากทั่วโลก\", \"Headlines around the world\"),",
+                "  early:T(\"เร็วกว่ากำหนด\", \"early\"), lastYear:T(\"ทันในปีสุดท้าย\", \"in the final year\"), yr:T(\"ปี\", \"yr\"), mo:T(\"เดือน\", \"mo\"),",
+                "  reached:T(\"ถึงเป้า\", \"Reached\"), temp:T(\"อุณหภูมิโลก\", \"Warming\"), good:T(\"ปีที่ดี\", \"Good years\"), cut:T(\"ลด CO₂ ได้\", \"CO₂ cut\"), perYr:T(\"Gt/ปี\", \"Gt/yr\"),",
+                "  nz:T(\"ไปถึง Net Zero\", \"Way to Net Zero\"), left:T(\"CO₂ ยังเหลือ\", \"CO₂ still left\"), appr:T(\"ความนิยม\", \"Approval\"),",
+                "  why:{l1:T(\"โลกร้อนทะลุ 3°C\", \"Warming broke 3°C\"), l2:T(\"ความนิยมหมด\", \"Approval ran out\"), l3:T(\"สิ้นปี 2050 แต่ยังไม่ถึง Net Zero\", \"End of 2050, still short of Net Zero\")},",
+                "  story:T(\"เรื่องของคุณ\", \"Your story\"), papers:T(\"หนังสือพิมพ์\", \"Papers\"), real:T(\"สิ่งที่คุณทำได้จริงวันนี้\", \"What you can do in real life today\"),",
+                "};",
+                "const sceneKind = () => { const o = S.over, tier = P.endTier ? P.endTier(P.goodYears ? P.goodYears() : 0) : 1; return (o === \"win\" ? \"win\" : o + \"_\") + Math.max(0, Math.min(2, tier)); };",
+                "const TEXT_SCENES = [\"win0\", \"l2_0\", \"l2_1\", \"l2_2\", \"l3_0\", \"l3_1\"];   // scenes with words in them have an English recording too",
+                "const ease = f => 1 - Math.pow(1 - Math.max(0, Math.min(1, f)), 3);",
+                "",
+                "/* ---- the looping video on the NewsArt sprite ---- */",
+                "const vids = {};",
+                "function videoTexture(name){",
+                "  if (vids[name]) return vids[name];",
+                "  // the export renames resource files (assets/endings/news-x.mp4 → news-x.mp4): look the file up by the resource's name",
+                "  let url = `assets/endings/${name}.mp4`;",
+                "  try {",
+                "    const g = Screens.scene && Screens.scene.getGame(), gd = g && g.getGameData && g.getGameData();",
+                "    const r = gd && gd.resources && (gd.resources.resources || []).find(x => x.name === url); if (r && r.file) url = r.file;",
+                "    const rl = g && (g.getResourceLoader ? g.getResourceLoader() : g.getResourcesLoader && g.getResourcesLoader()); if (rl && rl.getFullUrl) url = rl.getFullUrl(url);",
+                "  } catch(e){}",
+                "  const v = document.createElement(\"video\");",
+                "  v.muted = true; v.loop = true; v.playsInline = true; v.setAttribute(\"playsinline\", \"\"); v.setAttribute(\"muted\", \"\"); v.preload = \"auto\"; v.crossOrigin = \"anonymous\"; v.src = url;",
+                "  const rec = vids[name] = {v, tex:null, ok:false};",
+                "  v.addEventListener(\"canplay\", () => { if (!rec.tex){ try { rec.tex = PIXI.Texture.from(v, {resourceOptions:{autoPlay:true, updateFPS:30}}); rec.ok = true; k.dirty(\"Modal\"); } catch(e){ rec.ok = false; } } });",
+                "  v.addEventListener(\"error\", () => { rec.ok = false; });",
+                "  const p = v.play(); if (p && p.catch) p.catch(() => {});",
+                "  return rec;",
+                "}",
+                "function stopVideos(except){ for (const n in vids) if (n !== except){ try { vids[n].v.pause(); } catch(e){} } }",
+                "",
+                "/* ---- stage: design coordinates → screen ---- */",
+                "function stage(){",
+                "  const wide = k.W / k.H >= 1.12, sw = wide ? 1280 : 400, sh = wide ? 720 : 860, s = Math.min(k.W / sw, k.H / sh);",
+                "  return {wide, s, ox:(k.W - sw * s) / 2, oy:(k.H - sh * s) / 2, sw, sh};",
+                "}",
+                "",
+                "Screens.renderNews = function(l){",
+                "  const G = stage(), {s, ox, oy, wide} = G, X = v => ox + v * s, Y = v => oy + v * s, Z = v => v * s;",
+                "  const o = S.over, win = o === \"win\", th = S.lang === \"th\", now = performance.now(), tt = (now - (UIM.endAt || now)) / 1000;",
+                "  const nw = P.endNews ? P.endNews() : {papers:[], ticker:[], early:0, nz:0, net:P.netCO2(), date:P.dateStr()};",
+                "  const e2 = S.v2 && P.ending2 ? P.ending2() : null, kind = sceneKind(), ng = P.goodYears ? P.goodYears() : 0, ny = (S.years || []).length;",
+                "  const im = P.impactSummary ? P.impactSummary() : null;",
+                "  const earlyTxt = !win ? \"\" : nw.early >= 12 ? `${L(NT.early)} ${Math.floor(nw.early / 12)} ${L(NT.yr)}${nw.early % 12 ? ` ${nw.early % 12} ${L(NT.mo)}` : \"\"}` : L(NT.lastYear);",
+                "  const head = win ? `${t(\"winTitle\")} · ${earlyTxt}` : `${t(o + \"Title\")} · ${L(NT.why[o] || NT.why.l3)}`;",
+                "  const quote = `“${L(P.endQuote ? P.endQuote() : T(\"\", \"\"))}”`;",
+                "  k.rect(l, 0, 0, k.W, k.H, \"#04070b\", {under:true});",
+                "  // the TV",
+                "  const tv = wide ? {x:28, y:22, w:840, h:473} : {x:12, y:12, w:376, h:236};",
+                "  const tx = X(tv.x), ty = Y(tv.y), tw = Z(tv.w), thh = Z(tv.h), on = ease(tt / .5);",
+                "  const name = `news-${kind}${!th && TEXT_SCENES.includes(kind) ? \"-en\" : \"\"}`;",
+                "  let go = null; try { go = k.sprite(l, \"NewsArt\", `news-${kind}`, tx, ty + thh * (1 - on) / 2, tw, Math.max(1, thh * on)); } catch(e){}",
+                "  const rec = videoTexture(name); stopVideos(name);",
+                "  if (go && go.getZOrder() !== -1.5) go.setZOrder(-1.5);   // above the backdrop (painter -2), under every panel and text",
+                "  if (go && rec.ok && rec.tex){ const spr = go.getRendererObject && go.getRendererObject(); if (spr && spr.texture !== rec.tex){ spr.texture = rec.tex; go.setWidth(tw * k.K); go.setHeight(Math.max(1, thh * on) * k.K); } }",
+                "  this._newsVid = rec;",
+                "  if (UIM.newsSheet) return this.newsSheet(l, G, nw, im, th);",
+                "  // top: LIVE + channel",
+                "  const blink = Math.floor(tt / .6) % 2 === 0;",
+                "  k.rect(l, tx + Z(12), ty + Z(10), Z(52), Z(22), \"#e3262e\", {r:Z(4), a:blink ? 1 : .55});",
+                "  k.text(l, `● ${L(NT.live)}`, tx + Z(12), ty + Z(12), {font:\"dispS\", size:Z(12.5), color:\"#ffffff\", w:Z(52), align:\"center\", max:1});",
+                "  const ch = `GCT NEWS · ${nw.date} · ${t(\"mode_\" + S.mode)}`, cw = k.textW(ch, {font:\"mono\", size:Z(wide ? 12 : 10)}) + Z(16);",
+                "  k.rect(l, tx + Z(70), ty + Z(10), cw, Z(22), \"#000000\", {r:Z(4), a:.55});",
+                "  k.text(l, ch, tx + Z(78), ty + Z(13), {font:\"mono\", size:Z(wide ? 12 : 10), color:\"#e6f0ee\", max:1});",
+                "  // picture-in-picture: the character",
+                "  const pip = wide ? 120 : 64, pa = ease((tt - 1.1) / .5);",
+                "  if (pa > 0){ const px = tx + tw - Z(pip + 14), py = ty + Z(10);",
+                "    k.rect(l, px - Z(3), py - Z(3), Z(pip + 6), Z(pip + (wide ? 26 : 6)), \"#0e1d24\", {r:Z(10), stroke:\"#ffffff\", sw:2, a:pa});",
+                "    W.portrait(l, px, py, Z(pip), S.char, {r:Z(8), a:pa});",
+                "    if (wide) k.text(l, `${L(NT.interview)} · ${L(CHAR[S.char].person)}`, px, py + Z(pip + 3), {size:Z(11.5), color:\"#e6f0ee\", w:Z(pip), max:1, a:pa}); }",
+                "  // lower third",
+                "  const la = ease((tt - .55) / .55), bkS = wide ? 21 : 12, hdS = wide ? 26 : 14.5, l3y = ty + thh - Z(wide ? 84 : 46);",
+                "  if (la > 0){",
+                "    const bkW = k.textW(L(NT.breaking), {font:\"disp\", size:Z(bkS)}) + Z(wide ? 32 : 16), bh = Z(wide ? 44 : 26);",
+                "    const hdW = Math.min(tw - bkW, k.textW(head, {font:\"disp\", size:Z(hdS)}) + Z(wide ? 36 : 20)) * la;",
+                "    k.rect(l, tx, l3y, bkW * Math.min(1, la * 2), bh, \"#e3262e\");",
+                "    k.text(l, L(NT.breaking), tx, l3y + (bh - Z(bkS) * 1.45) / 2, {font:\"disp\", size:Z(bkS), color:\"#ffffff\", w:bkW, align:\"center\", max:1});",
+                "    k.rect(l, tx + bkW, l3y, hdW, bh, \"#ffffff\", {a:.96});",
+                "    if (la > .6) k.text(l, head, tx + bkW + Z(wide ? 18 : 10), l3y + (bh - Z(hdS) * 1.45) / 2, {font:\"disp\", size:Z(hdS), color:\"#0b0f14\", w:hdW - Z(wide ? 24 : 14), max:1});",
+                "    const chip = win ? L(ENDINGS.win.grades[S.grade || \"A\"]) : `${L(NT.nz)} ${nw.nz}%`, cS = wide ? 15 : 11.5, cw2 = k.textW(chip, {font:\"dispS\", size:Z(cS)}) + Z(wide ? 28 : 16), ch2 = Z(wide ? 30 : 20);",
+                "    k.rect(l, tx, l3y + bh, cw2, ch2, win ? \"gold\" : \"warn\");",
+                "    k.text(l, chip, tx, l3y + bh + (ch2 - Z(cS) * 1.45) / 2, {font:\"dispS\", size:Z(cS), color:\"#1a1300\", w:cw2, align:\"center\", max:1});",
+                "    if (wide){ const n = Math.floor(Math.max(0, tt - 1.2) * 28), q = [...quote].slice(0, n).join(\"\"), qw = Math.min(tw - cw2, k.textW(quote, {size:Z(15)}) + Z(28));",
+                "      k.rect(l, tx + cw2, l3y + bh, qw, ch2, \"#0b0f14\", {a:.9}); k.text(l, q, tx + cw2 + Z(14), l3y + bh + (ch2 - Z(15) * 1.45) / 2, {size:Z(15), color:\"#e6f0ee\", w:qw - Z(20), max:1}); }",
+                "  }",
+                "  // numbers",
+                "  const cnt = (v, d = 0, delay = .6) => (v * ease((tt - delay) / 1.1)).toFixed(d);",
+                "  const stats = win ? [",
+                "    [L(NT.reached), nw.date, \"fg\"], [L(NT.temp), `+${cnt(S.temp, 2)}°C`, \"fg\"], [L(NT.good), `${cnt(ng)} / ${ny}`, \"good\"],",
+                "    im && im.saved > .1 ? [L(NT.cut), `${cnt(im.saved, 1)} ${L(NT.perYr)}`, \"fg\"] : [t(\"skillsTitle\"), `${Object.keys(S.owned).length}/${P.SKILLS.length}`, \"fg\"],",
+                "  ] : [",
+                "    [L(NT.nz), `${cnt(nw.nz)}%`, \"warn\"], [L(NT.left), `${cnt(nw.net, 1)} Gt`, \"fg\"],",
+                "    o === \"l2\" ? [L(NT.appr), `${Math.max(0, S.appr).toFixed(0)}%`, \"bad\"] : [L(NT.temp), `+${cnt(S.temp, 2)}°C`, o === \"l1\" ? \"bad\" : \"fg\"],",
+                "    [L(NT.good), `${cnt(ng)} / ${ny}`, \"fg\"],",
+                "  ];",
+                "  const statBox = (x0, y0, w0, h0) => { const cw3 = (w0 - 8) / 2;",
+                "    stats.forEach(([a, b, c], i) => { const sx = X(x0 + (i % 2) * (cw3 + 8)), sy = Y(y0 + Math.floor(i / 2) * (h0 + 8)), al = ease((tt - .9 - i * .12) / .45);",
+                "      k.rect(l, sx, sy + Z(8) * (1 - al), Z(cw3), Z(h0), \"panel\", {r:Z(10), stroke:\"line\", a:al});",
+                "      k.text(l, a, sx + Z(12), sy + Z(6), {size:Z(12), color:\"muted\", w:Z(cw3 - 20), max:1, a:al});",
+                "      k.text(l, b, sx + Z(12), sy + Z(22), {font:\"dispS\", size:Z(20), color:c, w:Z(cw3 - 20), max:1, a:al}); }); };",
+                "  // papers",
+                "  const paper = (p, x0, y0, w0, i, fly = true) => {",
+                "    const a = fly ? ease((tt - 1.6 - i * .25) / .6) : 1, dx = fly ? (1 - a) * 220 : 0, bg = [\"#f4efe3\", \"#fffdf7\", \"#f6f3ee\"][i] || \"#f4efe3\";",
+                "    const nameFont = p.id === \"wt\" ? \"logo\" : \"dispS\", hs = wide ? 16 : 15;",
+                "    const hh = k.textH(p.head, {font:\"dispS\", size:Z(hs), w:Z(w0 - 24), lh:1.3}), gh = p.gloss ? k.textH(`“${p.gloss}”`, {size:Z(11.5), w:Z(w0 - 24), lh:1.35}) : 0, ph = Z(30) + hh + (gh ? gh + Z(4) : 0) + Z(8);",
+                "    const px = X(x0 + dx), py = Y(y0);",
+                "    if (p.id === \"th\") k.rect(l, px, py - Z(5), Z(w0), Z(5), \"#c8402e\", {a});",
+                "    k.rect(l, px, py, Z(w0), ph, bg, {a, r:Z(2)});",
+                "    k.text(l, p.name, px + Z(12), py + Z(7), {font:nameFont, size:Z(13.5), color:p.id === \"th\" ? \"#c8402e\" : \"#1b1a17\", max:1, a});",
+                "    k.text(l, p.head, px + Z(12), py + Z(26), {font:\"dispS\", size:Z(hs), color:\"#1b1a17\", w:Z(w0 - 24), lh:1.3, a});",
+                "    if (gh) k.text(l, `“${p.gloss}”`, px + Z(12), py + Z(30) + hh, {size:Z(11.5), color:\"#5a564e\", w:Z(w0 - 24), lh:1.35, a});",
+                "    return ph / s + 10;",
+                "  };",
+                "  const story = (x0, y0, w0, lines) => {",
+                "    const a = ease((tt - 1.3) / .5);",
+                "    if (e2){ k.text(l, L(e2.title), X(x0), Y(y0), {font:\"dispS\", size:Z(19), color:win ? \"good\" : \"#ff9c90\", w:Z(w0), max:1, a});",
+                "      k.text(l, L(e2.body), X(x0), Y(y0 + 28), {size:Z(14), color:\"#c9dbd8\", w:Z(w0), lh:1.5, max:lines, a}); }",
+                "    else k.text(l, t(win ? \"winBody\" + (S.grade || \"A\") : o + \"Body\"), X(x0), Y(y0), {size:Z(14), color:\"#c9dbd8\", w:Z(w0), lh:1.5, max:lines, a});",
+                "  };",
+                "  const moreBtn = (x0, y0, label) => W.btn(l, \"nw-more\", X(x0), Y(y0), label, () => { Audio.play(\"page\"); UIM.newsSheet = true; const ml = k.L(\"ModalScroll\"); if (ml) ml.scroll = 0; k.dirty(); }, {kind:\"ghost\", size:Z(14), h:Z(44)});",
+                "  // reward + score + buttons",
+                "  const rw = UIM.reward;",
+                "  const reward = (x0, y0) => { let cx = X(x0); const yy = Y(y0);",
+                "    if (!rw) cx += k.text(l, `[[loader]] ${t(\"rewardWait\")}`, cx, yy, {size:Z(13), color:\"muted\", iconColor:\"muted\", max:1}).w + Z(12);",
+                "    else if (rw.guest) cx += k.text(l, `${t(\"rewardGuest\")} · XP +${rw.xp}`, cx, yy, {size:Z(13), color:\"muted\", max:1}).w + Z(12);",
+                "    else if (rw.error) cx += k.text(l, `${t(\"rewardFail\")} · XP +${rw.xp || 0}`, cx, yy, {size:Z(13), color:\"muted\", max:1}).w + Z(12);",
+                "    else { cx += W.terra(l, cx, yy, `+${rw.terra}`, {size:Z(15), color:\"good\"}) + Z(12); cx = W.runs(l, cx, yy, [[`XP +${rw.xp}`, {font:\"monoB\", size:Z(14), color:\"accent\"}]]) + Z(12);",
+                "      if (rw.levelUp) cx += k.text(l, `[[star]] ${t(\"levelUp\")} ${rw.level}`, cx, yy, {size:Z(13), color:\"gold\", iconColor:\"gold\"}).w + Z(12); }",
+                "    k.text(l, `${t(\"finalScore\")} ${P.score().toLocaleString()}`, cx, yy + Z(1), {font:\"mono\", size:Z(12.5), color:\"muted\", max:1}); };",
+                "  const buttons = (xr, y0, full) => {",
+                "    const bs = {size:Z(15), h:Z(46)}, items = [[\"tomenu\", t(\"mainMenu\"), () => Screens.toMenu(), \"ghost\"],",
+                "      [\"restart\", t(\"restart\"), () => { stopVideos(); Audio.stopAmb(300); UIM.worldSel = !!S.world; UIM.reward = null; UIM.newsSheet = false; UIM.modal = \"charsel\"; S.over = null; S.started = false; P.newGame(S.lang, {mode:S.mode, char:S.char}); P.Map.refresh(); k.dirty(); }, win ? \"ghost\" : \"primary\"]];",
+                "    if (win) items.push([\"playon\", `[[infinity]] ${t(\"playOn\")}`, () => { stopVideos(); UIM.newsSheet = false; Screens.continueWorld(); }, \"gold\"]);",
+                "    if (full){ const bw = (Z(full) - Z(8) * (items.length - 1)) / items.length; items.forEach(([id, lab, fn, kd], i) => W.btn(l, id, X(xr) + i * (bw + Z(8)), Y(y0), lab, fn, {...bs, kind:kd, w:bw})); return; }",
+                "    let bx = X(xr); for (let i = items.length - 1; i >= 0; i--){ const [id, lab, fn, kd] = items[i]; const w0 = W.btnW(lab, bs); bx -= w0; W.btn(l, id, bx, Y(y0), lab, fn, {...bs, kind:kd}); bx -= Z(8); } };",
+                "  if (wide){",
+                "    k.text(l, L(NT.world), X(888), Y(22), {font:\"dispS\", size:Z(14), color:\"muted\", max:1});",
+                "    let py = 46; nw.papers.forEach((p, i) => { py += paper(p, 888, py, 364, i); });",
+                "    statBox(888, 495 - 2 * 52 - 8, 364, 52);",
+                "    story(28, 512, 700, 2);",
+                "    moreBtn(740, 516, `${L(NT.story)} ›`);",
+                "    reward(28, 668);",
+                "    buttons(1252, 654);",
+                "  } else {",
+                "    story(16, 262, 368, 3);",
+                "    // the character's line",
+                "    const qy = 352; k.rect(l, X(16), Y(qy), Z(368), Z(58), \"panel\", {r:Z(12), stroke:\"line\"}); W.portrait(l, X(26), Y(qy + 9), Z(40), S.char);",
+                "    k.text(l, L(CHAR[S.char].person), X(76), Y(qy + 7), {font:\"dispS\", size:Z(12.5), color:\"accent\", max:1}); k.text(l, quote, X(76), Y(qy + 25), {size:Z(13), w:Z(300), max:2, lh:1.35});",
+                "    if (nw.papers[0]) paper(nw.papers[0], 16, 424, 368, 0, false);",
+                "    statBox(16, 548, 368, 52);",
+                "    reward(16, 746);",
+                "    moreBtn(260, 726, `${L(NT.papers)} · ${L(NT.story)} ›`);",
+                "    buttons(16, 778, 368);",
+                "  }",
+                "  this._newsTicker = {y:Y(wide ? 596 : 704), h:Z(wide ? 40 : 34), s, items:nw.ticker};",
+                "  k.clearSlave(\"ModalScroll\");",
+                "};",
+                "/* the sheet: your story, the papers (tall screens), what you can do in real life */",
+                "Screens.newsSheet = function(l, G, nw, im, th){",
+                "  const {s, wide} = G, Y = v => G.oy + v * s, Z = v => v * s;",
+                "  {",
+                "    const sw = wide ? Math.min(k.W - 80, Z(760)) : k.W - Z(24), sx = (k.W - sw) / 2, sy = wide ? Y(56) : Y(12), shh = wide ? Math.min(k.H - sy - 40, Z(600)) : k.H - Y(12) * 2 - Z(0);",
+                "    k.rect(l, 0, 0, k.W, k.H, \"#020609\", {a:.6});",
+                "    k.hit(l, \"nw-veil\", 0, 0, k.W, k.H, () => { Audio.play(\"close\"); UIM.newsSheet = false; k.dirty(); }, {cursor:false});",
+                "    let ch = 0;",
+                "    k.slave(\"ModalScroll\", sl => {",
+                "      const x = 22, w = sw - 44; let y = 18;",
+                "      if (!wide){ W.h3(sl, L(NT.world), x, y, {w}); y += 22; nw.papers.forEach((p, i) => { const r = sheetPaper(sl, p, x, y, w, i); y += r + 10; }); y += 4; }",
+                "      W.h3(sl, L(NT.story), x, y, {w}); y += 22;",
+                "      const lines = [], st = P.endStory();",
+                "      if (im && im.saved > .1) lines.push(th ? `[[leaf]] เทียบกับถ้าไม่ทำอะไรเลย คุณช่วยลด CO₂ ได้ ${im.saved.toFixed(1)} Gt ต่อปี และโลกเย็นกว่า ${Math.max(0, im.bauTemp - S.temp).toFixed(2)}°C` : `[[leaf]] Compared with doing nothing, you cut CO₂ by ${im.saved.toFixed(1)} Gt a year and kept the world ${Math.max(0, im.bauTemp - S.temp).toFixed(2)}°C cooler`);",
+                "      if (st.best) lines.push(`[[heart-handshake]] ${t(\"storyBest\")}: ${P.cname(st.best)}`);",
+                "      if (st.worst) lines.push(`[[${P.HAZARDS[st.worst.type].icon}]] ${t(\"storyWorst\")}: ${L(P.HAZARDS[st.worst.type].name)} · ${P.cname(st.worst.c)} · ${P.dateStr(st.worst.tick)}`);",
+                "      st.dec.forEach(d => lines.push(`[[git-branch]] ${L(d.title)} → ${L(d.label)}`));",
+                "      { const os = P.oreSummary ? P.oreSummary() : null; if (os && os.used) lines.push(`[[$ore]] ${t(\"oreUsed\")} ${os.used}${os.top ? ` · ${t(\"oreMostFrom\")} ${P.cname(os.top)} ${os.share}%` : \"\"}`); }",
+                "      if (!lines.length) lines.push(t(\"storyNone\"));",
+                "      for (const x2 of lines) y += k.text(sl, x2, x, y, {size:13, w, color:\"fg\", iconColor:\"accent\"}).h + 4;",
+                "      y += 10;",
+                "      if (P.realActions){ W.h3(sl, L(NT.real), x, y, {w}); y += 22;",
+                "        for (const a of P.realActions()){ const th2 = k.textH(L(a.t), {size:13, w:w - 54, lh:1.45}), rh2 = th2 + 18;",
+                "          k.rect(sl, x, y, w, rh2, \"good\", {r:10, a:.1, stroke:\"good\", sa:.3}); k.icon(sl, a.icon, x + 11, y + 9, 20, \"good\"); k.text(sl, L(a.t), x + 40, y + 9, {size:13, w:w - 54, lh:1.45}); y += rh2 + 7; } }",
+                "      ch = y + 16;",
+                "      sl.frame(sx, sy, {x:sx, y:sy, w:sw, h:Math.min(shh, ch)}, ch);",
+                "    });",
+                "    const hh = Math.min(shh, ch);",
+                "    k.rect(l, sx, sy, sw, hh, \"#08141a\", {r:14, stroke:\"line\"});",
+                "    k.hit(l, \"nw-box\", sx, sy, sw, hh, () => {}, {cursor:false});",
+                "    W.hbtn(l, \"nw-close\", sx + sw - 40, sy + 10, \"x\", () => { Audio.play(\"close\"); UIM.newsSheet = false; k.dirty(); }, {color:\"muted\"});",
+                "  }",
+                "};",
+                "function sheetPaper(l, p, x, y, w, i){",
+                "  const bg = [\"#f4efe3\", \"#fffdf7\", \"#f6f3ee\"][i] || \"#f4efe3\", hh = k.textH(p.head, {font:\"dispS\", size:15, w:w - 24, lh:1.3}), gh = p.gloss ? k.textH(`“${p.gloss}”`, {size:11.5, w:w - 24, lh:1.35}) : 0, ph = 30 + hh + (gh ? gh + 4 : 0) + 8;",
+                "  k.rect(l, x, y, w, ph, bg, {r:2, bg:true});",
+                "  k.text(l, p.name, x + 12, y + 7, {font:p.id === \"wt\" ? \"logo\" : \"dispS\", size:13.5, color:p.id === \"th\" ? \"#c8402e\" : \"#1b1a17\", max:1});",
+                "  k.text(l, p.head, x + 12, y + 26, {font:\"dispS\", size:15, color:\"#1b1a17\", w:w - 24, lh:1.3});",
+                "  if (gh) k.text(l, `“${p.gloss}”`, x + 12, y + 30 + hh, {size:11.5, color:\"#5a564e\", w:w - 24, lh:1.35});",
+                "  return ph;",
+                "}",
+                "/* the ticker band (layer \"Train\", redrawn every frame while the end screen shows) */",
+                "Screens.renderNewsTicker = function(l){",
+                "  const nt = this._newsTicker; if (!nt || !S.over || S.mp || UIM.newsSheet || UIM.kind() !== \"end\") return;",
+                "  const {y, h, s, items} = nt; if (!items || !items.length) return;",
+                "  k.rect(l, 0, y, k.W, h, \"#e3262e\");",
+                "  const fs = (h > 36 * s ? 16 : 14) * s, gap = 48 * s, text = items.join(\"     •     \"), tw = k.textW(text, {font:\"dispS\", size:fs}) + gap;",
+                "  // (no \"GCT NEWS\" box at the left: every text sits above every box on a layer, so the running text would cover it)",
+                "  const off = ((performance.now() / 1000) * 60 * s) % tw;",
+                "  for (let x = -off; x < k.W; x += tw) k.text(l, text, x, y + (h - fs * 1.45) / 2, {font:\"dispS\", size:fs, color:\"#ffffff\", max:1});",
+                "};",
+                "/* every frame: the video's picture, the opening animation (about 4 s), the LIVE light and the ticker */",
+                "Screens.newsTick = function(){",
+                "  if (UIM.kind() !== \"end\" || S.mp){ if (this._newsVid){ stopVideos(); this._newsVid = null; } return; }",
+                "  const r = this._newsVid; if (r && r.tex && r.tex.baseTexture && r.tex.baseTexture.resource && r.tex.baseTexture.resource.update) r.tex.baseTexture.resource.update();",
+                "  const tt = (performance.now() - (UIM.endAt || 0)) / 1000;",
+                "  if (tt < 4.5) k.dirty(\"Modal\"); else { const b = Math.floor(tt / .6); if (b !== this._nwBlink){ this._nwBlink = b; k.dirty(\"Modal\"); } }",
+                "  k.dirty(\"Train\");",
+                "};",
                 ""
               ],
               "parameterObjects": "",

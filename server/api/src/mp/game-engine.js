@@ -2593,6 +2593,17 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
   ]),
 ];
 P.CHANGELOG.find(x => x.v === "2.1").subs = [
+  SUB("2.1.4", "2026-11-12", [
+    "ฉากจบแบบใหม่เป็นรายการข่าวด่วน: ภาพข่าวเคลื่อนไหวของฉากจบทั้ง 12 แบบ แถบข่าวด่วน สัมภาษณ์สดตัวละคร พาดหัวจากหนังสือพิมพ์ทั่วโลก และตัววิ่งข่าวของคนในเรื่อง",
+    "ทุกอย่างอยู่ในจอเดียวทั้งคอมพิวเตอร์และมือถือ ไม่ต้องเลื่อนอ่าน เรื่องของคุณกับสิ่งที่ทำได้จริงเปิดดูได้จากปุ่ม",
+    "ชนะแล้วไม่แสดง Net Zero 100% อีก แต่บอกว่าถึงเป้าเร็วกว่ากำหนดเท่าไร ส่วนตอนแพ้บอกว่าไปถึง Net Zero กี่เปอร์เซ็นต์และ CO₂ ยังเหลือเท่าไร",
+    "เสียงเปิดข่าวด่วน แตรตอนชนะ แล้วตามด้วยเพลงฉากจบ",
+  ], [
+    "A new ending as a breaking-news broadcast: animated news footage for all 12 endings, the breaking-news bar, a live interview with your character, headlines from papers around the world and a ticker with what happened to the people of the story.",
+    "Everything fits on one screen on computers and phones, no scrolling; your story and what you can do in real life open from a button.",
+    "A win no longer shows \"Net Zero 100%\": it shows how early you got there. A loss shows how far you got and how much CO₂ is still left.",
+    "A news stinger, a fanfare when you win, then the ending music.",
+  ]),
   SUB("2.1.3", "2026-11-11", [
     "ภัยพิบัติเห็นบนแผนที่เป็น 3 มิติ: น้ำท่วมแผ่ไปบนพื้นดินแล้วค่อย ๆ ลด ไฟป่าลามเป็นแนวมีเปลวไฟกับควันลอยสูงและทิ้งรอยไหม้ ภัยแล้งดินแตกระแหง คลื่นความร้อนเรืองแสง น้ำเค็มรุกเข้ามาจากชายฝั่ง",
     "หน้าหนาวมีหิมะปกคลุมพื้นดินทางเหนือพร้อมหิมะตก",
@@ -5820,6 +5831,23 @@ P.endPaper = () => {
       : T("ไกรวิทย์ยังขายถ่านหินต่อไป และบอกว่าตัวเองเตือนแล้ว", "Krai keeps selling coal, and says he warned everyone")},
   ];
   return {head:HEAD[key] || HEAD.l3, people, date:P.dateStr()};
+};
+/* 4.0: the news end screen — three papers from around the world (each with a line in the player's language), the
+   news ticker, and how early (or how far short) the world got there. Data only: ui/modals.jsx (web) and the GDevelop
+   end screen draw it. */
+const JP_OPP = {win:"クライ氏、自社グループをクリーンエネルギーに転換「市場は変わった」", l2:"クライ氏、世界のエネルギー政策の新トップに",
+  other:"クライ氏は石炭販売を続行「警告はした」"};
+P.endNews = () => {
+  const np = P.endPaper(), o = S.over, win = o === "win", th = S.lang === "th";
+  const [fon, lung, opp] = np.people;
+  const papers = [
+    {id:"wt", name:"THE WORLD TIMES", head:np.head.en, gloss:th ? np.head.th : null},
+    {id:"th", name:th ? "ข่าวไทยรายวัน" : "Thai Daily News", head:lung.t.th, gloss:th ? null : lung.t.en, who:"lung"},
+    {id:"jp", name:"地球新聞", head:JP_OPP[win ? "win" : o === "l2" ? "l2" : "other"], gloss:L(opp.t), who:"opp"},
+  ];
+  const left = Math.max(0, P.TOTAL_TICKS - S.tick);   // months before the end of 2050
+  const nz = Math.round(Math.max(0, Math.min(1, (36 - P.netCO2()) / 36)) * 100);
+  return {papers, ticker:[L(fon.t), L(lung.t), L(opp.t)], early:win ? left : 0, nz, net:Math.max(0, P.netCO2()), date:np.date};
 };
 /* three things you can do in real life, from the branches you used most */
 const ACTS = {

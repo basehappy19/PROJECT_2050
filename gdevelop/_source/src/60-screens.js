@@ -353,7 +353,7 @@ Object.assign(Screens, {
     set("Modal", l => this.renderModal(l)); set("ModalScroll", null, "Modal");
     set("Toast", l => this.renderToast(l));
     set("Alerts", l => { if (this.renderAlerts) this.renderAlerts(l); if (this.drawHudTips) this.drawHudTips(l); });   // 3.5: + HUD tooltips on top
-    set("Train", l => { if (this.renderTrain) this.renderTrain(l); if (this.renderSubs) this.renderSubs(l); });   // + narration subtitles on top
+    set("Train", l => { if (this.renderTrain) this.renderTrain(l); if (this.renderSubs) this.renderSubs(l); if (this.renderNewsTicker) this.renderNewsTicker(l); });   // + narration subtitles on top
     Audio.setScene(scene);
     if (kind === "menu") Audio.setMood("menu"); else if (kind === "game") setTimeout(() => Audio.setMood(S.started ? Audio.gameMood() : "calm", true), 50);   // a new piece of music for the game
     P.Map.init(scene, kind === "loading" ? "loader" : kind);   // 3.8: the loading screen has the 3D globe too
@@ -380,6 +380,7 @@ Object.assign(Screens, {
     if (this.kind === "game" && P.Alerts && P.Alerts.busy()){ this._alT = (this._alT || 0) + dt; if (this._alT > .2){ this._alT = 0; k.dirty("Alerts"); } }   // fading lines, pulsing pill
     if (this.kind === "game" && UIM.modal === "intro" && this.introTick) this.introTick();
     if (this.narrTick) this.narrTick();
+    if (this.kind === "game" && this.newsTick && (S.over || this._newsVid)) this.newsTick();   // 4.0: news end screen (video, opening animation, ticker)
     if (this.kind === "game" && this._hudAnim) k.dirty("HUD");   // numbers sliding to their new value
     if (this.kind === "game"){ const m = k.mouse; if (m.x !== this._mx || m.y !== this._my){ this._mx = m.x; this._my = m.y; if (P.hasKeyboard()) k.dirty("MapUI"); }   // country name under the pointer
       if (this._edgeAnim){ this._eaT = (this._eaT || 0) + dt; if (this._eaT > .1){ this._eaT = 0; k.dirty("MapUI"); } } }
@@ -423,6 +424,12 @@ H.showEvent = () => { if (S.cev && CE_AMB[S.cev.id]) Audio.ambience(CE_AMB[S.cev
   if (UIM.modal === "skills" || UIM.modal === "charsel") UIM.modal = null; UIM.evMin = false; UIM.evAt = performance.now(); const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0; k.dirty(); };
 H.showEnd = () => {
   if (UIM.modal === "skills") UIM.modal = null; UIM.reward = null; const ml = k.L("ModalScroll"); if (ml) ml.scroll = 0;
+  UIM.endAt = performance.now(); UIM.newsSheet = false;   // 4.0: the news end screen's opening animation starts now
+  // 4.0: the broadcast stinger, a fanfare (or a low hit) as the headline lands, then the ending music
+  if (Audio.stopMusic) Audio.stopMusic();
+  Audio.play("news", {vol:.9});
+  if (S.over === "win") Audio.play("fanfare", {vol:.85, delay:1.3}); else Audio.play("impact", {vol:.6, delay:1.1});
+  setTimeout(() => { if (S.over && Audio.setMood) Audio.setMood(S.over === "win" ? "win" : "lose", true); }, 2300);
   const e = P.ENDINGS[S.over]; if (e && e.amb) setTimeout(() => { if (S.over) Audio.ambience(e.amb); }, 1200);   // each ending has its own soundscape
   k.dirty();
 };

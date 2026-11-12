@@ -33,7 +33,12 @@ const FLAGS = fs.existsSync(`${OUT}/assets/flags`) ? fs.readdirSync(`${OUT}/asse
 for (const f of FLAGS) img(`flags/${f}`, `assets/flags/${f}`);
 const PORTRAITS = fs.readdirSync(`${OUT}/assets/portraits`).filter(f => /\.(png|jpg)$/.test(f)).sort();   // + card-*.jpg (character cards)
 for (const f of PORTRAITS) img(`portraits/${f}`, `assets/portraits/${f}`);
-const ENDS = fs.readdirSync(`${OUT}/assets/endings`).filter(f => f.endsWith(".jpg")).sort();
+const ENDS = fs.readdirSync(`${OUT}/assets/endings`).filter(f => f.endsWith(".jpg") && !f.startsWith("news-")).sort();
+// 4.0: the news end screen — the first frame of each ending's footage (NewsArt sprite) and the looping videos, which
+// 75-news.js plays on that sprite (recorded from the website's animated scenes, web/src/ui/endscene.jsx)
+const NEWSART = fs.readdirSync(`${OUT}/assets/endings`).filter(f => f.startsWith("news-") && f.endsWith(".jpg")).sort();
+for (const f of NEWSART) img(`endings/${f}`, `assets/endings/${f}`);
+for (const f of fs.readdirSync(`${OUT}/assets/endings`).filter(f => f.endsWith(".mp4")).sort()) resources.push({file:`assets/endings/${f}`, kind:"video", metadata:"", name:`assets/endings/${f}`, userAdded:true});
 for (const f of ENDS) img(`endings/${f}`, `assets/endings/${f}`);
 // 2.1.3: event pictures, packed in sheets by gen-assets.mjs --events (only the Game scene uses them)
 const EVSHEETS = fs.existsSync(`${OUT}/assets/events`) ? fs.readdirSync(`${OUT}/assets/events`).filter(f => f.endsWith(".jpg")).sort() : [];
@@ -174,6 +179,7 @@ const MODULES = [
   ["68-train.js", "Screens · โหมดฝึกซ้อม (ทีละขั้น เหมือนเว็บ)"],
   ["67-windows.js", "Screens · 3.3 ตลาดทรัพยากร (แบบ A), ความนิยม (แบบ B), สรุปรายปี"],
   ["73-earth.js", "Earth · ภาพถ่ายดาวเทียมใต้แผนที่ และลูกโลก 3D ในหน้าเมนู (เหมือนเว็บ)"],
+  ["75-news.js", "Screens · 4.0 ฉากจบแบบข่าวด่วน: ภาพข่าวเคลื่อนไหว, แถบข่าวด่วน, หนังสือพิมพ์ทั่วโลก, ตัววิ่ง"],
   ["74-life.js", "Life · 3.6 เมฆและพายุหมุน, แสงเหนือ, ป่าฟื้นตัว, แท่นขุดเจาะน้ำมัน, รถไฟความเร็วสูง (เหมือนเว็บ)"],
 ];
 const srcOf = f => (f.startsWith("@engine/") ? `${ENGINE}/${f.slice(8)}` : `${SRC}/${f}`);
@@ -243,7 +249,7 @@ const menuScene = scene("Menu", ["Backdrop", "", "MapUI", "Menu", "MenuScroll", 
   group("เปลี่ยนฉาก", goEvents(["Game", "Loading"])),
 ], commonVars);
 
-const gameScene = scene("Game", ["Backdrop", "", "MapUI", "HUD", "Drawer", "DrawerScroll", "Alerts", "Modal", "ModalScroll", "Toast", "Train"], [...mapObjects(), sprite("EventArt", EVSHEETS.map(f => anim(f.slice(0, -4), `events/${f}`)))], [backdrop(), ...mapInstances()], [
+const gameScene = scene("Game", ["Backdrop", "", "MapUI", "HUD", "Drawer", "DrawerScroll", "Alerts", "Modal", "ModalScroll", "Toast", "Train"], [...mapObjects(), sprite("EventArt", EVSHEETS.map(f => anim(f.slice(0, -4), `events/${f}`))), sprite("NewsArt", NEWSART.map(f => anim(f.slice(0, -4), `endings/${f}`)))], [backdrop(), ...mapInstances()], [
   comment("ฉากเล่นเกม: 1 tick = 1 เดือนในเกม (ความเร็ว 1× = 4 วินาที, 2× = 2 วินาที, 3× = 1.33 วินาที) รวม 300 เดือน ม.ค. 2026 → ธ.ค. 2050\nตัวแปรฉาก Running = 1 เมื่อเวลาควรเดิน (ไม่ได้หยุด และไม่มีหน้าต่างตัดสินใจเปิดอยู่)"),
   std([atStart], [A("ResetTimer", ["", "\"tick\""])], [js("if (!window.P2050 || !window.P2050.ready) { runtimeScene.getVariables().get(\"GoTo\").setString(\"Loading\"); return; }\nwindow.P2050.Screens.setup(runtimeScene, \"game\");")]),
   frameJs,

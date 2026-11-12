@@ -384,6 +384,17 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
   ]),
 ];
 P.CHANGELOG.find(x => x.v === "2.1").subs = [
+  SUB("2.1.4", "2026-11-12", [
+    "ฉากจบแบบใหม่เป็นรายการข่าวด่วน: ภาพข่าวเคลื่อนไหวของฉากจบทั้ง 12 แบบ แถบข่าวด่วน สัมภาษณ์สดตัวละคร พาดหัวจากหนังสือพิมพ์ทั่วโลก และตัววิ่งข่าวของคนในเรื่อง",
+    "ทุกอย่างอยู่ในจอเดียวทั้งคอมพิวเตอร์และมือถือ ไม่ต้องเลื่อนอ่าน เรื่องของคุณกับสิ่งที่ทำได้จริงเปิดดูได้จากปุ่ม",
+    "ชนะแล้วไม่แสดง Net Zero 100% อีก แต่บอกว่าถึงเป้าเร็วกว่ากำหนดเท่าไร ส่วนตอนแพ้บอกว่าไปถึง Net Zero กี่เปอร์เซ็นต์และ CO₂ ยังเหลือเท่าไร",
+    "เสียงเปิดข่าวด่วน แตรตอนชนะ แล้วตามด้วยเพลงฉากจบ",
+  ], [
+    "A new ending as a breaking-news broadcast: animated news footage for all 12 endings, the breaking-news bar, a live interview with your character, headlines from papers around the world and a ticker with what happened to the people of the story.",
+    "Everything fits on one screen on computers and phones, no scrolling; your story and what you can do in real life open from a button.",
+    "A win no longer shows \"Net Zero 100%\": it shows how early you got there. A loss shows how far you got and how much CO₂ is still left.",
+    "A news stinger, a fanfare when you win, then the ending music.",
+  ]),
   SUB("2.1.3", "2026-11-11", [
     "ภัยพิบัติเห็นบนแผนที่เป็น 3 มิติ: น้ำท่วมแผ่ไปบนพื้นดินแล้วค่อย ๆ ลด ไฟป่าลามเป็นแนวมีเปลวไฟกับควันลอยสูงและทิ้งรอยไหม้ ภัยแล้งดินแตกระแหง คลื่นความร้อนเรืองแสง น้ำเค็มรุกเข้ามาจากชายฝั่ง",
     "หน้าหนาวมีหิมะปกคลุมพื้นดินทางเหนือพร้อมหิมะตก",

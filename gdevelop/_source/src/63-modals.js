@@ -17,6 +17,7 @@ Screens.renderModal = function(l){
   l.blocks = !!kind; const sl = k.L("ModalScroll");
   if (!kind){ k.clearSlave("ModalScroll"); return; }
   if (kind === "skills") return this.renderSkills(l);
+  if (kind === "end" && !S.mp && this.renderNews) return this.renderNews(l);   // 4.0: the breaking-news end screen (75-news.js)
   const ce = kind === "event" && P.currentEvent(), pw = Math.min(k.W - 24, ce && ce.country ? 900 : (WIDTH[kind] || 620));   // 3.7.4: dispute window is wider (VS) · 3.7.6: market too
   const px = kind === "end" ? k.W - pw - 40 : (k.W - pw) / 2;
   let ch = 0;

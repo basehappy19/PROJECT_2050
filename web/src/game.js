@@ -267,7 +267,11 @@ H.showEvent = () => {
 };
 H.showEnd = () => {
   if (UIM.modal === "skills") UIM.modal = null; UIM.reward = null;
-  Audio.setBed(null); Audio.setMood(S.over === "win" ? "win" : "lose", true);
+  // 4.0: the news end screen — the broadcast stinger first, a fanfare (or a low hit) as the headline lands, then the music
+  Audio.setBed(null); Audio.stopMusic();
+  Audio.play("news", {vol:.9});
+  if (S.over === "win") Audio.play("fanfare", {vol:.85, delay:1.3}); else Audio.play("impact", {vol:.6, delay:1.1});
+  setTimeout(() => { if (S.over) Audio.setMood(S.over === "win" ? "win" : "lose", true); }, 2300);
   const AMB = {win:"fireworks", l1:"fire", l2:"crowd", l3:"gale"};
   setTimeout(() => { if (S.over){ Audio.ambience(AMB[S.over] || "wind", .8); if (S.over === "win") setTimeout(() => { if (S.over === "win") Audio.ambience("birds", .8); }, 9000); } }, 1200);
   bump();

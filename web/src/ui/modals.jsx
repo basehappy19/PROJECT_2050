@@ -7,6 +7,7 @@ import {Icon, Rich, plain} from "./icon.jsx";
 import {Btn, IconBtn, Seg, Meter, Portrait, portraitSrc, H3, Terra, Volume, GfxSeg, A11ySeg, NarrRow, LangSeg, Msg, Key, SlotInfo, Check, GroupList, GroupTilt, Speak} from "./widgets.jsx";
 
 import {YearStrip} from "./year.jsx";
+import {EndScene, sceneKind} from "./endscene.jsx";
 import {MpEnd, VoteDots, VoteHead} from "./mp.jsx";
 import {mapCrop, eventPoint, eventSnd, eventImg, SND_ICON, SND_TINT} from "./hero.js";
 const mapCropBg = pt => mapCrop(pt, pt ? 3.4 : 1.15, .3).backgroundImage;
@@ -105,50 +106,119 @@ const QUOTES = {
   l3:{th:"ใกล้แล้ว แต่ยังไม่พอ ครั้งหน้าเราต้องเร็วกว่านี้", en:"Close, but not enough. Next time we have to move faster."},
 };
 export const endImg = (o, grade) => `assets/img/endings/${o === "win" ? `end-win-${grade || "A"}` : P.ENDINGS[o].img}.jpg`;
+/* 4.0 · the end of the game as a breaking-news broadcast: live footage of the ending (ui/endscene.jsx), the lower third,
+   the papers from around the world and a ticker — all on one screen, no scrolling. The whole screen is laid out on a
+   fixed stage (1280×720 on wide screens, 400×860 on tall ones) and scaled to fit, so it looks the same everywhere.
+   A win doesn't show "Net Zero 100%" (it always is): it shows how early you got there, the warming and how much CO₂ you
+   cut. A loss shows how far you got (Net Zero %), what is still left and why it ended. */
+const EN_T = {
+  live:T("สด", "LIVE"), breaking:T("ข่าวด่วน", "BREAKING"), interview:T("สัมภาษณ์สด", "Live interview"), world:T("พาดหัวจากทั่วโลก", "Headlines around the world"),
+  early:T("เร็วกว่ากำหนด", "early"), lastYear:T("ทันในปีสุดท้าย", "in the final year"), yr:T("ปี", "yr"), mo:T("เดือน", "mo"),
+  reached:T("ถึงเป้า", "Reached"), temp:T("อุณหภูมิโลก", "Warming"), good:T("ปีที่ดี", "Good years"), cut:T("ลด CO₂ ได้", "CO₂ cut"), perYr:T("Gt/ปี", "Gt/yr"),
+  nz:T("ไปถึง Net Zero", "Way to Net Zero"), left:T("CO₂ ยังเหลือ", "CO₂ still left"), appr:T("ความนิยม", "Approval"),
+  why:{l1:T("โลกร้อนทะลุ 3°C", "Warming broke 3°C"), l2:T("ความนิยมหมด", "Approval ran out"), l3:T("สิ้นปี 2050 แต่ยังไม่ถึง Net Zero", "End of 2050, still short of Net Zero")},
+  story:T("เรื่องของคุณ", "Your story"), papers:T("หนังสือพิมพ์", "Papers"), real:T("สิ่งที่คุณทำได้จริงวันนี้", "What you can do in real life today"),
+};
+function T(th, en){ return {th, en}; }
+function useStage(){
+  const calc = () => { const w = window.innerWidth, h = window.innerHeight, wide = w / h >= 1.12; const [sw, sh] = wide ? [1280, 720] : [400, 860]; return {wide, k:Math.min(w / sw, h / sh)}; };
+  const [st, set] = useState(calc);
+  useEffect(() => { const on = () => set(calc()); window.addEventListener("resize", on); return () => window.removeEventListener("resize", on); }, []);
+  return st;
+}
+function useCount(v, dec = 0, dur = 1100, delay = 600){
+  const [n, setN] = useState(0);
+  useEffect(() => { let raf, t0; const step = now => { if (!t0) t0 = now; const f = Math.min(1, (now - t0 - delay) / dur); if (f > 0) setN(v * (1 - Math.pow(1 - f, 3))); if (f < 1) raf = requestAnimationFrame(step); else setN(v); }; raf = requestAnimationFrame(step); return () => cancelAnimationFrame(raf); }, [v]);
+  return n.toFixed(dec);
+}
+function Num({v, dec = 0, pre = "", suf = "", delay}){ return <>{pre}{useCount(v, dec, 1100, delay)}{suf}</>; }
 export function EndModal(){
   if (S.mp) return <MpEnd/>;   // 2.0: the end of a multiplayer game
-  const o = S.over, win = o === "win", net = P.netCO2(), st = P.endStory(), rw = UIM.reward;
-  const stats = [[t("temp"), `+${S.temp.toFixed(2)}°C`], [t("co2"), `${net.toFixed(1)} Gt`], [t("appr"), `${S.appr.toFixed(0)}%`], ["Net Zero", `${Math.round(Math.max(0, Math.min(1, (36 - net) / 36)) * 100)}%`], [t("skillsTitle"), `${Object.keys(S.owned).length}/${P.SKILLS.length}`], [t("timePlayed"), P.fmtTime(S.realSec)]];
+  const o = S.over, win = o === "win", rw = UIM.reward, th = S.lang === "th";
+  const {wide, k} = useStage();
+  const [sheet, setSheet] = useState(false);
+  const nw = P.endNews ? P.endNews() : {papers:[], ticker:[], early:0, nz:0, net:P.netCO2(), date:P.dateStr()};
+  const e2 = S.v2 && P.ending2 ? P.ending2() : null, tier = P.endTier ? P.endTier(P.goodYears ? P.goodYears() : 0) : 1;
+  const kind = sceneKind(o, tier), ng = P.goodYears ? P.goodYears() : 0, ny = (S.years || []).length;
+  const im = P.impactSummary ? P.impactSummary() : null;
+  const earlyTxt = !win ? "" : nw.early >= 12 ? `${L(EN_T.early)} ${Math.floor(nw.early / 12)} ${L(EN_T.yr)}${nw.early % 12 ? ` ${nw.early % 12} ${L(EN_T.mo)}` : ""}` : L(EN_T.lastYear);
+  const head = win ? `${t("winTitle")} · ${earlyTxt}` : `${t(o + "Title")} · ${L(EN_T.why[o] || EN_T.why.l3)}`;
+  const quote = L(P.endQuote ? P.endQuote() : QUOTES[o]);
+  const stats = win ? [
+    [L(EN_T.reached), nw.date, null],
+    [L(EN_T.temp), <Num v={S.temp} dec={2} pre="+" suf="°C"/>, null],
+    [L(EN_T.good), <><Num v={ng}/><small> / {ny}</small></>, "good"],
+    im && im.saved > .1 ? [L(EN_T.cut), <><Num v={im.saved} dec={1}/><small> {L(EN_T.perYr)}</small></>, null] : [t("skillsTitle"), `${Object.keys(S.owned).length}/${P.SKILLS.length}`, null],
+  ] : [
+    [L(EN_T.nz), <Num v={nw.nz} suf="%"/>, "warn"],
+    [L(EN_T.left), <><Num v={nw.net} dec={1}/><small> Gt</small></>, null],
+    o === "l2" ? [L(EN_T.appr), `${Math.max(0, S.appr).toFixed(0)}%`, "bad"] : [L(EN_T.temp), <Num v={S.temp} dec={2} pre="+" suf="°C"/>, o === "l1" ? "bad" : null],
+    [L(EN_T.good), <><Num v={ng}/><small> / {ny}</small></>, null],
+  ];
+  const chip = win ? <span class="nw-chip gold">{L(P.ENDINGS.win.grades[S.grade || "A"])}</span> : <span class="nw-chip warn">{`${L(EN_T.nz)} ${nw.nz}%`}</span>;
   const lines = [];
-  if (st.best) lines.push(`[[heart-handshake]] ${t("storyBest")}: ${P.cname(st.best)}`);
-  if (st.worst) lines.push(`[[${P.HAZARDS[st.worst.type].icon}]] ${t("storyWorst")}: ${L(P.HAZARDS[st.worst.type].name)} · ${P.cname(st.worst.c)} · ${P.dateStr(st.worst.tick)}`);
-  st.dec.forEach(d => lines.push(`[[git-branch]] ${L(d.title)} → ${L(d.label)}`));
-  { const os = P.oreSummary(); if (os.used) lines.push(`[[$ore]] ${t("oreUsed")} ${os.used}${os.top ? ` · ${t("oreMostFrom")} ${P.cname(os.top)} ${os.share}%` : ""}`); }
-  { const im = P.impactSummary && P.impactSummary(); if (im && im.saved > .1) lines.unshift(S.lang === "th" ? `[[leaf]] เทียบกับถ้าไม่ทำอะไรเลย คุณช่วยลด CO₂ ได้ ${im.saved.toFixed(1)} Gt ต่อปี และโลกเย็นกว่า ${Math.max(0, im.bauTemp - S.temp).toFixed(2)}°C` : `[[leaf]] Compared with doing nothing, you cut CO₂ by ${im.saved.toFixed(1)} Gt a year and kept the world ${Math.max(0, im.bauTemp - S.temp).toFixed(2)}°C cooler`); }
-  if (!lines.length) lines.push(t("storyNone"));
-  return <div class="veil end-veil">
-    <div class="endart" style={{backgroundImage:`url(${endImg(o, S.grade)})`}}/>
-    <section class={"modal end " + (win ? "win" : "lose")} role="dialog" aria-modal="true">
-      <Tag color={win ? "good" : "bad"}>{`${P.dateStr()} · ${t("mode_" + S.mode)}`}</Tag>
-      <h2 class="endtitle">{t(win ? "winTitle" : o + "Title")}</h2>
-      {win ? <p class="gold grade">{L(P.ENDINGS.win.grades[S.grade || "A"])}</p> : null}
-      {S.v2 && P.ending2 ? (() => { const e2 = P.ending2(), ng = P.goodYears(); return <>
-        <p class={"end2t " + (win ? "good" : "bad")}>{L(e2.title)}</p>
-        <p>{L(e2.body)}</p>
-        <div class="endyears"><small class="muted">{L(P.UI2.yrGoodYears)} <b class="mono good">{ng}</b> / {(S.years || []).length}</small><YearStrip big/></div>
-      </>; })() : <p>{t(win ? "winBody" + (S.grade || "A") : o + "Body")}</p>}
-      <div class="quote"><Portrait id={S.char} size={56}/><div><b style={{color:P.CHAR[S.char].color}}>{L(P.CHAR[S.char].person)}</b><p>“{L(P.endQuote ? P.endQuote() : QUOTES[o])}”</p></div></div>
-      <div class="statgrid three">{stats.map(([a, b], i) => <div class="stat" key={i}><span><Rich t={up(a)}/></span><b>{b}</b></div>)}</div>
-      {P.endPaper ? (() => { const np = P.endPaper(); return <div class="paper">
-        <div class="pmast"><b>THE WORLD TIMES</b><small class="mono">{np.date}</small></div>
-        <h3>{L(np.head)}</h3>
-        <ul>{np.people.map(x => <li key={x.who}><Portrait id={x.who} size={34} ring={P.NPC[x.who].color}/><span>{L(x.t)}</span></li>)}</ul>
-      </div>; })() : null}
-      <H3>{t("yourStory")}</H3>
-      <ul class="story-lines">{lines.map((s, i) => <li key={i}><Rich t={s} iconColor="accent"/></li>)}</ul>
-      {P.realActions ? <><H3>{S.lang === "th" ? "สิ่งที่คุณทำได้จริงวันนี้" : "What you can do in real life today"}</H3>
-        <ul class="reallife">{P.realActions().map((a, i) => <li key={i}><Icon n={a.icon} size={20}/><span>{L(a.t)}</span></li>)}</ul></> : null}
-      <div class={"reward " + (rw && !rw.guest && !rw.error ? "ok" : "")}>
-        {!rw ? <span class="muted"><Icon n="loader" size={16} cls="spin"/> {t("rewardWait")}</span>
-          : rw.guest ? <span class="muted">{t("rewardGuest")} · XP +{rw.xp}</span>
-          : rw.error ? <span class="muted">{t("rewardFail")} · XP +{rw.xp || 0}</span>
-          : <><Terra n={`+${rw.terra}`} cls="good big"/><b class="acc mono">XP +{rw.xp}</b>{rw.levelUp ? <b class="gold"><Icon n="star" size={15}/> {t("levelUp")} {rw.level}</b> : null}{rw.note ? <small class="muted">{rw.note}</small> : null}</>}
-      </div>
-      <div class="endfoot">
-        <div><small class="muted">{up(t("finalScore"))}</small><div class="score">{P.score().toLocaleString()}</div></div>
-        <div class="btns"><Btn kind="ghost" onClick={() => G.toMenu()}>{t("mainMenu")}</Btn><Btn kind={win ? "ghost" : "primary"} onClick={() => G.restart()}>{t("restart")}</Btn>{win ? <Btn kind="gold" onClick={() => G.continueWorld()}>{`[[infinity]] ${t("playOn")}`}</Btn> : null}</div>
-      </div>
-    </section>
+  { const st = P.endStory();
+    if (im && im.saved > .1) lines.push(th ? `[[leaf]] เทียบกับถ้าไม่ทำอะไรเลย คุณช่วยลด CO₂ ได้ ${im.saved.toFixed(1)} Gt ต่อปี และโลกเย็นกว่า ${Math.max(0, im.bauTemp - S.temp).toFixed(2)}°C` : `[[leaf]] Compared with doing nothing, you cut CO₂ by ${im.saved.toFixed(1)} Gt a year and kept the world ${Math.max(0, im.bauTemp - S.temp).toFixed(2)}°C cooler`);
+    if (st.best) lines.push(`[[heart-handshake]] ${t("storyBest")}: ${P.cname(st.best)}`);
+    if (st.worst) lines.push(`[[${P.HAZARDS[st.worst.type].icon}]] ${t("storyWorst")}: ${L(P.HAZARDS[st.worst.type].name)} · ${P.cname(st.worst.c)} · ${P.dateStr(st.worst.tick)}`);
+    st.dec.forEach(d => lines.push(`[[git-branch]] ${L(d.title)} → ${L(d.label)}`));
+    const os = P.oreSummary(); if (os.used) lines.push(`[[$ore]] ${t("oreUsed")} ${os.used}${os.top ? ` · ${t("oreMostFrom")} ${P.cname(os.top)} ${os.share}%` : ""}`);
+    if (!lines.length) lines.push(t("storyNone")); }
+  const reward = <div class={"nw-reward " + (rw && !rw.guest && !rw.error ? "ok" : "")}>
+    {!rw ? <span class="muted"><Icon n="loader" size={15} cls="spin"/> {t("rewardWait")}</span>
+      : rw.guest ? <span class="muted">{t("rewardGuest")} · XP +{rw.xp}</span>
+      : rw.error ? <span class="muted">{t("rewardFail")} · XP +{rw.xp || 0}</span>
+      : <><Terra n={`+${rw.terra}`} cls="good"/><b class="acc mono">XP +{rw.xp}</b>{rw.levelUp ? <b class="gold"><Icon n="star" size={14}/> {t("levelUp")} {rw.level}</b> : null}</>}
+    <span class="mono muted nw-score">{t("finalScore")} {P.score().toLocaleString()}</span>
+  </div>;
+  const btns = <div class="nw-btns">
+    <Btn kind="ghost" onClick={() => G.toMenu()}>{t("mainMenu")}</Btn>
+    <Btn kind={win ? "ghost" : "primary"} onClick={() => G.restart()}>{t("restart")}</Btn>
+    {win ? <Btn kind="gold" onClick={() => G.continueWorld()}>{`[[infinity]] ${t("playOn")}`}</Btn> : null}
+  </div>;
+  const paperList = d0 => <div class="nw-papers">{nw.papers.map((p, i) => <article key={p.id} class={"nw-paper p-" + p.id} style={{animationDelay:`${d0 + i * .2}s`}}>
+    <b class="nw-pname">{p.name}</b><p class="nw-phead" lang={p.id === "jp" ? "ja" : p.id === "wt" ? "en" : "th"}>{p.head}</p>{p.gloss ? <small class="nw-gloss">“{p.gloss}”</small> : null}
+  </article>)}</div>;
+  const papers = paperList(1.6);
+  const tv = <section class="nw-tv">
+    <EndScene kind={kind} th={th} nz={nw.nz} date={nw.date}/>
+    <div class="nw-scan"/>
+    <div class="nw-top"><span class="nw-live">● {L(EN_T.live)}</span><span class="mono">GCT NEWS · {nw.date} · {t("mode_" + S.mode)}</span></div>
+    <figure class="nw-pip"><img src={portraitSrc(S.char, P.outfitOf ? P.outfitOf(S.char) : undefined)} alt=""/><figcaption>{L(EN_T.interview)} · {L(P.CHAR[S.char].person)}</figcaption></figure>
+    <div class="nw-l3">
+      <div class="nw-l3a"><span class="nw-bk">{L(EN_T.breaking)}</span><h2 class="nw-head">{head}</h2></div>
+      <div class="nw-l3b">{chip}<span class="nw-quote"><Typewriter text={`“${quote}”`}/></span></div>
+    </div>
+  </section>;
+  const statBox = <div class="nw-stats">{stats.map(([a, b, c], i) => <div class={"nw-stat " + (c || "")} key={i} style={{animationDelay:`${.9 + i * .12}s`}}><span>{a}</span><b>{b}</b></div>)}</div>;
+  const ticker = nw.ticker.length ? <div class="nw-ticker" aria-hidden="true"><span class="nw-tk">GCT NEWS</span><div class="nw-tkrun">{[0, 1].map(r => <span key={r}>{nw.ticker.map((x, i) => <span key={i}>{x}</span>)}</span>)}</div></div> : null;
+  const story = e2 ? <div class="nw-e2"><b class={win ? "good" : "bad"}>{L(e2.title)}</b><p>{L(e2.body)}</p></div> : <div class="nw-e2"><p>{t(win ? "winBody" + (S.grade || "A") : o + "Body")}</p></div>;
+  const moreBtn = <button type="button" class="nw-more" onClick={() => { Audio.play("page"); setSheet(true); }}>{wide ? L(EN_T.story) : `${L(EN_T.papers)} · ${L(EN_T.story)}`} ›</button>;
+  return <div class={"veil end-veil news " + (win ? "win" : "lose")}>
+    <div class={"nw-stage " + (wide ? "wide" : "tall")} style={{transform:`translate(-50%, -50%) scale(${k})`}} role="dialog" aria-modal="true" aria-label={head}>
+      {wide ? <>
+        {tv}
+        <aside class="nw-side"><div class="nw-h">{L(EN_T.world)}</div>{papers}{statBox}</aside>
+        <div class="nw-under">{story}{moreBtn}</div>
+        {ticker}
+        <div class="nw-bar">{reward}{btns}</div>
+      </> : <>
+        {tv}
+        <div class="nw-body">{story}
+          <div class="nw-qrow"><img src={portraitSrc(S.char, P.outfitOf ? P.outfitOf(S.char) : undefined)} alt=""/><span><b>{L(P.CHAR[S.char].person)}</b>“{quote}”</span></div>
+          {nw.papers.length ? <div class="nw-papers one">{(() => { const p0 = nw.papers[0]; return <article class="nw-paper p-wt"><b class="nw-pname">{p0.name}</b><p class="nw-phead" lang="en">{p0.head}</p>{p0.gloss ? <small class="nw-gloss">“{p0.gloss}”</small> : null}</article>; })()}</div> : null}
+          {statBox}</div>
+        {ticker}
+        <div class="nw-bar">{reward}<div class="nw-row">{moreBtn}</div>{btns}</div>
+      </>}
+      {sheet ? <div class="nw-sheet" role="dialog" aria-label={L(EN_T.story)}>
+        <IconBtn n="x" title="Close" cls="mclose" onClick={() => setSheet(false)} sound="close"/>
+        {!wide ? <><H3>{L(EN_T.world)}</H3>{paperList(.05)}</> : null}
+        <H3>{L(EN_T.story)}</H3>
+        <ul class="story-lines">{lines.map((x, i) => <li key={i}><Rich t={x} iconColor="accent"/></li>)}</ul>
+        {P.realActions ? <><H3>{L(EN_T.real)}</H3><ul class="reallife">{P.realActions().map((a, i) => <li key={i}><Icon n={a.icon} size={20}/><span>{L(a.t)}</span></li>)}</ul></> : null}
+      </div> : null}
+    </div>
   </div>;
 }
 

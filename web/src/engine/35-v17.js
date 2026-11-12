@@ -216,6 +216,23 @@ P.endPaper = () => {
   ];
   return {head:HEAD[key] || HEAD.l3, people, date:P.dateStr()};
 };
+/* 4.0: the news end screen — three papers from around the world (each with a line in the player's language), the
+   news ticker, and how early (or how far short) the world got there. Data only: ui/modals.jsx (web) and the GDevelop
+   end screen draw it. */
+const JP_OPP = {win:"クライ氏、自社グループをクリーンエネルギーに転換「市場は変わった」", l2:"クライ氏、世界のエネルギー政策の新トップに",
+  other:"クライ氏は石炭販売を続行「警告はした」"};
+P.endNews = () => {
+  const np = P.endPaper(), o = S.over, win = o === "win", th = S.lang === "th";
+  const [fon, lung, opp] = np.people;
+  const papers = [
+    {id:"wt", name:"THE WORLD TIMES", head:np.head.en, gloss:th ? np.head.th : null},
+    {id:"th", name:th ? "ข่าวไทยรายวัน" : "Thai Daily News", head:lung.t.th, gloss:th ? null : lung.t.en, who:"lung"},
+    {id:"jp", name:"地球新聞", head:JP_OPP[win ? "win" : o === "l2" ? "l2" : "other"], gloss:L(opp.t), who:"opp"},
+  ];
+  const left = Math.max(0, P.TOTAL_TICKS - S.tick);   // months before the end of 2050
+  const nz = Math.round(Math.max(0, Math.min(1, (36 - P.netCO2()) / 36)) * 100);
+  return {papers, ticker:[L(fon.t), L(lung.t), L(opp.t)], early:win ? left : 0, nz, net:Math.max(0, P.netCO2()), date:np.date};
+};
 /* three things you can do in real life, from the branches you used most */
 const ACTS = {
   energy:{icon:"plug-zap", t:T("ปิดไฟและถอดปลั๊กเมื่อไม่ใช้ ตั้งแอร์ 26°C ขึ้นไป และเลือกเครื่องใช้ไฟฟ้าประหยัดไฟเบอร์ 5", "Switch off and unplug what you don't use, set air-con to 26°C or more, and choose energy-saving appliances")},
