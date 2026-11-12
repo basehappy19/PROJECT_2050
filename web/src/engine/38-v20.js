@@ -22,8 +22,11 @@ Object.assign(P.UI, {
   delayHit:{th:"ผลจากการตัดสินใจก่อนหน้ามาถึงแล้ว", en:"An earlier decision catches up"},
 });
 const FAST_SPEEDS = [0, 3, 2, 1.5];
-/* Fast mode has no mineral limits, so skills cost a little more (bot test: a sensible player wins ~80%) */
-P.BALANCE.F = {inc:1, cost:1.12, haz:1.05, growth:1.02};
+/* Fast mode has no mineral limits, so skills cost a little more. 2.1.3 (bot test with the seasons): a sensible player
+   wins about 35–50% (was {inc:1, cost:1.12, haz:1.05, growth:1.02}: every time) — a little kinder than Normal, as it is
+   the first-game mode. Fast mode is close to a knife edge (no minerals or groups, few events), so small changes here
+   move the win rate a lot. */
+P.BALANCE.F = {inc:.92, cost:1.22, haz:1.071, growth:1.0355};
 { const _start = P.startGame; P.startGame = (lang, o = {}) => _start(lang, o && o.mode === "fast" && !o.ab ? {...o, ab:"F"} : o); }
 /* seconds of real time per game month */
 P.secPerMonth = (sp = S.speed) => (S.mode === "fast" ? FAST_SPEEDS : P.SPEEDS)[sp] || 4;

@@ -12,7 +12,7 @@ if (P.mods && P.mods.seasons) return;
      Drought-Proof Crops (A3) and Low-Methane Rice (A1) improve the odds, a hotter world worsens them.
    · Seasons get harsher as the world warms (seasonPower): hazard season weights, the power peak and the farming
      odds all scale with it.
-   · Season report: when a season ends it gets a grade A–F (CO₂, approval, disaster damage, aid) and A–C pay a reward.
+   · Season report: when a season ends it gets a grade A–F (CO₂, approval, disaster damage, aid) and A–B pay a reward.
    (The seasonal look of the map is drawn in life.js drawSeason.)
    ========================================================================= */
 const {S} = P;
@@ -67,7 +67,7 @@ function harvest(){
   const pBad = clamp(.15 + k * .55 - (has("A3") ? .1 : 0), .05, .7);
   const r = P.rand();
   if (r < pGood){
-    const g = 25 + Math.round(10 * P.rand()); S.ep += g; S.appr = clamp(S.appr + 1, 0, 100);   // 3.7.7: a good harvest also pleases people if (P.ledgerTag) P.ledgerTag("harvest", g, 0);
+    const g = SR.harvest + Math.round(SR.harvestR * P.rand()); S.ep += g; S.appr = clamp(S.appr + 1, 0, 100);   // 3.7.7: a good harvest also pleases people if (P.ledgerTag) P.ledgerTag("harvest", g, 0);
     P.addLog(`${L(TXT.good)} · ${P.IC.ep} +${g} · ${L(T("ความนิยม", "Approval"))} +1%`, "gd"); hook("toast", {icon:"wheat", title:L(TXT.good).replace(/\[\[[^\]]+\]\]\s*/, ""), msg:`${P.IC.ep} +${g}`});
     return;
   }
@@ -99,14 +99,18 @@ function grade(a){
   const g = pts >= 7 ? "A" : pts >= 5 ? "B" : pts >= 4 ? "C" : pts >= 2 ? "D" : "F";
   return {g, pts, dN, dA, hits:hits.length};
 }
-const REWARD = {A:{ep:40, pc:10}, B:{ep:20, pc:5}, C:null, D:null, F:null};
+/* the numbers a season can give or take (P.SEASON_RULES, so the bot test can try others) */
+/* 2.1.3: rewards were A 40 money + 10 policy points, B 20 + 5, four times a year — about +160 money and +40 points a
+   year for a good player, which made every game a win (the bot test did not load this file then; it does now) */
+const SR = P.SEASON_RULES = {A:{ep:15, pc:3}, B:{ep:6, pc:1}, harvest:25, harvestR:10, peak:.06};
+const REWARD = {get A(){ return SR.A; }, get B(){ return SR.B; }, C:null, D:null, F:null};
 
 function seasonsTick(){
   if (!S.started || S.training) return;
   const m = S.tick % 12, sea = P.seasonOf(S.tick);
   S.seasCO2 = seasonCO2(sea.id);
   // summer peak: approval
-  if (sea.id === "hot" && !has("E9")) S.appr = clamp(S.appr - .06 * seasonPower(), 0, 100);   // 3.7.7: was −.35 a month (+ June): too harsh, players lost on approval
+  if (sea.id === "hot" && !has("E9")) S.appr = clamp(S.appr - SR.peak * seasonPower(), 0, 100);   // 3.7.7: was −.35 a month (+ June): too harsh, players lost on approval
   if (m === 6) harvest();
   // a new season starts (months 2, 5, 8, 11)
   if (m % 3 === 2){

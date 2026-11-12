@@ -41,7 +41,7 @@ P2050_DOMAINS=game.example.ac.th,.github.io node build.mjs   # ให้เก�
 
 ### ทดสอบ
 - `node tools/smoke.mjs` — เปิดเกมจาก build ที่ป้องกันแล้ว เล่น ~25 วินาที รายงาน error และเวลาที่ใช้
-- `node tools/sim.mjs [จำนวนเกม] [preset] [โหมด]` — บอทเล่นทั้งเกมหลายรอบ ใช้ปรับความยาก (`BOTS=good,casual,cbam,idle` เลือกบอท: cbam = ใช้ภาษีคาร์บอนข้ามแดนอย่างเดียว, idle = ไม่ทำอะไรเลย) · 1.1: บอท good ชนะราว 40–45%, casual แทบไม่ชนะ, Hard Core ราว 20%
+- `node tools/sim.mjs [จำนวนเกม] [preset] [โหมด]` — บอทเล่นทั้งเกมหลายรอบ ใช้ปรับความยาก (`BOTS=good,casual,cbam,idle` เลือกบอท: cbam = ใช้ภาษีคาร์บอนข้ามแดนอย่างเดียว, idle = ไม่ทำอะไรเลย) · 1.1: บอท good ชนะราว 40–45%, casual แทบไม่ชนะ, Hard Core ราว 20% · 2.1.3: บอทโหลดระบบฤดูกาล (`40-seasons.js`, `41-storms.js`) ด้วยแล้วเหมือนเกมจริง ลองค่ารางวัลฤดูได้ด้วย `SR='{"A":{"ep":15,"pc":3}}'` · ผลล่าสุดดูใน `claude/balance-2.1.3.md` ของโปรเจกต์
 - `node tools/qa.mjs <steps.mjs> [outDir] [w] [h]` — ถ่ายภาพหน้าจอตามสคริปต์ ใช้ตรวจ UI
 - `node tools/perf.mjs 1600 900 2 medium` — วัดความลื่นของแผนที่ (ต้อง `--open`)
 - `node tools/scene.mjs out.png 1600 900 1 "P.Game.openSkills()"` — ถ่ายภาพหน้าจอเดียว (ต้อง `--open`)

@@ -23,8 +23,11 @@ const SPEEDS = [0, 9, 4.5, 3];      // seconds per month: 1× ≈ 45 min for the
 const MAX_PROJECTS = 3;
 const MODES = {normal:{ep:25, pc:20, haz:1, dmg:1}, hard:{ep:10, pc:12, haz:1.3, dmg:1.2}, daily:{ep:25, pc:20, haz:1.1, dmg:1}};
 /* Balance presets: inc = monthly income · cost = prices of skills and orders · haz = how often disasters come · growth = how fast emissions grow.
-   Bot test (tools/sim.mjs): A = a sensible player wins ~60%, usually in 2049–2050; B = harder, ~30%. Players get A; B is for testing during development. */
-const BALANCE = {A:{inc:1, cost:1.1, haz:1, growth:1}, B:{inc:.9, cost:1, haz:1.15, growth:1.05}};
+   Bot test (tools/sim.mjs, with the seasons since 2.1.3): with A a sensible player wins ~25% as the Scientist and 30–55%
+   with the other characters (caps: Scientist ≤40%, others ≤60%), mostly in 2048–2050, and most of their losses are
+   near misses that run out of time; B = harder still. Players get A; B is for testing during development.
+   2.1.3: was {inc:1, cost:1.1, haz:1, growth:1}, which a sensible player won every time once the season rewards came in. */
+const BALANCE = {A:{inc:.88, cost:1.25, haz:1.09, growth:1.045}, B:{inc:.85, cost:1.3, haz:1.15, growth:1.06}};
 const HARD = {inc:1, cost:.975, haz:1.1, growth:1};   // Hard Core on top of the preset
 const bal = () => { const b = BALANCE[S.ab] || BALANCE.A; return S.mode === "hard" ? {inc:b.inc * HARD.inc, cost:b.cost * HARD.cost, haz:b.haz * HARD.haz, growth:b.growth * HARD.growth} : b; };
 function setBalance(id, values){ if (values) BALANCE[id] = Object.assign({inc:1, cost:1, haz:1, growth:1}, values); if (S) S.ab = BALANCE[id] ? id : "A"; }

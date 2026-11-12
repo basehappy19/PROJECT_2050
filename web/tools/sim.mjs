@@ -17,7 +17,7 @@ function makeEngine(seed){
   ctx.window = ctx; vm.createContext(ctx);
   // deterministic Math.random per game so runs can be repeated
   let s = seed >>> 0; ctx.Math = Object.create(Math); ctx.Math.random = () => { s = (s + 0x6D2B79F5) | 0; let x = Math.imul(s ^ (s >>> 15), 1 | s); x ^= x + Math.imul(x ^ (x >>> 7), 61 | x); return ((x ^ (x >>> 14)) >>> 0) / 4294967296; };
-  for (const f of fs.readdirSync(ENG).filter(f => /^(1\d|2\d|3\d)-.*\.js$/.test(f) && !(process.env.NOPOL && f.startsWith("32-")) && !(process.env.NOV20 && /^3[78]-/.test(f))).sort()) vm.runInContext(`(function(){${fs.readFileSync(path.join(ENG, f), "utf8")}})();`, ctx, {filename:f});
+  for (const f of fs.readdirSync(ENG).filter(f => /^(1\d|2\d|3\d|40|41)-.*\.js$/.test(f) && !(process.env.NOPOL && f.startsWith("32-")) && !(process.env.NOV20 && /^3[78]-/.test(f))).sort()) vm.runInContext(`(function(){${fs.readFileSync(path.join(ENG, f), "utf8")}})();`, ctx, {filename:f});
   return ctx.P2050;
 }
 
@@ -25,7 +25,8 @@ const co2Value = (P, n) => { const fx = n.fx || {}; let v = 0; if (fx.co2) v -= 
 
 function play(bot, seed){
   const P = makeEngine(seed), S = P.S;
-  if (process.env.YR && P.YEAR_RULES) Object.assign(P.YEAR_RULES, JSON.parse(process.env.YR));   // 2.0: try other yearly-review rules
+  if (process.env.YR && P.YEAR_RULES) Object.assign(P.YEAR_RULES, JSON.parse(process.env.YR));
+  if (process.env.SR && P.SEASON_RULES) Object.assign(P.SEASON_RULES, JSON.parse(process.env.SR));   // 2.1.3: try other season rewards   // 2.0: try other yearly-review rules
   if (P.setBalance) P.setBalance(PRESET, process.env.BAL ? JSON.parse(process.env.BAL) : undefined);   // BAL='{"inc":1.1,"cost":.9}' tries a custom preset
   P.startGame("th", {mode:MODE, char:process.env.CHAR || "sci", charLv:+(process.env.LV || 1), seed, ab:PRESET});
   const R = () => P.rand();

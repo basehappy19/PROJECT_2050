@@ -2606,6 +2606,7 @@ P.CHANGELOG.find(x => x.v === "2.1").subs = [
     "รถไฟหลายแบบ: รถไฟหัวกระสุนในญี่ปุ่น ไต้หวัน ปักกิ่ง–เซี่ยงไฮ้ และมุมไบ รถไฟฟ้าความเร็วสูง รถไฟฟ้าโดยสาร (หรือรถโดยสารลากด้วยหัวดีเซลบนเส้นที่ยังไม่มีไฟฟ้า) และรถไฟขนส่งสินค้า",
     "รถไฟน้อยลงและสั้นลง ทุกเส้นเป็นทางคู่ ขบวนที่สวนกันวิ่งคนละราง ไม่ทับกันแล้ว และตำแหน่งรถไฟไม่กระโดดเวลาซูมเข้าออก",
     "หิมะจางลงเล็กน้อย ขอบค่อย ๆ จางหาย ไม่มีเส้นตัดตรงทางเหนือแล้ว · ภาพ 3 มิติเบาลงบนมือถือ",
+    "ปรับสมดุลให้ท้าทายขึ้น: รางวัลสรุปฤดูเหลือ A เงิน +15 แต้มนโยบาย +3 · B +6 / +1 (เดิม +40 / +10 และ +20 / +5) รายได้ลดลงและสกิลแพงขึ้นเล็กน้อย เล่นดีชนะได้ แต่ต้องวางแผน ส่วนโหมดเร็วง่ายกว่าโหมดปกตินิดหน่อย",
   ], [
     "Disasters you can see in 3D: floods spread over the land and drain away, wildfires burn across the country with flames, tall smoke and a black scar, drought cracks the ground, heatwaves glow, salt water creeps in from the coast.",
     "Northern winters cover the land with snow, with snow falling.",
@@ -2619,6 +2620,7 @@ P.CHANGELOG.find(x => x.v === "2.1").subs = [
     "More kinds of trains: bullet trains in Japan, Taiwan, Beijing–Shanghai and Mumbai, high-speed electric trains, electric passenger trains (or diesel-hauled coaches on lines not yet electrified) and freight trains.",
     "Fewer, shorter trains on double track: trains going opposite ways keep to their own side instead of overlapping, and trains no longer jump when you zoom.",
     "Snow is a little fainter and fades out at its edges, with no straight line across the north · the 3D layer is lighter on phones.",
+    "A more challenging balance: season rewards are now A +15 money +3 policy points, B +6 / +1 (were +40 / +10 and +20 / +5), income is a little lower and skills cost a little more. Good play still wins, but it takes a plan; Fast mode stays a little kinder than Normal.",
   ]),
   SUB("2.1.2", "2026-11-10", [
     "แผงประเทศอ่านง่ายขึ้น: CO₂ ตัวใหญ่ (หน่วย Gt) ความเสี่ยงภัย ป้องกันภัย และเทคโนโลยีสีเขียวเป็นช่องของตัวเอง แร่ที่ประเทศนั้นมีขึ้นให้เห็นเลย และบอกว่าแร่ไหนต้องแปรรูปก่อน",
@@ -2770,8 +2772,11 @@ const SPEEDS = [0, 9, 4.5, 3];      // seconds per month: 1× ≈ 45 min for the
 const MAX_PROJECTS = 3;
 const MODES = {normal:{ep:25, pc:20, haz:1, dmg:1}, hard:{ep:10, pc:12, haz:1.3, dmg:1.2}, daily:{ep:25, pc:20, haz:1.1, dmg:1}};
 /* Balance presets: inc = monthly income · cost = prices of skills and orders · haz = how often disasters come · growth = how fast emissions grow.
-   Bot test (tools/sim.mjs): A = a sensible player wins ~60%, usually in 2049–2050; B = harder, ~30%. Players get A; B is for testing during development. */
-const BALANCE = {A:{inc:1, cost:1.1, haz:1, growth:1}, B:{inc:.9, cost:1, haz:1.15, growth:1.05}};
+   Bot test (tools/sim.mjs, with the seasons since 2.1.3): with A a sensible player wins ~25% as the Scientist and 30–55%
+   with the other characters (caps: Scientist ≤40%, others ≤60%), mostly in 2048–2050, and most of their losses are
+   near misses that run out of time; B = harder still. Players get A; B is for testing during development.
+   2.1.3: was {inc:1, cost:1.1, haz:1, growth:1}, which a sensible player won every time once the season rewards came in. */
+const BALANCE = {A:{inc:.88, cost:1.25, haz:1.09, growth:1.045}, B:{inc:.85, cost:1.3, haz:1.15, growth:1.06}};
 const HARD = {inc:1, cost:.975, haz:1.1, growth:1};   // Hard Core on top of the preset
 const bal = () => { const b = BALANCE[S.ab] || BALANCE.A; return S.mode === "hard" ? {inc:b.inc * HARD.inc, cost:b.cost * HARD.cost, haz:b.haz * HARD.haz, growth:b.growth * HARD.growth} : b; };
 function setBalance(id, values){ if (values) BALANCE[id] = Object.assign({inc:1, cost:1, haz:1, growth:1}, values); if (S) S.ab = BALANCE[id] ? id : "A"; }
@@ -6098,8 +6103,11 @@ Object.assign(P.UI, {
   delayHit:{th:"ผลจากการตัดสินใจก่อนหน้ามาถึงแล้ว", en:"An earlier decision catches up"},
 });
 const FAST_SPEEDS = [0, 3, 2, 1.5];
-/* Fast mode has no mineral limits, so skills cost a little more (bot test: a sensible player wins ~80%) */
-P.BALANCE.F = {inc:1, cost:1.12, haz:1.05, growth:1.02};
+/* Fast mode has no mineral limits, so skills cost a little more. 2.1.3 (bot test with the seasons): a sensible player
+   wins about 35–50% (was {inc:1, cost:1.12, haz:1.05, growth:1.02}: every time) — a little kinder than Normal, as it is
+   the first-game mode. Fast mode is close to a knife edge (no minerals or groups, few events), so small changes here
+   move the win rate a lot. */
+P.BALANCE.F = {inc:.92, cost:1.22, haz:1.071, growth:1.0355};
 { const _start = P.startGame; P.startGame = (lang, o = {}) => _start(lang, o && o.mode === "fast" && !o.ab ? {...o, ab:"F"} : o); }
 /* seconds of real time per game month */
 P.secPerMonth = (sp = S.speed) => (S.mode === "fast" ? FAST_SPEEDS : P.SPEEDS)[sp] || 4;
@@ -6275,7 +6283,7 @@ if (P.mods && P.mods.seasons) return;
      Drought-Proof Crops (A3) and Low-Methane Rice (A1) improve the odds, a hotter world worsens them.
    · Seasons get harsher as the world warms (seasonPower): hazard season weights, the power peak and the farming
      odds all scale with it.
-   · Season report: when a season ends it gets a grade A–F (CO₂, approval, disaster damage, aid) and A–C pay a reward.
+   · Season report: when a season ends it gets a grade A–F (CO₂, approval, disaster damage, aid) and A–B pay a reward.
    (The seasonal look of the map is drawn in life.js drawSeason.)
    ========================================================================= */
 const {S} = P;
@@ -6330,7 +6338,7 @@ function harvest(){
   const pBad = clamp(.15 + k * .55 - (has("A3") ? .1 : 0), .05, .7);
   const r = P.rand();
   if (r < pGood){
-    const g = 25 + Math.round(10 * P.rand()); S.ep += g; S.appr = clamp(S.appr + 1, 0, 100);   // 3.7.7: a good harvest also pleases people if (P.ledgerTag) P.ledgerTag("harvest", g, 0);
+    const g = SR.harvest + Math.round(SR.harvestR * P.rand()); S.ep += g; S.appr = clamp(S.appr + 1, 0, 100);   // 3.7.7: a good harvest also pleases people if (P.ledgerTag) P.ledgerTag("harvest", g, 0);
     P.addLog(`${L(TXT.good)} · ${P.IC.ep} +${g} · ${L(T("ความนิยม", "Approval"))} +1%`, "gd"); hook("toast", {icon:"wheat", title:L(TXT.good).replace(/\[\[[^\]]+\]\]\s*/, ""), msg:`${P.IC.ep} +${g}`});
     return;
   }
@@ -6362,14 +6370,18 @@ function grade(a){
   const g = pts >= 7 ? "A" : pts >= 5 ? "B" : pts >= 4 ? "C" : pts >= 2 ? "D" : "F";
   return {g, pts, dN, dA, hits:hits.length};
 }
-const REWARD = {A:{ep:40, pc:10}, B:{ep:20, pc:5}, C:null, D:null, F:null};
+/* the numbers a season can give or take (P.SEASON_RULES, so the bot test can try others) */
+/* 2.1.3: rewards were A 40 money + 10 policy points, B 20 + 5, four times a year — about +160 money and +40 points a
+   year for a good player, which made every game a win (the bot test did not load this file then; it does now) */
+const SR = P.SEASON_RULES = {A:{ep:15, pc:3}, B:{ep:6, pc:1}, harvest:25, harvestR:10, peak:.06};
+const REWARD = {get A(){ return SR.A; }, get B(){ return SR.B; }, C:null, D:null, F:null};
 
 function seasonsTick(){
   if (!S.started || S.training) return;
   const m = S.tick % 12, sea = P.seasonOf(S.tick);
   S.seasCO2 = seasonCO2(sea.id);
   // summer peak: approval
-  if (sea.id === "hot" && !has("E9")) S.appr = clamp(S.appr - .06 * seasonPower(), 0, 100);   // 3.7.7: was −.35 a month (+ June): too harsh, players lost on approval
+  if (sea.id === "hot" && !has("E9")) S.appr = clamp(S.appr - SR.peak * seasonPower(), 0, 100);   // 3.7.7: was −.35 a month (+ June): too harsh, players lost on approval
   if (m === 6) harvest();
   // a new season starts (months 2, 5, 8, 11)
   if (m % 3 === 2){
