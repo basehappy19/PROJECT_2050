@@ -22,8 +22,8 @@ P.CHARS.push(
          {id:"oce2", cd:30, lv:5, icon:"radio", name:T("เตือนภัยทะเล", "Sea-Storm Warning"), desc:T("ทุกพยากรณ์พายุ น้ำท่วม และน้ำเค็มรุกตอนนี้ อพยพให้ฟรี", "Every storm, flood and saltwater forecast right now is evacuated for free")}]},
   {id:"eng", price:349, icon:"hard-hat", color:"#ffc24a",
    name:T("วิศวกรเมือง", "The City Engineer"), person:T("คุณกล้า", "Kla"),
-   pas:T("สกิลหมวดเมือง อุตสาหกรรม และอาหารกับน้ำ ทยอยผลเร็วขึ้น 25% (เลเวล 3: 30%)", "City, industry and food & water skills roll out 25% faster (level 3: 30%)"),
-   acts:[{id:"eng1", cd:30, icon:"construction", name:T("เร่งก่อสร้าง", "Rush the Build"), desc:T("ทุกโครงการที่กำลังทยอยผล เดินหน้าเร็วขึ้นทันที 4 เดือน", "Every project rolling out jumps 4 months ahead now")},
+   pas:T("สกิลหมวดเมือง อุตสาหกรรม และอาหารกับน้ำ ได้ผลเต็มที่เร็วขึ้น 25% (เลเวล 3: 30%)", "City, industry and food & water skills reach full effect 25% faster (level 3: 30%)"),
+   acts:[{id:"eng1", cd:30, icon:"construction", name:T("เร่งก่อสร้าง", "Rush the Build"), desc:T("ทุกโครงการที่กำลังดำเนินการ เดินหน้าเร็วขึ้นทันที 4 เดือน", "Every project in progress jumps 4 months ahead now")},
          {id:"eng2", cd:96, lv:5, icon:"shield-check", name:T("เมืองทนภัย", "Hardened Cities"), desc:T("ความเสี่ยงภัยพิบัติทุกทวีป −6%", "Every region's disaster risk −6%")}]},
 );
 P.CHARS.slice(-2).forEach(c => { P.CHAR[c.id] = c; });

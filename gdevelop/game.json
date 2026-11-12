@@ -22335,7 +22335,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "15ccd84e-530f-412a-af7f-315e881d8520",
+          "persistentUuid": "33a4311d-88ff-4053-8ce8-ef068a5ecd3b",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -22664,7 +22664,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "12fcd15a-5b42-4edc-a77f-538fc7df6bb5",
+          "persistentUuid": "f65aa15b-e142-4ed0-8b3a-8f7597cf3064",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -22680,7 +22680,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Ocean",
-          "persistentUuid": "08d6b1d3-5c15-4d99-abf3-3cd6ef8127da",
+          "persistentUuid": "9b9667bd-9b4b-436b-ae95-55619e330c84",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -22696,7 +22696,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "MapRim",
-          "persistentUuid": "4499ce6c-0414-4275-85a8-1f3bb0208cf1",
+          "persistentUuid": "b9da2097-760d-4608-be76-9d1547bbaeea",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -22712,7 +22712,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "ArcticIce",
-          "persistentUuid": "bee41f48-d5af-48d1-af2e-aa47bbf2d6c0",
+          "persistentUuid": "0d958606-075b-4e8a-8bfe-fe425175e664",
           "width": 1920,
           "x": 0,
           "y": 84,
@@ -22728,7 +22728,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "1fdb68f4-5860-4b06-b370-934c4a4962aa",
+          "persistentUuid": "6c364b45-c17e-468d-89ed-3a2eab0da458",
           "width": 1636.6666666666667,
           "x": 67.33333333333333,
           "y": 84.66666666666667,
@@ -22755,7 +22755,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "83b60ffb-acde-4b56-b26a-faf3d4ebf102",
+          "persistentUuid": "8053a3e8-c6fe-4592-83c1-a01949f12e44",
           "width": 1069.3333333333333,
           "x": 610,
           "y": 92.66666666666667,
@@ -22782,7 +22782,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "ec0c1cb5-ba40-476e-8448-db04d8a1e718",
+          "persistentUuid": "ca3516cd-4395-4a3d-88d1-24ec90b1250d",
           "width": 486,
           "x": 1125.3333333333333,
           "y": 222.66666666666666,
@@ -22809,7 +22809,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "e3ef31e3-3d24-43e3-b103-05441f00c397",
+          "persistentUuid": "3ec1c237-b5cd-4719-a02e-330b40958125",
           "width": 251.33333333333334,
           "x": 466.6666666666667,
           "y": 480,
@@ -22836,7 +22836,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "b9cb4e54-9dc1-4f61-9889-cf944079f4b3",
+          "persistentUuid": "f93c59ba-03c3-4363-9a17-ca25a7408ba3",
           "width": 474,
           "x": 807.3333333333334,
           "y": 315.33333333333337,
@@ -22863,7 +22863,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "7b7a2aca-9228-4361-93ae-fd9dc9c73d9a",
+          "persistentUuid": "dc72c140-a2ea-41ed-999e-89703071f961",
           "width": 640,
           "x": 1213.3333333333333,
           "y": 330.66666666666663,
@@ -22890,7 +22890,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "ef4ddd6a-1281-43c9-a9e5-c8a8853bff0b",
+          "persistentUuid": "dea10010-76b3-4707-817f-b764c81aaedf",
           "width": 1638,
           "x": 66.66666666666667,
           "y": 84,
@@ -22917,7 +22917,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "8017aeb8-5c0a-4c8f-898f-c59d0d8c68b1",
+          "persistentUuid": "d5e5ee63-2be4-41c2-9f27-a40cd48988e6",
           "width": 1070.6666666666667,
           "x": 609.3333333333334,
           "y": 92,
@@ -22944,7 +22944,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "9a85e108-f9bf-4564-ac02-624d3c620769",
+          "persistentUuid": "aa716a7b-8e3f-49fa-948d-64ba5cfce562",
           "width": 488,
           "x": 1124,
           "y": 222,
@@ -22971,7 +22971,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "ec25b5f7-adca-4c17-858b-3d0d9ac6cfb1",
+          "persistentUuid": "759b09f2-d32a-4061-938f-a1b76c66256d",
           "width": 252.66666666666666,
           "x": 466,
           "y": 479.3333333333333,
@@ -22998,7 +22998,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "22926689-94b9-4781-8416-fac63120b997",
+          "persistentUuid": "ed96e24a-e6ef-4872-b715-a7e83eab9242",
           "width": 474,
           "x": 807.3333333333334,
           "y": 314,
@@ -23025,7 +23025,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "0c958b1d-5292-4a5a-bf28-25de5d293700",
+          "persistentUuid": "acabef0d-a411-40a8-b505-b24e9879f03a",
           "width": 640,
           "x": 1214,
           "y": 330,
@@ -23052,7 +23052,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "1318d718-c65d-473c-b69d-3daaf9682711",
+          "persistentUuid": "f8622d7a-5e04-4f8c-a42a-485a6e308241",
           "width": 0,
           "x": 573.7,
           "y": 516.4,
@@ -23073,7 +23073,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.22
+              "value": 0.43
             }
           ]
         },
@@ -23084,7 +23084,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "4e301522-4923-44fd-ab0b-eb203bdbae7e",
+          "persistentUuid": "949d969f-87fd-4725-8d7a-ab1ea4ddf738",
           "width": 0,
           "x": 444.5,
           "y": 591.2,
@@ -23105,7 +23105,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.82
+              "value": 2.66
             }
           ]
         },
@@ -23116,7 +23116,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "e82d108f-89a8-433a-a443-cc0b6fca3c22",
+          "persistentUuid": "a1be3d1d-b57d-462e-8531-f8327ddc894c",
           "width": 0,
           "x": 306.8,
           "y": 563.1,
@@ -23137,7 +23137,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.72
+              "value": 5.82
             }
           ]
         },
@@ -23148,7 +23148,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "0c51e544-a755-45d0-bb35-6352930d0fdf",
+          "persistentUuid": "40cd4bb1-80ec-4bd3-ac20-bfb9340d15fa",
           "width": 0,
           "x": 491.6,
           "y": 507.7,
@@ -23169,7 +23169,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.84
+              "value": 2.12
             }
           ]
         },
@@ -23180,7 +23180,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "49f1818c-b6f7-48f9-8032-1cb5db68597c",
+          "persistentUuid": "993d3e60-033b-4920-93fd-303300e38989",
           "width": 0,
           "x": 541.1,
           "y": 494.6,
@@ -23201,7 +23201,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.16
+              "value": 2.9
             }
           ]
         },
@@ -23212,7 +23212,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "e444cfa1-438d-4ddd-a326-eff273df45f1",
+          "persistentUuid": "232f6b43-1c4e-4179-bf4f-691003f4940c",
           "width": 0,
           "x": 422.1,
           "y": 658,
@@ -23233,7 +23233,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.4
+              "value": 0.68
             }
           ]
         },
@@ -23244,7 +23244,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "1ff762a4-9286-4ff6-8b30-67e45e59d729",
+          "persistentUuid": "4a96d87c-42a5-4845-b0e7-756e0a025485",
           "width": 0,
           "x": 335.2,
           "y": 418.4,
@@ -23265,7 +23265,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.84
+              "value": 5.1
             }
           ]
         },
@@ -23276,7 +23276,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "7957bd16-1d3b-4750-aad9-9536c2dcb987",
+          "persistentUuid": "9017c549-8a81-42f3-a015-90beca1bfe58",
           "width": 0,
           "x": 1020,
           "y": 434.7,
@@ -23297,7 +23297,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.26
+              "value": 1.11
             }
           ]
         },
@@ -23308,7 +23308,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "40629a8e-0952-42da-8839-047fb3befc87",
+          "persistentUuid": "c12af6ca-af28-4dcf-a717-9489835c404e",
           "width": 0,
           "x": 1034.8,
           "y": 455.2,
@@ -23329,7 +23329,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.19
+              "value": 2.17
             }
           ]
         },
@@ -23340,7 +23340,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "99683952-4e76-4252-a331-76bf0de54d92",
+          "persistentUuid": "1e9b9b7a-553d-4458-b745-a3bf49d5edb8",
           "width": 0,
           "x": 1101.5,
           "y": 426.6,
@@ -23361,7 +23361,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.41
+              "value": 2.64
             }
           ]
         },
@@ -23372,7 +23372,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "db2371fa-7a5f-4ab1-be6a-be38a4ff1f46",
+          "persistentUuid": "29f6a4ff-c860-40ab-9aac-184b635e72ca",
           "width": 0,
           "x": 1247.6,
           "y": 399.2,
@@ -23393,7 +23393,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2
+              "value": 5.55
             }
           ]
         },
@@ -23404,7 +23404,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "4e1bae8b-4250-4d03-85c3-8ccaf1867a2c",
+          "persistentUuid": "acde0986-c7f9-4dfb-90ad-9026372fa878",
           "width": 0,
           "x": 1147.4,
           "y": 429,
@@ -23425,7 +23425,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.93
+              "value": 0.05
             }
           ]
         },
@@ -23436,7 +23436,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "443d9753-5604-47e3-bfff-9dca939328ff",
+          "persistentUuid": "ed1ebde8-09a1-43ae-b608-fd8be2e4ae37",
           "width": 0,
           "x": 998.2,
           "y": 518.5,
@@ -23457,7 +23457,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.04
+              "value": 2.88
             }
           ]
         },
@@ -23468,7 +23468,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "5a9a74e0-279f-4a4c-b220-ed873a14fde3",
+          "persistentUuid": "801c7e6b-4f5c-4f0a-b272-471a2e2853c9",
           "width": 0,
           "x": 1195.7,
           "y": 514.2,
@@ -23489,7 +23489,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.6
+              "value": 1.02
             }
           ]
         },
@@ -23500,7 +23500,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f217f433-40d4-4d67-956d-6ebcdbb79fce",
+          "persistentUuid": "2582948e-fa95-45f5-bedf-4c16b0eb8f33",
           "width": 0,
           "x": 1203.6,
           "y": 363.4,
@@ -23521,7 +23521,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.9
+              "value": 2.06
             }
           ]
         },
@@ -23532,7 +23532,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "2d0c394d-9476-4326-91cd-ffe1d5996936",
+          "persistentUuid": "7e9ab6d4-79e2-47e8-9217-02187e8cf33a",
           "width": 0,
           "x": 1723.5,
           "y": 522.1,
@@ -23553,7 +23553,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.23
+              "value": 1.07
             }
           ]
         },
@@ -23564,7 +23564,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "440816a6-1b61-4ee0-9d40-298f0e19d32f",
+          "persistentUuid": "417f38c2-cbc5-45fa-9028-1bd69398689d",
           "width": 0,
           "x": 1754.3,
           "y": 581.9,
@@ -23585,7 +23585,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.31
+              "value": 2.85
             }
           ]
         },
@@ -23596,7 +23596,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d93d9a19-c0b6-4ebb-8f14-d26d0655fe41",
+          "persistentUuid": "639713a2-2730-4e73-a097-7340af7e54fc",
           "width": 0,
           "x": 1864.2,
           "y": 551.5,
@@ -23617,7 +23617,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.22
+              "value": 3.83
             }
           ]
         },
@@ -23628,7 +23628,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f1b98d06-f6a4-44a0-9696-6c709a12f2f2",
+          "persistentUuid": "3145b1d6-1537-41e3-9fc9-bdc7c3014271",
           "width": 0,
           "x": 1787.5,
           "y": 538.3,
@@ -23649,7 +23649,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.83
+              "value": 3.24
             }
           ]
         },
@@ -23660,7 +23660,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "9d8c9351-d519-4293-bdf9-98a5304a14b1",
+          "persistentUuid": "6ff14faa-4242-4004-8978-4d5c709d9c41",
           "width": 0,
           "x": 1704.8,
           "y": 634.6,
@@ -23681,7 +23681,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.18
+              "value": 1.57
             }
           ]
         },
@@ -23692,7 +23692,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a425c6d2-a29c-4ad0-a69b-813836fdbc1e",
+          "persistentUuid": "36c4c145-dba9-45e8-bc7c-b8ec7806aae5",
           "width": 0,
           "x": 1663.7,
           "y": 592.5,
@@ -23713,7 +23713,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.29
+              "value": 2.5
             }
           ]
         },
@@ -23724,7 +23724,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ef98f93a-fbc8-4f2a-b9a3-0101d8a74fe5",
+          "persistentUuid": "80383c6e-b641-44b5-871c-08e8b9a9c406",
           "width": 0,
           "x": 1485,
           "y": 498.3,
@@ -23745,7 +23745,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.39
+              "value": 2.07
             }
           ]
         },
@@ -23756,7 +23756,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "65fb8989-1938-400f-bb4d-4ca9e330ebfc",
+          "persistentUuid": "e2633f33-a753-411a-99fb-a66159f22a8e",
           "width": 0,
           "x": 1765.8,
           "y": 508.5,
@@ -23777,7 +23777,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.2
+              "value": 4.11
             }
           ]
         },
@@ -23788,7 +23788,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a087e254-792e-48c5-af63-f63399f263b0",
+          "persistentUuid": "1c55b1c9-4970-4760-9adf-18844b3a6c14",
           "width": 0,
           "x": 1627.5,
           "y": 693,
@@ -23809,7 +23809,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.32
+              "value": 1.06
             }
           ]
         },
@@ -23820,7 +23820,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ff4999f2-3031-442e-9c54-d7b98efd8a6a",
+          "persistentUuid": "399ad05a-68a6-48c8-ba4d-3440bbfde974",
           "width": 0,
           "x": 1665.5,
           "y": 814.1,
@@ -23841,7 +23841,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.98
+              "value": 2.89
             }
           ]
         },
@@ -23852,7 +23852,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a865d35d-c818-4922-9e06-bac343b544bb",
+          "persistentUuid": "e0f20c50-140f-4ba2-a7f3-f75b68dbfce7",
           "width": 0,
           "x": 1751.3,
           "y": 687.8,
@@ -23873,7 +23873,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.74
+              "value": 1.87
             }
           ]
         },
@@ -23884,7 +23884,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "878c0132-9b8f-4bba-a246-49016911a656",
+          "persistentUuid": "b8047f88-50e7-4397-a585-b91bd9536c12",
           "width": 0,
           "x": 1486.8,
           "y": 599.1,
@@ -23905,7 +23905,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2
+              "value": 3.66
             }
           ]
         },
@@ -23916,7 +23916,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f3f91ea6-d6ec-439d-921f-56248f8d1504",
+          "persistentUuid": "cc4bacc6-7b52-4635-93de-d741335d0d9b",
           "width": 0,
           "x": 1460.8,
           "y": 659.8,
@@ -23937,7 +23937,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.1
+              "value": 0.12
             }
           ]
         },
@@ -23948,7 +23948,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "6028c10a-66ba-4b4d-8bd6-ed102bc70ecd",
+          "persistentUuid": "0aca4e67-deb4-4494-97f5-5fe59363f7a0",
           "width": 0,
           "x": 1566.5,
           "y": 630.1,
@@ -23969,7 +23969,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.07
+              "value": 2.97
             }
           ]
         },
@@ -23980,7 +23980,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d77be14b-7d12-4cfb-83dc-3a012828b61a",
+          "persistentUuid": "8b61766f-1dd9-4bd2-b127-2d5ada3238a2",
           "width": 0,
           "x": 1933.7,
           "y": 989.4,
@@ -24001,7 +24001,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.35
+              "value": 4.1
             }
           ]
         },
@@ -24012,7 +24012,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f4b4b8fd-e1a1-45c1-8370-60350298563b",
+          "persistentUuid": "5036ba23-1ba5-406f-b5dc-86ec015861d7",
           "width": 0,
           "x": 1664.9,
           "y": 711.1,
@@ -24033,7 +24033,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.08
+              "value": 3.76
             }
           ]
         },
@@ -24044,7 +24044,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "13aa55ee-e4c4-4d4e-bd06-69d1edf23d0f",
+          "persistentUuid": "ed62a7e4-5266-4785-a390-bf90f9a111bf",
           "width": 0,
           "x": 1425.2,
           "y": 623.1,
@@ -24065,7 +24065,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.07
+              "value": 1.03
             }
           ]
         },
@@ -24076,7 +24076,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "42ee3283-5e5d-4a90-9a45-7076d0a312f5",
+          "persistentUuid": "9b66a840-3f45-4a78-86f6-bc2e73617671",
           "width": 0,
           "x": 739.2,
           "y": 921.1,
@@ -24097,7 +24097,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.14
+              "value": 2.62
             }
           ]
         },
@@ -24108,7 +24108,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "cc66cfe1-4590-43e7-bc03-2a253c4c59e9",
+          "persistentUuid": "e5900ed5-8280-4c26-86ce-97f40e0e9a4e",
           "width": 0,
           "x": 667.9,
           "y": 994.1,
@@ -24129,7 +24129,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.72
+              "value": 5.66
             }
           ]
         },
@@ -24140,7 +24140,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "cb68b4e3-b22d-4e9e-8794-829e12164a5b",
+          "persistentUuid": "1549e85f-00c0-4014-8564-a41c3d9328d9",
           "width": 0,
           "x": 555.6,
           "y": 849.4,
@@ -24161,7 +24161,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.24
+              "value": 1.14
             }
           ]
         },
@@ -24172,7 +24172,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ebf65eaf-c631-41b6-bcb5-b9b8a3322371",
+          "persistentUuid": "ae526c0a-2f7b-406e-bb55-f9f55c462477",
           "width": 0,
           "x": 573.1,
           "y": 748.2,
@@ -24193,7 +24193,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.94
+              "value": 1.44
             }
           ]
         },
@@ -24204,7 +24204,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "40adbe78-20e5-43cf-9767-d63948147173",
+          "persistentUuid": "a04a36b2-335f-44ba-9dd5-eba29c3f7dd8",
           "width": 0,
           "x": 594.2,
           "y": 986,
@@ -24225,7 +24225,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.64
+              "value": 2.51
             }
           ]
         },
@@ -24236,7 +24236,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "683f60da-ba60-468f-913f-2b42ffa7eacd",
+          "persistentUuid": "a96d1af6-1bce-4d38-a07a-84f86f19d347",
           "width": 0,
           "x": 658.2,
           "y": 795.3,
@@ -24257,7 +24257,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.74
+              "value": 2.89
             }
           ]
         },
@@ -24268,7 +24268,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "5ff80464-1095-4c7f-aefe-e6bfca750e56",
+          "persistentUuid": "49a29ece-5da0-4a35-948e-ef6faaf2bc70",
           "width": 0,
           "x": 1302.6,
           "y": 624.4,
@@ -24289,7 +24289,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.56
+              "value": 2.75
             }
           ]
         },
@@ -24300,7 +24300,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "7d3ba9ab-7ebc-4d24-a57c-d689f2298029",
+          "persistentUuid": "c5bf90ba-07d8-4597-a257-627cf3897d1c",
           "width": 0,
           "x": 1331,
           "y": 551.5,
@@ -24321,7 +24321,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.08
+              "value": 4.52
             }
           ]
         },
@@ -24332,7 +24332,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "5e0c3c2c-804e-47ea-86cb-d5b3a827e500",
+          "persistentUuid": "b71cd7b3-baf5-4930-a397-f502565d41f3",
           "width": 0,
           "x": 1209,
           "y": 589.9,
@@ -24353,7 +24353,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.98
+              "value": 3
             }
           ]
         },
@@ -24364,7 +24364,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "87ee99bf-a84c-4878-be81-0a7f51c48e87",
+          "persistentUuid": "24e88d3b-eae9-40a3-ae76-a41792e259f5",
           "width": 0,
           "x": 1041.1,
           "y": 737.3,
@@ -24385,7 +24385,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.27
+              "value": 2.97
             }
           ]
         },
@@ -24396,7 +24396,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ea2be8a8-8e1f-4e2e-a570-938f5a6683f4",
+          "persistentUuid": "fa93e324-705c-41c0-a828-9db225fd4b01",
           "width": 0,
           "x": 1189.7,
           "y": 938.4,
@@ -24417,7 +24417,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.17
+              "value": 0.59
             }
           ]
         },
@@ -24428,7 +24428,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "2c249a91-2589-43e6-a36c-3a80281da154",
+          "persistentUuid": "01037d21-b34b-4c72-a99a-4b5bcbf82b89",
           "width": 0,
           "x": 1354.5,
           "y": 621.1,
@@ -24449,7 +24449,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.29
+              "value": 4.65
             }
           ]
         },
@@ -24460,7 +24460,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "dc4c39dd-d17b-43e7-8131-47d03ca35341",
+          "persistentUuid": "de52c7b4-6875-422d-8cb7-c924d71fee34",
           "width": 0,
           "x": 1242.8,
           "y": 784.4,
@@ -24481,7 +24481,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.35
+              "value": 4.5
             }
           ]
         },
@@ -24492,7 +24492,7 @@
           "keepRatio": true,
           "layer": "Menu",
           "name": "MenuShade",
-          "persistentUuid": "21158051-e362-4262-a341-957a76bf70a4",
+          "persistentUuid": "b89d1070-8f34-41ee-9c77-f21c052c8846",
           "width": 900,
           "x": 0,
           "y": 0,
@@ -25802,7 +25802,7 @@
           "keepRatio": true,
           "layer": "Backdrop",
           "name": "Backdrop",
-          "persistentUuid": "5f42d36c-8ecd-47b0-83d4-7071dad1c33f",
+          "persistentUuid": "ebbbe843-c5a6-4ab3-b050-4dbd0c05d975",
           "width": 1920,
           "x": 0,
           "y": 0,
@@ -25818,7 +25818,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Ocean",
-          "persistentUuid": "37d2aeff-4aca-4b4e-b97f-da0422af93e1",
+          "persistentUuid": "6687721b-c55f-484b-989c-ef56dec965d3",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -25834,7 +25834,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "MapRim",
-          "persistentUuid": "2daab846-d85c-4332-b919-f9889b536ebd",
+          "persistentUuid": "8553e2ba-ce36-4ed6-8a64-9f51778f2393",
           "width": 1973.3333333333333,
           "x": -26.666666666666668,
           "y": 57.33333333333333,
@@ -25850,7 +25850,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "ArcticIce",
-          "persistentUuid": "93cdfdf0-5472-4421-97c0-c0e3260db206",
+          "persistentUuid": "95a48eb3-7f43-48eb-bf5e-3ad65ca62a0f",
           "width": 1920,
           "x": 0,
           "y": 84,
@@ -25866,7 +25866,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "95c3b120-d9d7-4334-856c-e7132254008d",
+          "persistentUuid": "1e1ad8fb-e8db-48ad-9375-0de8d623034d",
           "width": 1636.6666666666667,
           "x": 67.33333333333333,
           "y": 84.66666666666667,
@@ -25893,7 +25893,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "fa5f8b93-77c9-479f-b01d-0eb208dded6f",
+          "persistentUuid": "c2f0d4dc-78e4-480e-b27b-167199aff2a6",
           "width": 1069.3333333333333,
           "x": 610,
           "y": 92.66666666666667,
@@ -25920,7 +25920,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "18a4c281-95f4-4d88-a518-ae11ab2cede1",
+          "persistentUuid": "eaaaf0ec-0695-44c1-a021-1d97bfb6cad1",
           "width": 486,
           "x": 1125.3333333333333,
           "y": 222.66666666666666,
@@ -25947,7 +25947,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "4e140d88-9f74-4caa-b57c-0fce4a1caad6",
+          "persistentUuid": "0ebe08b6-6bb2-41dc-9606-be29fb1fa2b9",
           "width": 251.33333333333334,
           "x": 466.6666666666667,
           "y": 480,
@@ -25974,7 +25974,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "a743b655-2b27-47e8-8b57-e84ee1d71607",
+          "persistentUuid": "7a773697-943b-4fa3-bb9d-19ffe722fbd8",
           "width": 474,
           "x": 807.3333333333334,
           "y": 315.33333333333337,
@@ -26001,7 +26001,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Region",
-          "persistentUuid": "5f964c2f-6859-4ce8-b3bb-d4dabcb812da",
+          "persistentUuid": "1c62b4e7-7063-4c66-a1ef-204c2517e901",
           "width": 640,
           "x": 1213.3333333333333,
           "y": 330.66666666666663,
@@ -26028,7 +26028,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "0d35eb62-e499-4015-ad33-b32ce6d568c6",
+          "persistentUuid": "bca1b6a0-2e27-4b9b-87c5-175cfb80923c",
           "width": 1638,
           "x": 66.66666666666667,
           "y": 84,
@@ -26055,7 +26055,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "83980589-8ff6-43da-875a-844a55bb871f",
+          "persistentUuid": "9e033a93-136a-4b5d-bf41-95f8b43459c7",
           "width": 1070.6666666666667,
           "x": 609.3333333333334,
           "y": 92,
@@ -26082,7 +26082,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "a706c7d9-73da-455d-a3e9-de1af4090abd",
+          "persistentUuid": "0388b0f7-fe06-4dd0-8346-1075d778ef08",
           "width": 488,
           "x": 1124,
           "y": 222,
@@ -26109,7 +26109,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "0d61d6a6-c5a6-4b26-8c6a-0ce453e26f5f",
+          "persistentUuid": "e163e0a8-9926-4274-82d6-65698ab80aef",
           "width": 252.66666666666666,
           "x": 466,
           "y": 479.3333333333333,
@@ -26136,7 +26136,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "a142dc2c-3e7c-4326-8ffd-8d53821474c7",
+          "persistentUuid": "c807f508-0298-4cc9-a9cb-811be1127192",
           "width": 474,
           "x": 807.3333333333334,
           "y": 314,
@@ -26163,7 +26163,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "RegionLine",
-          "persistentUuid": "1cc660fe-526c-447d-8be7-e429a019d3a9",
+          "persistentUuid": "78dfc5b5-65f2-4a30-956a-0f3f69075a05",
           "width": 640,
           "x": 1214,
           "y": 330,
@@ -26190,7 +26190,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "46ffdc3b-af26-493c-b70b-0ec3bcfbf7e1",
+          "persistentUuid": "de8a9e60-283d-4906-82ad-68f7f1090c3a",
           "width": 0,
           "x": 573.7,
           "y": 516.4,
@@ -26211,7 +26211,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.28
+              "value": 4.69
             }
           ]
         },
@@ -26222,7 +26222,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "56abcba9-7545-4704-bed0-5a8925c74363",
+          "persistentUuid": "bef8e785-2613-42c9-b224-077c6ed1c12d",
           "width": 0,
           "x": 444.5,
           "y": 591.2,
@@ -26243,7 +26243,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.06
+              "value": 4.61
             }
           ]
         },
@@ -26254,7 +26254,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "06dd84b6-3598-4663-8084-ea5f6a96267c",
+          "persistentUuid": "8f59f70b-eadd-4b01-9477-dbcd129e2733",
           "width": 0,
           "x": 306.8,
           "y": 563.1,
@@ -26275,7 +26275,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.59
+              "value": 1.85
             }
           ]
         },
@@ -26286,7 +26286,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "70d34d2b-b64f-4048-86db-9d9a4b09d3d9",
+          "persistentUuid": "3761b62b-b9f0-4d1f-a444-a46722570c8a",
           "width": 0,
           "x": 491.6,
           "y": 507.7,
@@ -26307,7 +26307,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.62
+              "value": 0.02
             }
           ]
         },
@@ -26318,7 +26318,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a6b0983e-0f71-4f56-a56f-ed6adf9a392a",
+          "persistentUuid": "ecd5db68-9624-4555-be8b-004e7472ddad",
           "width": 0,
           "x": 541.1,
           "y": 494.6,
@@ -26339,7 +26339,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.92
+              "value": 3.56
             }
           ]
         },
@@ -26350,7 +26350,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f7790f8d-4f38-4d28-be0a-79825b457659",
+          "persistentUuid": "00e386d4-e9c9-4d88-b6af-2cad141f59da",
           "width": 0,
           "x": 422.1,
           "y": 658,
@@ -26371,7 +26371,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.43
+              "value": 3.06
             }
           ]
         },
@@ -26382,7 +26382,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "68868540-fe8e-4b5b-95be-86a767c57d97",
+          "persistentUuid": "ce0b5ea8-e480-4835-8922-da651e508179",
           "width": 0,
           "x": 335.2,
           "y": 418.4,
@@ -26403,7 +26403,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.79
+              "value": 0.41
             }
           ]
         },
@@ -26414,7 +26414,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "79c7b394-b9a4-4556-a55a-4a41dfab7d9f",
+          "persistentUuid": "88402895-6252-4e17-81c6-33b17113ee8d",
           "width": 0,
           "x": 1020,
           "y": 434.7,
@@ -26435,7 +26435,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.77
+              "value": 4.97
             }
           ]
         },
@@ -26446,7 +26446,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "df28abcf-d91e-4898-ad04-5fdd333ffb81",
+          "persistentUuid": "5463a4a6-0e95-4a9b-a1f0-6e4bca49598b",
           "width": 0,
           "x": 1034.8,
           "y": 455.2,
@@ -26467,7 +26467,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.86
+              "value": 4.89
             }
           ]
         },
@@ -26478,7 +26478,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "059ccba7-a8ae-4eb9-918f-99240107f4e9",
+          "persistentUuid": "6db27d33-f0ff-4f0d-b08e-002a46086948",
           "width": 0,
           "x": 1101.5,
           "y": 426.6,
@@ -26499,7 +26499,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.55
+              "value": 1.94
             }
           ]
         },
@@ -26510,7 +26510,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "4a1cd3b8-89b7-4820-b122-0a4cee603541",
+          "persistentUuid": "37b2c7e1-9014-4dd6-9286-9378bd22cbbe",
           "width": 0,
           "x": 1247.6,
           "y": 399.2,
@@ -26531,7 +26531,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.64
+              "value": 0.49
             }
           ]
         },
@@ -26542,7 +26542,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "a5785765-ba5b-4260-8d21-9c8ba8613b8a",
+          "persistentUuid": "2904712e-f397-4162-b8d2-0d16caddcfb1",
           "width": 0,
           "x": 1147.4,
           "y": 429,
@@ -26563,7 +26563,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.97
+              "value": 0.48
             }
           ]
         },
@@ -26574,7 +26574,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8d4b0348-0049-43ee-8a8b-79f9040b8e47",
+          "persistentUuid": "12733e69-e51d-41fa-a313-263ca4bde6fa",
           "width": 0,
           "x": 998.2,
           "y": 518.5,
@@ -26595,7 +26595,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.11
+              "value": 4.75
             }
           ]
         },
@@ -26606,7 +26606,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "20e42d51-b98f-4be0-b01b-a5c4b7eebd80",
+          "persistentUuid": "e2d380be-07d5-40df-be08-64573b825ada",
           "width": 0,
           "x": 1195.7,
           "y": 514.2,
@@ -26627,7 +26627,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.91
+              "value": 1.92
             }
           ]
         },
@@ -26638,7 +26638,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "89d48f39-982d-4457-9f81-8b7a8041000c",
+          "persistentUuid": "c9b3b96c-62d1-41b6-9a98-2a887f462215",
           "width": 0,
           "x": 1203.6,
           "y": 363.4,
@@ -26659,7 +26659,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.26
+              "value": 4.44
             }
           ]
         },
@@ -26670,7 +26670,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "fe1e4d21-82ca-4d6d-881b-c023def214e2",
+          "persistentUuid": "88e1ef90-b581-441c-b99c-bcd7883db0ae",
           "width": 0,
           "x": 1723.5,
           "y": 522.1,
@@ -26691,7 +26691,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.18
+              "value": 1.78
             }
           ]
         },
@@ -26702,7 +26702,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "6c305fe6-cbe7-4df0-b61e-4efb0f33b363",
+          "persistentUuid": "b2d5ba6a-f6d2-4875-9953-a89c339cdb41",
           "width": 0,
           "x": 1754.3,
           "y": 581.9,
@@ -26723,7 +26723,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.19
+              "value": 2.22
             }
           ]
         },
@@ -26734,7 +26734,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "69dcbba1-5560-4f8e-87d1-9beb939d7720",
+          "persistentUuid": "c9e0a72d-76a1-4464-b382-0320c87aca32",
           "width": 0,
           "x": 1864.2,
           "y": 551.5,
@@ -26755,7 +26755,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.82
+              "value": 3.73
             }
           ]
         },
@@ -26766,7 +26766,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f434ac3d-29fe-46ad-a7dd-984cee921ca0",
+          "persistentUuid": "182248fa-4575-4147-97dd-c493255f1680",
           "width": 0,
           "x": 1787.5,
           "y": 538.3,
@@ -26787,7 +26787,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.71
+              "value": 3.18
             }
           ]
         },
@@ -26798,7 +26798,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "af74a5f7-428a-49c8-8f26-5328cc2513a1",
+          "persistentUuid": "1ee7fdc7-ba4a-4b1c-a1a2-43eb84c5dc58",
           "width": 0,
           "x": 1704.8,
           "y": 634.6,
@@ -26819,7 +26819,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.12
+              "value": 3.11
             }
           ]
         },
@@ -26830,7 +26830,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f9aa20f8-8188-47e3-93f9-bdcd146b5fbd",
+          "persistentUuid": "8f26c511-a456-492a-a508-95e9bc69f826",
           "width": 0,
           "x": 1663.7,
           "y": 592.5,
@@ -26851,7 +26851,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.19
+              "value": 2.58
             }
           ]
         },
@@ -26862,7 +26862,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "9f2ba54d-c347-4421-9b5a-d31565a6c1f2",
+          "persistentUuid": "59465f65-493a-4525-a2e2-84e3fd1c6115",
           "width": 0,
           "x": 1485,
           "y": 498.3,
@@ -26883,7 +26883,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.82
+              "value": 1.71
             }
           ]
         },
@@ -26894,7 +26894,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "39d121fb-f842-4424-ba0b-7545402d58b6",
+          "persistentUuid": "2f0154ea-0386-4393-a250-f3e859e05563",
           "width": 0,
           "x": 1765.8,
           "y": 508.5,
@@ -26915,7 +26915,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.63
+              "value": 1.52
             }
           ]
         },
@@ -26926,7 +26926,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "4c560fbf-f328-4a36-b11c-71fa6b89a7a2",
+          "persistentUuid": "f5f640cb-a623-4abf-9799-6f2a5f8e7623",
           "width": 0,
           "x": 1627.5,
           "y": 693,
@@ -26947,7 +26947,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.71
+              "value": 1.45
             }
           ]
         },
@@ -26958,7 +26958,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b00a127f-3b6f-40c6-8fda-945152fb094f",
+          "persistentUuid": "cef36a37-ed97-446e-8d54-f2ace0ab7928",
           "width": 0,
           "x": 1665.5,
           "y": 814.1,
@@ -26979,7 +26979,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.29
+              "value": 3.39
             }
           ]
         },
@@ -26990,7 +26990,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "61a17aff-4810-4d0d-978f-04d781ebefe1",
+          "persistentUuid": "624759f4-c9e9-4cf6-8584-1dad36798db7",
           "width": 0,
           "x": 1751.3,
           "y": 687.8,
@@ -27011,7 +27011,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.17
+              "value": 0.71
             }
           ]
         },
@@ -27022,7 +27022,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d86af9b2-5516-46ac-b82f-adb75b4c1021",
+          "persistentUuid": "41655a09-fff1-4373-b8b1-ead4e78817d4",
           "width": 0,
           "x": 1486.8,
           "y": 599.1,
@@ -27054,7 +27054,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b42b4ca2-f071-4933-b3cd-e24fe2a85e6f",
+          "persistentUuid": "d97b37f1-a430-4416-9a97-6aefa8dfb014",
           "width": 0,
           "x": 1460.8,
           "y": 659.8,
@@ -27075,7 +27075,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.04
+              "value": 0.34
             }
           ]
         },
@@ -27086,7 +27086,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8dafe4cd-298d-47a3-bf0b-6864ec67a70c",
+          "persistentUuid": "9e25bd38-d808-4586-9376-fce97a76b6f9",
           "width": 0,
           "x": 1566.5,
           "y": 630.1,
@@ -27107,7 +27107,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.24
+              "value": 5.02
             }
           ]
         },
@@ -27118,7 +27118,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "b4acb6a5-4d43-422c-b39d-1ae89d897e46",
+          "persistentUuid": "19f57590-7f48-4265-b5d8-1a8e9c20e883",
           "width": 0,
           "x": 1933.7,
           "y": 989.4,
@@ -27139,7 +27139,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.87
+              "value": 0.21
             }
           ]
         },
@@ -27150,7 +27150,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "d647a35e-561b-40db-a2db-bd7457795759",
+          "persistentUuid": "c1553043-ac7d-4e75-92d8-bc77e74a595b",
           "width": 0,
           "x": 1664.9,
           "y": 711.1,
@@ -27171,7 +27171,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.81
+              "value": 5.82
             }
           ]
         },
@@ -27182,7 +27182,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "8262365b-f1d9-4028-8252-b0b3409c4fd2",
+          "persistentUuid": "df2f419e-175b-442d-92cd-094f43fdd42c",
           "width": 0,
           "x": 1425.2,
           "y": 623.1,
@@ -27203,7 +27203,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.37
+              "value": 3.12
             }
           ]
         },
@@ -27214,7 +27214,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ba527948-531f-40a2-8df3-0fcdb8063540",
+          "persistentUuid": "65c8a288-f1af-4e20-b8a0-7c335adfd1c6",
           "width": 0,
           "x": 739.2,
           "y": 921.1,
@@ -27235,7 +27235,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.37
+              "value": 4.92
             }
           ]
         },
@@ -27246,7 +27246,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "6498ec9e-88fe-4f35-925d-40dc2960b736",
+          "persistentUuid": "302cbb09-e714-4dca-9c00-d4b7bc2dda52",
           "width": 0,
           "x": 667.9,
           "y": 994.1,
@@ -27267,7 +27267,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.77
+              "value": 4.15
             }
           ]
         },
@@ -27278,7 +27278,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "cff753cc-e28f-451e-8679-5eab9b1be69d",
+          "persistentUuid": "37116ba0-5dc8-4160-aa10-a0eb2879cd42",
           "width": 0,
           "x": 555.6,
           "y": 849.4,
@@ -27299,7 +27299,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 1.44
+              "value": 3.85
             }
           ]
         },
@@ -27310,7 +27310,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "627fad38-d995-475a-8887-21850cd74684",
+          "persistentUuid": "23badb7d-f39a-4f2c-86d0-c10bbab56168",
           "width": 0,
           "x": 573.1,
           "y": 748.2,
@@ -27331,7 +27331,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.52
+              "value": 6.18
             }
           ]
         },
@@ -27342,7 +27342,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "4845b9a4-1952-4c89-85b0-2d4e6bc2d0e3",
+          "persistentUuid": "22f627eb-b901-41ab-8626-8cec3fb0a7a3",
           "width": 0,
           "x": 594.2,
           "y": 986,
@@ -27363,7 +27363,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.5
+              "value": 2.31
             }
           ]
         },
@@ -27374,7 +27374,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "28fefafd-706e-48d7-91dd-8a038be3bbc4",
+          "persistentUuid": "ea451998-b366-4c3f-91cc-dc05225482f4",
           "width": 0,
           "x": 658.2,
           "y": 795.3,
@@ -27395,7 +27395,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 6.07
+              "value": 6.26
             }
           ]
         },
@@ -27406,7 +27406,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "c5e34d3c-1dc4-4084-b648-c2936758ed3c",
+          "persistentUuid": "964a97a6-f748-4286-9c37-b7fe9c8bafab",
           "width": 0,
           "x": 1302.6,
           "y": 624.4,
@@ -27427,7 +27427,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 3.36
+              "value": 1.87
             }
           ]
         },
@@ -27438,7 +27438,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "0fb68234-0bd9-4dc3-a63c-ed817fae05e9",
+          "persistentUuid": "6617820f-77c6-4cc5-8ebd-c3ceef80d47c",
           "width": 0,
           "x": 1331,
           "y": 551.5,
@@ -27459,7 +27459,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.23
+              "value": 2.5
             }
           ]
         },
@@ -27470,7 +27470,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "f51933b4-86a5-4537-89ba-0174f9a06b3a",
+          "persistentUuid": "6bbc9f89-a63b-4bd1-bf6c-2ff658ef0da6",
           "width": 0,
           "x": 1209,
           "y": 589.9,
@@ -27491,7 +27491,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 4.61
+              "value": 0.93
             }
           ]
         },
@@ -27502,7 +27502,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "381b24fe-fcf0-4770-b3a3-0dfd9cf8073c",
+          "persistentUuid": "9745cfd3-8084-4958-89ae-d063a0f0f02a",
           "width": 0,
           "x": 1041.1,
           "y": 737.3,
@@ -27523,7 +27523,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 2.85
+              "value": 0.05
             }
           ]
         },
@@ -27534,7 +27534,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "017c0006-a054-4792-91d6-9b8852918709",
+          "persistentUuid": "753bfc11-42f6-4557-b112-3215020b19e9",
           "width": 0,
           "x": 1189.7,
           "y": 938.4,
@@ -27555,7 +27555,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.08
+              "value": 2.62
             }
           ]
         },
@@ -27566,7 +27566,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "ae219119-8a03-4c69-a667-6d17e0e6d078",
+          "persistentUuid": "da6bedf2-0dc6-48da-a89c-3fc1ecca4e9e",
           "width": 0,
           "x": 1354.5,
           "y": 621.1,
@@ -27587,7 +27587,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 5.96
+              "value": 5.6
             }
           ]
         },
@@ -27598,7 +27598,7 @@
           "keepRatio": true,
           "layer": "",
           "name": "Plume",
-          "persistentUuid": "3d378f1e-6691-4c29-afe8-8fc5200587ae",
+          "persistentUuid": "b0cb2327-ff13-4d7d-9dea-7abd29917722",
           "width": 0,
           "x": 1242.8,
           "y": 784.4,
@@ -27619,7 +27619,7 @@
             {
               "name": "Phase",
               "type": "number",
-              "value": 0.8
+              "value": 4.42
             }
           ]
         }
@@ -29711,11 +29711,11 @@
                 "  cat2:{th:\"นโยบายภูมิอากาศและเศรษฐกิจสังคม\",en:\"Climate Policy & Socio-Economy\"},",
                 "  cat3:{th:\"แหล่งดูดซับคาร์บอนและวิศวกรรมธรรมชาติ\",en:\"Carbon Sink & Nature Engineering\"},",
                 "  unlock:{th:\"อนุมัติโครงการ\",en:\"Approve project\"}, owned:{th:\"ดำเนินการแล้ว\",en:\"Enacted\"},",
-                "  needs:{th:\"ต้องมีก่อน\",en:\"Requires\"}, none:{th:\"ไม่มี\",en:\"None\"}, rollout:{th:\"ทยอยผล\",en:\"Roll-out\"},",
-                "  months:{th:\"เดือน\",en:\"mo\"}, inProgress:{th:\"โครงการที่กำลังทยอยผล\",en:\"Projects rolling out\"},",
+                "  needs:{th:\"ต้องมีก่อน\",en:\"Requires\"}, none:{th:\"ไม่มี\",en:\"None\"}, rollout:{th:\"ได้ผลเต็มที่ใน\",en:\"Full effect in\"},",
+                "  months:{th:\"เดือน\",en:\"mo\"}, inProgress:{th:\"โครงการที่กำลังดำเนินการ\",en:\"Projects in progress\"},",
                 "  paused:{th:\"หยุดชะงัก\",en:\"stalled\"},",
                 "  rollNote:{th:\"การลด CO₂ ทยอยเกิดขึ้นทุกเดือน คูณด้วยอัตราทำตามแผนของทวีป ณ เดือนนั้น และยิ่งลดได้มากแล้ว ตันสุดท้ายยิ่งลดยาก\",en:\"CO₂ cuts arrive monthly, scale with each region's on-plan at that time, and the last tonnes are the hardest to cut.\"},",
-                "  capFull:{th:\"ทีมงาน GCT ดูแลโครงการได้พร้อมกันสูงสุด 3 โครงการ รอให้โครงการเดิมทยอยผลครบก่อน\",en:\"GCT can run at most 3 roll-outs at once. Wait for one to finish.\"},",
+                "  capFull:{th:\"ทีมงาน GCT ดูแลโครงการได้พร้อมกันสูงสุด 3 โครงการ รอให้โครงการเดิมเสร็จก่อน\",en:\"GCT can run at most 3 projects at once. Wait for one to finish.\"},",
                 "  co2Now:{th:\"CO₂ ปัจจุบัน\",en:\"CO₂ now\"}, co2Start:{th:\"ปี 2026\",en:\"In 2026\"}, fossil:{th:\"สัดส่วนฟอสซิล\",en:\"Fossil share\"}, reserve:{th:\"ทุนสำรอง\",en:\"Reserves\"},",
                 "  cooldown:{th:\"พักอีก\",en:\"Ready in\"},",
                 "  chartCo2:{th:\"CO₂ สุทธิของโลก (Gt/ปี)\",en:\"Global net CO₂ (Gt/yr)\"}, chartTemp:{th:\"อุณหภูมิเพิ่มจากยุคก่อนอุตสาหกรรม (°C)\",en:\"Warming vs pre-industrial (°C)\"},",
@@ -29740,7 +29740,7 @@
                 "  logTech:{th:\"อนุมัติโครงการ\",en:\"Approved\"}, logAct:{th:\"สั่งการ\",en:\"Ordered\"},",
                 "  logTipping:{th:\"[[$temp]] อุณหภูมิเกิน +1.5°C โลกร้อนเร็วขึ้น\",en:\"[[$temp]] Warming passed +1.5°C and is speeding up.\"},",
                 "  logTipping2:{th:\"[[$temp]] อุณหภูมิเกิน +2.0°C ระบบนิเวศวิกฤต\",en:\"[[$temp]] Warming passed +2.0°C. Ecosystems in crisis.\"},",
-                "  logRollDone:{th:\"โครงการทยอยผลครบแล้ว\",en:\"finished rolling out\"},",
+                "  logRollDone:{th:\"เสร็จแล้ว ได้ผลเต็มที่\",en:\"done, now at full effect\"},",
                 "  delayed:{th:\"ผลล่าช้า\",en:\"delayed\"},",
                 "  redHelp:{th:\"ส่งความช่วยเหลือภัยพิบัติที่\",en:\"Disaster aid sent to\"},",
                 "  redMiss:{th:\"ไม่ได้ตอบสนองภัยพิบัติที่\",en:\"Missed the disaster in\"},",
@@ -30837,8 +30837,8 @@
                 "   body:{th:[\"[[cloud-lightning]] ไอคอนกะพริบ = พยากรณ์ภัย แตะเพื่อสั่งอพยพก่อนภัยมาถึง\",\"[[siren]] หลังภัยถล่มจะมีฟองแดง แตะเพื่อส่งความช่วยเหลือ (มิตรภาพขึ้น)\",\"[[sprout]] ฟองเขียว: แตะเพื่อเก็บเงินฟรี\"],",
                 "         en:[\"[[cloud-lightning]] A pulsing icon = hazard forecast. Tap it to evacuate in time\",\"[[siren]] After a hazard a red bubble appears. Tap to send aid (friendship improve)\",\"[[sprout]] Green bubbles: tap to collect free Money\"]}},",
                 "  {img:\"t6-tree.jpg\", title:{th:\"หน้าสกิล\",en:\"The skill screen\"},",
-                "   body:{th:[\"42 สกิล 5 หมวด เปิดด้วยปุ่ม \\\"สกิล\\\" หรือกด T เกมจะหยุดระหว่างเลือก\",\"เห็นเฉพาะสกิลถัดไปที่ซื้อได้ ที่ไกลกว่านั้นเป็น ???\",\"ทยอยผลพร้อมกันได้ 3 โครงการ ซื้อถี่เกินไปจะเจอเงินเฟ้อสีเขียว\"],",
-                "         en:[\"42 skills in 5 categories. Open with \\\"Skills\\\" or press T; the game pauses\",\"You only see the next skills you can buy; further ones are ???\",\"3 roll-outs at once. Buying too fast causes Greenflation\"]}},",
+                "   body:{th:[\"42 สกิล 5 หมวด เปิดด้วยปุ่ม \\\"สกิล\\\" หรือกด T เกมจะหยุดระหว่างเลือก\",\"เห็นเฉพาะสกิลถัดไปที่ซื้อได้ ที่ไกลกว่านั้นเป็น ???\",\"ดำเนินการพร้อมกันได้ 3 โครงการ ซื้อถี่เกินไปจะเจอเงินเฟ้อสีเขียว\"],",
+                "         en:[\"42 skills in 5 categories. Open with \\\"Skills\\\" or press T; the game pauses\",\"You only see the next skills you can buy; further ones are ???\",\"3 projects at once. Buying too fast causes Greenflation\"]}},",
                 "  {img:\"t9-minerals.jpg\", title:{th:\"แร่และสิ่งที่สร้าง\",en:\"Minerals and what you build\"},",
                 "   body:{th:[\"[[$ore]] สกิลพลังงานสะอาดหลายอย่างต้องใช้แร่ เช่น ลิเทียม ทองแดง แร่หายาก\",\"แร่มาจากประเทศที่เป็นมิตรกับเรา ฟองสีส้มบนแผนที่ และการสั่งซื้อในแผงประเทศ ถ้าประเทศผู้ผลิตห้ามส่งออก ต้องหาแหล่งอื่น\",\"สิ่งที่ซื้อจะไปตั้งบนแผนที่จริง เช่น กังหันลมและโซลาร์ฟาร์ม\"],",
                 "         en:[\"[[$ore]] Many clean-energy skills need minerals such as lithium, copper and rare earths\",\"Minerals come from friendly countries, orange bubbles on the map, and purchase orders in a country's panel. If a producer bans exports, find another source\",\"What you buy appears on the real map, such as wind turbines and solar farms\"]}},",
@@ -31355,7 +31355,7 @@
                 "  {id:\"sci\", price:0,   icon:\"flask-conical\", color:\"#5fd39a\",",
                 "   name:{th:\"นักวิทยาศาสตร์\",en:\"The Scientist\"}, person:{th:\"ดร.ภูผา\",en:\"Dr. Phupha\"},",
                 "   pas:{th:\"สกิลหมวดพลังงานถูกลง 8%\",en:\"Energy skills cost 8% less\"},",
-                "   acts:[{id:\"sci1\", cd:42, icon:\"lightbulb\", name:{th:\"ค้นพบใหม่\",en:\"Breakthrough\"}, desc:{th:\"สกิลถัดไปที่ซื้อจะทยอยผลเสร็จทันที และไม่นับโควตา 3 โครงการ\",en:\"The next skill you buy rolls out instantly and ignores the 3-project limit\"}},",
+                "   acts:[{id:\"sci1\", cd:42, icon:\"lightbulb\", name:{th:\"ค้นพบใหม่\",en:\"Breakthrough\"}, desc:{th:\"สกิลถัดไปที่ซื้อจะได้ผลเต็มที่ทันที และไม่นับโควตา 3 โครงการ\",en:\"The next skill you buy works at full effect at once and ignores the 3-project limit\"}},",
                 "         {id:\"sci2\", cd:96, lv:5, icon:\"flask-round\", name:{th:\"ทุนวิจัยเร่งด่วน\",en:\"Research Sprint\"}, desc:{th:\"สกิลถัดไปที่ซื้อถูกลง 5%\",en:\"The next skill you buy costs 5% less\"}}]},",
                 "  {id:\"dip\", price:449, icon:\"handshake\", color:\"#8fd0ff\",",
                 "   name:{th:\"นักการทูต\",en:\"The Diplomat\"}, person:{th:\"ทูตวารี\",en:\"Ambassador Waree\"},",
@@ -31511,12 +31511,12 @@
                 "  skillsTitle:T(\"สกิล\",\"Skills\"), pausedHere:T(\"เกมหยุดชั่วคราวขณะเปิดหน้านี้\",\"The game is paused while this screen is open\"),",
                 "  buffInstant:T(\"ค้นพบใหม่: สกิลถัดไปเสร็จทันที\",\"Breakthrough: next skill is instant\"), buffDisc:T(\"ทุนวิจัย: สกิลถัดไปถูกลง 5%\",\"Research sprint: next skill −5%\"),",
                 "  ready:T(\"พร้อม\",\"Ready\"), hiddenSkill:T(\"สกิลปริศนา\",\"Unknown skill\"), hiddenHint:T(\"ต้องปลดล็อกก่อน:\",\"Unlock first:\"),",
-                "  noRollouts:T(\"ยังไม่มีโครงการที่กำลังทยอยผล\",\"No projects rolling out\"), needReq:T(\"ต้องมีสกิลก่อนหน้าก่อน\",\"Needs the earlier skill first\"),",
-                "  useNow:T(\"ใช้ตอนนี้\",\"Use now\"), target:T(\"เป้าหมาย\",\"Target\"), rollingOut:T(\"กำลังทยอยผล\",\"Rolling out\"),",
-                "  unlock:T(\"ปลดล็อกสกิล\",\"Unlock skill\"), owned:T(\"มีแล้ว\",\"Owned\"), inProgress:T(\"โครงการที่ทยอยผล\",\"Rolling out\"),",
+                "  noRollouts:T(\"ยังไม่มีโครงการที่กำลังดำเนินการ\",\"No projects in progress\"), needReq:T(\"ต้องมีสกิลก่อนหน้าก่อน\",\"Needs the earlier skill first\"),",
+                "  useNow:T(\"ใช้ตอนนี้\",\"Use now\"), target:T(\"เป้าหมาย\",\"Target\"), rollingOut:T(\"กำลังดำเนินการ\",\"In progress\"), rollLeft:T(\"อีก {N} เดือนได้ผลเต็มที่\",\"Full effect in {N} mo\"),",
+                "  unlock:T(\"ปลดล็อกสกิล\",\"Unlock skill\"), owned:T(\"มีแล้ว\",\"Owned\"), inProgress:T(\"กำลังดำเนินการ\",\"In progress\"),",
                 "  logTech:T(\"ปลดล็อกสกิล\",\"Skill unlocked\"),",
                 "  skillTip:T(\"[[shield]] รับมือภัย · [[scale]] ได้อย่างเสียอย่าง · [[zap]] กดใช้ได้\",\"[[shield]] handles disasters · [[scale]] trade-off · [[zap]] can be used\"),",
-                "  capFull:T(\"ทยอยผลพร้อมกันได้สูงสุด 3 โครงการ รอให้โครงการเดิมเสร็จก่อน\",\"At most 3 roll-outs at once. Wait for one to finish.\"),",
+                "  capFull:T(\"ดำเนินการพร้อมกันได้สูงสุด 3 โครงการ รอให้โครงการเดิมเสร็จก่อน\",\"At most 3 projects at once. Wait for one to finish.\"),",
                 "  /* end */",
                 "  winBodyS:T(\"การปล่อยคาร์บอนสุทธิแตะศูนย์ ขณะที่โลกยังร้อนไม่ถึง 1.6°C ป่าฟื้นตัว ทะเลกลับมาใส และเมืองทุกเมืองหายใจได้สะดวก\",\"Net emissions hit zero with warming under 1.6°C. Forests recover, seas clear and every city breathes again.\"),",
                 "  winBodyA:T(\"การปล่อยคาร์บอนสุทธิแตะศูนย์ทันเวลา โลกยังมีบาดแผล แต่ยุคหลังคาร์บอนเริ่มต้นขึ้นแล้ว\",\"Net emissions hit zero in time. The planet is scarred, but the post-carbon era has begun.\"),",
@@ -32310,6 +32310,17 @@
                 "  ]),",
                 "];",
                 "P.CHANGELOG.find(x => x.v === \"2.1\").subs = [",
+                "  SUB(\"2.1.5\", \"2026-11-12\", [",
+                "    \"รถไฟบนแผนที่ขึ้นเมื่ออัปสกิล: ต้นเกมยังไม่มีรถไฟ ซื้อสกิลรถไฟความเร็วสูงแล้วรถไฟความเร็วสูง รถไฟหัวกระสุน รถไฟขนส่งสินค้า และรถไฟโดยสารจะขึ้นบนเส้นทางจริง จากนั้นเส้นทางใหม่ค่อย ๆ เปิดทีละสาย\",",
+                "    \"สกิลกฎหมายขนส่งไฟฟ้า 100% เปลี่ยนหัวรถจักรดีเซลที่มีควันเป็นรถไฟฟ้าทุกสาย\",",
+                "    \"สกิลที่ซื้อแล้วแต่ยังไม่ได้ผลเต็มที่เป็นสีทอง มีวงรอบช่องค่อย ๆ เต็มตามความคืบหน้า และบอกว่าอีกกี่เดือนจะได้ผลเต็มที่ พอได้ผลเต็มที่แล้วจึงเปลี่ยนเป็นสีเขียว\",",
+                "    \"เปลี่ยนคำว่า \\\"ทยอยผล\\\" เป็นคำที่เข้าใจง่ายขึ้น: \\\"กำลังดำเนินการ\\\" และ \\\"ได้ผลเต็มที่ใน ... เดือน\\\"\",",
+                "  ], [",
+                "    \"Trains arrive with your skills: there are none at the start. Buy High-Speed Rail and high-speed, bullet, freight and passenger trains run on the real lines, then new lines open one by one.\",",
+                "    \"The Zero-Emission Transport Law turns every smoky diesel locomotive into an electric one.\",",
+                "    \"A skill you bought that is not yet at full effect is gold, with a ring around it that fills up and the months left until full effect. It turns green once it is fully working.\",",
+                "    \"Plainer words for skills in progress: \\\"In progress\\\" and \\\"Full effect in ... months\\\".\",",
+                "  ]),",
                 "  SUB(\"2.1.4\", \"2026-11-12\", [",
                 "    \"ฉากจบแบบใหม่เป็นรายการข่าวด่วน: ภาพข่าวเคลื่อนไหวของฉากจบทั้ง 12 แบบ แถบข่าวด่วน สัมภาษณ์สดตัวละคร พาดหัวจากหนังสือพิมพ์ทั่วโลก และตัววิ่งข่าวของคนในเรื่อง\",",
                 "    \"ทุกอย่างอยู่ในจอเดียวทั้งคอมพิวเตอร์และมือถือ ไม่ต้องเลื่อนอ่าน เรื่องของคุณกับสิ่งที่ทำได้จริงเปิดดูได้จากปุ่ม\",",
@@ -34845,8 +34856,8 @@
                 "         {id:\"oce2\", cd:30, lv:5, icon:\"radio\", name:T(\"เตือนภัยทะเล\", \"Sea-Storm Warning\"), desc:T(\"ทุกพยากรณ์พายุ น้ำท่วม และน้ำเค็มรุกตอนนี้ อพยพให้ฟรี\", \"Every storm, flood and saltwater forecast right now is evacuated for free\")}]},",
                 "  {id:\"eng\", price:349, icon:\"hard-hat\", color:\"#ffc24a\",",
                 "   name:T(\"วิศวกรเมือง\", \"The City Engineer\"), person:T(\"คุณกล้า\", \"Kla\"),",
-                "   pas:T(\"สกิลหมวดเมือง อุตสาหกรรม และอาหารกับน้ำ ทยอยผลเร็วขึ้น 25% (เลเวล 3: 30%)\", \"City, industry and food & water skills roll out 25% faster (level 3: 30%)\"),",
-                "   acts:[{id:\"eng1\", cd:30, icon:\"construction\", name:T(\"เร่งก่อสร้าง\", \"Rush the Build\"), desc:T(\"ทุกโครงการที่กำลังทยอยผล เดินหน้าเร็วขึ้นทันที 4 เดือน\", \"Every project rolling out jumps 4 months ahead now\")},",
+                "   pas:T(\"สกิลหมวดเมือง อุตสาหกรรม และอาหารกับน้ำ ได้ผลเต็มที่เร็วขึ้น 25% (เลเวล 3: 30%)\", \"City, industry and food & water skills reach full effect 25% faster (level 3: 30%)\"),",
+                "   acts:[{id:\"eng1\", cd:30, icon:\"construction\", name:T(\"เร่งก่อสร้าง\", \"Rush the Build\"), desc:T(\"ทุกโครงการที่กำลังดำเนินการ เดินหน้าเร็วขึ้นทันที 4 เดือน\", \"Every project in progress jumps 4 months ahead now\")},",
                 "         {id:\"eng2\", cd:96, lv:5, icon:\"shield-check\", name:T(\"เมืองทนภัย\", \"Hardened Cities\"), desc:T(\"ความเสี่ยงภัยพิบัติทุกทวีป −6%\", \"Every region's disaster risk −6%\")}]},",
                 ");",
                 "P.CHARS.slice(-2).forEach(c => { P.CHAR[c.id] = c; });",
@@ -35694,8 +35705,8 @@
                 "    [\"[[cloud-lightning]] ไอคอนกะพริบ = พยากรณ์ภัย แตะเพื่อสั่งอพยพก่อนภัยมาถึง\", \"[[$money]] ฟองเขียว = เงินฟรี · [[$heart]] ฟองแดง = ส่งความช่วยเหลือ · [[$ore]] ฟองส้ม = ทรัพยากร\", \"เก็บฟองได้เฉพาะตอนเวลาเดินอยู่ ถ้าหยุดเกม ฟองจะจางลง\"],",
                 "    [\"[[cloud-lightning]] A pulsing icon = a disaster forecast; tap it to evacuate in time\", \"[[$money]] Green bubble = free money · [[$heart]] red = send aid · [[$ore]] orange = resources\", \"Bubbles can only be collected while time is running; paused, they fade\"]),",
                 "  TU(\"n06-skills.jpg\", \"สกิล\", \"Skills\",",
-                "    [\"50 สกิลใน 6 หมวด เปิดด้วยปุ่ม \\\"สกิล\\\" หรือกด T เกมหยุดระหว่างเลือก\", \"แต่ละหมวดบอกเป้าหมาย SDG ที่เกี่ยวข้อง เห็นเฉพาะสกิลถัดไป ที่ไกลกว่านั้นเป็น ???\", \"ทยอยผลพร้อมกันได้ 3 โครงการ ซื้อถี่เกินไปจะเจอเงินเฟ้อสีเขียว\"],",
-                "    [\"50 skills in 6 branches; open with \\\"Skills\\\" or press T (the game pauses)\", \"Each branch shows the SDGs it serves; you only see the next skills, further ones are ???\", \"3 projects roll out at once; buying too fast causes Greenflation\"]),",
+                "    [\"50 สกิลใน 6 หมวด เปิดด้วยปุ่ม \\\"สกิล\\\" หรือกด T เกมหยุดระหว่างเลือก\", \"แต่ละหมวดบอกเป้าหมาย SDG ที่เกี่ยวข้อง เห็นเฉพาะสกิลถัดไป ที่ไกลกว่านั้นเป็น ???\", \"ดำเนินการพร้อมกันได้ 3 โครงการ ซื้อถี่เกินไปจะเจอเงินเฟ้อสีเขียว\"],",
+                "    [\"50 skills in 6 branches; open with \\\"Skills\\\" or press T (the game pauses)\", \"Each branch shows the SDGs it serves; you only see the next skills, further ones are ???\", \"3 projects at once; buying too fast causes Greenflation\"]),",
                 "  TU(\"n07-market.jpg\", \"ทรัพยากรและตลาด\", \"Resources and the market\",",
                 "    [\"[[$ore]] สกิลพลังงานสะอาดใช้ทรัพยากร 5 กลุ่ม เช่น แร่แบตเตอรี่ แร่หายาก ทองแดง\", \"ที่ได้มาบางส่วนเป็นแร่ดิบ ต้องรอแปรรูป สร้าง [[factory]] โรงแยกแร่เพื่อแปรรูปเร็วขึ้น\", \"ขาดเมื่อไรซื้อในตลาดได้ เหลือก็ขายเป็นเงิน ราคาขึ้นลงทุกเดือน\"],",
                 "    [\"[[$ore]] Clean-energy skills use 5 resource groups, such as battery minerals, rare earths and copper\", \"Some arrive raw and must be refined; build a [[factory]] refinery to refine faster\", \"Short? Buy in the market. Spare? Sell for money. Prices move every month\"]),",
@@ -41588,6 +41599,9 @@
                 "let GX = 16, GY = 78, GW = 800, GH = 500, DX = 840, DW = 380, OX = 0, OY = 0;",
                 "let HEXR = 50, COLW = 168, ROWH = 142, SC = 1;",
                 "const hexPts = (cx, cy, r) => { const p = []; for (let i = 0; i < 6; i++){ const a = Math.PI / 180 * (60 * i - 30); p.push(cx + r * Math.cos(a), cy + r * Math.sin(a)); } return p; };",
+                "/* 2.1.5: the part of a hexagon's outline (same corners as hexPts) that is done, f = 0 → 1, as a polyline */",
+                "const ringPath = (cx, cy, r, f) => { const v = i => { const a = Math.PI / 180 * (60 * i - 30); return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };",
+                "  const out = v(0), segs = Math.min(1, f) * 6; for (let i = 1; i <= Math.ceil(segs); i++){ const a = v(i - 1), b = v(i), u = Math.min(1, segs - (i - 1)); out.push(a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u); } return out; };",
                 "const cx0 = n => 92 + n.pos[0] * 168, cy0 = n => 70 + n.pos[1] * 142 + (n.pos[0] % 2 ? 26 : 0);",
                 "const centre = n => [OX + cx0(n) * SC, OY + cy0(n) * SC];",
                 "/* \"next\" = all requirements owned; anything further away is dimmed with a lock (name and picture visible, like web 2.1) */",
@@ -41647,15 +41661,16 @@
                 "    const p = P.rollProgress(n.id), sel = S.node === n.id, id = \"hx-\" + n.id, hov = k.isHover(l, id);",
                 "    const afford = vis && !own && (P.canAfford ? P.canAfford(n) : S.ep >= c.ep && S.pc >= c.pc) && !P.atCapacity(n);",
                 "    if (afford) k.poly(l, hexPts(cx, cy, HEXR + 8), \"accent\", {a:.18});",
-                "    const fill = own ? (n.type === \"active\" ? \"#2c5a7a\" : \"#1f7a5c\") : vis ? \"panel2\" : \"bg\";",
-                "    k.poly(l, hexPts(cx, cy, HEXR), fill, {stroke:own ? \"good\" : afford ? \"accent\" : \"line\", sw:hov ? 2.4 : 1.3, a:vis ? 1 : .65});",
-                "    if (p !== null){ k.poly(l, hexPts(cx, cy, HEXR - 5), \"accent\", {a:.15 + .35 * p}); }",
+                "    // 2.1.5 (web): still in progress = gold, with a ring that fills up; green only at full effect",
+                "    const roll = p !== null, fill = roll ? \"#5a4512\" : own ? (n.type === \"active\" ? \"#2c5a7a\" : \"#1f7a5c\") : vis ? \"panel2\" : \"bg\";",
+                "    k.poly(l, hexPts(cx, cy, HEXR), fill, {stroke:roll ? \"gold\" : own ? \"good\" : afford ? \"accent\" : \"line\", sw:hov ? 2.4 : 1.3, a:vis ? 1 : .65});",
                 "    if (sel){ const q = hexPts(cx, cy, HEXR + 5); k.path(l, [...q, q[0], q[1]], \"#ffffff\", {w:2.5}); }",
+                "    if (roll){ const q = hexPts(cx, cy, HEXR + 10); k.path(l, [...q, q[0], q[1]], \"#f2c14e\", {w:4, a:.18}); k.path(l, ringPath(cx, cy, HEXR + 10, Math.max(.02, p)), \"#f2c14e\", {w:4}); }",
                 "    // the skill's 3D picture (web assets/img/ui/3d/sk-<id>.webp): full when owned / buyable, dim when visible, faint when further away",
                 "    const is = 50 * SC; k.icon(l, \"$sk-\" + n.id, cx - is / 2, cy - 33 * SC, is, \"#ffffff\", own || afford ? 1 : vis ? .7 : .3);",
                 "    if (!vis) k.icon(l, \"lock\", cx - 8 * SC, cy + 13 * SC, 16 * SC, \"muted\");",
                 "    const lab = vis ? (p !== null ? `${Math.round(p * 100)}%` : own ? (n.type === \"active\" ? (S.actCd[n.id] ? `${S.actCd[n.id]} ${t(\"moShort\")}` : t(\"ready\")) : \"✓\") : `${c.ep}·${c.pc}`) : \"\";",
-                "    if (lab) k.text(l, lab, cx - HEXR, cy + 25 * SC - 12, {font:\"mono\", size:12, color:own ? \"#e8fff6\" : afford ? \"accent\" : \"muted\", w:HEXR * 2, align:\"center\"});",
+                "    if (lab) k.text(l, lab, cx - HEXR, cy + 25 * SC - 12, {font:\"mono\", size:12, color:roll ? \"gold\" : own ? \"#e8fff6\" : afford ? \"accent\" : \"muted\", w:HEXR * 2, align:\"center\"});",
                 "    if (n.type === \"active\") k.icon(l, \"zap\", cx + HEXR - 24 * SC, cy - HEXR + 9 * SC, 13, own ? \"gold\" : \"muted\");",
                 "    if (vis && n.trade) k.icon(l, \"scale\", cx - HEXR + 11 * SC, cy - HEXR + 9 * SC, 13, \"warn\");",
                 "    if (vis && n.resp) k.icon(l, \"shield\", cx - HEXR + 11 * SC, cy - HEXR + 9 * SC, 13, \"sky\");",
@@ -41670,9 +41685,9 @@
                 "    for (const ro of S.rollouts.slice(0, 6)){",
                 "      const n = SKILL[ro.id], w = 220;",
                 "      k.rect(l, rx, ry, w, 34, \"panel2\", {r:8, bg:true});",
-                "      k.icon(l, n.icon, rx + 8, ry + 9, 16, \"accent\");",
+                "      k.icon(l, n.icon, rx + 8, ry + 9, 16, \"gold\");",
                 "      k.text(l, L(n.name), rx + 30, ry + 3, {size:11, w:w - 40, max:1});",
-                "      W.meter(l, rx + 30, ry + 22, w - 90, 4, 1 - ro.left / ro.months, \"accent\");",
+                "      W.meter(l, rx + 30, ry + 22, w - 90, 4, 1 - ro.left / ro.months, \"gold\");",
                 "      k.text(l, `${ro.left} ${t(\"moShort\")}`, rx + w - 56, ry + 16, {font:\"mono\", size:10, color:\"muted\", w:48, align:\"right\"});",
                 "      rx += w + 8; if (rx + w > GX + GW){ break; }",
                 "    }",
@@ -41771,8 +41786,13 @@
                 "    else if (n.target === \"country\" && S.selC) cy += k.text(l, `${t(\"target\")}: ${P.cname(S.selC)}`, px, cy, {size:12, color:\"muted\", w:iw}).h + 4;",
                 "  } else {",
                 "    const p = P.rollProgress(n.id);",
-                "    k.text(l, p !== null ? `[[loader]] ${t(\"rollingOut\")} ${Math.round(p * 100)}%` : `[[check]] ${t(\"owned\")}`, px, cy + 8, {font:\"dispS\", size:15, color:p !== null ? \"accent\" : \"good\", iconColor:p !== null ? \"accent\" : \"good\"});",
-                "    cy += 40;",
+                "    if (p !== null){",
+                "      const left = Math.max(...S.rollouts.filter(r => r.id === n.id).map(r => r.left));",
+                "      k.text(l, `[[hourglass]] ${t(\"rollingOut\")} ${Math.round(p * 100)}%`, px, cy + 4, {font:\"dispS\", size:15, color:\"gold\", iconColor:\"gold\"});",
+                "      k.text(l, t(\"rollLeft\").replace(\"{N}\", left), px + 24, cy + 26, {size:12.5, color:\"muted\"});",
+                "      W.meter(l, px, cy + 48, iw, 5, p, \"gold\");",
+                "      cy += 62;",
+                "    } else { k.text(l, `[[check]] ${t(\"owned\")}`, px, cy + 8, {font:\"dispS\", size:15, color:\"good\", iconColor:\"good\"}); cy += 40; }",
                 "  }",
                 "  // tip at the bottom",
                 "  k.text(l, t(\"skillTip\"), px, y + h - 54, {size:11.5, color:\"muted\", w:iw, lh:1.35});",
@@ -42690,7 +42710,7 @@
                 "  {id:\"buy\", hold:1, target:() => hitRect(\"buy\"), setup:() => { S.skillCat = \"energy\"; S.node = \"E1\"; mats(); k.dirty(); }, done:() => !!S.owned.E1,",
                 "   text:() => ({th:`นี่คือสกิลแรก \"${P.SKILL.E1.name.th}\" ดูผลและราคาแล้วกด \"ปลดล็อก\"`, en:`This is your first skill, \"${P.SKILL.E1.name.en}\". Check what it does and what it costs, then press \"Unlock\".`})},",
                 "  {id:\"skclose\", hold:1, target:() => hitRect(\"sk-close\"), done:() => UIM.modal !== \"skills\",",
-                "   text:T(\"สกิลจะทยอยให้ผลภายในไม่กี่เดือน · ทำพร้อมกันได้ 3 โครงการ · ปิดหน้าสกิล\", \"A skill rolls out over a few months · 3 projects can run at once · close the skill tree.\")},",
+                "   text:T(\"สกิลจะค่อย ๆ ได้ผลจนเต็มที่ภายในไม่กี่เดือน · ทำพร้อมกันได้ 3 โครงการ · ปิดหน้าสกิล\", \"A skill grows to full effect over a few months · 3 projects can run at once · close the skill tree.\")},",
                 "  {id:\"hazard\", target:() => hitRect(\"hz-\", true),",
                 "   setup:() => { P.setSpeed(0); S.haz = []; P.addHazard(P.C(\"PHL\"), \"typhoon\"); P.Map.focusCountry(\"PHL\"); S.ep = Math.max(S.ep, 60); k.dirty(); },",
                 "   done:() => { const h = ownedHaz(); return !!(h && h.evac); },",

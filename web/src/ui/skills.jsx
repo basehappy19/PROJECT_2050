@@ -53,10 +53,11 @@ export function Skills(){
               const [cx, cy] = centre(n), vis = visible(n), own = !!S.owned[n.id], c = P.nodeCost(n), p = P.rollProgress(n.id), sel = S.node === n.id;
               const afford = vis && !own && P.canAfford(n);
               const lab = vis ? (p !== null ? `${Math.round(p * 100)}%` : own ? (n.type === "active" ? (S.actCd[n.id] ? `${S.actCd[n.id]} ${t("moShort")}` : t("ready")) : "✓") : `${c.ep}·${c.pc}`) : "";
-              return <g key={n.id} data-node={n.id} class={`hex ${own ? "own" : vis ? (afford ? "afford" : "vis") : "hid"} ${n.type} ${sel ? "sel" : ""}`} onClick={() => pick(n.id)} onPointerEnter={() => Audio.hover()} tabIndex={0} role="button" aria-label={L(n.name)} onKeyDown={e => { if (e.key === "Enter") pick(n.id); }}>
+              /* 2.1.5: a skill that is still in progress is gold (green only once it has its full effect), with a ring that fills up */
+              return <g key={n.id} data-node={n.id} class={`hex ${own ? "own" : vis ? (afford ? "afford" : "vis") : "hid"} ${p !== null ? "roll" : ""} ${n.type} ${sel ? "sel" : ""}`} onClick={() => pick(n.id)} onPointerEnter={() => Audio.hover()} tabIndex={0} role="button" aria-label={L(n.name)} onKeyDown={e => { if (e.key === "Enter") pick(n.id); }}>
                 {afford ? <polygon class="halo" points={hexPts(cx, cy, R + 8)}/> : null}
                 <polygon class="body" points={hexPts(cx, cy, R)}/>
-                {p !== null ? <polygon class="prog" points={hexPts(cx, cy, R - 5)} style={{opacity:.15 + .35 * p}}/> : null}
+                {p !== null ? <><polygon class="ringbg" points={hexPts(cx, cy, R + 10)}/><polygon class="ring" points={hexPts(cx, cy, R + 10)} pathLength="100" style={{strokeDasharray:`${Math.max(1, p * 100).toFixed(1)} 100`}}/></> : null}
                 {sel ? <polygon class="selring" points={hexPts(cx, cy, R + 5)}/> : null}
                 <image href={`assets/img/ui/3d/sk-${n.id}.webp`} x={cx - 25} y={cy - 33} width="50" height="50" opacity={own || afford ? 1 : vis ? .7 : .3}/>
                 {!vis ? <SvgIcon n="lock" x={cx - 8} y={cy + 13} s={16} color={COL.muted}/> : null}
@@ -70,7 +71,7 @@ export function Skills(){
           </svg>
           <div class="rollouts">{S.rollouts.length ? S.rollouts.slice(0, 6).map((ro, i) => {
             const n = P.SKILL[ro.id];
-            return <div class="ro" key={i}><Icon n={n.icon} size={16} color="accent"/><span>{L(n.name)}</span><Meter v={1 - ro.left / ro.months} h={4}/><small class="mono">{ro.left} {t("moShort")}</small></div>;
+            return <div class="ro" key={i}><Icon n={n.icon} size={16} color="gold"/><span>{L(n.name)}</span><Meter v={1 - ro.left / ro.months} color="gold" h={4}/><small class="mono">{ro.left} {t("moShort")}</small></div>;
           }) : <span class="muted small">{t("noRollouts")}</span>}</div>
         </div>
         <Detail cat={cat}/>
@@ -136,7 +137,8 @@ function Detail({cat}){
     </> : n.type === "active" ? <>
       <Btn block size="lg" kind="gold" disabled={!(a && P.abilityReady(a))} onClick={() => { if (P.useAbility(n.id)){ Audio.play("powerup", {vol:.6}); bump(); } }}>{cd ? `${t("cooldown")} ${cd} ${t("months")}` : `[[zap]] ${t("useNow")}`}</Btn>
       {!cd && n.target === "country" && !(S.selC && !S.selC.startsWith("R_")) ? <p class="warn small">{t("needCountry")}</p> : n.target === "country" && S.selC ? <p class="muted small">{t("target")}: {P.cname(S.selC)}</p> : null}
-    </> : <p class={"state " + (p !== null ? "acc" : "good")}><Icon n={p !== null ? "loader" : "check"} size={18}/> {p !== null ? `${t("rollingOut")} ${Math.round(p * 100)}%` : t("owned")}</p>}
+    </> : p !== null ? <div class="state roll"><Icon n="hourglass" size={18}/><span>{t("rollingOut")} {Math.round(p * 100)}%<small>{t("rollLeft").replace("{N}", Math.max(...S.rollouts.filter(r => r.id === n.id).map(r => r.left)))}</small></span><Meter v={p} color="gold" h={5}/></div>
+      : <p class="state good"><Icon n="check" size={18}/> {t("owned")}</p>}
     <p class="muted small tip"><Rich t={t("skillTip")} iconColor="inherit"/></p>
   </div>;
 }

@@ -387,9 +387,13 @@ P.CHANGELOG.find(x => x.v === "2.1").subs = [
   SUB("2.1.5", "2026-11-12", [
     "รถไฟบนแผนที่ขึ้นเมื่ออัปสกิล: ต้นเกมยังไม่มีรถไฟ ซื้อสกิลรถไฟความเร็วสูงแล้วรถไฟความเร็วสูง รถไฟหัวกระสุน รถไฟขนส่งสินค้า และรถไฟโดยสารจะขึ้นบนเส้นทางจริง จากนั้นเส้นทางใหม่ค่อย ๆ เปิดทีละสาย",
     "สกิลกฎหมายขนส่งไฟฟ้า 100% เปลี่ยนหัวรถจักรดีเซลที่มีควันเป็นรถไฟฟ้าทุกสาย",
+    "สกิลที่ซื้อแล้วแต่ยังไม่ได้ผลเต็มที่เป็นสีทอง มีวงรอบช่องค่อย ๆ เต็มตามความคืบหน้า และบอกว่าอีกกี่เดือนจะได้ผลเต็มที่ พอได้ผลเต็มที่แล้วจึงเปลี่ยนเป็นสีเขียว",
+    "เปลี่ยนคำว่า \"ทยอยผล\" เป็นคำที่เข้าใจง่ายขึ้น: \"กำลังดำเนินการ\" และ \"ได้ผลเต็มที่ใน ... เดือน\"",
   ], [
     "Trains arrive with your skills: there are none at the start. Buy High-Speed Rail and high-speed, bullet, freight and passenger trains run on the real lines, then new lines open one by one.",
     "The Zero-Emission Transport Law turns every smoky diesel locomotive into an electric one.",
+    "A skill you bought that is not yet at full effect is gold, with a ring around it that fills up and the months left until full effect. It turns green once it is fully working.",
+    "Plainer words for skills in progress: \"In progress\" and \"Full effect in ... months\".",
   ]),
   SUB("2.1.4", "2026-11-12", [
     "ฉากจบแบบใหม่เป็นรายการข่าวด่วน: ภาพข่าวเคลื่อนไหวของฉากจบทั้ง 12 แบบ แถบข่าวด่วน สัมภาษณ์สดตัวละคร พาดหัวจากหนังสือพิมพ์ทั่วโลก และตัววิ่งข่าวของคนในเรื่อง",

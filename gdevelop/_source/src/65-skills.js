@@ -13,6 +13,9 @@ const k = Kit;
 let GX = 16, GY = 78, GW = 800, GH = 500, DX = 840, DW = 380, OX = 0, OY = 0;
 let HEXR = 50, COLW = 168, ROWH = 142, SC = 1;
 const hexPts = (cx, cy, r) => { const p = []; for (let i = 0; i < 6; i++){ const a = Math.PI / 180 * (60 * i - 30); p.push(cx + r * Math.cos(a), cy + r * Math.sin(a)); } return p; };
+/* 2.1.5: the part of a hexagon's outline (same corners as hexPts) that is done, f = 0 → 1, as a polyline */
+const ringPath = (cx, cy, r, f) => { const v = i => { const a = Math.PI / 180 * (60 * i - 30); return [cx + r * Math.cos(a), cy + r * Math.sin(a)]; };
+  const out = v(0), segs = Math.min(1, f) * 6; for (let i = 1; i <= Math.ceil(segs); i++){ const a = v(i - 1), b = v(i), u = Math.min(1, segs - (i - 1)); out.push(a[0] + (b[0] - a[0]) * u, a[1] + (b[1] - a[1]) * u); } return out; };
 const cx0 = n => 92 + n.pos[0] * 168, cy0 = n => 70 + n.pos[1] * 142 + (n.pos[0] % 2 ? 26 : 0);
 const centre = n => [OX + cx0(n) * SC, OY + cy0(n) * SC];
 /* "next" = all requirements owned; anything further away is dimmed with a lock (name and picture visible, like web 2.1) */
@@ -72,15 +75,16 @@ Screens.renderSkills = function(l){
     const p = P.rollProgress(n.id), sel = S.node === n.id, id = "hx-" + n.id, hov = k.isHover(l, id);
     const afford = vis && !own && (P.canAfford ? P.canAfford(n) : S.ep >= c.ep && S.pc >= c.pc) && !P.atCapacity(n);
     if (afford) k.poly(l, hexPts(cx, cy, HEXR + 8), "accent", {a:.18});
-    const fill = own ? (n.type === "active" ? "#2c5a7a" : "#1f7a5c") : vis ? "panel2" : "bg";
-    k.poly(l, hexPts(cx, cy, HEXR), fill, {stroke:own ? "good" : afford ? "accent" : "line", sw:hov ? 2.4 : 1.3, a:vis ? 1 : .65});
-    if (p !== null){ k.poly(l, hexPts(cx, cy, HEXR - 5), "accent", {a:.15 + .35 * p}); }
+    // 2.1.5 (web): still in progress = gold, with a ring that fills up; green only at full effect
+    const roll = p !== null, fill = roll ? "#5a4512" : own ? (n.type === "active" ? "#2c5a7a" : "#1f7a5c") : vis ? "panel2" : "bg";
+    k.poly(l, hexPts(cx, cy, HEXR), fill, {stroke:roll ? "gold" : own ? "good" : afford ? "accent" : "line", sw:hov ? 2.4 : 1.3, a:vis ? 1 : .65});
     if (sel){ const q = hexPts(cx, cy, HEXR + 5); k.path(l, [...q, q[0], q[1]], "#ffffff", {w:2.5}); }
+    if (roll){ const q = hexPts(cx, cy, HEXR + 10); k.path(l, [...q, q[0], q[1]], "#f2c14e", {w:4, a:.18}); k.path(l, ringPath(cx, cy, HEXR + 10, Math.max(.02, p)), "#f2c14e", {w:4}); }
     // the skill's 3D picture (web assets/img/ui/3d/sk-<id>.webp): full when owned / buyable, dim when visible, faint when further away
     const is = 50 * SC; k.icon(l, "$sk-" + n.id, cx - is / 2, cy - 33 * SC, is, "#ffffff", own || afford ? 1 : vis ? .7 : .3);
     if (!vis) k.icon(l, "lock", cx - 8 * SC, cy + 13 * SC, 16 * SC, "muted");
     const lab = vis ? (p !== null ? `${Math.round(p * 100)}%` : own ? (n.type === "active" ? (S.actCd[n.id] ? `${S.actCd[n.id]} ${t("moShort")}` : t("ready")) : "✓") : `${c.ep}·${c.pc}`) : "";
-    if (lab) k.text(l, lab, cx - HEXR, cy + 25 * SC - 12, {font:"mono", size:12, color:own ? "#e8fff6" : afford ? "accent" : "muted", w:HEXR * 2, align:"center"});
+    if (lab) k.text(l, lab, cx - HEXR, cy + 25 * SC - 12, {font:"mono", size:12, color:roll ? "gold" : own ? "#e8fff6" : afford ? "accent" : "muted", w:HEXR * 2, align:"center"});
     if (n.type === "active") k.icon(l, "zap", cx + HEXR - 24 * SC, cy - HEXR + 9 * SC, 13, own ? "gold" : "muted");
     if (vis && n.trade) k.icon(l, "scale", cx - HEXR + 11 * SC, cy - HEXR + 9 * SC, 13, "warn");
     if (vis && n.resp) k.icon(l, "shield", cx - HEXR + 11 * SC, cy - HEXR + 9 * SC, 13, "sky");
@@ -95,9 +99,9 @@ Screens.renderSkills = function(l){
     for (const ro of S.rollouts.slice(0, 6)){
       const n = SKILL[ro.id], w = 220;
       k.rect(l, rx, ry, w, 34, "panel2", {r:8, bg:true});
-      k.icon(l, n.icon, rx + 8, ry + 9, 16, "accent");
+      k.icon(l, n.icon, rx + 8, ry + 9, 16, "gold");
       k.text(l, L(n.name), rx + 30, ry + 3, {size:11, w:w - 40, max:1});
-      W.meter(l, rx + 30, ry + 22, w - 90, 4, 1 - ro.left / ro.months, "accent");
+      W.meter(l, rx + 30, ry + 22, w - 90, 4, 1 - ro.left / ro.months, "gold");
       k.text(l, `${ro.left} ${t("moShort")}`, rx + w - 56, ry + 16, {font:"mono", size:10, color:"muted", w:48, align:"right"});
       rx += w + 8; if (rx + w > GX + GW){ break; }
     }
@@ -196,8 +200,13 @@ Screens.skillDetail = function(l, x, y, w, h){
     else if (n.target === "country" && S.selC) cy += k.text(l, `${t("target")}: ${P.cname(S.selC)}`, px, cy, {size:12, color:"muted", w:iw}).h + 4;
   } else {
     const p = P.rollProgress(n.id);
-    k.text(l, p !== null ? `[[loader]] ${t("rollingOut")} ${Math.round(p * 100)}%` : `[[check]] ${t("owned")}`, px, cy + 8, {font:"dispS", size:15, color:p !== null ? "accent" : "good", iconColor:p !== null ? "accent" : "good"});
-    cy += 40;
+    if (p !== null){
+      const left = Math.max(...S.rollouts.filter(r => r.id === n.id).map(r => r.left));
+      k.text(l, `[[hourglass]] ${t("rollingOut")} ${Math.round(p * 100)}%`, px, cy + 4, {font:"dispS", size:15, color:"gold", iconColor:"gold"});
+      k.text(l, t("rollLeft").replace("{N}", left), px + 24, cy + 26, {size:12.5, color:"muted"});
+      W.meter(l, px, cy + 48, iw, 5, p, "gold");
+      cy += 62;
+    } else { k.text(l, `[[check]] ${t("owned")}`, px, cy + 8, {font:"dispS", size:15, color:"good", iconColor:"good"}); cy += 40; }
   }
   // tip at the bottom
   k.text(l, t("skillTip"), px, y + h - 54, {size:11.5, color:"muted", w:iw, lh:1.35});

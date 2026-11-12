@@ -43,7 +43,7 @@ const STEPS = [
   {id:"buy", hold:1, target:() => hitRect("buy"), setup:() => { S.skillCat = "energy"; S.node = "E1"; mats(); k.dirty(); }, done:() => !!S.owned.E1,
    text:() => ({th:`นี่คือสกิลแรก "${P.SKILL.E1.name.th}" ดูผลและราคาแล้วกด "ปลดล็อก"`, en:`This is your first skill, "${P.SKILL.E1.name.en}". Check what it does and what it costs, then press "Unlock".`})},
   {id:"skclose", hold:1, target:() => hitRect("sk-close"), done:() => UIM.modal !== "skills",
-   text:T("สกิลจะทยอยให้ผลภายในไม่กี่เดือน · ทำพร้อมกันได้ 3 โครงการ · ปิดหน้าสกิล", "A skill rolls out over a few months · 3 projects can run at once · close the skill tree.")},
+   text:T("สกิลจะค่อย ๆ ได้ผลจนเต็มที่ภายในไม่กี่เดือน · ทำพร้อมกันได้ 3 โครงการ · ปิดหน้าสกิล", "A skill grows to full effect over a few months · 3 projects can run at once · close the skill tree.")},
   {id:"hazard", target:() => hitRect("hz-", true),
    setup:() => { P.setSpeed(0); S.haz = []; P.addHazard(P.C("PHL"), "typhoon"); P.Map.focusCountry("PHL"); S.ep = Math.max(S.ep, 60); k.dirty(); },
    done:() => { const h = ownedHaz(); return !!(h && h.evac); },

@@ -318,7 +318,7 @@ const CHARS = [
   {id:"sci", price:0,   icon:"flask-conical", color:"#5fd39a",
    name:{th:"นักวิทยาศาสตร์",en:"The Scientist"}, person:{th:"ดร.ภูผา",en:"Dr. Phupha"},
    pas:{th:"สกิลหมวดพลังงานถูกลง 8%",en:"Energy skills cost 8% less"},
-   acts:[{id:"sci1", cd:42, icon:"lightbulb", name:{th:"ค้นพบใหม่",en:"Breakthrough"}, desc:{th:"สกิลถัดไปที่ซื้อจะทยอยผลเสร็จทันที และไม่นับโควตา 3 โครงการ",en:"The next skill you buy rolls out instantly and ignores the 3-project limit"}},
+   acts:[{id:"sci1", cd:42, icon:"lightbulb", name:{th:"ค้นพบใหม่",en:"Breakthrough"}, desc:{th:"สกิลถัดไปที่ซื้อจะได้ผลเต็มที่ทันที และไม่นับโควตา 3 โครงการ",en:"The next skill you buy works at full effect at once and ignores the 3-project limit"}},
          {id:"sci2", cd:96, lv:5, icon:"flask-round", name:{th:"ทุนวิจัยเร่งด่วน",en:"Research Sprint"}, desc:{th:"สกิลถัดไปที่ซื้อถูกลง 5%",en:"The next skill you buy costs 5% less"}}]},
   {id:"dip", price:449, icon:"handshake", color:"#8fd0ff",
    name:{th:"นักการทูต",en:"The Diplomat"}, person:{th:"ทูตวารี",en:"Ambassador Waree"},

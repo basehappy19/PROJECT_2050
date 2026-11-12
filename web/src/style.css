@@ -455,6 +455,15 @@ canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
 .hex.own .body{fill:#1f7a5c;stroke:var(--good)} .hex.own.active .body{fill:#2c5a7a}
 .hex:hover .body,.hex:focus .body{stroke-width:2.4;filter:brightness(1.2)}
 .hex .prog{fill:var(--accent)}
+/* 2.1.5: in progress = gold body and a ring that fills up as the skill reaches its full effect; green = full effect */
+.hex.roll .body{fill:#5a4512;stroke:var(--gold)} .hex.roll .lab{fill:var(--gold);font-weight:700}
+.hex .ringbg{fill:none;stroke:rgba(242,193,78,.18);stroke-width:4}
+.hex .ring{fill:none;stroke:var(--gold);stroke-width:4;stroke-linecap:round;transition:stroke-dasharray .5s}
+.hex.roll .halo{display:none}
+.sk-detail .state.roll{width:100%;box-sizing:border-box;display:grid;grid-template-columns:auto 1fr;column-gap:8px;row-gap:6px;color:var(--gold)}
+.sk-detail .state.roll span{display:flex;flex-direction:column;gap:2px} .sk-detail .state.roll small{font:500 12.5px var(--body, inherit);color:var(--muted)}
+.sk-detail .state.roll .meter{grid-column:1/3;background:rgba(242,193,78,.16)} .ro .meter{background:rgba(242,193,78,.16)}
+@media (prefers-reduced-motion:reduce){.hex .ring{transition:none}}
 .hex .selring{fill:none;stroke:#fff;stroke-width:2.5}
 .hex .lab{font:500 12px var(--mono);fill:var(--muted);text-anchor:middle} .hex.own .lab{fill:#e8fff6} .hex.afford .lab{fill:var(--accent)} .hex.hid .lab{fill:var(--line)}
 .hexname{font:500 12px/1.25 var(--body);color:var(--fg);text-align:center;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
