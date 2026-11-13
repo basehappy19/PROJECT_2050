@@ -64,7 +64,7 @@ fi
 if [ "$NO_DEPLOY" -eq 0 ]; then
   step "VPS: pull, build, restart"
   # build output (assets/app-*.js, index.html, sw.js...) is rebuilt on the server, so reset it before pulling
-  ssh "${SSH_OPTS[@]}" "$VPS_HOST" "bash -lc 'set -e; cd $VPS_DIR; git checkout -q -- . && git clean -fdq -- assets; git pull --ff-only && npm run build && pm2 restart $PM2_APP && pm2 status $PM2_APP'"
+  ssh "${SSH_OPTS[@]}" "$VPS_HOST" "bash -lc 'set -e; cd $VPS_DIR; git checkout -q -- . && git clean -fdq -- assets; git pull --ff-only && npm run build && pm2 restart $PM2_APP'"
 fi
 
 step "done"
