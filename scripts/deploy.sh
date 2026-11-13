@@ -25,12 +25,12 @@ done
 shift $((OPTIND-1))
 MSG="${1:-}"
 
-SSH_OPTS=(-p "$VPS_PORT" -o StrictHostKeyChecking=accept-new)
+SSH_OPTS=(-p "$VPS_PORT" -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 -o ServerAliveInterval=15)
 KEY="$ROOT/.deploy/id_ed25519"
 if [ -f "$KEY" ]; then
   chmod 600 "$KEY" 2>/dev/null || true
   SSH_OPTS+=(-i "$KEY" -o IdentitiesOnly=yes)
-  export GIT_SSH_COMMAND="ssh -i '$KEY' -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new"
+  export GIT_SSH_COMMAND="ssh -i '$KEY' -o IdentitiesOnly=yes -o StrictHostKeyChecking=accept-new -o ConnectTimeout=15 -o ServerAliveInterval=15"
   PUSH_TARGET="$GH_SSH"
 else
   PUSH_TARGET="origin"
