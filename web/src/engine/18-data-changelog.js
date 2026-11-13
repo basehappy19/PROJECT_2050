@@ -387,9 +387,11 @@ P.CHANGELOG.find(x => x.v === "2.1").subs = [
   SUB("2.1.7", "2026-11-13", [
     "ตอนจบเกมขึ้นตารางคะแนนก่อน: แต้มแต่ละรายการเรียงจากมากไปน้อย พร้อมวิธีคิด (เช่น 13 เดือน × 20) และคะแนนสุดท้าย แตะแต่ละแถวเพื่อดูว่ามาจากไหน เช่น CO₂ ที่ลดได้มาจากทวีปไหน กดสลับไปดูข่าวและเรื่องราวแบบเดิมได้",
     "แผงสกิลใหม่ อ่านจบได้ในหน้าเดียว: ได้อะไร / เสียอะไร (ขึ้นเฉพาะสกิลที่มีข้อเสีย) / ความพอใจแต่ละกลุ่ม / ต้องใช้ / เงื่อนไข และปุ่มซื้ออยู่ล่างสุดเสมอ บอกเลยว่าขาดอะไรอีกเท่าไหร่",
+    "เปลี่ยนชื่อ \"ทำตามแผน\" เป็น \"ความร่วมมือของทวีป\": ยิ่งทวีปร่วมมือมาก สกิลและคำสั่งยิ่งลด CO₂ ได้เต็ม และรายได้ทุกเดือนยิ่งมาก",
   ], [
     "The end of the game opens on a score table: each item biggest first, with its working (such as 13 months × 20) and the final score. Tap a row to see where it came from, such as which continents the CO₂ cut came from. Switch back to the news and story any time.",
     "A new skill panel that fits on one screen: what you get / what it costs you (only when it does) / how each group feels / what you need / conditions, with the buy button always at the bottom saying what is still missing.",
+    "In Thai, \"on-plan\" is now called \"continent cooperation\": the more a continent cooperates, the more of each CO₂ cut lands and the more you earn each month.",
   ]),
   SUB("2.1.6", "2026-11-13", [
     "หน้าสรุปผลงานขึ้นทุก 5 ปี (2030, 2035, 2040, 2045) แทนทุกปี: คะแนนเฉลี่ย คะแนนแต่ละปี CO₂ ที่ลดได้ใน 5 ปี และรางวัลรวม ปีที่อยู่ระหว่างกลางยังได้คะแนนและรางวัลเหมือนเดิม แต่ขึ้นเป็นบรรทัดสั้น ๆ แทนหน้าต่าง",

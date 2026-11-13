@@ -14,7 +14,7 @@ const UI = {
   epHint:{th:"เงินทุน",en:"money"}, pcHint:{th:"อำนาจผ่านนโยบาย",en:"clout"},
   appr:{th:"[[$appr]] ความนิยม",en:"[[$appr]] Approval"},
   perMo:{th:"/ด.",en:"/mo"}, sinks:{th:"ดักจับ",en:"sinks"}, perYr:{th:"ใน 12 ด.",en:"in 12 mo"},
-  compliance:{th:"[[$plan]] ทำตามแผน",en:"[[$plan]] On-plan"}, vuln:{th:"[[$risk]] ความเสี่ยงภัยพิบัติ",en:"[[$risk]] Disaster risk"},
+  compliance:{th:"[[$plan]] ความร่วมมือของทวีป",en:"[[$plan]] On-plan"}, vuln:{th:"[[$risk]] ความเสี่ยงภัยพิบัติ",en:"[[$risk]] Disaster risk"},
   treeHint:{th:"เส้นลูกศรแสดงลำดับการปลดล็อก: ต้องมีโหนดต้นทางก่อน · สีเขียว = มีแล้ว · สีฟ้า = ปลดล็อกได้ · เส้นประ = ยังล็อก",en:"Arrows show unlock order: own the source first · green = owned · blue = available · dashed = locked"},
   alsoNeeds:{th:"ต้องมี",en:"needs"},
   nbTech:{th:"เทคโนโลยี",en:"Tech"}, nbRegion:{th:"ทวีป",en:"Regions"}, nbStats:{th:"สถิติ",en:"Stats"}, nbNews:{th:"ข่าว",en:"News"},
@@ -37,7 +37,7 @@ const UI = {
   needs:{th:"ต้องมีก่อน",en:"Requires"}, none:{th:"ไม่มี",en:"None"}, rollout:{th:"ได้ผลเต็มที่ใน",en:"Full effect in"},
   months:{th:"เดือน",en:"mo"}, inProgress:{th:"โครงการที่กำลังดำเนินการ",en:"Projects in progress"},
   paused:{th:"หยุดชะงัก",en:"stalled"},
-  rollNote:{th:"การลด CO₂ ทยอยเกิดขึ้นทุกเดือน คูณด้วยอัตราทำตามแผนของทวีป ณ เดือนนั้น และยิ่งลดได้มากแล้ว ตันสุดท้ายยิ่งลดยาก",en:"CO₂ cuts arrive monthly, scale with each region's on-plan at that time, and the last tonnes are the hardest to cut."},
+  rollNote:{th:"การลด CO₂ ทยอยเกิดขึ้นทุกเดือน คูณด้วยความร่วมมือของทวีป ณ เดือนนั้น และยิ่งลดได้มากแล้ว ตันสุดท้ายยิ่งลดยาก",en:"CO₂ cuts arrive monthly, scale with each region's on-plan at that time, and the last tonnes are the hardest to cut."},
   capFull:{th:"ทีมงาน GCT ดูแลโครงการได้พร้อมกันสูงสุด 3 โครงการ รอให้โครงการเดิมเสร็จก่อน",en:"GCT can run at most 3 projects at once. Wait for one to finish."},
   co2Now:{th:"CO₂ ปัจจุบัน",en:"CO₂ now"}, co2Start:{th:"ปี 2026",en:"In 2026"}, fossil:{th:"สัดส่วนฟอสซิล",en:"Fossil share"}, reserve:{th:"ทุนสำรอง",en:"Reserves"},
   cooldown:{th:"พักอีก",en:"Ready in"},
@@ -122,10 +122,10 @@ const CITIES = {
 
 /* Regional actions: cost ×1.25 per use in that region, 4-month cooldown. */
 const ACTIONS = [
-  {id:"fund",  ep:40, pc:0,  cd:4, name:{th:"กองทุนพลังงานสะอาด",en:"Clean energy fund"}, desc:{th:"CO₂ ทวีป −0.35 Gt × ทำตามแผน",en:"Regional CO₂ −0.35 Gt × on-plan"}},
-  {id:"diplo", ep:0,  pc:12, cd:4, name:{th:"การทูตภูมิอากาศ",en:"Climate diplomacy"}, desc:{th:"ทำตามแผน +8% (ค่อยๆ ลดลงสู่ค่าฐาน)",en:"On-plan +8% (drifts back to baseline)"}},
+  {id:"fund",  ep:40, pc:0,  cd:4, name:{th:"กองทุนพลังงานสะอาด",en:"Clean energy fund"}, desc:{th:"CO₂ ทวีป −0.35 Gt × ความร่วมมือ",en:"Regional CO₂ −0.35 Gt × on-plan"}},
+  {id:"diplo", ep:0,  pc:12, cd:4, name:{th:"การทูตภูมิอากาศ",en:"Climate diplomacy"}, desc:{th:"ความร่วมมือ +8% (ค่อยๆ ลดลงสู่ค่าฐาน)",en:"On-plan +8% (drifts back to baseline)"}},
   {id:"adapt", ep:35, pc:0,  cd:4, name:{th:"กองทุนปรับตัว",en:"Adaptation fund"}, desc:{th:"ความเสี่ยงภัยพิบัติ −10%, ความนิยม +1%",en:"Disaster risk −10%, approval +1%"}},
-  {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ทวีป −0.8 Gt × ทำตามแผน, ทำตามแผน −6%",en:"Regional CO₂ −0.8 Gt × on-plan, on-plan −6%"}},
+  {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ทวีป −0.8 Gt × ความร่วมมือ, ความร่วมมือ −6%",en:"Regional CO₂ −0.8 Gt × on-plan, on-plan −6%"}},
 ];
 
 const IC = {ep:"[[$money]]", pc:"[[$policy]]", appr:"[[$appr]]", temp:"[[$temp]]", co2:"[[$co2]]", comp:"[[$plan]]", vuln:"[[$risk]]", rel:"[[$heart]]", ore:"[[$ore]]", gem:"[[$credit]]", sink:"[[$sink]]"};
@@ -1181,7 +1181,7 @@ const ACH = [
   {id:"branchN",   icon:"trees",           t:{th:"ผู้พิทักษ์ธรรมชาติ",en:"Nature Guardian"},           d:{th:"ปลดล็อกสกิลหมวดเกษตรและป่าไม้ครบทุกสกิลในเกมเดียว",en:"Unlock every farming & forest skill in one game"}},
   {id:"allTech",   icon:"award",           t:{th:"ต้นไม้ครบทุกกิ่ง",en:"Full Tree"},                  d:{th:"ปลดล็อกครบ 40 สกิลในเกมเดียว",en:"Unlock all 40 skills in one game"}},
   {id:"fusion",    icon:"sparkles",        t:{th:"ดวงอาทิตย์บนโลก",en:"A Sun on Earth"},              d:{th:"สร้างโรงไฟฟ้าฟิวชันจนเสร็จ",en:"Finish building fusion power"}},
-  {id:"unity",     icon:"handshake",       t:{th:"โลกสามัคคี",en:"United World"},                     d:{th:"ทำตามแผนทุกทวีปถึง 85% พร้อมกัน",en:"Every region at 85% on-plan at once"}},
+  {id:"unity",     icon:"handshake",       t:{th:"โลกสามัคคี",en:"United World"},                     d:{th:"ความร่วมมือทุกทวีปถึง 85% พร้อมกัน",en:"Every region at 85% on-plan at once"}},
   {id:"safe",      icon:"shield-alert",    t:{th:"โลกปลอดภัย",en:"Safe Planet"},                      d:{th:"ความเสี่ยงภัยพิบัติทุกทวีปต่ำกว่า 35%",en:"Every region below 35% disaster risk"}},
   {id:"peak",      icon:"chart-line",      t:{th:"ผ่านจุดสูงสุด",en:"Past the Peak"},                 d:{th:"CO₂ สุทธิลดลงอย่างน้อย 2 Gt ใน 12 เดือน",en:"Cut net CO₂ by at least 2 Gt in 12 months"}},
   {id:"half",      icon:"flag",            t:{th:"ครึ่งทาง",en:"Halfway There"},                      d:{th:"CO₂ สุทธิต่ำกว่า 18 Gt",en:"Get net CO₂ below 18 Gt"}},
@@ -1309,11 +1309,11 @@ const SKILLS = [
   S_("C4","city","brick-wall",[2,1],75,15,["C2"],12,{th:"ประตูกั้นน้ำเค็ม",en:"Saltwater Barriers"},
     {th:"น้ำเค็มรุกเสียหายน้อยลง 60% และความเสี่ยงภัย SEA −8%",en:"Saltwater intrusion does 60% less damage; SEA risk −8%"},{vuln:{SEA:-8}},{resp:{saltwater:.6}}),
   S_("C7","city","shield-check",[3,1],160,40,["C2","C3"],24,{th:"เมกะโปรเจกต์เมืองทนภัย",en:"Resilient Megacities"},
-    {th:"ความเสี่ยงภัยทุกทวีป −10% และทำตามแผนทุกทวีป +3%",en:"Every region's risk −10% and on-plan +3%"},{vulnAll:-10,compAll:3}),
+    {th:"ความเสี่ยงภัยทุกทวีป −10% และความร่วมมือทุกทวีป +3%",en:"Every region's risk −10% and on-plan +3%"},{vulnAll:-10,compAll:3}),
 
   /* ---------------- Diplomacy & policy ---------------- */
   S_("P1","policy","megaphone",[0,1],30,5,[],0,{th:"แคมเปญความรู้ด้านภูมิอากาศ",en:"Climate Literacy Campaign"},
-    {th:"ความนิยม +10% และทำตามแผนทุกทวีป +5% (ถาวร)",en:"Approval +10%, every region's on-plan +5% (permanent)"},{appr:10,compAll:5}),
+    {th:"ความนิยม +10% และความร่วมมือทุกทวีป +5% (ถาวร)",en:"Approval +10%, every region's on-plan +5% (permanent)"},{appr:10,compAll:5}),
   S_("P2","policy","receipt",[1,0],60,25,["P1"],6,{th:"ภาษีคาร์บอน",en:"Carbon Tax"},
     {th:"CO₂ โลก −2.5 Gt, รายได้ [[$money]] +6/เดือน แต่ความนิยม −8%",en:"Global CO₂ −2.5 Gt, [[$money]] +6/mo, but approval −8%"},{co2:-2.5,appr:-8,epInc:6},{trade:1}),
   S_("D1","policy","hand-coins",[1,1],80,20,["P1"],0,{th:"กองทุนภูมิอากาศโลก",en:"Global Climate Fund"},
@@ -1321,11 +1321,11 @@ const SKILLS = [
   S_("D4","policy","piggy-bank",[1,2],40,10,["P1"],0,{th:"ระดมทุนฉุกเฉิน",en:"Emergency Fundraising"},
     {th:"สกิลกดใช้: ได้ [[$money]] +80 ทันที แต่ความนิยม −4% · พัก 18 เดือน",en:"Active: [[$money]] +80 now, approval −4% · 18-month cooldown"},{},{type:"active",cd:18}),
   S_("P3","policy","scale",[2,0],90,40,["P2"],0,{th:"ภาษีคาร์บอนข้ามพรมแดน",en:"Carbon Border Tax"},
-    {th:"ทวีปที่ทำตามแผนต่ำกว่า 70% ถูกบังคับลด CO₂ ปีละ −0.3 Gt ต่อเนื่อง",en:"Regions under 70% on-plan must cut −0.3 Gt/yr, ongoing"},{p3:1}),
+    {th:"ทวีปที่ความร่วมมือต่ำกว่า 70% ถูกบังคับลด CO₂ ปีละ −0.3 Gt ต่อเนื่อง",en:"Regions under 70% on-plan must cut −0.3 Gt/yr, ongoing"},{p3:1}),
   S_("D2","policy","arrow-left-right",[2,1],70,20,["D1"],0,{th:"แลกเปลี่ยนเทคโนโลยี",en:"Technology Exchange"},
     {th:"ปลดล็อกคำสั่ง \"แลกเปลี่ยนเทคโนโลยี\" กับแต่ละประเทศ",en:"Unlocks the \"Share technology\" order for each country"},{}),
   S_("P6","policy","ban",[3,0],150,60,["P3"],12,{th:"เลิกอุดหนุนฟอสซิลทั่วโลก",en:"End Fossil Subsidies"},
-    {th:"CO₂ โลก −4.5 Gt แต่ทำตามแผนใน MEAF และ NA −15% ทันที",en:"Global CO₂ −4.5 Gt, but MEAF and NA on-plan −15% at once"},{co2:-4.5,comp:{MEAF:-15,NA:-15},damp:.25},{trade:1}),
+    {th:"CO₂ โลก −4.5 Gt แต่ความร่วมมือของทวีป MEAF และ NA −15% ทันที",en:"Global CO₂ −4.5 Gt, but MEAF and NA on-plan −15% at once"},{co2:-4.5,comp:{MEAF:-15,NA:-15},damp:.25},{trade:1}),
   S_("D3","policy","handshake",[3,1],120,40,["D2"],0,{th:"สนธิสัญญาระดับทวีป",en:"Regional Treaties"},
     {th:"ปลดล็อกการตั้งกลุ่มพันธมิตร (ประเทศที่มิตรภาพ 50+ ตั้งแต่ 3 ประเทศในทวีปเดียวกัน)",en:"Unlocks alliances (3+ countries in one region with friendship 50+)"},{}),
 ];
@@ -1768,12 +1768,12 @@ Object.assign(P.UI, {
   countriesIn:T("ประเทศในทวีปนี้ (แตะเพื่อเลือก)","Countries in this region (tap to select)"),
   ordersRegion:T("คำสั่งรายทวีป","Regional orders"), ordersCountry:T("ความร่วมมือกับประเทศนี้","Work with this country"),
   thisCountryOnly:T("เฉพาะประเทศนี้ (ถูกกว่า ผลแคบกว่า)","this country only (cheaper, narrower)"),
-  cact_fund:T("CO₂ ประเทศนี้ −12% × ทำตามแผน และมิตรภาพ +3","This country's CO₂ −12% × on-plan, friendship +3"),
+  cact_fund:T("CO₂ ประเทศนี้ −12% × ความร่วมมือ และมิตรภาพ +3","This country's CO₂ −12% × on-plan, friendship +3"),
   cact_diplo:T("มิตรภาพกับประเทศนี้ +12","Friendship with this country +12"),
   cact_adapt:T("การปรับตัวของประเทศนี้ +20 (ภัยเสียหายน้อยลง) และมิตรภาพ +4","This country's adaptation +20 (less hazard damage), friendship +4"),
-  cact_tariff:T("CO₂ ประเทศนี้ −25% × ทำตามแผน แต่มิตรภาพ −12","This country's CO₂ −25% × on-plan, but friendship −12"),
+  cact_tariff:T("CO₂ ประเทศนี้ −25% × ความร่วมมือ แต่มิตรภาพ −12","This country's CO₂ −25% × on-plan, but friendship −12"),
   relation:T("มิตรภาพ","Friendship"), relHigh:T("ไว้ใจเรามาก: คำสั่งได้ผลดีและตั้งพันธมิตรได้","Trusts us: orders work well, alliance-ready"),
-  relMid:T("ทั่วไป: ยังพอคุยกันได้","Neutral: open to talks"), relLow:T("ไม่ไว้ใจเรา: ทำตามแผนในทวีปลดลง","Distrusts us: regional on-plan suffers"),
+  relMid:T("ทั่วไป: ยังพอคุยกันได้","Neutral: open to talks"), relLow:T("ไม่ไว้ใจเรา: ความร่วมมือของทวีปลดลง","Distrusts us: regional on-plan suffers"),
   shareOfRegion:T("สัดส่วนในทวีป","Share of region"), risk:T("ความเสี่ยงภัย","Disaster risk"), adapt:T("การปรับตัว","Adaptation"),
   hazardsHere:T("ภัยที่พบบ่อย","Common hazards"),
   allyOn:T("กลุ่มพันธมิตรในทวีปนี้","Alliance in this region"), allyMember:T("สมาชิกพันธมิตร","alliance member"),
@@ -2598,9 +2598,11 @@ P.CHANGELOG.find(x => x.v === "2.1").subs = [
   SUB("2.1.7", "2026-11-13", [
     "ตอนจบเกมขึ้นตารางคะแนนก่อน: แต้มแต่ละรายการเรียงจากมากไปน้อย พร้อมวิธีคิด (เช่น 13 เดือน × 20) และคะแนนสุดท้าย แตะแต่ละแถวเพื่อดูว่ามาจากไหน เช่น CO₂ ที่ลดได้มาจากทวีปไหน กดสลับไปดูข่าวและเรื่องราวแบบเดิมได้",
     "แผงสกิลใหม่ อ่านจบได้ในหน้าเดียว: ได้อะไร / เสียอะไร (ขึ้นเฉพาะสกิลที่มีข้อเสีย) / ความพอใจแต่ละกลุ่ม / ต้องใช้ / เงื่อนไข และปุ่มซื้ออยู่ล่างสุดเสมอ บอกเลยว่าขาดอะไรอีกเท่าไหร่",
+    "เปลี่ยนชื่อ \"ทำตามแผน\" เป็น \"ความร่วมมือของทวีป\": ยิ่งทวีปร่วมมือมาก สกิลและคำสั่งยิ่งลด CO₂ ได้เต็ม และรายได้ทุกเดือนยิ่งมาก",
   ], [
     "The end of the game opens on a score table: each item biggest first, with its working (such as 13 months × 20) and the final score. Tap a row to see where it came from, such as which continents the CO₂ cut came from. Switch back to the news and story any time.",
     "A new skill panel that fits on one screen: what you get / what it costs you (only when it does) / how each group feels / what you need / conditions, with the buy button always at the bottom saying what is still missing.",
+    "In Thai, \"on-plan\" is now called \"continent cooperation\": the more a continent cooperates, the more of each CO₂ cut lands and the more you earn each month.",
   ]),
   SUB("2.1.6", "2026-11-13", [
     "หน้าสรุปผลงานขึ้นทุก 5 ปี (2030, 2035, 2040, 2045) แทนทุกปี: คะแนนเฉลี่ย คะแนนแต่ละปี CO₂ ที่ลดได้ใน 5 ปี และรางวัลรวม ปีที่อยู่ระหว่างกลางยังได้คะแนนและรางวัลเหมือนเดิม แต่ขึ้นเป็นบรรทัดสั้น ๆ แทนหน้าต่าง",
@@ -2740,17 +2742,17 @@ Object.assign(P.UI, {
   /* friendship */
   relHostile:T("ไม่ร่วมมือแล้ว: CO₂ ของประเทศนี้ค่อยๆ เพิ่มขึ้น และอาจคว่ำบาตรเรา", "Not cooperating: its CO₂ creeps up and it may sanction us"),
   relSanct:T("คว่ำบาตรเราอยู่อีก", "Sanctioning us for another"),
-  relLow:T("ไม่ไว้ใจเรา: ทำตามแผนในทวีปลดลง ถ้าต่ำถึง −30 จะไม่ร่วมมือ", "Distrusts us: on-plan in this continent drops; at −30 it stops cooperating"),
+  relLow:T("ไม่ไว้ใจเรา: ความร่วมมือของทวีปลดลง ถ้าต่ำถึง −30 จะไม่ร่วมมือ", "Distrusts us: on-plan in this continent drops; at −30 it stops cooperating"),
   /* carbon tariff */
-  cact_tariff:T("CO₂ ประเทศนี้ −20% × ทำตามแผน (ได้ผลน้อยลงทุกครั้ง) แต่มิตรภาพ −22 ความนิยม −1% และอาจถูกตอบโต้ด้วยการคว่ำบาตร", "This country's CO₂ −20% × on-plan (less each time), but friendship −22, approval −1%, and it may hit back with sanctions"),
+  cact_tariff:T("CO₂ ประเทศนี้ −20% × ความร่วมมือ (ได้ผลน้อยลงทุกครั้ง) แต่มิตรภาพ −22 ความนิยม −1% และอาจถูกตอบโต้ด้วยการคว่ำบาตร", "This country's CO₂ −20% × on-plan (less each time), but friendship −22, approval −1%, and it may hit back with sanctions"),
 });
-{ const a = P.ACTIONS.find(x => x.id === "tariff"); if (a) a.desc = T("CO₂ ทวีป −0.8 Gt × ทำตามแผน (ได้ผลน้อยลงทุกครั้ง) แต่ทำตามแผน −8% มิตรภาพทุกประเทศในทวีป −10 ความนิยม −2% และบางประเทศอาจคว่ำบาตร", "Continent CO₂ −0.8 Gt × on-plan (less each time), but on-plan −8%, every country here friendship −10, approval −2%, and some may sanction us"); }
+{ const a = P.ACTIONS.find(x => x.id === "tariff"); if (a) a.desc = T("CO₂ ทวีป −0.8 Gt × ความร่วมมือ (ได้ผลน้อยลงทุกครั้ง) แต่ความร่วมมือ −8% มิตรภาพทุกประเทศในทวีป −10 ความนิยม −2% และบางประเทศอาจคว่ำบาตร", "Continent CO₂ −0.8 Gt × on-plan (less each time), but on-plan −8%, every country here friendship −10, approval −2%, and some may sanction us"); }
 Object.assign(P.UI, { googleContinue:T("ดำเนินการต่อด้วย Google", "Continue with Google") });
 Object.assign(P.UI, { matShortSk:T("ทรัพยากรไม่พอ ขาดอีก", "Not enough resources, short by"), toMarket:T("ไปตลาดทรัพยากร", "Go to the market") });
 /* 1.1.3: what each value in the top bar means */
 Object.assign(P.UI, {
-  tipEp:T("ใช้ซื้อสกิล สั่งการ และช่วยเหลือ ได้ทุกเดือนตามความนิยมและการทำตามแผน และได้มากจากการกดฟองสีเขียว", "Pays for skills, orders and aid. Comes every month (more with approval and on-plan) and in bigger amounts from green bubbles."),
-  tipPc:T("ใช้ปลดล็อกสกิลและการทูต ได้ทุกเดือนตามการทำตามแผน และจากการอ่านข่าวกรองกับรายงานประจำปี", "Needed for skills and diplomacy. Comes every month with on-plan, and from reading forecasts and the yearly report."),
+  tipEp:T("ใช้ซื้อสกิล สั่งการ และช่วยเหลือ ได้ทุกเดือนตามความนิยมและความร่วมมือของทวีป และได้มากจากการกดฟองสีเขียว", "Pays for skills, orders and aid. Comes every month (more with approval and on-plan) and in bigger amounts from green bubbles."),
+  tipPc:T("ใช้ปลดล็อกสกิลและการทูต ได้ทุกเดือนตามความร่วมมือของทวีป และจากการอ่านข่าวกรองกับรายงานประจำปี", "Needed for skills and diplomacy. Comes every month with on-plan, and from reading forecasts and the yearly report."),
   tipOre:T("ทรัพยากร 5 กลุ่มที่พลังงานสะอาดต้องใช้ ได้จากประเทศที่เป็นมิตร ฟองสีส้ม การสั่งซื้อ และตลาดทรัพยากร (กดเพื่อเปิดตลาด)", "The 5 mineral groups clean energy needs: from friendly countries, orange bubbles, purchase orders and the market (tap to open it)."),
   tipAppr:T("ถ้าลดถึง 0% จะถูกถอดถอน ลดเมื่อภัยพิบัติ การตัดสินใจที่คนไม่ชอบ และโลกร้อนขึ้น เพิ่มเมื่อช่วยผู้ประสบภัย (ฟองสีแดง)", "At 0% you are voted out. Falls with disasters, unpopular choices and a hotter world; rises when you help disaster victims (red bubbles)."),
   tipNZ:T("CO₂ สุทธิของโลกต่อปี ลดให้ถึง 0 ก่อนสิ้นปี 2050 เพื่อชนะ", "The world's net CO₂ per year. Bring it to 0 before the end of 2050 to win."),
@@ -4058,7 +4060,7 @@ const STAT = {
   policy:{th:"แต้มนโยบาย", en:"Policy points", icon:"scroll-text"},
   ore:{th:"ทรัพยากร", en:"Resources", icon:"gem"},
   appr:{th:"ความนิยม", en:"Approval", icon:"smile"},
-  plan:{th:"ทำตามแผน", en:"On-plan", icon:"circle-check"},
+  plan:{th:"ความร่วมมือของทวีป", en:"On-plan", icon:"circle-check"},
   heart:{th:"มิตรภาพ", en:"Friendship", icon:"heart"},
   risk:{th:"ความเสี่ยงภัย", en:"Disaster risk", icon:"triangle-alert"},
   temp:{th:"อุณหภูมิ", en:"Temperature", icon:"thermometer"},
@@ -4070,10 +4072,10 @@ const STAT = {
 const T = (th, en) => ({th, en});
 const LBL = {
   co2World:T("CO₂ ทั้งโลก", "World CO₂"), co2Each:T("CO₂ ทุกทวีป (แห่งละ)", "CO₂, every region (each)"), co2In:T("CO₂", "CO₂"),
-  sink:T("ดูดซับ CO₂", "CO₂ capture"), appr:T("ความนิยม", "Approval"), planAll:T("ทำตามแผน ทุกทวีป", "On-plan, every region"), planIn:T("ทำตามแผน", "On-plan"),
+  sink:T("ดูดซับ CO₂", "CO₂ capture"), appr:T("ความนิยม", "Approval"), planAll:T("ความร่วมมือ ทุกทวีป", "On-plan, every region"), planIn:T("ความร่วมมือ", "On-plan"),
   riskAll:T("ความเสี่ยงภัยพิบัติ ทุกทวีป", "Disaster risk, every region"), riskIn:T("ความเสี่ยงภัยพิบัติ", "Disaster risk"),
   income:T("รายได้เงิน", "Money income"), growth:T("การปล่อย CO₂ โตช้าลง", "CO₂ growth slows"), temp:T("อุณหภูมิโลก", "Global temperature"),
-  p3:T("บังคับทวีปที่ทำตามแผนต่ำกว่า 70% ลด CO₂", "Regions under 70% on-plan must cut CO₂"), hzDmg:T("เสียหาย", "damage"),
+  p3:T("บังคับทวีปที่ความร่วมมือต่ำกว่า 70% ลด CO₂", "Regions under 70% on-plan must cut CO₂"), hzDmg:T("เสียหาย", "damage"),
   perMo:T("/เดือน", "/mo"), perYr:T("/ปี", "/yr"), ore:T("ทรัพยากร", "Resources"), oreInc:T("รายได้ทรัพยากร", "Resource income"), oreDisc:T("สกิลใช้ทรัพยากรน้อยลง", "Skills need fewer resources"),
 };
 const fmtN = (v, d = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d).replace(/\.0+$/, "");
@@ -4463,7 +4465,7 @@ function goalsTick(){
 const ERAS = {
   shift:{icon:"zap", name:T("ยุคเปลี่ยนผ่าน", "The Transition"), goal:T("ไปให้ถึง Net Zero", "Reach Net Zero")},
   heal:{icon:"sprout", name:T("ยุคฟื้นฟู", "The Healing"), goal:T("ดึง CO₂ ออกจนอุณหภูมิลดต่ำกว่า +1.5°C", "Pull CO₂ out until warming falls below +1.5°C")},
-  thrive:{icon:"sparkles", name:T("ยุครุ่งเรือง", "The Thriving Age"), goal:T("รักษาโลกให้สมดุล ทุกทวีปทำตามแผน 80% ขึ้นไป", "Keep the world in balance, every region 80%+ on-plan")},
+  thrive:{icon:"sparkles", name:T("ยุครุ่งเรือง", "The Thriving Age"), goal:T("รักษาโลกให้สมดุล ทุกทวีปร่วมมือ 80% ขึ้นไป", "Keep the world in balance, every region 80%+ on-plan")},
 };
 /* the world mode replaces game over with setbacks you can recover from */
 function worldCheck(){
@@ -4650,7 +4652,7 @@ const TXT = {
   ambHelp:T("ทูตทำให้มิตรภาพขึ้นเองทุกเดือน และพาเทคโนโลยีสีเขียวเข้ามาเร็วขึ้น (ส่งได้พร้อมกัน 3 ประเทศ)", "An ambassador raises friendship every month and brings green technology in faster (3 at a time)"),
   ambHere:T("มีทูตของเราอยู่ที่นี่", "Our ambassador is here"), ambFull:T("ทูตครบ 3 คนแล้ว เรียกกลับก่อน 1 คน", "All 3 ambassadors are out; recall one first"),
   hqSet:T("ย้ายฐานบัญชาการมาที่นี่", "Move the home base here"), hqHere:T("ฐานบัญชาการของเรา", "Our home base"),
-  hqHelp:T("ฐานบัญชาการ: มิตรภาพไม่ต่ำกว่า 50 ทวีปนี้ทำตามแผนดีขึ้น และได้แต้มนโยบายเพิ่ม", "Home base: friendship never below 50, this region follows the plan better, and you get extra policy points"),
+  hqHelp:T("ฐานบัญชาการ: มิตรภาพไม่ต่ำกว่า 50 ทวีปนี้ร่วมมือดีขึ้น และได้แต้มนโยบายเพิ่ม", "Home base: friendship never below 50, this region follows the plan better, and you get extra policy points"),
   hqWait:T("ย้ายฐานได้อีกครั้งใน", "Can move again in"),
   prest:T("ดาวเกียรติยศ", "Prestige stars"), prestHelp:T("ได้เมื่อพาโลกต่อเนื่องเข้ายุคใหม่ หรือทำเป้าหมายครบ 10 ข้อ · โลกใหม่ได้เงินเพิ่ม 3% ต่อดาว", "Earned when a Continuous World enters a new era or completes 10 goals · new worlds get 3% more money per star"),
   gotStar:T("ได้ดาวเกียรติยศ", "Prestige star earned"),
@@ -5146,7 +5148,7 @@ const WATER = [
     T("ภัยแล้งและคลื่นความร้อนเสียหายน้อยลง 25% ความเสี่ยงภัย MEAF −10% แต่น้ำเกลือเข้มข้นทำร้ายทะเล (อุณหภูมิ +0.01°C)", "Droughts and heatwaves 25% less damage, MEAF risk −10%, but the brine harms the sea (+0.01°C)"),
     {vuln:{MEAF:-10}, tip:2.5}, {resp:{drought:.25, heat:.25}, trade:1, ore:30}),
   W("W7", "handshake", [3, 1], 140, 40, ["W4", "W5"], 0, T("ข้อตกลงความมั่นคงทางอาหารโลก", "World Food Security Pact"),
-    T("มิตรภาพทุกประเทศ +6 ทำตามแผนทุกทวีป +4% และความนิยม +3%", "Every country friendship +6, every region on-plan +4%, approval +3%"), {relAll:6, compAll:4, appr:3}),
+    T("มิตรภาพทุกประเทศ +6 ความร่วมมือทุกทวีป +4% และความนิยม +3%", "Every country friendship +6, every region on-plan +4%, approval +3%"), {relAll:6, compAll:4, appr:3}),
   W("W8", "flask-conical", [3, 2], 110, 25, ["W6"], 18, T("ปุ๋ยไนโตรเจนสีเขียว", "Green Fertiliser"),
     T("CO₂ โลก −0.9 Gt (ผลิตแอมโมเนียด้วยไฮโดรเจนสีเขียว) แต่ปุ๋ยแพงขึ้น: ความนิยม −2%", "Global CO₂ −0.9 Gt (ammonia from green hydrogen), but dearer fertiliser: approval −2%"), {co2:-0.9, appr:-2}, {trade:1, ore:25}),
 ];
@@ -5189,7 +5191,7 @@ const GROUPS = [
    good:T("สนับสนุน: ความนิยม +0.1%/เดือน", "Backing you: approval +0.1%/mo"), bad:T("ไม่พอใจมาก: อาจเกิดการประท้วงในเมือง (ความนิยมและเงินลด)", "Very angry: city riots may break out (approval and money fall)")},
   {id:"ind",   w:.25, icon:"factory",        color:"#ffb04a", name:T("ภาคอุตสาหกรรม", "Industry"),
    likes:T("พลังงานราคาถูก · เทคโนโลยีใหม่ · ปกป้องธุรกิจในประเทศ", "Cheap power, new technology, protection at home"), hates:T("ภาษีคาร์บอน · กฎบังคับโรงงาน · เลิกอุดหนุนฟอสซิล", "Carbon taxes, factory rules, ending fossil subsidies"),
-   good:T("สนับสนุน: รายได้ +2/เดือน", "Backing you: income +2/mo"), bad:T("ไม่พอใจมาก: อาจนัดหยุดงานและล็อบบี้ (เงินลด ทำตามแผนลด)", "Very angry: strikes and lobbying may follow (money and on-plan fall)")},
+   good:T("สนับสนุน: รายได้ +2/เดือน", "Backing you: income +2/mo"), bad:T("ไม่พอใจมาก: อาจนัดหยุดงานและล็อบบี้ (เงินลด ความร่วมมือลด)", "Very angry: strikes and lobbying may follow (money and on-plan fall)")},
   {id:"farm",  w:.20, icon:"tractor",        color:"#9ad35a", name:T("เกษตรกร", "Farmers"),
    likes:T("ชลประทาน · พืชทนแล้ง · เกษตรฟื้นฟู", "Irrigation, hardy crops, regenerative farming"), hates:T("เสียที่ดินทำกิน · ปุ๋ยแพง · เนื้อสัตว์ทางเลือก · ภัยแล้ง", "Losing farmland, dearer fertiliser, alternative meat, droughts"),
    good:T("สนับสนุน: ดินเก็บคาร์บอนเพิ่มทุกเดือน", "Backing you: soils store a little more carbon each month"), bad:T("ไม่พอใจมาก: อาจขับรถไถปิดถนน (เงินและแต้มนโยบายลด)", "Very angry: tractor blockades may follow (money and policy points fall)")},
@@ -6707,7 +6709,7 @@ function orderFx(kind, id, c){
     if (id === "shield") return [shield(20), rel(4)];
     if (id === "ore") return [...oreDetail(c).map(o => o.g ? {...tk(P.MAT[o.g].icon, "+" + o.n, false, T(`${P.L(P.MAT[o.g].name)} +${o.n}${o.ready ? "" : " (ต้องแปรรูป)"}`, `${P.L(P.MAT[o.g].name)} +${o.n}${o.ready ? "" : " (needs refining)"}`)), mat:P.MAT[o.g].name, raw:!o.ready} : tk("$ore", "+" + o.n)), rel(2)];
   } else {
-    if (id === "fund") return [co2(-12 * comp, T(`CO₂ ของประเทศนี้ ${sg(-12 * comp)}% (−12% × ทำตามแผน ${Math.round(comp * 100)}%)`, `This country's CO₂ ${sg(-12 * comp)}% (−12% × on-plan ${Math.round(comp * 100)}%)`)), rel(3)];
+    if (id === "fund") return [co2(-12 * comp, T(`CO₂ ของประเทศนี้ ${sg(-12 * comp)}% (−12% × ความร่วมมือ ${Math.round(comp * 100)}%)`, `This country's CO₂ ${sg(-12 * comp)}% (−12% × on-plan ${Math.round(comp * 100)}%)`)), rel(3)];
     if (id === "diplo") return [rel(12)];
     if (id === "adapt") return [shield(20), rel(4)];
     if (id === "tariff"){

@@ -46,7 +46,7 @@ function orderFx(kind, id, c){
     if (id === "shield") return [shield(20), rel(4)];
     if (id === "ore") return [...oreDetail(c).map(o => o.g ? {...tk(P.MAT[o.g].icon, "+" + o.n, false, T(`${P.L(P.MAT[o.g].name)} +${o.n}${o.ready ? "" : " (ต้องแปรรูป)"}`, `${P.L(P.MAT[o.g].name)} +${o.n}${o.ready ? "" : " (needs refining)"}`)), mat:P.MAT[o.g].name, raw:!o.ready} : tk("$ore", "+" + o.n)), rel(2)];
   } else {
-    if (id === "fund") return [co2(-12 * comp, T(`CO₂ ของประเทศนี้ ${sg(-12 * comp)}% (−12% × ทำตามแผน ${Math.round(comp * 100)}%)`, `This country's CO₂ ${sg(-12 * comp)}% (−12% × on-plan ${Math.round(comp * 100)}%)`)), rel(3)];
+    if (id === "fund") return [co2(-12 * comp, T(`CO₂ ของประเทศนี้ ${sg(-12 * comp)}% (−12% × ความร่วมมือ ${Math.round(comp * 100)}%)`, `This country's CO₂ ${sg(-12 * comp)}% (−12% × on-plan ${Math.round(comp * 100)}%)`)), rel(3)];
     if (id === "diplo") return [rel(12)];
     if (id === "adapt") return [shield(20), rel(4)];
     if (id === "tariff"){

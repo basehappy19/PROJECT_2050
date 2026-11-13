@@ -76,7 +76,7 @@ const WATER = [
     T("ภัยแล้งและคลื่นความร้อนเสียหายน้อยลง 25% ความเสี่ยงภัย MEAF −10% แต่น้ำเกลือเข้มข้นทำร้ายทะเล (อุณหภูมิ +0.01°C)", "Droughts and heatwaves 25% less damage, MEAF risk −10%, but the brine harms the sea (+0.01°C)"),
     {vuln:{MEAF:-10}, tip:2.5}, {resp:{drought:.25, heat:.25}, trade:1, ore:30}),
   W("W7", "handshake", [3, 1], 140, 40, ["W4", "W5"], 0, T("ข้อตกลงความมั่นคงทางอาหารโลก", "World Food Security Pact"),
-    T("มิตรภาพทุกประเทศ +6 ทำตามแผนทุกทวีป +4% และความนิยม +3%", "Every country friendship +6, every region on-plan +4%, approval +3%"), {relAll:6, compAll:4, appr:3}),
+    T("มิตรภาพทุกประเทศ +6 ความร่วมมือทุกทวีป +4% และความนิยม +3%", "Every country friendship +6, every region on-plan +4%, approval +3%"), {relAll:6, compAll:4, appr:3}),
   W("W8", "flask-conical", [3, 2], 110, 25, ["W6"], 18, T("ปุ๋ยไนโตรเจนสีเขียว", "Green Fertiliser"),
     T("CO₂ โลก −0.9 Gt (ผลิตแอมโมเนียด้วยไฮโดรเจนสีเขียว) แต่ปุ๋ยแพงขึ้น: ความนิยม −2%", "Global CO₂ −0.9 Gt (ammonia from green hydrogen), but dearer fertiliser: approval −2%"), {co2:-0.9, appr:-2}, {trade:1, ore:25}),
 ];

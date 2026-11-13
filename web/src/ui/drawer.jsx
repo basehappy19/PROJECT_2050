@@ -63,15 +63,15 @@ function RegionButtons(){
 const StatGrid = ({stats}) => <div class="statgrid">{stats.map(([a, b, col], i) => <div key={i} class="stat"><span><Rich t={a}/></span><b class={col || ""}>{b}</b></div>)}</div>;
 /* ---------- 3.2 (design C): friendship ring, one line per order with its effects as chips ---------- */
 const FX_IC = [[/มิตรภาพ|friendship/i, "$heart"], [/CO₂/, "$co2"], [/ปรับตัว|adaptation|เสียหาย|damage/i, "shield"], [/ทรัพยากร|mineral/i, "gem"],
-  [/ทำตามแผน|on-plan/i, "clipboard-check"], [/ความนิยม|approval/i, "$appr"], [/ความเสี่ยงภัย|เปราะบาง|disaster risk|vulnerab/i, "$risk"], [/คว่ำบาตร|sanction/i, "ban"]];
+  [/ความร่วมมือ|ทำตามแผน|on-plan/i, "clipboard-check"], [/ความนิยม|approval/i, "$appr"], [/ความเสี่ยงภัย|เปราะบาง|disaster risk|vulnerab/i, "$risk"], [/คว่ำบาตร|sanction/i, "ban"]];
 /* the order's own description, cut into short effect chips (so they always match the game data) */
 function fxChips(desc){
   const txt = plain(desc).replace(/\s*\([^)]*\)/g, "")
     .replace(/ทรัพยากรที่ประเทศนี้มี/g, "ทรัพยากร").replace(/ภัยในประเทศนี้/g, "ภัย").replace(/มิตรภาพกับประเทศนี้/g, "มิตรภาพ").replace(/(ของ)?ประเทศนี้/g, "")
     .replace(/this country's minerals/gi, "Minerals").replace(/ with this country/gi, "").replace(/this country's\s*/gi, "").replace(/\s+/g, " ").trim();
-  const parts = txt.split(/\s*(?:,|;|และ|\sand\s|\sbut\s)\s*|(?<=[\d%])\s(?=มิตรภาพ|ความนิยม|ทำตามแผน|CO₂)|\s(?=แต่)/i).map(x => x.replace(/^(แต่|but|and)\s+|^แต่/i, "").trim()).filter(Boolean);
+  const parts = txt.split(/\s*(?:,|;|และ|\sand\s|\sbut\s)\s*|(?<=[\d%])\s(?=มิตรภาพ|ความนิยม|ความร่วมมือ|ทำตามแผน|CO₂)|\s(?=แต่)/i).map(x => x.replace(/^(แต่|but|and)\s+|^แต่/i, "").trim()).filter(Boolean);
   return parts.slice(0, 5).map(x => {
-    const bad = /คว่ำบาตร|sanction|ตอบโต้/i.test(x) || (/CO₂/.test(x) ? /\+\d/.test(x) : (/−|-\d/.test(x) && /มิตรภาพ|ทำตามแผน|ความนิยม|friendship|on-plan|approval/i.test(x)));
+    const bad = /คว่ำบาตร|sanction|ตอบโต้/i.test(x) || (/CO₂/.test(x) ? /\+\d/.test(x) : (/−|-\d/.test(x) && /มิตรภาพ|ความร่วมมือ|ทำตามแผน|ความนิยม|friendship|on-plan|approval/i.test(x)));
     const icon = (FX_IC.find(([re]) => re.test(x)) || [0, "sparkles"])[1];
     return {t:x, bad, icon};
   });

@@ -149,7 +149,7 @@ function goalsTick(){
 const ERAS = {
   shift:{icon:"zap", name:T("ยุคเปลี่ยนผ่าน", "The Transition"), goal:T("ไปให้ถึง Net Zero", "Reach Net Zero")},
   heal:{icon:"sprout", name:T("ยุคฟื้นฟู", "The Healing"), goal:T("ดึง CO₂ ออกจนอุณหภูมิลดต่ำกว่า +1.5°C", "Pull CO₂ out until warming falls below +1.5°C")},
-  thrive:{icon:"sparkles", name:T("ยุครุ่งเรือง", "The Thriving Age"), goal:T("รักษาโลกให้สมดุล ทุกทวีปทำตามแผน 80% ขึ้นไป", "Keep the world in balance, every region 80%+ on-plan")},
+  thrive:{icon:"sparkles", name:T("ยุครุ่งเรือง", "The Thriving Age"), goal:T("รักษาโลกให้สมดุล ทุกทวีปร่วมมือ 80% ขึ้นไป", "Keep the world in balance, every region 80%+ on-plan")},
 };
 /* the world mode replaces game over with setbacks you can recover from */
 function worldCheck(){

@@ -87,11 +87,11 @@ const SKILLS = [
   S_("C4","city","brick-wall",[2,1],75,15,["C2"],12,{th:"ประตูกั้นน้ำเค็ม",en:"Saltwater Barriers"},
     {th:"น้ำเค็มรุกเสียหายน้อยลง 60% และความเสี่ยงภัย SEA −8%",en:"Saltwater intrusion does 60% less damage; SEA risk −8%"},{vuln:{SEA:-8}},{resp:{saltwater:.6}}),
   S_("C7","city","shield-check",[3,1],160,40,["C2","C3"],24,{th:"เมกะโปรเจกต์เมืองทนภัย",en:"Resilient Megacities"},
-    {th:"ความเสี่ยงภัยทุกทวีป −10% และทำตามแผนทุกทวีป +3%",en:"Every region's risk −10% and on-plan +3%"},{vulnAll:-10,compAll:3}),
+    {th:"ความเสี่ยงภัยทุกทวีป −10% และความร่วมมือทุกทวีป +3%",en:"Every region's risk −10% and on-plan +3%"},{vulnAll:-10,compAll:3}),
 
   /* ---------------- Diplomacy & policy ---------------- */
   S_("P1","policy","megaphone",[0,1],30,5,[],0,{th:"แคมเปญความรู้ด้านภูมิอากาศ",en:"Climate Literacy Campaign"},
-    {th:"ความนิยม +10% และทำตามแผนทุกทวีป +5% (ถาวร)",en:"Approval +10%, every region's on-plan +5% (permanent)"},{appr:10,compAll:5}),
+    {th:"ความนิยม +10% และความร่วมมือทุกทวีป +5% (ถาวร)",en:"Approval +10%, every region's on-plan +5% (permanent)"},{appr:10,compAll:5}),
   S_("P2","policy","receipt",[1,0],60,25,["P1"],6,{th:"ภาษีคาร์บอน",en:"Carbon Tax"},
     {th:"CO₂ โลก −2.5 Gt, รายได้ [[$money]] +6/เดือน แต่ความนิยม −8%",en:"Global CO₂ −2.5 Gt, [[$money]] +6/mo, but approval −8%"},{co2:-2.5,appr:-8,epInc:6},{trade:1}),
   S_("D1","policy","hand-coins",[1,1],80,20,["P1"],0,{th:"กองทุนภูมิอากาศโลก",en:"Global Climate Fund"},
@@ -99,11 +99,11 @@ const SKILLS = [
   S_("D4","policy","piggy-bank",[1,2],40,10,["P1"],0,{th:"ระดมทุนฉุกเฉิน",en:"Emergency Fundraising"},
     {th:"สกิลกดใช้: ได้ [[$money]] +80 ทันที แต่ความนิยม −4% · พัก 18 เดือน",en:"Active: [[$money]] +80 now, approval −4% · 18-month cooldown"},{},{type:"active",cd:18}),
   S_("P3","policy","scale",[2,0],90,40,["P2"],0,{th:"ภาษีคาร์บอนข้ามพรมแดน",en:"Carbon Border Tax"},
-    {th:"ทวีปที่ทำตามแผนต่ำกว่า 70% ถูกบังคับลด CO₂ ปีละ −0.3 Gt ต่อเนื่อง",en:"Regions under 70% on-plan must cut −0.3 Gt/yr, ongoing"},{p3:1}),
+    {th:"ทวีปที่ความร่วมมือต่ำกว่า 70% ถูกบังคับลด CO₂ ปีละ −0.3 Gt ต่อเนื่อง",en:"Regions under 70% on-plan must cut −0.3 Gt/yr, ongoing"},{p3:1}),
   S_("D2","policy","arrow-left-right",[2,1],70,20,["D1"],0,{th:"แลกเปลี่ยนเทคโนโลยี",en:"Technology Exchange"},
     {th:"ปลดล็อกคำสั่ง \"แลกเปลี่ยนเทคโนโลยี\" กับแต่ละประเทศ",en:"Unlocks the \"Share technology\" order for each country"},{}),
   S_("P6","policy","ban",[3,0],150,60,["P3"],12,{th:"เลิกอุดหนุนฟอสซิลทั่วโลก",en:"End Fossil Subsidies"},
-    {th:"CO₂ โลก −4.5 Gt แต่ทำตามแผนใน MEAF และ NA −15% ทันที",en:"Global CO₂ −4.5 Gt, but MEAF and NA on-plan −15% at once"},{co2:-4.5,comp:{MEAF:-15,NA:-15},damp:.25},{trade:1}),
+    {th:"CO₂ โลก −4.5 Gt แต่ความร่วมมือของทวีป MEAF และ NA −15% ทันที",en:"Global CO₂ −4.5 Gt, but MEAF and NA on-plan −15% at once"},{co2:-4.5,comp:{MEAF:-15,NA:-15},damp:.25},{trade:1}),
   S_("D3","policy","handshake",[3,1],120,40,["D2"],0,{th:"สนธิสัญญาระดับทวีป",en:"Regional Treaties"},
     {th:"ปลดล็อกการตั้งกลุ่มพันธมิตร (ประเทศที่มิตรภาพ 50+ ตั้งแต่ 3 ประเทศในทวีปเดียวกัน)",en:"Unlocks alliances (3+ countries in one region with friendship 50+)"},{}),
 ];

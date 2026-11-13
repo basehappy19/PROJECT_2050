@@ -41,17 +41,17 @@ Object.assign(P.UI, {
   /* friendship */
   relHostile:T("ไม่ร่วมมือแล้ว: CO₂ ของประเทศนี้ค่อยๆ เพิ่มขึ้น และอาจคว่ำบาตรเรา", "Not cooperating: its CO₂ creeps up and it may sanction us"),
   relSanct:T("คว่ำบาตรเราอยู่อีก", "Sanctioning us for another"),
-  relLow:T("ไม่ไว้ใจเรา: ทำตามแผนในทวีปลดลง ถ้าต่ำถึง −30 จะไม่ร่วมมือ", "Distrusts us: on-plan in this continent drops; at −30 it stops cooperating"),
+  relLow:T("ไม่ไว้ใจเรา: ความร่วมมือของทวีปลดลง ถ้าต่ำถึง −30 จะไม่ร่วมมือ", "Distrusts us: on-plan in this continent drops; at −30 it stops cooperating"),
   /* carbon tariff */
-  cact_tariff:T("CO₂ ประเทศนี้ −20% × ทำตามแผน (ได้ผลน้อยลงทุกครั้ง) แต่มิตรภาพ −22 ความนิยม −1% และอาจถูกตอบโต้ด้วยการคว่ำบาตร", "This country's CO₂ −20% × on-plan (less each time), but friendship −22, approval −1%, and it may hit back with sanctions"),
+  cact_tariff:T("CO₂ ประเทศนี้ −20% × ความร่วมมือ (ได้ผลน้อยลงทุกครั้ง) แต่มิตรภาพ −22 ความนิยม −1% และอาจถูกตอบโต้ด้วยการคว่ำบาตร", "This country's CO₂ −20% × on-plan (less each time), but friendship −22, approval −1%, and it may hit back with sanctions"),
 });
-{ const a = P.ACTIONS.find(x => x.id === "tariff"); if (a) a.desc = T("CO₂ ทวีป −0.8 Gt × ทำตามแผน (ได้ผลน้อยลงทุกครั้ง) แต่ทำตามแผน −8% มิตรภาพทุกประเทศในทวีป −10 ความนิยม −2% และบางประเทศอาจคว่ำบาตร", "Continent CO₂ −0.8 Gt × on-plan (less each time), but on-plan −8%, every country here friendship −10, approval −2%, and some may sanction us"); }
+{ const a = P.ACTIONS.find(x => x.id === "tariff"); if (a) a.desc = T("CO₂ ทวีป −0.8 Gt × ความร่วมมือ (ได้ผลน้อยลงทุกครั้ง) แต่ความร่วมมือ −8% มิตรภาพทุกประเทศในทวีป −10 ความนิยม −2% และบางประเทศอาจคว่ำบาตร", "Continent CO₂ −0.8 Gt × on-plan (less each time), but on-plan −8%, every country here friendship −10, approval −2%, and some may sanction us"); }
 Object.assign(P.UI, { googleContinue:T("ดำเนินการต่อด้วย Google", "Continue with Google") });
 Object.assign(P.UI, { matShortSk:T("ทรัพยากรไม่พอ ขาดอีก", "Not enough resources, short by"), toMarket:T("ไปตลาดทรัพยากร", "Go to the market") });
 /* 1.1.3: what each value in the top bar means */
 Object.assign(P.UI, {
-  tipEp:T("ใช้ซื้อสกิล สั่งการ และช่วยเหลือ ได้ทุกเดือนตามความนิยมและการทำตามแผน และได้มากจากการกดฟองสีเขียว", "Pays for skills, orders and aid. Comes every month (more with approval and on-plan) and in bigger amounts from green bubbles."),
-  tipPc:T("ใช้ปลดล็อกสกิลและการทูต ได้ทุกเดือนตามการทำตามแผน และจากการอ่านข่าวกรองกับรายงานประจำปี", "Needed for skills and diplomacy. Comes every month with on-plan, and from reading forecasts and the yearly report."),
+  tipEp:T("ใช้ซื้อสกิล สั่งการ และช่วยเหลือ ได้ทุกเดือนตามความนิยมและความร่วมมือของทวีป และได้มากจากการกดฟองสีเขียว", "Pays for skills, orders and aid. Comes every month (more with approval and on-plan) and in bigger amounts from green bubbles."),
+  tipPc:T("ใช้ปลดล็อกสกิลและการทูต ได้ทุกเดือนตามความร่วมมือของทวีป และจากการอ่านข่าวกรองกับรายงานประจำปี", "Needed for skills and diplomacy. Comes every month with on-plan, and from reading forecasts and the yearly report."),
   tipOre:T("ทรัพยากร 5 กลุ่มที่พลังงานสะอาดต้องใช้ ได้จากประเทศที่เป็นมิตร ฟองสีส้ม การสั่งซื้อ และตลาดทรัพยากร (กดเพื่อเปิดตลาด)", "The 5 mineral groups clean energy needs: from friendly countries, orange bubbles, purchase orders and the market (tap to open it)."),
   tipAppr:T("ถ้าลดถึง 0% จะถูกถอดถอน ลดเมื่อภัยพิบัติ การตัดสินใจที่คนไม่ชอบ และโลกร้อนขึ้น เพิ่มเมื่อช่วยผู้ประสบภัย (ฟองสีแดง)", "At 0% you are voted out. Falls with disasters, unpopular choices and a hotter world; rises when you help disaster victims (red bubbles)."),
   tipNZ:T("CO₂ สุทธิของโลกต่อปี ลดให้ถึง 0 ก่อนสิ้นปี 2050 เพื่อชนะ", "The world's net CO₂ per year. Bring it to 0 before the end of 2050 to win."),

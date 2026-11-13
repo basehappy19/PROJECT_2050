@@ -15,7 +15,7 @@ const STAT = {
   policy:{th:"แต้มนโยบาย", en:"Policy points", icon:"scroll-text"},
   ore:{th:"ทรัพยากร", en:"Resources", icon:"gem"},
   appr:{th:"ความนิยม", en:"Approval", icon:"smile"},
-  plan:{th:"ทำตามแผน", en:"On-plan", icon:"circle-check"},
+  plan:{th:"ความร่วมมือของทวีป", en:"On-plan", icon:"circle-check"},
   heart:{th:"มิตรภาพ", en:"Friendship", icon:"heart"},
   risk:{th:"ความเสี่ยงภัย", en:"Disaster risk", icon:"triangle-alert"},
   temp:{th:"อุณหภูมิ", en:"Temperature", icon:"thermometer"},
@@ -27,10 +27,10 @@ const STAT = {
 const T = (th, en) => ({th, en});
 const LBL = {
   co2World:T("CO₂ ทั้งโลก", "World CO₂"), co2Each:T("CO₂ ทุกทวีป (แห่งละ)", "CO₂, every region (each)"), co2In:T("CO₂", "CO₂"),
-  sink:T("ดูดซับ CO₂", "CO₂ capture"), appr:T("ความนิยม", "Approval"), planAll:T("ทำตามแผน ทุกทวีป", "On-plan, every region"), planIn:T("ทำตามแผน", "On-plan"),
+  sink:T("ดูดซับ CO₂", "CO₂ capture"), appr:T("ความนิยม", "Approval"), planAll:T("ความร่วมมือ ทุกทวีป", "On-plan, every region"), planIn:T("ความร่วมมือ", "On-plan"),
   riskAll:T("ความเสี่ยงภัยพิบัติ ทุกทวีป", "Disaster risk, every region"), riskIn:T("ความเสี่ยงภัยพิบัติ", "Disaster risk"),
   income:T("รายได้เงิน", "Money income"), growth:T("การปล่อย CO₂ โตช้าลง", "CO₂ growth slows"), temp:T("อุณหภูมิโลก", "Global temperature"),
-  p3:T("บังคับทวีปที่ทำตามแผนต่ำกว่า 70% ลด CO₂", "Regions under 70% on-plan must cut CO₂"), hzDmg:T("เสียหาย", "damage"),
+  p3:T("บังคับทวีปที่ความร่วมมือต่ำกว่า 70% ลด CO₂", "Regions under 70% on-plan must cut CO₂"), hzDmg:T("เสียหาย", "damage"),
   perMo:T("/เดือน", "/mo"), perYr:T("/ปี", "/yr"), ore:T("ทรัพยากร", "Resources"), oreInc:T("รายได้ทรัพยากร", "Resource income"), oreDisc:T("สกิลใช้ทรัพยากรน้อยลง", "Skills need fewer resources"),
 };
 const fmtN = (v, d = 1) => (v > 0 ? "+" : v < 0 ? "−" : "") + Math.abs(v).toFixed(d).replace(/\.0+$/, "");

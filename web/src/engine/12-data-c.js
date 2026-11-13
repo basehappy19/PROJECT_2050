@@ -96,7 +96,7 @@ const ACH = [
   {id:"branchN",   icon:"trees",           t:{th:"ผู้พิทักษ์ธรรมชาติ",en:"Nature Guardian"},           d:{th:"ปลดล็อกสกิลหมวดเกษตรและป่าไม้ครบทุกสกิลในเกมเดียว",en:"Unlock every farming & forest skill in one game"}},
   {id:"allTech",   icon:"award",           t:{th:"ต้นไม้ครบทุกกิ่ง",en:"Full Tree"},                  d:{th:"ปลดล็อกครบ 40 สกิลในเกมเดียว",en:"Unlock all 40 skills in one game"}},
   {id:"fusion",    icon:"sparkles",        t:{th:"ดวงอาทิตย์บนโลก",en:"A Sun on Earth"},              d:{th:"สร้างโรงไฟฟ้าฟิวชันจนเสร็จ",en:"Finish building fusion power"}},
-  {id:"unity",     icon:"handshake",       t:{th:"โลกสามัคคี",en:"United World"},                     d:{th:"ทำตามแผนทุกทวีปถึง 85% พร้อมกัน",en:"Every region at 85% on-plan at once"}},
+  {id:"unity",     icon:"handshake",       t:{th:"โลกสามัคคี",en:"United World"},                     d:{th:"ความร่วมมือทุกทวีปถึง 85% พร้อมกัน",en:"Every region at 85% on-plan at once"}},
   {id:"safe",      icon:"shield-alert",    t:{th:"โลกปลอดภัย",en:"Safe Planet"},                      d:{th:"ความเสี่ยงภัยพิบัติทุกทวีปต่ำกว่า 35%",en:"Every region below 35% disaster risk"}},
   {id:"peak",      icon:"chart-line",      t:{th:"ผ่านจุดสูงสุด",en:"Past the Peak"},                 d:{th:"CO₂ สุทธิลดลงอย่างน้อย 2 Gt ใน 12 เดือน",en:"Cut net CO₂ by at least 2 Gt in 12 months"}},
   {id:"half",      icon:"flag",            t:{th:"ครึ่งทาง",en:"Halfway There"},                      d:{th:"CO₂ สุทธิต่ำกว่า 18 Gt",en:"Get net CO₂ below 18 Gt"}},

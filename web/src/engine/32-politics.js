@@ -25,7 +25,7 @@ const GROUPS = [
    good:T("สนับสนุน: ความนิยม +0.1%/เดือน", "Backing you: approval +0.1%/mo"), bad:T("ไม่พอใจมาก: อาจเกิดการประท้วงในเมือง (ความนิยมและเงินลด)", "Very angry: city riots may break out (approval and money fall)")},
   {id:"ind",   w:.25, icon:"factory",        color:"#ffb04a", name:T("ภาคอุตสาหกรรม", "Industry"),
    likes:T("พลังงานราคาถูก · เทคโนโลยีใหม่ · ปกป้องธุรกิจในประเทศ", "Cheap power, new technology, protection at home"), hates:T("ภาษีคาร์บอน · กฎบังคับโรงงาน · เลิกอุดหนุนฟอสซิล", "Carbon taxes, factory rules, ending fossil subsidies"),
-   good:T("สนับสนุน: รายได้ +2/เดือน", "Backing you: income +2/mo"), bad:T("ไม่พอใจมาก: อาจนัดหยุดงานและล็อบบี้ (เงินลด ทำตามแผนลด)", "Very angry: strikes and lobbying may follow (money and on-plan fall)")},
+   good:T("สนับสนุน: รายได้ +2/เดือน", "Backing you: income +2/mo"), bad:T("ไม่พอใจมาก: อาจนัดหยุดงานและล็อบบี้ (เงินลด ความร่วมมือลด)", "Very angry: strikes and lobbying may follow (money and on-plan fall)")},
   {id:"farm",  w:.20, icon:"tractor",        color:"#9ad35a", name:T("เกษตรกร", "Farmers"),
    likes:T("ชลประทาน · พืชทนแล้ง · เกษตรฟื้นฟู", "Irrigation, hardy crops, regenerative farming"), hates:T("เสียที่ดินทำกิน · ปุ๋ยแพง · เนื้อสัตว์ทางเลือก · ภัยแล้ง", "Losing farmland, dearer fertiliser, alternative meat, droughts"),
    good:T("สนับสนุน: ดินเก็บคาร์บอนเพิ่มทุกเดือน", "Backing you: soils store a little more carbon each month"), bad:T("ไม่พอใจมาก: อาจขับรถไถปิดถนน (เงินและแต้มนโยบายลด)", "Very angry: tractor blockades may follow (money and policy points fall)")},

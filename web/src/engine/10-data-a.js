@@ -10,7 +10,7 @@ const UI = {
   epHint:{th:"เงินทุน",en:"money"}, pcHint:{th:"อำนาจผ่านนโยบาย",en:"clout"},
   appr:{th:"[[$appr]] ความนิยม",en:"[[$appr]] Approval"},
   perMo:{th:"/ด.",en:"/mo"}, sinks:{th:"ดักจับ",en:"sinks"}, perYr:{th:"ใน 12 ด.",en:"in 12 mo"},
-  compliance:{th:"[[$plan]] ทำตามแผน",en:"[[$plan]] On-plan"}, vuln:{th:"[[$risk]] ความเสี่ยงภัยพิบัติ",en:"[[$risk]] Disaster risk"},
+  compliance:{th:"[[$plan]] ความร่วมมือของทวีป",en:"[[$plan]] On-plan"}, vuln:{th:"[[$risk]] ความเสี่ยงภัยพิบัติ",en:"[[$risk]] Disaster risk"},
   treeHint:{th:"เส้นลูกศรแสดงลำดับการปลดล็อก: ต้องมีโหนดต้นทางก่อน · สีเขียว = มีแล้ว · สีฟ้า = ปลดล็อกได้ · เส้นประ = ยังล็อก",en:"Arrows show unlock order: own the source first · green = owned · blue = available · dashed = locked"},
   alsoNeeds:{th:"ต้องมี",en:"needs"},
   nbTech:{th:"เทคโนโลยี",en:"Tech"}, nbRegion:{th:"ทวีป",en:"Regions"}, nbStats:{th:"สถิติ",en:"Stats"}, nbNews:{th:"ข่าว",en:"News"},
@@ -33,7 +33,7 @@ const UI = {
   needs:{th:"ต้องมีก่อน",en:"Requires"}, none:{th:"ไม่มี",en:"None"}, rollout:{th:"ได้ผลเต็มที่ใน",en:"Full effect in"},
   months:{th:"เดือน",en:"mo"}, inProgress:{th:"โครงการที่กำลังดำเนินการ",en:"Projects in progress"},
   paused:{th:"หยุดชะงัก",en:"stalled"},
-  rollNote:{th:"การลด CO₂ ทยอยเกิดขึ้นทุกเดือน คูณด้วยอัตราทำตามแผนของทวีป ณ เดือนนั้น และยิ่งลดได้มากแล้ว ตันสุดท้ายยิ่งลดยาก",en:"CO₂ cuts arrive monthly, scale with each region's on-plan at that time, and the last tonnes are the hardest to cut."},
+  rollNote:{th:"การลด CO₂ ทยอยเกิดขึ้นทุกเดือน คูณด้วยความร่วมมือของทวีป ณ เดือนนั้น และยิ่งลดได้มากแล้ว ตันสุดท้ายยิ่งลดยาก",en:"CO₂ cuts arrive monthly, scale with each region's on-plan at that time, and the last tonnes are the hardest to cut."},
   capFull:{th:"ทีมงาน GCT ดูแลโครงการได้พร้อมกันสูงสุด 3 โครงการ รอให้โครงการเดิมเสร็จก่อน",en:"GCT can run at most 3 projects at once. Wait for one to finish."},
   co2Now:{th:"CO₂ ปัจจุบัน",en:"CO₂ now"}, co2Start:{th:"ปี 2026",en:"In 2026"}, fossil:{th:"สัดส่วนฟอสซิล",en:"Fossil share"}, reserve:{th:"ทุนสำรอง",en:"Reserves"},
   cooldown:{th:"พักอีก",en:"Ready in"},
@@ -118,10 +118,10 @@ const CITIES = {
 
 /* Regional actions: cost ×1.25 per use in that region, 4-month cooldown. */
 const ACTIONS = [
-  {id:"fund",  ep:40, pc:0,  cd:4, name:{th:"กองทุนพลังงานสะอาด",en:"Clean energy fund"}, desc:{th:"CO₂ ทวีป −0.35 Gt × ทำตามแผน",en:"Regional CO₂ −0.35 Gt × on-plan"}},
-  {id:"diplo", ep:0,  pc:12, cd:4, name:{th:"การทูตภูมิอากาศ",en:"Climate diplomacy"}, desc:{th:"ทำตามแผน +8% (ค่อยๆ ลดลงสู่ค่าฐาน)",en:"On-plan +8% (drifts back to baseline)"}},
+  {id:"fund",  ep:40, pc:0,  cd:4, name:{th:"กองทุนพลังงานสะอาด",en:"Clean energy fund"}, desc:{th:"CO₂ ทวีป −0.35 Gt × ความร่วมมือ",en:"Regional CO₂ −0.35 Gt × on-plan"}},
+  {id:"diplo", ep:0,  pc:12, cd:4, name:{th:"การทูตภูมิอากาศ",en:"Climate diplomacy"}, desc:{th:"ความร่วมมือ +8% (ค่อยๆ ลดลงสู่ค่าฐาน)",en:"On-plan +8% (drifts back to baseline)"}},
   {id:"adapt", ep:35, pc:0,  cd:4, name:{th:"กองทุนปรับตัว",en:"Adaptation fund"}, desc:{th:"ความเสี่ยงภัยพิบัติ −10%, ความนิยม +1%",en:"Disaster risk −10%, approval +1%"}},
-  {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ทวีป −0.8 Gt × ทำตามแผน, ทำตามแผน −6%",en:"Regional CO₂ −0.8 Gt × on-plan, on-plan −6%"}},
+  {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ทวีป −0.8 Gt × ความร่วมมือ, ความร่วมมือ −6%",en:"Regional CO₂ −0.8 Gt × on-plan, on-plan −6%"}},
 ];
 
 const IC = {ep:"[[$money]]", pc:"[[$policy]]", appr:"[[$appr]]", temp:"[[$temp]]", co2:"[[$co2]]", comp:"[[$plan]]", vuln:"[[$risk]]", rel:"[[$heart]]", ore:"[[$ore]]", gem:"[[$credit]]", sink:"[[$sink]]"};
