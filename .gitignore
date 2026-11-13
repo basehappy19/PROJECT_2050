@@ -47,3 +47,9 @@ gdevelop/_source/build/export/
 
 # 3.9: Windows and Android builds kept on this computer (never committed)
 release/
+
+# deploy key used by scripts/deploy.sh (never commit)
+.deploy/
+# local pitch/storyboard files and trailer work (not part of the site)
+/*.pptx
+/trailer/
