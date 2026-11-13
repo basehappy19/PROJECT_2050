@@ -1811,6 +1811,8 @@ Object.assign(P.UI, {
   ready:T("พร้อม","Ready"), hiddenSkill:T("สกิลปริศนา","Unknown skill"), hiddenHint:T("ต้องปลดล็อกก่อน:","Unlock first:"),
   noRollouts:T("ยังไม่มีโครงการที่กำลังดำเนินการ","No projects in progress"), needReq:T("ต้องมีสกิลก่อนหน้าก่อน","Needs the earlier skill first"),
   useNow:T("ใช้ตอนนี้","Use now"), target:T("เป้าหมาย","Target"), rollingOut:T("กำลังดำเนินการ","In progress"), rollLeft:T("อีก {N} เดือนได้ผลเต็มที่","Full effect in {N} mo"),
+  // 2.1.7: the skill panel in sections (what you get · what it costs you · how each group feels · what you need · when)
+  skGain:T("ได้อะไร","What you get"), skLose:T("เสียอะไร","What it costs you"), skGroups:T("ความพอใจแต่ละกลุ่ม","How each group feels"), skNeed:T("ต้องใช้","You need"), skCond:T("เงื่อนไข","Conditions"), skShort:T("ขาด","short"), skShortBtn:T("ขาดอีก","Still need"), skNow:T("ได้ผลทันทีที่ซื้อ","Works as soon as you buy it"), skFullIn:T("ได้ผลเต็มที่ใน","Full effect in"),
   unlock:T("ปลดล็อกสกิล","Unlock skill"), owned:T("มีแล้ว","Owned"), inProgress:T("กำลังดำเนินการ","In progress"),
   logTech:T("ปลดล็อกสกิล","Skill unlocked"),
   skillTip:T("[[shield]] รับมือภัย · [[scale]] ได้อย่างเสียอย่าง · [[zap]] กดใช้ได้","[[shield]] handles disasters · [[scale]] trade-off · [[zap]] can be used"),
@@ -2593,6 +2595,13 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
   ]),
 ];
 P.CHANGELOG.find(x => x.v === "2.1").subs = [
+  SUB("2.1.7", "2026-11-13", [
+    "ตอนจบเกมขึ้นตารางคะแนนก่อน: แต้มแต่ละรายการเรียงจากมากไปน้อย พร้อมวิธีคิด (เช่น 13 เดือน × 20) และคะแนนสุดท้าย แตะแต่ละแถวเพื่อดูว่ามาจากไหน เช่น CO₂ ที่ลดได้มาจากทวีปไหน กดสลับไปดูข่าวและเรื่องราวแบบเดิมได้",
+    "แผงสกิลใหม่ อ่านจบได้ในหน้าเดียว: ได้อะไร / เสียอะไร (ขึ้นเฉพาะสกิลที่มีข้อเสีย) / ความพอใจแต่ละกลุ่ม / ต้องใช้ / เงื่อนไข และปุ่มซื้ออยู่ล่างสุดเสมอ บอกเลยว่าขาดอะไรอีกเท่าไหร่",
+  ], [
+    "The end of the game opens on a score table: each item biggest first, with its working (such as 13 months × 20) and the final score. Tap a row to see where it came from, such as which continents the CO₂ cut came from. Switch back to the news and story any time.",
+    "A new skill panel that fits on one screen: what you get / what it costs you (only when it does) / how each group feels / what you need / conditions, with the buy button always at the bottom saying what is still missing.",
+  ]),
   SUB("2.1.6", "2026-11-13", [
     "หน้าสรุปผลงานขึ้นทุก 5 ปี (2030, 2035, 2040, 2045) แทนทุกปี: คะแนนเฉลี่ย คะแนนแต่ละปี CO₂ ที่ลดได้ใน 5 ปี และรางวัลรวม ปีที่อยู่ระหว่างกลางยังได้คะแนนและรางวัลเหมือนเดิม แต่ขึ้นเป็นบรรทัดสั้น ๆ แทนหน้าต่าง",
     "หน้าสกิลและแท็บประเทศอยู่บนสุด: การแจ้งเตือนไม่ขึ้นบังอีกแล้ว (บนจอคอมการแจ้งเตือนย้ายไปข้างแท็บ บนมือถือรอจนปิดแท็บ)",
@@ -5857,6 +5866,45 @@ P.endPaper = () => {
    end screen draw it. */
 const JP_OPP = {win:"クライ氏、自社グループをクリーンエネルギーに転換「市場は変わった」", l2:"クライ氏、世界のエネルギー政策の新トップに",
   other:"クライ氏は石炭販売を続行「警告はした」"};
+/* 2.1.7: the final score, item by item, exactly as P.score() adds it up (biggest first), each with its working and
+   details to open: where the CO₂ was cut, the people behind approval, the countries behind friendship */
+P.scoreParts = () => {
+  const th = S.lang !== "en", win = S.over === "win", TT = P.TOTAL_TICKS || 300, left = Math.max(0, TT - S.tick);
+  const n = (v, d = 0) => (+v).toLocaleString("en-US", {minimumFractionDigits:d, maximumFractionDigits:d});
+  const sg = v => (v < 0 ? "−" : "+") + Math.abs(v).toFixed(1);
+  const net = P.netCO2(), rel = Math.max(0, P.relAll()), tempD = Math.max(0, 2.5 - S.temp);
+  const regs = S.regions.map(r => ({id:r.id, cut:r.co2_0 - r.co2})).sort((a, b) => b.cut - a.cut);
+  const cutAll = 36 - net, sinkCut = cutAll - regs.reduce((a, r) => a + r.cut, 0);
+  const rname = id => L(P.RMETA ? P.RMETA[id].name : (P.REGIONS.find(r => r.id === id) || {}).name);
+  const whereCO2 = k => [...regs.map(r => ({label:rname(r.id), val:k ? n(r.cut * k) : `${sg(-r.cut)} Gt`, cls:r.cut > 0 ? "good" : "bad"})),
+    {label:th ? "ป่าและทะเลดูดซับ" : "Forests and oceans", val:k ? n(sinkCut * k) : `${sg(-sinkCut)} Gt`, cls:"good"}];
+  const parts = [];
+  if (win){
+    parts.push({id:"nz", icon:"trophy", raw:5000, label:th ? "Net Zero สำเร็จ" : "Net Zero reached", calc:th ? "โบนัสชนะ" : "win bonus",
+      note:th ? `CO₂ ที่ลดได้ทั้งหมด ${cutAll.toFixed(1)} Gt มาจาก` : `The ${cutAll.toFixed(1)} Gt cut came from`, det:whereCO2(0)});
+    parts.push({id:"early", icon:"clock", raw:left * 20, label:th ? "จบก่อนกำหนด" : "Finished early", calc:th ? `${left} เดือน × 20` : `${left} months × 20`,
+      note:th ? `ถึง Net Zero ${P.dateStr()} เหลือ ${left} เดือนก่อนสิ้นปี 2050` : `Net Zero in ${P.dateStr()}, ${left} months before the end of 2050`, det:[]});
+  } else {
+    parts.push({id:"co2", icon:"$co2", raw:cutAll * 80, label:th ? "CO₂ ที่ลดได้" : "CO₂ cut", calc:`${cutAll.toFixed(1)} Gt × 80`,
+      note:th ? "แต้มจากแต่ละที่ (Gt ที่ลด × 80)" : "Points from each place (Gt cut × 80)", det:whereCO2(80)});
+    parts.push({id:"nz", icon:"trophy", raw:0, label:th ? "Net Zero ยังไม่สำเร็จ" : "Net Zero not reached", calc:th ? "ถ้าสำเร็จ +5,000" : "+5,000 if reached", miss:1,
+      note:th ? `ยังเหลือ CO₂ สุทธิ ${net.toFixed(1)} Gt ต่อปี` : `${net.toFixed(1)} Gt a year still left`, det:[]});
+  }
+  parts.push({id:"temp", icon:"thermometer", raw:tempD * 1500, label:th ? "โลกไม่ร้อนเกิน 2.5°C" : "Below 2.5°C", calc:`(2.50 − ${S.temp.toFixed(2)}) × 1,500`,
+    note:th ? `อุณหภูมิตอนจบ +${S.temp.toFixed(2)}°C ยิ่งต่ำกว่า 2.5°C มาก ยิ่งได้มาก` : `The world ended at +${S.temp.toFixed(2)}°C; the further under 2.5°C, the more points`, det:[]});
+  const gs = (P.GROUPS || []).filter(g => S.groups && typeof S.groups[g.id] === "number");
+  parts.push({id:"appr", icon:"$appr", raw:S.appr * 15, label:th ? "ความนิยม" : "Approval", calc:`${S.appr.toFixed(0)}% × 15`,
+    note:gs.length ? (th ? "ความพอใจแต่ละกลุ่มตอนจบ" : "How each group felt at the end") : "", det:gs.map(g => ({label:L(g.name), val:`${S.groups[g.id].toFixed(0)}%`, cls:S.groups[g.id] >= 50 ? "good" : S.groups[g.id] < 30 ? "bad" : ""}))});
+  const cs = S.countries.filter(c => !c.rest).slice().sort((a, b) => b.rel - a.rel);
+  parts.push({id:"rel", icon:"$heart", raw:rel * 10, label:th ? "มิตรภาพทุกประเทศ" : "Friendship", calc:th ? `เฉลี่ย ${rel.toFixed(0)} × 10` : `avg ${rel.toFixed(0)} × 10`,
+    note:th ? "ประเทศที่สนิทที่สุด / ห่างที่สุด" : "Closest and furthest countries", det:[...cs.slice(0, 3), ...cs.slice(-2)].map(c => ({label:P.cname(c.id), val:c.rel.toFixed(0), cls:c.rel >= 50 ? "good" : c.rel < 0 ? "bad" : ""}))});
+  // whole points that add up to P.score() exactly (the rounding difference goes to the biggest item)
+  parts.forEach(p => { p.pts = Math.round(p.raw); });
+  const total = P.score(), diff = total - parts.reduce((a, p) => a + p.pts, 0);
+  parts.sort((a, b) => b.pts - a.pts || (a.miss ? 1 : 0) - (b.miss ? 1 : 0));
+  if (diff && parts[0].pts + diff >= 0) parts[0].pts += diff;
+  return {parts, total, n};
+};
 P.endNews = () => {
   const np = P.endPaper(), o = S.over, win = o === "win", th = S.lang === "th";
   const [fon, lung, opp] = np.people;

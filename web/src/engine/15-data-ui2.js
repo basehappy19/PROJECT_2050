@@ -55,6 +55,8 @@ Object.assign(P.UI, {
   ready:T("พร้อม","Ready"), hiddenSkill:T("สกิลปริศนา","Unknown skill"), hiddenHint:T("ต้องปลดล็อกก่อน:","Unlock first:"),
   noRollouts:T("ยังไม่มีโครงการที่กำลังดำเนินการ","No projects in progress"), needReq:T("ต้องมีสกิลก่อนหน้าก่อน","Needs the earlier skill first"),
   useNow:T("ใช้ตอนนี้","Use now"), target:T("เป้าหมาย","Target"), rollingOut:T("กำลังดำเนินการ","In progress"), rollLeft:T("อีก {N} เดือนได้ผลเต็มที่","Full effect in {N} mo"),
+  // 2.1.7: the skill panel in sections (what you get · what it costs you · how each group feels · what you need · when)
+  skGain:T("ได้อะไร","What you get"), skLose:T("เสียอะไร","What it costs you"), skGroups:T("ความพอใจแต่ละกลุ่ม","How each group feels"), skNeed:T("ต้องใช้","You need"), skCond:T("เงื่อนไข","Conditions"), skShort:T("ขาด","short"), skShortBtn:T("ขาดอีก","Still need"), skNow:T("ได้ผลทันทีที่ซื้อ","Works as soon as you buy it"), skFullIn:T("ได้ผลเต็มที่ใน","Full effect in"),
   unlock:T("ปลดล็อกสกิล","Unlock skill"), owned:T("มีแล้ว","Owned"), inProgress:T("กำลังดำเนินการ","In progress"),
   logTech:T("ปลดล็อกสกิล","Skill unlocked"),
   skillTip:T("[[shield]] รับมือภัย · [[scale]] ได้อย่างเสียอย่าง · [[zap]] กดใช้ได้","[[shield]] handles disasters · [[scale]] trade-off · [[zap]] can be used"),

@@ -221,6 +221,45 @@ P.endPaper = () => {
    end screen draw it. */
 const JP_OPP = {win:"クライ氏、自社グループをクリーンエネルギーに転換「市場は変わった」", l2:"クライ氏、世界のエネルギー政策の新トップに",
   other:"クライ氏は石炭販売を続行「警告はした」"};
+/* 2.1.7: the final score, item by item, exactly as P.score() adds it up (biggest first), each with its working and
+   details to open: where the CO₂ was cut, the people behind approval, the countries behind friendship */
+P.scoreParts = () => {
+  const th = S.lang !== "en", win = S.over === "win", TT = P.TOTAL_TICKS || 300, left = Math.max(0, TT - S.tick);
+  const n = (v, d = 0) => (+v).toLocaleString("en-US", {minimumFractionDigits:d, maximumFractionDigits:d});
+  const sg = v => (v < 0 ? "−" : "+") + Math.abs(v).toFixed(1);
+  const net = P.netCO2(), rel = Math.max(0, P.relAll()), tempD = Math.max(0, 2.5 - S.temp);
+  const regs = S.regions.map(r => ({id:r.id, cut:r.co2_0 - r.co2})).sort((a, b) => b.cut - a.cut);
+  const cutAll = 36 - net, sinkCut = cutAll - regs.reduce((a, r) => a + r.cut, 0);
+  const rname = id => L(P.RMETA ? P.RMETA[id].name : (P.REGIONS.find(r => r.id === id) || {}).name);
+  const whereCO2 = k => [...regs.map(r => ({label:rname(r.id), val:k ? n(r.cut * k) : `${sg(-r.cut)} Gt`, cls:r.cut > 0 ? "good" : "bad"})),
+    {label:th ? "ป่าและทะเลดูดซับ" : "Forests and oceans", val:k ? n(sinkCut * k) : `${sg(-sinkCut)} Gt`, cls:"good"}];
+  const parts = [];
+  if (win){
+    parts.push({id:"nz", icon:"trophy", raw:5000, label:th ? "Net Zero สำเร็จ" : "Net Zero reached", calc:th ? "โบนัสชนะ" : "win bonus",
+      note:th ? `CO₂ ที่ลดได้ทั้งหมด ${cutAll.toFixed(1)} Gt มาจาก` : `The ${cutAll.toFixed(1)} Gt cut came from`, det:whereCO2(0)});
+    parts.push({id:"early", icon:"clock", raw:left * 20, label:th ? "จบก่อนกำหนด" : "Finished early", calc:th ? `${left} เดือน × 20` : `${left} months × 20`,
+      note:th ? `ถึง Net Zero ${P.dateStr()} เหลือ ${left} เดือนก่อนสิ้นปี 2050` : `Net Zero in ${P.dateStr()}, ${left} months before the end of 2050`, det:[]});
+  } else {
+    parts.push({id:"co2", icon:"$co2", raw:cutAll * 80, label:th ? "CO₂ ที่ลดได้" : "CO₂ cut", calc:`${cutAll.toFixed(1)} Gt × 80`,
+      note:th ? "แต้มจากแต่ละที่ (Gt ที่ลด × 80)" : "Points from each place (Gt cut × 80)", det:whereCO2(80)});
+    parts.push({id:"nz", icon:"trophy", raw:0, label:th ? "Net Zero ยังไม่สำเร็จ" : "Net Zero not reached", calc:th ? "ถ้าสำเร็จ +5,000" : "+5,000 if reached", miss:1,
+      note:th ? `ยังเหลือ CO₂ สุทธิ ${net.toFixed(1)} Gt ต่อปี` : `${net.toFixed(1)} Gt a year still left`, det:[]});
+  }
+  parts.push({id:"temp", icon:"thermometer", raw:tempD * 1500, label:th ? "โลกไม่ร้อนเกิน 2.5°C" : "Below 2.5°C", calc:`(2.50 − ${S.temp.toFixed(2)}) × 1,500`,
+    note:th ? `อุณหภูมิตอนจบ +${S.temp.toFixed(2)}°C ยิ่งต่ำกว่า 2.5°C มาก ยิ่งได้มาก` : `The world ended at +${S.temp.toFixed(2)}°C; the further under 2.5°C, the more points`, det:[]});
+  const gs = (P.GROUPS || []).filter(g => S.groups && typeof S.groups[g.id] === "number");
+  parts.push({id:"appr", icon:"$appr", raw:S.appr * 15, label:th ? "ความนิยม" : "Approval", calc:`${S.appr.toFixed(0)}% × 15`,
+    note:gs.length ? (th ? "ความพอใจแต่ละกลุ่มตอนจบ" : "How each group felt at the end") : "", det:gs.map(g => ({label:L(g.name), val:`${S.groups[g.id].toFixed(0)}%`, cls:S.groups[g.id] >= 50 ? "good" : S.groups[g.id] < 30 ? "bad" : ""}))});
+  const cs = S.countries.filter(c => !c.rest).slice().sort((a, b) => b.rel - a.rel);
+  parts.push({id:"rel", icon:"$heart", raw:rel * 10, label:th ? "มิตรภาพทุกประเทศ" : "Friendship", calc:th ? `เฉลี่ย ${rel.toFixed(0)} × 10` : `avg ${rel.toFixed(0)} × 10`,
+    note:th ? "ประเทศที่สนิทที่สุด / ห่างที่สุด" : "Closest and furthest countries", det:[...cs.slice(0, 3), ...cs.slice(-2)].map(c => ({label:P.cname(c.id), val:c.rel.toFixed(0), cls:c.rel >= 50 ? "good" : c.rel < 0 ? "bad" : ""}))});
+  // whole points that add up to P.score() exactly (the rounding difference goes to the biggest item)
+  parts.forEach(p => { p.pts = Math.round(p.raw); });
+  const total = P.score(), diff = total - parts.reduce((a, p) => a + p.pts, 0);
+  parts.sort((a, b) => b.pts - a.pts || (a.miss ? 1 : 0) - (b.miss ? 1 : 0));
+  if (diff && parts[0].pts + diff >= 0) parts[0].pts += diff;
+  return {parts, total, n};
+};
 P.endNews = () => {
   const np = P.endPaper(), o = S.over, win = o === "win", th = S.lang === "th";
   const [fon, lung, opp] = np.people;

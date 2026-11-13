@@ -112,6 +112,9 @@ export const endImg = (o, grade) => `assets/img/endings/${o === "win" ? `end-win
    A win doesn't show "Net Zero 100%" (it always is): it shows how early you got there, the warming and how much CO₂ you
    cut. A loss shows how far you got (Net Zero %), what is still left and why it ended. */
 const EN_T = {
+  // 2.1.7: the score table (shown first) and the switch back to the news
+  tabScore:T("ตารางคะแนน", "Score"), tabNews:T("ข่าวและเรื่องราว", "News and story"), scoreT:T("ตารางคะแนนภารกิจ", "Mission score"),
+  item:T("รายการ · คิดจาก", "Item · working"), pts:T("แต้ม", "Points"), final:T("คะแนนสุดท้าย", "Final score"), tapOpen:T("แตะแต่ละแถวเพื่อดูว่ามาจากไหน", "Tap a row to see where it came from"),
   live:T("สด", "LIVE"), breaking:T("ข่าวด่วน", "BREAKING"), interview:T("สัมภาษณ์สด", "Live interview"), world:T("พาดหัวจากทั่วโลก", "Headlines around the world"),
   early:T("เร็วกว่ากำหนด", "early"), lastYear:T("ทันในปีสุดท้าย", "in the final year"), yr:T("ปี", "yr"), mo:T("เดือน", "mo"),
   reached:T("ถึงเป้า", "Reached"), temp:T("อุณหภูมิโลก", "Warming"), good:T("ปีที่ดี", "Good years"), cut:T("ลด CO₂ ได้", "CO₂ cut"), perYr:T("Gt/ปี", "Gt/yr"),
@@ -137,6 +140,8 @@ export function EndModal(){
   const o = S.over, win = o === "win", rw = UIM.reward, th = S.lang === "th";
   const {wide, k} = useStage();
   const [sheet, setSheet] = useState(false);
+  const [view, setView] = useState("score");   // 2.1.7: the score table first; the news and story one tap away
+  const [open, setOpen] = useState({});
   const nw = P.endNews ? P.endNews() : {papers:[], ticker:[], early:0, nz:0, net:P.netCO2(), date:P.dateStr()};
   const e2 = S.v2 && P.ending2 ? P.ending2() : null, tier = P.endTier ? P.endTier(P.goodYears ? P.goodYears() : 0) : 1;
   const kind = sceneKind(o, tier), ng = P.goodYears ? P.goodYears() : 0, ny = (S.years || []).length;
@@ -169,8 +174,29 @@ export function EndModal(){
       : rw.guest ? <span class="muted">{t("rewardGuest")} · XP +{rw.xp}</span>
       : rw.error ? <span class="muted">{t("rewardFail")} · XP +{rw.xp || 0}</span>
       : <><Terra n={`+${rw.terra}`} cls="good"/><b class="acc mono">XP +{rw.xp}</b>{rw.levelUp ? <b class="gold"><Icon n="star" size={14}/> {t("levelUp")} {rw.level}</b> : null}</>}
-    <span class="mono muted nw-score">{t("finalScore")} {P.score().toLocaleString()}</span>
+    {view !== "score" ? <span class="mono muted nw-score">{t("finalScore")} {P.score().toLocaleString()}</span> : null}
   </div>;
+  /* 2.1.7: the score table: biggest first, raw points only, each row opens to show where its points came from */
+  const sp = P.scoreParts ? P.scoreParts() : null;
+  const tabs = sp ? <div class="nw-tabs" role="tablist">
+    {[["score", "list", EN_T.tabScore], ["news", "newspaper", EN_T.tabNews]].map(([v, ic, lb]) => <button type="button" role="tab" key={v} aria-selected={view === v} class={view === v ? "on" : ""}
+      onClick={() => { if (view !== v){ Audio.play("tab"); setView(v); } }}><Icon n={ic} size={16}/>{L(lb)}</button>)}
+  </div> : null;
+  const scoreTab = sp ? <section class="nw-st" aria-label={L(EN_T.scoreT)}>
+    <div class="nw-st-head"><span class="nw-tk">GCT NEWS</span><b>{L(EN_T.scoreT)}</b></div>
+    <div class="nw-st-cols"><span>{L(EN_T.item)}</span><span>{L(EN_T.pts)}</span></div>
+    <div class="nw-st-rows">{sp.parts.map((q, i) => { const on = !!open[q.id], can = !!(q.det.length || q.note);
+      return <div key={q.id} class={"nw-st-row" + (q.miss ? " miss" : "") + (on ? " on" : "")} style={{animationDelay:`${.25 + i * .12}s`}}>
+        <button type="button" class="nw-st-btn" aria-expanded={can ? on : undefined} disabled={!can} onClick={e => { const row = e.currentTarget.parentElement; Audio.play(on ? "close" : "open", {vol:.5}); setOpen({...open, [q.id]:!on}); if (!on) requestAnimationFrame(() => requestAnimationFrame(() => row.scrollIntoView({block:"nearest", behavior:"smooth"}))); }}>
+          <Icon n={q.icon} size={18}/>
+          <span class="nw-st-l"><b>{q.label}</b><small class="mono">{q.calc}</small></span>
+          <b class="mono nw-st-p">{q.pts < 0 ? "−" : ""}{sp.n(Math.abs(q.pts))}</b>
+          {can ? <Icon n="chevron-down" size={16} cls="nw-st-chev"/> : <i class="nw-st-chev"/>}
+        </button>
+        {on ? <div class="nw-st-det">{q.note ? <p>{q.note}</p> : null}{q.det.length ? <ul>{q.det.map((d, j) => <li key={j}><span>{d.label}</span><b class={"mono " + (d.cls || "")}>{d.val}</b></li>)}</ul> : null}</div> : null}
+      </div>; })}</div>
+    <div class="nw-st-total"><span>{L(EN_T.final)}</span><b class="mono">{sp.n(sp.total)}</b></div>
+  </section> : null;
   const btns = <div class="nw-btns">
     <Btn kind="ghost" onClick={() => G.toMenu()}>{t("mainMenu")}</Btn>
     <Btn kind={win ? "ghost" : "primary"} onClick={() => G.restart()}>{t("restart")}</Btn>
@@ -198,16 +224,16 @@ export function EndModal(){
     <div class={"nw-stage " + (wide ? "wide" : "tall")} style={{transform:`translate(-50%, -50%) scale(${k})`}} role="dialog" aria-modal="true" aria-label={head}>
       {wide ? <>
         {tv}
-        <aside class="nw-side"><div class="nw-h">{L(EN_T.world)}</div>{papers}{statBox}</aside>
+        <aside class="nw-side">{tabs}{sp && view === "score" ? scoreTab : <><div class="nw-h">{L(EN_T.world)}</div>{papers}{statBox}</>}</aside>
         <div class="nw-under">{story}{moreBtn}</div>
         {ticker}
         <div class="nw-bar">{reward}{btns}</div>
       </> : <>
         {tv}
-        <div class="nw-body">{story}
+        <div class="nw-body">{tabs}{sp && view === "score" ? scoreTab : <>{story}
           <div class="nw-qrow"><img src={portraitSrc(S.char, P.outfitOf ? P.outfitOf(S.char) : undefined)} alt=""/><span><b>{L(P.CHAR[S.char].person)}</b>“{quote}”</span></div>
           {nw.papers.length ? <div class="nw-papers one">{(() => { const p0 = nw.papers[0]; return <article class="nw-paper p-wt"><b class="nw-pname">{p0.name}</b><p class="nw-phead" lang="en">{p0.head}</p>{p0.gloss ? <small class="nw-gloss">“{p0.gloss}”</small> : null}</article>; })()}</div> : null}
-          {statBox}</div>
+          {statBox}</>}</div>
         {ticker}
         <div class="nw-bar">{reward}<div class="nw-row">{moreBtn}</div>{btns}</div>
       </>}
