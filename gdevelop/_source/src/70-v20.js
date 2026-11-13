@@ -142,7 +142,9 @@ H.gameStart = () => {
 };
 const yearly0 = H.yearly;
 H.yearly = rec => {
-  if (S.simple){ if (P.Alerts) P.Alerts.addLoss({k:"year", y:rec.y, good:rec.g, ep:rec.ep, pc:rec.pc, appr:rec.appr}); return; }   // Fast mode: a line, not a window
-  if (UIM.modal === "story" || UIM.modal === "intro"){ UIM.yearQ = rec; return; }
-  yearly0(rec);
+  // Fast mode and (web 2.1.6) the years between the 5-year reviews: a line, not a window
+  if (S.simple || (P.isReviewYear && !P.isReviewYear(rec.y))){ if (P.Alerts) P.Alerts.addLoss({k:"year", y:rec.y, good:rec.g, ep:rec.ep, pc:rec.pc, appr:rec.appr}); return; }
+  const span = (P.yearSpan && P.yearSpan(rec.y)) || rec;
+  if (UIM.modal === "story" || UIM.modal === "intro"){ UIM.yearQ = span; return; }
+  yearly0(span);
 };

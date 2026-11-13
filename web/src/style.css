@@ -303,7 +303,7 @@ canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
 .tabbtn .badge{position:static;margin-left:2px}
 .tabbtn.pulse:not(.on){animation:none}
 /* drawer */
-.drawer{position:absolute;right:calc(14px + var(--safe-r));top:calc(70px + var(--safe-t));bottom:calc(var(--bottom-h, 160px) + 20px + var(--safe-b));width:420px;display:flex;flex-direction:column;background:rgba(8,20,26,.9);animation:drawer .25s cubic-bezier(.2,.8,.2,1);z-index:2}
+.drawer{position:absolute;right:calc(14px + var(--safe-r));top:calc(70px + var(--safe-t));bottom:calc(var(--bottom-h, 160px) + 20px + var(--safe-b));width:420px;display:flex;flex-direction:column;background:rgba(8,20,26,.9);animation:drawer .25s cubic-bezier(.2,.8,.2,1);z-index:5}   /* 2.1.6: above the warning cards (4) and the loss lines (3) */
 @keyframes drawer{from{transform:translateX(30px);opacity:0}}
 .dhead{display:flex;align-items:center;gap:8px;padding:8px 10px 8px 16px;border-bottom:1px solid var(--line)}
 .dhead h2{flex:1;font:600 15px var(--disp);letter-spacing:.04em}
@@ -485,6 +485,8 @@ canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
 /* toast + transitions */
 .toast{position:fixed;right:calc(16px + var(--safe-r));bottom:calc(150px + var(--safe-b));z-index:40;width:340px;display:flex;gap:12px;align-items:center;padding:12px;border-color:rgba(242,180,65,.6);animation:toast 4.6s cubic-bezier(.2,.8,.2,1) forwards}
 .toast.tl{left:16px;top:16px;right:auto;bottom:auto}
+/* 2.1.6: the skills page is above the toast (z 45); with the country tab open the toast sits left of it, never on top */
+@media (min-width:900px){ .game.has-drawer ~ .toast:not(.tl){right:calc(var(--drawer-w, 420px) + 30px + var(--safe-r))} }
 .home~.toast{bottom:calc(20px + var(--safe-b))}
 .toast .ticon{flex:none;width:52px;height:52px;border-radius:var(--radius-md);background:color-mix(in srgb,var(--warn) 18%,transparent);display:grid;place-items:center;color:var(--warn)}
 .toast div{display:flex;flex-direction:column;min-width:0} .toast b{font:600 16px var(--disp);white-space:nowrap;overflow:hidden;text-overflow:ellipsis} .toast small{font-size:12px}
@@ -506,7 +508,7 @@ canvas.globe.ready{opacity:1} canvas.globe:active{cursor:grabbing}
   .kpi .s{display:none} .kpi{min-width:84px}
   .meters{gap:20px;padding:8px 12px} .mtr-f span:first-child{display:none}
   .tabbtn span{display:none} .tabbtn{padding:0 13px}
-  .drawer{width:360px} .has-drawer .zoom{right:calc(380px + var(--safe-r))}
+  .drawer{width:360px} :root{--drawer-w:360px} .has-drawer .zoom{right:calc(380px + var(--safe-r))}
   .menu-panel,.menu-panel.sub{width:min(460px,calc(100vw - 40px))}
   .sk-body{grid-template-columns:1fr;grid-template-rows:minmax(260px,1fr) auto;overflow-y:auto} .sk-detail{overflow:visible}
   .sk-cats{grid-template-columns:repeat(6,minmax(120px,1fr));overflow-x:auto}
@@ -1043,6 +1045,14 @@ html.cb .bar.temp .z:nth-child(1){background:#4ea8ff} html.cb .bar.temp .z:nth-c
 .ystrip i.g{background:var(--good)} .ystrip i.b{background:var(--bad)}
 .ystrip i.cur{outline:2px solid #fff;outline-offset:1px}
 .ystrip.big i{height:16px}
+/* 2.1.6: the 5-year review */
+.y5ring{flex:none;display:flex;flex-direction:column;align-items:center;gap:2px} .y5ring small{font-size:12px;color:var(--muted);margin-top:-6px}
+.y5years{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:8px;margin-top:12px}
+.y5y{display:grid;grid-template-columns:1fr auto;grid-template-rows:auto auto;align-items:center;padding:8px 10px;border-radius:var(--radius-md);background:var(--surface-2);border:1px solid var(--line);animation:panelin .45s cubic-bezier(.2,.8,.2,1) both}
+.y5y small{grid-column:1/3;font-size:11.5px;color:var(--muted)} .y5y b{font-size:20px}
+.y5y.g{border-color:rgba(95,211,154,.45)} .y5y.g b,.y5y.g svg{color:var(--good)}
+.y5y.b{border-color:rgba(255,90,74,.45)} .y5y.b b,.y5y.b svg{color:var(--bad)}
+@media (max-width:560px), (max-height:500px){ .y5y{padding:6px 8px} .y5y b{font-size:16px} .modal.y5 .ystory p{font-size:14px} }
 .ystrip small{position:absolute;top:18px;left:0;font:500 12px var(--mono);color:var(--muted)}
 .ystrip.big{margin-bottom:14px}
 .end2t{font:600 18px var(--disp);margin:6px 0 4px}
@@ -1338,7 +1348,7 @@ small.mono,.mono.small,.tag,.kpi .k,.hexname{font-family:var(--body);letter-spac
 @keyframes tickfade{0%,78%{opacity:1;visibility:visible}100%{opacity:0;visibility:hidden}}
 
 /* skills: a full-screen page instead of a window */
-.skills-page{position:fixed;inset:0;z-index:20;display:flex;background:radial-gradient(ellipse at 50% 0%,#10303a 0%,var(--bg) 70%);animation:fade .2s ease-out}
+.skills-page{position:fixed;inset:0;z-index:45;display:flex;background:radial-gradient(ellipse at 50% 0%,#10303a 0%,var(--bg) 70%);animation:fade .2s ease-out}
 .skills-page .skills{max-width:none;width:100%;height:100%;border-radius:0;border:0;box-shadow:none;background:none;padding:var(--safe-t) var(--safe-r) var(--safe-b) var(--safe-l);animation:none}
 .sk-head .skback.skclose{margin-left:0}
 .sk-head .sk-res{margin-left:auto}

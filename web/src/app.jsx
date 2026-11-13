@@ -105,12 +105,14 @@ function Loading({leaving}){
 function Toast(){
   const [cur, setCur] = useState(null);
   const kind = UIM.kind();
+  // 2.1.6: on a phone the country tab is a sheet over the bottom half, so a new toast waits until it is closed
+  const sheet = S.tab && UIM.screen === "game" && window.innerWidth < 900;
   useEffect(() => {
-    if (cur || !UIM.toastQ.length || (kind && kind !== "end")) return;
+    if (cur || !UIM.toastQ.length || (kind && kind !== "end") || sheet) return;
     const a = UIM.toastQ.shift(); setCur(a); Audio.play(a.msg ? "coin" : "jingle", {vol:.8});
   });
   useEffect(() => { if (!cur) return; const id = setTimeout(() => { setCur(null); bump(); }, 4600); return () => clearTimeout(id); }, [cur]);
-  if (!cur) return null;
+  if (!cur || (kind && kind !== "end")) return null;   // 2.1.6: a window (the skills page …) is never covered by a toast
   return <div class={"toast glass-strong " + (kind === "end" ? "tl" : "")} role="status" key={cur.id || cur.title || cur.msg}>
     <span class="ticon"><Icon n={cur.icon} size={26}/></span>
     <div><small class="warn">{up(cur.msg ? cur.title : t("achUnlocked"))}</small><b>{cur.msg ? <Rich t={cur.msg}/> : L(cur.t)}</b>{!cur.msg ? <span class="muted small">{L(cur.d)}</span> : null}</div>
@@ -119,7 +121,8 @@ function Toast(){
 
 /* ---------- 3.9: people of the story talk while you play (45-voices.js) ---------- */
 function Voice(){
-  const v = UIM.voice, kind = UIM.kind(), show = v && UIM.screen === "game" && !kind && !UIM.train;
+  // 2.1.6: on a phone the line waits while the country tab (a sheet) is open, so it never covers it
+  const v = UIM.voice, kind = UIM.kind(), show = v && UIM.screen === "game" && !kind && !UIM.train && !(S.tab && window.innerWidth < 900);
   // the timer belongs to this line: other redraws must not cancel it (before, any redraw did, and the faded bubble stayed
   // on screen invisible, catching taps meant for the map)
   useEffect(() => {

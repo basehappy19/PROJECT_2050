@@ -384,6 +384,15 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
   ]),
 ];
 P.CHANGELOG.find(x => x.v === "2.1").subs = [
+  SUB("2.1.6", "2026-11-13", [
+    "หน้าสรุปผลงานขึ้นทุก 5 ปี (2030, 2035, 2040, 2045) แทนทุกปี: คะแนนเฉลี่ย คะแนนแต่ละปี CO₂ ที่ลดได้ใน 5 ปี และรางวัลรวม ปีที่อยู่ระหว่างกลางยังได้คะแนนและรางวัลเหมือนเดิม แต่ขึ้นเป็นบรรทัดสั้น ๆ แทนหน้าต่าง",
+    "หน้าสกิลและแท็บประเทศอยู่บนสุด: การแจ้งเตือนไม่ขึ้นบังอีกแล้ว (บนจอคอมการแจ้งเตือนย้ายไปข้างแท็บ บนมือถือรอจนปิดแท็บ)",
+    "กองทุนปรับตัวใช้คำว่า \"ความเสี่ยงภัยพิบัติ\" แทน \"ความเปราะบาง\"",
+  ], [
+    "The review now comes every 5 years (2030, 2035, 2040, 2045) instead of every year: the average score, each year's score, the CO₂ cut over the 5 years and the total reward. The years in between still score and pay as before, as a short line instead of a window.",
+    "The skills page and the country tab stay on top: notifications no longer cover them (on a computer they move beside the tab; on a phone they wait until it is closed).",
+    "The adaptation fund says \"disaster risk\" instead of \"vulnerability\".",
+  ]),
   SUB("2.1.5", "2026-11-12", [
     "รถไฟบนแผนที่ขึ้นเมื่ออัปสกิล: ต้นเกมยังไม่มีรถไฟ ซื้อสกิลรถไฟความเร็วสูงแล้วรถไฟความเร็วสูง รถไฟหัวกระสุน รถไฟขนส่งสินค้า และรถไฟโดยสารจะขึ้นบนเส้นทางจริง จากนั้นเส้นทางใหม่ค่อย ๆ เปิดทีละสาย",
     "สกิลกฎหมายขนส่งไฟฟ้า 100% เปลี่ยนหัวรถจักรดีเซลที่มีควันเป็นรถไฟฟ้าทุกสาย",

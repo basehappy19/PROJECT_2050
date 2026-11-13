@@ -59,7 +59,7 @@ Screens.regionButtons = function(l, y, cw){
 };
 /* web fxChips: an order's own description cut into short effect chips (so they always match the game data) */
 const FX_IC = [[/มิตรภาพ|friendship/i, "$heart"], [/CO₂/, "$co2"], [/ปรับตัว|adaptation|เสียหาย|damage/i, "shield"], [/ทรัพยากร|mineral/i, "gem"],
-  [/ทำตามแผน|on-plan/i, "clipboard-check"], [/ความนิยม|approval/i, "$appr"], [/เปราะบาง|vulnerab/i, "shield"], [/คว่ำบาตร|sanction/i, "ban"]];
+  [/ทำตามแผน|on-plan/i, "clipboard-check"], [/ความนิยม|approval/i, "$appr"], [/ความเสี่ยงภัย|เปราะบาง|disaster risk|vulnerab/i, "$risk"], [/คว่ำบาตร|sanction/i, "ban"]];
 const plainT = s2 => String(s2).replace(/\[\[[^\]]*\]\]\s*/g, "");
 function fxChips(desc){
   const txt = plainT(desc).replace(/\s*\([^)]*\)/g, "")

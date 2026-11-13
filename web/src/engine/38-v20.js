@@ -82,7 +82,16 @@ const goodYears = () => (S.years || []).filter(x => x.g).length;
 /* the story for a year and its ending */
 P.yearStory = rec => { const s = P.YEAR_STORY[rec.y] || P.YEAR_STORY[2050]; return rec.g ? s.good : s.bad; };
 P.ending2 = () => { const list = P.END2[S.over] || P.END2.l3; return list[P.endTier(goodYears())]; };
-Object.assign(P, {yearTarget, yearScore, goodYears, YEAR_RULES:YR});
+/* 2.1.6: the review window comes every 5 years (2030, 2035 …) and sums up the years since the last one */
+const yearSpan = (y, n = 5) => {
+  const list = (S.years || []).filter(x => x.y > y - n && x.y <= y && !x.last).sort((a, b) => a.y - b.y);
+  if (!list.length) return null;
+  const last = list[list.length - 1], ng = list.filter(x => x.g).length, sum = k => list.reduce((a, x) => a + (x[k] || 0), 0);
+  return {y:last.y, y0:list[0].y, span:list.length, ng, g:ng * 2 >= list.length ? 1 : 0, s:Math.round(sum("s") / list.length),
+    net:last.net, tgt:last.tgt, cut:+sum("cut").toFixed(2), ep:sum("ep"), pc:sum("pc"), appr:+sum("appr").toFixed(2), list};
+};
+const isReviewYear = y => y % 5 === 0;
+Object.assign(P, {yearTarget, yearScore, goodYears, yearSpan, isReviewYear, YEAR_RULES:YR});
 
 const _tick = P.tick;
 P.tick = () => { _tick(); if (S.regions && S.started && !S.over) yearTick(); };

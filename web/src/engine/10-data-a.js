@@ -120,7 +120,7 @@ const CITIES = {
 const ACTIONS = [
   {id:"fund",  ep:40, pc:0,  cd:4, name:{th:"กองทุนพลังงานสะอาด",en:"Clean energy fund"}, desc:{th:"CO₂ ทวีป −0.35 Gt × ทำตามแผน",en:"Regional CO₂ −0.35 Gt × on-plan"}},
   {id:"diplo", ep:0,  pc:12, cd:4, name:{th:"การทูตภูมิอากาศ",en:"Climate diplomacy"}, desc:{th:"ทำตามแผน +8% (ค่อยๆ ลดลงสู่ค่าฐาน)",en:"On-plan +8% (drifts back to baseline)"}},
-  {id:"adapt", ep:35, pc:0,  cd:4, name:{th:"กองทุนปรับตัว",en:"Adaptation fund"}, desc:{th:"ความเปราะบาง −10%, ความนิยม +1%",en:"Vulnerability −10%, approval +1%"}},
+  {id:"adapt", ep:35, pc:0,  cd:4, name:{th:"กองทุนปรับตัว",en:"Adaptation fund"}, desc:{th:"ความเสี่ยงภัยพิบัติ −10%, ความนิยม +1%",en:"Disaster risk −10%, approval +1%"}},
   {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ทวีป −0.8 Gt × ทำตามแผน, ทำตามแผน −6%",en:"Regional CO₂ −0.8 Gt × on-plan, on-plan −6%"}},
 ];
 

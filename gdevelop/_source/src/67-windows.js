@@ -145,9 +145,9 @@ Screens.mPolitics = function(l, pw){
 /* ---------------- yearly review ---------------- */
 Screens.mYear = function(l, pw){
   const r = UIM.yearRec; if (!r) return 80;
-  const T2 = P.UI2, good = !!r.g, x = 20, w = pw - 40, col = good ? "good" : "bad"; let y = 18;
-  k.text(l, P.up(`[[${good ? "trending-up" : "trending-down"}]] ${L(T2.yrTitle)} ${r.y}`), x, y, {font:"mono", size:11.5, color:col, iconColor:col}); y += 20;
-  const hh = k.text(l, good ? L(T2.yrGood) : L(T2.yrBad), x, y, {font:"disp", size:26, w:w - 150, lh:1.25, color:col}).h;
+  const T2 = P.UI2, good = !!r.g, x = 20, w = pw - 40, col = good ? "good" : "bad", five = !!r.span; let y = 18;   // five: web 2.1.6 5-year review
+  k.text(l, P.up(five ? `[[calendar-check]] ${L(T2.yr5Title)} ${r.y0}–${r.y}` : `[[${good ? "trending-up" : "trending-down"}]] ${L(T2.yrTitle)} ${r.y}`), x, y, {font:"mono", size:11.5, color:col, iconColor:col}); y += 20;
+  const hh = k.text(l, five ? (good ? L(T2.yr5Good) : L(T2.yr5Bad)) : good ? L(T2.yrGood) : L(T2.yrBad), x, y, {font:"disp", size:26, w:w - 150, lh:1.25, color:col}).h;
   // score ring (web Ring: 132 px)
   const cx = x + w - 62, cy = 72, R = 54;
   const arc = (f0, f1) => { const pts = []; for (let i = 0, n = Math.max(2, Math.ceil(72 * (f1 - f0))); i <= n; i++){ const a = -Math.PI / 2 + (f0 + (f1 - f0) * i / n) * Math.PI * 2; pts.push(cx + Math.cos(a) * (R - 6), cy + Math.sin(a) * (R - 6)); } return pts; };
@@ -155,12 +155,24 @@ Screens.mYear = function(l, pw){
   if (r.s > 0) k.path(l, arc(0, Math.min(1, r.s / 100)), col, {w:11});
   k.text(l, String(r.s), cx - 40, cy - 24, {font:"monoB", size:32, w:80, align:"center", color:"#ffffff"});
   k.text(l, "/ 100", cx - 30, cy + 14, {font:"dispS", size:11, w:60, align:"center", color:col});
+  if (five) k.text(l, L(T2.yr5Avg), cx - 60, cy + R + 2, {size:11.5, w:120, align:"center", color:"muted"});
   y += Math.max(hh, 30) + 12;
   // numbers
-  const nums = [[t("co2"), `${r.net.toFixed(1)} Gt`, "fg"], [L(T2.yrTarget), `≤ ${r.tgt.toFixed(1)} Gt`, "fg"], [L(T2.yrCut), `${r.cut > 0 ? "−" : "+"}${Math.abs(r.cut).toFixed(1)} Gt`, r.cut > 0 ? "good" : "bad"]];
+  const nums = [[t("co2"), `${r.net.toFixed(1)} Gt`, "fg"], [L(T2.yrTarget), `≤ ${r.tgt.toFixed(1)} Gt`, "fg"], [L(five ? T2.yr5Cut : T2.yrCut), `${r.cut > 0 ? "−" : "+"}${Math.abs(r.cut).toFixed(1)} Gt`, r.cut > 0 ? "good" : "bad"]];
   let nx = x;
   for (const [a, b, c] of nums){ k.text(l, a, nx, y, {size:11.5, color:"muted"}); k.text(l, b, nx, y + 16, {font:"monoB", size:16, color:c}); nx += 140; }
   y += 50;
+  // web 2.1.6: one tile per year of the 5 (year, score, good or bad)
+  if (five){
+    y = Math.max(y, cy + R + 22);   // below the "average score" label under the ring
+    const n = r.list.length, gap = 8, tw = (w - gap * (n - 1)) / n;
+    r.list.forEach((q, i) => { const tx = x + i * (tw + gap), qc = q.g ? "good" : "bad";
+      k.rect(l, tx, y, tw, 50, "panel2", {r:10, stroke:qc, sa:.45});
+      k.text(l, String(q.y), tx + 10, y + 6, {size:11.5, color:"muted"});
+      k.text(l, String(q.s), tx + 10, y + 21, {font:"monoB", size:19, color:qc});
+      k.icon(l, q.g ? "trending-up" : "trending-down", tx + tw - 24, y + 26, 14, qc); });
+    y += 62;
+  }
   // story line
   const st = P.yearStory ? P.yearStory(r) : null;
   if (st){
@@ -182,16 +194,16 @@ Screens.mYear = function(l, pw){
   if (r.pc) parts.push(`${IC.pc} +${r.pc}`);
   if (r.appr) parts.push(`${IC.appr || "[[$appr]]"} ${r.appr > 0 ? "+" : "−"}${Math.abs(r.appr).toFixed(1)}%`);
   k.rect(l, x, y, w, 40, col, {r:10, a:.1, stroke:col, sa:.5});
-  k.text(l, `[[${good ? "hand-coins" : "shield-alert"}]] ${good ? L(T2.yrRewardGood) : L(T2.yrRewardBad)}`, x + 12, y + 11, {size:13, color:col, iconColor:col, w:w - 200, max:1});
+  k.text(l, `[[${good ? "hand-coins" : "shield-alert"}]] ${five ? (good ? L(T2.yr5RewardGood) : L(T2.yr5RewardBad)) : good ? L(T2.yrRewardGood) : L(T2.yrRewardBad)}`, x + 12, y + 11, {size:13, color:col, iconColor:col, w:w - 200, max:1});
   const pt = parts.join("   "), pw2 = k.textW(pt, {font:"monoB", size:13});
   k.text(l, pt, x + w - 12 - pw2, y + 11, {font:"monoB", size:13, color:col});
   y += 52;
   const ng = (S.years || []).filter(q => q.g).length;
-  const nl = `${L(T2.yrNext)} [[chevron-right]]`, nw = W.btnW(nl);
+  const nl = `${L(five ? T2.yr5Next : T2.yrNext)} [[chevron-right]]`, nw = W.btnW(nl);
   W.runs(l, x, y - 2, [[`${L(T2.yrGoodYears)} `, {size:12, color:"muted"}], [String(ng), {font:"monoB", size:12, color:"good"}], [` / ${(S.years || []).length}`, {size:12, color:"muted"}]]);
   W.yearStrip(l, x, y + 18, w - nw - 18, {cur:r.y});   // web YearStrip: 25 squares, 2026 … 2050
   W.btn(l, "yearnext", x + w - nw, y, nl, () => Screens.closeWin());
   y += 46;
-  y += k.text(l, L(T2.yrHow), x, y, {size:11, color:"muted", w, lh:1.35}).h;
+  y += k.text(l, L(five ? T2.yr5How : T2.yrHow), x, y, {size:11, color:"muted", w, lh:1.35}).h;
   return y + 16;
 };

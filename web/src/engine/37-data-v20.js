@@ -46,6 +46,16 @@ P.UI2 = {
   yrNext:T("ปีถัดไป", "Next year"),
   yrHow:T("คะแนนมาจาก CO₂ สุทธิเทียบกับเป้าปีนี้ (60%) และสิ่งที่ลดได้ในปีนี้ (40%) · 50 ขึ้นไป = ปีที่ดี", "The score comes from net CO₂ against this year's target (60%) and what you cut this year (40%) · 50+ = a good year"),
   yrMeter:T("เป้าปีนี้", "This year"),
+  // 2.1.6: the review window every 5 years (each year still scores and pays as before; the years in between are a line)
+  yr5Title:T("สรุปผลงาน 5 ปี", "5 years in review"),
+  yr5Good:T("5 ปีที่ผ่านมาไปได้ดี", "A good five years"),
+  yr5Bad:T("5 ปีที่ผ่านมายังไม่ถึงเป้า", "Five years below target"),
+  yr5Avg:T("คะแนนเฉลี่ย", "Average score"),
+  yr5Cut:T("ลดได้ใน 5 ปี", "Cut in 5 years"),
+  yr5RewardGood:T("รางวัลจากปีที่ดีรวม 5 ปี: งบประมาณเพิ่ม", "Rewards from the good years: more funding"),
+  yr5RewardBad:T("หลายปีไม่ถึงเป้า: ความเชื่อมั่นลดลง", "Several years below target: trust falls"),
+  yr5Next:T("ไปต่อ", "Continue"),
+  yr5How:T("ทุกปียังมีคะแนนของตัวเอง (50 ขึ้นไป = ปีที่ดี ได้งบเพิ่ม) หน้าสรุปนี้ขึ้นทุก 5 ปี", "Every year still has its own score (50+ = a good year with more funding). This review comes every 5 years."),
   // fast mode
   fastTag:T("โหมดเร็ว", "Fast mode"),
   // menu / training

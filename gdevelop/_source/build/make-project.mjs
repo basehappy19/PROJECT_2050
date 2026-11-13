@@ -249,7 +249,7 @@ const menuScene = scene("Menu", ["Backdrop", "", "MapUI", "Menu", "MenuScroll", 
   group("เปลี่ยนฉาก", goEvents(["Game", "Loading"])),
 ], commonVars);
 
-const gameScene = scene("Game", ["Backdrop", "", "MapUI", "HUD", "Drawer", "DrawerScroll", "Alerts", "Modal", "ModalScroll", "Toast", "Train"], [...mapObjects(), sprite("EventArt", EVSHEETS.map(f => anim(f.slice(0, -4), `events/${f}`))), sprite("NewsArt", NEWSART.map(f => anim(f.slice(0, -4), `endings/${f}`)))], [backdrop(), ...mapInstances()], [
+const gameScene = scene("Game", ["Backdrop", "", "MapUI", "HUD", "Alerts", "Drawer", "DrawerScroll", "Modal", "ModalScroll", "Toast", "Train"], [...mapObjects(), sprite("EventArt", EVSHEETS.map(f => anim(f.slice(0, -4), `events/${f}`))), sprite("NewsArt", NEWSART.map(f => anim(f.slice(0, -4), `endings/${f}`)))], [backdrop(), ...mapInstances()], [
   comment("ฉากเล่นเกม: 1 tick = 1 เดือนในเกม (ความเร็ว 1× = 4 วินาที, 2× = 2 วินาที, 3× = 1.33 วินาที) รวม 300 เดือน ม.ค. 2026 → ธ.ค. 2050\nตัวแปรฉาก Running = 1 เมื่อเวลาควรเดิน (ไม่ได้หยุด และไม่มีหน้าต่างตัดสินใจเปิดอยู่)"),
   std([atStart], [A("ResetTimer", ["", "\"tick\""])], [js("if (!window.P2050 || !window.P2050.ready) { runtimeScene.getVariables().get(\"GoTo\").setString(\"Loading\"); return; }\nwindow.P2050.Screens.setup(runtimeScene, \"game\");")]),
   frameJs,

@@ -284,9 +284,11 @@ H.voice = v => { UIM.voice = {...v, id:(UIM.voice ? UIM.voice.id : 0) + 1, at:0}
 H.loss = o => addLoss(o);
 H.hazardWarn = h => { Audio.play("data", {vol:.5, delay:.25}); addAlert(h); };
 H.yearly = rec => {
-  if (S.simple || S.mp){ addLoss({k:"year", y:rec.y, good:rec.g, ep:rec.ep, pc:rec.pc, appr:rec.appr}); return; }   // Fast mode and multiplayer: a line, not a window
-  if (UIM.modal === "story" || UIM.modal === "intro"){ UIM.yearQ = rec; return; }
-  G.showYear(rec);
+  // Fast mode, multiplayer and (2.1.6) the years between the 5-year reviews: a line, not a window
+  if (S.simple || S.mp || !P.isReviewYear(rec.y)){ addLoss({k:"year", y:rec.y, good:rec.g, ep:rec.ep, pc:rec.pc, appr:rec.appr}); return; }
+  const span = P.yearSpan(rec.y) || rec;
+  if (UIM.modal === "story" || UIM.modal === "intro"){ UIM.yearQ = span; return; }
+  G.showYear(span);
 };
 H.story = act => { if (UIM.modal === "skills") UIM.modal = null; G.showStory(act); };
 H.gameStart = () => {

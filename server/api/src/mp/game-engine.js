@@ -124,7 +124,7 @@ const CITIES = {
 const ACTIONS = [
   {id:"fund",  ep:40, pc:0,  cd:4, name:{th:"กองทุนพลังงานสะอาด",en:"Clean energy fund"}, desc:{th:"CO₂ ทวีป −0.35 Gt × ทำตามแผน",en:"Regional CO₂ −0.35 Gt × on-plan"}},
   {id:"diplo", ep:0,  pc:12, cd:4, name:{th:"การทูตภูมิอากาศ",en:"Climate diplomacy"}, desc:{th:"ทำตามแผน +8% (ค่อยๆ ลดลงสู่ค่าฐาน)",en:"On-plan +8% (drifts back to baseline)"}},
-  {id:"adapt", ep:35, pc:0,  cd:4, name:{th:"กองทุนปรับตัว",en:"Adaptation fund"}, desc:{th:"ความเปราะบาง −10%, ความนิยม +1%",en:"Vulnerability −10%, approval +1%"}},
+  {id:"adapt", ep:35, pc:0,  cd:4, name:{th:"กองทุนปรับตัว",en:"Adaptation fund"}, desc:{th:"ความเสี่ยงภัยพิบัติ −10%, ความนิยม +1%",en:"Disaster risk −10%, approval +1%"}},
   {id:"tariff",ep:30, pc:10, cd:4, name:{th:"บังคับภาษีคาร์บอนข้ามแดน",en:"Enforce carbon tariff"}, desc:{th:"CO₂ ทวีป −0.8 Gt × ทำตามแผน, ทำตามแผน −6%",en:"Regional CO₂ −0.8 Gt × on-plan, on-plan −6%"}},
 ];
 
@@ -2593,6 +2593,15 @@ P.CHANGELOG.find(x => x.v === "1.5").subs = [
   ]),
 ];
 P.CHANGELOG.find(x => x.v === "2.1").subs = [
+  SUB("2.1.6", "2026-11-13", [
+    "หน้าสรุปผลงานขึ้นทุก 5 ปี (2030, 2035, 2040, 2045) แทนทุกปี: คะแนนเฉลี่ย คะแนนแต่ละปี CO₂ ที่ลดได้ใน 5 ปี และรางวัลรวม ปีที่อยู่ระหว่างกลางยังได้คะแนนและรางวัลเหมือนเดิม แต่ขึ้นเป็นบรรทัดสั้น ๆ แทนหน้าต่าง",
+    "หน้าสกิลและแท็บประเทศอยู่บนสุด: การแจ้งเตือนไม่ขึ้นบังอีกแล้ว (บนจอคอมการแจ้งเตือนย้ายไปข้างแท็บ บนมือถือรอจนปิดแท็บ)",
+    "กองทุนปรับตัวใช้คำว่า \"ความเสี่ยงภัยพิบัติ\" แทน \"ความเปราะบาง\"",
+  ], [
+    "The review now comes every 5 years (2030, 2035, 2040, 2045) instead of every year: the average score, each year's score, the CO₂ cut over the 5 years and the total reward. The years in between still score and pay as before, as a short line instead of a window.",
+    "The skills page and the country tab stay on top: notifications no longer cover them (on a computer they move beside the tab; on a phone they wait until it is closed).",
+    "The adaptation fund says \"disaster risk\" instead of \"vulnerability\".",
+  ]),
   SUB("2.1.5", "2026-11-12", [
     "รถไฟบนแผนที่ขึ้นเมื่ออัปสกิล: ต้นเกมยังไม่มีรถไฟ ซื้อสกิลรถไฟความเร็วสูงแล้วรถไฟความเร็วสูง รถไฟหัวกระสุน รถไฟขนส่งสินค้า และรถไฟโดยสารจะขึ้นบนเส้นทางจริง จากนั้นเส้นทางใหม่ค่อย ๆ เปิดทีละสาย",
     "สกิลกฎหมายขนส่งไฟฟ้า 100% เปลี่ยนหัวรถจักรดีเซลที่มีควันเป็นรถไฟฟ้าทุกสาย",
@@ -5980,6 +5989,16 @@ P.UI2 = {
   yrNext:T("ปีถัดไป", "Next year"),
   yrHow:T("คะแนนมาจาก CO₂ สุทธิเทียบกับเป้าปีนี้ (60%) และสิ่งที่ลดได้ในปีนี้ (40%) · 50 ขึ้นไป = ปีที่ดี", "The score comes from net CO₂ against this year's target (60%) and what you cut this year (40%) · 50+ = a good year"),
   yrMeter:T("เป้าปีนี้", "This year"),
+  // 2.1.6: the review window every 5 years (each year still scores and pays as before; the years in between are a line)
+  yr5Title:T("สรุปผลงาน 5 ปี", "5 years in review"),
+  yr5Good:T("5 ปีที่ผ่านมาไปได้ดี", "A good five years"),
+  yr5Bad:T("5 ปีที่ผ่านมายังไม่ถึงเป้า", "Five years below target"),
+  yr5Avg:T("คะแนนเฉลี่ย", "Average score"),
+  yr5Cut:T("ลดได้ใน 5 ปี", "Cut in 5 years"),
+  yr5RewardGood:T("รางวัลจากปีที่ดีรวม 5 ปี: งบประมาณเพิ่ม", "Rewards from the good years: more funding"),
+  yr5RewardBad:T("หลายปีไม่ถึงเป้า: ความเชื่อมั่นลดลง", "Several years below target: trust falls"),
+  yr5Next:T("ไปต่อ", "Continue"),
+  yr5How:T("ทุกปียังมีคะแนนของตัวเอง (50 ขึ้นไป = ปีที่ดี ได้งบเพิ่ม) หน้าสรุปนี้ขึ้นทุก 5 ปี", "Every year still has its own score (50+ = a good year with more funding). This review comes every 5 years."),
   // fast mode
   fastTag:T("โหมดเร็ว", "Fast mode"),
   // menu / training
@@ -6202,7 +6221,16 @@ const goodYears = () => (S.years || []).filter(x => x.g).length;
 /* the story for a year and its ending */
 P.yearStory = rec => { const s = P.YEAR_STORY[rec.y] || P.YEAR_STORY[2050]; return rec.g ? s.good : s.bad; };
 P.ending2 = () => { const list = P.END2[S.over] || P.END2.l3; return list[P.endTier(goodYears())]; };
-Object.assign(P, {yearTarget, yearScore, goodYears, YEAR_RULES:YR});
+/* 2.1.6: the review window comes every 5 years (2030, 2035 …) and sums up the years since the last one */
+const yearSpan = (y, n = 5) => {
+  const list = (S.years || []).filter(x => x.y > y - n && x.y <= y && !x.last).sort((a, b) => a.y - b.y);
+  if (!list.length) return null;
+  const last = list[list.length - 1], ng = list.filter(x => x.g).length, sum = k => list.reduce((a, x) => a + (x[k] || 0), 0);
+  return {y:last.y, y0:list[0].y, span:list.length, ng, g:ng * 2 >= list.length ? 1 : 0, s:Math.round(sum("s") / list.length),
+    net:last.net, tgt:last.tgt, cut:+sum("cut").toFixed(2), ep:sum("ep"), pc:sum("pc"), appr:+sum("appr").toFixed(2), list};
+};
+const isReviewYear = y => y % 5 === 0;
+Object.assign(P, {yearTarget, yearScore, goodYears, yearSpan, isReviewYear, YEAR_RULES:YR});
 
 const _tick = P.tick;
 P.tick = () => { _tick(); if (S.regions && S.started && !S.over) yearTick(); };

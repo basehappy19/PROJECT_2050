@@ -63,7 +63,7 @@ function RegionButtons(){
 const StatGrid = ({stats}) => <div class="statgrid">{stats.map(([a, b, col], i) => <div key={i} class="stat"><span><Rich t={a}/></span><b class={col || ""}>{b}</b></div>)}</div>;
 /* ---------- 3.2 (design C): friendship ring, one line per order with its effects as chips ---------- */
 const FX_IC = [[/มิตรภาพ|friendship/i, "$heart"], [/CO₂/, "$co2"], [/ปรับตัว|adaptation|เสียหาย|damage/i, "shield"], [/ทรัพยากร|mineral/i, "gem"],
-  [/ทำตามแผน|on-plan/i, "clipboard-check"], [/ความนิยม|approval/i, "$appr"], [/เปราะบาง|vulnerab/i, "shield"], [/คว่ำบาตร|sanction/i, "ban"]];
+  [/ทำตามแผน|on-plan/i, "clipboard-check"], [/ความนิยม|approval/i, "$appr"], [/ความเสี่ยงภัย|เปราะบาง|disaster risk|vulnerab/i, "$risk"], [/คว่ำบาตร|sanction/i, "ban"]];
 /* the order's own description, cut into short effect chips (so they always match the game data) */
 function fxChips(desc){
   const txt = plain(desc).replace(/\s*\([^)]*\)/g, "")

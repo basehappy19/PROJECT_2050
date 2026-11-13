@@ -30,6 +30,7 @@ function Ring({v, good}){
 }
 export function YearModal(){
   const r = UIM.yearRec; if (!r) return null;
+  if (r.span) return <Year5 r={r}/>;
   const st = P.yearStory(r), T2 = P.UI2, good = !!r.g, who = st.who, news = who === "news";
   const npc = P.NPC[who], name = news ? "THE WORLD TIMES" : npc ? L(npc.name) : who === "adv" ? L(P.ADVISOR.name) : "";
   const col = news ? COL.fg : npc ? npc.color : COL.purple;
@@ -65,6 +66,50 @@ export function YearModal(){
         <Btn onClick={() => G.closeYear()} sound={null}>{`${L(T2.yrNext)} [[chevron-right]]`}</Btn>
       </div>
       <p class="muted tiny yhow">{L(T2.yrHow)}</p>
+    </section>
+  </div>;
+}
+
+/* 2.1.6: the 5-year review: the average score, one tile per year (score, good or bad), CO₂ against the target, what the 5 years cut and paid */
+function Year5({r}){
+  const st = P.yearStory(r), T2 = P.UI2, good = !!r.g, who = st.who, news = who === "news";
+  const npc = P.NPC[who], name = news ? "THE WORLD TIMES" : npc ? L(npc.name) : who === "adv" ? L(P.ADVISOR.name) : "";
+  const col = news ? COL.fg : npc ? npc.color : COL.purple;
+  const ng = (S.years || []).filter(x => x.g).length;
+  return <div class="veil year-veil" onClick={e => { if (e.target === e.currentTarget && performance.now() - (UIM.yearAt || 0) > 700) G.closeYear(); }}>
+    <section class={"modal year y5 " + (good ? "good" : "bad")} role="dialog" aria-modal="true">
+      <div class="yhead">
+        <div>
+          <div class={"tag " + (good ? "good" : "bad")}><Rich t={up(`[[calendar-check]] ${L(T2.yr5Title)} ${r.y0}–${r.y}`)} iconColor="inherit"/></div>
+          <h2>{good ? L(T2.yr5Good) : L(T2.yr5Bad)}</h2>
+          <div class="ynums">
+            <span><small><Rich t={t("co2")}/></small><b class="mono">{r.net.toFixed(1)} Gt</b></span>
+            <span><small>{L(T2.yrTarget)}</small><b class="mono">≤ {r.tgt.toFixed(1)} Gt</b></span>
+            <span><small>{L(T2.yr5Cut)}</small><b class={"mono " + (r.cut > 0 ? "good" : "bad")}>{r.cut > 0 ? "−" : "+"}{Math.abs(r.cut).toFixed(1)} Gt</b></span>
+          </div>
+        </div>
+        <div class="y5ring"><Ring v={r.s} good={good}/><small>{L(T2.yr5Avg)}</small></div>
+      </div>
+      <div class="y5years">{r.list.map((x, i) => <div key={x.y} class={"y5y " + (x.g ? "g" : "b")} style={{animationDelay:`${.15 + i * .08}s`}}>
+        <small>{x.y}</small><b class="mono">{x.s}</b><Icon n={x.g ? "trending-up" : "trending-down"} size={14}/>
+      </div>)}</div>
+      <div class={"ystory " + (news ? "news" : "")} style={{"--sc":col}}>
+        {news ? <span class="ynews"><Icon n="newspaper" size={34}/></span> : <Portrait id={who} size={74} ring={col}/>}
+        <div><b style={{color:col}}>{name}</b><p>“{L(st)}”</p></div>
+      </div>
+      <div class={"yreward " + (good ? "good" : "bad")}>
+        <Icon n={good ? "hand-coins" : "shield-alert"} size={20}/>
+        <span>{good ? L(T2.yr5RewardGood) : L(T2.yr5RewardBad)}</span>
+        <span class="grow"/>
+        {r.ep ? <b class="mono good"><Rich t={`${P.IC.ep} +${r.ep}`} iconColor="inherit"/></b> : null}
+        {r.pc ? <b class="mono good"><Rich t={`${P.IC.pc} +${r.pc}`} iconColor="inherit"/></b> : null}
+        {r.appr ? <b class={"mono " + (r.appr > 0 ? "good" : "bad")}><Rich t={`${P.IC.appr} ${r.appr > 0 ? "+" : "−"}${Math.abs(r.appr).toFixed(1)}%`} iconColor="inherit"/></b> : null}
+      </div>
+      <div class="yfoot">
+        <div class="grow"><small class="muted">{L(T2.yrGoodYears)} <b class="good mono">{ng}</b> / {(S.years || []).length}</small><YearStrip cur={r.y}/></div>
+        <Btn onClick={() => G.closeYear()} sound={null}>{`${L(T2.yr5Next)} [[chevron-right]]`}</Btn>
+      </div>
+      <p class="muted tiny yhow">{L(T2.yr5How)}</p>
     </section>
   </div>;
 }

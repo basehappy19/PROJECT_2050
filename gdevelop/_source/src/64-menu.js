@@ -661,7 +661,10 @@ Screens.toastUpdate = function(dt){
 };
 Screens.renderToast = function(l){
   const a = UIM.toast; if (!a) return;
-  const w = 340, end = UIM.kind() === "end", x = end ? 16 : (k.W - 16) - w, h = 78, y = end ? 16 : this.kind === "game" ? k.H - 130 - h - 8 : k.H - 16 - h;
+  const kind = UIM.kind(); if (kind && kind !== "end") return;   // web 2.1.6: a window (the skills page …) stays on top; the toast never covers it
+  // web 2.1.6: with the country tab open, the toast sits left of it instead of on top of it
+  const dw = this.kind === "game" && S.tab && this.drawerWidth ? this.drawerWidth() + 16 : 0;
+  const w = 340, end = kind === "end", x = end ? 16 : (k.W - 16) - dw - w, h = 78, y = end ? 16 : this.kind === "game" ? k.H - 130 - h - 8 : k.H - 16 - h;
   k.rect(l, x, y, w, h, "panel", {r:12, stroke:"warn", sa:.6, bg:true});
   k.hgrad(l, x + 12, y + 13, 52, 52, [[0, "#f2b441"], [1, "#e0612f"]], {r:10});
   k.icon(l, a.icon, x + 25, y + 26, 26, "#2b1300");

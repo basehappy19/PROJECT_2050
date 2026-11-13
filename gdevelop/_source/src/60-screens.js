@@ -342,7 +342,7 @@ Object.assign(Screens, {
     this.scene = scene; this.kind = kind; UIM.screen = kind === "loading" ? "menu" : kind;
     const layers = kind === "loading" ? ["Loader", "Toast"]
       : kind === "menu" ? ["MapUI", "Menu", "MenuScroll", "Modal", "ModalScroll", "Toast", "Train"]
-      : ["MapUI", "HUD", "Drawer", "DrawerScroll", "Alerts", "Modal", "ModalScroll", "Toast", "Train"];
+      : ["MapUI", "HUD", "Alerts", "Drawer", "DrawerScroll", "Modal", "ModalScroll", "Toast", "Train"];   // web 2.1.6: the country tab (Drawer) sits above the warnings and the loss lines
     k.setup(scene, layers);
     const set = (n, fn, master) => { const l = k.L(n); if (!l) return; if (fn) l.render = fn; if (master) l.master = master; };
     set("Loader", l => this.renderLoader(l));
