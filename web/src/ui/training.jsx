@@ -17,6 +17,12 @@ const BKK = [13.75, 100.5];
 const hitRect = pre => { const h = GameMap.hits.find(q => q.id.startsWith(pre)); return h ? {x:h.x - 6, y:h.y - 6, w:h.w + 12, h:h.h + 12} : null; };   // hit boxes are screen pixels (3.2: the overlay is flat)
 const ownedHaz = () => (S.haz || [])[0];
 const st = () => UIM.train;
+/* 2.1.8: give the player everything a skill needs (money, policy, minerals) so a training step can never get stuck
+   (E1 needs copper since 2.1.3, and the training game starts with none) */
+const enoughFor = id => { const n = P.SKILL[id]; if (!n) return; const c = P.nodeCost(n);
+  S.ep = Math.max(S.ep, c.ep + 40); S.pc = Math.max(S.pc, c.pc + 10);
+  if (S.oreOn && P.oreCost) S.ore = Math.max(S.ore || 0, P.oreCost(n));
+  const k = P.matCost ? P.matCost(n) : null; if (k){ S.mat = S.mat || {}; for (const g in k) S.mat[g] = Math.max(S.mat[g] || 0, k[g]); } };
 
 /* ---------------- the steps ----------------
    text · target() → a rectangle to light up · hold: the clock stays stopped · setup(): runs once when the step starts
@@ -36,7 +42,7 @@ export const STEPS = [
    text:T("ฟองสีเขียว = เงินฟรี! แตะฟองเพื่อเก็บ · เก็บได้เฉพาะตอนเวลาเดินอยู่", "Green bubble = free money! Tap it to collect · bubbles can only be collected while time is running.")},
   {id:"skills", hold:1, target:() => rectOf($("[data-tab=tech]")), setup:() => { P.setSpeed(0); S.ep = Math.max(S.ep, 260); S.pc = Math.max(S.pc, 60); }, done:() => UIM.modal === "skills",
    text:T("สกิลคือวิธีลด CO₂ ระยะยาว · เปิดหน้าสกิล", "Skills are how you cut CO₂ for good · open the skill tree.")},
-  {id:"buy", hold:1, target:() => rectOf($(".sk-detail .btn-lg")), setup:() => { S.skillCat = "energy"; S.node = "E1"; bump(); }, done:() => !!S.owned.E1,
+  {id:"buy", hold:1, target:() => rectOf($(".sk-detail .btn-lg")), setup:() => { S.skillCat = "energy"; S.node = "E1"; enoughFor("E1"); bump(); }, done:() => !!S.owned.E1,
    text:() => ({th:`นี่คือสกิลแรก "${P.SKILL.E1.name.th}" ดูผลและราคาแล้วกด "อนุมัติ"`, en:`This is your first skill, "${P.SKILL.E1.name.en}". Check what it does and what it costs, then press "Approve".`})},
   {id:"skclose", hold:1, target:() => rectOf($(".skclose")), done:() => UIM.modal !== "skills",
    text:T("สกิลจะค่อย ๆ ได้ผลจนเต็มที่ภายในไม่กี่เดือน · ทำพร้อมกันได้ 3 โครงการ · ปิดหน้าสกิล", "A skill grows to full effect over a few months · 3 projects can run at once · close the skill tree.")},
@@ -104,6 +110,7 @@ export function Training({onFinish, onQuit}){
     if (tr.i === 0 && !tr.at) Train.enter(0);
     const id = setInterval(() => {
       const t = st(); if (!t) return; const cur = STEPS[t.i];
+      if (cur && cur.id === "buy" && !S.owned.E1 && !P.canAfford(P.SKILL.E1)) enoughFor("E1");
       if (cur && !cur.final && performance.now() - t.at > 500){
         if (skippable(cur)) Train.next();
         else if (cur.done && cur.done()) Train.next();
