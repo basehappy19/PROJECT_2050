@@ -79,7 +79,7 @@ export function Skills(){
       <nav class="sk-cats">{P.SKILL_CATS.map(c => {
         const list = P.SKILLS.filter(n => n.cat === c.id), own = list.filter(n => S.owned[n.id]).length;
         const ready = list.filter(n => !S.owned[n.id] && visible(n) && P.canAfford(n)).length;
-        return <button type="button" key={c.id} class={cat === c.id ? "on" : ""} onPointerEnter={() => Audio.hover()} onClick={() => {
+        return <button type="button" key={c.id} data-cat={c.id} class={cat === c.id ? "on" : ""} onPointerEnter={() => Audio.hover()} onClick={() => {
           Audio.play("tab"); S.skillCat = c.id;
           const first = P.SKILLS.find(n => n.cat === c.id && !S.owned[n.id] && visible(n)) || P.SKILLS.find(n => n.cat === c.id); S.node = first.id; bump();
         }}>

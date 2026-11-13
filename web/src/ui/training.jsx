@@ -17,6 +17,8 @@ const BKK = [13.75, 100.5];
 const hitRect = pre => { const h = GameMap.hits.find(q => q.id.startsWith(pre)); return h ? {x:h.x - 6, y:h.y - 6, w:h.w + 12, h:h.h + 12} : null; };   // hit boxes are screen pixels (3.2: the overlay is flat)
 const ownedHaz = () => (S.haz || [])[0];
 const st = () => UIM.train;
+/* where the player is during the "buy" step: off the skill page, in another category, on another skill, or at the button */
+const buyWhere = () => UIM.modal !== "skills" ? "page" : (S.skillCat || "energy") !== "energy" ? "cat" : S.node !== "E1" ? "node" : "btn";
 /* 2.1.8: give the player everything a skill needs (money, policy, minerals) so a training step can never get stuck
    (E1 needs copper since 2.1.3, and the training game starts with none) */
 const enoughFor = id => { const n = P.SKILL[id]; if (!n) return; const c = P.nodeCost(n);
@@ -42,8 +44,15 @@ export const STEPS = [
    text:T("ฟองสีเขียว = เงินฟรี! แตะฟองเพื่อเก็บ · เก็บได้เฉพาะตอนเวลาเดินอยู่", "Green bubble = free money! Tap it to collect · bubbles can only be collected while time is running.")},
   {id:"skills", hold:1, target:() => rectOf($("[data-tab=tech]")), setup:() => { P.setSpeed(0); S.ep = Math.max(S.ep, 260); S.pc = Math.max(S.pc, 60); }, done:() => UIM.modal === "skills",
    text:T("สกิลคือวิธีลด CO₂ ระยะยาว · เปิดหน้าสกิล", "Skills are how you cut CO₂ for good · open the skill tree.")},
-  {id:"buy", hold:1, target:() => rectOf($(".sk-detail .btn-lg")), setup:() => { S.skillCat = "energy"; S.node = "E1"; enoughFor("E1"); bump(); }, done:() => !!S.owned.E1,
-   text:() => ({th:`นี่คือสกิลแรก "${P.SKILL.E1.name.th}" ดูผลและราคาแล้วกด "อนุมัติ"`, en:`This is your first skill, "${P.SKILL.E1.name.en}". Check what it does and what it costs, then press "Approve".`})},
+  /* 2.1.8: if the player wanders off (closes the page, opens another category, picks another skill), light up the way back */
+  {id:"buy", hold:1, target:() => { const w = buyWhere();
+     return w === "page" ? rectOf($("[data-tab=tech]")) : w === "cat" ? rectOf($(".sk-cats [data-cat=energy]")) : w === "node" ? rectOf($(".sk-grid [data-node=E1]")) : rectOf($(".sk-detail .btn-lg")); },
+   setup:() => { S.skillCat = "energy"; S.node = "E1"; enoughFor("E1"); bump(); }, done:() => !!S.owned.E1,
+   text:() => { const w = buyWhere(), nm = P.SKILL.E1.name;
+     return w === "page" ? T("หน้าสกิลปิดไปแล้ว · กดปุ่มสกิลเพื่อเปิดอีกครั้ง", "The skill tree is closed · press Skills to open it again")
+       : w === "cat" ? (c => ({th:`ตอนนี้อยู่หมวดอื่น · กดหมวด "${c.th}" ด้านล่างก่อน`, en:`You're in another category · press "${c.en}" at the bottom first`}))(P.SKILL_CATS.find(q => q.id === "energy").name)
+       : w === "node" ? {th:`ยังไม่ใช่สกิลนี้ · แตะช่อง "${nm.th}" ที่มีกรอบสว่าง`, en:`Not that one yet · tap the lit-up "${nm.en}" hexagon`}
+       : {th:`นี่คือสกิลแรก "${nm.th}" ดูผลและราคาแล้วกด "ปลดล็อก" ตรงนี้`, en:`This is your first skill, "${nm.en}". Check what it does and what it costs, then press "Unlock" here.`}; }},
   {id:"skclose", hold:1, target:() => rectOf($(".skclose")), done:() => UIM.modal !== "skills",
    text:T("สกิลจะค่อย ๆ ได้ผลจนเต็มที่ภายในไม่กี่เดือน · ทำพร้อมกันได้ 3 โครงการ · ปิดหน้าสกิล", "A skill grows to full effect over a few months · 3 projects can run at once · close the skill tree.")},
   {id:"hazard", target:() => hitRect("hz-") || rectOf($(".hzalert")),
